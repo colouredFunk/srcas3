@@ -1,0 +1,108 @@
+﻿package ui{
+	import flash.display.*;
+	import flash.events.*;
+	import flash.utils.*;
+	import flash.net.*;
+	import flash.system.*;
+	import flash.geom.*;
+	
+	//import ui.FreeTran;
+	
+	public class ImageCut extends Sprite{
+		//private var freeTran:FreeTran;
+		//private var rectClip:Sprite;
+		//private var frameClip:Sprite;
+		//private var maskClip:Sprite;
+		//private var intactClip:Sprite;
+		//private var thumbnailClip:Sprite;
+		
+		private var intactBmp:Bitmap;
+		private var thumbnailBmp:Bitmap;
+		private var bmpThumbnail:BitmapData;
+		private var bmpIntact:BitmapData;
+		
+		public function ImageCut(){
+			init();
+		}
+		private function init():void{
+			thumbnailBmp=new Bitmap();
+			thumbnailClip.addChild(thumbnailBmp);
+			intactBmp=new Bitmap();
+			intactClip.addChild(intactBmp);
+			intactClip.addEventListener(MouseEvent.MOUSE_DOWN,click);
+			intactClip.buttonMode=true;
+			rectClip.visible=false;
+			rectClip.addEventListener(MouseEvent.MOUSE_DOWN,click);
+			rectClip.buttonMode=true;
+			freeTran.pic=rectClip;
+			freeTran.visible=false;
+		}
+		public function getBitmapData():BitmapData{
+			return bmpThumbnail;
+		}
+		public function setIntact(_bmpIntact:BitmapData):void {
+			if(bmpIntact){
+				bmpIntact.dispose();
+			}
+			bmpIntact=_bmpIntact;
+			intactBmp.bitmapData=bmpIntact;
+			intactBmp.smoothing=true;
+			rectClip.visible=true;
+			freeTran.visible=true;
+			reset();
+			freeTran.moving=function():void{
+				enterFrame();
+			}
+		}
+		public function reset():void{
+			if(!bmpIntact){
+				return;
+			}
+			intactClip.rotation=0;
+			if (intactClip.width/intactClip.height>frameClip.width/frameClip.height) {
+				intactClip.width=frameClip.width;
+				intactClip.scaleY=intactClip.scaleX;
+				intactClip.x=frameClip.x;
+				intactClip.y=frameClip.y+(frameClip.height-intactClip.height)*0.5;
+			} else {
+				intactClip.height=frameClip.height;
+				intactClip.scaleX=intactClip.scaleY;
+				intactClip.x=frameClip.x+(frameClip.width-intactClip.width)*0.5;
+				intactClip.y=frameClip.y;
+			}
+			rectClip.x=int(frameClip.x+frameClip.width*0.5);
+			rectClip.y=int(frameClip.y+frameClip.height*0.5);
+			rectClip.rotation=0;
+			rectClip.scaleX=rectClip.scaleY=1;
+			freeTran.pic=null;
+			freeTran.pic=rectClip;
+			enterFrame();
+		}
+		private function click(evt:MouseEvent):void {
+			freeTran.setPicByMouse(evt.currentTarget as DisplayObject);
+		}
+		private function getContainBmd(_obj:*,_bg:*):BitmapData {
+			var _rect:Rectangle=_obj.getBounds(_obj);
+			var _bmd:BitmapData=new BitmapData(_rect.width,_rect.height,true,0x00000000);
+			var _m:Matrix=_bg.transform.concatenatedMatrix;
+			var _objM:Matrix=new Matrix(1,0,0,1,-_rect.x,-_rect.y);
+			_bmd.draw(_obj,_objM);
+			_objM.tx*=-1;
+			_objM.ty*=-1;
+			var _m2:Matrix=_obj.transform.concatenatedMatrix;
+			_objM.concat(_m2);
+			_objM.invert();
+			_m.concat(_objM);
+			_bmd.draw(_bg,_m);
+			return _bmd;
+		}
+		private function enterFrame():void {
+			if (bmpThumbnail) {
+				bmpThumbnail.dispose();
+			}
+			bmpThumbnail=getContainBmd(rectClip,intactClip)
+			thumbnailBmp.bitmapData=bmpThumbnail;
+			intactBmp.smoothing=true;
+		}
+	}
+}
