@@ -13,14 +13,14 @@
 		public var scene:Scene3D;
 		public var camera:Camera3D;
 		public var pause:Boolean;
-		public function init(vpWidth:Number=550,vpHeight:Number=400):void {
-			initPaperVision(vpWidth,vpHeight);
+		public function init(vpWidth:Number=550,vpHeight:Number=400,_interactive:Boolean=false):void {
+			initPaperVision(vpWidth,vpHeight,_interactive);
 			init2d();
 			init3d();
 			initEvents();
 		}
-		protected function initPaperVision(vpWidth:Number,vpHeight:Number):void {
-			viewport=new Viewport3D(vpWidth,vpHeight);
+		protected function initPaperVision(vpWidth:Number,vpHeight:Number,_interactive:Boolean=false):void {
+			viewport=new Viewport3D(vpWidth,vpHeight,false,_interactive);
 			addChild(viewport);
 			renderer=new BasicRenderEngine  ;
 			scene=new Scene3D  ;
@@ -40,6 +40,9 @@
 				return;
 			}
 			processFrame();
+			render();
+		}
+		public function render():void{
 			renderer.renderScene(scene,camera,viewport);
 		}
 	}
