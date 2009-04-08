@@ -1,10 +1,14 @@
 ﻿package {
 	import flash.events.*;
 	import flash.display.*;
-	import flash.net.*;
+	import flash.net.URLRequest;
+	import flash.net.URLLoader;
+	import flash.net.LocalConnection;
+	import flash.net.navigateToURL;
 	import flash.utils.*;
 	import flash.geom.ColorTransform;
 	import flash.filters.ColorMatrixFilter;
+	import flash.system.Capabilities;
 
 	public class Common {
 		public static var a2r:Number=180/Math.PI;
@@ -117,6 +121,9 @@
 				_tar.mouseEnabled=_tar.mouseChildren=false;
 			}
 		}
+		public static function playerVersion():int{
+			return int(flash.system.Capabilities.version.split(",")[0].split(" ")[1]);
+		}
 		public static function hasPara(_xmlList:XMLList,_key:String,_value:*):XML {
 			if (_xmlList.length()>0) {
 				var _xmlListTemp:XMLList=_xmlList.attribute(_key).contains(_value);
@@ -126,6 +133,12 @@
 				return null;
 			}
 			return null;
+		}
+		public static function gc():void{
+			try{
+				new LocalConnection().connect("gc");
+				new LocalConnection().connect("gc");
+			}catch(error : Error){}
 		}
 		//为监听器传递参数
 		public static function EventUp(f:Function,... arg):Function {

@@ -1,10 +1,13 @@
 ﻿package {
+	import flash.display.Sprite;
 	import flash.display.MovieClip;
 	//import flash.display.Stage;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.display.StageDisplayState;
-
+	
+	import flash.events.Event;
+	import flash.events.ProgressEvent;
 	import flash.events.FullScreenEvent;
 
 	public class DocClass extends MovieClip {
@@ -24,6 +27,28 @@
 			stage.align=StageScaleMode.NO_SCALE;
 			stage.showDefaultContextMenu=false;
 			//this.addEventListener(FullScreenEvent.FULL_SCREEN,$onFullScreen);
+			loaderInfo.addEventListener(ProgressEvent.PROGRESS,loading);
+			loaderInfo.addEventListener(Event.COMPLETE,loaded);
+			stop();
+			onLoaded=function():void{
+				if(this.currentFrame==1){
+					play();
+				}
+			}
+		}
+		public var onLoading:Function;
+		protected function loading(evt:ProgressEvent):void{
+			if(onLoading!=null){
+				onLoading(evt.bytesLoaded/evt.bytesTotal);
+			}
+		}
+		public var onLoaded:Function;
+		protected function loaded(evt:Event):void{
+			loaderInfo.removeEventListener(ProgressEvent.PROGRESS,loading);
+			loaderInfo.removeEventListener(Event.COMPLETE,loaded);
+			if(onLoaded!=null){
+				onLoaded();
+			}
 		}
 		public function get WIDTH():int{
 			return __WIDTH;
