@@ -15,10 +15,10 @@
 		protected var __WIDTH:int;
 		protected var __HEIGHT:int;
 		public function DocClass() {
-			super();
 			init();
 		}
 		protected function init():void {
+			stop();
 			single=this;
 			__WIDTH=stage.stageWidth;
 			__HEIGHT=stage.stageHeight;
@@ -27,9 +27,9 @@
 			stage.align=StageScaleMode.NO_SCALE;
 			stage.showDefaultContextMenu=false;
 			//this.addEventListener(FullScreenEvent.FULL_SCREEN,$onFullScreen);
-			loaderInfo.addEventListener(ProgressEvent.PROGRESS,loading);
-			loaderInfo.addEventListener(Event.COMPLETE,loaded);
-			stop();
+			//this.loaderInfo.addEventListener(ProgressEvent.PROGRESS,loading);
+			//this.loaderInfo.addEventListener(Event.COMPLETE,loaded);
+			this.addEventListener(Event.ENTER_FRAME,loading);
 			onLoaded=function():void{
 				if(this.currentFrame==1){
 					play();
@@ -37,9 +37,14 @@
 			}
 		}
 		public var onLoading:Function;
-		protected function loading(evt:ProgressEvent):void{
+		protected function loading(evt:*):void{
+			var _nT:Number=loaderInfo.bytesLoaded/loaderInfo.bytesTotal;
 			if(onLoading!=null){
-				onLoading(evt.bytesLoaded/evt.bytesTotal);
+				onLoading(_nT);
+			}
+			if(_nT==1&&onLoaded!=null){
+				this.removeEventListener(Event.ENTER_FRAME,loading);
+				onLoaded();
 			}
 		}
 		public var onLoaded:Function;

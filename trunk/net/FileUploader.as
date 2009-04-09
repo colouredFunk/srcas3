@@ -21,7 +21,7 @@
 		public var onUploadFailed:Function;
 		public var onLoad:Function;
 		public var onLoadComplete:Function;
-		public var openFailed:Function;
+		public var onFailed:Function;
 
 		public function FileUploader() {
 			init();
@@ -45,21 +45,22 @@
 			onLoad=null;
 			onLoadComplete=null;
 			onUploading=null;
-			openFailed=null;
+			onFailed=null;
 		}
 		public function browse():void {
 			try {
 				file.browse([new FileFilter(fileInfos,"*."+fileTypes.replace(/\,/g,";*."))]);
 			} catch (e) {
-				if(openFailed!=null){
-					openFailed("error!");
+				if(onFailed!=null){
+					onFailed("打开"+fileInfos+"失败!");
 				}
 			}
 		}
 		private function selectFile(event:Event):void {
 			if (file.size>maxSize*1024) {
-				if(openFailed!=null){
-				openFailed(fileInfos+"大小不要超过"+maxSize+"k!");}
+				if(onFailed!=null){
+					onFailed(fileInfos+"大小不要超过"+maxSize+"k!");
+				}
 				isSet=false;
 				return;
 			}
@@ -74,8 +75,8 @@
 		}
 		private function upload():void {
 			if(!isSet){
-				if(openFailed!=null){
-					openFailed("选择要打开的"+fileInfos+"!");
+				if(onFailed!=null){
+					onFailed("选择要打开的"+fileInfos+"!");
 				}
 				return;
 			}
@@ -88,7 +89,9 @@
 					onUpload();
 				}
 			} else {
-				
+				if(onFailed!=null){
+					onFailed("没有上传地址!");
+				}
 			}
 		}
 		private function uploadProgress(event:ProgressEvent):void {
@@ -106,6 +109,9 @@
 				if (onUploadFailed!=null) {
 					onUploadFailed();
 				}
+				if(onFailed!=null){
+					onFailed("上传失败，页面程序原因!");
+				}
 				return;
 			}
 			if (onUploadComplete!=null) {
@@ -118,6 +124,9 @@
 			file.removeEventListener(IOErrorEvent.IO_ERROR,uploadError);
 			if (onUploadFailed!=null) {
 				onUploadFailed();
+			}
+			if(onFailed!=null){
+				onFailed("上传失败!");
 			}
 		}
 	}
