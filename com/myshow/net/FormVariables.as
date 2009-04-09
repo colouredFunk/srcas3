@@ -1,4 +1,4 @@
-package com.myshow.net	{
+﻿package com.myshow.net	{
 	import flash.utils.ByteArray;
 	
 	public class FormVariables {
@@ -69,6 +69,9 @@ package com.myshow.net	{
 		}
 		
 		public function add(name:String, value:*):void {
+			if(!value){
+				return;
+			}
 			if (typeof value == "string" || value is ByteArray)
 				this.variables[name] = value;
 			else

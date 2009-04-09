@@ -12,7 +12,6 @@
 		//private var freeTran:FreeTran;
 		//private var rectClip:Sprite;
 		//private var frameClip:Sprite;
-		//private var maskClip:Sprite;
 		//private var intactClip:Sprite;
 		//private var thumbnailClip:Sprite;
 		
@@ -25,10 +24,19 @@
 			init();
 		}
 		private function init():void{
+			x=Math.round(x);
+			y=Math.round(y);
 			thumbnailBmp=new Bitmap();
 			thumbnailClip.addChild(thumbnailBmp);
+			thumbnailClip.x=Math.round(thumbnailClip.x);
+			thumbnailClip.y=Math.round(thumbnailClip.y);
 			intactBmp=new Bitmap();
 			intactClip.addChild(intactBmp);
+			intactClip.x=Math.round(intactClip.x);
+			intactClip.y=Math.round(intactClip.y);
+			intactClip.width=Math.round(intactClip.width);
+			intactClip.height=Math.round(intactClip.height);
+			
 			intactClip.addEventListener(MouseEvent.MOUSE_DOWN,click);
 			intactClip.buttonMode=true;
 			rectClip.visible=false;
@@ -74,6 +82,7 @@
 			rectClip.y=int(frameClip.y+frameClip.height*0.5);
 			rectClip.rotation=0;
 			rectClip.scaleX=rectClip.scaleY=1;
+			rectClip.frameClip.visible=false;
 			freeTran.pic=null;
 			freeTran.pic=rectClip;
 			enterFrame();
@@ -86,7 +95,9 @@
 			var _bmd:BitmapData=new BitmapData(_rect.width,_rect.height,true,0x00000000);
 			var _m:Matrix=_bg.transform.concatenatedMatrix;
 			var _objM:Matrix=new Matrix(1,0,0,1,-_rect.x,-_rect.y);
+			_obj.frameClip.visible=true;
 			_bmd.draw(_obj,_objM);
+			_obj.frameClip.visible=false;
 			_objM.tx*=-1;
 			_objM.ty*=-1;
 			var _m2:Matrix=_obj.transform.concatenatedMatrix;
