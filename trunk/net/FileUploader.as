@@ -107,7 +107,7 @@
 			trace("上传完毕:"+str);
 			if (str=="Failed!") {
 				if (onUploadFailed!=null) {
-					onUploadFailed();
+					onUploadFailed("上传失败，页面程序原因!");
 				}
 				if(onFailed!=null){
 					onFailed("上传失败，页面程序原因!");
@@ -123,7 +123,7 @@
 			file.removeEventListener(DataEvent.UPLOAD_COMPLETE_DATA,uploadComplete);
 			file.removeEventListener(IOErrorEvent.IO_ERROR,uploadError);
 			if (onUploadFailed!=null) {
-				onUploadFailed();
+				onUploadFailed("上传失败!");
 			}
 			if(onFailed!=null){
 				onFailed("上传失败!");

@@ -44,6 +44,7 @@
 			rectClip.buttonMode=true;
 			freeTran.pic=rectClip;
 			freeTran.visible=false;
+			freeTran.dragRect=new Rectangle(frameClip.x,frameClip.y,frameClip.width,frameClip.height);
 		}
 		public function getBitmapData():BitmapData{
 			return bmpThumbnail;
