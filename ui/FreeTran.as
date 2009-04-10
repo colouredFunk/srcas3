@@ -132,6 +132,8 @@ package ui{
 				}
 			}
 		}
+		private var rtMouseX:int;
+		private var rtMouseY:int;
 		private function mouseMove(event:MouseEvent):void{
 			userMouse.x=this.mouseX;
 			userMouse.y=this.mouseY;
@@ -205,7 +207,8 @@ package ui{
 			}else{
 				return;
 			}
-			
+			rtMouseX=root.mouseX;
+			rtMouseY=root.mouseY;
 			updateDotsByDragArea();
 			if(tweenMode==TWEEN_MODE_NORMAL){
 				setTransform(pic,dragArea);
@@ -292,9 +295,10 @@ package ui{
 		private function rollOverDragArea(event:MouseEvent):void{
 			showUserMouse("drag");
 		}
+		public var dragRect:Rectangle;
 		private function pressDragArea(event:MouseEvent):void{
 			isMoving=true;
-			this.startDrag();
+			this.startDrag(false,dragRect);
 		}
 		
 		private function showUserMouse(label:String="blank"):void{
@@ -324,15 +328,13 @@ package ui{
 			isRotating=false;
 			isSkewing=false;
 			
-			
 			userMouse.x+=-1000000;//因为下面的hitTest不希望碰到userMouse
-			if(dragArea.hitTestPoint(root.mouseX,root.mouseY,true)){
+			if(dragArea.hitTestPoint(rtMouseX,rtMouseY,true)){
 				showUserMouse("drag");
-			}else if(!this.hitTestPoint(root.mouseX,root.mouseY,true)){
+			}else if(!this.hitTestPoint(rtMouseX,rtMouseY,true)){
 				showUserMouse();
 			}
 			userMouse.x+=1000000;
-			
 			switch(tweenMode){
 				case TWEEN_MODE_TWEEN:
 					this.removeEventListener(Event.ENTER_FRAME,enterFrame);
@@ -340,10 +342,10 @@ package ui{
 			
 					currM=getM(pic,dragArea);
 				break;
-				case TWEEN_MODE_NO:
+				default:
 					setTransform(pic,dragArea);
-				break;
 			}
+			moving(2);
 		}
 		private function enterFrame(event:Event):void{
 			var m:Matrix=pic.transform.matrix;
