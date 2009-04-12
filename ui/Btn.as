@@ -1,5 +1,6 @@
 ﻿package ui{
 	import flash.display.*;
+	import flash.text.TextField;
 	import flash.events.*;
 	public class Btn extends MovieClip {
 		protected var __isIn:Boolean=false;
