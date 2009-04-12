@@ -134,12 +134,6 @@
 			}
 			return null;
 		}
-		public static function gc():void{
-			try{
-				new LocalConnection().connect("gc");
-				new LocalConnection().connect("gc");
-			}catch(error : Error){}
-		}
 		//为监听器传递参数
 		public static function EventUp(f:Function,... arg):Function {
 			return function(e:Event):void{f.apply(null,[e].concat(arg))};
