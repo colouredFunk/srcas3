@@ -61,17 +61,17 @@ package ui{
 			}
 			currObj=this.parent.getChildByName(_scrollTargetName);
 			if (currObj) {
-				if(currObj.height<rect.height){
-					setEnabled(false);
-					return;
-				}
 				var b:Rectangle=currObj.getBounds(this.parent);
 				//b.height+=10;//底部留10个像素的空白
 				objYMin=int(this.y+currObj.y-b.y);
 				objMoveDy=rect.height-b.height;
 				currObj.mask=rect;
 				updateCurrObj(null);
-				setEnabled(true);
+				if(currObj.height<rect.height){
+					setEnabled(false);
+				}else{
+					setEnabled(true);
+				}
 			} else {
 				setEnabled(false);
 			}
@@ -124,7 +124,6 @@ package ui{
 				}
 			}
 			currObj.y=objYMin+int(objMoveDy*(btn.y-dragRect.y)/dragRect.height);
-			trace(currObj.y+"___"+objYMin);
 		}
 	}
 }
