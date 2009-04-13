@@ -57,7 +57,7 @@ package ui{
 		[Inspectable(defaultValue="")];
 		public function set scrollTargetName(_scrollTargetName:String):void {
 			if (currObj) {
-				currObj.y=objYMin;
+				//currObj.y=objYMin;
 			}
 			currObj=this.parent.getChildByName(_scrollTargetName);
 			if (currObj) {
@@ -124,6 +124,7 @@ package ui{
 				}
 			}
 			currObj.y=objYMin+int(objMoveDy*(btn.y-dragRect.y)/dragRect.height);
+			trace(currObj.y+"___"+objYMin);
 		}
 	}
 }

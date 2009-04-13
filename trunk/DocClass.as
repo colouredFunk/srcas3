@@ -24,7 +24,7 @@
 			__HEIGHT=stage.stageHeight;
 			__flashVars=stage.loaderInfo.parameters;
 			stage.align=StageAlign.TOP;
-			stage.align=StageScaleMode.NO_SCALE;
+			stage.scaleMode=StageScaleMode.NO_SCALE;
 			stage.showDefaultContextMenu=false;
 			//this.addEventListener(FullScreenEvent.FULL_SCREEN,$onFullScreen);
 			//this.loaderInfo.addEventListener(ProgressEvent.PROGRESS,loading);
@@ -37,11 +37,13 @@
 			}
 		}
 		public var onLoading:Function;
+		protected var loadedPst:Number;//0~1
 		protected function loading(evt:*):void{
 			var _nT:Number=loaderInfo.bytesLoaded/loaderInfo.bytesTotal;
 			if(onLoading!=null){
 				onLoading(_nT);
 			}
+			loadedPst=_nT;
 			if(_nT==1&&onLoaded!=null){
 				this.removeEventListener(Event.ENTER_FRAME,loading);
 				onLoaded();
