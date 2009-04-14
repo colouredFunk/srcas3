@@ -139,7 +139,7 @@
 			return function(e:Event):void{f.apply(null,[e].concat(arg))};
 		}
 		//_funLoaded(event:Event):void {event.currentTarget.content as Bitmap;event.currentTarget.loader as Loader};
-		public static function loader(_obj:*,_funLoaded:Function=null,_funLoading:Function=null):Loader {
+		public static function loader(_obj:*,_funLoaded:Function=null,_funLoading:Function=null,_funError:Function=null):Loader {
 			var _loader:Loader=new Loader  ;
 			if (_funLoaded!=null) {
 				if (_funLoading!=null) {
@@ -157,6 +157,17 @@
 				};
 				_loader.contentLoaderInfo.addEventListener(Event.COMPLETE,_tempLoaded);
 			}
+			if(_funError!=null){
+				var _tempError:Function=function(event:IOErrorEvent):void{
+					_funError(event);
+					if(_funLoading!=null){
+						_loader.contentLoaderInfo.removeEventListener(ProgressEvent.PROGRESS,_funLoading);
+					}
+					_loader.contentLoaderInfo.removeEventListener(Event.COMPLETE,_tempLoaded);
+					_loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,_tempError);
+				};
+				_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,_tempError);
+			}
 			if (_obj is ByteArray) {
 				_loader.loadBytes(_obj);
 			} else {
@@ -165,7 +176,7 @@
 			return _loader;
 		}
 		//_funLoaded(event:Event):void {event.currentTarget.data}
-		public static function urlLoader(_url:String,_funLoaded:Function=null,_funLoading:Function=null):URLLoader {
+		public static function urlLoader(_url:String,_funLoaded:Function=null,_funLoading:Function=null,_funError:Function=null):URLLoader {
 			var _loader:URLLoader=new URLLoader  ;
 			//_loader.dataFormat=URLLoaderDataFormat.BINARY;
 			if (_funLoaded!=null) {
@@ -183,6 +194,17 @@
 					_loader.removeEventListener(Event.COMPLETE,_tempLoaded);
 				};
 				_loader.addEventListener(Event.COMPLETE,_tempLoaded);
+			}
+			if(_funError!=null){
+				var _tempError:Function=function(event:IOErrorEvent):void{
+					_funError(event);
+					if(_funLoading!=null){
+						_loader.removeEventListener(ProgressEvent.PROGRESS,_funLoading);
+					}
+					_loader.removeEventListener(Event.COMPLETE,_tempLoaded);
+					_loader.removeEventListener(IOErrorEvent.IO_ERROR,_tempError);
+				};
+				_loader.addEventListener(IOErrorEvent.IO_ERROR,_tempError);
 			}
 			_loader.load(new URLRequest(_url));
 			return _loader;

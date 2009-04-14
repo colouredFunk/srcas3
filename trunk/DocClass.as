@@ -37,13 +37,13 @@
 			}
 		}
 		public var onLoading:Function;
-		protected var loadedPst:Number;//0~1
+		protected var loadedPct:Number;//0~1
 		protected function loading(evt:*):void{
 			var _nT:Number=loaderInfo.bytesLoaded/loaderInfo.bytesTotal;
 			if(onLoading!=null){
 				onLoading(_nT);
 			}
-			loadedPst=_nT;
+			loadedPct=_nT;
 			if(_nT==1&&onLoaded!=null){
 				this.removeEventListener(Event.ENTER_FRAME,loading);
 				onLoaded();
