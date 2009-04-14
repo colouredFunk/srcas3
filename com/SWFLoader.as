@@ -1,7 +1,7 @@
 ﻿/*
  * SWF加载
  */
-package {
+package com{
 	import flash.display.Loader;
 	import flash.display.LoaderInfo;
 	import flash.events.Event;
@@ -16,25 +16,25 @@ package {
 	 * SWF加载器
 	 */
 	public class SWFLoader extends EventDispatcher {
-		private var m_loadinfo:LoaderInfo;
+		private var __loadinfo:LoaderInfo;
 
 		public function get loadinfo():LoaderInfo {
-			return m_loadinfo;
+			return __loadinfo;
 		}
 		public function SWFLoader() {
 		}
 		/**
 		 加载SWF
 		 */
-		public function load(url:String):void {
-			var loader:Loader         = new Loader();
-			var context:LoaderContext = new LoaderContext();
+		public function load(_url:String):void {
+			var _loader:Loader         = new Loader();
+			var _context:LoaderContext = new LoaderContext();
 
 			/** 加载到子域 */
-			context.applicationDomain = new ApplicationDomain(ApplicationDomain.currentDomain);
+			_context.applicationDomain = new ApplicationDomain(ApplicationDomain.currentDomain);
 
-			initLoadEvent(loader.contentLoaderInfo);
-			loader.load(new URLRequest(url),context);
+			initLoadEvent(_loader.contentLoaderInfo);
+			_loader.load(new URLRequest(_url),_context);
 		}
 		/**
 		 * 获取当前ApplicationDomain内的类定义
@@ -43,12 +43,12 @@ package {
 		 * info加载swf的LoadInfo，不指定则从当前域获取
 		 * return获取的类定义，如果不存在返回null
 		 */
-		public function getClass(name:String, info:LoaderInfo = null):Class {
+		public function getClass(_name:String, _info:LoaderInfo = null):Class {
 			try {
-				if (info == null) {
-					return ApplicationDomain.currentDomain.getDefinition(name)  as  Class;
+				if (_info == null) {
+					return ApplicationDomain.currentDomain.getDefinition(_name)  as  Class;
 				}
-				return info.applicationDomain.getDefinition(name)  as  Class;
+				return _info.applicationDomain.getDefinition(_name)  as  Class;
 			} catch (e:ReferenceError) {
 				//trace("定义 " + name + " 不存在");
 				return null;
@@ -61,11 +61,11 @@ package {
 		 * 
 		 * @param info加载对象的LoaderInfo
 		 */
-		private function initLoadEvent(info : LoaderInfo):void {
-			info.addEventListener(ProgressEvent.PROGRESS, this.onProgress);
-			info.addEventListener(Event.COMPLETE, this.onComplete);
-			info.addEventListener(IOErrorEvent.IO_ERROR, this.onError);
-			info.addEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onError);
+		private function initLoadEvent(_info : LoaderInfo):void {
+			_info.addEventListener(ProgressEvent.PROGRESS, this.onProgress);
+			_info.addEventListener(Event.COMPLETE, this.onComplete);
+			_info.addEventListener(IOErrorEvent.IO_ERROR, this.onError);
+			_info.addEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onError);
 		}
 		/**
 		 * @private
@@ -73,23 +73,26 @@ package {
 		 * 
 		 * @param inft加载对象的LoaderInfo
 		 */
-		private function removeLoadEvent(info:LoaderInfo):void {
-			info.removeEventListener(Event.COMPLETE,onComplete);
-			info.removeEventListener(ProgressEvent.PROGRESS,onProgress);
-			info.removeEventListener(IOErrorEvent.IO_ERROR,onError);
-			info.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,onError);
+		private function removeLoadEvent(_info:LoaderInfo):void {
+			_info.removeEventListener(Event.COMPLETE,onComplete);
+			_info.removeEventListener(ProgressEvent.PROGRESS,onProgress);
+			_info.removeEventListener(IOErrorEvent.IO_ERROR,onError);
+			_info.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,onError);
 		}
 		/** 加载事件 */
 		private function onComplete(e:Event):void {
-			var info:LoaderInfo = e.currentTarget as LoaderInfo;
-			removeLoadEvent(info);
-			m_loadinfo = info;
+			var _info:LoaderInfo = e.currentTarget as LoaderInfo;
+			removeLoadEvent(_info);
+			__loadinfo = _info;
 			this.dispatchEvent(e);
 		}
 		/** 加载中 */
-		public var loadedPst:Number=0;
+		private var __loadedPct:Number=0;
+		public function get loadedPct():Number{
+			return __loadedPct;
+		}
 		private function onProgress(e:ProgressEvent):void {
-			loadedPst=e.bytesLoaded/e.bytesTotal;
+			__loadedPct=e.bytesLoaded/e.bytesTotal;
 			this.dispatchEvent(e);
 		}
 		/** 出错事件 */

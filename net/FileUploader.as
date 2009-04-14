@@ -107,10 +107,18 @@
 			trace("上传完毕:"+str);
 			if (str=="Failed!") {
 				if (onUploadFailed!=null) {
-					onUploadFailed("上传失败，页面程序原因!");
+					onUploadFailed("上传失败，页面程序异常!");
 				}
 				if(onFailed!=null){
-					onFailed("上传失败，页面程序原因!");
+					onFailed("上传失败，页面程序异常!");
+				}
+				return;
+			}else if(str=="Refused!"){
+				if (onUploadFailed!=null) {
+					onUploadFailed("拒绝上传!");
+				}
+				if(onFailed!=null){
+					onFailed("拒绝上传!");
 				}
 				return;
 			}
@@ -123,10 +131,10 @@
 			file.removeEventListener(DataEvent.UPLOAD_COMPLETE_DATA,uploadComplete);
 			file.removeEventListener(IOErrorEvent.IO_ERROR,uploadError);
 			if (onUploadFailed!=null) {
-				onUploadFailed("上传失败!");
+				onUploadFailed("上传失败，页面未响应!");
 			}
 			if(onFailed!=null){
-				onFailed("上传失败!");
+				onFailed("上传失败，页面未响应!");
 			}
 		}
 	}
