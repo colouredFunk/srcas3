@@ -121,6 +121,40 @@
 				_tar.mouseEnabled=_tar.mouseChildren=false;
 			}
 		}
+		public static function encodeStr(_str:String,_type:String="gbk"):String{
+			var _byte:ByteArray =new ByteArray();
+			_byte.writeMultiByte(_str,_type);
+			return String(_byte);
+		}
+		//
+		public static function urlencodeGB2312(str:String):String{
+			var result:String ="";
+			var byte:ByteArray =new ByteArray();
+			byte.writeMultiByte(str,"gb2312");
+			for(var i:int;i<byte.length;i++){
+				result += escape(String.fromCharCode(byte));
+			}
+			return result;
+		}
+		public static function urlencodeBIG5(str:String):String{
+			var result:String ="";
+			var byte:ByteArray =new ByteArray();
+			byte.writeMultiByte(str,"big5");
+			for(var i:int;i<byte.length;i++){
+				result += escape(String.fromCharCode(byte));
+			}
+			return result;
+		}
+		public static function urlencodeGBK(str:String):String{
+			var result:String ="";
+			var byte:ByteArray =new ByteArray();
+			byte.writeMultiByte(str,"gbk");
+			for(var i:int;i<byte.length;i++){
+				result += escape(String.fromCharCode(byte));
+			}
+			return result;
+		}
+		//
 		public static function playerVersion():int{
 			return int(flash.system.Capabilities.version.split(",")[0].split(" ")[1]);
 		}
