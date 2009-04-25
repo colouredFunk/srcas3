@@ -11,7 +11,6 @@
 	import flash.events.FullScreenEvent;
 
 	public class DocClass extends MovieClip {
-		public static var single:DocClass;
 		protected var __WIDTH:int;
 		protected var __HEIGHT:int;
 		public function DocClass() {
@@ -19,7 +18,6 @@
 		}
 		protected function init():void {
 			stop();
-			single=this;
 			__WIDTH=stage.stageWidth;
 			__HEIGHT=stage.stageHeight;
 			__flashVars=stage.loaderInfo.parameters;
