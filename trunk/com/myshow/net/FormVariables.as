@@ -29,7 +29,7 @@
 					result.writeUTFBytes("--" + this.boundary + "\r\n");
 					if (this.variables[name] is ByteArray) {
 						filename = createRandomKey(8);
-						result.writeUTFBytes("Content-Disposition: form-data; name=\"" + name + "\"; filename=\"\\" + filename + ".tmp\"\r\n");
+						result.writeUTFBytes("Content-Disposition: form-data; name=\"" + name + "\"; filename=\"\\" + filename + ".jpg\"\r\n");
 						result.writeUTFBytes("Content-Type: application/octet-stream\r\n\r\n");
 						result.writeBytes(this.variables[name]);
 					} else {
@@ -42,7 +42,29 @@
 			}
 			return result;
 		}
-		
+		public function get dataGBK():ByteArray {
+			var result:ByteArray = new ByteArray();
+			var filename:String;
+			
+			if (this.length > 0) {
+				for (var name:String in this.variables) {
+					result.writeUTFBytes("--" + this.boundary + "\r\n");
+					if (this.variables[name] is ByteArray) {
+						filename = createRandomKey(8);
+						result.writeMultiByte("Content-Disposition: form-data; name=\"" + name + "\"; filename=\"\\" + filename + ".jpg\"\r\n", 'gbk');
+						result.writeUTFBytes("Content-Type: application/octet-stream\r\n\r\n");
+						result.writeMultiByte(this.variables[name],'gbk');
+					} else {
+						result.writeMultiByte("Content-Disposition: form-data; name=\"" + name + "\"\r\n\r\n",'gbk');
+						result.writeMultiByte(this.variables[name],'gbk');
+					}
+					result.writeUTFBytes("\r\n");
+				}
+				result.writeUTFBytes("--" + this.boundary + "--\r\n");
+			}
+			trace(result);
+			return result;
+		}
 		public function FormVariables(variables:Object = null) {
 			if (variables)
 				this.variables = variables;

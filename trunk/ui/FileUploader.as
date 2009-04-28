@@ -10,6 +10,7 @@
 		public var fileTypes:String="jpg,jpeg,gif,png,bmp";
 		public var fileInfos:String="图片";
 		public var fileName:String;
+		public var urlRequest:URLRequest;
 		public var url:String;
 
 		private var file:FileReference;
@@ -86,11 +87,11 @@
 				}
 				return;
 			}
-			if (url) {
+			if (url||urlRequest) {
 				file.addEventListener(ProgressEvent.PROGRESS,uploadProgress);
 				file.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,uploadComplete);
 				file.addEventListener(IOErrorEvent.IO_ERROR,uploadError);
-				file.upload(new URLRequest(url),fileName);
+				file.upload(urlRequest||new URLRequest(url),fileName);
 				uploadBar.visible=true;
 				if (onUpload!=null) {
 					onUpload();
