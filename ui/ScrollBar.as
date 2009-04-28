@@ -28,8 +28,7 @@ package ui{
 
 		public function ScrollBar() {
 			this.addEventListener(Event.ADDED_TO_STAGE,added);
-			dragRect=new Rectangle(0,btnUp.y+btn.height*0.5,0,btnDown.y-btnUp.y-btn.height);
-			setEnabled(false);
+			setStyle();
 		}
 		private function added(event:Event):void {
 			this.removeEventListener(Event.ADDED_TO_STAGE,added);
@@ -87,6 +86,12 @@ package ui{
 			dir=0;
 			scrollTargetName=currObj.name;
 		}
+		public function setStyle() : void
+        {
+            dragRect = new Rectangle(0, btnUp.y + btn.height * 0.5, 0, btnDown.y - btnUp.y - btn.height);
+            setEnabled(false);
+            return;
+        }
 		private function goUp():void {
 			dir=-1;
 			this.addEventListener(Event.ENTER_FRAME,updateCurrObj);

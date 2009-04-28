@@ -5,6 +5,7 @@
 	import flash.net.URLLoader;
 	import flash.net.LocalConnection;
 	import flash.net.navigateToURL;
+	import flash.net.URLStream;
 	import flash.utils.*;
 	import flash.geom.ColorTransform;
 	import flash.filters.ColorMatrixFilter;
@@ -121,8 +122,12 @@
 				_tar.mouseEnabled=_tar.mouseChildren=false;
 			}
 		}
-		public static function encodeStr(_str:String,_type:String="gbk"):String{
-			var _byte:ByteArray =new ByteArray();
+		public static function isValidEmail(_email:String):Boolean {
+			var _emailExpression:RegExp=/^[a-z][\w.-]+@\w[\w.-]+\.[\w.-]*[a-z][a-z]$/i;
+			return _emailExpression.test(_email);
+		}
+		public static function encodeStr(_str:String,_type:String="GBK"):String{
+			var _byte:ByteArray = new ByteArray();
 			_byte.writeMultiByte(_str,_type);
 			return String(_byte);
 		}
@@ -242,6 +247,39 @@
 			}
 			_loader.load(new URLRequest(_url));
 			return _loader;
+		}//_funLoaded(event:Event):void {event.currentTarget.data}
+		public static function urlStream(_url:String,_funLoaded:Function=null,_funLoading:Function=null,_funError:Function=null):URLStream {
+			var _stream:URLStream=new URLStream  ;
+			//_loader.dataFormat=URLLoaderDataFormat.BINARY;
+			if (_funLoaded!=null) {
+				if (_funLoading!=null) {
+					//var _tempLoading:Function=function(event:Event):void{
+						//_funLoading(event);
+					//};
+					_stream.addEventListener(ProgressEvent.PROGRESS,_funLoading);
+				}
+				var _tempLoaded:Function=function(event:Event):void{
+					_funLoaded(event);
+					if(_funLoading!=null){
+						_stream.removeEventListener(ProgressEvent.PROGRESS,_funLoading);
+					}
+					_stream.removeEventListener(Event.COMPLETE,_tempLoaded);
+				};
+				_stream.addEventListener(Event.COMPLETE,_tempLoaded);
+			}
+			if(_funError!=null){
+				var _tempError:Function=function(event:IOErrorEvent):void{
+					_funError(event);
+					if(_funLoading!=null){
+						_stream.removeEventListener(ProgressEvent.PROGRESS,_funLoading);
+					}
+					_stream.removeEventListener(Event.COMPLETE,_tempLoaded);
+					_stream.removeEventListener(IOErrorEvent.IO_ERROR,_tempError);
+				};
+				_stream.addEventListener(IOErrorEvent.IO_ERROR,_tempError);
+			}
+			_stream.load(new URLRequest(_url));
+			return _stream;
 		}
 		public static function getURL(_url:String,_openType:String):void {
 			navigateToURL(new URLRequest(_url),_openType);

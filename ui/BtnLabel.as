@@ -41,8 +41,9 @@
 		public function set label(_label:String):void {
 			if (__label!=_label) {
 				__label=_label;
-				txt.text=__label;
 				reset();
+				txt.text=__label;
+				resetBar();
 			}
 		}
 		[Inspectable(enumeration="left,right,center",defaultValue="left",type="String",name="对齐")]
