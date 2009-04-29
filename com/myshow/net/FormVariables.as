@@ -53,7 +53,7 @@
 						filename = createRandomKey(8);
 						result.writeMultiByte("Content-Disposition: form-data; name=\"" + name + "\"; filename=\"\\" + filename + ".jpg\"\r\n", 'gbk');
 						result.writeUTFBytes("Content-Type: application/octet-stream\r\n\r\n");
-						result.writeMultiByte(this.variables[name],'gbk');
+						result.writeBytes(this.variables[name]);
 					} else {
 						result.writeMultiByte("Content-Disposition: form-data; name=\"" + name + "\"\r\n\r\n",'gbk');
 						result.writeMultiByte(this.variables[name],'gbk');
