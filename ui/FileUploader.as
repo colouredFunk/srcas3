@@ -16,6 +16,7 @@
 		private var file:FileReference;
 		private var isSet:Boolean;
 		public var maxSize:int=10000;
+		public var maxSizeShow:int=10000;
 
 		public var onUpload:Function;
 		public var onUploadComplete:Function;
@@ -67,7 +68,7 @@
 		private function selectFile(event:Event):void {
 			if (file.size>maxSize*1024) {
 				if(openFailed!=null){
-				openFailed(fileInfos+"大小不要超过"+maxSize+"k!");}
+				openFailed(fileInfos+"大小不要超过"+maxSizeShow+"K!");}
 				isSet=false;
 				return;
 			}
