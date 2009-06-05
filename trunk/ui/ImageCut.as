@@ -5,25 +5,25 @@
 	import flash.net.*;
 	import flash.system.*;
 	import flash.geom.*;
-	
+
 	//import ui.FreeTran;
-	
-	public class ImageCut extends Sprite{
+
+	public class ImageCut extends Sprite {
 		//private var freeTran:FreeTran;
 		//private var rectClip:Sprite;
 		//private var frameClip:Sprite;
 		//private var intactClip:Sprite;
 		//private var thumbnailClip:Sprite;
-		
+
 		private var intactBmp:Bitmap;
 		private var thumbnailBmp:Bitmap;
 		private var bmpThumbnail:BitmapData;
 		private var bmpIntact:BitmapData;
-		
-		public function ImageCut(){
+
+		public function ImageCut() {
 			init();
 		}
-		private function init():void{
+		private function init():void {
 			x=Math.round(x);
 			y=Math.round(y);
 			thumbnailBmp=new Bitmap();
@@ -36,7 +36,7 @@
 			intactClip.y=Math.round(intactClip.y);
 			intactClip.width=Math.round(intactClip.width);
 			intactClip.height=Math.round(intactClip.height);
-			
+
 			intactClip.addEventListener(MouseEvent.MOUSE_DOWN,click);
 			intactClip.buttonMode=true;
 			rectClip.visible=false;
@@ -46,11 +46,11 @@
 			freeTran.visible=false;
 			freeTran.dragRect=new Rectangle(frameClip.x,frameClip.y,frameClip.width,frameClip.height);
 		}
-		public function getBitmapData():BitmapData{
+		public function getBitmapData():BitmapData {
 			return bmpThumbnail;
 		}
 		public function setIntact(_bmpIntact:BitmapData):void {
-			if(bmpIntact){
+			if (bmpIntact) {
 				bmpIntact.dispose();
 			}
 			bmpIntact=_bmpIntact;
@@ -59,12 +59,13 @@
 			rectClip.visible=true;
 			freeTran.visible=true;
 			reset();
+			reset();
 			freeTran.moving=function():void{
-				enterFrame();
-			}
+			enterFrame();
+			};
 		}
-		public function reset():void{
-			if(!bmpIntact){
+		public function reset():void {
+			if (! bmpIntact) {
 				return;
 			}
 			intactClip.rotation=0;
@@ -95,7 +96,7 @@
 			var _rect:Rectangle=_obj.getBounds(_obj);
 			var _bmd:BitmapData=new BitmapData(_rect.width,_rect.height,true,0x00000000);
 			var _m:Matrix=_bg.transform.concatenatedMatrix;
-			var _objM:Matrix=new Matrix(1,0,0,1,-_rect.x,-_rect.y);
+			var _objM:Matrix=new Matrix(1,0,0,1,- _rect.x,- _rect.y);
 			_obj.frameClip.visible=true;
 			_bmd.draw(_obj,_objM);
 			_obj.frameClip.visible=false;
@@ -112,7 +113,7 @@
 			if (bmpThumbnail) {
 				bmpThumbnail.dispose();
 			}
-			bmpThumbnail=getContainBmd(rectClip,intactClip)
+			bmpThumbnail=getContainBmd(rectClip,intactClip);
 			thumbnailBmp.bitmapData=bmpThumbnail;
 			intactBmp.smoothing=true;
 		}
