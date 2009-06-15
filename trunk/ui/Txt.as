@@ -20,6 +20,8 @@
 		protected var txtName:String="__txt";
 		protected var bar:Sprite;
 		protected var barName:String="__bar";
+		public var html:Boolean;
+		public var onChange:Function;
 		public function Txt() {
 			init();
 		}
@@ -27,7 +29,11 @@
 			bar=getChildByName(barName) as Sprite;
 			txt=getChildByName(txtName) as TextField;
 			txt.mouseWheelEnabled=false;
-			txt.text=__text;
+			if (html) {
+				txt.htmlText=__text;
+			} else {
+				txt.text=__text;
+			}
 			txt.multiline=false;
 			txt.wordWrap=false;
 			if (bar) {
@@ -44,7 +50,11 @@
 		[Inspectable(defaultValue="Txt",type="String",name="文本")]
 		public function set text(_text):void {
 			if (__text!=_text) {
-				txt.text=__text=_text;
+				if (html) {
+					txt.htmlText=__text=_text;
+				} else {
+					txt.text=__text=_text;
+				}
 				//txt.text=__text=_text.toUpperCase();//如果要全部大写
 				reset();
 			}
@@ -85,7 +95,7 @@
 				txt.x=0;
 			} else if (txt.autoSize == "right") {
 				txt.x=- int(txt.width);
-			} else if (txt.autoSize == "center"){
+			} else if (txt.autoSize == "center") {
 				txt.x=- int(txt.width*0.5);
 			}
 			if (bar) {
@@ -95,11 +105,14 @@
 					bar.x=- widthAdd*0.5;
 				} else if (txt.autoSize == "right") {
 					bar.x=- int(bar.width)+widthAdd*0.5;
-				} else if (txt.autoSize == "center"){
+				} else if (txt.autoSize == "center") {
 					bar.x=- int(bar.width*0.5);
 				}
 				bar.x+=xOff;
 				bar.y=yOff;
+			}
+			if (onChange!=null) {
+				onChange();
 			}
 		}
 	}

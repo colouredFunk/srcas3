@@ -5,7 +5,7 @@
 	public class Btn extends MovieClip {
 		protected var __isIn:Boolean=false;
 		protected var __isDown:Boolean=false;
-		protected var isSelect:Boolean=false;
+		public var isSelect:Boolean=false;
 		public var aniClip:MovieClip;
 		protected var aniClipName:String="__aniClip";
 		//protected var mArea:Sprite;

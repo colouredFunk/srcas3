@@ -61,7 +61,7 @@
 			reset();
 			reset();
 			freeTran.moving=function():void{
-			enterFrame();
+				enterFrame();
 			};
 		}
 		public function reset():void {
