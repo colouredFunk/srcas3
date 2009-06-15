@@ -1,33 +1,21 @@
 ﻿/***
-FreeTran 版本:v1.2
-简要说明:仿照flash ide里的变形工具制作的.
+FreeTran 版本:v1.0
+简要说明:这家伙很懒什么都没写
 创建时间:2009年2月4日 09:09:29
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚;最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-历次修改:
-	2009年3月23日 10:57:37
-		http://space.flash8.net/bbs/viewthread.php?tid=373892&extra=page%3D1
-		修正5楼的 Poshidon 朋友说的:
-		有bug...按住横向缩放，放大缩小放大缩小...结果纵向的比例因子向0靠拢.....反之亦然.....
-		版本号改为v1.1
-	2009年4月8日 18:10:20
-		修正 晓雨听飏  朋友说的:
-		我经常找不到旋转按钮。
-		版本号改为v1.2
-		
-用法举例:
-	使用方法很简单,主要有三种:
-	1.直接在参数面板里设置 变形对象 值
-	2.设置 picName 值, 例如 freeTran.picName="mc"
-	3.设置 pic 值, 例如 freeTran.pic=mc
-
+历次修改:未有修改
+用法举例:这家伙很懒什么都没写
 */
 package ui{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
-	import flash.ui.*;
 	import flash.geom.*;
+	
+	import flash.ui.*;
+	
 	public class FreeTran extends Sprite{
+		
 		public static const TWEEN_MODE_NORMAL:String="正常";
 		public static const TWEEN_MODE_NO:String="没有";
 		public static const TWEEN_MODE_TWEEN:String="缓动";
@@ -131,28 +119,24 @@ package ui{
 		}
 		private function setDot1sByCurrDot(x:Number,y:Number):void{
 			var dot:FreeTranDot;
-			var i:int;
 			if(currDot.xId){
 				var dx:Number=(x-currDot.x)*currDot.xId;
-				i=0;
 				for each(dot in dot1Arr){
-					dot2Arr[i].x=dot.x+=dx*dot.xId;
-					i++;
+					dot.x+=dx*dot.xId;
 				}
 			}
 			if(currDot.yId){
 				var dy:Number=(y-currDot.y)*currDot.yId;
-				i=0;
 				for each(dot in dot1Arr){
-					dot2Arr[i].y=dot.y+=dy*dot.yId;
-					i++;
+					dot.y+=dy*dot.yId;
 				}
 			}
 		}
+		private var rtMouseX:int;
+		private var rtMouseY:int;
 		private function mouseMove(event:MouseEvent):void{
 			userMouse.x=this.mouseX;
 			userMouse.y=this.mouseY;
-			
 			if(currDot){
 				var dot:FreeTranDot,dot1:FreeTranDot1,dot2:FreeTranDot2;
 				var dx:Number,dy:Number;
@@ -205,7 +189,6 @@ package ui{
 					}
 						
 				}
-				
 				var sMat:Matrix=new Matrix();
 				sMat.a = (dot121.x-dot111.x)/dragArea.body.width;
 				sMat.b = (dot121.y-dot111.y)/dragArea.body.width;
@@ -213,21 +196,25 @@ package ui{
 				sMat.d = (dot112.y-dot111.y)/dragArea.body.height;
 				dragArea.transform.matrix=sMat;
 				var rect:Rectangle=dragArea.body.getBounds(this);
-				dragArea.x-=rect.x+rect.width/2;
-				dragArea.y-=rect.y+rect.height/2;
-				
+				dragArea.x-=rect.x+rect.width*0.5;
+				dragArea.y-=rect.y+rect.height*0.5;
+				moving(0);
 			}else if(isRotating){
+				moving(1);
 				this.rotation+=(Math.atan2(this.mouseY,this.mouseX)-currRota)*(180/Math.PI);
 			}else if(isMoving||isSkewing){
+				moving(2);
 			}else{
 				return;
 			}
-			
+			rtMouseX=root.mouseX;
+			rtMouseY=root.mouseY;
+			updateDotsByDragArea();
 			if(tweenMode==TWEEN_MODE_NORMAL){
 				setTransform(pic,dragArea);
 			}
 		}
-		
+		public var moving:Function;
 		private function getDpByDotAndMouse(dot:FreeTranDot,dot0:FreeTranDot,dot1:FreeTranDot):Point{
 			//把dot的位置调整到Mouse在直线dot0-dot1的投影上
 			var x0:Number=dot0.x;
@@ -308,9 +295,10 @@ package ui{
 		private function rollOverDragArea(event:MouseEvent):void{
 			showUserMouse("drag");
 		}
+		public var dragRect:Rectangle;
 		private function pressDragArea(event:MouseEvent):void{
 			isMoving=true;
-			this.startDrag();
+			this.startDrag(false,dragRect);
 		}
 		
 		private function showUserMouse(label:String="blank"):void{
@@ -326,7 +314,7 @@ package ui{
 		}
 		
 		public function rollOutArea(event:Event):void{
-			showUserMouse();
+			showUserMouse(isMoving?"drag":"blank");
 		}
 		private function mouseUp(event:MouseEvent):void{
 			if(!(isMoving||currDot||isRotating||isSkewing)){
@@ -340,15 +328,13 @@ package ui{
 			isRotating=false;
 			isSkewing=false;
 			
-			
 			userMouse.x+=-1000000;//因为下面的hitTest不希望碰到userMouse
-			if(dragArea.hitTestPoint(root.mouseX,root.mouseY,true)){
+			if(dragArea.hitTestPoint(rtMouseX,rtMouseY,true)){
 				showUserMouse("drag");
-			}else if(!this.hitTestPoint(root.mouseX,root.mouseY,true)){
+			}else if(!this.hitTestPoint(rtMouseX,rtMouseY,true)){
 				showUserMouse();
 			}
 			userMouse.x+=1000000;
-			
 			switch(tweenMode){
 				case TWEEN_MODE_TWEEN:
 					this.removeEventListener(Event.ENTER_FRAME,enterFrame);
@@ -356,10 +342,10 @@ package ui{
 			
 					currM=getM(pic,dragArea);
 				break;
-				case TWEEN_MODE_NO:
+				default:
 					setTransform(pic,dragArea);
-				break;
 			}
+			moving(2);
 		}
 		private function enterFrame(event:Event):void{
 			var m:Matrix=pic.transform.matrix;
@@ -383,18 +369,18 @@ package ui{
 			}
 		}
 		
-		public function dragPic(_pic:DisplayObject):void{
-			pic=_pic;
-			pressDragArea(null);
-		}
-		
 		private var __pic:DisplayObject;
 		public function get pic():DisplayObject{
 			return __pic;
 		}
 		public function set pic(_pic:DisplayObject):void{
+			if(_pic&&_pic==__pic)return;
 			__pic=_pic;
 			if(__pic){
+				var _depthOff:int;
+				_depthOff=parent.getChildIndex(this)>parent.getChildIndex(__pic)?1:0;
+				
+				parent.setChildIndex(this,parent.getChildIndex(__pic)+_depthOff);
 				this.transform.matrix=new Matrix();
 				dragArea.transform.matrix=new Matrix();
 				dragArea.body.transform.matrix=new Matrix();
@@ -424,10 +410,17 @@ package ui{
 				updateDotsByDragArea();
 				
 				mouseMove(null);
+				//pressDragArea(null);
 				
 				this.visible=true;
 			}else{
 				this.visible=false;
+			}
+		}
+		public function setPicByMouse(_pic:DisplayObject):void{
+			pic=_pic;
+			if(__pic){
+				pressDragArea(null);
 			}
 		}
 		private function updateDotsByDragArea():void{
@@ -438,10 +431,8 @@ package ui{
 			for each(var dot1:FreeTranDot1 in dot1Arr){
 				var dot2:FreeTranDot2=dot2Arr[i];
 				var p:Point=m.transformPoint(new Point(50+50*dot1.xId,50+50*dot1.yId));
-				
 				dot1.x=dot2.x=p.x;
 				dot1.y=dot2.y=p.y;
-				
 				i++;
 			}
 		}
@@ -461,29 +452,6 @@ package ui{
 			
 			return m;
 		}
+	
 	}
 }
-/*
-public static const TWEEN_MODE_NORMAL:String="正常";
-		public static const TWEEN_MODE_NO:String="没有";
-		public static const TWEEN_MODE_TWEEN:String="缓动";
-		[Inspectable(enumeration="正常,没有,缓动",defaultValue="正常",name="缓动类型")]
-		public var tweenMode:String;
-		
-		[Inspectable(defaultValue="",type="string",name="变形对象")]
-		public var picName:*;
-		
-		[Inspectable(defaultValue=true,name="旋转")]
-		public var canRotate:Boolean=true;
-		
-		[Inspectable(defaultValue=true,name="缩放")]
-		public var canScale:Boolean=true;
-		
-		[Inspectable(defaultValue=true,name="倾斜或剪切")]
-		public var canSkew:Boolean=true;
-		
-		[Inspectable(defaultValue=false,name="四角等比缩放")]
-		public var lockScale:Boolean;
-		
-		
-*/

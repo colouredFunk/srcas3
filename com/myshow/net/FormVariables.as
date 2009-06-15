@@ -62,7 +62,6 @@
 				}
 				result.writeUTFBytes("--" + this.boundary + "--\r\n");
 			}
-			trace(result);
 			return result;
 		}
 		public function FormVariables(variables:Object = null) {
