@@ -391,10 +391,10 @@ package ui{
 				
 				//让 dragArea.body 变成 __pic的内部结构 的形状和位置
 				//这样子 dragArea 就和 __pic "平衡"了
-				dragArea.body.x=rect.x;
-				dragArea.body.y=rect.y;
-				dragArea.body.width=rect.width;
-				dragArea.body.height=rect.height;
+				dragArea.body.x=Math.round(rect.x);
+				dragArea.body.y=Math.round(rect.y);
+				dragArea.body.width=Math.round(rect.width);
+				dragArea.body.height=Math.round(rect.height);
 				
 				//让 dragArea 和 __pic 看起来形状和位置一样
 				setTransform(dragArea,__pic);
@@ -431,8 +431,8 @@ package ui{
 			for each(var dot1:FreeTranDot1 in dot1Arr){
 				var dot2:FreeTranDot2=dot2Arr[i];
 				var p:Point=m.transformPoint(new Point(50+50*dot1.xId,50+50*dot1.yId));
-				dot1.x=dot2.x=p.x;
-				dot1.y=dot2.y=p.y;
+				dot1.x=dot2.x=Math.round(p.x);
+				dot1.y=dot2.y=Math.round(p.y);
 				i++;
 			}
 		}
