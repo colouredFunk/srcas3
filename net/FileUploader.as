@@ -14,11 +14,11 @@
 		private var file:FileReference;
 		private var isSet:Boolean;
 		public var maxSize:int=10000;
-
+		public var version:uint=9;
 		public var onUpload:Function;
-		public var onUploadComplete:Function;
 		public var onUploading:Function;
 		public var onUploadFailed:Function;
+		public var onUploadComplete:Function;
 		public var onLoad:Function;
 		public var onLoadComplete:Function;
 		public var onFailed:Function;
@@ -28,12 +28,8 @@
 		}
 		private function init():void{
 			file=new FileReference();
-			file.addEventListener(Event.SELECT,selectFile);
-			//file.addEventListener(Event.COMPLETE,loadComplete);
-			//file.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,uploadComplete);
-			//file.addEventListener(ProgressEvent.PROGRESS,uploadProgress);
 		}
-		public function remove(event:Event):void{
+		public function remove(_evt:Event):void{
 			file.removeEventListener(Event.SELECT,selectFile);
 			file.removeEventListener(Event.COMPLETE,loadComplete);
 			file.removeEventListener(DataEvent.UPLOAD_COMPLETE_DATA,uploadComplete);
@@ -41,14 +37,16 @@
 			file=null;
 			
 			onUpload=null;
+			onUploading=null;
+			onUploadFailed=null;
 			onUploadComplete=null;
 			onLoad=null;
 			onLoadComplete=null;
-			onUploading=null;
 			onFailed=null;
 		}
 		public function browse():void {
 			try {
+				file.addEventListener(Event.SELECT,selectFile);
 				file.browse([new FileFilter(fileInfos,"*."+fileTypes.replace(/\,/g,";*."))]);
 			} catch (e) {
 				if(onFailed!=null){
@@ -56,21 +54,40 @@
 				}
 			}
 		}
-		private function selectFile(event:Event):void {
+		private function selectFile(_evt:Event):void {
+			file.removeEventListener(Event.SELECT,selectFile);
 			if (file.size>maxSize*1024) {
 				if(onFailed!=null){
-					onFailed(fileInfos+"大小不要超过"+maxSize+"k!");
+					onFailed(fileInfos+"大小不要超过"+maxSize+"K!");
 				}
 				isSet=false;
 				return;
 			}
 			isSet=true;
-			upload();
+			if(version<10){
+				upload();
+			}else{
+				load();
+			}
 		}
-		private function loadComplete(event:Event):void {
+		private function load():void{
+			if(!isSet){
+				if(onFailed!=null){
+					onFailed("选择要打开的"+fileInfos+"!");
+				}
+				return;
+			}
+			file.addEventListener(Event.COMPLETE,loadComplete);
+			file.addEventListener(IOErrorEvent.IO_ERROR,uploadError);
+			file.load();
+			if (onLoad!=null) {
+				onLoad();
+			}
+		}
+		private function loadComplete(_evt:Event):void {
 			file.removeEventListener(Event.COMPLETE,loadComplete);
 			if (onLoadComplete!=null) {
-				onLoadComplete(event.currentTarget.data);
+				onLoadComplete(_evt.currentTarget.data);
 			}
 		}
 		private function upload():void {
@@ -94,16 +111,16 @@
 				}
 			}
 		}
-		private function uploadProgress(event:ProgressEvent):void {
+		private function uploadProgress(_evt:ProgressEvent):void {
 			if(onUploading!=null){
-				onUploading(event.bytesLoaded/event.bytesTotal);
+				onUploading(_evt.bytesLoaded/_evt.bytesTotal);
 			}
 		}
-		private function uploadComplete(event:DataEvent):void {
+		private function uploadComplete(_evt:DataEvent):void {
 			file.removeEventListener(ProgressEvent.PROGRESS,uploadProgress);
 			file.removeEventListener(DataEvent.UPLOAD_COMPLETE_DATA,uploadComplete);
 			file.removeEventListener(IOErrorEvent.IO_ERROR,uploadError);
-			var str:String=event.data.replace(/(^\s*)|(\s*$)/g,"");
+			var str:String=_evt.data.replace(/(^\s*)|(\s*$)/g,"");
 			trace("上传完毕:"+str);
 			if (str=="Failed!") {
 				if (onUploadFailed!=null) {
@@ -126,7 +143,7 @@
 				onUploadComplete(str);
 			}
 		}
-		private function uploadError(event:IOErrorEvent):void {
+		private function uploadError(_evt:IOErrorEvent):void {
 			file.removeEventListener(ProgressEvent.PROGRESS,uploadProgress);
 			file.removeEventListener(DataEvent.UPLOAD_COMPLETE_DATA,uploadComplete);
 			file.removeEventListener(IOErrorEvent.IO_ERROR,uploadError);

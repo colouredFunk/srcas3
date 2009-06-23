@@ -65,6 +65,9 @@
 		public function get flashVars():Object {
 			return __flashVars;
 		}
+		public function get swfVersion():uint{
+			return loaderInfo.swfVersion;
+		}
 		public var onFullScreen:Function;
 		public function setFullScreen(_isFullScreen:Boolean):void {
 			if (_isFullScreen) {
