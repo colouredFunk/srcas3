@@ -28,6 +28,7 @@
 		private var cameraRadianNow:Number;
 		private var __cameraRadius:Number;
 		public var viewHuman:Boolean;
+		public var lockY:Boolean;
 		public var lock:Boolean;
 		public function set cameraRadius(_r:Number):void {
 			__cameraRadius=_r;
@@ -41,7 +42,7 @@
 		public function process():Boolean {
 			if (isMouseDown) {
 				mouseNowX=mouseX;
-				mouseNowY=mouseY;
+				mouseNowY=lockY?0:mouseY;
 				ob3d.rotationY+= (obRY + mouseDownX - mouseNowX - ob3d.rotationY) * 0.5;
 				if (viewHuman) {
 					cameraRadianNow+=(cameraRadianDown+(mouseDownY - mouseNowY)*0.01-cameraRadianNow)*0.5;
@@ -64,7 +65,7 @@
 			if (evt.type == "mouseDown") {
 				isMouseDown=true;
 				mouseDownX=mouseX;
-				mouseDownY=mouseY;
+				mouseDownY=lockY?0:mouseY;
 				obRY=ob3d.rotationY;
 				if (viewHuman) {
 					cameraRadianDown=Math.atan2(camera.y,camera.z);
