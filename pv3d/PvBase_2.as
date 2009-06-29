@@ -9,7 +9,7 @@
 	
 	public class PvBase_2 extends Sprite {
 		public var viewport:Viewport3D;
-		public var renderer:BasicRenderEngine;
+		public var renderer:*;
 		public var scene:Scene3D;
 		public var camera:Camera3D;
 		public var pause:Boolean;
