@@ -1,7 +1,7 @@
 ﻿package pv3d{
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
-	
+
 	import org.papervision3d.cameras.Camera3D;
 	import org.papervision3d.objects.DisplayObject3D;
 
@@ -14,7 +14,7 @@
 		private var mouseNowX:Number;
 		private var mouseNowY:Number;
 		private var isMouseDown:Boolean=false;
-		public function MouseDrager(_camera:Camera3D=null,_ob3d:DisplayObject3D=null):void {
+		public function MouseDrager(_camera:Camera3D=null,_ob3d:DisplayObject3D=null) {
 			reset(_camera,_ob3d);
 		}
 		public function reset(_camera:Camera3D=null,_ob3d:DisplayObject3D=null):void {
@@ -62,7 +62,7 @@
 			return isMouseDown;
 		}
 		public function onMouseClick(evt:MouseEvent):void {
-			if (evt.type == "mouseDown") {
+			if (evt.type=="mouseDown") {
 				isMouseDown=true;
 				mouseDownX=mouseX;
 				mouseDownY=lockY?0:mouseY;
@@ -74,7 +74,7 @@
 					obRX=ob3d.rotationX;
 				}
 			}
-			if (evt.type == "mouseUp") {
+			if (evt.type=="mouseUp") {
 				isMouseDown=false;
 			}
 		}
@@ -84,14 +84,14 @@
 		public function onWheel_handle(evt:MouseEvent):void {
 			if (evt.delta>0) {
 				/*if (camera.zoom<zoomMax) {
-					camera.zoom+=zoomSp;
+				camera.zoom+=zoomSp;
 				}*/
 				if (cameraRadius>zoomMin) {
 					cameraRadius-=zoomSp;
 				}
 			} else {
 				/*if (camera.zoom>zoomMin) {
-					camera.zoom-=zoomSp;
+				camera.zoom-=zoomSp;
 				}*/
 				if (cameraRadius<zoomMax) {
 					cameraRadius+=zoomSp;
