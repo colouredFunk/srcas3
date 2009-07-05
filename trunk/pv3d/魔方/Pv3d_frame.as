@@ -3,7 +3,7 @@
 
 	import pv3d.*;
 	import gs.TweenLite;
-	
+
 	import org.papervision3d.events.*;
 	import org.papervision3d.objects.*;
 	import org.papervision3d.core.math.*;
@@ -14,7 +14,7 @@
 	import org.papervision3d.materials.MovieAssetMaterial;
 	import org.papervision3d.materials.BitmapMaterial;
 	import org.papervision3d.materials.BitmapFileMaterial;
-	
+
 	import org.papervision3d.events.InteractiveScene3DEvent;
 
 	public class Pv3d_frame extends PvBase_2 {
@@ -27,26 +27,26 @@
 		private var puzzleCube:PuzzleCube;
 		private var cubeWDH:uint;
 		override protected function init2d():void {
-			puzzleCube=new PuzzleCube(2);
+			puzzleCube=new PuzzleCube(3);
 			cubeWDH=100;
 			btn_xp.release=function():void{
-				rollStart(0,-1);
-			}
+			rollStart(0,-1);
+			};
 			btn_xn.release=function():void{
-				rollStart(0,1);
-			}
+			rollStart(0,1);
+			};
 			btn_yp.release=function():void{
-				rollStart(1,-1);
-			}
+			rollStart(1,-1);
+			};
 			btn_yn.release=function():void{
-				rollStart(1,1);
-			}
+			rollStart(1,1);
+			};
 			btn_zp.release=function():void{
-				rollStart(2,-1);
-			}
+			rollStart(2,-1);
+			};
 			btn_zn.release=function():void{
-				rollStart(2,1);
-			}
+			rollStart(2,1);
+			};
 		}
 		private var rotateOBJ:DisplayObject3D;
 		override protected function init3d():void {
@@ -90,25 +90,25 @@
 						_ob.back=puzzleMaterials.BACK;
 						_ob.front=puzzleMaterials.FRONT;
 						/*if (_cubeModel.x==0) {
-							
+						
 						} else if (_cubeModel.x>0) {
-							_ob.right=puzzleMaterials.RIGHT;
+						_ob.right=puzzleMaterials.RIGHT;
 						} else {
-							_ob.left=puzzleMaterials.LEFT;
+						_ob.left=puzzleMaterials.LEFT;
 						}
 						if (_cubeModel.y==0) {
-							
+						
 						} else if (_cubeModel.y>0) {
-							_ob.bottom=puzzleMaterials.BOTTOM;
+						_ob.bottom=puzzleMaterials.BOTTOM;
 						} else {
-							_ob.top=puzzleMaterials.TOP;
+						_ob.top=puzzleMaterials.TOP;
 						}
 						if (_cubeModel.z==0) {
-							
+						
 						} else if (_cubeModel.z>0) {
-							_ob.front=puzzleMaterials.FRONT;
+						_ob.front=puzzleMaterials.FRONT;
 						} else {
-							_ob.back=puzzleMaterials.BACK;
+						_ob.back=puzzleMaterials.BACK;
 						}*/
 						_cube=new CubeIn(new MaterialsList(_ob),cubeWDH,cubeWDH,cubeWDH);
 						_cube.model=_cubeModel;
@@ -116,7 +116,7 @@
 						_cube.addEventListener(InteractiveScene3DEvent.OBJECT_OVER,rollOver_p);
 						_cube.addEventListener(InteractiveScene3DEvent.OBJECT_OUT,rollOut_p);
 						_cube.addEventListener(InteractiveScene3DEvent.OBJECT_PRESS,press_p);
-						
+
 						setRP(_cubeModel,0);
 						viewCenter.addChild(_cube);
 					}
@@ -125,23 +125,42 @@
 			viewCenter.addChild(rotateOBJ);
 			scene.addChild(viewCenter);
 			mouseDrager=new MouseDrager(camera,viewCenter);
-			//mouseDrager.viewHuman=true;
+			mouseDrager.viewHuman=true;
 			setMouse(this);
 		}
-		private function setRP(_cubeModel:*,_xyz:uint):void{
+		private function setRP(_cubeModel:*,_xyz:uint):void {
 			var _cube:*=_cubeModel.cube;
 			_cube.x=_cubeModel.x*cubeWDH-(puzzleCube.rank-1)*cubeWDH*0.5;
 			_cube.y=_cubeModel.y*cubeWDH-(puzzleCube.rank-1)*cubeWDH*0.5;
 			_cube.z=_cubeModel.z*cubeWDH-(puzzleCube.rank-1)*cubeWDH*0.5;
-			switch(_xyz){
-				case 0:
-					_cube.rotationX=Math.round((Math.atan2(_cubeModel.vz,_cubeModel.vy)-Math.PI*0.25)*180/Math.PI);
+			switch (_xyz) {
+				case 0 :
+					//if (_cubeModel.vx>0) {
+						_cube.rotationX=_cubeModel.vx;
+						//Math.round((Math.atan2(_cubeModel.vz,_cubeModel.vy)-Math.PI*0.25)*180/Math.PI);
+						//_cube.rotationY=Math.round((Math.atan2(_cubeModel.vx,_cubeModel.vz)-Math.PI*0.25)*180/Math.PI);
+					
+					//} else {
+						//_cube.rotationX=360-Math.round((Math.atan2(_cubeModel.vz,_cubeModel.vy)-Math.PI*0.25)*180/Math.PI);
+					//}
 					break;
-				case 1:
-					_cube.rotationY=Math.round((Math.atan2(_cubeModel.vx,_cubeModel.vz)-Math.PI*0.25)*180/Math.PI);
+				case 1 :
+					//if (_cubeModel.vy>0) {
+						//_cube.rotationX=Math.round((Math.atan2(_cubeModel.vz,_cubeModel.vy)-Math.PI*0.25)*180/Math.PI);
+						_cube.rotationY=_cubeModel.vy;
+						//Math.round((Math.atan2(_cubeModel.vx,_cubeModel.vz)-Math.PI*0.25)*180/Math.PI);
+					//} else {
+						//_cube.rotationY=360-Math.round((Math.atan2(_cubeModel.vx,_cubeModel.vz)-Math.PI*0.25)*180/Math.PI);
+
+					//}
 					break;
-				case 2:
-					_cube.rotationZ=Math.round((Math.atan2(_cubeModel.vy,_cubeModel.vx)-Math.PI*0.25)*180/Math.PI);
+				case 2 :
+					//if (_cubeModel.vz>0) {
+						_cube.rotationZ=_cubeModel.vz;
+						//Math.round((Math.atan2(_cubeModel.vy,_cubeModel.vx)-Math.PI*0.25)*180/Math.PI);
+					//} else {
+						//_cube.rotationZ=360-Math.round((Math.atan2(_cubeModel.vy,_cubeModel.vx)-Math.PI*0.25)*180/Math.PI);
+					//}
 					break;
 			}
 			//trace(_cube.rotationX+"___"+_cube.rotationY+"___"+_cube.rotationZ);
@@ -156,47 +175,47 @@
 			var _obR:Object={};
 			var _plane:*;
 			var _cubeList:Array;
-			switch(_xyz){
-				case 0:
+			switch (_xyz) {
+				case 0 :
 					_plane=puzzleCube.getPlane(_xyz,cubeNow.model.x);
 					_obR.rotationX=String(90*_dir);
 					break;
-				case 1:
+				case 1 :
 					_plane=puzzleCube.getPlane(_xyz,cubeNow.model.y);
 					_obR.rotationY=String(90*_dir);
 					break;
-				case 2:
+				case 2 :
 					_plane=puzzleCube.getPlane(_xyz,cubeNow.model.z);
 					_obR.rotationZ=String(90*_dir);
 					break;
 			}
 			_cubeList=_plane.getCubes();
-			for each(_e in _cubeList){
+			for each (_e in _cubeList) {
 				viewCenter.removeChild(_e.cube);
 				rotateOBJ.addChild(_e.cube);
 			}
 			_obR.onComplete=function():void{
-				_plane.rotateCubes(_dir);
-				for each(_e in _cubeList){
-					setRP(_e,_xyz);
-					rotateOBJ.removeChild(_e.cube);
-					viewCenter.addChild(_e.cube);
-				}
-				rotateOBJ.rotationX=0;
-				rotateOBJ.rotationY=0;
-				rotateOBJ.rotationZ=0;
+			_plane.rotateCubes(_dir);
+			for each(_e in _cubeList){
+			setRP(_e,_xyz);
+			rotateOBJ.removeChild(_e.cube);
+			viewCenter.addChild(_e.cube);
 			}
+			rotateOBJ.rotationX=0;
+			rotateOBJ.rotationY=0;
+			rotateOBJ.rotationZ=0;
+			};
 			TweenLite.to(rotateOBJ,0.5,_obR);
 			//stage.removeEventListener(MouseEvent.MOUSE_UP, rollStart);
 		}
 		private function rollOver_p(_evt:InteractiveScene3DEvent):void {
 			//rollOut_p(null);
-			
+
 			//TweenLite.to(cubeNow,0.3,{scale:1.5});
 		}
 		private function rollOut_p(_evt:InteractiveScene3DEvent):void {
 			//if(cubeNow){
-				//TweenLite.to(cubeNow,0.3,{scale:1});
+			//TweenLite.to(cubeNow,0.3,{scale:1});
 			//}
 		}
 		public function setMouse(_obj:*=null):void {
@@ -225,9 +244,9 @@
 import org.papervision3d.objects.primitives.Cube;
 import org.papervision3d.materials.utils.MaterialsList;
 
-class CubeIn extends Cube{
+class CubeIn extends Cube {
 	public var model:*;
-	public function CubeIn( materials:MaterialsList, width:Number=500, depth:Number=500, height:Number=500, segmentsS:int=1, segmentsT:int=1, segmentsH:int=1, insideFaces:int=0, excludeFaces:int=0 ){
+	public function CubeIn( materials:MaterialsList, width:Number=500, depth:Number=500, height:Number=500, segmentsS:int=1, segmentsT:int=1, segmentsH:int=1, insideFaces:int=0, excludeFaces:int=0 ) {
 		super( materials, width, depth, height, segmentsS, segmentsT, segmentsH, insideFaces, excludeFaces);
 	}
 }

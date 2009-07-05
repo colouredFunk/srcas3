@@ -106,16 +106,13 @@ class PlaneModel {
 		_vx=_cubeModel.vx,_vy=_cubeModel.vy,_vz=_cubeModel.vz;
 		switch (xyz) {
 			case 0 :
-				_v=rotateV(_vy,_vz,Math.PI*0.5*_dir);
-				_vy=_v[0],_vz=_v[1];
+				_vx+=_dir*90;
 				break;
 			case 1 :
-				_v=rotateV(_vz,_vx,Math.PI*0.5*_dir);
-				_vx=_v[1],_vz=_v[0];
+				_vy+=_dir*90;
 				break;
 			case 2 :
-				_v=rotateV(_vx,_vy,Math.PI*0.5*_dir);
-				_vx=_v[0],_vy=_v[1];
+				_vz+=_dir*90;
 				break;
 		}
 		_cubeModel.setVXYZ(_vx,_vy,_vz);
@@ -136,7 +133,9 @@ class PlaneModel {
 				_vx=_v[0]+off,_vy=_v[1]+off;
 				break;
 		}
+		trace("___"+_cubeModel.x+"__"+_cubeModel.y+"__"+_cubeModel.z);
 		_cubeModel.setXYZ(_vx,_vy,_vz);
+		trace(_cubeModel.x+"__"+_cubeModel.y+"__"+_cubeModel.z);
 	}
 	private static function rotateV(_v0:Number,_v1:Number,_rot:Number):Array {
 		var _c:Number=Math.cos(_rot);
@@ -162,10 +161,18 @@ class CubeModel {
 		return __vz;
 	}
 	public function setVXYZ(_vx:Number,_vy:Number,_vz:Number):void {
-		__vx=Math.round(_vx);
-		__vy=Math.round(_vy);
-		__vz=Math.round(_vz);
-		trace(__vx+"___"+__vy+"___"+__vz);
+		__vx=rFloor(_vx);
+		__vy=rFloor(_vy);
+		__vz=rFloor(_vz);
+	}
+	private static function rFloor(r:Number):Number {
+		if (r>=180) {
+			r-=360;
+		}
+		if (r<=-180) {
+			r+=360;
+		}
+		return Math.round(r);
 	}
 	private var __x,__y,__z:uint;
 	public function get x():uint {
