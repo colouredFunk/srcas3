@@ -79,7 +79,7 @@
 			}
 			file.addEventListener(Event.COMPLETE,loadComplete);
 			file.addEventListener(IOErrorEvent.IO_ERROR,uploadError);
-			file.load();
+			file["load"]();
 			if (onLoad!=null) {
 				onLoad();
 			}
