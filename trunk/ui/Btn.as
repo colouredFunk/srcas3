@@ -14,53 +14,70 @@
 		public var rollOver:Function;
 		public var rollOut:Function;
 		public var onOpen:Function;
+		public var onAddTo:Function;
 		public var noFrame:Boolean;
 		public var obTemp:Object;
-		
+
 		public function Btn() {
 			init();
 		}
 		protected function init():void {
 			stop();
-			buttonMode=true;
 			this.addEventListener(Event.ADDED_TO_STAGE,added);
 		}
 		protected function added(evt:Event):void {
 			this.removeEventListener(Event.ADDED_TO_STAGE,added);
-
 			this.addEventListener(Event.REMOVED_FROM_STAGE,removed);
-
-			this.addEventListener(MouseEvent.MOUSE_DOWN,$onPress);
-			stage.addEventListener(MouseEvent.MOUSE_UP,$onRelease);
-			this.addEventListener(MouseEvent.ROLL_OVER,$onRollOver);
-			this.addEventListener(MouseEvent.ROLL_OUT,$onRollOut);
-
+			if (totalFrames>8) {
+				setAni(this);
+			}
+			setEnabled(true);
 			reset();
+			if (onAddTo!=null) {
+				onAddTo(this);
+			}
 		}
 		protected function removed(evt:Event):void {
 			this.removeEventListener(Event.REMOVED_FROM_STAGE,removed);
-
-			this.removeEventListener(MouseEvent.MOUSE_DOWN,$onPress);
-			stage.removeEventListener(MouseEvent.MOUSE_UP,$onRelease);
-			this.removeEventListener(MouseEvent.ROLL_OVER,$onRollOver);
-			this.removeEventListener(MouseEvent.ROLL_OUT,$onRollOut);
-			press=null;
-			release=null;
-			rollOver=null;
-			rollOut=null;
+			setEnabled(false);
 			if (aniClip) {
 				aniClip.removeEventListener(Event.ENTER_FRAME,aniRun);
 			}
 			for each (var _e:* in obTemp) {
 				_e=null;
 			}
+			press=null;
+			release=null;
+			rollOver=null;
+			rollOut=null;
+			aniClip=null;
 			obTemp=null;
+			if(stage.focus==this){
+				//否则会引起一些按键不能动作
+				stage.focus=null;
+			}
 		}
-		public function get isDown():Boolean{
+		public function get isDown():Boolean {
 			return __isDown;
 		}
-		public function get isIn():Boolean{
+		public function get isIn():Boolean {
 			return __isIn;
+		}
+		//protected var enabled
+		public function setEnabled(_b:Boolean):void {
+			if (_b) {
+				buttonMode=true;
+				this.addEventListener(MouseEvent.MOUSE_DOWN,$onPress);
+				stage.addEventListener(MouseEvent.MOUSE_UP,$onRelease);
+				this.addEventListener(MouseEvent.ROLL_OVER,$onRollOver);
+				this.addEventListener(MouseEvent.ROLL_OUT,$onRollOut);
+			} else {
+				buttonMode=false;
+				this.removeEventListener(MouseEvent.MOUSE_DOWN,$onPress);
+				stage.removeEventListener(MouseEvent.MOUSE_UP,$onRelease);
+				this.removeEventListener(MouseEvent.ROLL_OVER,$onRollOver);
+				this.removeEventListener(MouseEvent.ROLL_OUT,$onRollOut);
+			}
 		}
 		private function $onPress(evt:MouseEvent):void {
 			if (! __isDown) {
@@ -100,6 +117,8 @@
 		}
 		protected function reset():void {
 			if (aniClip==this) {
+				setAni(aniClip);
+				aniClip.buttonMode=true;
 				return;
 			}
 			if (aniClip&&aniClip.hasEventListener(Event.ENTER_FRAME)) {
@@ -120,7 +139,7 @@
 				}
 			}
 			frame+=isSelect?4:0;
-			if(!noFrame){
+			if (! noFrame) {
 				gotoAndStop(frame);
 			}
 			setAni(getChildByName(aniClipName) as MovieClip);
@@ -147,7 +166,6 @@
 					}
 				} else {
 					evt.target.prevFrame();
-					//evt.target.prevFrame();
 				}
 			} else {
 				delayTime--;
