@@ -29,7 +29,6 @@
 			this.loaderInfo.addEventListener(Event.COMPLETE,loaded);
 			//this.addEventListener(Event.ENTER_FRAME,loading);
 			onLoaded=function():void{
-				trace(1);
 				if(this.currentFrame==1){
 					play();
 				}
