@@ -2,7 +2,9 @@
 	import flash.events.*;
 	import flash.display.*;
 	import flash.net.URLRequest;
+	import flash.net.URLRequestMethod;
 	import flash.net.URLLoader;
+	import flash.net.URLVariables;
 	import flash.net.LocalConnection;
 	import flash.net.navigateToURL;
 	import flash.net.URLStream;
@@ -111,6 +113,11 @@
 		public static function trigonometric(x:Number,T:Number,A:Number):Number {
 			var _nT:Number=Math.PI/T;
 			return A*Math.sin(_nT*x);
+		}
+		public static function setRGB(_clip:*, _color:Number):void {
+			var _ctf:ColorTransform = _clip.transform.colorTransform;
+			_ctf.color = _color;
+			_clip.transform.colorTransform = _ctf;
 		}
 		private static const cmf:ColorMatrixFilter=new ColorMatrixFilter([0.3086000084877014,0.6093999743461609,0.0820000022649765,0,0,0.3086000084877014,0.6093999743461609,0.0820000022649765,0,0,0.3086000084877014,0.6093999743461609,0.0820000022649765,0,0,0,0,0,1,0]);
 		public static function setGray(_tar:Sprite,_value:Boolean):void {
@@ -281,13 +288,23 @@
 			_stream.load(new URLRequest(_url));
 			return _stream;
 		}
-		public static function getURL(_url:String,_openType:String):void {
-			navigateToURL(new URLRequest(_url),_openType);
+		public static function getURL(_url:String,_openType:String,_data:Object=null):void {
+			var _request:URLRequest=new URLRequest(_url);
+			if(_data){
+				var _urlVariables:URLVariables=new URLVariables();
+				for(var _i:String in _data){
+					_urlVariables[_i]=_data[_i];
+				}
+				trace(_urlVariables);
+				_request.data=_urlVariables;
+				_request.method=URLRequestMethod.POST;
+			}
+			navigateToURL(_request,_openType);
 		}
 		public static function garbageCallback():void {
 			try {
-				new LocalConnection().connect("MoonSpirit");
-				new LocalConnection().connect("MoonSpirit");
+				new LocalConnection().connect("DDT");
+				new LocalConnection().connect("DDT");
 			} catch (error:Error) {
 			}
 		}

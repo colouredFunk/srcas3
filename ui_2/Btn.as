@@ -25,11 +25,15 @@
 		protected function added(_evt:Event):void {
 			this.removeEventListener(Event.ADDED_TO_STAGE,added);
 			this.addEventListener(Event.REMOVED_FROM_STAGE,removed);
+			
+			setEnabled(true);
+			
 			if (totalFrames>8) {
 				aniClip=this;
 			}
-			setEnabled(true);
-			setStyle();
+			setAni(getChildByName(aniClipName) as MovieClip);
+			stop();
+			
 			if (onAddTo!=null) {
 				onAddTo(this);
 			}

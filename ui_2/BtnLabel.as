@@ -11,6 +11,17 @@
 			mouseChildren=false;
 			super.init();
 		}
+		protected function getTxt():void {
+			if (txt) {
+				return;
+			}
+			var _len:uint=numChildren;
+			for (var _i:uint=0; _i<_len; _i++) {
+				if (getChildAt(_i) is Txt) {
+					txt=getChildAt(_i);
+				}
+			}
+		}
 		protected var __widthMax:int;
 		[Inspectable(defaultValue=0,type="int",name="0_固定宽")]
 		public function set widthMax(_widthMax:int):void {
@@ -50,34 +61,24 @@
 			if (__label!=_label) {
 				__label=_label;
 				if (! txt) {
-					return;
+					getTxt();
 				}
 				txt.text=__label;
-				txt.setStyle();
 				setStyleBar();
 			}
 		}
-		[Inspectable(enumeration="none,left,right,center",defaultValue="none",type="String",name="对齐")]
+		[Inspectable(enumeration="left,right,center",defaultValue="left",type="String",name="对齐")]
 		public function set autoSize(_autoSize:String):void {
 			if (! txt) {
-				return;
+				getTxt();
 			}
 			txt.autoSize=_autoSize;
+			setStyleBar();
 		}
 		override public function setStyle():void {
 			super.setStyle();
 			getTxt();
 			setStyleBar();
-		}
-		protected function getTxt():void {
-			if (! txt) {
-				var _len:uint=numChildren;
-				for (var _i:uint=0; _i<_len; _i++) {
-					if (getChildAt(_i) is Txt) {
-						txt=getChildAt(_i);
-					}
-				}
-			}
 		}
 		protected function setStyleBar():void {
 			bar=getChildByName(barName);
