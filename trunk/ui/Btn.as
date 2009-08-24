@@ -46,10 +46,10 @@
 			for each (var _e:* in obTemp) {
 				_e=null;
 			}
-			press=null;
-			release=null;
-			rollOver=null;
-			rollOut=null;
+			//press=null;
+			//release=null;
+			//rollOver=null;
+			//rollOut=null;
 			aniClip=null;
 			obTemp=null;
 			if(stage.focus==this){

@@ -2,8 +2,6 @@
 	import flash.display.Sprite;
 	import flash.text.TextField;
 	public class Txt extends Sprite {
-		//[Inspectable(defaultValue=0,type="int",name="固定宽")]
-		private var widthMax:int=0;
 		//[Inspectable(defaultValue=0,type="int",name="固定高")]
 		private var heightMax:int=0;
 		//[Inspectable(defaultValue=0,type="int",name="水平偏移")]
@@ -28,13 +26,20 @@
 		protected function init():void {
 			txt=getChildByName(txtName) as TextField;
 			txt.mouseWheelEnabled=false;
+			txt.mouseEnabled=false;
 			txt.multiline=false;
 			txt.wordWrap=false;
+			txt.autoSize="left";
 
 			bar=getChildByName(barName) as Sprite;
 			if (bar) {
 				bar.mask=txt;
 			}
+		}
+		protected var __widthMax:int;
+		[Inspectable(defaultValue=0,type="int",name="0_固定宽")]
+		public function set widthMax(_widthMax:int):void {
+			__widthMax=_widthMax;
 		}
 		public function get text():String {
 			if (txt.selectable) {
@@ -60,6 +65,7 @@
 		[Inspectable(enumeration="left,right,center,none",defaultValue="left",type="String",name="对齐")]
 		public function set autoSize(_autoSize:String):void {
 			txt.autoSize=_autoSize;
+			setStyle();
 		}
 		public function get type():String {
 			return txt.type;
@@ -78,8 +84,9 @@
 			txt.restrict=_restrict;
 		}
 		public function setStyle():void {
-			if (widthMax) {
-				txt.width=widthMax;
+			if (__widthMax) {
+				txt.wordWrap=true;
+				txt.width=__widthMax;
 			} else {
 				txt.autoSize=txt.autoSize;
 			}
