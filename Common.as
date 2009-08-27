@@ -295,7 +295,6 @@
 				for(var _i:String in _data){
 					_urlVariables[_i]=_data[_i];
 				}
-				trace(_urlVariables);
 				_request.data=_urlVariables;
 				_request.method=URLRequestMethod.POST;
 			}

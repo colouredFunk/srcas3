@@ -6,6 +6,7 @@
 		protected var __isIn:Boolean;
 		protected var __isDown:Boolean;
 		public var isSelect:Boolean;
+		public var isSelectPlay:Boolean;
 		public var aniClip:MovieClip;
 		protected var aniClipName:String="__aniClip";
 		public var press:Function;
@@ -26,7 +27,7 @@
 			this.removeEventListener(Event.ADDED_TO_STAGE,added);
 			this.addEventListener(Event.REMOVED_FROM_STAGE,removed);
 			
-			setEnabled(true);
+			setEnabled(isEnabled);
 			
 			if (totalFrames>8) {
 				aniClip=this;
@@ -66,7 +67,7 @@
 		public function get isIn():Boolean {
 			return __isIn;
 		}
-		//protected var enabled
+		protected var isEnabled:Boolean=true;
 		public function setEnabled(_b:Boolean):void {
 			if (_b) {
 				buttonMode=true;
@@ -81,6 +82,7 @@
 				this.removeEventListener(MouseEvent.ROLL_OVER,$onRollOver);
 				this.removeEventListener(MouseEvent.ROLL_OUT,$onRollOut);
 			}
+			isEnabled=_b;
 		}
 		private function $onPress(_evt:MouseEvent):void {
 			if (! __isDown) {
@@ -148,7 +150,7 @@
 		protected var delayTime:int=1;
 		public var delayMax:int=0;
 		private function aniRun(_evt:Event):void {
-			if (__isIn) {
+			if (_evt.target==this?(__isIn||isSelect):(__isIn||(isSelectPlay?isSelect:false))) {
 				if (_evt.target.currentFrame==_evt.target.totalFrames) {
 					delayTime=delayMax;
 					_evt.target.removeEventListener(Event.ENTER_FRAME,aniRun);
