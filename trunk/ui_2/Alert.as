@@ -129,9 +129,9 @@
 		public function remove():void {
 			callBack=null;
 			visible=false;
-			//if (parent) {
-				//parent.removeChild(this);
-			//}
+			if (parent) {
+				parent.removeChild(this);
+			}
 		}
 	}
 }
