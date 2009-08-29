@@ -6,14 +6,15 @@
 	import flash.system.*;
 	import flash.geom.*;
 
-	//import ui.FreeTran;
-
 	public class ImageCut extends Sprite {
-		//private var freeTran:FreeTran;
-		//private var rectClip:Sprite;
-		//private var frameClip:Sprite;
-		//private var intactClip:Sprite;
-		//private var thumbnailClip:Sprite;
+		public var freeTran:*;
+		public var rectClip:Sprite;
+		public var frameClip:Sprite;
+		public var intactClip:Sprite;
+		public var thumbnailClip:Sprite;
+		public var btn_reset:Sprite;
+		public var btn_ok:Sprite;
+		public var btn_browse:Sprite;
 
 		private var intactBmp:Bitmap;
 		private var thumbnailBmp:Bitmap;
@@ -84,7 +85,7 @@
 			rectClip.y=int(frameClip.y+frameClip.height*0.5);
 			rectClip.rotation=0;
 			rectClip.scaleX=rectClip.scaleY=1;
-			rectClip.frameClip.visible=false;
+			rectClip["frameClip"].visible=false;
 			freeTran.pic=null;
 			freeTran.pic=rectClip;
 			enterFrame();

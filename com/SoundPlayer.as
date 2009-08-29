@@ -25,22 +25,18 @@
 		public static var SOUND_START:String="soundStart";
 		public static var SOUND_STOP:String="soundStop";
 		public static var SOUND_PAUSE:String="soundPause";
-		public static var SOUND_PROGRESS:String="soundProgress";
 		public static var SOUND_COMPLETE:String="soundComplete";
+		public static var SOUND_STATE:String="soundState";
+		public static var PROGRESS:String="progress";
 		public static var COMPLETE:String="complete";
 		public function SoundPlayer() {
 			
 		}
-		protected var __isPlaying:Boolean;
-		public function get isPlaying():Boolean {
-			return __isPlaying;
-		}
-		protected var __playId:uint;
+		private var __playId:uint;
 		public function get playId():uint{
 			return __playId;
 		}
 		public function set playId(_playId:uint):void{
-			trace(_playId);
 			if (_playId==musicList.list.length()) {
 				_playId=0;
 			}else if (_playId>musicList.list.length()){
@@ -49,25 +45,50 @@
 			__playId=_playId;
 			stop();
 			if (sound) {
-				sound.removeEventListener(ProgressEvent.PROGRESS,$soundProgress);
+				sound.removeEventListener(ProgressEvent.PROGRESS,progress);
 				sound.removeEventListener(Event.COMPLETE,$complete);
 			}
 			position=0;
 			sound=new Sound();
-			sound.addEventListener(ProgressEvent.PROGRESS,$soundProgress);
+			sound.addEventListener(ProgressEvent.PROGRESS,progress);
 			sound.addEventListener(Event.COMPLETE,$complete);
 			sound.load(new URLRequest(musicList.list[playId]));
 		}
-		public function autoPlay():Boolean{
-			if (isPlaying) {
-				pause();
-			}else{
-				play();
+		public function attachMusic(_musicList:String):void {
+			newList(_musicList.split("|"));
+			playId=0;
+		}
+		public var defaultVolume:Number=0.8;
+		private var __volume:Number;
+		public function get volume():Number{
+			if(isNaN(__volume)){
+				return defaultVolume;
 			}
-			return isPlaying;
+			return __volume;
+		}
+		public function set volume(_volume:Number):void{
+			if(!soundChannel){
+				return;
+			}
+            var _trans:SoundTransform = soundChannel.soundTransform;
+            _trans.volume = _volume;
+            soundChannel.soundTransform = _trans;
+			__volume=_volume;
+		}
+		private var __playState:uint;
+		public function get playState():uint {
+			return __playState;
+		}
+		public function autoPlay():Boolean{
+			if (playState==2) {
+				pause();
+				return false;
+			}
+			play();
+			return true;
 		}
 		public function play():void {
-			if (isPlaying) {
+			if (playState==2) {
 				return;
 			}
 			if (soundChannel) {
@@ -75,27 +96,31 @@
 				soundChannel.removeEventListener(Event.SOUND_COMPLETE,$soundComplete);
 			}
 			soundChannel=sound.play(position);
+			volume=volume;
 			soundChannel.addEventListener(Event.SOUND_COMPLETE,$soundComplete);
-			__isPlaying=true;
 			dispatchEvent(new Event(SOUND_START));
+			__playState=2;
+			dispatchEvent(new Event(SOUND_STATE));
 		}
 		public function pause():void {
-			if (! isPlaying) {
+			if (playState!=2) {
 				return;
 			}
 			position=soundChannel.position;
 			soundChannel.stop();
-			__isPlaying=false;
 			dispatchEvent(new Event(SOUND_PAUSE));
+			__playState=1;
+			dispatchEvent(new Event(SOUND_STATE));
 		}
 		public function stop():void {
-			if (! isPlaying) {
+			if (playState==0) {
 				return;
 			}
 			position=0;
 			soundChannel.stop();
-			__isPlaying=false;
 			dispatchEvent(new Event(SOUND_STOP));
+			__playState=0;
+			dispatchEvent(new Event(SOUND_STATE));
 		}
 		public function next():void {
 			playId++;
@@ -104,10 +129,6 @@
 		public function prev():void {
 			playId--;
 			play();
-		}
-		public function attachMusic(_musicList:String):void {
-			newList(_musicList.split("|"));
-			playId=0;
 		}
 		protected function newList(_list:*):void {
 			musicList=<root></root>;
@@ -121,8 +142,8 @@
 				musicList.list=_list.list;
 			}
 		}
-		protected function $soundProgress(_evt:ProgressEvent):void {
-			dispatchEvent(new Event(SOUND_PROGRESS));
+		protected function progress(_evt:ProgressEvent):void {
+			dispatchEvent(new Event(PROGRESS));
 		}
 		protected function $complete(_evt:Event):void {
 			dispatchEvent(new Event(COMPLETE));
@@ -140,7 +161,7 @@
 					next();
 					break;
 				case 3:
-					
+					stop();
 					break;
 			}
 			dispatchEvent(new Event(SOUND_COMPLETE));

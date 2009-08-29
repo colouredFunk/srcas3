@@ -12,26 +12,22 @@
 		private var widthAdd:Number=0;
 		//[Inspectable(defaultValue=0,type="int",name="高增益")]
 		private var heightAdd:Number=0;
-		protected var bar:Sprite;
-		protected var barName:String="__bar";
+		public var bar:Sprite;
 
 		private var __text:String="";
-		protected var txt:TextField;
-		protected var txtName:String="__txt";
+		public var txt:TextField;
 		public var html:Boolean;
 		public var onChange:Function;
 		public function Txt() {
 			init();
 		}
 		protected function init():void {
-			txt=getChildByName(txtName) as TextField;
 			txt.mouseWheelEnabled=false;
 			txt.mouseEnabled=false;
 			txt.multiline=false;
 			txt.wordWrap=false;
 			txt.autoSize="left";
-
-			bar=getChildByName(barName) as Sprite;
+			
 			if (bar) {
 				bar.mask=txt;
 			}

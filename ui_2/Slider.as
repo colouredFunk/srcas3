@@ -1,54 +1,55 @@
 ﻿package ui_2{
 	import flash.display.Sprite;
 	import flash.events.Event;
-	import flash.events.MouseEvent;
 	import ui_2.Btn;
 	public class Slider extends Sprite {
+		public static var CHANGE:String="change";
 		public var change:Function;
 		public var press:Function;
 		public var release:Function;
 
-		protected var thumb:*;
-		protected var thumbName:String="__thumb";
-		protected var bar:*;
-		protected var barName:String="__bar";
-		protected var track:*;
-		protected var trackName:String="__track";
+		public var thumb:*;
+		public var bar:*;
+		public var track:*;
 
 		protected var scale:Number;
 		protected var mouseXOff:int;
+		protected var isAutoLength:Boolean=true;
+		protected var timeHold:uint;
+		protected var isThumb:Boolean;
 		public function Slider() {
 			init();
 		}
 		protected function init():void {
-			thumb=getChildByName(thumbName);
-			bar=getChildByName(barName);
-			track=getChildByName(trackName);
-			//thumb["isThumb"] = true;
-			track.press=function ():void {
-				mouseXOff= (this==thumb && !bar) ? thumb.mouseX : 0;
+			if(!thumb){
+				thumb=new Btn();
+				addChild(thumb);
+			}
+			thumb.hitArea=this;
+			thumb.press=function ():void {
+				mouseXOff= !bar ? thumb.mouseX : 0;
+				timeHold=0;
 				dirHold();
 				addEventListener(Event.ENTER_FRAME,dirHold);
 				if(press!=null){
 					press(value);
 				}
 			};
-			track.release =function ():void {
+			thumb.release =function ():void {
 				removeEventListener(Event.ENTER_FRAME,dirHold);
 				if(release!=null){
 					release(value);
 				}
 			};
-			if (thumb) {
-				thumb.press=track.press;
-				thumb.release=track.release;
-			}
 			if (bar) {
 				bar.mouseEnabled=false;
 				bar.mouseChildren=false;
 			}
 			value=0;
-			length=track.width+track.x*2;
+			if(track){
+				thumb.setAni(track);
+				length=track.width+track.x*2;
+			}
 		}
 		protected var __value:Number;
 		public function get value():Number {
@@ -56,11 +57,7 @@
 		}
 		[Inspectable(defaultValue=0,type="Number",name="初始值")]
 		public function set value(_value:Number):void {
-			if (_value<minimum) {
-				_value=minimum;
-			} else if (_value>maximum) {
-				_value=maximum;
-			}
+			_value=formatValue(_value);
 			if (__value==_value) {
 				return;
 			}
@@ -69,6 +66,15 @@
 			if (change!=null) {
 				change(value,minimum,maximum);
 			}
+			dispatchEvent(new Event(CHANGE));
+		}
+		protected function formatValue(_value:Number):Number{
+			if (_value<minimum) {
+				_value=minimum;
+			} else if (_value>maximum) {
+				_value=maximum;
+			}
+			return _value;
 		}
 		protected var __length:uint;
 		public function get length():uint {
@@ -80,7 +86,9 @@
 				return;
 			}
 			__length=_length;
-			track.width = length-track.x*2;
+			if(isAutoLength&&track){
+				track.width = length-track.x*2;
+			}
 			setStyle();
 		}
 		protected var __maximum:Number=100;
@@ -110,11 +118,12 @@
 			__snapInterval=_snapInterval;
 			setStyle();
 		}
-		public function formatValue():void {
+		public function intValue():void {
 			value=Math.round(thumb.x/scale)+minimum;
 		}
 		protected function dirHold(_evt:Event=null):void {
 			value = Math.round((mouseX-mouseXOff)/scale/snapInterval)*snapInterval+minimum;
+			timeHold++;
 		}
 		public function setStyle():void {
 			scale = length/(maximum-minimum);

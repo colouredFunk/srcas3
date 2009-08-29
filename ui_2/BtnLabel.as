@@ -2,25 +2,11 @@
 	import flash.events.Event;
 	public class BtnLabel extends ui_2.Btn {
 		protected var __label:String;
-		protected var txt:*;
-		protected var txtName:String;
-		protected var bar:*;
-		protected var barName:String="__bar";
+		public var txt:*;
+		public var bar:*;
 		override protected function init():void {
-			aniClipName="__aniClip_0";
 			mouseChildren=false;
 			super.init();
-		}
-		protected function getTxt():void {
-			if (txt) {
-				return;
-			}
-			var _len:uint=numChildren;
-			for (var _i:uint=0; _i<_len; _i++) {
-				if (getChildAt(_i) is Txt) {
-					txt=getChildAt(_i);
-				}
-			}
 		}
 		protected var __widthMax:int;
 		[Inspectable(defaultValue=0,type="int",name="0_固定宽")]
@@ -60,28 +46,20 @@
 		public function set label(_label:String):void {
 			if (__label!=_label) {
 				__label=_label;
-				if (! txt) {
-					getTxt();
-				}
 				txt.text=__label;
 				setStyleBar();
 			}
 		}
 		[Inspectable(enumeration="left,right,center",defaultValue="left",type="String",name="对齐")]
 		public function set autoSize(_autoSize:String):void {
-			if (! txt) {
-				getTxt();
-			}
 			txt.autoSize=_autoSize;
 			setStyleBar();
 		}
 		override public function setStyle():void {
 			super.setStyle();
-			getTxt();
 			setStyleBar();
 		}
 		protected function setStyleBar():void {
-			bar=getChildByName(barName);
 			if (! bar||! txt) {
 				return;
 			}
