@@ -1,0 +1,89 @@
+﻿package{
+	import easybox2d.EasyBox2D;
+	import ui_2.Slider;
+	
+	
+	import flash.display.Bitmap;
+	import flash.display.Sprite;
+	import flash.display.MovieClip;
+	
+	import flash.events.Event;
+
+	[SWF(width="1100",height="600",frameRate="30")]
+	public class TestApp extends MovieClip{
+		private var easyBox:EasyBox2D;
+		public var player:*;
+		public function TestApp(){
+			easyBox=new EasyBox2D(this,false);
+			//easyBox.debugClip.mouseEnabled=false;
+			//easyBox.debugClip.mouseChildren=false;
+			createWall();
+			createChildren();
+		}
+		private var wS:uint=1100;
+		private var hS:uint=600;
+		public function createWall():void{
+			//建立边框
+			// Left
+			easyBox.register(null,{x:-50+10,y:hS*0.5,width:100,height:hS+100});
+			// Right
+			easyBox.register(null,{x:wS+50-10,y:hS*0.5,width:100,height:hS+100});
+			// Top
+			easyBox.register(null,{x:wS*0.5,y:-50+10,width:wS+100,height:100});
+			// Bottom
+			easyBox.register(null,{x:wS*0.5,y:hS+50-10,width:wS+100,height:100});
+		}
+		protected function createChildren():void{
+			var bd:* = easyBox.CreateBodyDef();
+			bd.position.Set(5,5);
+			
+			var cd1:* = easyBox.CreateCircleDef();
+			cd1.radius = 2;
+			cd1.density = 2.0;
+				
+			var cd2:* = easyBox.CreateCircleDef();
+			cd2.radius = 0.4;
+			cd2.localPosition.Set(2.1, 0);
+			cd2.density = 0.2;
+			
+			var body:*= easyBox.CreateBody(bd);
+			body.CreateShape(cd1);
+			var cd1_:*=body.CreateShape(cd2);
+			var cd2_:*=body.CreateShape(cd2);
+			body.SetMassFromShapes();
+			player.btn_vol.thumb.obTemp={shape0:cd2,body:body,shape:cd1_};
+			player.btn_progress.thumb.obTemp={shape0:cd2,body:body,shape:cd2_};
+			player.btn_vol.addEventListener(Slider.CHANGE,circleMove);
+			player.btn_progress.addEventListener(Slider.CHANGE,circleMove);
+			
+			easyBox.register(player,body);
+			
+			Common.urlLoader("xml/images.xml",xmlLoaded);
+		}
+		private function circleMove(_evt:Event):void{
+			var _clip:*=_evt.target.thumb;
+			_clip.obTemp.shape0.localPosition.Set(_clip.x*EasyBox2D.physToPixel,_clip.y*EasyBox2D.physToPixel);
+			_clip.obTemp.body.DestroyShape(_clip.obTemp.shape);
+			_clip.obTemp.shape=_clip.obTemp.body.CreateShape(_clip.obTemp.shape0);
+		}
+		private function xmlLoaded(_evt:Event):void{
+			var _xml:XML=new XML(_evt.currentTarget.data);
+			for each(var _e:* in _xml.images){
+				Common.loader(_e.@image,imagesLoaded);
+			}
+		}
+		private function imagesLoaded(_evt:Event):void{
+			var _bmp:Bitmap=_evt.currentTarget.content as Bitmap;
+			_bmp.x=-_bmp.width*0.5;
+			_bmp.y=-_bmp.height*0.5;
+			var _frame:*=new frame_0();
+			_frame.clip.width=_bmp.width+10;
+			_frame.clip.height=_bmp.height+10;
+			_frame.clip.x=-_frame.clip.width*0.5;
+			_frame.clip.y=-_frame.clip.height*0.5;
+			_frame.addChild(_bmp);
+			addChild(_frame);
+			easyBox.register(_frame,{x:Common.random(800)+100,y:Common.random(400)+100,type:EasyBox2D.BOX,density:1.0,friction:0.4,restitution:0.3});
+		}
+	}
+}

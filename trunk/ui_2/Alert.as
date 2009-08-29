@@ -4,12 +4,12 @@
 	import flash.display.Stage;
 	import flash.events.Event;
 	public class Alert extends Sprite {
-		protected var txt_title:*;
-		protected var txt_show:*;
-		protected var btn_y:*;
-		protected var btn_n:*;
-		protected var btn_x:*;
-		protected var bar:*;
+		public var txt_title:*;
+		public var txt_show:*;
+		public var btn_y:*;
+		public var btn_n:*;
+		public var btn_x:*;
+		public var bar:*;
 		protected var barWidth:int;
 		protected var barHeight:int;
 		protected var dx_show:int;
@@ -33,14 +33,10 @@
 			this.removeEventListener(Event.ADDED_TO_STAGE,added);
 			this.addEventListener(Event.REMOVED_FROM_STAGE,removed);
 			
-			bar=getChildByName("__bar");
-			btn_y=getChildByName("__btn_y");
-			btn_n=getChildByName("__btn_n");
 			//btn_y.autoSize="center";
 			//btn_n.autoSize="center";
 			//btn_y.label="确定";
 			//btn_n.label="取消";
-			txt_show=getChildByName("__txt_show");
 			btn_y.release = function():void {
 				if((callBack!=null)?(callBack(true)!= false):true){
 					remove();

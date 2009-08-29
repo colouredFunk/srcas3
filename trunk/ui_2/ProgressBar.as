@@ -1,17 +1,9 @@
 ﻿package ui_2{
-	import flash.events.Event;
-	import ui_2.Btn;
-	public class ProgressBar extends Btn {
+	import flash.display.Sprite;
+	public class ProgressBar extends Sprite {
 		public var change:Function;
-		protected var bar:*;
-		protected var barName:String="__bar";
-		override protected function added(_evt:Event):void {
-			isEnabled=false;
-			super.added(_evt);
-			bar=getChildByName(barName);
-			if (! bar) {
-				bar=this;
-			}
+		public var bar:*;
+		public function ProgressBar():void {
 			if (length==0) {
 				length=bar.width;
 			}
@@ -29,7 +21,7 @@
 			return __value;
 		}
 		public function set value(_value:Number):void {
-			if(_value>1){
+			if (_value>1) {
 				_value=1;
 			}
 			if (__value==_value) {
