@@ -4,6 +4,8 @@
 	import ui_2.Btn;
 	public class Slider extends Sprite {
 		public static var CHANGE:String="change";
+		public static var PRESS:String="press";
+		public static var RELEASE:String="release";
 		public var change:Function;
 		public var press:Function;
 		public var release:Function;
@@ -34,12 +36,14 @@
 				if(press!=null){
 					press(value);
 				}
+				dispatchEvent(new Event(PRESS));
 			};
 			thumb.release =function ():void {
 				removeEventListener(Event.ENTER_FRAME,dirHold);
 				if(release!=null){
 					release(value);
 				}
+				dispatchEvent(new Event(RELEASE));
 			};
 			if (bar) {
 				bar.mouseEnabled=false;
