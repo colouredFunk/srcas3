@@ -7,7 +7,6 @@
 
 	import flash.net.URLRequest;
 
-
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
@@ -32,6 +31,18 @@
 		public function SoundPlayer() {
 			
 		}
+		public function get loaded():Number{
+			if(!sound){
+				return 0;
+			}
+			return sound.bytesLoaded/sound.bytesTotal;
+		}
+		public function get played():Number{
+			if(playState==0){
+				return 0;
+			}
+			return soundChannel.position/sound.length;
+		}
 		private var __playId:uint;
 		public function get playId():uint{
 			return __playId;
@@ -49,6 +60,11 @@
 				sound.removeEventListener(Event.COMPLETE,$complete);
 			}
 			position=0;
+			try{
+				sound.close();
+			}catch (error:*){
+				
+			}
 			sound=new Sound();
 			sound.addEventListener(ProgressEvent.PROGRESS,progress);
 			sound.addEventListener(Event.COMPLETE,$complete);

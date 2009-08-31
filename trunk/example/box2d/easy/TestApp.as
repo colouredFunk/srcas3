@@ -9,7 +9,7 @@
 	
 	import flash.events.Event;
 
-	[SWF(width="1100",height="600",frameRate="30")]
+	[SWF(width="900",height="500",frameRate="30")]
 	public class TestApp extends MovieClip{
 		private var easyBox:EasyBox2D;
 		public var player:*;
@@ -20,8 +20,8 @@
 			createWall();
 			createChildren();
 		}
-		private var wS:uint=1100;
-		private var hS:uint=600;
+		private var wS:uint=900;
+		private var hS:uint=500;
 		public function createWall():void{
 			//建立边框
 			// Left
@@ -53,12 +53,12 @@
 			body.SetMassFromShapes();
 			player.btn_vol.thumb.obTemp={shape0:cd2,body:body,shape:cd1_};
 			player.btn_progress.thumb.obTemp={shape0:cd2,body:body,shape:cd2_};
-			player.btn_vol.addEventListener(Slider.CHANGE,circleMove);
-			player.btn_progress.addEventListener(Slider.CHANGE,circleMove);
+			player.btn_vol.addEventListener(Slider.RELEASE,circleMove);
+			player.btn_progress.addEventListener(Slider.RELEASE,circleMove);
 			
 			easyBox.register(player,body);
 			
-			Common.urlLoader("xml/images.xml",xmlLoaded);
+			//Common.urlLoader("xml/images.xml",xmlLoaded);
 		}
 		private function circleMove(_evt:Event):void{
 			var _clip:*=_evt.target.thumb;
