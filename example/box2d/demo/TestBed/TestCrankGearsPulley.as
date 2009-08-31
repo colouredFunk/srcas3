@@ -64,9 +64,9 @@ package TestBed{
 				body.SetMassFromShapes();
 				
 				rjd.Initialize(prevBody, body, new b2Vec2(100.0/m_physScale, (360.0-75.0)/m_physScale));
-				rjd.motorSpeed = 1.0 * -Math.PI;
-				rjd.maxMotorTorque = 5000.0;
-				rjd.enableMotor = true;
+				//rjd.motorSpeed = 1.0 * -Math.PI;
+				//rjd.maxMotorTorque = 5000.0;
+				//rjd.enableMotor = true;
 				m_joint1 = m_world.CreateJoint(rjd) as b2RevoluteJoint;
 				
 				prevBody = body;
@@ -79,11 +79,11 @@ package TestBed{
 				body.SetMassFromShapes();
 				
 				rjd.Initialize(prevBody, body, new b2Vec2(100.0/m_physScale, (360.0-135.0)/m_physScale));
-				rjd.enableMotor = false;
+				//rjd.enableMotor = false;
 				m_world.CreateJoint(rjd);
 				
 				prevBody = body;
-				
+				/*
 				// Define piston
 				sd.SetAsBox(22.5/m_physScale, 22.5/m_physScale);
 				bd.position.Set(100.0/m_physScale, (360.0-255.0)/m_physScale);
@@ -107,14 +107,14 @@ package TestBed{
 				bd.position.Set(100.0/m_physScale, (360.0-345.0)/m_physScale);
 				body = m_world.CreateBody(bd);
 				body.CreateShape(sd);
-				body.SetMassFromShapes();
+				body.SetMassFromShapes();*/
 			}
 			
 			
 			// 
 			// GEARS
 			//
-			{
+			/*{
 				var circle1:b2CircleDef = new b2CircleDef();
 				circle1.radius = 25 / m_physScale;
 				circle1.density = 5.0;
@@ -230,7 +230,7 @@ package TestBed{
 				body1 = m_world.CreateBody(bd);
 				body1.CreateShape(circ);
 				body1.SetMassFromShapes();
-			}
+			}*/
 			
 		}
 		
