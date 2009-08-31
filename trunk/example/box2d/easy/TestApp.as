@@ -13,8 +13,10 @@
 	public class TestApp extends MovieClip{
 		private var easyBox:EasyBox2D;
 		public var player:*;
+		public var ball_0:*;
+		public var ball_1:*;
 		public function TestApp(){
-			easyBox=new EasyBox2D(this,false);
+			easyBox=new EasyBox2D(this);
 			//easyBox.debugClip.mouseEnabled=false;
 			//easyBox.debugClip.mouseChildren=false;
 			createWall();
@@ -34,29 +36,46 @@
 			easyBox.register(null,{x:wS*0.5,y:hS+50-10,width:wS+100,height:100});
 		}
 		protected function createChildren():void{
-			var bd:* = easyBox.CreateBodyDef();
-			bd.position.Set(5,5);
+			var body:*;
+			var prevBody:*;
+			var bd:* = easyBox.createBodyDef();
+			var cd:* = easyBox.createCircleDef();
 			
-			var cd1:* = easyBox.CreateCircleDef();
-			cd1.radius = 2;
-			cd1.density = 2.0;
-				
-			var cd2:* = easyBox.CreateCircleDef();
+			bd.position.Set(5,5);
+			cd.radius = 5/3;
+			cd.density = 1;
+			body= easyBox.createBody(bd);
+			body.CreateShape(cd);
+			easyBox.register(player,body);
+			prevBody=body;
+			
+			bd.position.Set(7.1,5);
+			cd.radius = 0.4;
+			cd.density = 5;
+			body= easyBox.createBody(bd);
+			body.CreateShape(cd);
+			easyBox.register(ball_0,body);
+			
+			easyBox.createDistanceJoint(prevBody, body);
+			
+			body= easyBox.createBody(bd);
+			body.CreateShape(cd);
+			easyBox.register(ball_1,body);
+			
+			easyBox.createDistanceJoint(prevBody, body);
+			/*var cd2:* = easyBox.CreateCircleDef();
 			cd2.radius = 0.4;
 			cd2.localPosition.Set(2.1, 0);
-			cd2.density = 0.2;
+			*/
 			
-			var body:*= easyBox.CreateBody(bd);
-			body.CreateShape(cd1);
-			var cd1_:*=body.CreateShape(cd2);
-			var cd2_:*=body.CreateShape(cd2);
-			body.SetMassFromShapes();
-			player.btn_vol.thumb.obTemp={shape0:cd2,body:body,shape:cd1_};
-			player.btn_progress.thumb.obTemp={shape0:cd2,body:body,shape:cd2_};
-			player.btn_vol.addEventListener(Slider.RELEASE,circleMove);
-			player.btn_progress.addEventListener(Slider.RELEASE,circleMove);
+			//var cd1_:*=body.CreateShape(cd2);
+			//var cd2_:*=body.CreateShape(cd2);
+			//player.btn_vol.thumb.obTemp={shape0:cd2,body:body,shape:cd1_};
+			//player.btn_progress.thumb.obTemp={shape0:cd2,body:body,shape:cd2_};
+			//player.btn_vol.addEventListener(Slider.RELEASE,circleMove);
+			//player.btn_progress.addEventListener(Slider.RELEASE,circleMove);
 			
-			easyBox.register(player,body);
+			
 			
 			//Common.urlLoader("xml/images.xml",xmlLoaded);
 		}

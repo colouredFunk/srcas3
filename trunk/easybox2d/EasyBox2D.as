@@ -22,7 +22,8 @@
 		public static const BOX:int=0;
 		public static const CIRCLE:int=1;
 
-		public var worldBox:b2World;
+		private var worldBox:b2World;
+		private var rjd:b2RevoluteJointDef;
 		//迭代次数
 		public static var iterations:int = 10;
 		//时间系数
@@ -55,6 +56,7 @@
 				_gravity = new b2Vec2(0.0, 10.0);
 			}
 			worldBox = new b2World(_worldAABB, _gravity, _doSleep);
+			rjd = new b2RevoluteJointDef();
 			
 			worldClip=_container;
 			mouseControl=new MouseControl(worldClip);
@@ -102,46 +104,119 @@
 		//restitution 反弹;
 		
 		//创建刚体
-		public function register(_clip:*,parms:*):b2Body{
-			if(parms is b2Body){
-				bodyDict[_clip]=parms;
-				return parms;
+		public function createBody(_bodyDef:*):b2Body{
+			if(!(_bodyDef is b2BodyDef)){
+				if (!_bodyDef) {
+				_bodyDef=new Object();
 			}
-			if (!parms){
-				parms={};
+			
+			var bodyDef:b2BodyDef=new b2BodyDef();
+			bodyDef.position.Set(_bodyDef.x*physToPixel,_bodyDef.y*physToPixel);
+			
+			var shapeDef:b2ShapeDef;
+			
+			if (_bodyDef.type==BOX){
+				shapeDef=new b2PolygonDef();
+				(shapeDef as b2PolygonDef).SetAsBox(_bodyDef.width*physToPixel*0.5,_bodyDef.height*physToPixel*0.5);
+			}else if (_bodyDef.type==CIRCLE){
+				shapeDef=new b2CircleDef();
+				(shapeDef as b2CircleDef).radius = _bodyDef.radius*physToPixel;
+			}else{
+				throw new Error("type取值不合法")
 			}
-			if (!parms.hasOwnProperty("type")){
-				parms.type=BOX;
+			if (_bodyDef.hasOwnProperty("density")){
+				shapeDef.density=_bodyDef.density;
 			}
-			var _body:b2Body;
-			if (_clip is DisplayObject){ 
-				if (!parms.hasOwnProperty("x")){
-					parms.x=_clip.x
-				};
-				if (!parms.hasOwnProperty("y")){
-					parms.y=_clip.y
-				};
-				if (parms.type==BOX){
-					if (!parms.hasOwnProperty("width")){
-						parms.width=_clip.width
-					};
-					if (!parms.hasOwnProperty("height")){
-						parms.height=_clip.height
-					};
-				}else if (parms.type==CIRCLE){
-					if (!parms.hasOwnProperty("radius")){
-						parms.radius=_clip.width/2
-					};
-				}
+			if (_bodyDef.hasOwnProperty("friction")){
+				shapeDef.friction=_bodyDef.friction;
 			}
-			_body = createb2Body(parms);
+			if (_bodyDef.hasOwnProperty("restitution")){
+				shapeDef.restitution=_bodyDef.restitution
+			};
+			
+			var _body:b2Body =createBody(bodyDef);
+			_body.CreateShape(shapeDef);
+			_bodyDef=bodyDef;
+			}
+			return worldBox.CreateBody(_bodyDef);
+		}
+		public function createBodyDef():b2BodyDef{
+			return new b2BodyDef();
+		}
+		public function createCircleDef():b2CircleDef{
+			return new b2CircleDef();
+		}
+		public function createJoint(_body1:b2Body,_body2:b2Body,pos:*=null):b2RevoluteJointDef{
+			var jd:b2RevoluteJointDef = new b2RevoluteJointDef();
+			
+			/*if (!isNaN(lowerAngle)){
+				jd.enableLimit = true;
+				jd.lowerAngle=lowerAngle;
+			}
+			if (!isNaN(upperAngle)){
+				jd.enableLimit = true;
+				jd.upperAngle=upperAngle;
+			}*/
+			if(!pos){
+				var v1:*=_body1.GetPosition();
+				var v2:*=_body2.GetPosition();
+				pos=v2.Copy();
+				pos.Subtract(v1);
+				pos.Multiply(0.5);
+				pos.Add(v1);
+			}else{
+				//,{x:5,y:5}
+			}
+			jd.Initialize(_body1, _body2, pos);
+			worldBox.CreateJoint(jd);
+			return jd;
+		}
+		public function createDistanceJoint(_body1:b2Body,_body2:b2Body):b2DistanceJointDef{
+			var jd:b2DistanceJointDef = new b2DistanceJointDef();
+			jd.Initialize(_body1, _body2, _body1.GetPosition(),_body2.GetPosition());
+			worldBox.CreateJoint(jd);
+			return jd;
+		}
+		private function putToDic(_clip:*,_body:*):b2Body{
 			if (_clip){
-				//_body.m_userData=_clip;
 				bodyDict[_clip]=_body;
 			}else{
 				invisibleDict[_body]=_body;
 			}
+			_body.SetMassFromShapes();
 			return _body;
+		}
+		public function register(_clip:*,_body:*):b2Body{
+			if(_body is b2Body){
+				return putToDic(_clip,_body);
+			}
+			if (!_body){
+				_body={};
+			}
+			if (!_body.hasOwnProperty("type")){
+				_body.type=BOX;
+			}
+			if (_clip is DisplayObject){ 
+				if (!_body.hasOwnProperty("x")){
+					_body.x=_clip.x
+				};
+				if (!_body.hasOwnProperty("y")){
+					_body.y=_clip.y
+				};
+				if (_body.type==BOX){
+					if (!_body.hasOwnProperty("width")){
+						_body.width=_clip.width
+					};
+					if (!_body.hasOwnProperty("height")){
+						_body.height=_clip.height
+					};
+				}else if (_body.type==CIRCLE){
+					if (!_body.hasOwnProperty("radius")){
+						_body.radius=_clip.width/2
+					};
+				}
+			}
+			return putToDic(_clip,createBody(_body));
 		}
 		//销毁刚体
 		public function unregister(_clip:*):void{
@@ -159,67 +234,6 @@
 			}
 			return invisibleDict[_clip];
 		}
-		
-		public function createb2Body(parms:Object):b2Body{
-			if (!parms) parms=new Object()
-			
-			
-			var bodyDef:b2BodyDef=new b2BodyDef();
-			bodyDef.position.Set(parms.x*physToPixel,parms.y*physToPixel);
-			
-			var shapeDef:b2ShapeDef;
-			
-			if (parms.type==BOX){
-				shapeDef=new b2PolygonDef();
-				(shapeDef as b2PolygonDef).SetAsBox(parms.width*physToPixel*0.5,parms.height*physToPixel*0.5);
-			}else if (parms.type==CIRCLE){
-				shapeDef=new b2CircleDef();
-				(shapeDef as b2CircleDef).radius = parms.radius*physToPixel;
-			}else{
-				throw new Error("type取值不合法")
-			}
-			if (parms.hasOwnProperty("density")){
-				shapeDef.density=parms.density;
-			}
-			if (parms.hasOwnProperty("friction")){
-				shapeDef.friction=parms.friction;
-			}
-			if (parms.hasOwnProperty("restitution")){
-				shapeDef.restitution=parms.restitution
-			};
-			
-			var _body:b2Body = worldBox.CreateBody(bodyDef);
-			_body.CreateShape(shapeDef);
-			_body.SetMassFromShapes();
-			return _body;
-		}
-		public function CreateBody(_bodyDef:b2BodyDef):b2Body{
-			return worldBox.CreateBody(_bodyDef);
-		}
-		public function CreateBodyDef():b2BodyDef{
-			return new b2BodyDef();
-		}
-		public function CreateCircleDef():b2CircleDef{
-			return new b2CircleDef();
-		}
-		public function createJoint(body1:b2Body,body2:b2Body,pos:Point,lowerAngle:Number=NaN,upperAngle:Number=NaN):b2RevoluteJointDef{
-			var jd:b2RevoluteJointDef = new b2RevoluteJointDef();
-			
-			if (!isNaN(lowerAngle)){
-				jd.enableLimit = true;
-				jd.lowerAngle=lowerAngle;
-			}
-			if (!isNaN(upperAngle)){
-				jd.enableLimit = true;
-				jd.upperAngle=upperAngle;
-			}
-				
-			jd.Initialize(body1, body2, new b2Vec2(pos.x*physToPixel, pos.y*physToPixel));
-			worldBox.CreateJoint(jd);
-			return jd;
-		}
-		
-		
 		private function update(event:Event):void{
 			//更新鼠标
 			updateMouse();
