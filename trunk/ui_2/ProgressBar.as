@@ -23,6 +23,8 @@
 		public function set value(_value:Number):void {
 			if (_value>1) {
 				_value=1;
+			}else if(_value<0){
+				_value=0;
 			}
 			if (__value==_value) {
 				return;
