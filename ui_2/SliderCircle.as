@@ -6,9 +6,10 @@
 		public var radianOffset:int = 0;
 		public var isRotThumb:Boolean=true;
 		protected const RTA:Number=180/Math.PI;
-		override protected function init():void {
+		
+		override protected function added(_evt:Event):void {
 			radius=Math.abs(thumb.x);
-			super.init();
+			super.added(_evt);
 		}
 		override protected function formatValue(_value:Number):Number{
 			if(_value>maximum){

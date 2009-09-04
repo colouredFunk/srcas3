@@ -4,9 +4,9 @@
 		protected var __label:String;
 		public var txt:*;
 		public var bar:*;
-		override protected function init():void {
+		override protected function added(_evt:Event):void {
 			mouseChildren=false;
-			super.init();
+			super.added(_evt);
 		}
 		protected var __widthMax:int;
 		[Inspectable(defaultValue=0,type="int",name="0_固定宽")]

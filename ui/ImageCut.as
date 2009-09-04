@@ -12,9 +12,9 @@
 		public var frameClip:Sprite;
 		public var intactClip:Sprite;
 		public var thumbnailClip:Sprite;
-		public var btn_reset:Sprite;
-		public var btn_ok:Sprite;
-		public var btn_browse:Sprite;
+		public var btn_reset:*;
+		public var btn_ok:*;
+		public var btn_browse:*;
 
 		private var intactBmp:Bitmap;
 		private var thumbnailBmp:Bitmap;

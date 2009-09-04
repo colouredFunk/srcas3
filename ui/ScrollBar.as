@@ -25,7 +25,10 @@ package ui{
 		private var objYMin:Number;
 		private var objMoveDy:Number;
 		private var dir:int;
-
+		public var btn:*;
+		public var btnUp:*;
+		public var btnDown:*;
+		public var rect:*;
 		public function ScrollBar() {
 			this.addEventListener(Event.ADDED_TO_STAGE,added);
 			setStyle();
@@ -76,9 +79,9 @@ package ui{
 			}
 		}
 		public function setEnabled(_b:Boolean):void{
-			btn.setEnabled(_b);
-			btnUp.setEnabled(_b);
-			btnDown.setEnabled(_b);
+			btn.enabled=_b;
+			btnUp.enabled=_b;
+			btnDown.enabled=_b;
 			mouseEnabled=_b;
 		}
 		public function reset():void{

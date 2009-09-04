@@ -20,9 +20,12 @@
 		protected var timeHold:uint;
 		protected var isThumb:Boolean;
 		public function Slider() {
-			init();
+			addEventListener(Event.ADDED_TO_STAGE,added);
 		}
-		protected function init():void {
+		protected function added(_evt:Event):void {
+			removeEventListener(Event.ADDED_TO_STAGE,added);
+			addEventListener(Event.REMOVED_FROM_STAGE,removed);
+			
 			if(!thumb){
 				thumb=new Btn();
 				addChild(thumb);
@@ -55,7 +58,28 @@
 				length=track.width+track.x*2;
 			}
 		}
-		protected var __value:Number;
+		protected function removed(_evt:Event):void {
+			removeEventListener(Event.REMOVED_FROM_STAGE,removed);
+			removeEventListener(Event.ENTER_FRAME,dirHold);
+			change=null;
+			press=null;
+			release=null;
+		}
+		private var __enabled:Boolean;
+		public function get enabled():Boolean{
+			return __enabled;
+		}
+		public function set enabled(_enabled:Boolean):void{
+			if(__enabled==_enabled){
+				return;
+			}
+			__enabled=_enabled;
+			thumb.enabled=__enabled;
+			if (__enabled) {
+			} else {
+			}
+		}
+		private var __value:Number;
 		public function get value():Number {
 			return __value;
 		}
@@ -80,7 +104,7 @@
 			}
 			return _value;
 		}
-		protected var __length:uint;
+		private var __length:uint;
 		public function get length():uint {
 			return __length;
 		}
@@ -95,7 +119,7 @@
 			}
 			setStyle();
 		}
-		protected var __maximum:Number=100;
+		private var __maximum:Number=100;
 		public function get maximum():Number {
 			return __maximum;
 		}
@@ -104,7 +128,7 @@
 			__maximum=_maximum;
 			setStyle();
 		}
-		protected var __minimum:Number=0;
+		private var __minimum:Number=0;
 		public function get minimum():Number {
 			return __minimum;
 		}
@@ -113,7 +137,7 @@
 			__minimum=_minimum;
 			setStyle();
 		}
-		protected var __snapInterval:Number=1;
+		private var __snapInterval:Number=1;
 		public function get snapInterval():Number {
 			return __snapInterval;
 		}
