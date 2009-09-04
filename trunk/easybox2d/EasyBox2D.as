@@ -107,36 +107,37 @@
 		public function createBody(_bodyDef:*):b2Body{
 			if(!(_bodyDef is b2BodyDef)){
 				if (!_bodyDef) {
-				_bodyDef=new Object();
-			}
+					_bodyDef=new Object();
+				}
+				var bodyDef:b2BodyDef=new b2BodyDef();
+				bodyDef.position.Set(_bodyDef.x*physToPixel,_bodyDef.y*physToPixel);
+				
+				var shapeDef:b2ShapeDef;
 			
-			var bodyDef:b2BodyDef=new b2BodyDef();
-			bodyDef.position.Set(_bodyDef.x*physToPixel,_bodyDef.y*physToPixel);
+				if (_bodyDef.type==BOX){
+					shapeDef=new b2PolygonDef();
+					(shapeDef as b2PolygonDef).SetAsBox(_bodyDef.width*physToPixel*0.5,_bodyDef.height*physToPixel*0.5);
+				}else if (_bodyDef.type==CIRCLE){
+					shapeDef=new b2CircleDef();
+					(shapeDef as b2CircleDef).radius = _bodyDef.radius*physToPixel;
+				}else{
+					throw new Error("type取值不合法")
+				}
+				if (_bodyDef.hasOwnProperty("density")){
+					shapeDef.density=_bodyDef.density;
+				}
+				if (_bodyDef.hasOwnProperty("friction")){
+					shapeDef.friction=_bodyDef.friction;
+				}
+				if (_bodyDef.hasOwnProperty("restitution")){
+					shapeDef.restitution=_bodyDef.restitution
+				};
 			
-			var shapeDef:b2ShapeDef;
-			
-			if (_bodyDef.type==BOX){
-				shapeDef=new b2PolygonDef();
-				(shapeDef as b2PolygonDef).SetAsBox(_bodyDef.width*physToPixel*0.5,_bodyDef.height*physToPixel*0.5);
-			}else if (_bodyDef.type==CIRCLE){
-				shapeDef=new b2CircleDef();
-				(shapeDef as b2CircleDef).radius = _bodyDef.radius*physToPixel;
+				var _body:b2Body =worldBox.CreateBody(bodyDef);
+				_body.CreateShape(shapeDef);
+				return _body;
 			}else{
-				throw new Error("type取值不合法")
-			}
-			if (_bodyDef.hasOwnProperty("density")){
-				shapeDef.density=_bodyDef.density;
-			}
-			if (_bodyDef.hasOwnProperty("friction")){
-				shapeDef.friction=_bodyDef.friction;
-			}
-			if (_bodyDef.hasOwnProperty("restitution")){
-				shapeDef.restitution=_bodyDef.restitution
-			};
-			
-			var _body:b2Body =createBody(bodyDef);
-			_body.CreateShape(shapeDef);
-			_bodyDef=bodyDef;
+				
 			}
 			return worldBox.CreateBody(_bodyDef);
 		}
@@ -188,6 +189,7 @@
 		}
 		public function register(_clip:*,_body:*):b2Body{
 			if(_body is b2Body){
+				//_body.position.Set(_clip.x*physToPixel,_clip.y*physToPixel);
 				return putToDic(_clip,_body);
 			}
 			if (!_body){
@@ -198,10 +200,10 @@
 			}
 			if (_clip is DisplayObject){ 
 				if (!_body.hasOwnProperty("x")){
-					_body.x=_clip.x
+					_body.x=_clip.x;
 				};
 				if (!_body.hasOwnProperty("y")){
-					_body.y=_clip.y
+					_body.y=_clip.y;
 				};
 				if (_body.type==BOX){
 					if (!_body.hasOwnProperty("width")){

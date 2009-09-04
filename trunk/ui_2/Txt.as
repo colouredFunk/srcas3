@@ -27,7 +27,6 @@
 			txt.multiline=false;
 			txt.wordWrap=false;
 			txt.autoSize="left";
-			
 			if (bar) {
 				bar.mask=txt;
 			}

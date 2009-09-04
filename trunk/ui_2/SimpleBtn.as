@@ -9,11 +9,9 @@
 		public var release:Function;
 		public var rollOver:Function;
 		public var rollOut:Function;
-		public var obTemp:Object;
+		public var userData:Object;
+		public var area:*;
 		public function SimpleBtn() {
-			init();
-		}
-		protected function init():void {
 			stop();
 			addEventListener(Event.ADDED_TO_STAGE,added);
 		}
@@ -21,6 +19,10 @@
 			removeEventListener(Event.ADDED_TO_STAGE,added);
 			addEventListener(Event.REMOVED_FROM_STAGE,removed);
 			enabled=true;
+			if(area){
+				hitArea=area;
+				area.visible=false;
+			}
 		}
 		protected function removed(_evt:Event):void {
 			removeEventListener(Event.REMOVED_FROM_STAGE,removed);
@@ -29,10 +31,10 @@
 			release=null;
 			rollOver=null;
 			rollOut=null;
-			for each (var _e:* in obTemp) {
+			for each (var _e:* in userData) {
 				_e=null;
 			}
-			obTemp=null;
+			userData=null;
 			if (stage.focus==this) {
 				//否则会引起一些按键不能动作
 				stage.focus=null;

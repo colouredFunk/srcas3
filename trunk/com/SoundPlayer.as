@@ -123,7 +123,10 @@
 				return;
 			}
 			position=soundChannel.position;
-			soundChannel.stop();
+			if (soundChannel) {
+				soundChannel.stop();
+				soundChannel.removeEventListener(Event.SOUND_COMPLETE,$soundComplete);
+			}
 			dispatchEvent(new Event(SOUND_PAUSE));
 			__playState=1;
 			dispatchEvent(new Event(SOUND_STATE));
@@ -133,7 +136,10 @@
 				return;
 			}
 			position=0;
-			soundChannel.stop();
+			if (soundChannel) {
+				soundChannel.stop();
+				soundChannel.removeEventListener(Event.SOUND_COMPLETE,$soundComplete);
+			}
 			dispatchEvent(new Event(SOUND_STOP));
 			__playState=0;
 			dispatchEvent(new Event(SOUND_STATE));
