@@ -1,6 +1,7 @@
 ﻿package ui_2{
 	import flash.display.Sprite;
 	import flash.events.Event;
+	
 	import ui_2.Btn;
 	public class Slider extends Sprite {
 		public static var CHANGE:String="change";
@@ -32,7 +33,7 @@
 			}
 			thumb.hitArea=this;
 			thumb.press=function ():void {
-				mouseXOff= !bar ? thumb.mouseX : 0;
+				//mouseXOff= !bar ? thumb.mouseX : 0;
 				timeHold=0;
 				dirHold();
 				addEventListener(Event.ENTER_FRAME,dirHold);
@@ -48,15 +49,13 @@
 				}
 				dispatchEvent(new Event(RELEASE));
 			};
-			if (bar) {
-				bar.mouseEnabled=false;
-				bar.mouseChildren=false;
-			}
+			enabled=true;
 			value=0;
 			if(track){
 				thumb.setAni(track);
-				length=track.width+track.x*2;
+				length=(track.width*scaleX+track.x*2);
 			}
+			scaleX=1;
 		}
 		protected function removed(_evt:Event):void {
 			removeEventListener(Event.REMOVED_FROM_STAGE,removed);
