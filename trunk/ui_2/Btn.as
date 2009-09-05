@@ -21,14 +21,9 @@
 			onOpen=null;
 		}
 		override public function setStyle():void {
-			if (aniClip==this) {
-				setAni(aniClip);
-				return;
+			if (aniClip!=this) {
+				super.setStyle();
 			}
-			if (aniClip&&aniClip.hasEventListener(Event.ENTER_FRAME)) {
-				aniClip.removeEventListener(Event.ENTER_FRAME,aniRun);
-			}
-			super.setStyle();
 			setAni(aniClip);
 		}
 		protected var delayTime:int=1;
@@ -63,6 +58,9 @@
 				return;
 			}
 			aniClip=_clip;
+			if (aniClip&&aniClip.hasEventListener(Event.ENTER_FRAME)) {
+				aniClip.removeEventListener(Event.ENTER_FRAME,aniRun);
+			}
 			if(aniClip!=this){
 				aniClip.buttonMode=false;
 			}
