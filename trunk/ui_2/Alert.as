@@ -10,53 +10,64 @@
 		public var btn_n:*;
 		public var btn_x:*;
 		public var bar:*;
-		protected var barWidth:int;
-		protected var barHeight:int;
-		protected var dx_show:int;
-		protected var dy_show:int;
-		protected var dy_showyn:int;
-		protected var dy_yn:int;
-		//__bar,__btn_y,__btn_n,__btn_x,__txt_title,__txt_show
+		private var barWidth:int;
+		private var barHeight:int;
+		private var dx_show:int;
+		private var dy_show:int;
+		private var dy_showyn:int;
+		private var dy_yn:int;
+		
+		protected var maskArea:Sprite;
 		protected var isYN:Boolean;
 		protected var isDrag:Boolean;
 		protected var isMask:Boolean;
 		public var callBack:Function;
 		public function Alert() {
-			init();
-		}
-		protected function init():void {
 			this.addEventListener(Event.ADDED_TO_STAGE,added);
-			//txt_title.text = aStr[0];
-			
 		}
 		protected function added(_evt:Event):void {
 			this.removeEventListener(Event.ADDED_TO_STAGE,added);
 			this.addEventListener(Event.REMOVED_FROM_STAGE,removed);
 			
-			//btn_y.autoSize="center";
-			//btn_n.autoSize="center";
-			//btn_y.label="确定";
-			//btn_n.label="取消";
 			btn_y.release = function():void {
 				if((callBack!=null)?(callBack(true)!= false):true){
 					remove();
 				}
 			};
-			if (btn_n) {
-				btn_n.release=function ():void {
-					if((callBack!=null)?(callBack(false)!= false):true){
+			btn_n.release=function ():void {
+				if((callBack!=null)?(callBack(false)!= false):true){
 					remove();
-					}
-				};
-			}
+				}
+			};
+			txt_show.mouseEnabled=false;
+			btn_n.autoSize="center";
+			btn_y.autoSize="center";
+			bar.buttonMode=false;
+			bar.press = function():void  {
+				parent.addChild(this.parent);
+				startDrag();
+			};
+			bar.release =function ():void {
+				stopDrag();
+				adjustXY();
+			};
+			maskArea=new Sprite();
+			addChildAt(maskArea,0);
 			getStyleParams();
 		}
 		protected function removed(_evt:Event):void {
 			this.removeEventListener(Event.REMOVED_FROM_STAGE,removed);
-			
+			callBack=null;
+			removeChild(maskArea);
 		}
-		public function alert(_alert:String):void{
+		public function alert(_alert:String,_yes:String=null,_no:String=null):void{
 			txt_show.text=_alert;
+			if(_yes){
+				btn_y.label=_yes;
+			}
+			if(_no){
+				btn_n.label=_no;
+			}
 			setStyle();
 			setBar();
 		}
@@ -84,30 +95,20 @@
 		}
 		public function setBar(_isDrag:Boolean=true,_isMask:Boolean=true):void {
 			if (_isDrag) {
-				txt_show.mouseEnabled=false;
-				bar.buttonMode=false;
-				bar.press = function():void  {
-					parent.addChild(this.parent);
-					startDrag(false);
-				};
-				bar.release =function ():void {
-					stopDrag();
-					adjustXY();
-				};
+				bar.enabled=true;
 			} else {
-				delete bar.press;
-				delete bar.release;
+				bar.enabled=false;
 			}
 			if(_isMask){
-				//bar.hitArea=(parent as Sprite);
+				maskArea.hitArea=(parent as Sprite);
 			}else{
-				bar.hitArea=null;
+				maskArea.hitArea=null;
 			}
 			isMask=_isMask;
 			isDrag=_isDrag;
 		}
-		protected var rect:Rectangle;
-		protected function adjustXY():void {
+		private var rect:Rectangle;
+		private function adjustXY():void {
 			rect=getRect(this);
 			if (- x>rect.left) {
 				x=- rect.left;

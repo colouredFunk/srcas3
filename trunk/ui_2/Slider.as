@@ -114,7 +114,7 @@
 			}
 			__length=_length;
 			if(isAutoLength&&track){
-				track.width = length-track.x*2;
+				track.width = __length-track.x*2;
 			}
 			setStyle();
 		}
