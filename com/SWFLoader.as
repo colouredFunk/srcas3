@@ -83,8 +83,8 @@ package com{
 		private function onComplete(e:Event):void {
 			var _info:LoaderInfo = e.currentTarget as LoaderInfo;
 			removeLoadEvent(_info);
-			__loadinfo = _info;
 			this.dispatchEvent(e);
+			__loadinfo = _info;
 		}
 		/** 加载中 */
 		private var __loadedPct:Number=0;
