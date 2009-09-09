@@ -1,7 +1,7 @@
 ﻿package {
 	import flash.display.Sprite;
 	import flash.display.MovieClip;
-	//import flash.display.Stage;
+	
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.display.StageDisplayState;
@@ -9,6 +9,8 @@
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
 	import flash.events.FullScreenEvent;
+	
+	import flash.system.Security;
 
 	public class DocClass extends MovieClip {
 		protected var __WIDTH:int;
@@ -21,6 +23,7 @@
 			__WIDTH=stage.stageWidth;
 			__HEIGHT=stage.stageHeight;
 			__flashVars=stage.loaderInfo.parameters;
+			Security.allowDomain("*");
 			stage.align=StageAlign.TOP;
 			stage.scaleMode=StageScaleMode.NO_SCALE;
 			stage.showDefaultContextMenu=false;
