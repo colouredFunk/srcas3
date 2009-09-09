@@ -13,7 +13,7 @@
 	import flash.filters.ColorMatrixFilter;
 	import flash.system.Capabilities;
 
-	public class Common {
+	final public class Common {
 		public static var a2r:Number=180/Math.PI;
 		public static function randomOne():Number {
 			return random(1)>0?1:-1;

@@ -93,7 +93,9 @@
 			bodyDict=new Dictionary(true);	
 			invisibleDict=new Dictionary(true);
 		}
-		
+		public function isDragMoved():Boolean{
+			return mouseControl.isMoved();
+		}
 		//参数列表
 		//x,y左上角坐标
 		//width,height长宽
