@@ -1,6 +1,7 @@
 ﻿package com{
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
+	import flash.display.Stage;
 
 	import flash.events.EventDispatcher;
 	
