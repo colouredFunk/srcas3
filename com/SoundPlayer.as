@@ -70,8 +70,8 @@
 			sound.addEventListener(Event.COMPLETE,$complete);
 			sound.load(new URLRequest(musicList.list[playId]));
 		}
-		public function attachMusic(_musicList:String):void {
-			newList(_musicList.split("|"));
+		public function attachMusic(_musicList:*):void {
+			newList(_musicList);
 			playId=0;
 		}
 		public var defaultVolume:Number=0.8;
@@ -154,7 +154,12 @@
 		}
 		protected function newList(_list:*):void {
 			musicList=<root></root>;
-			if (_list is Array) {
+			//switch(){
+			//}
+			if ((_list is Array)||(_list is String)) {
+				if(_list is String){
+					_list=_list.split("|");
+				}
 				for each (var _e:* in _list) {
 					musicList.appendChild(<list>{_e}</list>);
 				}

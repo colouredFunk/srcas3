@@ -19,7 +19,6 @@
 		protected var mouseXOff:int;
 		protected var isAutoLength:Boolean=true;
 		protected var timeHold:uint;
-		protected var isThumb:Boolean;
 		public function Slider() {
 			addEventListener(Event.ADDED_TO_STAGE,added);
 		}
