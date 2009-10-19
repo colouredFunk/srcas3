@@ -57,8 +57,14 @@ package ui_2{
 		}
 		
 		[Inspectable(defaultValue=false,name="四角等比缩放")]
-		public var lockScale:Boolean;
-		
+		private var __canScale:Boolean;
+		public function set lockScale(_canScale:Boolean):void{
+			__canScale=_canScale;
+			dot101.visible=dot110.visible=dot120.visible=dot102.visible=!__canScale;
+		}
+		public function get lockScale():Boolean{
+			return __canScale;
+		}
 		
 		private var dot1Arr:Array;
 		private var dot2Arr:Array;

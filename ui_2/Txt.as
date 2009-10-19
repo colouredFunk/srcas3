@@ -33,8 +33,15 @@
 		}
 		protected var __widthMax:int;
 		[Inspectable(defaultValue=0,type="int",name="0_固定宽")]
+		public function get widthMax():int{
+			return __widthMax;
+		}
 		public function set widthMax(_widthMax:int):void {
 			__widthMax=_widthMax;
+			if(__widthMax){
+				txt.multiline=true;
+				txt.wordWrap=true;
+			}
 		}
 		public function get text():String {
 			if (txt.selectable) {
@@ -79,9 +86,9 @@
 			txt.restrict=_restrict;
 		}
 		public function setStyle():void {
-			if (__widthMax) {
+			if (widthMax) {
 				txt.wordWrap=true;
-				txt.width=__widthMax;
+				txt.width=widthMax;
 			} else {
 				txt.autoSize=txt.autoSize;
 			}
