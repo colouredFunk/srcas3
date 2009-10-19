@@ -52,10 +52,10 @@
 		}
 
 		/** 
-		* Sets / gets the length or magnitude of this vector. Changing the length will change the x and y but not the angle of this vector.  
+		* Sets / gets the length or magnitude of this vector. Changing the length will change the x and y but not the radian of this vector.  
 		*/
 		public function set length(value:Number):void {
-			var a:Number=angle;
+			var a:Number=radian;
 			_x=Math.cos(a)*value;
 			_y=Math.sin(a)*value;
 		}
@@ -71,13 +71,13 @@
 		}
 
 		/** 
-		* Gets / sets the angle of this vector. Changing the angle changes the x and y but retains the same length.   */
-		public function set angle(value:Number):void {
+		* Gets / sets the radian of this vector. Changing the radian changes the x and y but retains the same length.   */
+		public function set radian(value:Number):void {
 			var len:Number=length;
 			_x=Math.cos(value)*len;
 			_y=Math.sin(value)*len;
 		}
-		public function get angle():Number {
+		public function get radian():Number {
 			return Math.atan2(_y,_x);
 		}
 
@@ -143,12 +143,12 @@
 		}
 
 		/** 
-		* Calculates the angle between two vectors.  
+		* Calculates the radian between two vectors.  
 		* @param v1 The first Vector2D instance.  
 		* @param v2 The second Vector2D instance.  
-		* @return Number the angle between the two given vectors.  
+		* @return Number the radian between the two given vectors.  
 		*/
-		public static function angleBetween(v1:Vector2D,v2:Vector2D):Number {
+		public static function radianBetween(v1:Vector2D,v2:Vector2D):Number {
 			if (! v1.isNormalized()) {
 				v1=v1.clone().normalize();
 			}

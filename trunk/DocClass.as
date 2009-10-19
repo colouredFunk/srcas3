@@ -24,6 +24,7 @@
 			__HEIGHT=stage.stageHeight;
 			__flashVars=stage.loaderInfo.parameters;
 			Security.allowDomain("*");
+			Security.allowInsecureDomain("*");
 			stage.align=StageAlign.TOP;
 			stage.scaleMode=StageScaleMode.NO_SCALE;
 			stage.showDefaultContextMenu=false;

@@ -7,14 +7,14 @@
 		public function Data(){
 		}
 		public static function getInstance(_stage:Stage):Data {
-			if (_stage.loaderInfo.url.indexOf("http://localhost")==0) {
-				var _data:Data=new Data  ;
-				_data.writeUTFBytes("xxxxxxxxxxx");
-				_data.position=0;
-				return _data;
+			if (_stage.loaderInfo.url.indexOf("http://localhost")!=0) {
+				throw new Error("!!!");
+				return null;
 			}
-			throw new Error("!!!");
-			return null;
+			var _data:Data=new Data  ;
+			_data.writeUTFBytes("xxxxxxxxxxx");
+			_data.position=0;
+			return _data;
 		}
 	}
 }

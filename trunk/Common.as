@@ -109,6 +109,21 @@
 				return - _t;
 			}
 		}
+		//将数格式化为时间xx:xx
+		public static function formatTime_2(_n:uint):String {
+			var minutes:uint;
+			var seconds:uint;
+			if (_n<60) {
+				minutes = 0;
+				seconds = _n;
+			} else if (_n<3600) {
+				minutes = Math.floor(_n/60);
+				seconds = _n%60;
+			}
+			var s_m:String = minutes<10 ? "0"+String(minutes) : String(minutes);
+			var s_s:String = seconds<10 ? "0"+String(seconds) : String(seconds);
+			return s_m+":"+s_s;
+		}
 		//周期为T，振幅为A，相位为P[0，2PI]的函数对应x的y值（默认中心对称）曲线
 		public static function trigonometric(x:Number,T:Number,A:Number):Number {
 			var _nT:Number=Math.PI/T;

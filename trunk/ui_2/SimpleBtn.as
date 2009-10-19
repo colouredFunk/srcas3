@@ -25,6 +25,7 @@
 			}
 		}
 		protected function removed(_evt:Event):void {
+			stop();
 			removeEventListener(Event.REMOVED_FROM_STAGE,removed);
 			enabled=false;
 			press=null;
@@ -74,17 +75,20 @@
 			__select=_select;
 			setStyle();
 		}
+		private var __isIn:Boolean;
+		private var __isDown:Boolean;
 		public function get isIn():Boolean{
-			return Boolean(btnIn==this);
+			return __isIn;
 		}
 		public function get isDown():Boolean{
-			return Boolean(btnDown==this);
+			return __isDown;
 		}
 		private function $onPress(_evt:MouseEvent):void {
 			if(isDown){
 				return;
 			}
 			btnDown=this;
+			__isDown=true;
 			if (press!=null) {
 				press();
 			}
@@ -95,22 +99,24 @@
 				return;
 			}
 			btnDown=null;
-			if(btnIn&&!isIn){
-				btnIn.$onRollOver(null);
-			}
+			//if(btnIn&&btnIn!=this){
+				//btnIn.$onRollOver(null);
+			//}
+			__isDown=false;
 			if (release!=null) {
 				release();
 			}
 			setStyle();
 		}
 		private function $onRollOver(_evt:MouseEvent):void {
-			if(isIn&&_evt){
+			if(isIn){
 				return;
 			}
-			btnIn=this;
-			if(btnDown&&!isDown){
-				return;
-			}
+			//btnIn=this;
+			//if(btnDown&&btnDown!=this){
+				//return;
+			//}
+			__isIn=true;
 			if (rollOver!=null) {
 				rollOver();
 			}
@@ -121,6 +127,7 @@
 				return;
 			}
 			btnIn=null;
+			__isIn=false;
 			if (rollOut!=null) {
 				rollOut();
 			}
@@ -128,14 +135,14 @@
 		}
 		private var frame:uint;
 		public function setStyle():void {
-			if (btnIn==this) {
-				if (btnDown==this) {
+			if (isIn) {
+				if (isDown) {
 					frame=4;
 				} else {
 					frame=2;
 				}
 			} else {
-				if (btnDown==this) {
+				if (isDown) {
 					frame=3;
 				} else {
 					frame=1;

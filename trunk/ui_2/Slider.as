@@ -1,5 +1,6 @@
 ﻿package ui_2{
 	import flash.display.Sprite;
+	import flash.display.MovieClip;
 	import flash.events.Event;
 	
 	import ui_2.Btn;
@@ -42,6 +43,7 @@
 				dispatchEvent(new Event(PRESS));
 			};
 			thumb.release =function ():void {
+				timeHold=0;
 				removeEventListener(Event.ENTER_FRAME,dirHold);
 				if(release!=null){
 					release(value);
@@ -51,8 +53,12 @@
 			enabled=true;
 			value=0;
 			if(track){
-				thumb.setAni(track);
 				length=(track.width*scaleX+track.x*2);
+				track.mouseEnabled=false;
+				track.mouseChildren=false;
+				if(track is MovieClip&&thumb.hasOwnProperty("setAni")){
+					thumb["setAni"](track);
+				}
 			}
 			scaleX=1;
 		}
@@ -62,6 +68,9 @@
 			change=null;
 			press=null;
 			release=null;
+		}
+		public function isHold():Boolean{
+			return timeHold>0;
 		}
 		private var __enabled:Boolean;
 		public function get enabled():Boolean{
