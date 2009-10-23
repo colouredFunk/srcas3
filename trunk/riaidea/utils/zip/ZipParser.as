@@ -46,6 +46,7 @@ package riaidea.utils.zip{
 			if (!zip) return;
 			this.zip = zip;
 			this.data = data;
+			data.endian = Endian.LITTLE_ENDIAN;
 			data.position = 0;
 			parse();
 		}

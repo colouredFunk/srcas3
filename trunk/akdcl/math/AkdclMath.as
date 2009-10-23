@@ -1,8 +1,8 @@
 ﻿package akdcl.math{
 	public class AkdclMath {
-		import flash.utils.getTimer;
-		public function AkdclMath() {
-		}
+		
+		
+		
 		public static function fac(N:int):Number {
 			//全称factorial阶乘
 			var outN:Number=1;
