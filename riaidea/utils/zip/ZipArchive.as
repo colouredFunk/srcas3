@@ -156,6 +156,7 @@ package riaidea.utils.zip{
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, EventUp(getBitmapCompleted,file));
 			loader.loadBytes(file.data);
 		}
+		//EventUp是否重新扩展
 		private function EventUp (f:Function,... arg):Function{
         	return function(e:Event):void{f.apply(null,[e].concat(arg))};
 		}
