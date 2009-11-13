@@ -1,4 +1,4 @@
-﻿package com{
+﻿package application{
 
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
@@ -38,7 +38,7 @@
 			return sound.bytesLoaded/sound.bytesTotal;
 		}
 		public function get played():Number{
-			if(playState==0){
+			if(playState==SOUND_STOP){
 				return 0;
 			}
 			return soundChannel.position/sound.length;
@@ -91,12 +91,12 @@
             soundChannel.soundTransform = _trans;
 			__volume=_volume;
 		}
-		private var __playState:uint;
-		public function get playState():uint {
+		private var __playState:String;
+		public function get playState():String {
 			return __playState;
 		}
 		public function autoPlay():Boolean{
-			if (playState==2) {
+			if (playState==SOUND_START) {
 				pause();
 				return false;
 			}
@@ -104,7 +104,7 @@
 			return true;
 		}
 		public function play():void {
-			if (playState==2) {
+			if (playState==SOUND_START) {
 				return;
 			}
 			if (soundChannel) {
@@ -115,11 +115,11 @@
 			volume=volume;
 			soundChannel.addEventListener(Event.SOUND_COMPLETE,$soundComplete);
 			dispatchEvent(new Event(SOUND_START));
-			__playState=2;
+			__playState=SOUND_START;
 			dispatchEvent(new Event(SOUND_STATE));
 		}
 		public function pause():void {
-			if (playState!=2) {
+			if (playState!=SOUND_START) {
 				return;
 			}
 			position=soundChannel.position;
@@ -128,11 +128,11 @@
 				soundChannel.removeEventListener(Event.SOUND_COMPLETE,$soundComplete);
 			}
 			dispatchEvent(new Event(SOUND_PAUSE));
-			__playState=1;
+			__playState=SOUND_PAUSE;
 			dispatchEvent(new Event(SOUND_STATE));
 		}
 		public function stop():void {
-			if (playState==0) {
+			if (playState==SOUND_STOP) {
 				return;
 			}
 			position=0;
@@ -141,7 +141,7 @@
 				soundChannel.removeEventListener(Event.SOUND_COMPLETE,$soundComplete);
 			}
 			dispatchEvent(new Event(SOUND_STOP));
-			__playState=0;
+			__playState=SOUND_STOP;
 			dispatchEvent(new Event(SOUND_STATE));
 		}
 		public function next():void {
@@ -153,20 +153,21 @@
 			play();
 		}
 		protected function newList(_list:*):void {
-			musicList=<root></root>;
-			//switch(){
-			//}
-			if ((_list is Array)||(_list is String)) {
-				if(_list is String){
-					_list=_list.split("|");
-				}
-				for each (var _e:* in _list) {
-					musicList.appendChild(<list>{_e}</list>);
-				}
-			} else if (_list is XMLList) {
-				musicList.list=_list;
-			} else if (_list is XML) {
-				musicList.list=_list.list;
+
+			if (_list is XML) {
+				musicList=_list;
+			}else {
+				musicList =<root></root>;
+				if ((_list is Array)||(_list is String)) {
+					if(_list is String){
+						_list=_list.split("|");
+					}
+					for each (var _e:* in _list) {
+						musicList.appendChild(<list>{_e}</list>);
+					}
+				} else if (_list is XMLList) {
+					musicList.list=_list;
+				} 
 			}
 		}
 		protected function progress(_evt:ProgressEvent):void {

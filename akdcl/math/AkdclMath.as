@@ -2,7 +2,100 @@
 	public class AkdclMath {
 		
 		
-		
+		public static function random(_n:int=2):int {
+			_n--;
+			return Math.round(Math.random()*_n);
+		}
+		public static function randomOne():Number {
+			return random(1)>0?1:-1;
+		}
+		public static function rdm_0(a:Number,l:Number):Number {
+			return a-Math.random()*l+l*0.5;
+		}
+		public static function rdm_2(a:Number,b:Number):Number {
+			return Math.random()*b-a+a;
+		}
+		//按照数组提示产生[a1，a2]的随机因子(如果数组都为0则返回a2+1)
+		public static function rdm_a(_n0:Number, _n1:Number, _list:Array):Number {
+			var _max:Number=0;
+			var _rdm:Number=Math.random();
+			var _last:uint=0;
+			var _list:Array=_list.concat();
+			for(var _i:int=_list.length-1;_i>=0;_i--){
+				for (var _j:int= 0; _j<_i; _j++) {
+					_list[_i]+=_list[_j];
+				}
+				_max<_list[_i] && (_max=_list[_i]);
+				_list[_i]/=_max;
+				if (_rdm>=_list[_i]) {
+					_last=_i+1;
+					break;
+				}
+			}
+			return _n0+_last*(_n1-_n0)/(_list.length-1);
+		}
+		//_n小于_nMin返回_nMin，大于_nMax返回_nMax，反之返回_n
+		public static function numRange(_n:Number,_nMin:Number,_nMax:Number):Number {
+			if (_n<_nMin) {
+				return _nMin;
+			} else if (_n>_nMax) {
+				return _nMax;
+			}
+			return _n;
+		}
+		public static function distance(_x0:Number,_y0:Number,_xt:Number,_yt:Number):Number {
+			return Math.sqrt(Math.pow(_xt-_x0,2)+Math.pow(_yt-_y0,2));
+		}
+		//返回矩形区域最小正边长
+		public static function side_min(_x0:Number,_y0:Number,_xt:Number,_yt:Number):Number {
+			var _nDx:Number=_xt-_x0;
+			_nDx<0&&(_nDx=- _nDx);
+			var _nDy:Number=_yt-_y0;
+			_nDy<0&&(_nDy=- _nDy);
+			return Math.min(_nDx,_nDy);
+		}
+		//返回矩形区域最大正边长
+		public static function side_max(_x0:Number,_y0:Number,_xt:Number,_yt:Number):Number {
+			var _nDx:Number=_xt-_x0;
+			_nDx<0&&(_nDx=- _nDx);
+			var _nDy:Number=_yt-_y0;
+			_nDy<0&&(_nDy=- _nDy);
+			return Math.max(_nDx,_nDy);
+		}//返回正常的弧度数
+		public static function rFloor(r:Number):Number {
+			if (r>=Math.PI) {
+				r-=2*Math.PI;
+			}
+			if (r<=- Math.PI) {
+				r+=2*Math.PI;
+			}
+			return r;
+		}
+		//small<n<big；-1，0，1
+		public static function s_b(n:Number,a:Number,b:Number):int {
+			if (a<n&&n<b) {
+				return 0;
+			} else if (n<=a) {
+				return -1;
+			} else {
+				return 1;
+			}
+		}
+		//|n|>0,t;|n|<0,-t;|n|==0,0
+		public static function vpNum(_n:Number,_t:Number=1):Number {
+			if (_n==0) {
+				return 0;
+			} else if (_n>0) {
+				return _t;
+			} else {
+				return - _t;
+			}
+		}
+		//周期为T，振幅为A，相位为P[0，2PI]的函数对应x的y值（默认中心对称）曲线
+		public static function trigonometric(x:Number,T:Number,A:Number):Number {
+			var _nT:Number=Math.PI/T;
+			return A*Math.sin(_nT*x);
+		}
 		public static function fac(N:int):Number {
 			//全称factorial阶乘
 			var outN:Number=1;

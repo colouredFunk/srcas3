@@ -1,4 +1,5 @@
-﻿package com{
+﻿package application{
+	import flash.display.DisplayObject;
 	import flash.events.EventDispatcher;
 	import flash.utils.Dictionary;
 	import flash.display.Sprite;
@@ -11,19 +12,32 @@
 		public var viewXOff:Number=0;
 		private var rollDic:Dictionary;
 		private var rollList:Array;
+		private var rollDeath:Array;
 		public var length:uint=10;
 		public function RollModel(_radiusX:int=300,_radiusY:int=50) {
 			radiusX=_radiusX;
 			radiusY=_radiusY;
 			rollDic=new Dictionary();
 			rollList=[];
+			rollDeath=[];
 		}
 		public function addRoll(_roll:*,_radian:Number=NaN):void {
-			rollDic[_roll]=_radian||Math.PI*2/length*rollList.length;
+			rollDic[_roll]=_radian||radianFloor(Math.PI*2/length*rollList.length);
 			rollList.push(_roll);
+			rollDeath.push(_roll);
 		}
+		public function getRoll(_id:uint):DisplayObject{
+			return rollList[_id];
+		}
+		public function getRollRadian(_roll:DisplayObject):Number{
+			return rollDic[_roll];
+		}
+		public function getRollRadianByID(_id:uint):Number{
+			return rollDic[getRoll(_id)];
+		}
+		public var scaleK:Number=0.2;
 		private function getK(_n:Number):Number {
-			_n = _n*(1-0.2)+0.2;
+			_n = _n*(1-scaleK)+scaleK;
 			return _n;
 		}
 		private function getA(_n:Number):Number {
@@ -77,8 +91,8 @@
 					_roll.visible = _roll.alpha>0;
 				}
 			}
-			rollList.sort(depthSort);
-			rollList.forEach(setIndex);
+			rollDeath.sort(depthSort);
+			rollDeath.forEach(setIndex);
 		}
 		private function setIndex(_element:*, _index:int, _arr:Array):void{
 			if(_element.stage){
