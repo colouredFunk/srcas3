@@ -13,15 +13,15 @@
 	import flash.system.Security;
 
 	public class DocClass extends MovieClip {
-		protected var __WIDTH:int;
-		protected var __HEIGHT:int;
+		protected var __widthOrg:int;
+		protected var __heightOrg:int;
 		public function DocClass() {
 			init();
 		}
 		protected function init():void {
 			stop();
-			__WIDTH=stage.stageWidth;
-			__HEIGHT=stage.stageHeight;
+			__widthOrg=stage.stageWidth;
+			__heightOrg=stage.stageHeight;
 			__flashVars=stage.loaderInfo.parameters;
 			Security.allowDomain("*");
 			Security.allowInsecureDomain("*");
@@ -59,11 +59,11 @@
 				onLoaded();
 			}
 		}
-		public function get WIDTH():int{
-			return __WIDTH;
+		public function get widthOrg():int{
+			return __widthOrg;
 		}
-		public function get HEIGHT():int{
-			return __HEIGHT;
+		public function get heightOrg():int{
+			return __heightOrg;
 		}
 		protected var __flashVars:Object;
 		public function get flashVars():Object {
@@ -80,7 +80,7 @@
 				stage.displayState=StageDisplayState.NORMAL;
 			}
 			if (onFullScreen!=null) {
-				//onFullScreen(_isFullScreen,_isFullScreen?stage.fullScreenWidth:__WIDTH,_isFullScreen?stage.fullScreenHeight:__HEIGHT);
+				//onFullScreen(_isFullScreen,_isFullScreen?stage.fullScreenWidth:__widthOrg,_isFullScreen?stage.fullScreenHeight:__heightOrg);
 			}
 		}
 	}
