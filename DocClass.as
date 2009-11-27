@@ -29,9 +29,9 @@
 			stage.scaleMode=StageScaleMode.NO_SCALE;
 			stage.showDefaultContextMenu=false;
 			//this.addEventListener(FullScreenEvent.FULL_SCREEN,$onFullScreen);
-			//this.loaderInfo.addEventListener(ProgressEvent.PROGRESS,loading);
-			//this.loaderInfo.addEventListener(Event.COMPLETE,loaded);
-			this.addEventListener(Event.ENTER_FRAME,loading);
+			this.loaderInfo.addEventListener(ProgressEvent.PROGRESS,loading);
+			this.loaderInfo.addEventListener(Event.COMPLETE,loaded);
+			//this.addEventListener(Event.ENTER_FRAME,loading);
 			onLoaded=function():void{
 				if(this.currentFrame==1){
 					play();
@@ -46,10 +46,10 @@
 				onLoading(_nT);
 			}
 			loadedPct=_nT;
-			if(_nT==1&&onLoaded!=null){
-				this.removeEventListener(Event.ENTER_FRAME,loading);
-				onLoaded();
-			}
+			//if(_nT==1&&onLoaded!=null){
+				//this.removeEventListener(Event.ENTER_FRAME,loading);
+				//onLoaded();
+			//}
 		}
 		public var onLoaded:Function;
 		protected function loaded(evt:Event):void{

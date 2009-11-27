@@ -1,4 +1,5 @@
 ﻿package ui_2{
+	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.display.MovieClip;
 	import flash.events.Event;
@@ -12,10 +13,12 @@
 		public var press:Function;
 		public var release:Function;
 
-		public var thumb:*;
+		public var thumb:Btn;
 		public var bar:*;
 		public var track:*;
-
+		public var tick:*;
+		private var TickClass:Class;
+		private var tickList:Array;
 		protected var scale:Number;
 		protected var mouseXOff:int;
 		protected var isAutoLength:Boolean=true;
@@ -26,7 +29,6 @@
 		protected function added(_evt:Event):void {
 			removeEventListener(Event.ADDED_TO_STAGE,added);
 			addEventListener(Event.REMOVED_FROM_STAGE,removed);
-			
 			if(!thumb){
 				thumb=new Btn();
 				addChild(thumb);
@@ -53,14 +55,14 @@
 			enabled=true;
 			value=0;
 			if(track){
-				length=(track.width*scaleX+track.x*2);
+				length = (track.width * scaleX + track.x * 2);
 				track.mouseEnabled=false;
 				track.mouseChildren=false;
-				if(track is MovieClip&&thumb.hasOwnProperty("setAni")){
-					thumb["setAni"](track);
+				if(track is MovieClip){
+					thumb.setAni(track);
 				}
 			}
-			scaleX=1;
+			scaleX = 1;
 		}
 		protected function removed(_evt:Event):void {
 			removeEventListener(Event.REMOVED_FROM_STAGE,removed);
@@ -86,7 +88,11 @@
 			} else {
 			}
 		}
+		private var __valueLast:Number;
 		private var __value:Number;
+		public function get valueLast():Number {
+			return __valueLast;
+		}
 		public function get value():Number {
 			return __value;
 		}
@@ -96,6 +102,7 @@
 			if (__value==_value) {
 				return;
 			}
+			__valueLast = __value;
 			__value=_value;
 			setValue();
 			if (change!=null) {
@@ -152,6 +159,38 @@
 		public function set snapInterval(_snapInterval:Number):void {
 			__snapInterval=_snapInterval;
 			setStyle();
+		}
+		private var __tickInterval:Number = 0;
+		public function getTick(_id:uint):DisplayObject {
+			if (_id>=tickList.length) {
+				var _tick:*= new TickClass();
+				tickList.push(_tick);
+			}
+			return tickList[_id];
+		}
+		public function get tickInterval():Number {
+			return __tickInterval;
+		}
+		//[Inspectable(defaultValue=0,type="Number",name="刻度")]
+		public function set tickInterval(_tickInterval:Number):void {
+			if (_tickInterval == 0) {
+				return;
+			}
+			if (TickClass == null && tick) {
+				
+				tickList = [tick];
+				TickClass = tick.constructor as Class;
+			}
+			for each (var _tick:* in tickList) {
+				removeChild(_tick);
+			}
+			__tickInterval = _tickInterval;
+			for (var _i:Number = minimum, _id:uint = 0; _i <=maximum; _i += __tickInterval, _id++ ) {
+				_tick = getTick(_id);
+				_tick.x = (_i - minimum) * scale;
+				addChildAt(_tick,0);
+			}
+			//setStyle();
 		}
 		public function intValue():void {
 			value=Math.round(thumb.x/scale)+minimum;
