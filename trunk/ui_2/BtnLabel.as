@@ -66,11 +66,11 @@
 			bar.width=__widthMax?__widthMax:(txt.width+__widthAdd);
 			bar.height=__heightMax?__heightMax:(txt.height+__heightAdd);
 			if (txt.autoSize=="right") {
-				bar.x=- int(bar.width)+__widthAdd*0.5;
+				bar.x=- int(bar.width+__widthAdd*0.5);
 			} else if (txt.autoSize=="center") {
 				bar.x=- int(bar.width*0.5);
 			} else {
-				bar.x=- __widthAdd*0.5;
+				bar.x=- int(__widthAdd*0.5);
 			}
 			bar.x+=__xOff;
 			bar.y=__yOff;

@@ -8,8 +8,11 @@
 		public var onOpen:Function;
 		override protected function added(_evt:Event):void {
 			super.added(_evt);
+			if (aniClip) {
+				aniClip.stop();
+			}
 			if (totalFrames>8) {
-				aniClip=this;
+				setAni(this);
 			}
 			setAni(aniClip);
 		}
@@ -21,7 +24,9 @@
 			onOpen=null;
 		}
 		override public function setStyle():void {
-			if (aniClip!=this) {
+			if (totalFrames>8) {
+				setAni(this);
+			}else {
 				super.setStyle();
 			}
 			setAni(aniClip);
@@ -57,15 +62,15 @@
 			if (! _clip) {
 				return;
 			}
-			aniClip=_clip;
-			if (aniClip&&aniClip.hasEventListener(Event.ENTER_FRAME)) {
-				aniClip.removeEventListener(Event.ENTER_FRAME,aniRun);
+			if (_clip!=this) {
+				aniClip=_clip;
+				_clip.buttonMode=false;
 			}
-			if(aniClip!=this){
-				aniClip.buttonMode=false;
+			if (_clip&&_clip.hasEventListener(Event.ENTER_FRAME)) {
+				_clip.removeEventListener(Event.ENTER_FRAME,aniRun);
 			}
-			if (! aniClip.hasEventListener(Event.ENTER_FRAME)) {
-				aniClip.addEventListener(Event.ENTER_FRAME,aniRun);
+			if (! _clip.hasEventListener(Event.ENTER_FRAME)) {
+				_clip.addEventListener(Event.ENTER_FRAME,aniRun);
 			}
 		}
 	}
