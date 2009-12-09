@@ -21,7 +21,8 @@
 			enabled=true;
 			if(area){
 				hitArea=area;
-				area.visible=false;
+				area.visible = false;
+				
 			}
 		}
 		protected function removed(_evt:Event):void {

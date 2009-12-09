@@ -10,7 +10,7 @@
 	import flash.events.ProgressEvent;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
-	import gs.TweenMax;
+	import com.greensock.TweenMax;
 	import ui_2.SimpleBtn;
 	/**
 	 * ...
@@ -28,6 +28,7 @@
 		public static var LOADING:String = "pic_loading";
 		public static var TWEENING:String = "pic_tweening";
 		public static var DELAYING:String = "pic_delaying";
+		
 		public var picWidth:uint;
 		public var picHeight:uint;
 		public var picAspectRatio:Number;
@@ -48,6 +49,7 @@
 			addEventListener(Event.ADDED_TO_STAGE, added);
 		}
 		private function added(_evt:Event):void {
+			stage.align=StageAlign.TOP_LEFT;
 			removeEventListener(Event.ADDED_TO_STAGE, added);
 			addEventListener(Event.REMOVED_FROM_STAGE, removed);
 			timer = new Timer(100);
