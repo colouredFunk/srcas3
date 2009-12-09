@@ -3,8 +3,7 @@
 		
 		
 		public static function random(_n:int=2):int {
-			_n--;
-			return Math.round(Math.random()*_n);
+			return Math.floor(Math.random()*_n);
 		}
 		public static function randomOne():Number {
 			return random(1)>0?1:-1;

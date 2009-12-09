@@ -61,6 +61,10 @@
 				enabled=false;
 			}
 		}
+		public function setHeight(_h:Number):void{
+			rectMask.height=_h;
+			scrollContent=content.name;
+		}
 		private var __enabled:Boolean;
 		public function get enabled():Boolean {
 			return __enabled;

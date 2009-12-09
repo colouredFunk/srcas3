@@ -132,9 +132,9 @@
 			return _loader;
 		}
 		//_funLoaded(event:Event):void {event.currentTarget.data}
-		public static function urlLoader(_url:String,_funLoaded:Function=null,_funLoading:Function=null,_funError:Function=null):URLLoader {
+		public static function urlLoader(_url:String,_funLoaded:Function=null,_funLoading:Function=null,_funError:Function=null,_data:Object=null):URLLoader {
 			var _loader:URLLoader=new URLLoader();
-			//_loader.dataFormat=URLLoaderDataFormat.BINARY;
+			
 			if (_funLoaded!=null) {
 				if (_funLoading!=null) {
 					_loader.addEventListener(ProgressEvent.PROGRESS,_funLoading);
@@ -159,7 +159,17 @@
 				};
 				_loader.addEventListener(IOErrorEvent.IO_ERROR,_tempError);
 			}
-			_loader.load(new URLRequest(_url));
+			var _request:URLRequest=new URLRequest(_url);
+			if (_data) {
+				//_loader.dataFormat=URLLoaderDataFormat.VARIABLES;
+				var _urlVariables:URLVariables=new URLVariables();
+				for(var _i:String in _data){
+					_urlVariables[_i] = _data[_i];
+				}
+				_request.data=_urlVariables;
+				_request.method=URLRequestMethod.POST;
+			}
+			_loader.load(_request);
 			return _loader;
 		}//_funLoaded(event:Event):void {event.currentTarget.data}
 		public static function urlStream(_url:String,_funLoaded:Function=null,_funLoading:Function=null,_funError:Function=null):URLStream {

@@ -41,7 +41,8 @@
 					remove();
 				}
 			};
-			txt_show.mouseEnabled=false;
+			txt_show.mouseEnabled = false;
+			txt_show.html = true;
 			btn_n.autoSize="center";
 			btn_y.autoSize="center";
 			bar.buttonMode=false;
@@ -98,21 +99,29 @@
 				}
 			}
 			text=_alert.split("\r\n").join("\r");
+			showBtns(true, _isYN, _yes, _no);
+			setBar();
+		}
+		public function showBtns(_b:Boolean, _isYN:Boolean = false, _yes:String = null, _no:String = null):void {
+			if(_b){
+				btn_y.visible=btn_n.visible=_b;
+			}else{
+				btn_y.visible=btn_n.visible=_b;
+			}
 			if(_yes){
 				btn_y.label=_yes;
 			}
 			if(_no){
 				btn_n.label=_no;
 			}
-			isYN=_isYN;
-			setBar();
-		}
-		public function showBtns(_b:Boolean=false):void{
-			if(_b){
-				btn_y.visible=btn_n.visible=_b;
-			}else{
-				btn_y.visible=btn_n.visible=_b;
+			if (_isYN) {
+				btn_y.x=- btn_n.x;
+				btn_n.visible=true;
+			} else {
+				btn_y.x=0;
+				btn_n.visible=false;
 			}
+			isYN=_isYN;
 		}
 		protected function getStyleParams():void {
 			barWidth=int(bar.width);
@@ -133,13 +142,6 @@
 			adjustXY();
 		}
 		public function setBar(_isDrag:Boolean=true,_isMask:Boolean=true):void {
-			if (isYN) {
-				btn_y.x=- btn_n.x;
-				btn_n.visible=true;
-			} else {
-				btn_y.x=0;
-				btn_n.visible=false;
-			}
 			if (_isDrag) {
 				bar.enabled=true;
 			} else {
