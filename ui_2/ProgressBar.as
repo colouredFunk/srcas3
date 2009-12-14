@@ -3,6 +3,7 @@
 	public class ProgressBar extends Sprite {
 		public var change:Function;
 		public var bar:*;
+		public var thumb:*;
 		public function ProgressBar():void {
 			if (length==0) {
 				length=bar.width;
@@ -36,7 +37,10 @@
 			}
 		}
 		protected function setValue():void {
-			bar.width=Math.round(value*length);
+			bar.width = Math.round(value * length);
+			if (thumb) {
+				thumb.x = bar.width;
+			}
 		}
 	}
 }

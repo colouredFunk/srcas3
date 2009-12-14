@@ -84,7 +84,7 @@
 		public function get isDown():Boolean{
 			return __isDown;
 		}
-		private function $onPress(_evt:MouseEvent):void {
+		public function $onPress(_evt:MouseEvent):void {
 			if(isDown){
 				return;
 			}
@@ -95,7 +95,7 @@
 			}
 			setStyle();
 		}
-		private function $onRelease(_evt:MouseEvent):void {
+		public function $onRelease(_evt:MouseEvent):void {
 			if(!isDown){
 				return;
 			}
@@ -109,7 +109,7 @@
 			}
 			setStyle();
 		}
-		private function $onRollOver(_evt:MouseEvent):void {
+		public function $onRollOver(_evt:MouseEvent):void {
 			if(isIn){
 				return;
 			}
@@ -123,7 +123,7 @@
 			}
 			setStyle();
 		}
-		private function $onRollOut(_evt:MouseEvent):void {
+		public function $onRollOut(_evt:MouseEvent):void {
 			if (!isIn) {
 				return;
 			}

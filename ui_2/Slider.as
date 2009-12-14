@@ -13,7 +13,7 @@
 		public var press:Function;
 		public var release:Function;
 
-		public var thumb:Btn;
+		public var thumb:*;
 		public var bar:*;
 		public var track:*;
 		public var tick:*;
@@ -58,7 +58,7 @@
 				length = (track.width * scaleX + track.x * 2);
 				track.mouseEnabled=false;
 				track.mouseChildren=false;
-				if(track is MovieClip){
+				if(track is MovieClip&&track.totalFrames>1){
 					thumb.setAni(track);
 				}
 			}
@@ -71,7 +71,7 @@
 			press=null;
 			release=null;
 		}
-		public function isHold():Boolean{
+		public function get isHold():Boolean{
 			return timeHold>0;
 		}
 		private var __enabled:Boolean;
