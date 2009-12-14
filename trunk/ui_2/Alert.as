@@ -100,7 +100,7 @@
 			}
 			text=_alert.split("\r\n").join("\r");
 			showBtns(true, _isYN, _yes, _no);
-			setBar();
+			setBar(true,true);
 		}
 		public function showBtns(_b:Boolean, _isYN:Boolean = false, _yes:String = null, _no:String = null):void {
 			if(_b){
@@ -141,7 +141,7 @@
 			btn_n.y=btn_y.y=bar.y+bar.height-dy_yn;
 			adjustXY();
 		}
-		public function setBar(_isDrag:Boolean=true,_isMask:Boolean=true):void {
+		public function setBar(_isDrag:Boolean=false,_isMask:Boolean=false):void {
 			if (_isDrag) {
 				bar.enabled=true;
 			} else {
@@ -172,8 +172,6 @@
 			y=int(y);
 		}
 		public function remove():void {
-			callBack=null;
-			visible=false;
 			if (parent) {
 				parent.removeChild(this);
 			}

@@ -8,6 +8,9 @@
 			mouseChildren=false;
 			super.added(_evt);
 		}
+		public function get barWidth():uint {
+			return __widthMax?__widthMax:(txt.width + __widthAdd);
+		}
 		protected var __widthMax:int;
 		[Inspectable(defaultValue=0,type="int",name="0_固定宽")]
 		public function set widthMax(_widthMax:int):void {
@@ -54,6 +57,9 @@
 		public function set autoSize(_autoSize:String):void {
 			txt.autoSize=_autoSize;
 			setStyleBar();
+		}
+		public function set html(_b:Boolean):void{
+			txt.html=true;
 		}
 		override public function setStyle():void {
 			super.setStyle();

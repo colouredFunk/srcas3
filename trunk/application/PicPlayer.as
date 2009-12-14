@@ -5,6 +5,7 @@
 	import flash.display.BitmapData;
 	import flash.display.Loader;
 	import flash.display.Sprite;
+	import flash.display.StageAlign;
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
@@ -234,7 +235,7 @@
 			dispatchEvent(new Event(DELAYING));
 		}
 		private function picLoading(_evt:ProgressEvent):void {
-			dispatchEvent(new Event(LOADING));
+			dispatchEvent(new ProgressEvent(LOADING,false,false,_evt.bytesLoaded,_evt.bytesTotal));
 		}
 		private function changePic(_loader:Loader):void {
 			

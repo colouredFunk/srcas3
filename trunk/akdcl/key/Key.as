@@ -3,6 +3,7 @@
 
 	import akdcl.events.KeyEvent;
 	public class Key extends EventDispatcher implements IKey {
+		public var userData:Object;
 		public function Key(_code:*,_name:String=null,_type:String="system",_groupName:String=null):void {
 			keyCode=(_code is Number)?_code:String(_code).toUpperCase().charCodeAt(0);
 			keyName=_name||String.fromCharCode(keyCode);
