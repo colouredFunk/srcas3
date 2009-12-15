@@ -46,12 +46,14 @@
 		
 		private var numCombo:uint;
 		public var timeTotal:uint = 60;
-		public var timeAdd:uint = 2;
+		public var timeAdd:uint = 1;
 		public var onRemoveTiles:Function;
 		public var onRemoveType:Function;
 		public var onTimerChange:Function;
 		public var onTimerOver:Function;
 		public var onScoreChange:Function;
+		public var onRecMove:Function;
+		public var onRecUnmove:Function;
 		public function Collision() {
 			instance = this;
 			map = new Map();
@@ -74,6 +76,9 @@
 			}
 			rec_follow.press = function():void {
 				if (!isControl || map.isStone(lineX_now, lineY_now)) {
+					if (map.isStone(lineX_now, lineY_now)&&onRecUnmove!=null) {
+						onRecUnmove();
+					}
 					return;
 				}
 				if (isSelect && Math.abs(lineX_now - lineX_select) + Math.abs(lineY_now - lineY_select) == 1) {
@@ -292,8 +297,16 @@
 			rec_follow.scaleY = _h / rec_heightOrg;
 		}
 		private function moveRecSelect(_evt:Event):void {
-			lineX_now = int(mouseX / Tile.tileWidth);
-			lineY_now = int(mouseY / Tile.tileHeight);
+			var _lineX:uint = int(mouseX / Tile.tileWidth);
+			var _lineY:uint = int(mouseY / Tile.tileWidth);
+			if (lineX_now==_lineX&&lineY_now==_lineY) {
+				return;
+			}
+			if (rec_follow.alpha>0&&onRecMove!=null) {
+				onRecMove();
+			}
+			lineX_now = _lineX;
+			lineY_now = _lineY;
 			rec_follow.x = lineX_now * Tile.tileWidth;
 			rec_follow.y = lineY_now * Tile.tileHeight;
 			if (isPress) {
@@ -413,7 +426,7 @@
 					}
 				}
 				Map.picCount = Map.picMin + numRemoved / hardest * (Map.picMax - Map.picMin);
-				if (onRemoveTiles!=null) {
+				if (onRemoveTiles != null) {
 					onRemoveTiles(numRemoved);
 				}
 			}

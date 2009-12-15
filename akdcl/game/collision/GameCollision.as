@@ -29,7 +29,7 @@
 		public var btn_item_4:Btn;
 		private var itemsList:Array;
 		private var items:Items;
-		
+		public var onItemUse:Function;
 		public function GameCollision() {
 			itemsList = [btn_item_0, btn_item_1, btn_item_2, btn_item_3, btn_item_4];
 			var _btn:*;
@@ -56,6 +56,11 @@
 				itemsList[_id].txt.visible = true;
 				itemsList[_id].clip.gotoAndStop(_item.type);
 				itemsList[_id].txt.text = "X" + _item.remain;
+			}
+			items.onItemUse = function():void {
+				if (onItemUse!=null) {
+					onItemUse();
+				}
 			}
 			items.updata();
 			bar_time.value = 1;
