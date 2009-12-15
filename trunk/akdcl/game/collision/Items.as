@@ -18,6 +18,7 @@
 		public static const ITEMS_MAX:uint = 7;
 		public static var itemLength:uint = 3;
 		private var itemList:Array;
+		public var onItemUse:Function
 		public function Items() {
 			itemList = [];
 			//1石头消除
@@ -59,6 +60,9 @@
 			var _item:Item = itemList[_id];
 			if (!_item) {
 				return;
+			}
+			if (onItemUse!=null) {
+				onItemUse();
 			}
 			itemUsed(_item);
 			_item.remain--;

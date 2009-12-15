@@ -76,9 +76,9 @@
 			__sound = _sound;
 			btn_sound.clip.gotoAndStop(__sound?1:2);
 			if (__sound) {
-				SoundManage.stopSound();
+				SoundManage.setSoundVol(1);
 			}else {
-				SoundManage.returnSound();
+				SoundManage.setSoundVol(0);
 			}
 		}
 		public function startGame():void {
