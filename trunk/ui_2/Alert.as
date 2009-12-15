@@ -5,6 +5,7 @@
 	import flash.events.Event;
 	public class Alert extends Sprite {
 		public static var AlertLayer:Sprite;
+		public static var AlertClass:Class;
 		public var callBack:Function;
 		
 		private var barWidth:int;
@@ -30,7 +31,6 @@
 		protected function added(_evt:Event):void {
 			this.removeEventListener(Event.ADDED_TO_STAGE,added);
 			this.addEventListener(Event.REMOVED_FROM_STAGE,removed);
-			
 			btn_y.release = function():void {
 				if((callBack!=null)?(callBack(true)!= false):true){
 					remove();
@@ -94,7 +94,7 @@
 					this.x=int(AlertLayer.stage.stageWidth*0.5);
 					this.y=int(AlertLayer.stage.stageHeight*0.5);
 				}else{
-					trace("AlertLayer is null!!! So addChild "+this.name+" before "+this.name +".alert(xxxxxxxxxx)!!!" );
+					trace("AlertLayer is undefined!" );
 					return;
 				}
 			}
@@ -123,24 +123,6 @@
 			}
 			isYN=_isYN;
 		}
-		protected function getStyleParams():void {
-			barWidth=int(bar.width);
-			dx_show=int(txt_show.x-bar.x);
-			dy_show=int(txt_show.y-bar.y);
-			dy_yn=int(bar.y+bar.height-btn_y.y);
-			dy_showyn=int(btn_y.y-txt_show.y-txt_show.height);
-			if(!txt_show.widthMax){
-				txt_show.widthMax=barWidth-dx_show*2;
-			}
-		}
-		public function setStyle():void {
-			barHeight=int(txt_show.height+dy_showyn+dy_show+dy_yn);
-			bar.height=barHeight;
-			bar.y=- int(barHeight*0.5);
-			txt_show.y=bar.y+dy_show;
-			btn_n.y=btn_y.y=bar.y+bar.height-dy_yn;
-			adjustXY();
-		}
 		public function setBar(_isDrag:Boolean=false,_isMask:Boolean=false):void {
 			if (_isDrag) {
 				bar.enabled=true;
@@ -154,6 +136,29 @@
 			}
 			isMask=_isMask;
 			isDrag=_isDrag;
+		}
+		public function remove():void {
+			if (parent) {
+				parent.removeChild(this);
+			}
+		}
+		public function setStyle():void {
+			barHeight=int(txt_show.height+dy_showyn+dy_show+dy_yn);
+			bar.height=barHeight;
+			bar.y=- int(barHeight*0.5);
+			txt_show.y=bar.y+dy_show;
+			btn_n.y=btn_y.y=bar.y+bar.height-dy_yn;
+			adjustXY();
+		}
+		protected function getStyleParams():void {
+			barWidth=int(bar.width);
+			dx_show=int(txt_show.x-bar.x);
+			dy_show=int(txt_show.y-bar.y);
+			dy_yn=int(bar.y+bar.height-btn_y.y);
+			dy_showyn=int(btn_y.y-txt_show.y-txt_show.height);
+			if(!txt_show.widthMax){
+				txt_show.widthMax=barWidth-dx_show*2;
+			}
 		}
 		private var rect:Rectangle;
 		private function adjustXY():void {
@@ -171,10 +176,16 @@
 			x=int(x);
 			y=int(y);
 		}
-		public function remove():void {
-			if (parent) {
-				parent.removeChild(this);
+		
+		public static function createAlert(_str:String,_isYN:Boolean=false,_yes:String=null,_no:String=null):Alert {
+			var _alert:Alert;
+			if (AlertClass) {
+				_alert = new AlertClass();
+			}else {
+				_alert = new Alert();
 			}
+			_alert.alert(_str, _isYN, _yes, _no);
+			return _alert;
 		}
 	}
 }
