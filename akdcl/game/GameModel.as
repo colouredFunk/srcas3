@@ -200,7 +200,6 @@
 			}
 			alertWait.showBtns(true, true,labelTryAgain,labelResetGame);
 			alertWait.text = _evt?tipFail:tipFailPage;
-			
 		}
 		public function getAlert(_str:String,_isYN:Boolean=false,_yes:String=null,_no:String=null):Alert {
 			var _alert:Alert = new AlertClass();
