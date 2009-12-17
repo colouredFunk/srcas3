@@ -1,4 +1,4 @@
-﻿package application{
+﻿package akdcl.application{
 	import flash.display.DisplayObject;
 	import flash.events.EventDispatcher;
 	import flash.utils.Dictionary;

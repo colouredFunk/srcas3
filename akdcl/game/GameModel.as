@@ -1,11 +1,13 @@
 ﻿package akdcl.game
 {
-	import akdcl.game.SoundManage;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.net.URLLoader;
 	import flash.net.URLVariables;
+	
+	import akdcl.manager.SoundManager;
+	import akdcl.net.AkdclLoader;
 	import ui_2.Btn;
 	import ui_2.Alert;
 	
@@ -38,15 +40,17 @@
 		public var labelTryAgain:String = "重试";
 		public var game:*;
 		
-		public var AlertClass:Class = Alert_0;
 		public var btn_pause:Btn;
 		public var btn_sound:*;
 		public var btn_help:Btn;
 		public var btn_back:Btn;
+		protected var loader:AkdclLoader;
 		
 		protected var isGameWin:Boolean;
 		public function GameModel() {
 			Alert.AlertLayer = this;
+			Alert.AlertClass = Alert_0;
+			loader = new AkdclLoader();
 			btn_pause.release = function():void {
 				gamePause();
 			}
@@ -76,9 +80,9 @@
 			__sound = _sound;
 			btn_sound.clip.gotoAndStop(__sound?1:2);
 			if (__sound) {
-				SoundManage.setSoundVol(1);
+				SoundManager.setSoundVol(1);
 			}else {
-				SoundManage.setSoundVol(0);
+				SoundManager.setSoundVol(0);
 			}
 		}
 		public function startGame():void {
@@ -89,25 +93,25 @@
 		}
 		public function gamePause():void {
 			pause = true;
-			getAlert(tipPause, false, labelBackToGame).callBack = function():void {
+			Alert.createAlert(tipPause, false, labelBackToGame).callBack = function():void {
 				pause = false;
 			};
 		}
 		public function gameHelp():void {
 			pause = true;
-			getAlert(tipHelp, false, labelBackToGame).callBack = function():void {
+			Alert.createAlert(tipHelp, false, labelBackToGame).callBack = function():void {
 				pause = false;
 			};
 		}
 		public function gameStart():void {
 			pause = true;
-			getAlert(tipStart).callBack = function():void {
+			Alert.createAlert(tipStart).callBack = function():void {
 				startGame();
 			}
 		}
 		public function gameReset():void {
 			pause = true;
-			getAlert(tipReset, true, labelResetGame, labelBackToGame).callBack = function(_b:Boolean):void {
+			Alert.createAlert(tipReset, true, labelResetGame, labelBackToGame).callBack = function(_b:Boolean):void {
 				if (_b) {
 					resetGame();
 				}else {
@@ -121,7 +125,7 @@
 				return;
 			}
 			isGameWin = true;
-			getAlert(tipGameWin, true,labelSubimt,labelResetGame).callBack = function(_b:Boolean):void {
+			Alert.createAlert(tipGameWin, true,labelSubimt,labelResetGame).callBack = function(_b:Boolean):void {
 				if (_b) {
 					gameSubmit();
 				}else {
@@ -132,23 +136,13 @@
 		public function gameOver():void {
 			pause = true;
 			isGameWin = false;
-			getAlert(tipGameOver, true,labelSubimt,labelResetGame).callBack = function(_b:Boolean):void {
+			Alert.createAlert(tipGameOver, true,labelSubimt,labelResetGame).callBack = function(_b:Boolean):void {
 				if (_b) {
 					gameSubmit();
 				}else {
 					resetGame();
 				}
 			};
-		}
-		public function gameSubmit():void {
-			pause = true;
-			if (urlRequest&&urlRequest.length>0) {
-				alertWait = getAlert(tipSubmit);
-				alertWait.showBtns(false);
-				var _loader:URLLoader = Common.urlLoader(urlRequest, onRequsetLoaded, null, onRequsetError, dataSubmit());
-			}else {
-				getURL();
-			}
 		}
 		protected var send:*;
 		protected var load:*;
@@ -167,16 +161,27 @@
 			var _data:Object = { test:"test" };
 			return _data;
 		}
+		public function getURL():void {
+			loader.getURL(isGameWin?urlGameWin:urlGameOver, urlTarget, dataSubmit());
+		}
+		public function gameSubmit():void {
+			pause = true;
+			if (urlRequest&&urlRequest.length>0) {
+				alertWait = Alert.createAlert(tipSubmit);
+				alertWait.showBtns(false);
+				loader.addEventListener(Event.COMPLETE, onRequsetLoaded);
+				loader.addEventListener(IOErrorEvent.IO_ERROR, onRequsetError);
+				loader.load(urlRequest,dataSubmit());
+			}else {
+				getURL();
+			}
+		}
 		private var alertWait:Alert;
 		private function onRequsetLoaded(_evt:Event):void {
-			var _result:URLVariables = new URLVariables();
-			try {
-				_result.decode(_evt.currentTarget.data);
-			}catch (_error:*) {
+			loader.removeEventListener(Event.COMPLETE, onRequsetLoaded);
+			if (loader.content is String) {
 				onRequsetError(null);
-				return;
-			}
-			if (_result.hasOwnProperty(result) && _result[result] == "1" || _result[result] == "true") {
+			}else if(loader.content.hasOwnProperty(result) && loader.content[result] == "1" || loader.content[result] == "true"){
 				alertWait.remove();
 				getURL();
 			}else {
@@ -187,10 +192,8 @@
 				alertWait.text = tipRefuse;
 			}
 		}
-		private function getURL():void {
-			Common.getURL(isGameWin?urlGameWin:urlGameOver, urlTarget, dataSubmit());
-		}
 		private function onRequsetError(_evt:IOErrorEvent):void {
+			loader.removeEventListener(IOErrorEvent.IO_ERROR, onRequsetError);
 			alertWait.callBack = function(_b:Boolean):void {
 				if (_b) {
 					gameSubmit();
@@ -200,11 +203,6 @@
 			}
 			alertWait.showBtns(true, true,labelTryAgain,labelResetGame);
 			alertWait.text = _evt?tipFail:tipFailPage;
-		}
-		public function getAlert(_str:String,_isYN:Boolean=false,_yes:String=null,_no:String=null):Alert {
-			var _alert:Alert = new AlertClass();
-			_alert.alert(_str, _isYN, _yes, _no);
-			return _alert;
 		}
 	}
 	

@@ -1,4 +1,4 @@
-﻿package application
+﻿package akdcl.application
 {
 	import br.com.stimuli.loading.loadingtypes.VideoItem;
 	import flash.display.Bitmap;

@@ -108,14 +108,22 @@
 		public function checkMap():void {
 			map.checkMap();
 		}
+		private var pause:Boolean;
 		public function setPause(_b:Boolean):void {
+			pause=_b;
 			if (_b) {
 				timer.stop();
 				visible = false;
 			}else {
-				timer.start();
+				timeStart();
 				visible = true;
 			}
+		}
+		private function timeStart():void{
+			if(pause){
+				return;
+			}
+			timer.start();
 		}
 		private var __score:uint;
 		public function get score():uint {
@@ -218,7 +226,7 @@
 			setFixTile(_tile_1.lineX,_tile_1.lineY,_tile_0);
 			setFixTile(_lineX, _lineY, _tile_1);
 			if (_isBack) {
-				timer.start();
+				timeStart();
 				return;
 			}
 			var _isRigth:Boolean;
@@ -254,7 +262,7 @@
 				if (_isContinue) {
 					//仍然有解
 					//继续游戏
-					timer.start();
+					timeStart();
 				}else {
 					//无解
 					//刷新地图

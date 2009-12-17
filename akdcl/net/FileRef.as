@@ -1,4 +1,4 @@
-﻿package net{
+﻿package akdcl.net{
 	import flash.net.FileFilter;
 	import flash.net.FileReference;
 	import flash.net.URLRequest;
