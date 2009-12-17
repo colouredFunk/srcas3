@@ -1,7 +1,7 @@
-﻿package akdcl.game{
+﻿package akdcl.manager{
 	import flash.media.*;
 	import flash.utils.*;
-	public class SoundManage{
+	public class SoundManager{
 		public static var isMusicPlay:Boolean=true;
 		public static var isSoundPlay:Boolean=true;
 		

@@ -1,4 +1,4 @@
-﻿package application{
+﻿package akdcl.application{
 
 	import flash.media.Sound;
 	import flash.media.SoundChannel;

@@ -1,4 +1,4 @@
-﻿package pv3d{
+﻿package akdcl.pv3d{
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 

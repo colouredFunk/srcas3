@@ -1,4 +1,4 @@
-﻿package net{
+﻿package akdcl.net{
 	import flash.events.*;
 	import flash.utils.*;
 	import flash.net.*;
