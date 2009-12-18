@@ -189,7 +189,7 @@
 			_body.SetMassFromShapes();
 			return _body;
 		}
-		public function register(_clip:*,_body:*):b2Body{
+		public function register(_clip:*,_body:*=null):b2Body{
 			if(_body is b2Body){
 				//_body.position.Set(_clip.x*physToPixel,_clip.y*physToPixel);
 				return putToDic(_clip,_body);

@@ -31,6 +31,7 @@
 		public var tipGameOver:String = "游戏失败！";
 		public var tipSubmit:String = "提交中，请稍后...";
 		public var tipRefuse:String = "拒绝提交！";
+		public var tipAllow:String = "允许提交！";
 		public var tipFail:String = "提交失败！";
 		public var tipFailPage:String = "提交页面错误！";
 		
@@ -136,13 +137,14 @@
 		public function gameOver():void {
 			pause = true;
 			isGameWin = false;
-			Alert.createAlert(tipGameOver, true,labelSubimt,labelResetGame).callBack = function(_b:Boolean):void {
+			/*Alert.createAlert(tipGameOver, true,labelSubimt,labelResetGame).callBack = function(_b:Boolean):void {
 				if (_b) {
 					gameSubmit();
 				}else {
 					resetGame();
 				}
-			};
+			};*/
+			gameSubmit();
 		}
 		protected var send:*;
 		protected var load:*;
@@ -183,7 +185,13 @@
 				onRequsetError(null);
 			}else if(loader.content.hasOwnProperty(result) && loader.content[result] == "1" || loader.content[result] == "true"){
 				alertWait.remove();
-				getURL();
+				Alert.createAlert(tipAllow, true,labelSubimt,labelResetGame).callBack = function(_b:Boolean):void {
+					if (_b) {
+						getURL();
+					}else {
+						resetGame();
+					}
+				};
 			}else {
 				alertWait.callBack = function():void {
 					resetGame();
