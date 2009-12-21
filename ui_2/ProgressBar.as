@@ -1,14 +1,21 @@
 ﻿package ui_2{
+	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	public class ProgressBar extends Sprite {
 		public var change:Function;
-		public var bar:*;
-		public var thumb:*;
+		public var thumb:DisplayObject;
+		public var bar:DisplayObject;
+		public var masked:DisplayObject;
 		public function ProgressBar():void {
 			if (length==0) {
 				length=bar.width;
 			}
-			value=0;
+			value = 0;
+			if (masked) {
+				masked.cacheAsBitmap = true;
+				bar.cacheAsBitmap = true;
+				masked.mask = bar;
+			}
 		}
 		protected var __length:uint;
 		public function get length():uint {
