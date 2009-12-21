@@ -32,7 +32,7 @@
 			}
 			eachLimit[1]=0.01;
 			eachLimit[2]=0.03;
-			eachLimit[3]=0.05;
+			eachLimit[3]=0.02;
 		}
 		public function resetPicCount():void {
 			picMin = Map.mapHeight * Map.mapWidth / 10;

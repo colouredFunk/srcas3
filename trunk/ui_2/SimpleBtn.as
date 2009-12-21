@@ -11,6 +11,7 @@
 		public var rollOut:Function;
 		public var userData:Object;
 		public var area:*;
+		public var needReload:Boolean;
 		public function SimpleBtn() {
 			stop();
 			addEventListener(Event.ADDED_TO_STAGE,added);
@@ -22,12 +23,21 @@
 			if(area){
 				hitArea=area;
 				area.visible = false;
+				mouseChildren = false;
 			}
 		}
 		protected function removed(_evt:Event):void {
 			stop();
+			if (stage.focus==this) {
+				//否则会引起一些按键不能动作
+				stage.focus=null;
+			}
 			removeEventListener(Event.REMOVED_FROM_STAGE,removed);
 			enabled=false;
+			if (needReload) {
+				addEventListener(Event.ADDED_TO_STAGE,added);
+				return;
+			}
 			press=null;
 			release=null;
 			rollOver=null;
@@ -36,10 +46,6 @@
 				_e=null;
 			}
 			userData=null;
-			if (stage.focus==this) {
-				//否则会引起一些按键不能动作
-				stage.focus=null;
-			}
 		}
 		private var __enabled:Boolean;
 		override public function get enabled():Boolean{

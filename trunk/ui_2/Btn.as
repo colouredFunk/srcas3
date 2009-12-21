@@ -17,10 +17,12 @@
 			setAni(aniClip);
 		}
 		override protected function removed(_evt:Event):void {
+			
 			super.removed(_evt);
 			if (aniClip) {
 				aniClip.removeEventListener(Event.ENTER_FRAME,aniRun);
 			}
+			this.removeEventListener(Event.ENTER_FRAME,aniRun);
 			onOpen=null;
 		}
 		override public function setStyle():void {
