@@ -18,6 +18,10 @@
 			init2d();
 			init3d();
 			initEvents();
+			addEventListener(Event.ADDED_TO_STAGE, added);
+		}
+		protected function added(_evt:Event):void {
+			removeEventListener(Event.ADDED_TO_STAGE, added);
 		}
 		protected function initPaperVision(vpWidth:Number,vpHeight:Number,_interactive:Boolean=false):void {
 			viewport=new Viewport3D(vpWidth,vpHeight,false,_interactive);

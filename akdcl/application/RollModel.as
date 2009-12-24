@@ -6,7 +6,7 @@
 	public class RollModel extends Sprite{
 		public var isScale:Boolean;
 		public var isAlpha:Boolean;
-		public var isXY:Boolean=true;
+		public var isXY:Boolean;
 		public var radiusX:int;
 		public var radiusY:int;
 		public var viewXOff:Number = Math.PI * 0.5;
@@ -33,10 +33,14 @@
 		public function get rotatePer():Number {
 			return __rotatePer;
 		}
-		public function addRoll(_roll:*,_radian:Number=NaN):void {
-			rollDic[_roll]=_radian||radianFloor(rotatePer*rollList.length);
+		public function addRoll(_roll:*, _id:uint, _list:Array, _radian:Number = NaN):void {
+			rollDic[_roll]=_radian||radianFloor(rotatePer*_id);
 			rollList.push(_roll);
 			rollDepth.push(_roll);
+		}
+		public function addRollList(_list:Array):void {
+			length = _list.length;
+			_list.forEach(addRoll);
 		}
 		public function getRoll(_id:int):DisplayObject {
 			_id %= rollList.length;
@@ -61,6 +65,7 @@
 			_n = _n*(1-scaleA)+scaleA;
 			return _n;
 		}
+		public var scaleOffY:Number = 0.02;
 		protected function radianFloor(_radian:Number):Number {
 			if (_radian>=Math.PI) {
 				_radian-=2*Math.PI;
@@ -103,7 +108,7 @@
 				_roll.x = _cos*radiusX;
 				_roll.y = _sin*(radiusY+viewY);
 				if (isXY) {
-					_roll.y += _roll.x*addX*(radiusY+viewY)*0.02;
+					_roll.y += _roll.x*addX*(radiusY+viewY)*scaleOffY;
 				}
 				_scale =getK((_sin+1)*0.5);
 				if (isScale) {
