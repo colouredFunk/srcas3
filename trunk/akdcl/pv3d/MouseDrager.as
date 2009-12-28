@@ -83,16 +83,10 @@
 		public var zoomSp:Number=50;
 		public function onWheel_handle(evt:MouseEvent):void {
 			if (evt.delta>0) {
-				/*if (camera.zoom<zoomMax) {
-				camera.zoom+=zoomSp;
-				}*/
 				if (cameraRadius>zoomMin) {
 					cameraRadius-=zoomSp;
 				}
 			} else {
-				/*if (camera.zoom>zoomMin) {
-				camera.zoom-=zoomSp;
-				}*/
 				if (cameraRadius<zoomMax) {
 					cameraRadius+=zoomSp;
 				}

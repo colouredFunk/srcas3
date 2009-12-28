@@ -22,13 +22,18 @@
 		}
 		protected function added(_evt:Event):void {
 			removeEventListener(Event.ADDED_TO_STAGE, added);
+			addEventListener(Event.REMOVED_FROM_STAGE, removed);
+		}
+		protected function removed(_evt:Event):void {
+			removeEventListener(Event.REMOVED_FROM_STAGE, removed);
+			
 		}
 		protected function initPaperVision(vpWidth:Number,vpHeight:Number,_interactive:Boolean=false):void {
 			viewport=new Viewport3D(vpWidth,vpHeight,false,_interactive);
+			renderer=new BasicRenderEngine();
+			scene=new Scene3D();
+			camera=new Camera3D();
 			addChild(viewport);
-			renderer=new BasicRenderEngine  ;
-			scene=new Scene3D  ;
-			camera=new Camera3D  ;
 		}
 		protected function init2d():void {
 		}
