@@ -46,10 +46,10 @@
 				onLoading(_nT);
 			}
 			loadedPct=_nT;
-			//if(_nT==1&&onLoaded!=null){
-				//this.removeEventListener(Event.ENTER_FRAME,loading);
-				//onLoaded();
-			//}
+			if(_nT==1&&onLoaded!=null){
+				this.removeEventListener(Event.ENTER_FRAME,loading);
+				onLoaded();
+			}
 		}
 		public var onLoaded:Function;
 		protected function loaded(evt:Event):void{
