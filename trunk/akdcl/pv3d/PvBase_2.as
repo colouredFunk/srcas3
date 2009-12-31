@@ -51,7 +51,7 @@
 			processFrame();
 			render();
 		}
-		public function render():void{
+		protected function render():void{
 			renderer.renderScene(scene,camera,viewport);
 		}
 	}
