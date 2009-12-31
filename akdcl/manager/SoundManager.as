@@ -405,7 +405,7 @@ import flash.utils.*;
 class SndObj{
 	public var name:String;
 	public var sound:Sound;
-	public var vol:Number;
+	private var __vol:Number;
 	public var channel:SoundChannel;
 	public var startVol:Number;
 	public var endVol:Number;
@@ -413,6 +413,13 @@ class SndObj{
 	public var totalTime:Number;
 	public var intervalId:int;
 	public function SndObj(){
+	}
+	public function get vol():Number {
+		return __vol;
+	}
+	public function set vol(_vol:Number):void {
+		__vol = _vol;
+		//channel.soundTransform.volume = __vol;
 	}
 	public function setSound():void{
 		/*
