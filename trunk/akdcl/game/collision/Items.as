@@ -29,6 +29,10 @@
 			//6竖排消除removeAllRight(3,_y);手动
 			//7增加50%游戏时间
 		}
+		public function reset():void {
+			itemList = [];
+			updata();
+		}
 		public function addItem(_type:int = -1, _value:uint = 0, _remain:uint = 1):Boolean {
 			if (_type<0) {
 				_type = Math.floor(Math.random() * (ITEMS_MAX - 1)) + 1 + 1;

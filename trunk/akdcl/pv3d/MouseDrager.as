@@ -1,5 +1,6 @@
 ﻿package akdcl.pv3d{
 	import flash.display.Sprite;
+	import flash.events.Event;
 	import flash.events.MouseEvent;
 
 	import org.papervision3d.cameras.Camera3D;
@@ -13,7 +14,11 @@
 		private var mouseDownY:Number;
 		private var mouseNowX:Number;
 		private var mouseNowY:Number;
-		private var isMouseDown:Boolean=false;
+		private var isMouseDown:Boolean = false;
+		public var onPress:Function;
+		public var onHold:Function;
+		public var onDrag:Function;
+		public var onRelease:Function;
 		public function MouseDrager(_camera:Camera3D=null,_ob3d:DisplayObject3D=null) {
 			reset(_camera,_ob3d);
 		}
@@ -39,7 +44,7 @@
 		public function get cameraRadius():Number {
 			return __cameraRadius;
 		}
-		public function process():Boolean {
+		public function process(_evt:Event=null):Boolean {
 			if (isMouseDown) {
 				mouseNowX=mouseX;
 				mouseNowY=lockY?0:mouseY;
@@ -56,14 +61,16 @@
 					camera.z=Math.cos(cameraRadianNow)*cameraRadius;
 					camera.y=Math.sin(cameraRadianNow)*cameraRadius;
 				} else {
-					ob3d.rotationX+= (obRX - mouseDownY + mouseNowY - ob3d.rotationX) * 0.5;
+					ob3d.rotationX += (obRX - mouseDownY + mouseNowY - ob3d.rotationX) * 0.5;
+				}
+				if (onHold!=null) {
+					onHold();
 				}
 			}
 			return isMouseDown;
 		}
 		public function onMouseClick(evt:MouseEvent):void {
-			if (evt.type=="mouseDown") {
-				isMouseDown=true;
+			if (evt.type == "mouseDown") {
 				mouseDownX=mouseX;
 				mouseDownY=lockY?0:mouseY;
 				obRY=ob3d.rotationY;
@@ -73,8 +80,14 @@
 				} else {
 					obRX=ob3d.rotationX;
 				}
-			}
-			if (evt.type=="mouseUp") {
+				if (!isMouseDown && onPress != null) {
+					onPress();
+				}
+				isMouseDown=true;
+			}else if (evt.type == "mouseUp") {
+				if (isMouseDown && onRelease != null) {
+					onRelease();
+				}
 				isMouseDown=false;
 			}
 		}

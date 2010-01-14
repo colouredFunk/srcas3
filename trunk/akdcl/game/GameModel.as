@@ -64,7 +64,6 @@
 			btn_back.release = function():void {
 				gameReset();
 			}
-			gameStart();
 		}
 		private var __pause:Boolean;
 		public function get pause():Boolean {
@@ -86,10 +85,10 @@
 				SoundManager.setSoundVol(0);
 			}
 		}
-		public function startGame():void {
+		protected function startGame():void {
 			pause = false;
 		}
-		public function resetGame():void {
+		protected function resetGame():void {
 			pause = false;
 		}
 		public function gamePause():void {
@@ -126,29 +125,21 @@
 				return;
 			}
 			isGameWin = true;
-			Alert.createAlert(tipGameWin, true,labelSubimt,labelResetGame).callBack = function(_b:Boolean):void {
-				if (_b) {
-					gameSubmit();
-				}else {
-					resetGame();
-				}
-			};
+			gameSubmit();
 		}
 		public function gameOver():void {
 			pause = true;
 			isGameWin = false;
-			/*Alert.createAlert(tipGameOver, true,labelSubimt,labelResetGame).callBack = function(_b:Boolean):void {
-				if (_b) {
-					gameSubmit();
-				}else {
-					resetGame();
-				}
-			};*/
 			gameSubmit();
 		}
 		protected var send:*;
 		protected var load:*;
-		public function setXML(_xml:XML):void {
+		public function setXML(_xml:*):XML {
+			if (_xml is String) {
+				_xml = XML(_xml);
+			}else if (_xml is Event) {
+				_xml = XML(_xml.currentTarget.data);
+			}
 			for each(var _e:XML in _xml.options.children()){
 				if(this.hasOwnProperty(_e.name())){
 					this[_e.name()]=_e.text();
@@ -156,8 +147,8 @@
 			}
 			load = _xml.load;
 			send = _xml.send;
-			
 			result = load.result.@key;
+			return _xml;
 		}
 		protected function dataSubmit():Object {
 			var _data:Object = { test:"test" };
@@ -166,10 +157,11 @@
 		public function getURL():void {
 			loader.getURL(isGameWin?urlGameWin:urlGameOver, urlTarget, dataSubmit());
 		}
+		private var alertWait:Alert;
 		public function gameSubmit():void {
 			pause = true;
-			if (urlRequest&&urlRequest.length>0) {
-				alertWait = Alert.createAlert(tipSubmit);
+			if (urlRequest && urlRequest.length > 0) {
+				alertWait = Alert.createAlert((isGameWin?tipGameWin:tipGameOver)+"\n"+tipSubmit);
 				alertWait.showBtns(false);
 				loader.addEventListener(Event.COMPLETE, onRequsetLoaded);
 				loader.addEventListener(IOErrorEvent.IO_ERROR, onRequsetError);
@@ -178,14 +170,14 @@
 				getURL();
 			}
 		}
-		private var alertWait:Alert;
 		private function onRequsetLoaded(_evt:Event):void {
 			loader.removeEventListener(Event.COMPLETE, onRequsetLoaded);
 			if (loader.content is String) {
 				onRequsetError(null);
 			}else if(loader.content.hasOwnProperty(result) && loader.content[result] == "1" || loader.content[result] == "true"){
-				alertWait.remove();
-				Alert.createAlert(tipAllow, true,labelSubimt,labelResetGame).callBack = function(_b:Boolean):void {
+				alertWait.text = (isGameWin?tipGameWin:tipGameOver)+"\n"+tipAllow;
+				alertWait.showBtns(true, true, labelSubimt, labelResetGame);
+				alertWait.callBack = function(_b:Boolean):void {
 					if (_b) {
 						getURL();
 					}else {
@@ -193,15 +185,17 @@
 					}
 				};
 			}else {
+				alertWait.text = tipRefuse;
+				alertWait.showBtns(true, false, labelResetGame);
 				alertWait.callBack = function():void {
 					resetGame();
 				}
-				alertWait.showBtns(true, false, labelResetGame);
-				alertWait.text = tipRefuse;
 			}
 		}
 		private function onRequsetError(_evt:IOErrorEvent):void {
 			loader.removeEventListener(IOErrorEvent.IO_ERROR, onRequsetError);
+			alertWait.text = _evt?tipFail:tipFailPage;
+			alertWait.showBtns(true, true,labelTryAgain,labelResetGame);
 			alertWait.callBack = function(_b:Boolean):void {
 				if (_b) {
 					gameSubmit();
@@ -209,8 +203,6 @@
 					resetGame();
 				}
 			}
-			alertWait.showBtns(true, true,labelTryAgain,labelResetGame);
-			alertWait.text = _evt?tipFail:tipFailPage;
 		}
 	}
 	

@@ -105,6 +105,7 @@
 		override public function resetGame():void {
 			super.resetGame();
 			game.reset();
+			items.reset();
 		}
 		override public function set pause(_pause:Boolean):void {
 			super.pause = _pause;

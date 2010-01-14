@@ -12,6 +12,7 @@
 	import flash.geom.ColorTransform;
 	import flash.filters.ColorMatrixFilter;
 	import flash.system.Capabilities;
+	import flash.external.ExternalInterface;
 
 	final public class Common {
 		public static function objToString(_obj:Object):String {
@@ -202,7 +203,12 @@
 			_stream.load(new URLRequest(_url));
 			return _stream;
 		}
-		public static function getURL(_url:String,_openType:String,_data:Object=null):void {
+		public static function getURL(_url:String, _openType:String, _data:Object = null):void {
+			/*var _broswer:String = ExternalInterface.call("function getBrowser() { return navigator.userAgent } ") as String;
+			if (_broswer.indexOf("Firefox") != -1 || _broswer.indexOf("MSIE 7.0") != -1) {
+				ExternalInterface.call('window.open("' +_url + '", "' +_openType + '")');
+				return;
+			}*/
 			var _request:URLRequest=new URLRequest(_url);
 			if(_data){
 				var _urlVariables:URLVariables=new URLVariables();
