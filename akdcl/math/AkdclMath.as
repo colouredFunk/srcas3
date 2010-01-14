@@ -14,6 +14,19 @@
 		public static function rdm_2(a:Number,b:Number):Number {
 			return Math.random()*b-a+a;
 		}
+		//操作数组
+		public static function disorder(arr:Array):void {
+			//trace("Common.disorder 未测试");
+			var L:uint = arr.length;
+			var ran:uint;
+			var temp:*;
+			for (var i:uint = 0; i<L; i++) {
+				ran = random(L);
+				temp = arr[i];
+				arr[i] = arr[ran];
+				arr[ran] = temp;
+			}
+		}
 		//按照数组提示产生[a1，a2]的随机因子(如果数组都为0则返回a2+1)
 		public static function rdm_a(_n0:Number, _n1:Number, _list:Array):Number {
 			var _max:Number=0;
@@ -22,11 +35,12 @@
 			var _list:Array=_list.concat();
 			for(var _i:int=_list.length-1;_i>=0;_i--){
 				for (var _j:int= 0; _j<_i; _j++) {
-					_list[_i]+=_list[_j];
+					_list[_i] = Number(_list[_i]);
+					_list[_i] += Number(_list[_j]);
 				}
-				_max<_list[_i] && (_max=_list[_i]);
+				_max<Number(_list[_i]) && (_max=Number(_list[_i]));
 				_list[_i]/=_max;
-				if (_rdm>=_list[_i]) {
+				if (_rdm>=Number(_list[_i])) {
 					_last=_i+1;
 					break;
 				}

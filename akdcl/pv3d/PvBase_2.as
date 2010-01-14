@@ -26,7 +26,10 @@
 		}
 		protected function removed(_evt:Event):void {
 			removeEventListener(Event.REMOVED_FROM_STAGE, removed);
-			
+			removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+			removeChild(viewport);
+			viewport.destroy();
+			viewport = null;
 		}
 		protected function initPaperVision(vpWidth:Number,vpHeight:Number,_interactive:Boolean=false):void {
 			viewport=new Viewport3D(vpWidth,vpHeight,false,_interactive);
