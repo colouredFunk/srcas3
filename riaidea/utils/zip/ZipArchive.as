@@ -31,7 +31,6 @@ package riaidea.utils.zip{
 	 */
 	public class ZipArchive extends EventDispatcher{
 		
-		private var _name:String;
 		/**
 		 * @private
 		 */
@@ -43,10 +42,10 @@ package riaidea.utils.zip{
 		/**
 		 * 构造函数，创建一个新的Zip档案。
 		 */
-		public function ZipArchive(name:String = null) {
+		public function ZipArchive(_name:String = null) {
 			_list = [];
 			_entry = new Dictionary(true);
-			if (name)_name = name;
+			if (_name)__name = _name;
 		}
 		/**
 		 * 加载一个zip档案，与此方法的事件有ProgressEvent.PROGRESS、ZipEvent.ZIP_INIT、ZipEvent.ZIP_FAILED、IOErrorEvent.IO_ERROR。
@@ -54,7 +53,7 @@ package riaidea.utils.zip{
 		 */
 		public function load(request:String):void {
 			try {
-				if (!_name)_name = request;
+				if (!name)name = request;
 				var parser:ZipParser = new ZipParser();
 				parser.addEventListener(ZipEvent.ZIP_PARSE_COMPLETED, parseCompleted);
 				parser.writeZipFromFile(this, request);
@@ -83,7 +82,7 @@ package riaidea.utils.zip{
 			if (file) {
 				if (index<0 || index >= _list.length)_list.push(file);
 				else _list.splice(index, 0, file);
-				_entry[name] = file;
+				_entry[file.name] = file;
 				return file;
 			}
 			return null;
@@ -95,9 +94,9 @@ package riaidea.utils.zip{
 		 * @param	index 指定文件的位置，默认值为-1，即在末尾添加文件。
 		 * @return
 		 */
-		public function addFileFromBytes(name:String, data:ByteArray = null, index:int=-1):ZipFile {
-			if (_entry[name]) throw new Error("file: "+name+" already exists.");
-			var file:ZipFile = new ZipFile(name);
+		public function addFileFromBytes(_name:String, data:ByteArray = null, index:int=-1):ZipFile {
+			if (_entry[_name]) throw new Error("file: "+_name+" already exists.");
+			var file:ZipFile = new ZipFile(_name);
 			try {
 				data.uncompress();
 			}catch (e:Error) { }
@@ -110,7 +109,7 @@ package riaidea.utils.zip{
 			file._crc32 = new CRC32().getCRC32(data);
 			if (index<0 || index >= _list.length)_list.push(file);
 			else _list.splice(index, 0, file);
-			_entry[name] = file;
+			_entry[_name] = file;
 			return file;
 		}
 		/**
@@ -120,12 +119,12 @@ package riaidea.utils.zip{
 		 * @param	index 指定文件的位置，默认值为-1，即在末尾添加文件。
 		 * @return
 		 */
-		public function addFileFromString(name:String, content:String, index:int=-1):ZipFile {
+		public function addFileFromString(_name:String, content:String, index:int=-1):ZipFile {
 			if (content == null) return null;
 			//默认utf-8进行编码
 			var data:ByteArray = new ByteArray();
 			data.writeUTFBytes(content);
-			return addFileFromBytes(name, data, index);
+			return addFileFromBytes(_name, data, index);
 		}
 		
 		/**
@@ -133,8 +132,8 @@ package riaidea.utils.zip{
 		 * @param	name 名称。
 		 * @return
 		 */
-		public function getFileByName(name:String):ZipFile {
-			return _entry[name] ? _entry[name] : null;
+		public function getFileByName(_name:String):ZipFile {
+			return _entry[_name] ? _entry[_name] : null;
 		}
 		/**
 		 * 根据文件位置获取Zip档案中的文件。
@@ -148,27 +147,24 @@ package riaidea.utils.zip{
 		 * 根据图片文件名称获取Zip档案中的文件，与此方法的事件有ZipEvent.ZIP_CONTENT_LOADED。
 		 * @param	name 名称。
 		 */
-		public function getBitmapByName(name:String):void {
-			var file:ZipFile = getFileByName(name);
+		public function getBitmapByName(_name:String):void {
+			var file:ZipFile = getFileByName(_name);
 			if (!file) return;
 			file.data.position = 0;
 			var loader:Loader = new Loader();
-			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, EventUp(getBitmapCompleted,file));
+			loader.name = _name;
+			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, getBitmapCompleted);
 			loader.loadBytes(file.data);
-		}
-		//EventUp是否重新扩展
-		private function EventUp (f:Function,... arg):Function{
-        	return function(e:Event):void{f.apply(null,[e].concat(arg))};
 		}
 		/**
 		 * 删除Zip档案中的指定名称的文件。
 		 * @param	name 指定文件的名字。
 		 * @return
 		 */
-		public function removeFileByName(name:String):ZipFile {
-			if (_entry[name]) {
+		public function removeFileByName(_name:String):ZipFile {
+			if (_entry[_name]) {
 				for (var i:uint = 0; i < _list.length; i++) {
-					if (name == _list[i].name) return removeFileAt(i);
+					if (_name == _list[i].name) return removeFileAt(i);
 				}
 			}
 			return null;
@@ -206,12 +202,15 @@ package riaidea.utils.zip{
 		}
 		/**
 		 * 根据图片文件名称获取zip文件成功后，广播ZIP_CONTENT_LOADED事件。
-		 * @param	evt evt.content为加载图像的bitmap对象。
+		 * @param	evt evt.content为加载图像的bitmapData对象。
 		 */
-		private function getBitmapCompleted(evt:Event,... arg):void {
+		private function getBitmapCompleted(evt:Event):void {
 			var info:LoaderInfo = evt.currentTarget as LoaderInfo;
 			info.removeEventListener(Event.COMPLETE, getBitmapCompleted);
-			dispatchEvent(new ZipEvent(ZipEvent.ZIP_CONTENT_LOADED,info.content,false,false,arg[0]));
+			var _bmp:Bitmap = info.content as Bitmap;
+			var _bmd:BitmapData = _bmp.bitmapData;
+			_bmp.bitmapData = null;
+			dispatchEvent(new ZipEvent(ZipEvent.ZIP_CONTENT_LOADED,_bmd,false,false,getFileByName(info.loader.name)));
 		}
 		
 		//getters & setters & toString
@@ -219,11 +218,12 @@ package riaidea.utils.zip{
 		/**
 		 * 设置和获取Zip档案名称。
 		 */
+		private var __name:String;
 		public function get name():String {
-			return _name;
+			return __name;
 		}
-		public function set name(name:String):void {
-			this._name = name;
+		public function set name(_name:String):void {
+			__name = _name;
 		}
 		/**
 		 * 获取Zip档案里的文件数。
