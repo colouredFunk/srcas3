@@ -41,23 +41,29 @@ package riaidea.utils.zip{
 		 */
 		private var _content: * ;
 		/**
+		 * @private
+		 */
+		private var _file:ZipFile ;
+		/**
 		 * 构造函数，使用指定的参数创建新的ZipEvent对象。
 		 * @param	type 事件类型
 		 * @param	content 事件相关内容
 		 * @param	bubbles 确定ZipEvent对象是否参与事件流的冒泡阶段。 默认值为false。
 		 * @param	cancelable 确定是否可以取消ZipEvent对象。 默认值为false。
 		 */
-		public var file:*;
-		public function ZipEvent(type:String, content:*= null, bubbles:Boolean = false, cancelable:Boolean = false,file:*=null) {
+		public function ZipEvent(type:String, content:*= null, bubbles:Boolean = false, cancelable:Boolean = false,file:ZipFile=null) {
 			super(type, bubbles, cancelable);
 			this._content = content;
-			this.file=file;
+			this._file = file;
 		}
 		/**
 		 * ZipEvent对象的相关信息。
 		 */
 		public function get content():* {
 			return _content;
+		}
+		public function get file():ZipFile {
+			return _file;
 		}
 	}
 }
