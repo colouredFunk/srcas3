@@ -33,7 +33,7 @@
 		public function get rotatePer():Number {
 			return __rotatePer;
 		}
-		public function addRoll(_roll:*, _id:uint, _list:Array, _radian:Number = NaN):void {
+		public function addRoll(_roll:*, _id:uint, _list:Array=null, _radian:Number = NaN):void {
 			rollDic[_roll]=_radian||radianFloor(rotatePer*_id);
 			rollList.push(_roll);
 			rollDepth.push(_roll);
