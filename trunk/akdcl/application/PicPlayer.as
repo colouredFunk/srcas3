@@ -1,6 +1,6 @@
 ﻿package akdcl.application
 {
-	import br.com.stimuli.loading.loadingtypes.VideoItem;
+	//import br.com.stimuli.loading.loadingtypes.VideoItem;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Loader;
