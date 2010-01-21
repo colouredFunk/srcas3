@@ -58,7 +58,7 @@
 			}
 			if (material) {
 				if (needWireframe) {
-					var _material:*= createMaterial(0x0098ff);
+					var _material:*= createMaterial();
 					wireframeDic[materialName] = _material;
 					backMaterialDic[materialName] = material;
 				}
@@ -70,13 +70,33 @@
 				}
 			}
 			return material;
-		}//
-		private function createMaterial(_color:uint, _alpha:Number = 0.2, _isWireframe:Boolean = true):*{
+		}
+		private var __materialColor:uint = 0x000000;
+		public function get materialColor():uint {
+			return __materialColor;
+		}
+		public function set materialColor(_materialColor:uint):void {
+			__materialColor = _materialColor;
+			for each(var _e:* in wireframeDic) {
+				_e.lineColor = __materialColor;
+			}
+		}
+		private var __materialAlpha:Number = 0.5;
+		public function get materialAlpha():Number {
+			return __materialAlpha;
+		}
+		public function set materialAlpha(_materialAlpha:Number):void {
+			__materialAlpha = _materialAlpha;
+			for each(var _e:* in wireframeDic) {
+				_e.lineAlpha = __materialAlpha;
+			}
+		}
+		private function createMaterial(_isWireframe:Boolean = true):*{
 			var _material:*;
 			if(_isWireframe){
-				_material = new WireframeMaterial(_color,_alpha);	
+				_material = new WireframeMaterial(materialColor, materialAlpha);
 			} else{
-				_material = new ColorMaterial(_color, _alpha);
+				_material = new ColorMaterial(materialColor, materialAlpha);
 			}
 			return _material;
 		}
@@ -88,12 +108,10 @@
 			var _i:String;
 			if (isWireframeNow) {
 				for (_i in wireframeDic) {
-					//this.materials.addMaterial(wireframeDic[_i], _i);
 					replaceMaterialByName(wireframeDic[_i], _i);
 				}
 			}else {
 				for (_i in backMaterialDic) {
-					//this.materials.addMaterial(backMaterialDic[_i], _i);
 					replaceMaterialByName(backMaterialDic[_i], _i);
 				}
 			}

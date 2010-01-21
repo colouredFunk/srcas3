@@ -4,6 +4,7 @@
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Loader;
+	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.events.ErrorEvent;
@@ -19,16 +20,19 @@
 	 */
 	public class  PicPlayer extends Sprite
 	{
-		public static var LOAD:String = "pic_load";
-		public static var RELOAD:String = "pic_reload";
-		public static var LOADED:String = "pic_loaded";
-		public static var ERROR:String = "pic_error";
-		public static var TWEENED:String = "pic_tweened";
-		public static var STATE_CHANGE:String = "pic_stateChange";
+		public static var XML_LOADED:String = "PicPlayer_xml_loaded";
+		public static var STATE_CHANGE:String = "PicPlayer_pic_stateChange";
 		
-		public static var LOADING:String = "pic_loading";
-		public static var TWEENING:String = "pic_tweening";
-		public static var DELAYING:String = "pic_delaying";
+		public static var LOAD:String = "PicPlayer_pic_load";
+		public static var RELOAD:String = "PicPlayer_pic_reload";
+		public static var LOADED:String = "PicPlayer_pic_loaded";
+		public static var RELOADED:String = "PicPlayer_pic_reloaded";
+		public static var ERROR:String = "PicPlayer_pic_error";
+		public static var TWEENED:String = "PicPlayer_pic_tweened";
+		
+		public static var LOADING:String = "PicPlayer_pic_loading";
+		public static var TWEENING:String = "PicPlayer_pic_tweening";
+		public static var DELAYING:String = "PicPlayer_pic_delaying";
 		
 		public var picWidth:uint;
 		public var picHeight:uint;
@@ -46,29 +50,52 @@
 		private var tweenPrevTo:Object;
 		private var tweenStyle:XML;
 		private var btn:SimpleBtn;
+		private var backShape:Shape;
+		
+		public var txt_debug:*;
 		public function PicPlayer() {
 			addEventListener(Event.ADDED_TO_STAGE, added);
 		}
 		private function added(_evt:Event):void {
-			stage.align=StageAlign.TOP_LEFT;
 			removeEventListener(Event.ADDED_TO_STAGE, added);
 			addEventListener(Event.REMOVED_FROM_STAGE, removed);
+			
 			timer = new Timer(100);
 			timer.addEventListener(TimerEvent.TIMER_COMPLETE, timeRun);
+			
 			loaderDic = { };
+			
 			picNow = new PicContainer();
 			picPrev = new PicContainer();
 			addChild(picNow);
 			addChild(picPrev);
+			
 			btn = new SimpleBtn();
 			btn.hitArea = picNow;
 			btn.userData = {url:null,type:"_blank"};
+			btn.press = function():void {
+				TweenMax.killTweensOf(txt_debug);
+				TweenMax.to(txt_debug,0.5,{autoAlpha:1,delay:2});
+			}
 			btn.release = function():void {
-				if (this.userData.url) {
-					Common.getURL(this.userData.url,this.userData.type)
-				}
+				TweenMax.killTweensOf(txt_debug);
+				TweenMax.to(txt_debug,0.5,{autoAlpha:0});
+				clickPic();
+			}
+			btn.rollOver = function():void {
+				timer.stop();
+			}
+			btn.rollOut = function():void {
+				timer.start();
 			}
 			addChild(btn);
+			
+			txt_debug.visible = false;
+			txt_debug.alpha = 0;
+			addChild(txt_debug);
+			
+			backShape = getChildAt(0) as Shape;
+			backShape.visible = false;
 		}
 		private function removed(_evt:Event):void {
 			removeEventListener(Event.REMOVED_FROM_STAGE, removed);
@@ -85,13 +112,37 @@
 		public function loadXml(_url:String):void {
 			Common.urlLoader(_url, xmlLoaded);
 		}
+		public function clickPic():void {
+			if (btn.userData.url) {
+				Common.getURL(btn.userData.url,btn.userData.type)
+			}
+		}
+		private var __masked:Boolean;
+		public function get masked():Boolean {
+			return __masked;
+		}
+		[Inspectable(defaultValue = false, type = "Boolean", name = "是否圆角遮罩")]
+		public function set masked(_masked:Boolean):void {
+			__masked = _masked;
+			if (__masked) {
+				mask = backShape;
+			}else if (mask == backShape) {
+				mask = null;
+			}
+		}
 		private function xmlLoaded(_evt:Event):void {
 			xml = new XML(_evt.currentTarget.data);
-			
-			picWidth = width||picWidth||(stage.stageWidth-x*2);
-			picHeight = height||picHeight||(stage.stageHeight-y*2);
-			picAspectRatio = picHeight / picWidth;
+			picWidth = width || picWidth;
+			picHeight = height || picHeight;
+			if (picWidth*picHeight==0) {
+				stage.align = StageAlign.TOP_LEFT;
+				picWidth = stage.stageWidth - x * 2;
+				picHeight = stage.stageHeight - y * 2;
+			}
 			scaleX = scaleY = 1;
+			backShape.width = picWidth;
+			backShape.height = picHeight;
+			txt_debug.text = "图片尺寸：" + picWidth + " x " + picHeight;
 			
 			fillMode = int(xml.fillMode) || fillMode;
 			timeDelay = Number(xml.timeDelay) || timeDelay;
@@ -111,7 +162,7 @@
 								</now>
 							</tween>
 			}
-			
+			dispatchEvent(new Event(XML_LOADED));
 			id_pic = 0;
 		}
 		private static function getObjInTween(_xml:XML,_depth:uint=0):Object {
@@ -164,6 +215,9 @@
 			dispatchEvent(new Event(__state));
 			dispatchEvent(new Event(STATE_CHANGE));
 		}
+		public function get picLength():uint {
+			return xml.pic.length();
+		}
 		private var __id_pic:int=-1;
 		public function get id_pic():int{
 			return __id_pic;
@@ -173,13 +227,16 @@
 				return;
 			}
 			if (_id_pic<0) {
-				_id_pic = xml.pic.length()-1;
-			} else if (_id_pic>xml.pic.length()-1) {
+				_id_pic = picLength-1;
+			} else if (_id_pic>picLength-1) {
 				_id_pic = 0;
 			}
 			__id_pic = _id_pic;
 			
 			loadPic(getPicPath(__id_pic));
+		}
+		public function getPicXML(_id:uint):XML {
+			return xml.pic[_id][0];
 		}
 		private function getPicPath(_id_pic:int):String {
 			var _picPath:String = String(xml.pic[_id_pic].@src);
@@ -215,6 +272,7 @@
 				_bmp.smoothing = true;
 				_evtOrLoader = _evtOrLoader.currentTarget.loader as Loader;
 			}
+			setState(RELOADED);
 			if (xml.pic[id_pic].text().length()>0) {
 				btn.userData.url = xml.pic[id_pic].text();
 				if (xml.pic[id_pic].@type.length()>0) {
