@@ -98,11 +98,11 @@
 				gameOver();
 			}
 		}
-		override public function startGame():void {
+		override protected function startGame():void {
 			super.startGame();
 			game.reset();
 		}
-		override public function resetGame():void {
+		override protected function resetGame():void {
 			super.resetGame();
 			game.reset();
 			items.reset();
