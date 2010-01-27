@@ -1,452 +1,336 @@
-﻿package akdcl.game.collision
+﻿package akdcl.game.tetris
 {
-	import akdcl.game.collision.Tile;
-	import akdcl.game.collision.Map;
-	
+	import akdcl.key.AtkKey;
+	import akdcl.key.Key;
+	import akdcl.key.KeyManager;
+	import akdcl.events.KeyEvent;
+	import flash.display.DisplayObject;
 	import flash.display.Sprite;
-	import flash.events.Event;
 	import flash.events.TimerEvent;
-	import flash.utils.Dictionary;
 	import flash.utils.Timer;
-	
 	import com.greensock.TweenMax;
-	
-	import ui_2.Btn;
 	/**
 	 * ...
 	 * @author Akdcl
 	 */
-	public class  Collision extends Sprite
+	public class  Tetris extends Sprite
 	{
-		public static var instance:Collision;
-		public var rec_follow:Btn;
-		public var rec_select:Btn;
-		public var tileContainer:Sprite;
-		public var hardest:uint = 3000;
+		public var map:Map;
+		protected var timer:Timer;
+		protected var tileActive:Tile;
+		protected var clipContainer:Sprite;
 		
-		private const rec_widthOrg:uint = 50;
-		private const rec_heightOrg:uint = 50;
+		public var timerSpeed:uint = 500;
+		public var moveSpeed:uint = 25;
+		public var downSpeed:uint = 25;
+		public var removePerLevel:uint = 10;
+		public var difficultyAdd:Number = 0.2;
+		public var nextShowMax:uint = 4;
 		
-		private var lineX_select:uint;
-		private var lineY_select:uint;
-		private var lineX_now:uint;
-		private var lineY_now:uint;
-		private var isPress:Boolean;
-		private var isSelect:Boolean;
+		protected var keyManager:KeyManager;
+		protected var dirKeys:AtkKey;
+		protected var rotateKeys:AtkKey;
+		protected var upKey:Key;
+		protected var downKey:Key;
+		protected var leftKey:Key;
+		protected var rightKey:Key;
 		
-		private var numRemoved:uint;
-		private var map:Map;
-		private var tileFixDic:Object;
-		private var tileFallDic:Dictionary;
-		private var tileRemoveDic:Dictionary;
-		private var removeList:Array;
-		private var tileFallDicLength:uint;
-		private var tileRemoveDicLength:uint;
-		private var timer:Timer;
+		public var onTileFalled:Function;
+		public var onTileRemove:Function;
+		public var onNextLevel:Function;
+		public var onGameOver:Function;
 		
-		private var numCombo:uint;
-		public var timeTotal:uint = 60;
-		public var timeAdd:uint = 1;
-		public var onRemoveTiles:Function;
-		public var onRemoveType:Function;
-		public var onTimerChange:Function;
-		public var onTimerOver:Function;
-		public var onScoreChange:Function;
-		public var onRecMove:Function;
-		public var onRecUnmove:Function;
-		public function Collision() {
-			instance = this;
-			map = new Map();
-			if (!tileContainer) {
-				tileContainer = new Sprite();
-				addChildAt(tileContainer,0);
-			}
+		protected static var SCOREADD_LINE:Array = [3, 5, 9, 17];
+		protected static const TILE_MODEL:Array = [Tile.A0, Tile.A1, Tile.A2, Tile.A3, Tile.A4, Tile.A5, Tile.A6];
+		public function Tetris() {
+			timer = new Timer(timerSpeed);
+			timer.addEventListener(TimerEvent.TIMER, timeRun);
 			
-			rec_select.visible = false;
-			rec_follow.alpha = 0;
-			rec_select.mouseEnabled = false;
-			rec_select.mouseChildren = false;
-			rec_follow.mouseChildren = false;
-			rec_follow.hitArea = tileContainer;
-			rec_follow.rollOver = function():void {
-				this.alpha = 1;
+			keyManager=new KeyManager(stage,moveSpeed);
+			upKey=new Key("W");
+			downKey=new Key("S");
+			leftKey=new Key("A");
+			rightKey=new Key("D");
+			//fireKey=new Key(32,"SPACE");
+			dirKeys = new AtkKey(keyManager, leftKey, rightKey);
+			rotateKeys = new AtkKey(keyManager, upKey, downKey);
+			
+			dirKeys.onKeyDown = function(_evt:KeyEvent):void {
+				keysDown(_evt.keyName);
 			}
-			rec_follow.rollOut = function():void {
-				this.alpha = 0;
-			}
-			rec_follow.press = function():void {
-				if (!isControl || map.isStone(lineX_now, lineY_now)) {
-					if (map.isStone(lineX_now, lineY_now)&&onRecUnmove!=null) {
-						onRecUnmove();
-					}
+			dirKeys.onKeyHold = function(_evt:KeyEvent):void {
+				if(_evt.holdTime<10){
 					return;
 				}
-				if (isSelect && Math.abs(lineX_now - lineX_select) + Math.abs(lineY_now - lineY_select) == 1) {
-					changeTiles(lineX_select, lineY_select, lineX_now, lineY_now);
-					isSelect = false;
-				}else {
-					lineX_select = lineX_now;
-					lineY_select = lineY_now;
-					isPress = true;
-				}
-				rec_select.visible = false;
+				keysDown(_evt.keyName);
 			}
-			rec_follow.release = function():void {
-				if(isPress){
-					isSelect = true;
-					isPress = false;
-					rec_select.x = lineX_now * Tile.tileWidth;
-					rec_select.y = lineY_now * Tile.tileHeight;
-					rec_select.visible = true;
+			rotateKeys.onKeyDown = function(_evt:KeyEvent):void {
+				keysDown(_evt.keyName);
+			}
+			rotateKeys.onKeyUp = function(_evt:KeyEvent):void {
+				switch(_evt.keyName) {
+					case "W":
+						break;
+					case "S":
+						timer.delay = timerSpeed / difficulty;
+						break;
 				}
 			}
-			time++;
-			timer = new Timer(1000);
-			timer.addEventListener(TimerEvent.TIMER, timerRun);
-			this.addEventListener(Event.ENTER_FRAME, moveRecSelect);
+			map = new Map();
+			map.mapHeight = 20;
+			map.mapWidth = 10;
+			
+			clipContainer = new Sprite();
+			addChild(clipContainer);
 		}
-		public function checkMap():void {
-			map.checkMap();
-		}
-		private var pause:Boolean;
-		public function setPause(_b:Boolean):void {
-			pause=_b;
-			if (_b) {
+		public function set pause(_pause:Boolean):void {
+			if (_pause) {
 				timer.stop();
-				visible = false;
+				dirKeys.stop();
+				rotateKeys.stop();
 			}else {
-				timeStart();
-				visible = true;
+				timer.start();
+				dirKeys.start();
+				rotateKeys.start();
 			}
-		}
-		private function timeStart():void{
-			if(pause){
-				return;
-			}
-			timer.start();
-		}
-		private var __score:uint;
-		public function get score():uint {
-			return __score;
-		}
-		public function set score(_score:uint):void {
-			if (_score<0) {
-				_score = 0;
-			}
-			if (__score==_score) {
-				return;
-			}
-			__score = _score;
-			if (onScoreChange!=null) {
-				onScoreChange(__score);
-			}
-		}
-		private var __time:int;
-		public function get time():int{
-			return __time;
-		}
-		public function set time(_time:int):void{
-			if (_time<0) {
-				_time = 0;
-			}else if (_time>timeTotal) {
-				_time = timeTotal;
-			}
-			if (__time==_time) {
-				return;
-			}
-			__time=_time;
-			if (onTimerChange!=null) {
-				onTimerChange(time,timeTotal);
-			}
-		}
-		public function get isControl():Boolean {
-			return timer.running;
 		}
 		public function reset():void {
+			clearMap();
+			level = 0;
 			score = 0;
-			time = 0;
-			numRemoved = 0;
-			map.resetPicCount();
-			buildMap();
+			removeCounts = 0;
+			creatTileActive();
+			timer.reset();
 		}
-		public function buildMap():void {
-			for each(var _e:Tile in tileFixDic) {
-				_e.removeRightNow();
+		protected function clearMap():void {
+			removeAllClip();
+			map.resetMap();
+			clipMap = map.clone();
+		}
+		private var __level:int = 0;
+		public function get level():int{
+			return __level;
+		}
+		public function set level(_level:int):void {
+			__level = _level;
+			difficulty = 1 + __level * difficultyAdd;
+			timer.delay = timerSpeed / difficulty;
+		}
+		protected var difficulty:Number = 1;
+		private var __removeCounts:uint;
+		public function get removeCounts():uint{
+			return __removeCounts;
+		}
+		public function set removeCounts(_removeCounts:uint):void{
+			__removeCounts = _removeCounts;
+		}
+		private var __score:int;
+		public function get score():int{
+			return __score;
+		}
+		public function set score(_score:int):void{
+			if (_score<0) {
+				_score = 0;
+			}else if (_score>999999) {
+				_score = 999999;
 			}
-			tileContainer.alpha = 1;
-			setRecSize(Tile.tileWidth, Tile.tileHeight);
-			tileFixDic = { };
-			tileFallDic = new Dictionary();
-			tileRemoveDic = new Dictionary();
-			map.getArray();
-			var _x, _y, _n:uint;
-			for (_y = Map.mapHeight-1; _y >=0; _y-- ) {
-				for (_x = 0; _x < Map.mapWidth; _x++ ) {
-					createTile(_x, _y-Map.mapHeight, map.getMap(_x, _y));
+			__score = _score;
+		}
+		protected function keysDown(_keyName:String):void {
+			if (!tileActive) {
+				return;
+			}
+			switch(_keyName) {
+				case "W":
+					if (isHit(1,0,0)) {
+						//tileActive.rotate(1);
+					}
+					break;
+				case "S":
+					timer.delay = downSpeed;
+					break;
+				case "A":
+					if (!isHit(0, -1)) {
+						tileActive.lineX--;
+					}
+					break;
+				case "D":
+					if (!isHit(0, 1)) {
+						tileActive.lineX++;
+					}
+					break;
+			}
+		}
+		public var nextShowList:Array;
+		protected function getRandomModel():uint {
+			if (!nextShowList) {
+				nextShowList = [];
+			}
+			var _n:uint;
+			while (nextShowList.length < nextShowMax) {
+				_n = Math.floor(Math.random() * TILE_MODEL.length);
+				nextShowList.push(_n);
+			}
+			return nextShowList.shift();
+		}
+		protected function timeRun(_evt:TimerEvent):void {
+			if (!tileActive) {
+				return;
+			}
+			if (isHit(0, 0, 1)) {
+				creatClipFromActive();
+			}else{
+				tileActive.lineY++;
+			}
+		}
+		protected function creatTileActive():void {
+			if (tileActive) {
+				removeChild(tileActive);
+			}
+			var _id:uint = getRandomModel();
+			tileActive = new Tile(TILE_MODEL[_id]);
+			tileActive.rotateMax = Tile.ROTATENUM_MAX[_id];
+			tileActive.changeStyle(_id+1);
+			tileActive.lineX = map.mapWidth * 0.5-1;
+			addChild(tileActive);
+		}
+		protected var clipMap:Array;
+		protected var tempClip:Sprite;
+		protected var removeCount_current:int;
+		protected function creatClipFromActive():void {
+			var _matrix:Array = tileActive.matrixCopy;
+			var _clip:TileClip;
+			var _x, _y:int;
+			for each(var _e:Array in _matrix) {
+				_x = tileActive.lineX + _e[0];
+				_y = tileActive.lineY + _e[1];
+				map.setMap(_x, _y, true);
+				_clip = new TileClip();
+				_clip.changeStyle(tileActive.frame);
+				_clip.lineX = _x;
+				_clip.lineY = _y;
+				clipContainer.addChild(_clip);
+				if (clipMap[_y][_x]) {
+					clipContainer.removeChild(clipMap[_y][_x]);
 				}
+				clipMap[_y][_x] = _clip;
 			}
-		}
-		public function getHint():void {
-			var _ary:Array = map.getHint();
-			changeTiles(_ary[0][0],_ary[0][1],_ary[1][0],_ary[1][1]);
-		}
-		public function shuffle():void {
-			map.shuffle();
-			for each(var _e:Tile in tileFixDic) {
-				_e.value = map.getMap(_e.lineX,_e.lineY);
-			}
-			removeAllRight();
-		}
-		public function isHit(_lineX:int, _lineY:int):Boolean {
-			var _b:Boolean;
-			if (Tile.acceleration>0) {
-				_b = Tile.isVertical ? (_lineY>=Map.mapHeight) : (_lineX>=Map.mapWidth);
-			} else {
-				_b = Tile.isVertical ? (_lineY<=0) : (_lineX<=0);
-			}
-			_b = _b || getFixTile(_lineX, _lineY);
-			return _b;
-		}
-		public function changeTiles(_lineX_0:uint, _lineY_0:uint, _lineX_1:uint, _lineY_1:uint, _isBack:Boolean = false):void {
-			var _tile_0:Tile = getFixTile(_lineX_0, _lineY_0);
-			var _tile_1:Tile = getFixTile(_lineX_1, _lineY_1);
-			if (!_tile_0 || !_tile_1 || map.isStone(_lineX_0, _lineY_0) || map.isStone(_lineX_1, _lineY_1)) {
-				return;
-			}
-			if (!_isBack) {
-				time++;
-			}
-			timer.stop();
-			TweenMax.to(_tile_0, 0.3, { x:_tile_1.x, y:_tile_1.y } );
-			TweenMax.to(_tile_1, 0.4, { x:_tile_0.x, y:_tile_0.y, onComplete:changeEnd, onCompleteParams:[_tile_0, _tile_1, _isBack] } );
-		}
-		private function changeEnd(_tile_0:Tile, _tile_1:Tile, _isBack:Boolean = false):void {
-			var _lineX:int = _tile_0.lineX;
-			var _lineY:int = _tile_0.lineY;
-			setFixTile(_tile_1.lineX,_tile_1.lineY,_tile_0);
-			setFixTile(_lineX, _lineY, _tile_1);
-			if (_isBack) {
-				timeStart();
-				return;
-			}
-			var _isRigth:Boolean;
-			_isRigth = map.canRemove(_tile_0.lineX, _tile_0.lineY, _tile_0.value) || map.canRemove(_tile_1.lineX, _tile_1.lineY, _tile_1.value);
-			if (_isRigth) {
-				removeAllRight();
-			}else {
-				changeTiles(_tile_0.lineX, _tile_0.lineY, _tile_1.lineX, _tile_1.lineY, true);
-			}
-		}
-		public function removeAllRight(_removeType:uint = 0, ..._arg):void {
-			switch(_removeType) {
-				case 0:
-					removeList = map.getRight();
-					break;
-				case 1:
-					removeList = map.getSame(_arg[0]);
-					break;
-				case 2:
-					removeList = map.getLineX(_arg[0]);
-					break;
-				case 3:
-					removeList = map.getLineY(_arg[0]);
-					break;
-				case 4:
-					removeList = map.getAllStones();
-					break;
-			}
-			if (removeList.length == 0) {
-				//无连击
-				numCombo = 0;
-				var _isContinue:Boolean = map.findRoad();
-				if (_isContinue) {
-					//仍然有解
-					//继续游戏
-					timeStart();
-				}else {
-					//无解
-					//刷新地图
-					TweenMax.to(tileContainer, 0.5, {alpha:0, onComplete:buildMap} );
-				}
-				return;
-			}
-			//连击
-			numCombo ++;
-			timer.stop();
-			var _tile:Tile;
 			
-			var _scoreAdd:uint = 0;
-			for each(var _e:* in removeList) {
-				//各种消除类型
-				for each(var _eL:* in _e) {
-					_tile = getFixTile(_eL[0], _eL[1]);
-					if (!_tile) {
+			var _lineY:uint = tileActive.lineY;
+			if (onTileFalled!=null) {
+				onTileFalled(tileActive);
+			}
+			removeChild(tileActive);
+			tileActive = null;
+			if (_lineY == 0) {
+				if (onGameOver!=null) {
+					onGameOver();
+				}
+				return;
+			}
+			var _fullLine:Array = map.getFullLineYId();
+			removeCount_current = _fullLine.length;
+			if (_fullLine.length == 0) {
+				score += _lineY * difficulty;
+				creatTileActive();
+				return;
+			}
+			removeCounts += removeCount_current;
+			if (onTileRemove!=null) {
+				onTileRemove(removeCounts);
+			}
+			score += _lineY * difficulty * SCOREADD_LINE[removeCount_current];
+			tempClip = new Sprite();
+			addChild(tempClip);
+			var _id:uint;
+			for (var _i:uint = 0; _i < _fullLine.length; _i++) {
+				_id = _fullLine[_i];
+				map.clearLineY(_id);
+				removeLineClip(clipMap.splice(_id, 1)[0]);
+			}
+			for (_i = 0; _i < _fullLine.length; _i++) {
+				map.addLineY();
+				clipMap.unshift(map.perLineY.concat());
+			}
+		}
+		protected function updateClip():void {
+			var _x, _y:uint;
+			for (_y = 0; _y < map.mapHeight; _y++) {
+				if (!clipMap[_y]) {
+					continue;
+				}
+				for (_x = 0; _x < map.mapWidth; _x++) {
+					if (clipMap[_y][_x]) {
+						//clipMap[_y][_x].lineX = _x;
+						clipMap[_y][_x].moveToLineY(_y);
+						//lineY = _y;
+					}else {
 						continue;
 					}
-					_tile.remove();
-				}
-				if (_removeType==0) {
-					_scoreAdd += _e.length * (_e.length + 2);
-					if (_tile && onRemoveType != null) {
-						onRemoveType(_tile.value);
-					}
-				}else {
-					_scoreAdd += _e.length * 4;
 				}
 			}
-			_scoreAdd *= numCombo;
-			score += _scoreAdd;
-			time -= timeAdd * (numCombo > 1?(numCombo * 0.5):1);
 		}
-		private function setRecSize(_w:Number,_h:Number):void {
-			rec_select.scaleX = _w / rec_widthOrg;
-			rec_select.scaleY = _h / rec_heightOrg;
-			rec_follow.scaleX = _w / rec_widthOrg;
-			rec_follow.scaleY = _h / rec_heightOrg;
+		protected function removeLineClip(_list:Array):void {
+			for each(var _e:* in _list) {
+				if (_e is DisplayObject) {
+					tempClip.addChild(_e);
+				}
+			}
+			removeCount_current--;
+			if (removeCount_current == 0) {
+				tempClip.alpha = 1;
+				TweenMax.to(tempClip, 0.3, { colorMatrixFilter: { colorize:0xffffff, brightness:2 }, yoyo:true, repeat:1 } );
+				TweenMax.to(tempClip, 0.3, { alpha:0, delay:0.3 , onComplete:removeEnd } );
+			}
 		}
-		private function moveRecSelect(_evt:Event):void {
-			var _lineX:uint = int(mouseX / Tile.tileWidth);
-			var _lineY:uint = int(mouseY / Tile.tileWidth);
-			if (lineX_now==_lineX&&lineY_now==_lineY) {
+		protected function removeAllClip():void {
+			if (!clipMap) {
 				return;
 			}
-			if (rec_follow.alpha>0&&onRecMove!=null) {
-				onRecMove();
-			}
-			lineX_now = _lineX;
-			lineY_now = _lineY;
-			rec_follow.x = lineX_now * Tile.tileWidth;
-			rec_follow.y = lineY_now * Tile.tileHeight;
-			if (isPress) {
-				if (lineX_select != lineX_now || lineY_select != lineY_now) {
-					if (lineX_select != lineX_now) {
-						changeTiles(lineX_select, lineY_select, lineX_select + (lineX_select > lineX_now? -1: 1), lineY_select);
-					}else {
-						changeTiles(lineX_select, lineY_select, lineX_select, lineY_select + (lineY_select > lineY_now? -1: 1));
-					}
-					isPress = false;
-				}
-			}
-		}
-		private function timerRun(_evt:TimerEvent):void {
-			time++;
-			if (time==timeTotal) {
-				timer.stop();
-				if (onTimerOver!=null) {
-					onTimerOver();
-				}
-			}
-		}
-		private function createTile(_lineX:int,_lineY:int,_value:uint=0):Tile {
-			var _tile:Tile = new Tile();
-			_tile.onFallBegin = function():void {
-				addFallTile(this);
-			}
-			_tile.onFallEnd = function():void {
-				removeFallTile(this);
-			}
-			_tile.onRemove = function():void {
-				addRemoveTile(this);
-			}
-			_tile.onRemoveFallBegin = function():void {
-				removeRemoveTile(this);
-			}
-			_tile.setLine(_lineX, _lineY);
-			_tile.value = _value;
-			_tile.fallBegin();
-			tileContainer.addChildAt(_tile,0);
-			return _tile;
-		}
-		private function getDicKey(_lineX:int, _lineY:int):String {
-			return "TILE_"+_lineY+"_"+_lineX;
-		}
-		private function getFixTile(_lineX:int, _lineY:int):Tile{
-			return tileFixDic[getDicKey(_lineX, _lineY)];
-		}
-		private function setFixTile(_lineX:int, _lineY:int, _tile:Tile=null):void {
-			if (_tile) {
-				tileFixDic[getDicKey(_lineX, _lineY)] = _tile;
-				_tile.setLine(_lineX, _lineY);
-				map.setMap(_tile.lineX, _tile.lineY, _tile.value);
-			}else{
-				delete tileFixDic[getDicKey(_lineX, _lineY)];
-			}
-		}
-		private function fillMap():void {
 			var _x, _y:uint;
-			var _tile:Tile;
-			for (_y = 0; _y < Map.mapHeight; _y++ ) {
-				for (_x = 0; _x < Map.mapWidth; _x++ ) {
-					_tile = getFixTile(_x, _y);
-					map.setMap(_x, _y, _tile?_tile.value:0);
+			for (_y = 0; _y < map.mapHeight; _y++) {
+				if (!clipMap[_y]) {
+					continue;
 				}
-			}
-		}
-		private function addFallTile(_tile:Tile):void {
-			if (tileFallDic[_tile]==_tile) {
-				return;
-			}
-			setFixTile(_tile.lineX, _tile.lineY);
-			tileFallDic[_tile] = _tile;
-			tileFallDicLength++;
-			makePrevFall(_tile);
-		}
-		private function removeFallTile(_tile:Tile):void {
-			if (tileFallDic[_tile]!=_tile) {
-				return;
-			}
-			delete tileFallDic[_tile];
-			setFixTile(_tile.lineX, _tile.lineY, _tile);
-			tileFallDicLength--;
-			if (tileFallDicLength == 0) {
-				//所有下落块下落完毕
-				//根据当前块值填充地图
-				fillMap();
-				//检测是否有连击情况
-				removeAllRight();
-			}
-		}
-		private function addRemoveTile(_tile:Tile):void {
-			if (tileRemoveDic[_tile]==_tile) {
-				return;
-			}
-			setFixTile(_tile.lineX, _tile.lineY);
-			tileRemoveDic[_tile] = _tile;
-			tileRemoveDicLength++;
-		}
-		private function removeRemoveTile(_tile:Tile):void {
-			if (tileRemoveDic[_tile]!=_tile) {
-				return;
-			}
-			delete tileRemoveDic[_tile];
-			addChild(_tile);
-			makePrevFall(_tile);
-			tileRemoveDicLength--;
-			numRemoved++;
-			if (tileRemoveDicLength == 0) {
-				//所有需要消除的块已消除完毕
-				//根据消除情况，增加新的块
-				var _x, _y:uint;
-				for (var _i:* in map.addDic) {
-					_x = int(_i);
-					for (_y = 0; _y < map.addDic[_i]; _y++) {
-						createTile(_x, -(1 + _y), map.getTileValue());
+				for (_x = 0; _x < map.mapWidth; _x++) {
+					if (clipMap[_y][_x]) {
+						clipContainer.removeChild(clipMap[_y][_x]);
+					}else {
+						continue;
 					}
 				}
-				Map.picCount = Map.picMin + numRemoved / hardest * (Map.picMax - Map.picMin);
-				if (onRemoveTiles != null) {
-					onRemoveTiles(numRemoved);
-				}
 			}
 		}
-		private function makePrevFall(_tile:Tile):void {
-			var _ary:Array = _tile.findPrev();
-			var _lineX:int = _ary[0];
-			var _lineY:int = _ary[1];
-			var _tilePrev:Tile = getFixTile(_lineX, _lineY);
-			if (_tilePrev) {
-				_tilePrev.fallBegin();
+		protected function removeEnd():void {
+			removeChild(tempClip);
+			var _level:uint = int(removeCounts / removePerLevel);
+			if (_level > level) {
+				level = _level;
+				//clearMap();
+				if (onNextLevel != null) {
+					onNextLevel();
+				}
 			}
+			updateClip();
+			creatTileActive();
+		}
+		protected function isHit(_dr:int = 0, _dx:int = 0, _dy:int = 0):Boolean {
+			var _matrix:Array = tileActive.matrixCopy;
+			if (_dr!=0) {
+				tileActive.rotate(_dr);
+			}
+			var _x, _y:int;
+			for each(var _e:Array in _matrix) {
+				_x = tileActive.lineX + _e[0] + _dx;
+				_y = tileActive.lineY + _e[1] + _dy;
+				if (map.getMap(_x, _y)) {
+					if (_dr!=0) {
+						tileActive.rotate(-_dr);
+					}
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }

@@ -139,6 +139,7 @@
 				picWidth = stage.stageWidth - x * 2;
 				picHeight = stage.stageHeight - y * 2;
 			}
+			picAspectRatio = picHeight / picWidth;
 			scaleX = scaleY = 1;
 			backShape.width = picWidth;
 			backShape.height = picHeight;
@@ -314,7 +315,7 @@
 						picNow.height = _picAspectRatio * picNow.width;
 					}else {
 						picNow.height = picHeight;
-						picNow.width = picNow.height/_picAspectRatio;
+						picNow.width = picNow.height / _picAspectRatio;
 					}
 					break;
 				case 2:
