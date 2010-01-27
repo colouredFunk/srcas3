@@ -103,12 +103,8 @@
 				return;
 			}
 			btnList = [];
-			var _startX:uint = btn_0.x;
-			var _startY:uint = btn_0.y;
-			var _BtnClass:Class = btn_0.constructor as Class;
 			var _btn:*;
 			var _i:uint;
-			var _label:String;
 			for (_i = 0; _i < 10; _i++ ) {
 				_btn = this["btn_" + _i];
 				if (!_btn) {
@@ -116,8 +112,19 @@
 				}
 				btnList[_i] = _btn;
 			}
+			var _isFrom:Boolean;
+			if (btnList.length > 1) {
+				_isFrom = true;
+			}
+			var _startX:uint = btn_0.x;
+			var _startY:uint = btn_0.y;
+			var _BtnClass:Class = btn_0.constructor as Class;
 			for (_i = 0; _i < picPlayer.picLength; _i++ ) {
 				_btn = btnList[_i];
+				if (_isFrom) {
+					setBtn(_btn, _i);
+					continue;
+				}
 				if (!_btn) {
 					_btn = new _BtnClass();
 					addChild(_btn);
@@ -139,16 +146,22 @@
 					}
 					_btn.y = _startY + _i * (against? -btnDistance:btnDistance);
 				}
-				_label = String(picPlayer.getPicXML(_i).@label);
-				_btn.label = _label || String(_i + 1);
-				_btn.autoSize = "center";
-				_btn.userData = { id:_i };
-				_btn.release = function():void {
-					picPlayer.id_pic = this.userData.id;
-				}
-				if (isRollOver) {
-					_btn.rollOver = _btn.release;
-				}
+				setBtn(_btn, _i);
+			}
+		}
+		protected function setBtn(_btn:*, _id:uint):void {
+			if (!_btn) {
+				return;
+			}
+			var _label:String = String(picPlayer.getPicXML(_id).@label);
+			_btn.label = _label || String(_id + 1);
+			_btn.autoSize = "center";
+			_btn.userData = { id:_id };
+			_btn.release = function():void {
+				picPlayer.id_pic = this.userData.id;
+			}
+			if (isRollOver) {
+				_btn.rollOver = _btn.release;
 			}
 		}
 		protected function onPlayerLoadingHandle(_evt:ProgressEvent):void{
@@ -173,8 +186,13 @@
 					if (btn_progress) {
 						btn_progress.label = (picPlayer.id_pic + 1) + " / " + picPlayer.picLength;
 					}
+					if (!btn_0) {
+						return;
+					}
 					btn_select = btnList[picPlayer.id_pic];
-					btn_select.select = true;
+					if (btn_select) {
+						btn_select.select = true;
+					}
 					break;
 				case PicPlayer.TWEENED:
 					mouseChildren = true;

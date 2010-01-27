@@ -98,6 +98,13 @@
 		public static function EventUp(f:Function,... arg):Function {
 			return function(e:Event):void{f.apply(null,[e].concat(arg))};
 		}
+		//
+		public static function clone(_source:Object):* {
+			var _copy:ByteArray = new ByteArray();
+			_copy.writeObject(_source);
+			_copy.position = 0;
+			return(_copy.readObject());
+		}
 		//_funLoaded(event:Event):void {event.currentTarget.content as Bitmap;event.currentTarget.loader as Loader};
 		public static function loader(_obj:*,_funLoaded:Function=null,_funLoading:Function=null,_funError:Function=null):Loader {
 			var _loader:Loader=new Loader();
