@@ -17,6 +17,7 @@
 	public class AkdclLoader extends EventDispatcher
 	{
 		public var content:*;
+		private var __data:*;
 		private var urlLoader:URLLoader;
 		private var request:URLRequest;
 		public function AkdclLoader() 
@@ -35,6 +36,34 @@
 			retuestURL(_url,_data);
 			navigateToURL(request,_target);
 		}
+		public function get data():*{
+			return __data;
+		}
+		public function getJSON(_key:String=null):*{
+			if (!__data) {
+				return null;
+			}
+			var _data:*;
+			try {
+				if (_key) {
+					_data = JSON.decode(__data[_key]);
+				}else {
+					_data = JSON.decode(__data);
+				}
+			}catch (_error:*) {
+				_data = null;
+			}
+			return _data;
+		}
+		public function get URLVarData():*{
+			var _data:URLVariables = new URLVariables();
+			try {
+				_data.decode(__data);
+			}catch (_error:*) {
+				_data = null;
+			}
+			return _data;
+		}
 		private function retuestURL(_url:String, _data:Object=null):void {
 			request.url = _url;
 			if (_data) {
@@ -48,14 +77,15 @@
 		private function onURLCompleteHandler(_evt:Event):void {
 			urlLoader.removeEventListener(Event.COMPLETE,onURLCompleteHandler);
 			var _result:URLVariables = new URLVariables();
+			__data = _evt.currentTarget.data;
 			try {
-				_result.decode(_evt.currentTarget.data);
+				_result.decode(__data);
 				content = _result;
 			}catch (_error:*) {
 				try {
-					content = JSON.decode(_evt.currentTarget.data);
+					content = JSON.decode(__data);
 				}catch (_error:*) {
-					content = _evt.currentTarget.data;
+					content = __data;
 				}
 			}
 			dispatchEvent(new Event(_evt.type));
