@@ -153,9 +153,14 @@
 			if (!_btn) {
 				return;
 			}
-			var _label:String = String(picPlayer.getPicXML(_id).@label);
-			_btn.label = _label || String(_id + 1);
-			_btn.autoSize = "center";
+			try {
+				var _label:String = String(picPlayer.getPicXML(_id).@label);
+				_btn.label = _label || String(_id + 1);
+				_btn.autoSize = "center";
+			}catch (_ero:*) {
+				
+			}
+			
 			_btn.userData = { id:_id };
 			_btn.release = function():void {
 				picPlayer.id_pic = this.userData.id;

@@ -72,7 +72,9 @@
 			return true;
 		}
 		public static function isValidEmail(_email:String):Boolean {
-			var _emailExpression:RegExp=/^[a-z][\w.-]+@\w[\w.-]+\.[\w.-]*[a-z][a-z]$/i;
+			var _emailExpression:RegExp =/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+(w+([.-]\w+))*/;
+			///^[a-z][\w.-]+@\w[\w.-]+\.[\w.-]*[a-z][a-z]$/i;
+			
 			return _emailExpression.test(_email);
 		}
 		public static function encodeStr(_str:String,_type:String="GBK"):String{
