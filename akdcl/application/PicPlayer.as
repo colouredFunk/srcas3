@@ -79,7 +79,7 @@
 			}
 			btn.release = function():void {
 				TweenMax.killTweensOf(txt_debug);
-				TweenMax.to(txt_debug,0.5,{autoAlpha:0});
+				TweenMax.to(txt_debug, 0.5, { autoAlpha:0 } );
 			}
 			btn.click = function():void {
 				clickPic();
