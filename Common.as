@@ -212,12 +212,7 @@
 			_stream.load(new URLRequest(_url));
 			return _stream;
 		}
-		public static function getURL(_url:String, _openType:String, _data:Object = null):void {
-			/*var _broswer:String = ExternalInterface.call("function getBrowser() { return navigator.userAgent } ") as String;
-			if (_broswer.indexOf("Firefox") != -1 || _broswer.indexOf("MSIE 7.0") != -1) {
-				ExternalInterface.call('window.open("' +_url + '", "' +_openType + '")');
-				return;
-			}*/
+		public static function getURL(_url:String, _target:String, _data:Object = null):void {
 			var _request:URLRequest=new URLRequest(_url);
 			if(_data){
 				var _urlVariables:URLVariables=new URLVariables();
@@ -227,7 +222,58 @@
 				_request.data=_urlVariables;
 				_request.method=URLRequestMethod.POST;
 			}
-			navigateToURL(_request,_openType);
+			
+			var WINDOW_OPEN_FUNCTION:String = "window.open";
+			var browserName:String = getBrowserName();
+			var _features:String = "";
+			if (getBrowserName() == "Firefox")
+			{
+				ExternalInterface.call(WINDOW_OPEN_FUNCTION, _url, _target, _features);
+			}
+			//If IE, 
+			else if (browserName == "IE")
+			{
+				ExternalInterface.call(WINDOW_OPEN_FUNCTION, _url, _target, _features);
+			}
+			//If Safari 
+			else if (browserName == "Safari")
+			{			  
+				navigateToURL(_request,_target);
+			}
+			//If Opera 
+			else if (browserName == "Opera")
+			{	
+				navigateToURL(_request,_target);
+			} else 
+			{
+				navigateToURL(_request,_target);
+			}
+		}
+		private static function getBrowserName():String
+		{
+			var browser:String;
+			var browserAgent:String = ExternalInterface.call("function getBrowser(){return navigator.userAgent;}");
+			if (browserAgent != null && browserAgent.indexOf("Firefox") >= 0) 
+			{
+				browser = "Firefox";
+			} 
+			else if (browserAgent != null && browserAgent.indexOf("Safari") >= 0)
+			{
+				browser = "Safari";
+			}			 
+			else if (browserAgent != null && browserAgent.indexOf("MSIE") >= 0)
+			{
+				browser = "IE";
+			}		 
+			else if (browserAgent != null && browserAgent.indexOf("Opera") >= 0)
+			{
+				browser = "Opera";
+			}
+			else 
+			{
+				browser = "Undefined";
+			}
+			return browser;
 		}
 		public static function garbageCallback():void {
 			try {
