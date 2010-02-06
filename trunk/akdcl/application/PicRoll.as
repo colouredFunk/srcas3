@@ -7,11 +7,11 @@
 	 * ...
 	 * @author Akdcl
 	 */
-	public class RollPices extends Btn 
+	public class PicRoll extends Btn 
 	{
 		public var maxShow:uint = 3;
 		public var rollContainer:Sprite;
-		public function RollPices() {
+		public function PicRoll() {
 			
 		}
 	}
