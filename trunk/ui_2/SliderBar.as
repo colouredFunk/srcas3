@@ -82,6 +82,7 @@
 			slider.enabled=__enabled;
 			//btn_up.enabled=__enabled;
 			//btn_down.enabled=__enabled;
+			slider.visible = __enabled;
 		}
 		public function get value():Number {
 			return slider.value;
