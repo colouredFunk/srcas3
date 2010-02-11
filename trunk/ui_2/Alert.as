@@ -46,7 +46,8 @@
 				}
 			};
 			mouseEnabled = false;
-			txt_show.mouseEnabled = false;
+			//txt_show.mouseEnabled = false;
+			txt_show.setTxtMouse(true);
 			txt_show.html = true;
 			btn_n.autoSize="center";
 			btn_y.autoSize="center";

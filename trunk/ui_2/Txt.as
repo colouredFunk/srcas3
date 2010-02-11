@@ -31,6 +31,9 @@
 				bar.mask=txt;
 			}
 		}
+		public function setTxtMouse(_b:Boolean):void {
+			txt.mouseEnabled=_b;
+		}
 		protected var __widthMax:int;
 		[Inspectable(defaultValue=0,type="int",name="0_固定宽")]
 		public function get widthMax():int{
