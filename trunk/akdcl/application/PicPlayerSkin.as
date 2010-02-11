@@ -23,6 +23,7 @@
 		protected var btn_select:*;
 		protected var btnList:Array;
 		protected var picPlayer:PicPlayer;
+		public var onSeted:Function;
 		public function PicPlayerSkin() {
 			addEventListener(Event.ADDED_TO_STAGE, added);
 		}
@@ -147,6 +148,9 @@
 					_btn.y = _startY + _i * (against? -btnDistance:btnDistance);
 				}
 				setBtn(_btn, _i);
+			}
+			if (onSeted!=null) {
+				onSeted();
 			}
 		}
 		protected function setBtn(_btn:*, _id:uint):void {
