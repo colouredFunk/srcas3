@@ -98,6 +98,8 @@
 		public function set btnDistance(_btnDistance:uint):void {
 			__btnDistance = _btnDistance;
 		}
+		protected var startX:uint;
+		protected var startY:uint;
 		protected function onPlayerXmlLoadedHandle(_evt:Event):void {
 			TweenMax.to(this, picPlayer.timeTween, { autoAlpha:1 } );
 			if (!btn_0) {
@@ -117,8 +119,8 @@
 			if (btnList.length > 1) {
 				_isFrom = true;
 			}
-			var _startX:uint = btn_0.x;
-			var _startY:uint = btn_0.y;
+			startX = btn_0.x;
+			startY = btn_0.y;
 			var _BtnClass:Class = btn_0.constructor as Class;
 			for (_i = 0; _i < picPlayer.picLength; _i++ ) {
 				_btn = btnList[_i];
@@ -132,20 +134,20 @@
 					btnList[_i] = _btn;
 				}
 				if (horizontal) {
-					_btn.y = _startY;
+					_btn.y = startY;
 					if (against) {
-						_btn.x = _startX + (_i-picPlayer.picLength+1) * btnDistance;
+						_btn.x = startX + (_i-picPlayer.picLength+1) * btnDistance;
 					}else {
-						_btn.x = _startX + _i * btnDistance;
+						_btn.x = startX + _i * btnDistance;
 					}
 				}else {
-					_btn.x = _startX;
+					_btn.x = startX;
 					if (against) {
-						_btn.y = _startY + (_i-picPlayer.picLength+1) * btnDistance;
+						_btn.y = startY + (_i-picPlayer.picLength+1) * btnDistance;
 					}else {
-						_btn.y = _startY + _i * btnDistance;
+						_btn.y = startY + _i * btnDistance;
 					}
-					_btn.y = _startY + _i * (against? -btnDistance:btnDistance);
+					_btn.y = startY + _i * (against? -btnDistance:btnDistance);
 				}
 				setBtn(_btn, _i);
 			}
