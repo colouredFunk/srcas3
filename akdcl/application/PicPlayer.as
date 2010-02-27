@@ -92,12 +92,15 @@
 			}
 			addChild(btn);
 			
+			
+			var _backShape:*= getChildAt(0);
+			if (_backShape != txt_debug) {
+				backShape =  _backShape as Shape;
+				backShape.visible = false;
+			}
 			txt_debug.visible = false;
 			txt_debug.alpha = 0;
 			addChild(txt_debug);
-			
-			backShape = getChildAt(0) as Shape;
-			backShape.visible = false;
 		}
 		private function removed(_evt:Event):void {
 			removeEventListener(Event.REMOVED_FROM_STAGE, removed);
@@ -110,6 +113,9 @@
 		}
 		private function timeRun(_evt:TimerEvent):void {
 			id_pic++;
+		}
+		public function get autoSize():Boolean {
+			return backShape == null;
 		}
 		public function loadXml(_url:String):void {
 			Common.urlLoader(_url, xmlLoaded);
@@ -134,8 +140,10 @@
 		}
 		private function xmlLoaded(_evt:Event):void {
 			xml = new XML(_evt.currentTarget.data);
-			picWidth = width || picWidth;
-			picHeight = height || picHeight;
+			if (backShape) {
+				picWidth = width;
+				picHeight = height;
+			}
 			if (picWidth*picHeight==0) {
 				stage.align = StageAlign.TOP_LEFT;
 				picWidth = stage.stageWidth - x * 2;
@@ -143,8 +151,10 @@
 			}
 			picAspectRatio = picHeight / picWidth;
 			scaleX = scaleY = 1;
-			backShape.width = picWidth;
-			backShape.height = picHeight;
+			if (backShape) {
+				backShape.width = picWidth;
+				backShape.height = picHeight;
+			}
 			txt_debug.text = "图片尺寸：" + picWidth + " x " + picHeight;
 			
 			fillMode = int(xml.fillMode) || fillMode;
