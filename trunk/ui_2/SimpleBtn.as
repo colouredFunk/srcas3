@@ -6,6 +6,7 @@
 		private static var btnDown:MovieClip;
 		private static var btnIn:MovieClip;
 		public var click:Function;
+		public var onSelect:Function;
 		public var press:Function;
 		public var release:Function;
 		public var rollOver:Function;
@@ -82,7 +83,10 @@
 			if (__select==_select) {
 				return;
 			}
-			__select=_select;
+			__select = _select;
+			if (onSelect!=null) {
+				onSelect(__select);
+			}
 			setStyle();
 		}
 		private var __isIn:Boolean;
