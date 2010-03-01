@@ -1,6 +1,7 @@
 ﻿package ui_2{
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.display.Stage;
 	import flash.events.Event;
@@ -8,6 +9,8 @@
 		public static var AlertLayer:Sprite;
 		public static var AlertClass:Class;
 		public static var AlertAppear:Function;
+		public static var TxtMouseEnabled:Boolean = true;
+		public static var AlertPoint:Point;
 		public var callBack:Function;
 		
 		private var barWidth:int;
@@ -46,7 +49,8 @@
 				}
 			};
 			mouseEnabled = false;
-			//txt_show.mouseEnabled = false;
+			txt_show.mouseEnabled = TxtMouseEnabled;
+			txt_show.mouseChildren = TxtMouseEnabled;
 			txt_show.setTxtMouse(true);
 			txt_show.html = true;
 			btn_n.autoSize="center";
@@ -104,8 +108,13 @@
 			if(!stage){
 				if(AlertLayer){
 					AlertLayer.addChild(this);
-					x=int(AlertLayer.stage.stageWidth*0.5);
-					y=int(AlertLayer.stage.stageHeight*0.5);
+					if (AlertPoint) {
+						x = AlertPoint.x;
+						y = AlertPoint.y;
+					}else {
+						x=int(AlertLayer.stage.stageWidth*0.5);
+						y=int(AlertLayer.stage.stageHeight*0.5);
+					}
 				}else{
 					trace("AlertLayer is undefined!" );
 					return;

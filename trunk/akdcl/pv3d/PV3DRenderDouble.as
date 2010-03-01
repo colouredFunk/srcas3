@@ -25,6 +25,8 @@
 			render_quadrant = new QuadrantRenderEngine();
 			scene = new Scene3D();
 			camera = new Camera3D();
+			camera.focus = 100;
+			camera.zoom = 10;
 			viewport = new Viewport3D(_vpWidth, _vpHeight, false, _interactive);
 			addChild(viewport);
 			init2d();
