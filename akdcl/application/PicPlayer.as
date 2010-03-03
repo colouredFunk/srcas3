@@ -41,7 +41,7 @@
 		public var timeDelay:Number;
 		public var timeTween:Number;
 		
-		private var xml:XML;
+		public var xml:XML;
 		private var timer:Timer;
 		private var loaderDic:Object;
 		private var picNow:PicContainer;
@@ -282,7 +282,9 @@
 			if (_evtOrLoader is Event) {
 				setState(LOADED);
 				var _bmp:Bitmap = _evtOrLoader.currentTarget.content as Bitmap;
-				_bmp.smoothing = true;
+				if (_bmp) {
+					_bmp.smoothing = true;
+				}
 				_evtOrLoader = _evtOrLoader.currentTarget.loader as Loader;
 			}
 			setState(RELOADED);
@@ -343,8 +345,12 @@
 					picNow.height = picHeight;
 					break;
 			}
-			picNow.x = (picWidth - picNow.width) * 0.5;
-			picNow.y = (picHeight - picNow.height) * 0.5;
+			if (fillMode==0) {
+				
+			}else {
+				picNow.x = (picWidth - picNow.width) * 0.5;
+				picNow.y = (picHeight - picNow.height) * 0.5;
+			}
 			
 			var _ob:Object;
 			TweenMax.to(picPrev, 0, getObjInTween(tweenStyle.prev.from[0]));
