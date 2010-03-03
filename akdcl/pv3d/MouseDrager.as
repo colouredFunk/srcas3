@@ -47,8 +47,8 @@
 		public function process(_evt:Event=null):Boolean {
 			if (isMouseDown) {
 				mouseNowX=mouseX;
-				mouseNowY=lockY?0:mouseY;
-				ob3d.rotationY+= (obRY + mouseDownX - mouseNowX - ob3d.rotationY) * 0.5;
+				mouseNowY = lockY?0:mouseY;
+				ob3d.rotationY += (obRY + (mouseDownX - mouseNowX) * 0.2 - ob3d.rotationY) * 0.5;
 				if (viewHuman) {
 					cameraRadianNow+=(cameraRadianDown+(mouseDownY - mouseNowY)*0.01-cameraRadianNow)*0.5;
 					if (lock) {
