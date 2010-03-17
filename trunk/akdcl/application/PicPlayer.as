@@ -276,9 +276,12 @@
 		}
 		private function picError(_evt:ErrorEvent):void {
 			setState(ERROR);
-			trace(id_pic);
+			for (var _i:String in loaderDic) {
+				if (!loaderDic[_i].content) {
+					delete loaderDic[_i];
+				}
+			}
 			id_pic++;
-			trace(id_pic);
 		}
 		private function picLoaded(_evtOrLoader:*):void {
 			if (_evtOrLoader is Event) {
