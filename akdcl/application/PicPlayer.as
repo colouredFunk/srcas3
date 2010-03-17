@@ -236,7 +236,7 @@
 			return __id_pic;
 		}
 		public function set id_pic(_id_pic:int):void {
-			if (state!=TWEENED||__id_pic==_id_pic) {
+			if ((state != TWEENED && state != ERROR) || __id_pic == _id_pic) {
 				return;
 			}
 			if (_id_pic<0) {
@@ -276,7 +276,9 @@
 		}
 		private function picError(_evt:ErrorEvent):void {
 			setState(ERROR);
+			trace(id_pic);
 			id_pic++;
+			trace(id_pic);
 		}
 		private function picLoaded(_evtOrLoader:*):void {
 			if (_evtOrLoader is Event) {
