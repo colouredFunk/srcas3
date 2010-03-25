@@ -49,7 +49,7 @@
 			_clip.transform.colorTransform = _ctf;
 		}
 		private static const cmf:ColorMatrixFilter=new ColorMatrixFilter([0.3086000084877014,0.6093999743461609,0.0820000022649765,0,0,0.3086000084877014,0.6093999743461609,0.0820000022649765,0,0,0.3086000084877014,0.6093999743461609,0.0820000022649765,0,0,0,0,0,1,0]);
-		public static function setGray(_tar:Sprite,_value:Boolean):void {
+		public static function setGray(_tar:*,_value:Boolean):void {
 			if (_value) {
 				_tar.filters=null;
 				_tar.mouseEnabled=_tar.mouseChildren=true;

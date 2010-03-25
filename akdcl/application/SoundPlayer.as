@@ -43,6 +43,12 @@
 			}
 			return soundChannel.position/sound.length;
 		}
+		public function get totalTime():uint {
+			if (!sound) {
+				return 0;
+			}
+			return sound.length;
+		}
 		private var __playId:uint;
 		public function get playId():uint{
 			return __playId;
@@ -68,11 +74,29 @@
 			sound=new Sound();
 			sound.addEventListener(ProgressEvent.PROGRESS,progress);
 			sound.addEventListener(Event.COMPLETE,$complete);
-			sound.load(new URLRequest(musicList.list[playId]));
+			sound.load(new URLRequest(musicList.list[playId].@src.toString()));
 		}
 		public function attachMusic(_musicList:*):void {
 			newList(_musicList);
 			playId=0;
+		}
+		private var volumePrev:Number=0;
+		public function get mute():Boolean{
+			return volume==0;
+		}
+		public function set mute(_mute:Boolean):void{
+			if(_mute==(volume==0)){
+				return;
+			}
+			if(_mute){
+				volumePrev=volume;
+				volume=0;
+			}else{
+				if (volumePrev <0.01) {
+					volumePrev = defaultVolume;
+				}
+				volume=volumePrev;
+			}
 		}
 		public var defaultVolume:Number=0.8;
 		private var __volume:Number;
@@ -144,18 +168,18 @@
 			__playState=SOUND_STOP;
 			dispatchEvent(new Event(SOUND_STATE));
 		}
-		public function next():void {
-			playId++;
-			play();
-		}
 		public function prev():void {
 			playId--;
+			play();
+		}
+		public function next():void {
+			playId++;
 			play();
 		}
 		protected function newList(_list:*):void {
 
 			if (_list is XML) {
-				musicList=_list;
+				musicList = _list;
 			}else {
 				musicList =<root></root>;
 				if ((_list is Array)||(_list is String)) {
@@ -163,7 +187,7 @@
 						_list=_list.split("|");
 					}
 					for each (var _e:* in _list) {
-						musicList.appendChild(<list>{_e}</list>);
+						musicList.appendChild(<list src={_e}/>);
 					}
 				} else if (_list is XMLList) {
 					musicList.list=_list;
