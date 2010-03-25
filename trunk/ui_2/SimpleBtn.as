@@ -31,7 +31,6 @@
 		protected function removed(_evt:Event):void {
 			stop();
 			if (stage.focus==this) {
-				//否则会引起一些按键不能动作
 				stage.focus=null;
 			}
 			removeEventListener(Event.REMOVED_FROM_STAGE,removed);
@@ -122,7 +121,7 @@
 				//btnIn.$onRollOver(null);
 			//}
 			__isDown=false;
-			if (release!=null) {
+			if (release != null) {
 				release();
 			}
 			setStyle();
