@@ -25,7 +25,8 @@
 		public static var SOUND_STOP:String="soundStop";
 		public static var SOUND_PAUSE:String="soundPause";
 		public static var SOUND_COMPLETE:String="soundComplete";
-		public static var SOUND_STATE:String="soundState";
+		public static var SOUND_STATE:String = "soundState";
+		public static var SOUND_IDCHANGE:String="SoundPlayer.soundIdChange"
 		public static var PROGRESS:String="progress";
 		public static var COMPLETE:String="complete";
 		public function SoundPlayer() {
@@ -45,21 +46,31 @@
 		}
 		public function get totalTime():uint {
 			if (!sound) {
+				return Infinity;
+			}
+			return sound.length / loaded;
+		}
+		public function get playedTime():uint {
+			if (!soundChannel) {
 				return 0;
 			}
-			return sound.length;
+			return soundChannel.position;
 		}
-		private var __playId:uint;
-		public function get playId():uint{
+		private var __playId:int = -1;
+		public function get playId():int{
 			return __playId;
 		}
-		public function set playId(_playId:uint):void{
-			if (_playId==musicList.list.length()) {
-				_playId=0;
-			}else if (_playId>musicList.list.length()){
-				_playId=musicList.list.length()-1;
+		public function set playId(_playId:int):void{
+			if (_playId<0) {
+				_playId = musicList.list.length() - 1;
+			}else if (_playId>musicList.list.length()-1){
+				_playId = 0;
 			}
-			__playId=_playId;
+			if (__playId == _playId) {
+				return;
+			}
+			__playId = _playId;
+			
 			stop();
 			if (sound) {
 				sound.removeEventListener(ProgressEvent.PROGRESS,progress);
@@ -71,13 +82,20 @@
 			}catch (error:*){
 				
 			}
-			sound=new Sound();
+			sound = new Sound();
+			sound.addEventListener(Event.ID3, onID3Loaded);
 			sound.addEventListener(ProgressEvent.PROGRESS,progress);
 			sound.addEventListener(Event.COMPLETE,$complete);
 			sound.load(new URLRequest(musicList.list[playId].@src.toString()));
+			
+			dispatchEvent(new Event(SOUND_IDCHANGE));
+		}
+		private function onID3Loaded(_evt:Event):void {
+			sound.id3;
 		}
 		public function attachMusic(_musicList:*):void {
 			newList(_musicList);
+			__playId = -1;
 			playId=0;
 		}
 		private var volumePrev:Number=0;
@@ -114,6 +132,12 @@
             _trans.volume = _volume;
             soundChannel.soundTransform = _trans;
 			__volume=_volume;
+		}
+		public function get volumeForTweenMax():Number{
+			return volume;
+		}
+		public function set volumeForTweenMax(_volume:Number):void {
+			volume = _volume;
 		}
 		private var __playState:String;
 		public function get playState():String {

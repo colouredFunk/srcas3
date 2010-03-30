@@ -19,6 +19,7 @@
 		public var btn_progress:*;
 		public var btn_prev:*;
 		public var btn_next:*;
+		public var btnsContainer:Sprite;
 		
 		protected var btn_select:*;
 		protected var btnList:Array;
@@ -65,6 +66,12 @@
 			if (btn_progress) {
 				//btn_progress
 			}
+		}
+		public function eachBtn(_fun:Function):void {
+			if (!btnList) {
+				return;
+			}
+			btnList.forEach(_fun);
 		}
 		private var __isRollOver:Boolean = false;
 		public function get isRollOver():Boolean {
@@ -121,6 +128,8 @@
 			}
 			startX = btn_0.x;
 			startY = btn_0.y;
+			btnsContainer = new Sprite();
+			addChild(btnsContainer);
 			var _BtnClass:Class = btn_0.constructor as Class;
 			for (_i = 0; _i < picPlayer.picLength; _i++ ) {
 				_btn = btnList[_i];
@@ -133,6 +142,7 @@
 					addChild(_btn);
 					btnList[_i] = _btn;
 				}
+				_btn.needReload = true;
 				if (horizontal) {
 					_btn.y = startY;
 					if (against) {
@@ -149,6 +159,7 @@
 					}
 					_btn.y = startY + _i * (against? -btnDistance:btnDistance);
 				}
+				btnsContainer.addChild(_btn);
 				setBtn(_btn, _i);
 			}
 			if (onSeted!=null) {
