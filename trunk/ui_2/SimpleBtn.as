@@ -5,7 +5,6 @@
 	public class SimpleBtn extends MovieClip {
 		private static var btnDown:MovieClip;
 		private static var btnIn:MovieClip;
-		public var click:Function;
 		public var onSelect:Function;
 		public var press:Function;
 		public var release:Function;
@@ -39,7 +38,6 @@
 				addEventListener(Event.ADDED_TO_STAGE,added);
 				return;
 			}
-			click = null;
 			press=null;
 			release=null;
 			rollOver=null;
@@ -60,14 +58,11 @@
 			__enabled=_enabled;
 			if (__enabled) {
 				buttonMode = true;
-				addEventListener(MouseEvent.CLICK, $onClick);
 				addEventListener(MouseEvent.MOUSE_DOWN,$onPress);
-				stage.addEventListener(MouseEvent.MOUSE_UP,$onRelease);
 				addEventListener(MouseEvent.ROLL_OVER,$onRollOver);
 				addEventListener(MouseEvent.ROLL_OUT,$onRollOut);
 			} else {
 				buttonMode=false;
-				removeEventListener(MouseEvent.CLICK, $onClick);
 				removeEventListener(MouseEvent.MOUSE_DOWN,$onPress);
 				stage.removeEventListener(MouseEvent.MOUSE_UP,$onRelease);
 				removeEventListener(MouseEvent.ROLL_OVER,$onRollOver);
@@ -96,15 +91,11 @@
 		public function get isDown():Boolean{
 			return __isDown;
 		}
-		public function $onClick(_evt:MouseEvent):void {
-			if (click!=null) {
-				click();
-			}
-		}
 		public function $onPress(_evt:MouseEvent):void {
 			if(isDown){
 				return;
 			}
+			stage.addEventListener(MouseEvent.MOUSE_UP,$onRelease);
 			btnDown=this;
 			__isDown=true;
 			if (press!=null) {
@@ -116,6 +107,7 @@
 			if(!isDown){
 				return;
 			}
+			stage.removeEventListener(MouseEvent.MOUSE_UP,$onRelease);
 			btnDown=null;
 			//if(btnIn&&btnIn!=this){
 				//btnIn.$onRollOver(null);
