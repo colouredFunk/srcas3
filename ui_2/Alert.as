@@ -9,7 +9,7 @@
 		public static var AlertLayer:Sprite;
 		public static var AlertClass:Class;
 		public static var AlertAppear:Function;
-		public static var TxtMouseEnabled:Boolean = true;
+		public static var TxtMouseEnabled:Boolean;
 		public static var AlertPoint:Point;
 		public var callBack:Function;
 		
@@ -51,7 +51,7 @@
 			mouseEnabled = false;
 			txt_show.mouseEnabled = TxtMouseEnabled;
 			txt_show.mouseChildren = TxtMouseEnabled;
-			txt_show.setTxtMouse(true);
+			txt_show.setTxtMouse(TxtMouseEnabled);
 			txt_show.html = true;
 			btn_n.autoSize="center";
 			btn_y.autoSize="center";
