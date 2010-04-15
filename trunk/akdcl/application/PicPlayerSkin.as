@@ -120,6 +120,7 @@
 				if (!_btn) {
 					break;
 				}
+				_btn.visible=false;
 				btnList[_i] = _btn;
 			}
 			var _isFrom:Boolean;
@@ -173,6 +174,7 @@
 			try {
 				var _label:String = String(picPlayer.getPicXML(_id).@label);
 				_btn.label = _label || String(_id + 1);
+				_btn.visible=true;
 				_btn.autoSize = "center";
 			}catch (_ero:*) {
 				
