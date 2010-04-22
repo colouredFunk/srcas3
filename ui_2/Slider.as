@@ -52,8 +52,8 @@
 				}
 				dispatchEvent(new Event(RELEASE));
 			};
-			enabled=true;
-			value=0;
+			enabled = true;
+			value = 0;
 			if(track){
 				length = (track.width * scaleX + track.x * 2);
 				track.mouseEnabled=false;
@@ -205,9 +205,7 @@
 		}
 		protected function setValue():void {
 			var _x:uint = Math.round((value-minimum)*scale);
-			if (thumb) {
-				thumb.x=_x;
-			}
+			thumb.x=_x;
 			if (bar) {
 				bar.width=_x;
 			}
