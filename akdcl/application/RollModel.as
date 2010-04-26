@@ -127,11 +127,19 @@
 				_element.parent.setChildIndex(_element,_index);
 			}
 		}
-		protected function depthSort(_clip_0:*, _clip_1:*):int {    
-			if(_clip_0.x+_clip_0.y*1002<_clip_1.x+_clip_1.y*1002){
-				return -1;
-			}else{
-				return 1;
+		protected function depthSort(_clip_0:*, _clip_1:*):int {
+			if (radiusY>0) {
+				if(_clip_0.x+_clip_0.y*1002<_clip_1.x+_clip_1.y*1002){
+					return -1;
+				}else{
+					return 1;
+				}
+			}else {
+				if(_clip_0.x+_clip_0.y*1002<_clip_1.x+_clip_1.y*1002){
+					return 1;
+				}else{
+					return -1;
+				}
 			}
 		}
 	}
