@@ -1,4 +1,5 @@
 ﻿package com{
+	import flash.display.DisplayObjectContainer;
 	import flash.geom.Point;
 	import flash.display.Sprite;
 	import flash.display.BlendMode;
@@ -6,35 +7,52 @@
 	import flash.events.Event;
 	
 	public class Shadow extends Sprite {
-		public static var drawContainer:*;
+		public static var drawContainer:DisplayObjectContainer;
+		
+		public var xEnd:Number=0;
+		public var yEnd:Number=0;
 		public var rgb:uint=0xff0000;
 		public var alphaStart:Number=1;
 		public var shadowLength:uint=10;
-		public var disappear:Number=0.9;
-		public var xEnd:Number=20;
-		public var yEnd:Number=20;
+		public var disappear:Number = 0.9;
 		public var speed:Object;
 		public var autoDraw:Boolean;
 		public var shadowType:uint;
 		protected var shadowList:Array;
 		protected var fillSprite:Sprite;
 		public function Shadow() {
-			init();
+			addEventListener(Event.ADDED_TO_STAGE, onAddToStageHandle);
 		}
-		protected function init():void {
+		protected function onAddToStageHandle(_evt:Event):void {
 			if(!drawContainer){
 				return;
 			}
-			speed={x:0,y:0};
-			shadowList=[];
-			fillSprite=new Sprite()  ;
+			removeEventListener(Event.ADDED_TO_STAGE, onAddToStageHandle);
+			addEventListener(Event.REMOVED_FROM_STAGE, onRemoveFromStageHandle);
+			speed = { x:0, y:0 };
+			shadowList = [];
+			fillSprite = new Sprite();
+			fillSprite.filters = filters;
+			fillSprite.blendMode = blendMode;
 			drawContainer.addChild(fillSprite);
-			this.addEventListener(Event.ENTER_FRAME,runStep);
-			fillSprite.blendMode=BlendMode.LIGHTEN;
-			visible=false;
-			//if (autoDraw) {
-				//beginDraw();
-			//}
+			
+			addEventListener(Event.ENTER_FRAME, runStep);
+			
+			alphaStart = alpha;
+			rgb = transform.colorTransform.color == 0?rgb:transform.colorTransform.color;
+			
+			visible = false;
+			blendMode = BlendMode.NORMAL;
+			filters = null;
+		}
+		protected function onRemoveFromStageHandle(_evt:Event):void {
+			removeEventListener(Event.REMOVED_FROM_STAGE, onRemoveFromStageHandle);
+			removeEventListener(Event.ENTER_FRAME, runStep);
+			if (fillSprite && drawContainer.contains(fillSprite) ) {
+				drawContainer.removeChild(fillSprite);
+			}
+			speed = null;
+			shadowList = null;
 		}
 		public function runStep(_evt:Event=null):void {
 			setShadowList();
@@ -49,7 +67,7 @@
 		protected function getPosNow() {
 			var _p1:Point=new Point(0,0);
 			var _p2:Point=new Point(xEnd,yEnd);
-			_p1=fillSprite.globalToLocal(this.localToGlobal(_p1));
+			_p1=fillSprite.globalToLocal(localToGlobal(_p1));
 			_p2=fillSprite.globalToLocal(parent.localToGlobal(_p2));
 			return [_p1,_p2];
 		}
@@ -57,7 +75,7 @@
 			if (_sd.shadowList.length>1) {
 				_fill.graphics.clear();
 				var _alphaNow:Number=_sd.alphaStart;
-				var _dAlpha:Number=_alphaNow/_sd.shadowLength;
+				var _dAlpha:Number=_alphaNow/(_sd.shadowLength-1);
 				var _dis:Number=1;
 				var _p1:*;
 				var _p2:*;
@@ -100,7 +118,7 @@
 						_p33=Point.interpolate(_p3,_p4,_dis);
 						_p44=Point.interpolate(_p4,_p3,_dis);
 					}
-					_fill.graphics.beginFill(_sd.rgb,_alphaNow);
+					_fill.graphics.beginFill(_sd.rgb, _alphaNow);
 					_fill.graphics.moveTo(_p11.x,_p11.y);
 					_fill.graphics.lineTo(_p22.x,_p22.y);
 					_fill.graphics.lineTo(_p33.x,_p33.y);
