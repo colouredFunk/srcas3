@@ -11,7 +11,7 @@
 		
 		public var xEnd:Number=0;
 		public var yEnd:Number=0;
-		public var rgb:uint=0xff0000;
+		public var rgb:uint=0xffffff;
 		public var alphaStart:Number=1;
 		public var shadowLength:uint=10;
 		public var disappear:Number = 0.9;
@@ -129,6 +129,9 @@
 				return _dAlpha;
 			}
 			return 0;
+		}
+		private static function getMixColor(_color_0:uint,_color_1:uint,_per:Number):uint {
+			
 		}
 	}
 }
