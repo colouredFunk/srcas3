@@ -63,6 +63,10 @@
 				}
 			}
 			scaleX = 1;
+			if (bar) {
+				bar.mouseEnabled = false;
+				bar.mouseChildren = false;
+			}
 		}
 		protected function removed(_evt:Event):void {
 			removeEventListener(Event.REMOVED_FROM_STAGE,removed);
