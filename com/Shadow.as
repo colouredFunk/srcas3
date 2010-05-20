@@ -130,8 +130,5 @@
 			}
 			return 0;
 		}
-		private static function getMixColor(_color_0:uint,_color_1:uint,_per:Number):uint {
-			
-		}
 	}
 }
