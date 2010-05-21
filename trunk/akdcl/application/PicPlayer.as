@@ -253,8 +253,6 @@
 			var _picPath:String = String(xml.pic[_id_pic].@src);
 			if (_picPath == null || _picPath.length <= 0) {
 				_picPath = xml.picesPath.text();
-			}
-			if (_picPath.indexOf(".") < 0) {
 				if (_picPath.charAt(_picPath.length-1)!="/") {
 					_picPath += "/";
 				}
