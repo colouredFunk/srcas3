@@ -15,6 +15,7 @@
 
 		public var thumb:*;
 		public var bar:*;
+		public var masked:*;
 		public var track:*;
 		public var tick:*;
 		private var TickClass:Class;
@@ -33,7 +34,6 @@
 				thumb=new Btn();
 				addChild(thumb);
 			}
-			thumb.hitArea=this;
 			thumb.press=function ():void {
 				//mouseXOff= !bar ? thumb.mouseX : 0;
 				timeHold=0;
@@ -55,6 +55,7 @@
 			enabled = true;
 			value = 0;
 			if(track){
+				thumb.hitArea=track;
 				length = (track.width * scaleX + track.x * 2);
 				track.mouseEnabled=false;
 				track.mouseChildren=false;
@@ -66,6 +67,11 @@
 			if (bar) {
 				bar.mouseEnabled = false;
 				bar.mouseChildren = false;
+				if (masked) {
+					masked.cacheAsBitmap = true;
+					bar.cacheAsBitmap = true;
+					masked.mask = bar;
+				}
 			}
 		}
 		protected function removed(_evt:Event):void {
