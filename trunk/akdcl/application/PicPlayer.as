@@ -116,7 +116,12 @@
 			return backShape == null;
 		}
 		public function loadXml(_url:String):void {
-			Common.urlLoader(_url, xmlLoaded);
+			var _xml:XML = XML(_url);
+			if (_xml.children().length()>0) {
+				xmlLoaded( { currentTarget: { data:_url }} );
+			}else {
+				Common.urlLoader(_url, xmlLoaded);
+			}
 		}
 		public function clickPic():void {
 			if (btn.userData.url) {
@@ -136,7 +141,7 @@
 				mask = null;
 			}
 		}
-		private function xmlLoaded(_evt:Event):void {
+		private function xmlLoaded(_evt:*):void {
 			xml = new XML(_evt.currentTarget.data);
 			if (backShape) {
 				picWidth = width;
