@@ -24,7 +24,7 @@
 		protected function init():void {
 			txt.mouseWheelEnabled=false;
 			txt.mouseEnabled=false;
-			txt.multiline=false;
+			//txt.multiline=false;
 			txt.wordWrap=false;
 			txt.autoSize="left";
 			if (bar) {
@@ -42,7 +42,7 @@
 		public function set widthMax(_widthMax:int):void {
 			__widthMax=_widthMax;
 			if(__widthMax){
-				txt.multiline=true;
+				//txt.multiline=true;
 				txt.wordWrap=true;
 			}
 		}
