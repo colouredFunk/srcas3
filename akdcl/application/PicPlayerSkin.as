@@ -205,6 +205,7 @@
 				case PicPlayer.LOADED:
 				case PicPlayer.RELOADED:
 					if (btn_info) {
+						btn_info.html = true;
 						btn_info.label = picPlayer.getPicXML(picPlayer.id_pic).@info;
 					}
 					if (btn_progress) {
