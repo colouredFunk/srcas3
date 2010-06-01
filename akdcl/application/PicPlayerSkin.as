@@ -172,10 +172,19 @@
 				return;
 			}
 			try {
-				var _label:String = String(picPlayer.getPicXML(_id).@label);
-				_btn.label = _label || String(_id + 1);
-				_btn.visible=true;
-				_btn.autoSize = "center";
+				var _icon:String = String(picPlayer.getPicXML(_id).@icon);
+				if (_icon.length>0) {
+					if (!_btn.icon) {
+						_btn.icon = new Sprite();
+						_btn.addChild(_btn.icon);
+					}
+					_btn.icon.addChild(Common.loader(_icon));
+				}else {
+					var _label:String = String(picPlayer.getPicXML(_id).@label);
+					_btn.label = _label || String(_id + 1);
+					_btn.visible=true;
+					_btn.autoSize = "center";
+				}
 			}catch (_ero:*) {
 				
 			}
@@ -206,7 +215,7 @@
 				case PicPlayer.RELOADED:
 					if (btn_info) {
 						btn_info.html = true;
-						btn_info.label = picPlayer.getPicXML(picPlayer.id_pic).@info;
+						btn_info.label = picPlayer.getPicXML(picPlayer.id_pic).info;
 					}
 					if (btn_progress) {
 						btn_progress.label = (picPlayer.id_pic + 1) + " / " + picPlayer.picLength;

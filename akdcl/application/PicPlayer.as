@@ -72,7 +72,7 @@
 			
 			btn = new SimpleBtn();
 			btn.hitArea = picNow;
-			btn.userData = {url:null,type:"_blank"};
+			btn.userData = {href:null,target:"_blank"};
 			btn.press = function():void {
 				TweenMax.killTweensOf(txt_debug);
 				TweenMax.to(txt_debug,0.5,{autoAlpha:1,delay:2});
@@ -124,8 +124,8 @@
 			}
 		}
 		public function clickPic():void {
-			if (btn.userData.url) {
-				Common.getURL(btn.userData.url,btn.userData.type)
+			if (btn.userData.href) {
+				Common.getURL(btn.userData.href,btn.userData.target)
 			}
 		}
 		private var __masked:Boolean;
@@ -295,11 +295,11 @@
 			}
 			setState(RELOADED);
 			if (xml.pic[id_pic].text().length()>0) {
-				btn.userData.url = xml.pic[id_pic].text();
-				if (xml.pic[id_pic].@type.length()>0) {
-					btn.userData.type = xml.pic[id_pic].@type;
+				btn.userData.href = String(xml.pic[id_pic].@href);
+				if (xml.pic[id_pic].@target.length()>0) {
+					btn.userData.target = String(xml.pic[id_pic].@target);
 				}else {
-					btn.userData.type = "_blank";
+					btn.userData.target = "_blank";
 				}
 				btn.enabled = true;
 			}else {
