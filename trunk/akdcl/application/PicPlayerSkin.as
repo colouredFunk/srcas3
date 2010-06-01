@@ -172,6 +172,8 @@
 				return;
 			}
 			try {
+				_btn.visible=true;
+				_btn.autoSize = "center";
 				var _icon:String = String(picPlayer.getPicXML(_id).@icon);
 				if (_icon.length>0) {
 					if (!_btn.icon) {
@@ -179,11 +181,10 @@
 						_btn.addChild(_btn.icon);
 					}
 					_btn.icon.addChild(Common.loader(_icon));
+					_btn.label = "";
 				}else {
 					var _label:String = String(picPlayer.getPicXML(_id).@label);
 					_btn.label = _label || String(_id + 1);
-					_btn.visible=true;
-					_btn.autoSize = "center";
 				}
 			}catch (_ero:*) {
 				
