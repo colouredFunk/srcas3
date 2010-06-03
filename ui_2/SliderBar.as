@@ -12,8 +12,8 @@
 		public var btn_up:*;
 		public var btn_down:*;
 		public var rectMask:*;
-		public var perWheel:uint=40;
-		public var perBtn:uint=80;
+		public var perWheel:uint = 40;
+		public var heightTB:uint = 20;
 		public var autoSize:Boolean=true;
 		public function SliderBar() {
 			addEventListener(Event.ADDED_TO_STAGE,added);
@@ -43,10 +43,10 @@
 			if (content&&content.height>rectMask.height) {
 				var _rect:Rectangle=content.getBounds(parent);
 				offX=int(x+content.x-_rect.x);
-				offY=int(y+content.y-_rect.y)+20;
+				offY=int(y+content.y-_rect.y)+heightTB;
 				content.x=offX;
-				rectMask.width=content.width+10;
-				maximum=content.height-rectMask.height+40;
+				rectMask.width=content.width+5;
+				maximum=content.height-rectMask.height+heightTB*2;
 				if (autoSize) {
 					slider.x=rectMask.width+10;
 				}
