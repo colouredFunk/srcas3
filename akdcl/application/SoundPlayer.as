@@ -4,6 +4,7 @@
 	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
 	import flash.media.SoundLoaderContext;
+	import flash.system.LoaderContext;
 
 	import flash.net.URLRequest;
 
@@ -86,7 +87,7 @@
 			sound.addEventListener(Event.ID3, onID3Loaded);
 			sound.addEventListener(ProgressEvent.PROGRESS,progress);
 			sound.addEventListener(Event.COMPLETE,$complete);
-			sound.load(new URLRequest(musicList.list[playId].@src.toString()));
+			sound.load(new URLRequest(musicList.list[playId].@src.toString()), new LoaderContext(true));
 			
 			dispatchEvent(new Event(SOUND_IDCHANGE));
 		}
