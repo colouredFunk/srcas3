@@ -213,40 +213,32 @@
 			return _stream;
 		}
 		public static function getURL(_url:String, _target:String, _data:Object = null):void {
-			var _request:URLRequest=new URLRequest(_url);
+			var _request:URLRequest = new URLRequest(_url);
 			if(_data){
-				var _urlVariables:URLVariables=new URLVariables();
+				var _urlVariables:URLVariables = new URLVariables();
 				for(var _i:String in _data){
-					_urlVariables[_i]=_data[_i];
+					_urlVariables[_i] = _data[_i];
 				}
-				_request.data=_urlVariables;
-				_request.method=URLRequestMethod.POST;
+				_request.data = _urlVariables;
+				_request.method = URLRequestMethod.POST;
+				navigateToURL(_request, _target);
+				return;
 			}
-			
 			var WINDOW_OPEN_FUNCTION:String = "window.open";
 			var browserName:String = getBrowserName();
 			var _features:String = "";
-			if (getBrowserName() == "Firefox")
-			{
-				ExternalInterface.call(WINDOW_OPEN_FUNCTION, _url, _target, _features);
-			}
-			//If IE, 
-			else if (browserName == "IE")
-			{
-				ExternalInterface.call(WINDOW_OPEN_FUNCTION, _url, _target, _features);
-			}
-			//If Safari 
-			else if (browserName == "Safari")
-			{			  
-				navigateToURL(_request,_target);
-			}
-			//If Opera 
-			else if (browserName == "Opera")
-			{	
-				navigateToURL(_request,_target);
-			} else 
-			{
-				navigateToURL(_request,_target);
+			switch(browserName) {
+				case "Firefox":
+				case "IE":
+					navigateToURL(_request,_target);
+					break;
+				case "Safari":
+				case "Opera":
+					navigateToURL(_request,_target);
+					break;
+				default:
+					navigateToURL(_request,_target);
+					break;
 			}
 		}
 		private static function getBrowserName():String
