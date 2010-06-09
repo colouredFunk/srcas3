@@ -1,6 +1,7 @@
 ﻿package akdcl.game.tileGame
 {
 	import akdcl.math.Vector2D;
+	import flash.geom.Point;
 	
 	/**
 	 * ...
@@ -10,26 +11,37 @@
 	{
 		public var userData:Object;
 		//移动速度标量
-		protected var moveSpeed:Number = 3;
+		protected var speedMove:Number = 5;
 		//移动速度矢量
-		protected var vector:Vector2D;
+		protected var vectorSpeed:Vector2D;
 		//存放围绕物体四周的点的横纵偏移量
-		protected var pointListX:Vector.<Array>;
-		protected var pointListY:Vector.<Array>;
+		protected var pointListX:Vector.<Number>;
+		protected var pointListY:Vector.<Number>;
+		
 		//物体虚拟高
 		public var width:uint;
 		//物体虚拟宽
 		public var height:uint;
-		private var width_half:uint;
-		private var height_half:uint;
-		private var __nTile_x:Number = 0;
-		private var __nTile_y:Number = 0;
-		private var nTile_xPrev:Number = 0;
-		private var nTile_yPrev:Number = 0;
-		private var Prev_x:Number = 0;
-		private var Prev_y:Number = 0;
+		private var halfWidth:uint;
+		private var halfHeight:uint;
 		public function MapObjMove() {
 			
+		}
+		//设置周围的点
+		private function setCorners():Void {
+			pointListX = new Vector();
+			pointListY = new Vector();
+			var _xn:uint = Math.ceil(width / map.tileWidth);
+			var _yn:uint = Math.ceil(height / map.tileHeight);
+			var _in:uint;
+			for (_in = 0; _in < _xn + 1; _in++) {
+				pointListX.push(width * (_in / _xn - 0.5));
+			}
+			for (_in = 0; _in < _yn + 1; _in++) {
+				pointListY.push(height * (_in / _yn - 0.5));
+			}
+			//aPoint_x[aPoint_x.length-1]--;
+			//aPoint_y[aPoint_y.length-1]--;
 		}
 	}
 }
