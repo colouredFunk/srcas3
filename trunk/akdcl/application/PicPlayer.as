@@ -116,8 +116,11 @@
 			return backShape == null;
 		}
 		public function loadXml(_url:String):void {
+			if (!_url) {
+				return;
+			}
 			var _xml:XML = XML(_url);
-			if (_xml.children().length()>0) {
+			if (_xml.pic.length() > 0) {
 				xmlLoaded( { currentTarget: { data:_url }} );
 			}else {
 				Common.urlLoader(_url, xmlLoaded);
@@ -259,7 +262,7 @@
 			if (_picPath == null || _picPath.length <= 0) {
 				_picPath = xml.picesPath.text();
 				if (_picPath.charAt(_picPath.length-1)!="/") {
-					_picPath += "/";
+					//_picPath += "/";
 				}
 				_picPath += xml.pic[_id_pic].@name;
 			}

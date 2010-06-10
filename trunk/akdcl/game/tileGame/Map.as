@@ -75,12 +75,19 @@
 			}
 		}
 		//返回对应横纵序区块
-		public function getTile(_x:uint, _y:uint):Tile {
-			return tileDic[getTileName(_x, _y)];
+		public function getTile(_tileX:uint, _tileY:uint):Tile {
+			return tileDic[getTileName(_tileX, _tileY)];
 		}
 		//返回对应横纵序区块名字
-		protected static function getTileName(_x:uint, _y:uint):String {
-			return "tile_" + _y + "_" + _x;
+		protected static function getTileName(_tileX:uint, _tileY:uint):String {
+			return "tile_" + _tileY + "_" + _tileX;
+		}
+		//返回坐标对应的序列；
+		public function xToTileX(_x:Number):uint {
+			return Math.round(_x / tileWidth);
+		}
+		public function yToTileY(_y:Number):uint {
+			return Math.round(_y / tileHeight);
 		}
 	}
 }
