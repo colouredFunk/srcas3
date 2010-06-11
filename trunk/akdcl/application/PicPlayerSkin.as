@@ -6,7 +6,9 @@
 	import flash.events.ProgressEvent;
 	import com.greensock.TweenMax;
 	import akdcl.application.PicPlayer;
+	import flash.text.TextField;
 	import ui_2.ProgressBar;
+	import ui_2.SimpleBtn;
 	/**
 	 * ...
 	 * @author Akdcl
@@ -50,7 +52,7 @@
 				bar_progress.mouseEnabled = false;
 				bar_progress.mouseChildren = false;
 			}
-			if (btn_info) {
+			if (btn_info && (btn_info is SimpleBtn)) {
 				btn_info.release = picPlayer.clickPic;
 			}
 			if (btn_prev) {
@@ -215,8 +217,12 @@
 				case PicPlayer.LOADED:
 				case PicPlayer.RELOADED:
 					if (btn_info) {
-						btn_info.html = true;
-						btn_info.label = picPlayer.getPicXML(picPlayer.id_pic).info;
+						if (btn_info is SimpleBtn) {
+							btn_info.html = true;
+							btn_info.label = Common.replaceStr(picPlayer.getPicXML(picPlayer.id_pic).info);
+						}else if(btn_info is TextField){
+							btn_info.htmlText = Common.replaceStr(picPlayer.getPicXML(picPlayer.id_pic).info);
+						}
 					}
 					if (btn_progress) {
 						btn_progress.label = (picPlayer.id_pic + 1) + " / " + picPlayer.picLength;

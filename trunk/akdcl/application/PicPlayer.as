@@ -297,7 +297,7 @@
 				_evtOrLoader = _evtOrLoader.currentTarget.loader as Loader;
 			}
 			setState(RELOADED);
-			if (xml.pic[id_pic].@href.length()>0) {
+			if (xml.pic[id_pic].@href.length()>0&&String(xml.pic[id_pic].@href).length>0) {
 				btn.userData.href = String(xml.pic[id_pic].@href);
 				if (xml.pic[id_pic].@target.length()>0) {
 					btn.userData.target = String(xml.pic[id_pic].@target);

@@ -62,7 +62,7 @@
 				addEventListener(MouseEvent.ROLL_OVER,$onRollOver);
 				addEventListener(MouseEvent.ROLL_OUT,$onRollOut);
 			} else {
-				buttonMode=false;
+				buttonMode = false;
 				removeEventListener(MouseEvent.MOUSE_DOWN,$onPress);
 				stage.removeEventListener(MouseEvent.MOUSE_UP,$onRelease);
 				removeEventListener(MouseEvent.ROLL_OVER,$onRollOver);

@@ -8,6 +8,7 @@
 	import flash.net.LocalConnection;
 	import flash.net.navigateToURL;
 	import flash.net.URLStream;
+	import flash.system.LoaderContext;
 	import flash.utils.*;
 	import flash.geom.ColorTransform;
 	import flash.filters.ColorMatrixFilter;
@@ -137,7 +138,7 @@
 			if (_obj is ByteArray) {
 				_loader.loadBytes(_obj);
 			} else {
-				_loader.load(new URLRequest(_obj));
+				_loader.load(new URLRequest(_obj), new LoaderContext(true));
 			}
 			return _loader;
 		}
