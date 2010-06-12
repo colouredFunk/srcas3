@@ -31,6 +31,38 @@
 		public function MapObjMove() {
 			tempData = { };
 		}
+		public function hitTestPt(_x:Number, _y:Number):Boolean {
+			var _tileX:uint = map.xToTileX(_x);
+			var _tileY:uint = map.yToTileY(_y);
+			var _tile:Tile = map.getTile(_tileX, _tileY);
+			if (_tile && _tile.unwalkable) {
+				return true;
+			}
+			return false;
+		}
+		public function hitTestPtVector(_x:Number, _y:Number,_dx:Number,_dy:Number):void {
+			var _tileX_0:uint = map.xToTileX(_x);
+			var _tileY_0:uint = map.yToTileY(_y);
+			
+			var _tileX_t:uint = map.xToTileX(_x + _dx);
+			var _tileY_t:uint = map.yToTileY(_y + _dy);
+			var _tile_t:Tile = map.getTile(_tileX_t, _tileY_t);
+			if (_tile_t) {
+				var _checkX:Boolean = (_dx * _tile_t.walkX >= 0);
+				var _checkY:Boolean = (_dy * _tile_t.walkY >= 0);
+				if (_checkX && _checkY) {
+					//目标区块可通行
+				}else if (!_checkX && !_checkY) {
+					//目标区块无法通行
+					//找到精确的碰撞点
+				}else if(_checkX) {
+					//y轴方向有可能无法通过
+				}else {
+					//x轴方向有可能无法通过
+				}
+			}
+			//return false;
+		}
 		//设置周围的点
 		private function setCorners():Void {
 			pointListTop = new Vector();
@@ -53,7 +85,7 @@
 			}
 			//aPoint_x[aPoint_x.length-1]--;
 			//aPoint_y[aPoint_y.length-1]--;
-			}
+		}
 		//检测水平方向的通行状况
 		private function hitTestX(_x:Number, _dir:int):int {
 			var _hitCounts:uint = 0;

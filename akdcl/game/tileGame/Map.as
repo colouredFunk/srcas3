@@ -69,7 +69,7 @@
 			for (_y = 0; _y < mapHeight; _y++) {
 				for (_x = 0; _x < mapWidth; _x++) {
 					_tile = new Tile(_x, _y);
-					tileDic[getTileName(x, y)] = _tile;
+					tileDic[getTileName(_x, _y)] = _tile;
 					_tile.map = this;
 				}
 			}
