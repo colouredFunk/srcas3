@@ -1,5 +1,7 @@
 ﻿package akdcl.application
 {
+	import flash.display.Bitmap;
+	import flash.display.Loader;
 	import flash.display.Sprite;
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
@@ -26,6 +28,8 @@
 		protected var btn_select:*;
 		protected var btnList:Array;
 		protected var picPlayer:PicPlayer;
+		public var iconWidth:uint;
+		public var iconHeight:uint;
 		public var onSeted:Function;
 		public function PicPlayerSkin() {
 			addEventListener(Event.ADDED_TO_STAGE, added);
@@ -35,6 +39,10 @@
 			addEventListener(Event.REMOVED_FROM_STAGE, removed);
 			visible = false;
 			alpha = 0;
+			if (btn_0.icon) {
+				iconWidth = btn_0.icon.width;
+				iconHeight = btn_0.icon.height;
+			}
 		}
 		protected function removed(_evt:Event):void {
 			removeEventListener(Event.REMOVED_FROM_STAGE, removed);
@@ -182,7 +190,7 @@
 						_btn.icon = new Sprite();
 						_btn.addChild(_btn.icon);
 					}
-					_btn.icon.addChild(Common.loader(_icon));
+					_btn.icon.addChild(Common.loader(_icon,onIconLoadedHandle));
 					_btn.label = "";
 				}else {
 					var _label:String = String(picPlayer.getPicXML(_id).@label);
@@ -199,6 +207,12 @@
 			if (isRollOver) {
 				_btn.rollOver = _btn.release;
 			}
+		}
+		protected function onIconLoadedHandle(_evt:Event):void {
+			var _loader:Loader = _evt.currentTarget.loader;
+			_loader.width = iconWidth;
+			_loader.height = iconHeight;
+			(_loader.content as Bitmap).smoothing = true;
 		}
 		protected function onPlayerLoadingHandle(_evt:ProgressEvent):void{
 			if (!bar_progress) {
