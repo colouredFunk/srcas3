@@ -16,13 +16,16 @@ package ui_2{
 		public function IDBtn(){
 			id=getId(getQualifiedClassName(this));
 			if(id==-1){
-				throw new Error("IDBtn 找不到id: "+this);
+				trace("IDBtn 找不到id: "+this);
 			}
 		}
 		public static function getId(str:String):int{
 			var numStr:String=str.replace(/.*?(\d+$)/,"$1");
 			if(numStr){
-				return int(numStr);
+				var id:int=int(numStr);
+				if(id.toString()==numStr){
+					return id;
+				}
 			}
 			return -1;
 		}

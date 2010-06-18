@@ -18,7 +18,10 @@ package ui_2{
 				xmlName=_xmlName;
 			}else{
 				var className:String=getQualifiedClassName(this);
-				xmlName=className.charAt(0).toLowerCase()+className.substr(1,className.length-id.toString().length-1);
+				xmlName=className.charAt(0).toLowerCase()+className.substr(1);
+				if(getId(className)>=0){
+					xmlName=xmlName.substr(0,xmlName.length-id.toString().length);
+				}
 			}
 			release=gotoURL;
 		}
