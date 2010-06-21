@@ -16,7 +16,7 @@
 		public function MapObj() {
 			
 		}	
-		public function setXY(_x:Number, _y:Number):Void {
+		public function setXY(_x:Number, _y:Number):void {
 			x = _x, y = _y;
 			//tileX = Map.vpToLine(x);
 			//tileY = Map.vpToLine(y);

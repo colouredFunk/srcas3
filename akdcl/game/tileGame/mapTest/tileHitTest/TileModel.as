@@ -22,8 +22,6 @@ package tileHitTest
 			clip.gotoAndStop(tile.walkFlag + 1);
 			x = tile.tileX * tile.map.tileWidth;
 			y = tile.tileY * tile.map.tileHeight;
-			
-			
 			release = function():void {
 				tile.walkFlag++;
 				update();

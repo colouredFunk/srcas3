@@ -25,6 +25,12 @@
 			tileX = _tileX;
 			tileY = _tileY;
 		}
+		public function get x():Number {
+			return tileX * map.mapWidth;
+		}
+		public function get y():Number {
+			return tileY * map.tileHeight;
+		}
 		private var __walkFlag:uint;
 		public function get walkFlag():uint {
 			return __walkFlag;

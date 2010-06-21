@@ -15,15 +15,15 @@ package
 		public var container:*;
 		private var tileModel:TileModel;
 		private var btn_p0, btn_pt:*;
-		
+		private var p_hit:*;
 		private var mapContainer:Sprite;
 		private var map:Map;
 		private var matrix_0:Array = [
 		[0],
 		null,
 		null,
-		null,
-		null,
+		[null, null, 10],
+		[null, null, 10],
 		null,
 		null,
 		[null, null, 4, 4, null, null,9, 9],
@@ -36,6 +36,7 @@ package
 			//tileModel = container.tile_model;
 			btn_p0 = container.btn_p0;
 			btn_pt = container.btn_pt;
+			p_hit = container.p_hit;
 			btn_p0.press = btn_pt.press =  function():void {
 				startDragPt(this);
 			}
@@ -52,9 +53,8 @@ package
 			map.matrix = matrix_0;
 			map.mapping();
 			map.eachTile(setTile);
-			
-			
-			
+			startDragPt(btn_p0);
+			stopDragPt(btn_p0);
 			
 		}
 		private function setTile(_tile:Tile):void {
@@ -65,47 +65,23 @@ package
 		}
 		private function startDragPt(_pt:*):void {
 			_pt.startDrag(true);
+			btn_pt.lineClip.visible = false;
+			p_hit.visible = false;
 		}
 		private function stopDragPt(_pt:*):void {
 			_pt.stopDrag();
-		}
-		private function hitTestPtVector(_x:Number, _y:Number,_dx:Number,_dy:Number):void {
-			var _xt:Number = _x + _dx;
-			var _yt:Number = _y + _dy;
-			
-			var _tileX_0:uint = map.xToTileX(_x);
-			var _tileY_0:uint = map.yToTileY(_y);
-			
-			var _tileX_t:uint = map.xToTileX(_xt);
-			var _tileY_t:uint = map.yToTileY(_yt);
-			
-			var _tile_t:Tile = map.getTile(_tileX_t, _tileY_t);
-			
-			
-			
-			if (_tile_t) {
-				var _checkX:Boolean = (_dx * _tile_t.walkX >= 0);
-				var _checkY:Boolean = (_dy * _tile_t.walkY >= 0);
-				if (_checkX && _checkY) {
-					//目标区块可通行
-				}else if (!_checkX && !_checkY) {
-					//目标区块无法通行
-					//找到精确的碰撞点
-				}else if(_checkX) {
-					//y轴方向有可能无法通过
-					
-					var _y0:Number = (_tileY_t + _tile_t.walkY * 0.5) * map.tileHeight;
-					
-					xxxxx = (_y0 - _y) * (_xt - _x) / (_yt - _y) + _x;
-				}else {
-					//x轴方向有可能无法通过
-					
-					var _x0:Number = (_tileX_t + _tile_t.walkX * 0.5) * map.tileWidth;
-					
-					yyyyy = (_x0 - _x) * (_yt - _y) / (_xt - _x) + _y;
-				}
+			btn_pt.lineClip.visible = true;
+			btn_pt.lineClip.rotation = Math.atan2(btn_p0.y - btn_pt.y, btn_p0.x - btn_pt.x) * 180 / Math.PI;
+			btn_pt.lineClip.clip.scaleX = Math.sqrt(Math.pow(btn_p0.y - btn_pt.y, 2) + Math.pow(btn_p0.x - btn_pt.x, 2));
+			var _isHit:Boolean;
+			_isHit = map.hitTest_2(btn_p0.x, btn_p0.y, btn_pt.x, btn_pt.y );
+			if (_isHit) {
+				p_hit.visible = true;
+				p_hit.x = map.hitTestPt.x;
+				p_hit.y = map.hitTestPt.y;
+			}else {
+				p_hit.visible = false;
 			}
-			//return false;
 		}
 	}
 	
