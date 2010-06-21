@@ -1,7 +1,6 @@
 ﻿package akdcl.game.tileGame
 {
 	import akdcl.math.Vector2D;
-	import akdcl.game.tileGame.Tile;
 	
 	/**
 	 * ...
@@ -31,63 +30,12 @@
 		public function MapObjMove() {
 			tempData = { };
 		}
-		public function hitTestPt(_x:Number, _y:Number):Boolean {
-			var _tileX:uint = map.xToTileX(_x);
-			var _tileY:uint = map.yToTileY(_y);
-			if (_tileX >= map.mapWidth || _tileY >= map.mapHeight) {
-				return false;
-			}else {
-				var _tile:Tile = map.getTile(_tileX, _tileY);
-				if (_tile?_tile.unwalkable:false) {
-					return true;
-				}
-				return false;
-			}
-		}
-		public function hitTestPtVector(_x:Number, _y:Number,_dx:Number,_dy:Number):void {
-			var _xt:Number = _x + _dx;
-			var _yt:Number = _y + _dy;
-			
-			var _tileX_0:uint = map.xToTileX(_x);
-			var _tileY_0:uint = map.yToTileY(_y);
-			
-			var _tileX_t:uint = map.xToTileX(_xt);
-			var _tileY_t:uint = map.yToTileY(_yt);
-			
-			var _tile_t:Tile = map.getTile(_tileX_t, _tileY_t);
-			
-			
-			
-			if (_tile_t) {
-				var _checkX:Boolean = (_dx * _tile_t.walkX >= 0);
-				var _checkY:Boolean = (_dy * _tile_t.walkY >= 0);
-				if (_checkX && _checkY) {
-					//目标区块可通行
-				}else if (!_checkX && !_checkY) {
-					//目标区块无法通行
-					//找到精确的碰撞点
-				}else if(_checkX) {
-					//y轴方向有可能无法通过
-					
-					var _y0:Number = (_tileY_t + _tile_t.walkY * 0.5) * map.tileHeight;
-					
-					xxxxx = (_y0 - _y) * (_xt - _x) / (_yt - _y) + _x;
-				}else {
-					//x轴方向有可能无法通过
-					
-					var _x0:Number = (_tileX_t + _tile_t.walkX * 0.5) * map.tileWidth;
-					
-					yyyyy = (_x0 - _x) * (_yt - _y) / (_xt - _x) + _y;
-				}
-			}
-			//return false;
-		}
 		//设置周围的点
-		private function setCorners():Void {
-			pointListTop = new Vector();
-			pointListBottom = new Vector();
-			pointListLeft = new Vector();
-			pointListRight = new Vector();
+		private function setCorners():void {
+			pointListTop = new Vector.<Array>();
+			pointListBottom = new Vector.<Array>();
+			pointListLeft = new Vector.<Array>();
+			pointListRight = new Vector.<Array>();
 			var _xn:uint = Math.ceil(width / map.tileWidth);
 			var _yn:uint = Math.ceil(height / map.tileHeight);
 			var _in:uint;
@@ -106,21 +54,14 @@
 			//aPoint_y[aPoint_y.length-1]--;
 		}
 		//检测水平方向的通行状况
-		private function hitTestX(_x:Number, _dir:int):int {
+		private function hitTestX(_x:Number, _vx:Number):int {
+			var _xt:Number = _x + _vx;
 			var _hitCounts:uint = 0;
-			var _pointList:Vector = (_dir > 0)?pointListRight:pointListLeft;
-			var _tile:Tile;
+			var _pointList:Vector.<Array> = (_vx > 0)?pointListRight:pointListLeft;
 			var _i:String;
-			var _tileX, _tileY:uint;
-			var _px, _py:Number;
 			
 			for (_i in _pointList) {
-				_px = _x + _pointList[_i][0];
-				_py = y + _pointList[_i][1];
-				_tileX = map.xToTileX(_px);
-				_tileY = map.yToTileY(_py);
-				_tile = map.getTile(_tileX, _tileY);
-				if (_tile.walkX == 2 || _dir == -_tile.walkX) {
+				if (map.hitTest_2(_xt, y, _xt + _pointList[_i][0], y + _pointList[_i][1])) {
 					_hitCounts++;
 				}
 			}
@@ -131,21 +72,14 @@
 			}
 		}
 		//检测垂直方向的通行状况
-		private function hitTestY(_y:Number, _dir:int):int {
+		private function hitTestY(_y:Number, _vy:int):int {
+			var _yt:Number = _y + _vy;
 			var _hitCounts:uint = 0;
-			var _pointList:Vector = (_dir > 0)?pointListTop:pointListBottom;
-			var _tile:Tile;
+			var _pointList:Vector.<Array> = (_vy > 0)?pointListTop:pointListBottom;
 			var _i:String;
-			var _tileX, _tileY:uint;
-			var _px, _py:Number;
 			
 			for (_i in _pointList) {
-				_px = x + _pointList[_i][0];
-				_py = _y + _pointList[_i][1];
-				_tileX = map.xToTileX(_px);
-				_tileY = map.yToTileY(_py);
-				_tile = map.getTile(_tileX, _tileY);
-				if (_tile.walkY == 2 || _dir == -_tile.walkY) {
+				if (map.hitTest_2(x, _yt, x + _pointList[_i][0], _yt + _pointList[_i][1])) {
 					_hitCounts++;
 				}
 			}
@@ -174,13 +108,13 @@
 			return _y;
 		}
 		//普通移动方式
-		public function runStep():Void {
+		public function runStep():void {
 			var _x:Number = x;
 			var _y:Number = y;
 			var _isHitX:Boolean;
 			var _isHitY:Boolean;
 			if (vectorSpeed.x != 0) {
-				_isHitX = hitTestX() != 0;
+				_isHitX = hitTestX(x + vectorSpeed.x, vectorSpeed.x > 0?1: -1) != 0;
 				if (_isHitX) {
 					//_x = closeToLR(obTemp.dx-obTemp.dsp_x, vectorSpeed.x > 0?1: -1);
 					//onHit(0,obSpeed.x);
@@ -189,7 +123,7 @@
 				}
 			}
 			if (vectorSpeed.y != 0) {
-				_isHitY = hitTestY() != 0;
+				_isHitY = hitTestY(y + vectorSpeed.y, vectorSpeed.y > 0?1: -1) != 0;
 				if (_isHitY) {
 					//_y = closeToY(obTemp.dy-obTemp.dsp_y, obTemp.dsp_y);
 					//onHit(1,obSpeed.y);
@@ -212,7 +146,7 @@
 				}*/
 			}
 			if (x != _x || y != _y) {
-				setXY(_ix,_iy);
+				//setXY(_ix,_iy);
 			}
 		}
 	}
