@@ -6,14 +6,12 @@
 	 * ...
 	 * @author Akdcl
 	 */
-	public class MapObjMove extends MapObj
+	public class ObjMove extends Obj
 	{
-		public var userData:Object;
-		protected var tempData:Object;
 		//移动速度标量
-		protected var speedMove:Number = 5;
+		//protected var speedMove:Number = 5;
 		//移动速度矢量
-		protected var vectorSpeed:Vector2D;
+		public var vectorSpeed:Vector2D;
 		//存放围绕物体四周的点的横纵偏移量
 		protected var pointListTop:Vector.<Array>;
 		protected var pointListBottom:Vector.<Array>;
@@ -21,17 +19,12 @@
 		protected var pointListRight:Vector.<Array>;
 		public var rectOffX:int=0;
 		public var rectOffY:int=0;
-		//物体虚拟高
-		public var width:uint=50;
-		//物体虚拟宽
-		public var height:uint=50;
-		private var halfWidth:Number;
-		private var halfHeight:Number;
-		public function MapObjMove() {
-			tempData = { };
+		public var onHitTile:Function;
+		public function ObjMove() {
+			vectorSpeed = new Vector2D();
 		}
 		//设置周围的点
-		private function setCorners():void {
+		public function setCorners():void {
 			pointListTop = new Vector.<Array>();
 			pointListBottom = new Vector.<Array>();
 			pointListLeft = new Vector.<Array>();
@@ -42,70 +35,64 @@
 			var _pt:Number;
 			for (_in = 0; _in < _xn + 1; _in++) {
 				_pt = width * (_in / _xn - 0.5);
-				pointListTop.push([_pt, -(halfHeight + rectOffY)]);
-				pointListBottom.push([_pt, halfHeight - rectOffY]);
+				if (_in==_xn) {
+					_pt--;
+				}
+				pointListTop.push([_pt - rectOffX, -(halfHeight + rectOffY)]);
+				pointListBottom.push([_pt - rectOffX, halfHeight - rectOffY - 1]);
 			}
 			for (_in = 0; _in < _yn + 1; _in++) {
 				_pt = height * (_in / _yn - 0.5);
-				pointListLeft.push([ -(halfWidth + rectOffX), _pt]);
-				pointListRight.push([halfWidth - rectOffX, _pt]);
+				if (_in==_yn) {
+					_pt--;
+				}
+				pointListLeft.push([ -(halfWidth + rectOffX), _pt - rectOffY]);
+				pointListRight.push([halfWidth - rectOffX - 1, _pt - rectOffY]);
 			}
-			//aPoint_x[aPoint_x.length-1]--;
-			//aPoint_y[aPoint_y.length-1]--;
+			/*trace(pointListTop);
+			trace(pointListBottom);
+			trace(pointListLeft);
+			trace(pointListRight);*/
 		}
 		//检测水平方向的通行状况
-		private function hitTestX(_x:Number, _vx:Number):int {
-			var _xt:Number = _x + _vx;
+		private function hitTestX(_vx:Number):int {
 			var _hitCounts:uint = 0;
 			var _pointList:Vector.<Array> = (_vx > 0)?pointListRight:pointListLeft;
 			var _i:String;
-			
+			var _x:Number;
 			for (_i in _pointList) {
-				if (map.hitTest_2(_xt, y, _xt + _pointList[_i][0], y + _pointList[_i][1])) {
+				_x = x + _pointList[_i][0];
+				if (map.hitTest_2(_x, y + _pointList[_i][1], _vx, 0)) {
 					_hitCounts++;
 				}
 			}
-			if (_hitCounts == _pointList.length) {
+			if (_hitCounts==0) {
+				return 0;
+			}else if (_hitCounts == _pointList.length) {
 				return 2;
 			}else {
-				return 0;
+				return 1;
 			}
 		}
 		//检测垂直方向的通行状况
-		private function hitTestY(_y:Number, _vy:int):int {
-			var _yt:Number = _y + _vy;
+		private function hitTestY(_vy:int):int {
 			var _hitCounts:uint = 0;
-			var _pointList:Vector.<Array> = (_vy > 0)?pointListTop:pointListBottom;
+			var _pointList:Vector.<Array> = (_vy > 0)?pointListBottom:pointListTop;
 			var _i:String;
-			
+			var _y:Number;
 			for (_i in _pointList) {
-				if (map.hitTest_2(x, _yt, x + _pointList[_i][0], _yt + _pointList[_i][1])) {
+				_y = y + _pointList[_i][1];
+				if (map.hitTest_2(x + _pointList[_i][0], _y, 0, _vy)) {
 					_hitCounts++;
 				}
 			}
-			if (_hitCounts == _pointList.length) {
+			if (_hitCounts==0) {
+				return 0;
+			}else if (_hitCounts == _pointList.length) {
 				return 2;
 			}else {
-				return 0;
+				return 1;
 			}
-		}
-		private function closeToLR(_tileX:uint, _dir:int):Number {
-			var _x:Number;
-			if (_dir>0) {
-				_x = map.tileWidth * _tileX + map.tileHalfWidth - (halfWidth - rectOffX);
-			}else {
-				_x = map.tileWidth * _tileX - map.tileHalfWidth + (halfWidth + rectOffX);
-			}
-			return _x;
-		}
-		private function closeToTB(_tileY:uint, _dir:int):Number {
-			var _y:Number;
-			if (_dir>0) {
-				_y = map.tileHeight * _tileY + map.tileHalfHeight - (halfHeight - rectOffY);
-			}else {
-				_y = map.tileHeight * _tileY - map.tileHalfHeight + (halfHeight + rectOffY);
-			}
-			return _y;
 		}
 		//普通移动方式
 		public function runStep():void {
@@ -114,19 +101,23 @@
 			var _isHitX:Boolean;
 			var _isHitY:Boolean;
 			if (vectorSpeed.x != 0) {
-				_isHitX = hitTestX(x + vectorSpeed.x, vectorSpeed.x > 0?1: -1) != 0;
+				_isHitX = hitTestX(vectorSpeed.x) != 0;
 				if (_isHitX) {
-					//_x = closeToLR(obTemp.dx-obTemp.dsp_x, vectorSpeed.x > 0?1: -1);
-					//onHit(0,obSpeed.x);
+					_x = map.hitTestPt.x + rectOffX +(vectorSpeed.x > 0? -1:1) * halfWidth;
+					if (onHitTile!=null) {
+						onHitTile(true);
+					}
 				} else {
 					_x += vectorSpeed.x;
 				}
 			}
 			if (vectorSpeed.y != 0) {
-				_isHitY = hitTestY(y + vectorSpeed.y, vectorSpeed.y > 0?1: -1) != 0;
+				_isHitY = hitTestY(vectorSpeed.y) != 0;
 				if (_isHitY) {
-					//_y = closeToY(obTemp.dy-obTemp.dsp_y, obTemp.dsp_y);
-					//onHit(1,obSpeed.y);
+					_y = map.hitTestPt.y + rectOffY +(vectorSpeed.y > 0? -1:1) * halfHeight;
+					if (onHitTile!=null) {
+						onHitTile(false);
+					}
 				} else {
 					_y += vectorSpeed.y;
 				}
@@ -146,7 +137,7 @@
 				}*/
 			}
 			if (x != _x || y != _y) {
-				//setXY(_ix,_iy);
+				setXY(_x,_y);
 			}
 		}
 	}

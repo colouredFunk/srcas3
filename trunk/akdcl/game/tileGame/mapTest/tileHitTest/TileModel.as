@@ -16,9 +16,6 @@ package tileHitTest
 			clip.stop();
 		}
 		public function update():void {
-			if (!tile) {
-				return;
-			}
 			clip.gotoAndStop(tile.walkFlag + 1);
 			x = tile.tileX * tile.map.tileWidth;
 			y = tile.tileY * tile.map.tileHeight;
