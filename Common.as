@@ -16,6 +16,24 @@
 	import flash.external.ExternalInterface;
 
 	final public class Common {
+		public static function copyInstanceToArray(_instance:*, _length:uint, _ary:Array, _eachFun:Function):Array {
+			if (!_ary) {
+				_ary = new Array();
+			}
+			var _instanceCopy:*;
+			var _instanceClass:Class = _instance.constructor as Class;
+			for (var _i:uint = 0; _i < _length;_i++ ) {
+				_instanceCopy = _ary[_i];
+				if (!_instanceCopy) {
+					_instanceCopy = new _instanceClass();
+					_ary[_i] = _instanceCopy;
+				}
+				if (_eachFun != null) {
+					_eachFun(_instanceCopy, _i, _instanceCopy != _instance, _length);
+				}
+			}
+			return _ary;
+		}
 		public static function objToString(_obj:Object):String {
 			var _str:String="";
 			for (var _i:String in _obj) {
@@ -75,7 +93,6 @@
 		public static function isValidEmail(_email:String):Boolean {
 			var _emailExpression:RegExp =/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+(w+([.-]\w+))*/;
 			///^[a-z][\w.-]+@\w[\w.-]+\.[\w.-]*[a-z][a-z]$/i;
-			
 			return _emailExpression.test(_email);
 		}
 		public static function encodeStr(_str:String,_type:String="GBK"):String{
