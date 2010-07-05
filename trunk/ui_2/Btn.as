@@ -33,7 +33,7 @@
 			}
 			setAni(aniClip);
 		}
-		protected var delayTime:int=1;
+		protected var delayTime:int=0;
 		public var delayMax:int=0;
 		private function aniRun(_evt:Event):void {
 			if (_evt.target==this?(isIn||isDown||select):(isIn||isDown||(isSelectPlay?select:false))) {
