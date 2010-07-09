@@ -25,8 +25,8 @@
 		public var btn_next:*;
 		public var btnsContainer:Sprite;
 		
-		protected var btn_select:*;
-		protected var btnList:Array;
+		public var btn_select:*;
+		public var btnList:Array;
 		protected var picPlayer:PicPlayer;
 		public var iconWidth:uint;
 		public var iconHeight:uint;
@@ -141,6 +141,7 @@
 			startY = btn_0.y;
 			btnsContainer = new Sprite();
 			addChild(btnsContainer);
+			//Common.copyInstanceToArray();
 			var _BtnClass:Class = btn_0.constructor as Class;
 			for (_i = 0; _i < picPlayer.picLength; _i++ ) {
 				_btn = btnList[_i];

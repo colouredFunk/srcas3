@@ -14,8 +14,21 @@
 	import flash.filters.ColorMatrixFilter;
 	import flash.system.Capabilities;
 	import flash.external.ExternalInterface;
-
+    import flash.ui.ContextMenu;
+    import flash.ui.ContextMenuItem;
+    import flash.ui.ContextMenuBuiltInItems;
+			
+			/*menu = new ContextMenu();
+			menu.hideBuiltInItems();
+			var _item:ContextMenuItem = new ContextMenuItem("123", true, false);
+			menu.customItems.push(_item);
+			this.contextMenu = menu;*/
 	final public class Common {
+		public static function addContextMenu():void {
+			var _menu:ContextMenu = new ContextMenu();
+			_menu.hideBuiltInItems();
+			
+		}
 		public static function copyInstanceToArray(_instance:*, _length:uint, _ary:Array, _eachFun:Function):Array {
 			if (!_ary) {
 				_ary = new Array();

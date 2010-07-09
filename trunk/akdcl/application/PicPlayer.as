@@ -38,7 +38,6 @@
 		public var picHeight:uint;
 		public var picAspectRatio:Number;
 		public var fillMode:uint;
-		public var timeDelay:Number;
 		public var timeTween:Number;
 		
 		public var xml:XML;
@@ -61,7 +60,7 @@
 			addEventListener(Event.REMOVED_FROM_STAGE, removed);
 			
 			timer = new Timer(100);
-			timer.addEventListener(TimerEvent.TIMER_COMPLETE, timeRun);
+			timer.addEventListener(TimerEvent.TIMER_COMPLETE, onTimeRunHandle);
 			
 			loaderDic = { };
 			
@@ -102,18 +101,26 @@
 		}
 		private function removed(_evt:Event):void {
 			removeEventListener(Event.REMOVED_FROM_STAGE, removed);
-			timer.removeEventListener(TimerEvent.TIMER_COMPLETE, timeRun);
+			timer.removeEventListener(TimerEvent.TIMER_COMPLETE, onTimeRunHandle);
 			loaderDic = null;
 			removeChild(picNow);
 			removeChild(picPrev);
 			picNow = null;
 			picPrev = null;
 		}
-		private function timeRun(_evt:TimerEvent):void {
+		private function onTimeRunHandle(_evt:TimerEvent):void {
 			id_pic++;
 		}
 		public function get autoSize():Boolean {
 			return backShape == null;
+		}
+		private var __timeDelay:Number;
+		public function get timeDelay():Number{
+			return __timeDelay;
+		}
+		public function set timeDelay(_timeDelay:Number):void{
+			__timeDelay = _timeDelay;
+			timer.repeatCount = timeDelay * 10;
 		}
 		public function loadXml(_url:String):void {
 			if (!_url) {
@@ -165,7 +172,6 @@
 			
 			fillMode = int(xml.fillMode) || fillMode;
 			timeDelay = Number(xml.timeDelay) || timeDelay;
-			timer.repeatCount = timeDelay * 10;
 			timeTween = Number(xml.timeTween) || timeTween;
 			if (xml.hasOwnProperty("tween")) {
 				tweenStyle = xml.tween[0];

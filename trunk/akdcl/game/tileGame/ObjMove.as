@@ -24,6 +24,7 @@
 			vectorSpeed = new Vector2D();
 		}
 		//设置周围的点
+		protected var kY:Number = 0.1;
 		public function setCorners():void {
 			pointListTop = new Vector.<Array>();
 			pointListBottom = new Vector.<Array>();
@@ -36,26 +37,26 @@
 			for (_in = 0; _in < _xn + 1; _in++) {
 				_pt = width * (_in / _xn - 0.5);
 				if (_in==_xn) {
-					_pt--;
+					_pt-=kY;
 				}
 				pointListTop.push([_pt - rectOffX, -(halfHeight + rectOffY)]);
-				pointListBottom.push([_pt - rectOffX, halfHeight - rectOffY - 1]);
+				pointListBottom.push([_pt - rectOffX, halfHeight - rectOffY - kY]);
 			}
 			for (_in = 0; _in < _yn + 1; _in++) {
 				_pt = height * (_in / _yn - 0.5);
 				if (_in==_yn) {
-					_pt--;
+					_pt-=kY;
 				}
 				pointListLeft.push([ -(halfWidth + rectOffX), _pt - rectOffY]);
-				pointListRight.push([halfWidth - rectOffX - 1, _pt - rectOffY]);
+				pointListRight.push([halfWidth - rectOffX - kY, _pt - rectOffY]);
 			}
-			/*trace(pointListTop);
+			trace(pointListTop);
 			trace(pointListBottom);
 			trace(pointListLeft);
-			trace(pointListRight);*/
+			trace(pointListRight);
 		}
 		//检测水平方向的通行状况
-		private function hitTestX(_vx:Number):int {
+		public function hitTestX(_vx:Number):int {
 			var _hitCounts:uint = 0;
 			var _pointList:Vector.<Array> = (_vx > 0)?pointListRight:pointListLeft;
 			var _i:String;
@@ -75,7 +76,7 @@
 			}
 		}
 		//检测垂直方向的通行状况
-		private function hitTestY(_vy:int):int {
+		public function hitTestY(_vy:Number):int {
 			var _hitCounts:uint = 0;
 			var _pointList:Vector.<Array> = (_vy > 0)?pointListBottom:pointListTop;
 			var _i:String;
@@ -103,7 +104,7 @@
 			if (vectorSpeed.x != 0) {
 				_isHitX = hitTestX(vectorSpeed.x) != 0;
 				if (_isHitX) {
-					_x = map.hitTestPt.x + rectOffX +(vectorSpeed.x > 0? -1:1) * halfWidth;
+					_x = map.hitTestPt.x + rectOffX +(vectorSpeed.x > 0? 0:width);
 					if (onHitTile!=null) {
 						onHitTile(true);
 					}
@@ -114,7 +115,7 @@
 			if (vectorSpeed.y != 0) {
 				_isHitY = hitTestY(vectorSpeed.y) != 0;
 				if (_isHitY) {
-					_y = map.hitTestPt.y + rectOffY +(vectorSpeed.y > 0? -1:1) * halfHeight;
+					_y = map.hitTestPt.y + rectOffY +(vectorSpeed.y > 0? 0:height);
 					if (onHitTile!=null) {
 						onHitTile(false);
 					}

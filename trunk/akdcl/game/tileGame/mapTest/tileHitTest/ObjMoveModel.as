@@ -35,10 +35,10 @@ package tileHitTest
 			xAxisKeys.onKeyDown=function(_evt:KeyEvent):void{
 				switch(_evt.keyName) {
 					case "A":
-						objMove.vectorSpeed.x = -5;
+						objMove.vectorSpeed.x = -10;
 						break;
 					case "D":
-						objMove.vectorSpeed.x = 5;
+						objMove.vectorSpeed.x = 10;
 						break;
 				}
 			}
@@ -46,9 +46,9 @@ package tileHitTest
 				if(_evt.keysName.length<2){
 					objMove.vectorSpeed.x = 0;
 				}else if(_evt.keyName=="A"){
-					objMove.vectorSpeed.x = 5;
+					objMove.vectorSpeed.x = 10;
 				}else{
-					objMove.vectorSpeed.x = -5;
+					objMove.vectorSpeed.x = -10;
 				}
 			}
 			yAxisKeys.onKeyDown=function(_evt:KeyEvent):void{
@@ -57,7 +57,7 @@ package tileHitTest
 						objMove.vectorSpeed.y = -10;
 						break;
 					case "S":
-						objMove.vectorSpeed.y += 20;
+						objMove.vectorSpeed.y += 10;
 						break;
 				}
 			}
@@ -86,11 +86,20 @@ package tileHitTest
 			x = objMove.x;
 			y = objMove.y;
 		}
-		private var g:int = 1;
+		private var g:Number = 0.5;
+		private var isFall:Boolean = true;
 		private function runStep(_evt:Event):void {
 			objMove.runStep();
 			update();
-			objMove.vectorSpeed.y += g;
+			if (isFall) {
+				objMove.vectorSpeed.y += g;
+			}
+			if (objMove.hitTestY(g) == 0) {
+				isFall = true;
+			}else {
+				isFall = false;
+			}
+			
 		}
 	}
 	
