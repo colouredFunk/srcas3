@@ -65,8 +65,8 @@ package
 			_objMove.map = map;
 			_objMove.x = 400;
 			_objMove.y = 100;
-			_objMove.rectOffY = 10;
-			_objMove.rectOffX = 10;
+			//_objMove.rectOffY = 10;
+			//_objMove.rectOffX = 10;
 			_objMove.setCorners();
 			objMoveModle.setObjMove(_objMove);
 		}

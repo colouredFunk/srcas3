@@ -108,10 +108,10 @@
 		}
 		//返回坐标对应的序列；
 		public function xToTileX(_x:Number):int {
-			return Math.round(_x / tileWidth);
+			return int(_x / tileWidth);
 		}
 		public function yToTileY(_y:Number):int {
-			return Math.round(_y / tileHeight);
+			return int(_y / tileHeight);
 		}
 		//返回对应横纵序区块
 		public function getTile(_tileX:uint, _tileY:uint):Tile {
@@ -191,6 +191,7 @@
 				var _crossX:Boolean = (_dx * _tile_t.walkX >= 0);
 				var _crossY:Boolean = (_dy * _tile_t.walkY >= 0);
 				if (_dx == 0) {
+					//水平方向无速度
 					if (_crossY||(_tileY_t == yToTileY(_y))) {
 						//目标区块可通行
 						return false;
@@ -201,6 +202,7 @@
 					hitTestTile = _tile_t;
 					return true;
 				}else if (_dy == 0) {
+					//垂直方向无速度
 					if (_crossX||(_tileX_t == xToTileX(_x))) {
 						//目标区块可通行
 						return false;

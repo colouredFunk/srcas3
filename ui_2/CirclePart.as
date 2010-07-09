@@ -11,23 +11,45 @@ package ui_2{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
-	public class CirclePart extends Sprite{
-		public function CirclePart(){
+	public class CirclePart extends Sprite {
+		public var maskrect:*;
+		public var hc2:*;
+		public var hc1:*;
+		public function CirclePart() {
+			angle(0, 0);
 		}
-		public function init(startAngle:Number,endAngle:Number):void{
-			//startAngle=normalizeAngle(startAngle);
-			//endAngle=normalizeAngle(endAngle);
-			maskrect.rotation=endAngle;
-			if(normalizeAngle(endAngle-startAngle)<0){
-				hc1.rotation=180+startAngle;
+		private var __angleStart:Number = 0;
+		public function get angleStart():Number{
+			return __angleStart;
+		}
+		public function set angleStart(_angleStart:Number):void{
+			__angleStart = _angleStart;
+			angle(__angleStart, __angleEnd);
+		}
+		private var __angleEnd:Number = 0;
+		public function get angleEnd():Number{
+			return __angleEnd;
+		}
+		public function set angleEnd(_angleEnd:Number):void{
+			__angleEnd = _angleEnd;
+			angle(__angleStart, __angleEnd);
+		}
+		public function angle(_angleStart:Number, _angleEnd:Number):void {
+			__angleStart = _angleStart;
+			__angleEnd = _angleEnd;
+			//_angleStart=normalizeAngle(_angleStart);
+			//_angleEnd=normalizeAngle(_angleEnd);
+			maskrect.rotation=_angleEnd;
+			if(normalizeAngle(_angleEnd-_angleStart)<0){
+				hc1.rotation=180+_angleStart;
 				hc2.visible=true;
 			}else{
-				hc1.rotation=startAngle;
+				hc1.rotation=_angleStart;
 				hc2.visible=false;
 			}
-			hc2.rotation=startAngle;
+			hc2.rotation=_angleStart;
 		}
-		public function normalizeAngle(angle:Number):Number{
+		private function normalizeAngle(angle:Number):Number{
 			while(angle>180){
 				angle-=360;
 			}
