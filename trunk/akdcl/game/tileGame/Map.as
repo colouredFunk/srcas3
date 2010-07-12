@@ -155,12 +155,12 @@
 				var _x0, _y0:Number;
 				var _hitX, _hitY:Number;
 				if (_tile_t.unwalkable) {
-					_y0 = (_tileY_t +(_dy > 0? -0.5: 0.5)) * tileHeight;
+					_y0 = (_tileY_t +(_dy > 0? 0: 1)) * tileHeight;
 					_hitX = (_y0 - _y) * (_xt - _x) / (_yt - _y) + _x;
 					_tileTemp = getTile(xToTileX(_hitX), _tileY_t);
 					if (!_tileTemp || _dy * _tileTemp.walkY >= 0) {
 						//目标区块x轴方向无法通过
-						_x0 = (_tileX_t + (_dx > 0? -0.5: 0.5)) * tileWidth;
+						_x0 = (_tileX_t + (_dx > 0? 0: 1)) * tileWidth;
 						_hitY = (_x0 - _x) * (_yt - _y) / (_xt - _x) + _y;
 						hitTestPt.x = _x0;
 						hitTestPt.y = _hitY;
@@ -198,7 +198,7 @@
 					}
 					//目标区块y轴方向无法通过
 					//hitTestPt.x=_x;
-					hitTestPt.y = (_tileY_t +(_dy > 0? -0.5: 0.5)) * tileHeight;
+					hitTestPt.y = (_tileY_t +(_dy > 0? 0: 1)) * tileHeight;
 					hitTestTile = _tile_t;
 					return true;
 				}else if (_dy == 0) {
@@ -209,7 +209,7 @@
 					}
 					//目标区块x轴方向无法通过
 					//hitTestPt.y=_y;
-					hitTestPt.x = (_tileX_t +(_dx > 0? -0.5: 0.5)) * tileWidth;
+					hitTestPt.x = (_tileX_t +(_dx > 0? 0: 1)) * tileWidth;
 					hitTestTile = _tile_t;
 					return true;
 				}else {
@@ -220,12 +220,12 @@
 						//目标区块可通行
 						return false;
 					}else if (!_crossX && !_crossY) {
-						_y0 = (_tileY_t +(_dy > 0? -0.5: 0.5)) * tileHeight;
+						_y0 = (_tileY_t +(_dy > 0? 0: 1)) * tileHeight;
 						_hitX = (_y0 - _y) * (_xt - _x) / (_yt - _y) + _x;
 						_tileTemp = getTile(xToTileX(_hitX), _tileY_t);
 						if (!_tileTemp || _dy * _tileTemp.walkY >= 0) {
 							//目标区块x轴方向无法通过
-							_x0 = (_tileX_t + (_dx > 0? -0.5: 0.5)) * tileWidth;
+							_x0 = (_tileX_t + (_dx > 0? 0: 1)) * tileWidth;
 							_hitY = (_x0 - _x) * (_yt - _y) / (_xt - _x) + _y;
 							hitTestPt.x = _x0;
 							hitTestPt.y = _hitY;
@@ -237,7 +237,7 @@
 						hitTestTile = _tileTemp?_tileTemp:_tile_t;
 						return true;
 					}else if(_crossX) {
-						_y0 = (_tileY_t +(_dy > 0? -0.5: 0.5)) * tileHeight;
+						_y0 = (_tileY_t +(_dy > 0? 0: 1)) * tileHeight;
 						_hitX = (_y0 - _y) * (_xt - _x) / (_yt - _y) + _x;
 						_tileTemp = getTile(xToTileX(_hitX), _tileY_t);
 						if (!_tileTemp || _dy * _tileTemp.walkY >= 0) {
@@ -250,7 +250,7 @@
 						hitTestTile = _tileTemp?_tileTemp:_tile_t;
 						return true;
 					}else {
-						_x0 = (_tileX_t + (_dx > 0? -0.5: 0.5)) * tileWidth;
+						_x0 = (_tileX_t + (_dx > 0? 0: 1)) * tileWidth;
 						_hitY = (_x0 - _x) * (_yt - _y) / (_xt - _x) + _y;
 						_tileTemp = getTile(_tileX_t, yToTileY(_hitY));
 						if (!_tileTemp || _dx * _tileTemp.walkX >= 0) {

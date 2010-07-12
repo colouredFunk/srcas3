@@ -261,7 +261,7 @@
 			switch(browserName) {
 				case "Firefox":
 				case "IE":
-					navigateToURL(_request,_target);
+					ExternalInterface.call(WINDOW_OPEN_FUNCTION, _url, _target, "");
 					break;
 				case "Safari":
 				case "Opera":

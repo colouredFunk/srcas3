@@ -104,7 +104,7 @@
 			if (vectorSpeed.x != 0) {
 				_isHitX = hitTestX(vectorSpeed.x) != 0;
 				if (_isHitX) {
-					_x = map.hitTestPt.x + rectOffX +(vectorSpeed.x > 0? 0:width);
+					_x = map.hitTestPt.x + rectOffX +(vectorSpeed.x > 0? -0.5:0.5)*width;
 					if (onHitTile!=null) {
 						onHitTile(true);
 					}
@@ -115,7 +115,7 @@
 			if (vectorSpeed.y != 0) {
 				_isHitY = hitTestY(vectorSpeed.y) != 0;
 				if (_isHitY) {
-					_y = map.hitTestPt.y + rectOffY +(vectorSpeed.y > 0? 0:height);
+					_y = map.hitTestPt.y + rectOffY +(vectorSpeed.y > 0? -0.5:0.5)*height;
 					if (onHitTile!=null) {
 						onHitTile(false);
 					}
