@@ -1,5 +1,6 @@
 ﻿package ui_2{
 	import flash.events.Event;
+	import flash.text.StyleSheet;
 	public class BtnLabel extends ui_2.Btn {
 		protected var __label:String;
 		public var txt:*;
@@ -60,6 +61,9 @@
 		}
 		public function set html(_b:Boolean):void{
 			txt.html=true;
+		}
+		public function set styleSheet(_styleSheet:StyleSheet):void {
+			txt.styleSheet = _styleSheet;
 		}
 		override public function setStyle():void {
 			super.setStyle();

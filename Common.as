@@ -29,6 +29,7 @@
 			_menu.hideBuiltInItems();
 			
 		}
+		//_eachFun(_instanceCopy, _i, _instanceCopy != _instance, _length);
 		public static function copyInstanceToArray(_instance:*, _length:uint, _ary:Array, _eachFun:Function):Array {
 			if (!_ary) {
 				_ary = new Array();

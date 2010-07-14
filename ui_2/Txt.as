@@ -1,5 +1,6 @@
 ﻿package ui_2{
 	import flash.display.Sprite;
+	import flash.text.StyleSheet;
 	import flash.text.TextField;
 	public class Txt extends Sprite {
 		//[Inspectable(defaultValue=0,type="int",name="固定高")]
@@ -87,6 +88,9 @@
 		}
 		public function set restrict(_restrict:String):void {
 			txt.restrict=_restrict;
+		}
+		public function set styleSheet(_styleSheet:StyleSheet):void {
+			txt.styleSheet = _styleSheet;
 		}
 		public function setStyle():void {
 			if (widthMax) {
