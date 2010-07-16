@@ -106,20 +106,18 @@
 			} else if (txt.autoSize == "center") {
 				txt.x=- int(txt.width*0.5);
 			}
-			/*
 			if (bar) {
-			bar.width=txt.width+widthAdd;
-			bar.height=txt.height+heightAdd;
-			if (txt.autoSize=="left") {
-			bar.x=- widthAdd*0.5;
-			} else if (txt.autoSize == "right") {
-			bar.x=- int(bar.width)+widthAdd*0.5;
-			} else if (txt.autoSize == "center") {
-			bar.x=- int(bar.width*0.5);
+				bar.width = txt.width;
+				if (txt.autoSize=="left") {
+					bar.x = 0 - widthAdd * 0.5;
+				} else if (txt.autoSize == "right") {
+					bar.x = - int(bar.width) + widthAdd * 0.5;
+				} else if (txt.autoSize == "center") {
+					bar.x = - int(bar.width * 0.5);
+				}
+				bar.x += xOff;
+				bar.y = yOff;
 			}
-			bar.x+=xOff;
-			bar.y=yOff;
-			}*/
 			if (onChange!=null) {
 				onChange();
 			}
