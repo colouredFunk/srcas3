@@ -244,6 +244,9 @@
 			_stream.load(new URLRequest(_url));
 			return _stream;
 		}
+		public static function getURLByXMLNode(_xml:XML, _hrefKey:String = "href", _targetKey:String = "target"):void {
+			getURL(String(_xml.attribute(_hrefKey)), String(_xml.attribute(_targetKey)));
+		}
 		public static function getURL(_url:String, _target:String, _data:Object = null):void {
 			var _request:URLRequest = new URLRequest(_url);
 			if(_data){

@@ -211,17 +211,17 @@
 		public function get listLength():uint{
 			return videoList?videoList.list.length():0;
 		}
-		private var __playId:uint;
-		public function get playId():uint{
+		private var __playId:int = -1;
+		public function get playId():int{
 			return __playId;
 		}
 		public function get loadedPercentage():Number {
 			return player.bytesLoaded / player.bytesTotal;
 		}
-		public function set playId(_playId:uint):void{
-			if (_playId==listLength) {
+		public function set playId(_playId:int):void{
+			if (_playId<0) {
 				_playId=0;
-			}else if (_playId>listLength){
+			}else if (_playId>=listLength){
 				_playId=listLength-1;
 			}
 			__playId = _playId;
@@ -317,7 +317,11 @@
 			if (_play ? false : (player.playing || player.buffering)) {
 				player.pause();
 			} else {
-				player.play();
+				if (playId<0) {
+					playId = 0;
+				}else {
+					player.play();
+				}
 			}
 		}
 		public function videoPause():void {

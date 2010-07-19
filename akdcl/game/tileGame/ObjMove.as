@@ -13,10 +13,14 @@
 		//移动速度矢量
 		public var vectorSpeed:Vector2D;
 		//存放围绕物体四周的点的横纵偏移量
-		protected var pointListTop:Vector.<Array>;
-		protected var pointListBottom:Vector.<Array>;
-		protected var pointListLeft:Vector.<Array>;
-		protected var pointListRight:Vector.<Array>;
+		protected var pointListT:Vector.<Vector2D>;
+		protected var pointListB:Vector.<Vector2D>;
+		protected var pointListL:Vector.<Vector2D>;
+		protected var pointListR:Vector.<Vector2D>;
+		protected var pointListTR:Vector.<Vector2D>;
+		protected var pointListRB:Vector.<Vector2D>;
+		protected var pointListBL:Vector.<Vector2D>;
+		protected var pointListLT:Vector.<Vector2D>;
 		public var rectOffX:int=0;
 		public var rectOffY:int=0;
 		public var onHitTile:Function;
@@ -26,39 +30,50 @@
 		//设置周围的点
 		protected var kY:Number = 0.1;
 		public function setCorners():void {
-			pointListTop = new Vector.<Array>();
-			pointListBottom = new Vector.<Array>();
-			pointListLeft = new Vector.<Array>();
-			pointListRight = new Vector.<Array>();
+			pointListT = new Vector.<Vector2D>();
+			pointListB = new Vector.<Vector2D>();
+			pointListL = new Vector.<Vector2D>();
+			pointListR = new Vector.<Vector2D>();
+			pointListTR = new Vector.<Vector2D>();
+			pointListRB = new Vector.<Vector2D>();
+			pointListBL = new Vector.<Vector2D>();
+			pointListLT = new Vector.<Vector2D>();
 			var _xn:uint = Math.ceil(width / map.tileWidth);
 			var _yn:uint = Math.ceil(height / map.tileHeight);
 			var _in:uint;
 			var _pt:Number;
+			var _vector2D:Vector2D;
 			for (_in = 0; _in < _xn + 1; _in++) {
 				_pt = width * (_in / _xn - 0.5);
 				if (_in==_xn) {
 					_pt-=kY;
 				}
-				pointListTop.push([_pt - rectOffX, -(halfHeight + rectOffY)]);
-				pointListBottom.push([_pt - rectOffX, halfHeight - rectOffY - kY]);
+				//trace(_pt - rectOffX - (halfHeight + rectOffY));
+				//trace(_pt - rectOffX + halfHeight - rectOffY - kY);
+				_vector2D = new Vector2D(_pt - rectOffX, -(halfHeight + rectOffY));
+				pointListT.push([, -(halfHeight + rectOffY)]);
+				pointListB.push([_pt - rectOffX, halfHeight - rectOffY - kY]);
 			}
+			Common.getURL();
 			for (_in = 0; _in < _yn + 1; _in++) {
 				_pt = height * (_in / _yn - 0.5);
 				if (_in==_yn) {
 					_pt-=kY;
 				}
-				pointListLeft.push([ -(halfWidth + rectOffX), _pt - rectOffY]);
-				pointListRight.push([halfWidth - rectOffX - kY, _pt - rectOffY]);
+				//trace( -(halfWidth + rectOffX)+ _pt - rectOffY);
+				//trace(halfWidth - rectOffX - kY+ _pt - rectOffY);
+				pointListL.push([ -(halfWidth + rectOffX), _pt - rectOffY]);
+				pointListR.push([halfWidth - rectOffX - kY, _pt - rectOffY]);
 			}
-			trace(pointListTop);
-			trace(pointListBottom);
-			trace(pointListLeft);
-			trace(pointListRight);
+			trace(pointListT);
+			trace(pointListB);
+			trace(pointListL);
+			trace(pointListR);
 		}
 		//检测水平方向的通行状况
 		public function hitTestX(_vx:Number):int {
 			var _hitCounts:uint = 0;
-			var _pointList:Vector.<Array> = (_vx > 0)?pointListRight:pointListLeft;
+			var _pointList:Vector.<Vector2D> = (_vx > 0)?pointListR:pointListL;
 			var _i:String;
 			var _x:Number;
 			for (_i in _pointList) {
@@ -78,7 +93,7 @@
 		//检测垂直方向的通行状况
 		public function hitTestY(_vy:Number):int {
 			var _hitCounts:uint = 0;
-			var _pointList:Vector.<Array> = (_vy > 0)?pointListBottom:pointListTop;
+			var _pointList:Vector.<Vector2D> = (_vy > 0)?pointListB:pointListT;
 			var _i:String;
 			var _y:Number;
 			for (_i in _pointList) {
