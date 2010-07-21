@@ -245,7 +245,10 @@
 			return _stream;
 		}
 		public static function getURLByXMLNode(_xml:XML, _hrefKey:String = "href", _targetKey:String = "target"):void {
-			getURL(String(_xml.attribute(_hrefKey)), String(_xml.attribute(_targetKey)));
+			var _href:String = String(_xml.attribute(_hrefKey));
+			if (_href) {
+				getURL(_href, String(_xml.attribute(_targetKey)));
+			}
 		}
 		public static function getURL(_url:String, _target:String, _data:Object = null):void {
 			var _request:URLRequest = new URLRequest(_url);

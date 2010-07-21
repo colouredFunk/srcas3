@@ -13,9 +13,15 @@
 	import flash.system.Security;
 
 	public class DocClass extends MovieClip {
-		protected var __widthOrg:int;
-		protected var __heightOrg:int;
+		private static var instance:DocClass;
+		public static function getInstance():DocClass {
+			return instance;
+		}
 		public function DocClass() {
+			if (instance) {
+				throw new Error ("ERROR:DocClass is a Singleton Class!");
+			}
+			instance = this;
 			init();
 		}
 		protected function init():void {
@@ -29,9 +35,9 @@
 			stage.scaleMode=StageScaleMode.NO_SCALE;
 			stage.showDefaultContextMenu=false;
 			//this.addEventListener(FullScreenEvent.FULL_SCREEN,$onFullScreen);
-			//this.loaderInfo.addEventListener(ProgressEvent.PROGRESS,loading);
-			//this.loaderInfo.addEventListener(Event.COMPLETE,loaded);
-			this.addEventListener(Event.ENTER_FRAME,loading);
+			//this.loaderInfo.addEventListener(ProgressEvent.PROGRESS,onLoadingHandle);
+			//this.loaderInfo.addEventListener(Event.COMPLETE,onLoadedHandle);
+			this.addEventListener(Event.ENTER_FRAME,onLoadingHandle);
 			onLoaded=function():void{
 				if(this.currentFrame==1){
 					play();
@@ -40,48 +46,39 @@
 		}
 		public var onLoading:Function;
 		protected var loadedPct:Number;//0~1
-		protected function loading(evt:*):void{
-			var _nT:Number=loaderInfo.bytesLoaded/loaderInfo.bytesTotal;
+		protected function onLoadingHandle(evt:*):void{
+			var _loaded:Number=loaderInfo.bytesLoaded/loaderInfo.bytesTotal;
 			if(onLoading!=null){
-				onLoading(_nT);
+				onLoading(_loaded);
 			}
-			loadedPct=_nT;
-			if(_nT==1&&onLoaded!=null){
-				this.removeEventListener(Event.ENTER_FRAME,loading);
+			loadedPct=_loaded;
+			if(_loaded==1&&onLoaded!=null){
+				this.removeEventListener(Event.ENTER_FRAME,onLoadingHandle);
 				onLoaded();
 			}
 		}
 		public var onLoaded:Function;
-		protected function loaded(evt:Event):void{
-			loaderInfo.removeEventListener(ProgressEvent.PROGRESS,loading);
-			loaderInfo.removeEventListener(Event.COMPLETE,loaded);
+		protected function onLoadedHandle(evt:Event):void{
+			loaderInfo.removeEventListener(ProgressEvent.PROGRESS,onLoadingHandle);
+			loaderInfo.removeEventListener(Event.COMPLETE,onLoadedHandle);
 			if(onLoaded!=null){
 				onLoaded();
 			}
 		}
+		private var __widthOrg:int;
+		private var __heightOrg:int;
 		public function get widthOrg():int{
 			return __widthOrg;
 		}
 		public function get heightOrg():int{
 			return __heightOrg;
 		}
-		protected var __flashVars:Object;
+		private var __flashVars:Object;
 		public function get flashVars():Object {
 			return __flashVars;
 		}
 		public function get swfVersion():uint{
 			return loaderInfo.swfVersion;
-		}
-		public var onFullScreen:Function;
-		public function setFullScreen(_isFullScreen:Boolean):void {
-			if (_isFullScreen) {
-				stage.displayState=StageDisplayState.FULL_SCREEN;
-			} else {
-				stage.displayState=StageDisplayState.NORMAL;
-			}
-			if (onFullScreen!=null) {
-				//onFullScreen(_isFullScreen,_isFullScreen?stage.fullScreenWidth:__widthOrg,_isFullScreen?stage.fullScreenHeight:__heightOrg);
-			}
 		}
 	}
 }
