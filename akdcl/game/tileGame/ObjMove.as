@@ -54,7 +54,6 @@
 				pointListT.push([, -(halfHeight + rectOffY)]);
 				pointListB.push([_pt - rectOffX, halfHeight - rectOffY - kY]);
 			}
-			Common.getURL();
 			for (_in = 0; _in < _yn + 1; _in++) {
 				_pt = height * (_in / _yn - 0.5);
 				if (_in==_yn) {

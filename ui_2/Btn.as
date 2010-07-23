@@ -20,7 +20,8 @@
 			
 			super.removed(_evt);
 			if (aniClip) {
-				aniClip.removeEventListener(Event.ENTER_FRAME,aniRun);
+				aniClip.removeEventListener(Event.ENTER_FRAME, aniRun);
+				aniClip.stop();
 			}
 			this.removeEventListener(Event.ENTER_FRAME,aniRun);
 			onOpen=null;

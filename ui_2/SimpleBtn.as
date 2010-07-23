@@ -5,6 +5,7 @@
 	public class SimpleBtn extends MovieClip {
 		private static var btnDown:MovieClip;
 		private static var btnIn:MovieClip;
+		public var needReload:Boolean;
 		public var onSelect:Function;
 		public var press:Function;
 		public var release:Function;
@@ -12,7 +13,6 @@
 		public var rollOut:Function;
 		public var userData:Object;
 		public var area:*;
-		public var needReload:Boolean;
 		public function SimpleBtn() {
 			stop();
 			addEventListener(Event.ADDED_TO_STAGE,added);
@@ -69,6 +69,14 @@
 				removeEventListener(MouseEvent.ROLL_OUT,$onRollOut);
 			}
 		}
+		private var __groupName:String;
+		public function set group(_groupName:String):void {
+			if (__groupName) {
+				RadioAndCheck.removeFromGroup(__groupName, this);
+			}
+			__groupName = _groupName;
+			RadioAndCheck.addToGroup(__groupName, this);
+		}
 		private var __select:Boolean;
 		public function get select():Boolean{
 			return __select;
@@ -78,6 +86,17 @@
 				return;
 			}
 			__select = _select;
+			if (__groupName) {
+				if (__select) {
+					if (RadioAndCheck.selectItem(__groupName, this)) {
+					}else {
+						return;
+					}
+				}else {
+					RadioAndCheck.unselectItem(__groupName, this);
+				}
+			}else {
+			}
 			if (onSelect!=null) {
 				onSelect(__select);
 			}
