@@ -12,13 +12,13 @@
 	
 	import flash.system.Security;
 	public class DocClass extends MovieClip {
-		private static var instance:DocClass;
+		protected static var instance:DocClass;
 		public static function getInstance():DocClass {
 			return instance;
 		}
 		public function DocClass() {
-			if (instance) {
-				throw new Error ("ERROR:DocClass is a Singleton Class!");
+			if (instance != null) {
+				throw new Error ("ERROR:DocClass Singleton already constructed!");
 			}
 			instance = this;
 			init();
