@@ -252,10 +252,20 @@
 			}
 			return _href;
 		}
-		public static function getURLByXMLNode(_xml:XML, _hrefKey:String = "href", _targetKey:String = "target"):void {
+		public static function isContainsHREFOrJS(_xml:XML, _hrefKey:String = "href", _jsKey:String = "js"):Boolean {
+			var _href:String = String(_xml.attribute(_hrefKey));
+			var _js:String = String(_xml.attribute(_jsKey));
+			return Boolean(_href || _js);
+		}
+		public static function getURLByXMLNode(_xml:XML, _hrefKey:String = "href", _jsKey:String = "js", _targetKey:String = "target"):void {
 			var _href:String = String(_xml.attribute(_hrefKey));
 			if (_href) {
 				getURL(_href, String(_xml.attribute(_targetKey)));
+				return;
+			}
+			var _js:String = String(_xml.attribute(_jsKey));
+			if (_js) {
+				ExternalInterface.call("eval", _js);
 			}
 		}
 		public static function getURL(_url:String, _target:String, _data:Object = null):void {
