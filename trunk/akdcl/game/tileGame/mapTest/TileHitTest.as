@@ -27,12 +27,15 @@ package
 		null,
 		[null, null, 10, null, null, null, null, 10],
 		[null, null, 10, null, null, null, null, 10],
+		[null, null, 10, null, null, null, null, 10],
+		[null, null, 10, null, null, null, null, 10],
 		null,
 		null,
 		[null, null, 4, 4, null, null, 9, 9],
 		null,
 		null,
 		null,
+		[null, null, null, null, 15, 15],
 		[null, null, null, null, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15],
 		];
 		public function TileHitTest() {
@@ -47,6 +50,9 @@ package
 			btn_p0.release = btn_pt.release =  function():void {
 				stopDragPt(this);
 			}
+			btn_pt.onXYChange = function():void {
+				
+			}
 			mapContainer = new Sprite();
 			container.addChildAt(mapContainer, 0);
 			
@@ -60,13 +66,13 @@ package
 			startDragPt(btn_p0);
 			stopDragPt(btn_p0);
 			var _objMove:ObjMove = new ObjMove();
-			//_objMove.width = 60;
-			//_objMove.height = 60;
+			_objMove.width = 60;
+			_objMove.height = 60;
 			_objMove.map = map;
 			_objMove.x = 400;
 			_objMove.y = 100;
-			//_objMove.rectOffY = 10;
-			//_objMove.rectOffX = 10;
+			_objMove.rectOffY = 10;
+			_objMove.rectOffX = 10;
 			_objMove.setCorners();
 			objMoveModle.setObjMove(_objMove);
 		}

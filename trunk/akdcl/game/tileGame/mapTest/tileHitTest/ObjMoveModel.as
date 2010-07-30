@@ -57,16 +57,17 @@ package tileHitTest
 						objMove.vectorSpeed.y = -10;
 						break;
 					case "S":
-						objMove.vectorSpeed.y += 10;
+						objMove.vectorSpeed.y = 10;
 						break;
 				}
 			}
 			yAxisKeys.onKeyUp = function(_evt:KeyEvent):void {
-				switch(_evt.keyName) {
-					case "W":
-						break;
-					case "S":
-						break;
+				if(_evt.keysName.length<2){
+					//objMove.vectorSpeed.y = 0;
+				}else if(_evt.keyName=="A"){
+					//objMove.vectorSpeed.y = 10;
+				}else{
+					//objMove.vectorSpeed.y = -10;
 				}
 			}
 			xAxisKeys.start();
@@ -78,7 +79,6 @@ package tileHitTest
 			objMove.onHitTile = function(_isXaxis:Boolean):void {
 				if (!_isXaxis) {
 					objMove.vectorSpeed.y = 0;
-					//g = 0;
 				}
 			}
 		}
