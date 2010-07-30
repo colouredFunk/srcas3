@@ -268,7 +268,7 @@
 				ExternalInterface.call("eval", _js);
 			}
 		}
-		public static function getURL(_url:String, _target:String, _data:Object = null):void {
+		public static function getURL(_url:String, _target:String="_blank", _data:Object = null):void {
 			var _request:URLRequest = new URLRequest(_url);
 			if(_data){
 				var _urlVariables:URLVariables = new URLVariables();
