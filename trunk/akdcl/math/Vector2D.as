@@ -33,7 +33,13 @@
 		*/
 		public function clone():Vector2D {
 			return new Vector2D(x,y);
-		}/** 
+		}
+		public function copy(_v2:Vector2D):Vector2D {
+			_x = _v2.x;
+			_y = _v2.y;
+			return this;
+		}
+		/** 
 		* Sets this vector's x and y values, and thus length, to zero.  
 		* @return Vector2D A reference to this vector.  
 		*/
@@ -111,8 +117,8 @@
 		* @return Vector2D A reference to this vector.  
 		*/
 		public function reverse():Vector2D {
-			_x=- _x;
-			_y=- _y;
+			_x = - _x;
+			_y = - _y;
 			return this;
 		}
 
@@ -141,7 +147,18 @@
 		public function crossProd(v2:Vector2D):Number {
 			return _x*v2.y-_y*v2.x;
 		}
-
+		public function isRight(_v2:Vector2D):Boolean{
+			//是否在p的右边
+			return crossProd(_v2) < 0;
+		}
+		protected static var vectorTemp_0:Vector2D = new Vector2D();
+		protected static var vectorTemp_1:Vector2D = new Vector2D();
+		public static function isPointOnRightSide(_pt:Vector2D, _p0:Vector2D, _p1:Vector2D):Boolean {
+			vectorTemp_0.copy(_pt);
+			vectorTemp_1.copy(_p1);
+			var _crossProduct:Number = vectorTemp_0.subtract(_p0).crossProd(vectorTemp_1.subtract(_p0));
+			return _crossProduct > 0;
+		}
 		/** 
 		* Calculates the radian between two vectors.  
 		* @param v1 The first Vector2D instance.  
@@ -171,7 +188,7 @@
 		* @return Vector2D A vector that is perpendicular to this vector.  
 		*/
 		public function get perp():Vector2D {
-			return new Vector2D(- y,x);
+			return new Vector2D( -_y, _x);
 		}
 
 		/** 
@@ -189,8 +206,8 @@
 		* @return Number The distance squared from this vector to the vector passed as a parameter.  
 		*/
 		public function distSQ(v2:Vector2D):Number {
-			var dx:Number=v2.x-x;
-			var dy:Number=v2.y-y;
+			var dx:Number=v2.x-_x;
+			var dy:Number=v2.y-_y;
 			return dx*dx+dy*dy;
 		}
 		/**  
@@ -199,7 +216,12 @@
 		* @return Vector2D A new vector containing the results of the addition.  
 		*/
 		public function add(v2:Vector2D):Vector2D {
-			return new Vector2D(_x+v2.x,_y+v2.y);
+			_x += v2.x;
+			_y += v2.y;
+			return this;
+		}
+		public function addNew(_v2:Vector2D):Vector2D {
+			return new Vector2D(_x + _v2.x, _y + _v2.y);
 		}
 		/** 
 		* Subtacts a vector to this vector, creating a new Vector2D instance to hold the result.  
@@ -207,7 +229,12 @@
 		* @return Vector2D A new vector containing the results of the subtraction.  
 		*/
 		public function subtract(v2:Vector2D):Vector2D {
-			return new Vector2D(_x-v2.x,_y-v2.y);
+			_x -= v2.x;
+			_y -= v2.y;
+			return this;
+		}
+		public function subtractNew(_v2:Vector2D):Vector2D {
+			return new Vector2D(_x - _v2.x, _y - _v2.y);
 		}
 		/** 
 		* Multiplies this vector by a value, creating a new Vector2D instance to hold the result.  
