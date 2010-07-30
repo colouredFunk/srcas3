@@ -12,6 +12,9 @@
 		//private var nRight:Number;
 		//private var nTop:Number;
 		//private var nBottom:Number;
+		protected static var vectorTemp_0:Vector2D = new Vector2D();
+		protected static var vectorTemp_1:Vector2D = new Vector2D();
+		protected static var vectorTemp_2:Vector2D = new Vector2D();
 		protected var tileDic:Object;
 		public function Map() {
 			tileDic = { };
@@ -179,94 +182,140 @@
 			//目标区块可通行
 			return false;
 		}
-		public function hitTest_2(_x:Number, _y:Number,_dx:Number,_dy:Number):Boolean {
+		public function hitTest_2(_x:Number, _y:Number, _dx:Number, _dy:Number, _auto:Boolean = true):Boolean {
 			var _xt:Number = _dx + _x;
 			var _yt:Number = _dy + _y;
 			
-			var _tileX_t:uint = xToTileX(_xt);
-			var _tileY_t:uint = yToTileY(_yt);
-			
-			var _tile_t:Tile = getTile(_tileX_t, _tileY_t);
-			if (_tile_t) {
-				var _crossX:Boolean = (_dx * _tile_t.walkX >= 0);
-				var _crossY:Boolean = (_dy * _tile_t.walkY >= 0);
+			var _tileX:int = xToTileX(_x);
+			var _tileY:int = yToTileY(_y);
+			var _tileX_t:int = xToTileX(_xt);
+			var _tileY_t:int = yToTileY(_yt);
+			//var _tile:Tile;
+			var _tile_t:Tile;
+			if (_tileX_t < 0 || _tileY_t < 0 || _tileX_t >= mapWidth || _tileY_t >= mapHeight) {
+				
+			}else {
+				_tile_t = getTile(_tileX_t, _tileY_t);
+			}
+			var _dTileX:uint = Math.abs(_tileX_t - _tileX);
+			var _dTileY:uint = Math.abs(_tileY_t - _tileY);
+			if (_auto) {
+				var _dTileMax:uint = Math.max(_dTileX, _dTileY);
+				if (_dTileMax>1) {
+					//分_dTileMax段运行
+					_dx /= _dTileMax, _dy /= _dTileMax;
+					for (var _i:uint; _i < _dTileMax; _i++ ) {
+						if (hitTest_2(_x, _y, _dx, _dy, false)) {
+							return true;
+						}
+						_x += _dx, _y += _dy;
+					}
+					//目标区块可通行
+					return false;
+				}
+			}
+			var _crossX:Boolean = !_tile_t || (_dx * _tile_t.walkX >= 0);
+			var _crossY:Boolean = !_tile_t || (_dy * _tile_t.walkY >= 0);
+			var _x0, _y0:Number;
+			var _hitX, _hitY:Number;
+			var _tileTemp:Tile;
+			if (_dTileX + _dTileY == 0) {
+				//目标区块可通行
+				return false;
+			}else if (_dTileX * _dTileY == 0) {
 				if (_dx == 0) {
 					//水平方向无速度
-					if (_crossY||(_tileY_t == yToTileY(_y))) {
+					if (_crossY) {
 						//目标区块可通行
 						return false;
 					}
 					//目标区块y轴方向无法通过
-					//hitTestPt.x=_x;
-					hitTestPt.y = (_tileY_t +(_dy > 0? 0: 1)) * tileHeight;
+					hitTestPt.x = _x, hitTestPt.y = (_tileY_t +(_dy > 0? 0: 1)) * tileHeight;
 					hitTestTile = _tile_t;
 					return true;
 				}else if (_dy == 0) {
 					//垂直方向无速度
-					if (_crossX||(_tileX_t == xToTileX(_x))) {
+					if (_crossX) {
 						//目标区块可通行
 						return false;
 					}
 					//目标区块x轴方向无法通过
-					//hitTestPt.y=_y;
-					hitTestPt.x = (_tileX_t +(_dx > 0? 0: 1)) * tileWidth;
+					hitTestPt.x = (_tileX_t +(_dx > 0? 0: 1)) * tileWidth, hitTestPt.y = _y;
 					hitTestTile = _tile_t;
 					return true;
 				}else {
-					var _x0, _y0:Number;
-					var _hitX, _hitY:Number;
-					var _tileTemp:Tile;
-					if (_crossX && _crossY) {
+					_x0 = (_tileX_t +(_dx > 0? 0: 1)) * tileWidth, _y0 = (_tileY_t +(_dy > 0? 0: 1)) * tileHeight;
+					if ((_tileX_t - _tileX == 0)?_crossY:_crossX) {
 						//目标区块可通行
 						return false;
-					}else if (!_crossX && !_crossY) {
-						_y0 = (_tileY_t +(_dy > 0? 0: 1)) * tileHeight;
-						_hitX = (_y0 - _y) * (_xt - _x) / (_yt - _y) + _x;
-						_tileTemp = getTile(xToTileX(_hitX), _tileY_t);
-						if (!_tileTemp || _dy * _tileTemp.walkY >= 0) {
-							//目标区块x轴方向无法通过
-							_x0 = (_tileX_t + (_dx > 0? 0: 1)) * tileWidth;
-							_hitY = (_x0 - _x) * (_yt - _y) / (_xt - _x) + _y;
-							hitTestPt.x = _x0;
-							hitTestPt.y = _hitY;
-						}else {
-							//目标区块y轴方向无法通过
-							hitTestPt.x = _hitX;
-							hitTestPt.y = _y0;
-						}
-						hitTestTile = _tileTemp?_tileTemp:_tile_t;
-						return true;
-					}else if(_crossX) {
-						_y0 = (_tileY_t +(_dy > 0? 0: 1)) * tileHeight;
-						_hitX = (_y0 - _y) * (_xt - _x) / (_yt - _y) + _x;
-						_tileTemp = getTile(xToTileX(_hitX), _tileY_t);
-						if (!_tileTemp || _dy * _tileTemp.walkY >= 0) {
-							//目标区块可通行
-							return false;
-						}
-						//目标区块y轴方向无法通过
-						hitTestPt.x = _hitX;
-						hitTestPt.y = _y0;
-						hitTestTile = _tileTemp?_tileTemp:_tile_t;
-						return true;
 					}else {
-						_x0 = (_tileX_t + (_dx > 0? 0: 1)) * tileWidth;
-						_hitY = (_x0 - _x) * (_yt - _y) / (_xt - _x) + _y;
-						_tileTemp = getTile(_tileX_t, yToTileY(_hitY));
-						if (!_tileTemp || _dx * _tileTemp.walkX >= 0) {
-							//目标区块可通行
+						if (_tileX_t - _tileX == 0) {
+							//目标区块y轴方向无法通过
+							_hitX = (_y0 - _y) * (_xt - _x) / (_yt - _y) + _x;
+							hitTestPt.x = _hitX, hitTestPt.y = _y0;
+						}else {
+							//目标区块x轴方向无法通过
+							_hitY = (_x0 - _x) * (_yt - _y) / (_xt - _x) + _y;
+							hitTestPt.x = _x0, hitTestPt.y = _hitY;
+						}
+					}
+					hitTestTile = _tile_t;
+					return true;
+				}
+			}else {
+				_x0 = (_tileX_t +(_dx > 0? 0: 1)) * tileWidth;
+				_y0 = (_tileY_t +(_dy > 0? 0: 1)) * tileHeight;
+				var _isRight:Boolean = isXYOnRightSide(_x0, _y0, _x, _y, _xt, _yt);
+				if ((_dx*_dy>0)?_isRight:!_isRight) {
+					//y延长
+					_hitY = (_x0 - _x) * (_yt - _y) / (_xt - _x) + _y;
+					_tileTemp = getTile(_tileX_t, yToTileY(_hitY));
+					if (!_tileTemp || _dx * _tileTemp.walkX >= 0) {
+						if (_crossY) {
+							//目标区块y轴方向可通行,x轴方向无需判断
 							return false;
 						}
+						_hitX = (_y0 - _y) * (_xt - _x) / (_yt - _y) + _x;
+						hitTestPt.x = _hitX, hitTestPt.y = _y0;
+					}else {
 						//目标区块x轴方向无法通过
-						hitTestPt.x = _x0;
-						hitTestPt.y = _hitY;
-						hitTestTile = _tileTemp?_tileTemp:_tile_t;
-						return true;
+						hitTestPt.x = _x0, hitTestPt.y = _hitY;
+					}
+				}else {
+					//x延长
+					_hitX = (_y0 - _y) * (_xt - _x) / (_yt - _y) + _x;
+					_tileTemp = getTile(xToTileX(_hitX), _tileY_t);
+					if (!_tileTemp || _dy * _tileTemp.walkY >= 0) {
+						if (_crossX) {
+							//目标区块x轴方向可通行,y轴方向无需判断
+							return false;
+						}
+						_hitY = (_x0 - _x) * (_yt - _y) / (_xt - _x) + _y;
+						hitTestPt.x = _x0, hitTestPt.y = _hitY;
+					}else {
+						//目标区块y轴方向无法通过
+						hitTestPt.x = _hitX, hitTestPt.y = _y0;
 					}
 				}
+				hitTestTile = _tileTemp?_tileTemp:_tile_t;
+				return true;
 			}
-			//目标区块可通行
-			return false;
+		}
+		public static function isPointOnRightSide(_pt:Vector2D, _p0:Vector2D, _p1:Vector2D):Boolean {
+			vectorTemp_0.copy(_pt);
+			vectorTemp_1.copy(_p1);
+			var _crossProduct:Number = vectorTemp_0.subtract(_p0).crossProd(vectorTemp_1.subtract(_p0));
+			return _crossProduct > 0;
+		}
+		public static function isXYOnRightSide(_xt:Number,_yt:Number,_x0:Number,_y0:Number,_x1:Number,_y1:Number):Boolean {
+			vectorTemp_0.x = _xt;
+			vectorTemp_0.y = _yt;
+			vectorTemp_1.x = _x0;
+			vectorTemp_1.y = _y0;
+			vectorTemp_2.x = _x1;
+			vectorTemp_2.y = _y1;
+			var _crossProduct:Number = vectorTemp_0.subtract(vectorTemp_2).crossProd(vectorTemp_1.subtract(vectorTemp_2));
+			return _crossProduct > 0;
 		}
 	}
 }
