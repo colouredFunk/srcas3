@@ -26,7 +26,7 @@
 			instance = this;
 			addFrameScript(0,init);
 		}
-		protected function init():void {
+		public function init(_optionsXMLPath:String = ""):void {
 			stop();
 			__widthOrg=stage.stageWidth;
 			__heightOrg=stage.stageHeight;
@@ -38,7 +38,8 @@
 			stage.showDefaultContextMenu=false;
 			//loaderInfo.addEventListener(ProgressEvent.PROGRESS,onLoadingHandle);
 			//loaderInfo.addEventListener(Event.COMPLETE,onLoadedHandle);
-			optionsXMLPath = flashVars.xml || optionsXMLPath;
+			optionsXMLPath = flashVars.xml || _optionsXMLPath;
+			trace(optionsXMLPath);
 			if (optionsXMLPath) {
 				Common.urlLoader(optionsXMLPath, onOptionsXMLLoadedHandle, onOptionsXMLLoadingHandle,onOptionsXMLLoadErrorHandle);
 			}
