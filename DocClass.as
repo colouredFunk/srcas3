@@ -20,14 +20,23 @@
 			return instance;
 		}
 		public function DocClass() {
+			stop();
 			if (instance != null) {
 				throw new Error ("ERROR:DocClass Singleton already constructed!");
 			}
 			instance = this;
-			addFrameScript(0,init);
+			addEventListener(Event.ENTER_FRAME, onDelayFrameHandle);
 		}
-		public function init(_optionsXMLPath:String = ""):void {
-			stop();
+		private function onDelayFrameHandle(_evt:Event):void {
+			init();
+			removeEventListener(Event.ENTER_FRAME, onDelayFrameHandle);
+		}
+		private var isInit:Boolean;
+		protected function init(_optionsXMLPath:String = ""):void {
+			if (isInit) {
+				return;
+			}
+			isInit = true;
 			__widthOrg=stage.stageWidth;
 			__heightOrg=stage.stageHeight;
 			__flashVars=stage.loaderInfo.parameters;
@@ -39,7 +48,6 @@
 			//loaderInfo.addEventListener(ProgressEvent.PROGRESS,onLoadingHandle);
 			//loaderInfo.addEventListener(Event.COMPLETE,onLoadedHandle);
 			optionsXMLPath = flashVars.xml || _optionsXMLPath;
-			trace(optionsXMLPath);
 			if (optionsXMLPath) {
 				Common.urlLoader(optionsXMLPath, onOptionsXMLLoadedHandle, onOptionsXMLLoadingHandle,onOptionsXMLLoadErrorHandle);
 			}
