@@ -58,6 +58,7 @@ package
 			
 			
 			map = new Map();
+			map.offY = -5;
 			map.tileWidth = 40;
 			map.tileHeight = 40;
 			map.matrix = matrix_0;

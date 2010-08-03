@@ -12,25 +12,13 @@
 		//private var nRight:Number;
 		//private var nTop:Number;
 		//private var nBottom:Number;
-		protected static var vectorTemp_0:Vector2D = new Vector2D();
-		protected static var vectorTemp_1:Vector2D = new Vector2D();
-		protected static var vectorTemp_2:Vector2D = new Vector2D();
-		protected var tileDic:Object;
-		public function Map() {
-			tileDic = { };
-			hitTestPt = new Vector2D();
-		}
 		private var __matrix:Array;
 		public function get matrix():Array {
 			return __matrix;
 		}
 		public function set matrix(_matrix:Array):void {
-			if (!_matrix) {
-				//throw new Error("map marix set null!");
-				return;
-			}
 			__matrix = _matrix;
-			if (__matrix.length>mapHeight) {
+			/*if (__matrix.length>mapHeight) {
 				mapHeight = __matrix.length;
 			}
 			var _mapWidth:uint;
@@ -41,8 +29,10 @@
 			}
 			if (_mapWidth>mapWidth) {
 				mapWidth = _mapWidth;
-			}
+			}*/
 		}
+		public var offX:int;
+		public var offY:int;
 		//地图宽
 		private var __mapWidth:uint = 20;
 		public function get mapWidth():uint {
@@ -83,38 +73,40 @@
 		public function get tileHalfHeight():uint {
 			return __tileHalfHeight;
 		}
+		protected var tileDic:Object;
+		public function Map() {
+			tileDic = { };
+			hitTestPt = new Vector2D();
+		}
 		public function mapping():void {
 			var _x, _y:uint = 0;
 			var _tile:Tile;
 			for (_y = 0; _y < mapHeight; _y++) {
 				for (_x = 0; _x < mapWidth; _x++) {
-					_tile = getTile(_x, _y);
-					if (matrix[_y] && (matrix[_y][_x] is Number)) {
+					if (matrix[_y+offY] && (matrix[_y+offY][_x+offX] is Number)) {
+						_tile = getTile(_x, _y);
 						if (!_tile) {
-							_tile = new Tile(_x, _y, matrix[_y][_x]);
+							_tile = new Tile(_x, _y, matrix[_y+offY][_x+offX]);
 							tileDic[getTileName(_x, _y)] = _tile;
 							_tile.map = this;
 						}else {
-							_tile.walkFlag = matrix[_y][_x];
+							_tile.walkFlag = matrix[_y+offY][_x+offX];
 						}
 					}
 				}
 			}
 		}
 		public function eachTile(_forEach:Function):void {
-			if (_forEach == null) {
-				return;
-			}
 			for each(var _tile:Tile in tileDic) {
 				_forEach(_tile);
 			}
 		}
 		//返回坐标对应的序列；
 		public function xToTileX(_x:Number):int {
-			return int(_x / tileWidth);
+			return int(_x / tileWidth + 1) - 1;
 		}
 		public function yToTileY(_y:Number):int {
-			return int(_y / tileHeight);
+			return int(_y / tileHeight + 1) - 1;
 		}
 		//返回对应横纵序区块
 		public function getTile(_tileX:uint, _tileY:uint):Tile {
@@ -124,7 +116,7 @@
 		protected static function getTileName(_tileX:uint, _tileY:uint):String {
 			return "tile_" + _tileY + "_" + _tileX;
 		}
-		public function hitTest_0(_x:Number, _y:Number):Boolean {
+		/*public function hitTest_0(_x:Number, _y:Number):Boolean {
 			var _tileX:uint = xToTileX(_x);
 			var _tileY:uint = yToTileY(_y);
 			if (_tileX >= mapWidth || _tileY >= mapHeight) {
@@ -181,7 +173,7 @@
 			}
 			//目标区块可通行
 			return false;
-		}
+		}*/
 		public function hitTest_2(_x:Number, _y:Number, _dx:Number, _dy:Number, _auto:Boolean = true):Boolean {
 			var _xt:Number = _dx + _x;
 			var _yt:Number = _dy + _y;
@@ -192,11 +184,7 @@
 			var _tileY_t:int = yToTileY(_yt);
 			//var _tile:Tile;
 			var _tile_t:Tile;
-			if (_tileX_t < 0 || _tileY_t < 0 || _tileX_t >= mapWidth || _tileY_t >= mapHeight) {
-				
-			}else {
-				_tile_t = getTile(_tileX_t, _tileY_t);
-			}
+			
 			var _dTileX:uint = Math.abs(_tileX_t - _tileX);
 			var _dTileY:uint = Math.abs(_tileY_t - _tileY);
 			if (_auto) {
@@ -214,16 +202,47 @@
 					return false;
 				}
 			}
-			var _crossX:Boolean = !_tile_t || (_dx * _tile_t.walkX >= 0);
-			var _crossY:Boolean = !_tile_t || (_dy * _tile_t.walkY >= 0);
 			var _x0, _y0:Number;
 			var _hitX, _hitY:Number;
+			if (_tileX_t < 0 || _tileY_t < 0 || _tileX_t >= mapWidth || _tileY_t >= mapHeight) {
+				_x0 = _dx < 0? 0:(mapWidth * tileWidth);
+				_y0 = _dy < 0? 0:(mapHeight * tileHeight);
+				if (_dx==0) {
+					hitTestPt.x = _x, hitTestPt.y = _y0;
+				}else if(_dy==0) {
+					hitTestPt.x = _x0, hitTestPt.y = _y;
+				}else {
+					/*if (_dTileX * _dTileY != 0) {
+						//穿过边块的可能
+					}*/
+					var _isRight_:Boolean = isXYOnRightSide(_x0, _y0, _x, _y, _xt, _yt);
+					if ((_dx*_dy>0)?_isRight_:!_isRight_) {
+						//x延长
+						_hitY = (_x0 - _x) * (_yt - _y) / (_xt - _x) + _y;
+						hitTestPt.x = _x0, hitTestPt.y = _hitY;
+					}else {
+						//y延长
+						_hitX = (_y0 - _y) * (_xt - _x) / (_yt - _y) + _x;
+						hitTestPt.x = _hitX, hitTestPt.y = _y0;
+					}
+				}
+				hitTestTile = null;
+				return true;
+			}else {
+				_tile_t = getTile(_tileX_t, _tileY_t);
+			}
+			var _crossX:Boolean = !_tile_t || (_dx * _tile_t.walkX >= 0);
+			var _crossY:Boolean = !_tile_t || (_dy * _tile_t.walkY >= 0);
 			var _tileTemp:Tile;
 			if (_dTileX + _dTileY == 0) {
 				//目标区块可通行
 				return false;
 			}else if (_dTileX * _dTileY == 0) {
-				if (_dx == 0) {
+				_tile_t.hitTest(_x, _y, _dx, _dy, _xt, _yt);
+				
+				
+				
+				/*if (_dx == 0) {
 					//水平方向无速度
 					if (_crossY) {
 						//目标区块可通行
@@ -261,10 +280,9 @@
 					}
 					hitTestTile = _tile_t;
 					return true;
-				}
+				}*/
 			}else {
-				_x0 = (_tileX_t +(_dx > 0? 0: 1)) * tileWidth;
-				_y0 = (_tileY_t +(_dy > 0? 0: 1)) * tileHeight;
+				_x0 = (_tileX_t +(_dx > 0? 0: 1)) * tileWidth, _y0 = (_tileY_t +(_dy > 0? 0: 1)) * tileHeight;
 				var _isRight:Boolean = isXYOnRightSide(_x0, _y0, _x, _y, _xt, _yt);
 				if ((_dx*_dy>0)?_isRight:!_isRight) {
 					//y延长
@@ -301,6 +319,9 @@
 				return true;
 			}
 		}
+		protected static var vectorTemp_0:Vector2D = new Vector2D();
+		protected static var vectorTemp_1:Vector2D = new Vector2D();
+		protected static var vectorTemp_2:Vector2D = new Vector2D();
 		public static function isPointOnRightSide(_pt:Vector2D, _p0:Vector2D, _p1:Vector2D):Boolean {
 			vectorTemp_0.copy(_pt);
 			vectorTemp_1.copy(_p1);
