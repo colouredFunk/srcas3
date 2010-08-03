@@ -8,8 +8,6 @@
 	 */
 	public class ObjMove extends Obj
 	{
-		//移动速度标量
-		//protected var speedMove:Number = 5;
 		//移动速度矢量
 		public var vectorSpeed:Vector2D;
 		//存放围绕物体四周的点的横纵偏移量
@@ -175,9 +173,9 @@
 				var _hit:Boolean = map.hitTest_2(x + _vector.x, y + _vector.y, vectorSpeed.x, vectorSpeed.y);
 				if (_hit) {
 					if (map.hitTestPt.x == (map.hitTestTile.tileX +(vectorSpeed.x > 0? 0: 1)) * map.tileWidth) {
-						//_y = y;
+						_y = y;
 					}else {
-						//_x = x;
+						_x = x;
 					}
 				}
 			}

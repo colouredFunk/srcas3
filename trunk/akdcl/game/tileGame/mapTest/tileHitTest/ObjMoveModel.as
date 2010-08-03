@@ -91,14 +91,14 @@ package tileHitTest
 		private function runStep(_evt:Event):void {
 			objMove.runStep();
 			update();
-			if (isFall) {
 				objMove.vectorSpeed.y += g;
+			/*if (isFall) {
 			}
 			if (objMove.hitTestY(g) == 0) {
 				isFall = true;
 			}else {
 				isFall = false;
-			}
+			}*/
 			
 		}
 	}
