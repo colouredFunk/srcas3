@@ -1,6 +1,7 @@
 ﻿package {
 	import flash.display.Sprite;
 	import flash.display.MovieClip;
+	import flash.events.IOErrorEvent;
 	
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
@@ -13,6 +14,8 @@
 	import flash.system.Security;
 	public class DocClass extends MovieClip {
 		protected static var instance:DocClass;
+		protected var optionsXMLPath:String;
+		public var optionsXML:XML;
 		public static function getInstance():DocClass {
 			return instance;
 		}
@@ -21,7 +24,7 @@
 				throw new Error ("ERROR:DocClass Singleton already constructed!");
 			}
 			instance = this;
-			init();
+			addFrameScript(0,init);
 		}
 		protected function init():void {
 			stop();
@@ -35,6 +38,10 @@
 			stage.showDefaultContextMenu=false;
 			//loaderInfo.addEventListener(ProgressEvent.PROGRESS,onLoadingHandle);
 			//loaderInfo.addEventListener(Event.COMPLETE,onLoadedHandle);
+			optionsXMLPath = flashVars.xml || optionsXMLPath;
+			if (optionsXMLPath) {
+				Common.urlLoader(optionsXMLPath, onOptionsXMLLoadedHandle, onOptionsXMLLoadingHandle,onOptionsXMLLoadErrorHandle);
+			}
 			addEventListener(Event.ENTER_FRAME,onLoadingHandle);
 			onLoaded=function():void{
 				if(currentFrame==1){
@@ -57,9 +64,6 @@
 				onLoaded();
 			}
 		}
-		protected function loadingProgress(_loaded:Number):void {
-			loaded += (_loaded - loaded) * loadDelay;
-		}
 		/*protected function onLoadedHandle(evt:Event):void{
 			loaderInfo.removeEventListener(ProgressEvent.PROGRESS,onLoadingHandle);
 			loaderInfo.removeEventListener(Event.COMPLETE,onLoadedHandle);
@@ -67,6 +71,25 @@
 				onLoaded();
 			}
 		}*/
+		protected var loaded_optionsXML:Number = 0;
+		protected function onOptionsXMLLoadingHandle(_evt:ProgressEvent):void {
+			loaded_optionsXML = int(_evt.bytesLoaded / _evt.bytesTotal * 1000) * 0.001;
+		}
+		protected function onOptionsXMLLoadedHandle(_evt:Event):void {
+			optionsXML = XML(_evt.currentTarget.data);
+			loaded_optionsXML = 1;
+		}
+		protected function onOptionsXMLLoadErrorHandle(_evt:IOErrorEvent):void {
+			throw new Error ("ERROR:未读取到XML，请检查是否配置正确!");
+		}
+		protected function loadingProgress(_loaded:Number):void {
+			if (optionsXMLPath) {
+				_loaded = _loaded * 0.9 + loaded_optionsXML * 0.1;
+				loaded += (_loaded - loaded) * loadDelay;
+			}else {
+				loaded += (_loaded - loaded) * loadDelay;
+			}
+		}
 		private var __widthOrg:int;
 		private var __heightOrg:int;
 		public function get widthOrg():int{
