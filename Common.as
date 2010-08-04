@@ -20,7 +20,7 @@
 			
 	final public class Common {
 		public static function addContextMenu(
-			obj:InteractiveObject,
+			obj:*,
 			caption:String,
 			onSelect:Function=null
 		):void {
@@ -31,7 +31,7 @@
 				menu.hideBuiltInItems();
 			}
 			var item:ContextMenuItem=new ContextMenuItem(caption);
-			if(onSelect!=null){
+			if (onSelect != null) {
 				item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,onSelect);
 			}
 			menu.customItems.push(item);
