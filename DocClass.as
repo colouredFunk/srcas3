@@ -46,7 +46,7 @@
 			paramsObject.width = widthOrg;
 			paramsObject.height = heightOrg;
 			paramsObject.flashVars = { };
-			Common.addContextMenu(this, widthOrg + " x " + heightOrg, onWHReleaseHandle);
+			Common.addContextMenu(this, "SWF:"+widthOrg + " x " + heightOrg, onWHReleaseHandle);
 			//loaderInfo.addEventListener(ProgressEvent.PROGRESS,onLoadingHandle);
 			//loaderInfo.addEventListener(Event.COMPLETE,onLoadedHandle);
 			onLoaded=function():void{
@@ -73,7 +73,7 @@
 			var _url:String = this.loaderInfo.url;
 			var _ary:Array = _url.split("/");
 			_url = _ary.pop();
-			_url = _ary.pop() +"/" + _url;
+			//_url = _ary.pop() +"/" + _url;
 			var _str:String = "addSWF('" + _url + "'," +_jsonStr + ");";
 			
 			_str = "<script language='JavaScript' type='text/javascript'>" + _str;

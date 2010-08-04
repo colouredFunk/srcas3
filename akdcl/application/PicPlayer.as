@@ -168,8 +168,8 @@
 				backShape.width = picWidth;
 				backShape.height = picHeight;
 			}
-			txt_debug.text = "图片尺寸：" + picWidth + " x " + picHeight;
-			
+			txt_debug.text = "轮播图片:" + picWidth + " x " + picHeight;
+			Common.addContextMenu(parent, txt_debug.text);
 			fillMode = int(xml.fillMode) || fillMode;
 			timeDelay = Number(xml.timeDelay) || timeDelay;
 			timeTween = Number(xml.timeTween) || timeTween;
