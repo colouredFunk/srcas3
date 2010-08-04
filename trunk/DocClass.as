@@ -1,8 +1,6 @@
 ﻿package {
 	import flash.display.Sprite;
 	import flash.display.MovieClip;
-	import flash.events.IOErrorEvent;
-	
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.display.StageDisplayState;
@@ -10,8 +8,13 @@
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
 	import flash.events.FullScreenEvent;
+	import flash.events.ContextMenuEvent;
+	import flash.events.IOErrorEvent;
 	
 	import flash.system.Security;
+	import flash.system.System;
+	
+	import com.adobe.serialization.json.JSON;
 	public class DocClass extends MovieClip {
 		protected static var instance:DocClass;
 		protected var optionsXMLPath:String;
@@ -25,38 +28,58 @@
 				throw new Error ("ERROR:DocClass Singleton already constructed!");
 			}
 			instance = this;
-			addEventListener(Event.ENTER_FRAME, onDelayFrameHandle);
+			loaderInfo.addEventListener(Event.INIT, onInitHandle);
 		}
-		private function onDelayFrameHandle(_evt:Event):void {
-			init();
-			removeEventListener(Event.ENTER_FRAME, onDelayFrameHandle);
+		protected function init():void {
+			
 		}
-		private var isInit:Boolean;
-		protected function init(_optionsXMLPath:String = ""):void {
-			if (isInit) {
-				return;
-			}
-			isInit = true;
-			__flashVars=loaderInfo.parameters;
-			__widthOrg = loaderInfo.width;
-			__heightOrg = loaderInfo.height;
+		protected function onInitHandle(_evt:Event):void {
 			Security.allowDomain("*");
 			Security.allowInsecureDomain("*");
 			stage.align=StageAlign.TOP_LEFT;
 			stage.scaleMode = StageScaleMode.SHOW_ALL;
-			stage.showDefaultContextMenu=false;
+			stage.showDefaultContextMenu = false;
+			__widthOrg = loaderInfo.width;
+			__heightOrg = loaderInfo.height;
+			__flashVars = loaderInfo.parameters;
+			paramsObject = { };
+			paramsObject.width = widthOrg;
+			paramsObject.height = heightOrg;
+			paramsObject.flashVars = { };
+			Common.addContextMenu(this, widthOrg + " x " + heightOrg, onWHReleaseHandle);
 			//loaderInfo.addEventListener(ProgressEvent.PROGRESS,onLoadingHandle);
 			//loaderInfo.addEventListener(Event.COMPLETE,onLoadedHandle);
-			optionsXMLPath = flashVars.xml || _optionsXMLPath;
-			if (optionsXMLPath) {
-				Common.urlLoader(optionsXMLPath, onOptionsXMLLoadedHandle, onOptionsXMLLoadingHandle,onOptionsXMLLoadErrorHandle);
-			}
-			addEventListener(Event.ENTER_FRAME,onLoadingHandle);
 			onLoaded=function():void{
 				if(currentFrame==1){
 					play();
 				}
 			}
+			optionsXMLPath = flashVars.xml || optionsXMLPath;
+			if (optionsXMLPath) {
+				Common.urlLoader(optionsXMLPath, onOptionsXMLLoadedHandle, onOptionsXMLLoadingHandle,onOptionsXMLLoadErrorHandle);
+			}
+			addEventListener(Event.ENTER_FRAME,onLoadingHandle);
+		}
+		protected var paramsObject:Object;
+		protected function onWHReleaseHandle(_evt:ContextMenuEvent):void {
+			if (optionsXMLPath) {
+				paramsObject.flashVars.xml = optionsXMLPath;
+			}
+			var _jsonStr:String = JSON.encode(paramsObject);
+			_jsonStr = Common.replaceStr(_jsonStr, '{"', '{');
+			_jsonStr = Common.replaceStr(_jsonStr, '":', ':');
+			_jsonStr = Common.replaceStr(_jsonStr, ',"', ',');
+			_jsonStr = Common.replaceStr(_jsonStr, '"', "'");
+			var _url:String = this.loaderInfo.url;
+			var _ary:Array = _url.split("/");
+			_url = _ary.pop();
+			_url = _ary.pop() +"/" + _url;
+			var _str:String = "addSWF('" + _url + "'," +_jsonStr + ");";
+			
+			_str = "<script language='JavaScript' type='text/javascript'>" + _str;
+			_str = _str + "</script>";
+			trace(_str);
+			System.setClipboard(_str);
 		}
 		public var onLoading:Function;
 		public var onLoaded:Function;
@@ -95,10 +118,8 @@
 		protected function loadingProgress(_loaded:Number):void {
 			if (optionsXMLPath) {
 				_loaded = _loaded * 0.9 + loaded_optionsXML * 0.1;
-				loaded += (_loaded - loaded) * loadDelay;
-			}else {
-				loaded += (_loaded - loaded) * loadDelay;
 			}
+			loaded += (_loaded - loaded) * loadDelay;
 		}
 		private var __widthOrg:int;
 		private var __heightOrg:int;
