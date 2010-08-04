@@ -18,16 +18,24 @@
     import flash.ui.ContextMenuItem;
     import flash.ui.ContextMenuBuiltInItems;
 			
-			/*menu = new ContextMenu();
-			menu.hideBuiltInItems();
-			var _item:ContextMenuItem = new ContextMenuItem("123", true, false);
-			menu.customItems.push(_item);
-			this.contextMenu = menu;*/
 	final public class Common {
-		public static function addContextMenu():void {
-			var _menu:ContextMenu = new ContextMenu();
-			_menu.hideBuiltInItems();
-			
+		public static function addContextMenu(
+			obj:InteractiveObject,
+			caption:String,
+			onSelect:Function=null
+		):void {
+			var menu:ContextMenu=obj.contextMenu;
+			if(!menu){
+				//trace("新建menu");
+				menu=new ContextMenu();
+				menu.hideBuiltInItems();
+			}
+			var item:ContextMenuItem=new ContextMenuItem(caption);
+			if(onSelect!=null){
+				item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,onSelect);
+			}
+			menu.customItems.push(item);
+			obj.contextMenu=menu;
 		}
 		//_eachFun(_instanceCopy, _i, _instanceCopy != _instance, _length);
 		public static function copyInstanceToArray(_instance:*, _length:uint, _ary:Array, _eachFun:Function):Array {
