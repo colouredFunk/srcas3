@@ -1,14 +1,12 @@
 ﻿package ui_2{
+	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.text.StyleSheet;
 	public class BtnLabel extends ui_2.Btn {
 		protected var __label:String;
 		public var txt:*;
 		public var bar:*;
-		override protected function added(_evt:Event):void {
-			mouseChildren=false;
-			super.added(_evt);
-		}
+		public var endClip:*;
 		public function get barWidth():uint {
 			return __widthMax?__widthMax:(txt.width + __widthAdd);
 		}
@@ -70,20 +68,27 @@
 			setStyleBar();
 		}
 		protected function setStyleBar():void {
-			if (! bar||! txt) {
+			if (!txt ) {
 				return;
 			}
-			bar.width=__widthMax?__widthMax:(txt.width+__widthAdd);
-			bar.height=__heightMax?__heightMax:(txt.height+__heightAdd);
-			if (txt.autoSize=="right") {
-				bar.x = int( - bar.width + __widthAdd * 0.5);
-			} else if (txt.autoSize=="center") {
-				bar.x=- int(bar.width*0.5);
-			} else {
-				bar.x=- int(__widthAdd*0.5);
+			if (bar) {
+				bar.width=__widthMax?__widthMax:(txt.width+__widthAdd);
+				bar.height=__heightMax?__heightMax:(txt.height+__heightAdd);
+				if (txt.autoSize=="right") {
+					bar.x = int( - bar.width + __widthAdd * 0.5);
+				} else if (txt.autoSize=="center") {
+					bar.x=- int(bar.width*0.5);
+				} else {
+					bar.x=- int(__widthAdd*0.5);
+				}
+				bar.x+=__xOff;
+				bar.y=__yOff;
 			}
-			bar.x+=__xOff;
-			bar.y=__yOff;
+			if (endClip) {
+				endClip.x = txt.txt.x + txt.width;
+				endClip.mouseEnabled = false;
+				endClip.mouseChildren = false;
+			}
 		}
 	}
 }

@@ -37,13 +37,13 @@
 				return;
 			}
 			isInit = true;
-			__widthOrg=stage.stageWidth;
-			__heightOrg=stage.stageHeight;
-			__flashVars=stage.loaderInfo.parameters;
+			__flashVars=loaderInfo.parameters;
+			__widthOrg = loaderInfo.width;
+			__heightOrg = loaderInfo.height;
 			Security.allowDomain("*");
 			Security.allowInsecureDomain("*");
-			stage.align=StageAlign.TOP;
-			stage.scaleMode=StageScaleMode.NO_SCALE;
+			stage.align=StageAlign.TOP_LEFT;
+			stage.scaleMode = StageScaleMode.SHOW_ALL;
 			stage.showDefaultContextMenu=false;
 			//loaderInfo.addEventListener(ProgressEvent.PROGRESS,onLoadingHandle);
 			//loaderInfo.addEventListener(Event.COMPLETE,onLoadedHandle);
@@ -64,7 +64,8 @@
 		protected var loaded:Number = 0;
 		protected function onLoadingHandle(_evt:*):void{
 			gotoAndStop(1);
-			loadingProgress(loaderInfo.bytesLoaded / loaderInfo.bytesTotal);
+			var _loaded:Number = loaderInfo.bytesLoaded / loaderInfo.bytesTotal;
+			loadingProgress(_loaded);
 			if (onLoading != null) {
 				onLoading(loaded);
 			}

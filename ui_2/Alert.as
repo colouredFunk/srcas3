@@ -19,6 +19,7 @@
 		private var dy_show:int;
 		private var dy_showyn:int;
 		private var dy_yn:int;
+		private var dy_x:int;
 		
 		public var txt_title:*;
 		public var txt_show:*;
@@ -48,6 +49,9 @@
 					remove();
 				}
 			};
+			if (btn_x) {
+				btn_x.release = btn_n.release;
+			}
 			mouseEnabled = false;
 			txt_show.mouseEnabled = TxtMouseEnabled;
 			txt_show.mouseChildren = TxtMouseEnabled;
@@ -185,7 +189,10 @@
 			if (item) {
 				item.y = txt_show.y + txt_show.height + dy_item;
 			}
-			btn_n.y = btn_y.y = bar.y + bar.height - dy_yn;
+			btn_n.y = btn_y.y = bar.y + barHeight - dy_yn;
+			if (btn_x) {
+				btn_x.y = dy_x - barHeight * 0.5;
+			}
 			adjustXY();
 		}
 		protected function getStyleParams():void {
@@ -193,6 +200,7 @@
 			dx_show = int(txt_show.x - bar.x);
 			dy_show = int(txt_show.y - bar.y);
 			dy_yn = int(bar.y + bar.height - btn_y.y);
+			dy_x = int(btn_x.y - bar.y);
 			dy_showyn = int(btn_y.y - txt_show.y - txt_show.height);
 			if (!txt_show.widthMax) {
 				txt_show.widthMax = barWidth - dx_show * 2;
