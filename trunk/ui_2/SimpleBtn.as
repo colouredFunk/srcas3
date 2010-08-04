@@ -2,6 +2,7 @@
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.display.Sprite;
 	public class SimpleBtn extends MovieClip {
 		private static var btnDown:MovieClip;
 		private static var btnIn:MovieClip;
@@ -17,6 +18,14 @@
 			stop();
 			addEventListener(Event.ADDED_TO_STAGE,added);
 		}
+		override public function get hitArea():Sprite { return super.hitArea; }
+		
+		override public function set hitArea(value:Sprite):void 
+		{
+			super.hitArea = value;
+			area = value;
+			mouseEnabled = true;
+		}
 		protected function added(_evt:Event):void {
 			removeEventListener(Event.ADDED_TO_STAGE,added);
 			addEventListener(Event.REMOVED_FROM_STAGE,removed);
@@ -24,7 +33,8 @@
 			if(area){
 				hitArea=area;
 				area.visible = false;
-				mouseChildren = false;
+			}else {
+				mouseEnabled = false;
 			}
 		}
 		protected function removed(_evt:Event):void {
