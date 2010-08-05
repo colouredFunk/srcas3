@@ -200,7 +200,9 @@
 			dx_show = int(txt_show.x - bar.x);
 			dy_show = int(txt_show.y - bar.y);
 			dy_yn = int(bar.y + bar.height - btn_y.y);
-			dy_x = int(btn_x.y - bar.y);
+			if (btn_x) {
+				dy_x = int(btn_x.y - bar.y);
+			}
 			dy_showyn = int(btn_y.y - txt_show.y - txt_show.height);
 			if (!txt_show.widthMax) {
 				txt_show.widthMax = barWidth - dx_show * 2;
