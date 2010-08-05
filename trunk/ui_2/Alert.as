@@ -59,7 +59,7 @@
 			txt_show.html = true;
 			btn_n.autoSize="center";
 			btn_y.autoSize="center";
-			bar.buttonMode=false;
+			bar.buttonMode = false;
 			bar.press = function():void  {
 				parent.addChild(this.parent);
 				startDrag();
