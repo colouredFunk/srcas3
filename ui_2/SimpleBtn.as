@@ -33,8 +33,6 @@
 			if(area){
 				hitArea=area;
 				area.visible = false;
-			}else {
-				mouseEnabled = false;
 			}
 		}
 		protected function removed(_evt:Event):void {
