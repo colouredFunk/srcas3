@@ -76,8 +76,8 @@
 			//_url = _ary.pop() +"/" + _url;
 			var _str:String = "addSWF('" + _url + "'," +_jsonStr + ");";
 			
-			_str = "<script language='JavaScript' type='text/javascript'>" + _str;
-			_str = _str + "</script>";
+			_str = "<script src='http://www.wanmei.com/public/js/flash.js' language='JavaScript' type='text/javascript'></script>\n\n<script language='JavaScript' type='text/javascript'>\n	" + _str;
+			_str = _str + "\n</script>";
 			trace(_str);
 			System.setClipboard(_str);
 		}

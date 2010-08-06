@@ -8,7 +8,7 @@
 		public var masked:DisplayObject;
 		public function ProgressBar():void {
 			if (length==0) {
-				length=bar.width;
+				length = bar.width;
 			}
 			value = 0;
 			if (masked) {

@@ -26,6 +26,12 @@ package ui_2
 				onIDChange(__id);
 			}
 		}
+		public function setID(_id:int):void {
+			__id = _id;
+			if (onIDChange!=null) {
+				onIDChange(__id);
+			}
+		}
 		private var __length:uint;
 		public function get length():uint{
 			return __length;
