@@ -78,6 +78,9 @@
 			}
 		}
 		private var __groupName:String;
+		public function get group():String {
+			return __groupName;
+		}
 		public function set group(_groupName:String):void {
 			if (__groupName) {
 				RadioAndCheck.removeFromGroup(__groupName, this);
