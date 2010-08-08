@@ -39,7 +39,7 @@
 			addEventListener(Event.REMOVED_FROM_STAGE, removed);
 			visible = false;
 			alpha = 0;
-			if (btn_0.icon) {
+			if (btn_0&&btn_0.icon) {
 				iconWidth = btn_0.icon.width;
 				iconHeight = btn_0.icon.height;
 			}
@@ -253,11 +253,15 @@
 				case PicPlayer.TWEENED:
 					mouseChildren = true;
 					mouseEnabled = true;
+					picPlayer.mouseChildren = true;
+					picPlayer.mouseEnabled = true;
 					break;
 				case PicPlayer.LOAD:
 				case PicPlayer.RELOAD:
 					mouseChildren = false;
 					mouseEnabled = false;
+					picPlayer.mouseChildren = false;
+					picPlayer.mouseEnabled = false;
 					if (btn_select) {
 						btn_select.select = false;
 					}
