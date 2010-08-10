@@ -43,7 +43,7 @@
 			if(playState==SOUND_STOP){
 				return 0;
 			}
-			return soundChannel.position/sound.length;
+			return soundChannel.position * loaded / (sound.length*sound.bytesTotal);
 		}
 		public function get totalTime():uint {
 			if (!sound) {
