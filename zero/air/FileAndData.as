@@ -1,4 +1,4 @@
-package zero._air{
+package zero.air{
 	import flash.filesystem.*;
 	import flash.utils.*;
 	public class FileAndData{
@@ -16,18 +16,10 @@ package zero._air{
 			fs.close();
 		}
 		public static function readDataFromURL(url:String):ByteArray{
-			var file:File=new File(url);
-			var data:ByteArray=new ByteArray();
-			fs.open(file,FileMode.READ);
-			fs.readBytes(data);
-			fs.close();
-			return data;
+			return readDataFromFile(new File(url));
 		}
 		public static function writeDataToURL(data:ByteArray,url:String):void{
-			var file:File=new File(url);
-			fs.open(file,FileMode.WRITE);
-			fs.writeBytes(data);
-			fs.close();
+			writeDataToFile(data,new File(url));
 		}
 	}
 }

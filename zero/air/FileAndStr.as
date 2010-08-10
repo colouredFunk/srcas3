@@ -1,4 +1,4 @@
-package zero._air{
+package zero.air{
 	import flash.filesystem.*;
 	import flash.utils.*;
 	public class FileAndStr{
@@ -20,21 +20,10 @@ package zero._air{
 			fs.close();
 		}
 		public static function readStrFromURL(url:String,charSet:String="utf-8"):String{
-			var file:File=new File(url);
-			//utf-8,unicode,gb2312
-			fs.open(file,FileMode.READ);
-			//var str:String=fs.readUTFBytes(fs.bytesAvailable);
-			var str:String=fs.readMultiByte(fs.bytesAvailable,charSet);
-			fs.close();
-			return str;
+			return readStrFromFile(new File(url),charSet);
 		}
 		public static function writeStrToURL(str:String,url:String,charSet:String="utf-8"):void{
-			var file:File=new File(url);
-			//utf-8,unicode,gb2312
-			fs.open(file,FileMode.WRITE);
-			fs.writeMultiByte(str,charSet);
-			//fs.writeUTFBytes(str);
-			fs.close();
+			writeStrToFile(str,new File(url),charSet);
 		}
 	}
 }
