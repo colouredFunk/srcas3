@@ -43,11 +43,11 @@
 			if(playState==SOUND_STOP){
 				return 0;
 			}
-			return soundChannel.position * loaded / (sound.length*sound.bytesTotal);
+			return soundChannel.position * loaded / sound.length;
 		}
 		public function get totalTime():uint {
 			if (!sound) {
-				return Infinity;
+				return Infinity;   
 			}
 			return sound.length / loaded;
 		}
@@ -87,7 +87,10 @@
 			sound.addEventListener(Event.ID3, onID3Loaded);
 			sound.addEventListener(ProgressEvent.PROGRESS,progress);
 			sound.addEventListener(Event.COMPLETE,$complete);
-			sound.load(new URLRequest(musicList.list[playId].@src.toString()), new LoaderContext(true));
+			sound.load(
+				new URLRequest(musicList.list[playId].@src.toString()),
+				new SoundLoaderContext()
+			);
 			
 			dispatchEvent(new Event(SOUND_IDCHANGE));
 		}
