@@ -14,10 +14,10 @@ package zero.swf{
 	import flash.utils.*;
 
 	public class SWFDataAndData{
-		public static var type:String="CWS";
-		public static var Version:int=int(Capabilities.version.match(/\d+,/)[0].replace(",",""));//例如 WIN 10,0,22,91 抽出 10
-		public static var FileLength:int;
-		public static function swfData2Data(swfData:ByteArray):ByteArray{
+		public var type:String="CWS";
+		public var Version:int=int(Capabilities.version.match(/\d+,/)[0].replace(",",""));//例如 WIN 10,0,22,91 抽出 10
+		public var FileLength:int;
+		public function swfData2Data(swfData:ByteArray):ByteArray{
 			//输入一个有效的SWF文件数据，返回SWF文件第8字节后面的数据(如果是压缩影片则解压)
 			if(swfData.length>8){
 				swfData.position=0;
@@ -48,13 +48,12 @@ package zero.swf{
 				if(FileLength!=(swfData[4]|(swfData[5]<<8)|(swfData[6]<<16)|(swfData[7]<<24))){
 					trace("文件长度不符");
 				}
-				
 				return data;
 			}
 			throw new Error("不是有效的SWF文件");
 			return null;
 		}
-		public static function data2SWFData(data:ByteArray):ByteArray{
+		public function data2SWFData(data:ByteArray):ByteArray{
 			//输入SWF文件第8字节后面的数据(如果是压缩影片则压缩)，返回一个有效的SWF文件数据
 			
 			FileLength=data.length+8;
