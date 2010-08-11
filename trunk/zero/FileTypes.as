@@ -14,17 +14,17 @@ package zero{
 	
 	public class FileTypes{
 		//public static const UNKNOWN:String="unknown";
-		public static const JPG:String=".jpg";
-		public static const PNG:String=".png";
-		public static const GIF:String=".gif";
-		public static const BMP:String=".bmp";
-		public static const SWF:String=".swf";
-		public static const MP3:String=".mp3";
-		public static const FLV:String=".flv";
-		public static const WAV:String=".wav";
-		public static const MID:String=".mid";
-		public static const RAR:String=".rar";
-		public static const EXE:String=".exe";
+		public static const JPG:String="jpg";
+		public static const PNG:String="png";
+		public static const GIF:String="gif";
+		public static const BMP:String="bmp";
+		public static const SWF:String="swf";
+		public static const MP3:String="mp3";
+		public static const FLV:String="flv";
+		public static const WAV:String="wav";
+		public static const MID:String="mid";
+		public static const RAR:String="rar";
+		public static const EXE:String="exe";
 		
 		public static const typeMark:Object={
 			_255216:JPG,
@@ -50,8 +50,8 @@ package zero{
 			
 			trace("无法仅通过分析 fileData 获取文件类型");
 			if(fileName){
-				var dotId:int=fileName.indexOf(".");
-				if(dotId>=0){
+				var dotId:int=fileName.indexOf(".")+1;
+				if(dotId>0){
 					trace("获取文件后缀作为文件类型");
 					return fileName.substr(dotId).toLowerCase();
 				}
