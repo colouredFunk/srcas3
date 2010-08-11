@@ -8,14 +8,19 @@ Tag 版本:v1.0
 */
 
 package zero.swf{
+	import _swf._tag._body.BodyData;
+	
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
+
 	public class Tag{
 		public var headOffset:int;
 		public var bodyOffset:int;
 		public var bodyLength:int;
 		public var type:int;
+		
+		public var ownData:ByteArray;
 		
 		public function Tag(){
 		}
@@ -30,7 +35,30 @@ package zero.swf{
 			}
 			bodyOffset=offset;
 		}
-		public static function toData_typeAndBodyData(type:int,bodyData:ByteArray):ByteArray{
+		
+		public function updateData(_ownData:ByteArray):void{
+			ownData=_ownData;
+			initByData(ownData,0);
+		}
+		public function updateByBodyData(bodyData:BodyData):void{
+			var typeName:String=getQualifiedClassName(bodyData).replace("_swf._tag._body::","");
+			if(typeName&&TagType.typeNameArr[TagType[typeName]]===typeName){
+				updateData(getTagDataByTypeAndBodyData(TagType[typeName],bodyData.toDataNow()));
+			}else{
+				throw new Error("未知 typeName: "+typeName);
+			}
+		}
+		
+		public function getNewDataByData(data:ByteArray,newData:ByteArray):void{
+			if(ownData){
+				newData.writeBytes(ownData,headOffset,bodyOffset-headOffset+bodyLength);
+			}else{
+				newData.writeBytes(data,headOffset,bodyOffset-headOffset+bodyLength);
+			}
+		}
+		
+		//
+		public static function getTagDataByTypeAndBodyData(type:int,bodyData:ByteArray):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=type<<6;
 			data[1]=type>>>2;

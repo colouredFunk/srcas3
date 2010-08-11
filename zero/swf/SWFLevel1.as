@@ -15,31 +15,113 @@ package zero.swf{
 	import flash.utils.*;
 	
 	public class SWFLevel1 extends SWFLevel0{
-		public var fileAttributes:FileAttributes;
-		public var setBackgroundColor:SetBackgroundColor;
+		private var fileAttributes:FileAttributes;
+		private var setBackgroundColor:SetBackgroundColor;
+		
+		private var setBackgroundColorTag:Tag;
+		private var fileAttributesTag:Tag;
+		private var metadataTag:Tag;
+		
 		public function SWFLevel1(){
+			fileAttributes=new FileAttributes();
+			setBackgroundColor=new SetBackgroundColor();
+			isAS3=true;//默认AS3
+			bgColor=0xffffff;//默认白色
 		}
+		
+		//
+		public function get isAS3():Boolean{
+			return fileAttributes.ActionScript3==1;
+		}
+		public function set isAS3(_isAS3:Boolean):void{
+			fileAttributes.ActionScript3=(_isAS3?1:0);
+		}
+		public function get UseNetwork():Boolean{
+			return fileAttributes.UseNetwork==1;
+		}
+		public function set UseNetwork(_UseNetwork:Boolean):void{
+			fileAttributes.UseNetwork=(_UseNetwork?1:0);
+		}
+		public function get HasMetadata():Boolean{
+			return fileAttributes.UseNetwork==1;
+		}
+		public function set HasMetadata(_HasMetadata:Boolean):void{
+			fileAttributes.HasMetadata=(_HasMetadata?1:0);
+		}
+		
+		//
+		public function get bgColor():int{
+			return setBackgroundColor.BackgroundColor;
+		}
+		public function set bgColor(_bgColor:int):void{
+			setBackgroundColor.BackgroundColor=_bgColor;
+		}
+		
 		override public function initByData(data:ByteArray):void{
 			super.initByData(data);
+			isAS3=false;
 			dataAndTags.forEachTag(getInfosByTag);
 		}
-		private function getInfosByTag(data:ByteArray,tag:Tag,tagId:int):void{
+		private function getInfosByTag(data:ByteArray,tag:Tag,tagV:Vector.<Tag>,tagId:int):void{
 			switch(tag.type){
-				case TagType.FileAttributes:
-					fileAttributes=new FileAttributes();
-					fileAttributes.initByDataNow(data,tag.bodyOffset);
-					//trace(fileAttributes.toXMLListStringNow("fileAttributes"));
-				break;
 				case TagType.SetBackgroundColor:
-					setBackgroundColor=new SetBackgroundColor();
 					setBackgroundColor.initByDataNow(data,tag.bodyOffset);
-					//trace(setBackgroundColor.toXMLListStringNow("setBackgroundColor"));
+				break;
+				case TagType.FileAttributes:
+					fileAttributes.initByDataNow(data,tag.bodyOffset);
 				break;
 			}
 		}
-		//public function _82272():void{
-		//	
-		//}
+		override public function toData():ByteArray{
+			setBackgroundColorTag=null;
+			fileAttributesTag=null;
+			metadataTag=null;
+			
+			dataAndTags.forEachTag(updateInfoTag);
+			
+			if(!setBackgroundColorTag){
+				setBackgroundColorTag=new Tag();
+			}
+			if(!fileAttributesTag){
+				fileAttributesTag=new Tag();
+			}
+			setBackgroundColorTag.updateByBodyData(setBackgroundColor);
+			dataAndTags.tagV.unshift(setBackgroundColorTag);
+			if(HasMetadata){
+				if(metadataTag){
+					//metadataTag.updateByBodyData(metadata);
+					dataAndTags.tagV.unshift(metadataTag);
+				}else{
+					HasMetadata=false;
+				}
+			}
+			if(isAS3){
+				if(Version<9){
+					throw new Error("Version="+Version+", 不支持AS3");
+					//Version=9;
+				}
+			}
+			fileAttributesTag.updateByBodyData(fileAttributes);
+			dataAndTags.tagV.unshift(fileAttributesTag);
+			
+			return super.toData();
+		}
+		private function updateInfoTag(data:ByteArray,tag:Tag,tagV:Vector.<Tag>,tagId:int):void{
+			switch(tag.type){
+				case TagType.SetBackgroundColor:
+					setBackgroundColorTag=tag;
+					tagV.splice(tagId,1);
+				break;
+				case TagType.FileAttributes:
+					fileAttributesTag=tag;
+					tagV.splice(tagId,1);
+				break;
+				case TagType.Metadata:
+					metadataTag=tag;
+					tagV.splice(tagId,1);
+				break;
+			}
+		}
 	}
 }
 
