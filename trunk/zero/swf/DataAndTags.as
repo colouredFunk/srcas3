@@ -10,9 +10,38 @@ DataAndTags 版本:v1.0
 package zero.swf{
 	import flash.utils.*;
 	public class DataAndTags{
+		private static function getDefaultData():ByteArray{
+			var defaultData:ByteArray=new ByteArray();
+			defaultData[0]=0x01;
+			defaultData[1]=0x00;
+			
+			//defaultData[2]=0x40;
+			//defaultData[3]=0x00;
+			//defaultData[4]=0x00;
+			//defaultData[5]=0x00;
+			
+			defaultData[2]=0x44;
+			defaultData[3]=0x11;
+			defaultData[4]=0x08;
+			defaultData[5]=0x00;
+			defaultData[6]=0x00;
+			defaultData[7]=0x00;
+			defaultData[8]=0x40;
+			defaultData[9]=0x00;
+			defaultData[10]=0x00;
+			defaultData[11]=0x00;
+			
+			return defaultData;
+		}
+		
 		public var data:ByteArray;
 		public var FrameCount:int;
 		public var tagV:Vector.<Tag>;
+		
+		public function DataAndTags(){
+			var defaultData:ByteArray=getDefaultData();
+			initByData(defaultData,0,defaultData.length);
+		}
 		
 		public function initByData(_data:ByteArray,offset:int,endOffset:int):void{
 			data=_data;
@@ -21,30 +50,45 @@ package zero.swf{
 			tagV=new Vector.<Tag>();
 			var tag:Tag;
 			var tagId:int=-1;
+			var realFrameCount:int=0;
 			while(offset<endOffset){
 				tagV[++tagId]=tag=new Tag();
 				tag.initByData(data,offset);
 				offset=tag.bodyOffset+tag.bodyLength;
 				//trace(TagType.typeArr[tag.type]);
+				if(tag.type==TagType.ShowFrame){
+					realFrameCount++;
+				}
 			}
+			if(FrameCount!=realFrameCount){
+				trace("FrameCount="+FrameCount+",realFrameCount="+realFrameCount);
+			}
+			
 			//trace("---------------------------------------");
 		}
 		public function getData(newData:ByteArray,offset:int):void{
 			//trace("FrameCount="+FrameCount);
-			newData[offset++]=FrameCount;
-			newData[offset++]=FrameCount>>8;
-			newData.position=offset;
+			var frameCountOffset:int=offset;
+			newData.position=offset+2;
+			var realFrameCount:int=0;
 			for each(var tag:Tag in tagV){
 				//trace(TagType.typeArr[tag.type]);
-				newData.writeBytes(data,tag.headOffset,tag.bodyOffset-tag.headOffset+tag.bodyLength);
+				tag.getNewDataByData(data,newData);
+				if(tag.type==TagType.ShowFrame){
+					realFrameCount++;
+				}
 			}
+			FrameCount=realFrameCount;
+			newData[frameCountOffset]=FrameCount;
+			newData[frameCountOffset+1]=FrameCount>>8;
+			
 			//trace("---------------------------------------");
 		}
 		
 		public function forEachTag(fun:Function):void{
-			var tagId:int=-1;
-			for each(var tag:Tag in tagV){
-				fun(data,tag,++tagId);
+			var tagId:int=tagV.length;
+			while(--tagId>=0){
+				fun(data,tagV[tagId],tagV,tagId);
 			}
 		}
 	}

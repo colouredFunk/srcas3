@@ -18,17 +18,50 @@ package zero.swf{
 		public var dataAndTags:DataAndTags;
 		
 		public function SWFLevel0(){
-		}
-		public function initBySWFData(swfData:ByteArray):void{
-			import zero.*;
 			swfDataAndData=new SWFDataAndData();
+			dataAndBaseInfo=new DataAndBaseInfo();
+			dataAndTags=new DataAndTags();
+		}
+		//
+		public function get type():String{
+			return swfDataAndData.type;
+		}
+		public function set type(_type:String):void{
+			swfDataAndData.type=_type;
+		}
+		public function get Version():int{
+			return swfDataAndData.Version;
+		}
+		public function set Version(_Version:int):void{
+			swfDataAndData.Version=_Version;
+		}
+		
+		//
+		public function get wid():int{
+			return dataAndBaseInfo.wid;
+		}
+		public function set wid(_wid:int):void{
+			dataAndBaseInfo.wid=_wid;
+		}
+		public function get hei():int{
+			return dataAndBaseInfo.hei;
+		}
+		public function set hei(_hei:int):void{
+			dataAndBaseInfo.hei=_hei;
+		}
+		public function get FrameRate():Number{
+			return dataAndBaseInfo.FrameRate;
+		}
+		public function set FrameRate(_FrameRate:Number):void{
+			dataAndBaseInfo.FrameRate=_FrameRate;
+		}
+		
+		//
+		public function initBySWFData(swfData:ByteArray):void{
 			initByData(swfDataAndData.swfData2Data(swfData));
 		}
 		public function initByData(data:ByteArray):void{
-			dataAndBaseInfo=new DataAndBaseInfo();
 			dataAndBaseInfo.initByData(data);
-			
-			dataAndTags=new DataAndTags();
 			dataAndTags.initByData(data,dataAndBaseInfo.offset,data.length);
 		}
 		public function toSWFData():ByteArray{

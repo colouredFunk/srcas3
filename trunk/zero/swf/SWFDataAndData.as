@@ -14,9 +14,16 @@ package zero.swf{
 	import flash.utils.*;
 
 	public class SWFDataAndData{
-		public var type:String="CWS";
-		public var Version:int=int(Capabilities.version.match(/\d+,/)[0].replace(",",""));//例如 WIN 10,0,22,91 抽出 10
+		public static const playerVersion:int=int(Capabilities.version.match(/\d+,/)[0].replace(",",""));//例如 WIN 10,0,22,91 抽出 10;
+		public var type:String;
+		public var Version:int=playerVersion;
 		public var FileLength:int;
+		
+		public function SWFDataAndData(){
+			type="CWS";
+			Version=playerVersion;
+		}
+		
 		public function swfData2Data(swfData:ByteArray):ByteArray{
 			//输入一个有效的SWF文件数据，返回SWF文件第8字节后面的数据(如果是压缩影片则解压)
 			if(swfData.length>8){

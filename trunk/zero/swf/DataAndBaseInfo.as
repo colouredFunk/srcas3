@@ -18,6 +18,12 @@ package zero.swf{
 		public var FrameRate:Number;
 		public var offset:int;
 		//public static var FrameCount:int;
+		public function DataAndBaseInfo(){
+			//wid=1;
+			//hei=1;
+			FrameRate=1;
+		}
+		
 		public function initByData(data:ByteArray):void{
 			//获取SWF的宽高帧频帧数
 			
