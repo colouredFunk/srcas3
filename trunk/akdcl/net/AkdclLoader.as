@@ -32,10 +32,6 @@
 			urlLoader.addEventListener(IOErrorEvent.IO_ERROR,onURLErrorHandler);
 			urlLoader.load(request);
 		}
-		public function getURL(_url:String, _target:String = "_self", _data:Object = null):void {
-			retuestURL(_url,_data);
-			navigateToURL(request,_target);
-		}
 		public function get data():*{
 			return __data;
 		}

@@ -166,7 +166,7 @@ package ui_2.transformTool
 			toolContainer.addChild(shapeBounds);
 			toolContainer.addChild(shapeArrow);
 			toolContainer.stage.addEventListener( MouseEvent.MOUSE_MOVE, EventHadler);
-			toolContainer.stage.addEventListener( MouseEvent.MOUSE_DOWN, EventHadler);
+			toolContainer.addEventListener( MouseEvent.MOUSE_DOWN, EventHadler);
 			toolContainer.stage.addEventListener( MouseEvent.MOUSE_UP, EventHadler);
 		}
 		public function Clear():void
@@ -178,16 +178,20 @@ package ui_2.transformTool
 			toolContainer.removeChild(shapeBounds);
 			
 			toolContainer.stage.removeEventListener( MouseEvent.MOUSE_MOVE, EventHadler);
-			toolContainer.stage.removeEventListener( MouseEvent.MOUSE_DOWN, EventHadler);
+			toolContainer.removeEventListener( MouseEvent.MOUSE_DOWN, EventHadler);
 			toolContainer.stage.removeEventListener( MouseEvent.MOUSE_UP, EventHadler);
 		}	
-		public function AddControl(_disObject:DisplayObject):void
+		public function AddControl(_disObject:DisplayObject,_isCenterMid:Boolean=true):void
 		{
 			var _objInfo:Object = findObjectInfo(_disObject);
 			if (_objInfo) {
 				return;
 			}
-			var _internalPoint:Point = new Point(_disObject.width * 0.5 / _disObject.scaleX, _disObject.height * 0.5 / _disObject.scaleY);
+			var _internalPoint:Point = new Point(0, 0);
+			if (_isCenterMid) {
+				_internalPoint.x = _disObject.width * 0.5 / _disObject.scaleX;
+				_internalPoint.y = _disObject.height * 0.5 / _disObject.scaleY;
+			}
 			var _externalPoint:Point = (_disObject.parent).globalToLocal(_disObject.localToGlobal(_internalPoint));
 			var _matrixObj:Object = matrixClass.GetMatrix(_disObject, _internalPoint);
 			
@@ -407,6 +411,7 @@ package ui_2.transformTool
 				var _objInfo:Object = findObjectInfo(_disObject);
 				if (!_objInfo) {
 					AddControl(_disObject);
+					_objInfo = findObjectInfo(_disObject);
 				}
 				if (__selectedItem) {
 					findObjectInfo(__selectedItem).state = stateClass.normal;
@@ -510,31 +515,44 @@ package ui_2.transformTool
 					}
 					break;
 				case "mouseMove":
-					_objInfo = findObjectInfo(_disObject);
-					GraphicsClear();
-					if (_objInfo && _disObject != selectedItem) {
-						DrawSelectGraphics(_objInfo.matrix);
+					/*var _parent:*=event.target;
+					while(_parent){
+						if(_parent==this){
+							return true;
+						}
+						_parent=_parent.parent;
 					}
+					return false;
+					trace(_evt.target+"_____"+_evt.currentTarget);*/
+					if (!_isInRectArea) {
+						ArrowClear();
+						return;
+					}
+					var passRoll:Boolean;
 					_objInfo = findObjectInfo(selectedItem);
 					if (_objInfo) {
 						var _stateClass:String;
-						_disObject = selectedItem;
 						_matrix = _objInfo.matrix;
 						_stateClass = _objInfo.state;
 						_areaNum = GetAreaNum(_objInfo);
 						if (_stateClass == stateClass.change) {
+							passRoll = true;
 							GraphicsClear();
 							_areaNum  = _objInfo.areanum;
 							ArrowMove();
 							SetChange(_objInfo, _areaNum);
-							_matrix = matrixClass.GetMatrix(_disObject, _objInfo.internalPoint);
+							_matrix = matrixClass.GetMatrix(selectedItem, _objInfo.internalPoint);
+							GraphicsDraw(_matrix);
 						}else if (_stateClass == stateClass.drag) {
+							passRoll = true;
 							GraphicsClear();
 							SetMove(_objInfo);
 							ArrowShow(shapeArrow.Bmp_move);
 							ArrowMove();
-							_matrix    = matrixClass.GetMatrix(_disObject,_objInfo.internalPoint);
+							_matrix    = matrixClass.GetMatrix(selectedItem,_objInfo.internalPoint);
+							GraphicsDraw(_matrix);
 						}else if (_areaNum != -1) {
+							passRoll = true;
 							GraphicsClear();
 							_objInfo.areanum = _areaNum;
 							_objInfo.state = stateClass.area;
@@ -544,12 +562,23 @@ package ui_2.transformTool
 								ArrowShow($_tmp_bmp,$_isOrigin);
 								ArrowMove();
 							}
+							GraphicsDraw(_matrix);
 						}else {
 							_objInfo.state = stateClass.select;
 							//GraphicsClear();
 							ArrowClear();
 						}
-						GraphicsDraw(_matrix);
+					}
+					if (passRoll) {
+						return;
+					}
+					_objInfo = findObjectInfo(_disObject);
+					if (_objInfo && _disObject != selectedItem) {
+						GraphicsClear();
+						DrawSelectGraphics(_objInfo.matrix);
+						if (selectedItem) {
+							GraphicsDraw(_matrix);
+						}
 					}
 					break;
 			}
@@ -1109,7 +1138,7 @@ package ui_2.transformTool
 			shapeArrow.Show($bmp,$isOrigin);
 			Mouse.hide();
 		}
-		private function ArrowClear():void
+		public function ArrowClear():void
 		{
 			shapeArrow.Clear();
 			Mouse.show();
@@ -1137,7 +1166,7 @@ package ui_2.transformTool
 		}
 		//----------------------------------------------------------------------
 		
-		private function GraphicsClear():void
+		public function GraphicsClear():void
 		{
 			shapeBounds.Clear();
 		}

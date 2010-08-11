@@ -30,9 +30,6 @@
 			instance = this;
 			loaderInfo.addEventListener(Event.INIT, onInitHandle);
 		}
-		protected function init():void {
-			
-		}
 		protected function onInitHandle(_evt:Event):void {
 			Security.allowDomain("*");
 			Security.allowInsecureDomain("*");
