@@ -11,13 +11,14 @@ package zero.swf{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
+	import zero.gettersetter.BGetterAndSetter;
 	public class DataAndBaseInfo{
 		public var wid:int;
 		public var hei:int;
 		public var FrameRate:Number;
 		public var offset:int;
 		//public static var FrameCount:int;
-		public function data2BaseInfo(data:ByteArray):void{
+		public function initByData(data:ByteArray):void{
 			//获取SWF的宽高帧频帧数
 			
 			//舞台宽高在SWF里是以一个RECT(见 SWF File Format Specification Version 10 第20页 Rectangle record)的结构保存
@@ -38,7 +39,7 @@ package zero.swf{
 			FrameRate=data[offset++]/256+data[offset++];//帧频是一个Number, 在SWF里以 FIXED8(16-bit 8.8 fixed-point number, 16位8.8定点数) 的结构保存
 			//trace("FrameRate="+FrameRate);
 		}
-		public function baseInfo2Data(data:ByteArray):void{
+		public function getData(data:ByteArray):void{
 			BGetterAndSetter.startSet(data,0);
 			var Xmax:int=wid*20;
 			var Ymax:int=hei*20;

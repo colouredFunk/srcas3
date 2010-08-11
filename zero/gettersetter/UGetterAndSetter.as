@@ -1,25 +1,38 @@
-﻿/***
-DataAndTagV 版本:v1.0
+/***
+UGetterAndSetter 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年1月13日 14:42:31
+创建时间:2010年6月13日 13:51:06
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.swf{
-	import flash.utils.*;
-	public class DataAndTagV{
-		public var FrameCount:int;
-		//public var tagV:Vector.<Tag>;
-		
-		public function data2TagV(data:ByteArray,offset:int):void{
-			FrameCount=data[offset++]|(data[offset++]<<8);//帧数是一个int, 在SWF里以 UI16(Unsigned 16-bit integer value, 16位无符号整数) 的结构保存
-			trace("FrameCount="+FrameCount);
+package zero.gettersetter{
+	import flash.utils.ByteArray;
+	public class UGetterAndSetter{
+		public static var offset:int;
+		public static function getU(data:ByteArray,_offset:int):uint{
+			var u:uint=0;
+			var step:int=0;
+			do{
+				var value:int=data[_offset++];
+				u|=((value&0x7f)<<step);// value & 0111 1111
+				step+=7;
+			}while(value>>>7);
+			offset=_offset;
+			return u;
 		}
-		public function tagV2Data(data:ByteArray,offset:int):void{
-			data[offset++]=FrameCount;
-			data[offset++]=FrameCount>>8;
+		public static function setU(value:uint,newData:ByteArray):void{
+			while(true){
+				var byteValue:int=value&0x7f;
+				value>>>=7;
+				if(value){
+					newData[newData.length]=0x80|byteValue;
+				}else{
+					newData[newData.length]=byteValue;
+					break;
+				}
+			}
 		}
 	}
 }
