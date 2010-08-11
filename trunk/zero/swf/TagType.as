@@ -196,7 +196,7 @@ package zero.swf{
 		//
 		//
 		//
-		public static const typeArr:Array=[
+		public static const typeNameArr:Array=[
 			"End",
 			"ShowFrame",
 			"DefineShape",

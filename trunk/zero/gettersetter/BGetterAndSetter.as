@@ -7,7 +7,7 @@ BGetterAndSetter 版本:v1.0
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.swf{
+package zero.gettersetter{
 	import flash.utils.*;
 	public class BGetterAndSetter{
 		//UB,SB,FB专用
