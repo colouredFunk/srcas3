@@ -83,12 +83,12 @@
 		-ClearRecorde():void //删除操作记录
 
 	公共属性:
-		-area:Rectangle  //TansformTool作用区域（默认为舞台区域)(读写）
-		-selectedItem:DisplayObject  //当前选择的显示对象(读写）
+		-area:Rectangle  //TansformTool作用区域（默认为舞台区域)(读写)
+		-selectedItem:DisplayObject  //当前选择的显示对象(读写)
 
 	用法示例 usage：
 	var _transform:TransformTool = new TransformTool(root as DisplayObjectContainer);
-	_transform.AddControl( mc );
+	_transform.AddControl(mc);
 	_transform.SetStyle(mc, {enMoveX:false, enScaleY:false, enSkewX:false, enSkewY:false});
 	_transform.SetType({o_graphics:"bmp", graphics:"rect", color:0x339900, size:2},"activate");
 	_transform.SetType({o_graphics:"circle", graphics:"rect", color:0x0, size:1},"select");
@@ -104,6 +104,7 @@ package ui_2.transformTool
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Shape;
+	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.ui.Mouse;
@@ -114,79 +115,86 @@ package ui_2.transformTool
 		
 	public class TransformTool 
 	{
-		private var _matrix:MatrixClass;
-		private var _math:MathClass;
-		private var _state:StateClass;
-		private var _shape_arrow:ArrowShapeClass;
-		private var _isInBounds:ContainPointClass;
-		private var _shape_bounds:ShapeClass ;
+		private var matrixClass:MatrixClass;
+		private var mathClass:MathClass;
+		private var stateClass:StateClass;
+		private var containTest:ContainPointClass;
+		private var shapeArrow:ArrowShapeClass;
+		private var shapeBounds:ShapeClass ;
 	
-		private var _Object_list:Array;
-		private var _Recorde_list:Array;
+		private var objectInfoList:Array;
+		private var recordeList:Array;
 		
-		private var _select_index:int;	
-		private var _recorde_index:int;	
-		private var _container:DisplayObject;
-		private var _type_activate:Object;
-		private var _type_select:Object;
-		private var _rectAngle:Rectangle;
+		private var selectIndex:int;	
+		private var recordIndex:int;	
+		private var toolContainer:DisplayObjectContainer;
+		private var typeActivate:Object;
+		private var typeSelect:Object;
+		private var rectArea:Rectangle;
+		//-------------------------------------------------
+		private static var mousePoint:Point = new Point();
+		public var onSelectChange:Function;
 		
-		public function TransformTool($containner:DisplayObjectContainer = null) 
+		public function TransformTool(_container:DisplayObjectContainer = null) 
 		{	
-			if (!$containner)
+			if (!_container)
 			{
 				throw Error("please set containner first!");
 				return;
 			}
-			_container = $containner
-			_matrix = new MatrixClass();
-			_math = new MathClass();
-			_state = new StateClass();
-			_shape_arrow = new ArrowShapeClass();
-			_shape_bounds = new ShapeClass();
-			_isInBounds = new ContainPointClass();
+			toolContainer = _container
+			matrixClass = new MatrixClass();
+			mathClass = new MathClass();
+			stateClass = new StateClass();
+			shapeArrow = new ArrowShapeClass();
+			shapeBounds = new ShapeClass();
+			containTest = new ContainPointClass();
 			
-			_rectAngle =  new Rectangle(0, 0, _container.stage.stageWidth, _container.stage.stageHeight);
+			rectArea =  new Rectangle(0, 0, toolContainer.stage.stageWidth, toolContainer.stage.stageHeight);
 			
-			_Object_list = new Array();
-			_Recorde_list = new Array();
-			_select_index = -1;
-			_recorde_index = 0;
-
+			objectInfoList = new Array();
+			recordeList = new Array();
+			selectIndex = -1;
+			recordIndex = 0;
 			
-			_type_activate = new Object();
-			_type_activate = { o_graphics:"cicle", graphics:"rect", o_bitmapdata: null, bitmapdata: null, color:0x0};
-			_type_select = new Object();
-			_type_select = { o_graphics:"cicle",  graphics:"rect", o_bitmapdata:null,  bitmapdata: null, color:0xFF9900};
+			typeActivate = { o_graphics:"cicle", graphics:"rect", o_bitmapdata: null, bitmapdata: null, color:0x0 };
+			typeSelect = { o_graphics:"cicle",  graphics:"rect", o_bitmapdata:null,  bitmapdata: null, color:0xFF9900 };
 			
 		}
-		
 		public function Init():void
 		{
-			_container.stage.addChild(_shape_bounds);
-			_container.stage.addChild(_shape_arrow);
-			
-			_container.stage.addEventListener( MouseEvent.MOUSE_MOVE, EventHadler);
-			_container.stage.addEventListener( MouseEvent.MOUSE_DOWN, EventHadler);
-			_container.stage.addEventListener( MouseEvent.MOUSE_UP, EventHadler);
+			toolContainer.addChild(shapeBounds);
+			toolContainer.addChild(shapeArrow);
+			toolContainer.stage.addEventListener( MouseEvent.MOUSE_MOVE, EventHadler);
+			toolContainer.stage.addEventListener( MouseEvent.MOUSE_DOWN, EventHadler);
+			toolContainer.stage.addEventListener( MouseEvent.MOUSE_UP, EventHadler);
 		}
-		
 		public function Clear():void
 		{
-			_shape_arrow.Clear();
-			_shape_bounds.Clear();
+			shapeArrow.Clear();
+			shapeBounds.Clear();
 			
-			_container.stage.removeChild(_shape_arrow);
-			_container.stage.removeChild(_shape_bounds);
+			toolContainer.removeChild(shapeArrow);
+			toolContainer.removeChild(shapeBounds);
 			
-			_container.stage.removeEventListener( MouseEvent.MOUSE_MOVE, EventHadler);
-			_container.stage.removeEventListener( MouseEvent.MOUSE_DOWN, EventHadler);
-			_container.stage.removeEventListener( MouseEvent.MOUSE_UP, EventHadler);
+			toolContainer.stage.removeEventListener( MouseEvent.MOUSE_MOVE, EventHadler);
+			toolContainer.stage.removeEventListener( MouseEvent.MOUSE_DOWN, EventHadler);
+			toolContainer.stage.removeEventListener( MouseEvent.MOUSE_UP, EventHadler);
 		}	
-		
-		public function AddControl($disOjbect:DisplayObject):void
+		public function AddControl(_disObject:DisplayObject):void
 		{
-			var $_style :Object= {
+			var _objInfo:Object = findObjectInfo(_disObject);
+			if (_objInfo) {
+				return;
+			}
+			var _internalPoint:Point = new Point(_disObject.width * 0.5 / _disObject.scaleX, _disObject.height * 0.5 / _disObject.scaleY);
+			var _externalPoint:Point = (_disObject.parent).globalToLocal(_disObject.localToGlobal(_internalPoint));
+			var _matrixObj:Object = matrixClass.GetMatrix(_disObject, _internalPoint);
+			
+			if (_disObject is DisplayObjectContainer) {
+				(_disObject as DisplayObjectContainer).mouseChildren=false;
+			}
+			var _style :Object= {
 				enMoveX:true,
 				enMoveY:true,
 				enScaleX:true,
@@ -198,466 +206,376 @@ package ui_2.transformTool
 				enRotation:true,
 				enSetMidPoint:true
 			};
-			
-			var $_index:int = FindIndex($disOjbect);
-			var $_internalPoint:Point = new Point(0, 0);
-			var $_externalPoint:Point = ($disOjbect.parent).globalToLocal($disOjbect.localToGlobal($_internalPoint));
-			var $_matrix_obj:Object = _matrix.GetMatrix($disOjbect, $_internalPoint);
-			
-			if ($disOjbect is DisplayObjectContainer) {
-				($disOjbect as DisplayObjectContainer).mouseChildren=false;
-			}
-			
-			if ($_index==-1) {
-				_Object_list.push(
-					{
-						obj        : $disOjbect, 
-						state      : _state.normal,
-						areanum    : -1,
-						mousePoint0 : new Point(0, 0),
-						mousePoint1 : new Point(0,0),
-						internalPoint  : $_internalPoint,
-						externalPoint  : $_externalPoint,
-						initMatrix : $_matrix_obj,
-						matrix     : $_matrix_obj,
-						style      : $_style
-					}
-				);
-			}
+			objectInfoList.push(
+				{
+					obj        : _disObject, 
+					state      : stateClass.normal,
+					areanum    : -1,
+					mousePoint0 : new Point(0,0),
+					mousePoint1 : new Point(0,0),
+					internalPoint  : _internalPoint,
+					externalPoint  : _externalPoint,
+					initMatrix : _matrixObj,
+					matrix     : _matrixObj,
+					style      : _style
+				}
+			);
 		}
 		
-		public function RemoveControl($object:DisplayObject):void 
+		public function RemoveControl(_disObject:DisplayObject):void 
 		{
-			var $_index:int=FindIndex($object);
-			if ($_index != -1) 
+			var _index:int=FindIndex(_disObject);
+			if (_index != -1) 
 			{
-				_Object_list.splice($_index,1);
+				objectInfoList.splice(_index,1);
 			}
 		}
 		
 		public function Undo():Boolean
 		{
-			if (_recorde_index < 0 || _Recorde_list.length<1 ) {
-				_recorde_index = 0;
+			if (recordIndex < 0 || recordeList.length<1 ) {
+				recordIndex = 0;
 				return false;
 			}else {
-				var $_disOjbect:DisplayObject = _Recorde_list[_recorde_index]["disObject"];
-				var $_matrix:Object = _Recorde_list[_recorde_index]["matrix_old"];
-				var $_tx:Number = $_matrix["tx"];
-				var $_ty:Number = $_matrix["ty"];
-				var $_scalex:Number = $_matrix["scalex"];
-				var $_scaley:Number = $_matrix["scaley"];
-				var $_skewx:Number = $_matrix["skewx"];
-				var $_skewy:Number = $_matrix["skewy"];
-				
-				var $_index:int = FindIndex($_disOjbect);
-				var $_obj_info:Object = _Object_list[$_index];
-				GraphicsClear();
-				(_select_index != -1) && (_Object_list[_select_index]["state"] =  _state.normal );
-				$_obj_info["state"] = _state.select;
-				$_obj_info["matrix"] = $_matrix;
-				_select_index = $_index;
-				GraphicsDraw($_matrix);
-				
-				_matrix.SetMatrix($_disOjbect, $_tx, $_ty, $_scalex, $_scaley, $_skewx, $_skewy);
-				_recorde_index = _recorde_index > 0? _recorde_index - 1:0;
+				doFun();
+				recordIndex = recordIndex > 0? recordIndex - 1:0;
 			}
 			return true;
 		}
-		
 		public function Redo():Boolean
 		{
-			_recorde_index = _recorde_index < ( _Recorde_list.length - 1)? _recorde_index + 1:( _Recorde_list.length - 1);
-			if (_recorde_index > _Recorde_list.length -1 || _Recorde_list.length<1 ) {
-				_recorde_index = _Recorde_list.length -1;
+			recordIndex = recordIndex < ( recordeList.length - 1)? recordIndex + 1:( recordeList.length - 1);
+			if (recordIndex > recordeList.length -1 || recordeList.length<1 ) {
+				recordIndex = recordeList.length -1;
 				return false;
 			}else{
-				var $_disOjbect:DisplayObject = _Recorde_list[_recorde_index]["disObject"];
-				var $_matrix:Object = _Recorde_list[_recorde_index]["matrix_new"];
-				var $_tx:Number = $_matrix["tx"];
-				var $_ty:Number = $_matrix["ty"];
-				var $_scalex:Number = $_matrix["scalex"];
-				var $_scaley:Number = $_matrix["scaley"];
-				var $_skewx:Number = $_matrix["skewx"];
-				var $_skewy:Number = $_matrix["skewy"];
-				
-				var $_index:int = FindIndex($_disOjbect);
-				var $_obj_info:Object = _Object_list[$_index];
-				GraphicsClear();
-				(_select_index != -1) && (_Object_list[_select_index]["state"] =  _state.normal );
-				$_obj_info["state"] = _state.select;
-				$_obj_info["matrix"] = $_matrix;
-				_select_index = $_index;
-				GraphicsDraw($_matrix);
-				
-				_matrix.SetMatrix($_disOjbect, $_tx, $_ty, $_scalex, $_scaley, $_skewx, $_skewy);
-				
+				doFun();
 			}
 			return true;
 		}
-		
+		private function doFun():void {
+			var _disObject:DisplayObject = recordeList[recordIndex].disObject;
+			var _matrix:Object = recordeList[recordIndex].matrix_old;
+			var $_tx:Number = _matrix.tx;
+			var $_ty:Number = _matrix.ty;
+			var $_scalex:Number = _matrix.scalex;
+			var $_scaley:Number = _matrix.scaley;
+			var $_skewx:Number = _matrix.skewx;
+			var $_skewy:Number = _matrix.skewy;
+			
+			var _objInfo:Object = findObjectInfo(_disObject);
+			GraphicsClear();
+			_objInfo.state = stateClass.select;
+			_objInfo.matrix = _matrix;
+			selectedItem = _disObject;
+			GraphicsDraw(_matrix);
+			
+			matrixClass.SetMatrix(_disObject, $_tx, $_ty, $_scalex, $_scaley, $_skewx, $_skewy);
+		}
 		public function ClearRecorde():void
 		{
-			_Recorde_list = [];
+			recordeList = [];
 		}
 		
-		public function SetInfo($disOjbect:DisplayObject,$parameter:Object):Boolean
+		public function SetInfo(_disObject:DisplayObject,$parameter:Object=null):Boolean
 		{
-			var $_index:int=FindIndex($disOjbect);
-			if ($_index != -1) 
-			{
-				var $_obj_info:Object = _Object_list[$_index];
-				var $_matrix:Object = $_obj_info["matrix"];
-				var $_o_matrix:Object = $_obj_info["initMatrix"];
-				
-
-				var $_tx:* = $parameter["x"];
-				var $_ty:* = $parameter["y"];
-				var $_scalex:* = $parameter["scalex"];
-				var $_scaley:* = $parameter["scaley"];
-				var $_skewx:* = $parameter["skewx"];
-				var $_skewy:* = $parameter["skewy"];
-				var $_rotation:* = $parameter["rotation"];
-
-				
-				($_tx == "revert") ? ($_matrix["tx"] = $_o_matrix["tx"]) : ($_tx != null) ? ($_matrix["tx"] = Number($_tx)) : null ;
-				($_ty == "revert") ? ($_matrix["ty"] = $_o_matrix["ty"]) : ($_ty != null) ? ($_matrix["ty"] = Number($_ty)) : null ;
-				($_scalex == "revert") ? ($_matrix["scalex"] = $_o_matrix["scalex"]) : ($_scalex != null) ? ($_matrix["scalex"] = Number($_scalex)) : null ;
-				($_scaley == "revert") ? ($_matrix["scaley"] = $_o_matrix["scaley"]) : ($_scaley != null) ? ($_matrix["scaley"] = Number($_scaley)) : null ;
-				if ($_rotation != null) 
-				{
-					if ($_rotation == "revert") {
-						$_matrix["skewx"] = $_o_matrix["skewx"];
-						$_matrix["skewy"] = $_o_matrix["skewy"];
-					}else {
-						$_matrix["skewx"] = Number($_rotation);
-						$_matrix["skewy"] = Number($_rotation);
-					}
-				}
-				($_skewx == "revert") ? ($_matrix["skewx"] = $_o_matrix["skewx"]) : ($_skewx != null) ? ($_matrix["skewx"] = Number($_skewx)) : null ;
-				($_skewy == "revert") ? ($_matrix["skewy"] = $_o_matrix["skewy"]) : ($_skewy != null) ? ($_matrix["skewy"] = Number($_skewy)) : null ;
-
-				_matrix.SetMatrix($disOjbect, $_matrix["tx"], $_matrix["ty"], $_matrix["scalex"], $_matrix["scaley"], $_matrix["skewx"], $_matrix["skewy"]);
-				$_obj_info["matrix"] = _matrix.GetMatrix($disOjbect, $_obj_info["internalPoint"]);
-
-				return true;
+			var _objInfo:Object = findObjectInfo(_disObject);
+			if (!_objInfo) {
+				return false;
 			}
-			return false;
+			var _matrix:Object = _objInfo.matrix;
+			var $_o_matrix:Object = _objInfo.initMatrix;
+			
+			if (!$parameter) {
+				$parameter = { };
+			}
+			var $_tx:* = $parameter.x || "revert";
+			var $_ty:* = $parameter.y || "revert";
+			var $_scalex:* = $parameter.scalex || "revert";
+			var $_scaley:* = $parameter.scaley || "revert";
+			var $_skewx:* = $parameter.skewx || "revert";
+			var $_skewy:* = $parameter.skewy || "revert";
+			var $_rotation:* = $parameter.rotation || "revert";
+			
+			($_tx == "revert") ? (_matrix.tx = $_o_matrix.tx) : ($_tx != null) ? (_matrix.tx = Number($_tx)) : null ;
+			($_ty == "revert") ? (_matrix.ty = $_o_matrix.ty) : ($_ty != null) ? (_matrix.ty = Number($_ty)) : null ;
+			($_scalex == "revert") ? (_matrix.scalex = $_o_matrix.scalex) : ($_scalex != null) ? (_matrix.scalex = Number($_scalex)) : null ;
+			($_scaley == "revert") ? (_matrix.scaley = $_o_matrix.scaley) : ($_scaley != null) ? (_matrix.scaley = Number($_scaley)) : null ;
+			if ($_rotation != null) 
+			{
+				if ($_rotation == "revert") {
+					_matrix.skewx = $_o_matrix.skewx;
+					_matrix.skewy = $_o_matrix.skewy;
+				}else {
+					_matrix.skewx = Number($_rotation);
+					_matrix.skewy = Number($_rotation);
+				}
+			}
+			($_skewx == "revert") ? (_matrix.skewx = $_o_matrix.skewx) : ($_skewx != null) ? (_matrix.skewx = Number($_skewx)) : null ;
+			($_skewy == "revert") ? (_matrix.skewy = $_o_matrix.skewy) : ($_skewy != null) ? (_matrix.skewy = Number($_skewy)) : null ;
+			
+			matrixClass.SetMatrix(_disObject, _matrix.tx, _matrix.ty, _matrix.scalex, _matrix.scaley, _matrix.skewx, _matrix.skewy);
+			_objInfo.matrix = matrixClass.GetMatrix(_disObject, _objInfo.internalPoint);
+			
+			return true;
 		}
-		
-		public function GetInfo($disOjbect:DisplayObject):Object
+		public function GetInfo(_disObject:DisplayObject):Object
 		{
-			var $_index:int=FindIndex($disOjbect);
-			if ($_index != -1) 
-			{
-				var $_obj_info:Object = _Object_list[$_index];
-				var $_matrix:Object = $_obj_info["matrix"];
-				var $_re_object:Object = {
-					x: $_matrix["tx"],
-					y: $_matrix["ty"],
-					scalex: $_matrix["scalex"],
-					scaley: $_matrix["scaley"],
-					skewx: $_matrix["skewx"],
-					skewy: $_matrix["skewy"],
-					rotation: $_matrix["skewx"]
-				}
-				return $_re_object;
+			var _objInfo:Object = findObjectInfo(_disObject);
+			if (!_objInfo) {
+				return null;
 			}
-			return null;
+			var _matrix:Object = _objInfo.matrix;
+			var $_re_object:Object = {
+				x: _matrix.tx,
+				y: _matrix.ty,
+				scalex: _matrix.scalex,
+				scaley: _matrix.scaley,
+				skewx: _matrix.skewx,
+				skewy: _matrix.skewy,
+				rotation: _matrix.skewx
+			}
+			return $_re_object;
 		}
-		
+		public function resetInfo(_disObject:DisplayObject):void {
+			_disObject.transform.matrix = new Matrix();
+		}
 		public function SetType($type:Object, $state:String = "activate"):void
 		{
-			var $_o_graphics :* = $type["o_graphics"];
-			var $_graphics:* = $type["graphics"];
-			var $_o_bitmapdata:* = $type["o_bitmapdata"];
-			var $_bitmapdata :* = $type["bitmapdata"];
-			var $_color :* = $type["color"];
-			var $_border :* = $type["border"];
-			var $_size :* = $type["size"];
-			var $_type :String = $type["type"];
+			var $_o_graphics :* = $type.o_graphics;
+			var $_graphics:* = $type.graphics;
+			var $_o_bitmapdata:* = $type.o_bitmapdata;
+			var $_bitmapdata :* = $type.bitmapdata;
+			var $_color :* = $type.color;
+			var $_border :* = $type.border;
+			var $_size :* = $type.size;
+			var $_type :String = $type.type;
 			
-			var $_type_activate:Object = { o_graphics:"cicle", graphics:"rect", o_bitmapdata: null, bitmapdata: null, color:0x0, border:1};
-			var $_type_select:Object  = { o_graphics:"cicle",  graphics:"rect", o_bitmapdata:null,  bitmapdata: null, color:0xFF9900, border:1};
+			var $typeActivate:Object = { o_graphics:"cicle", graphics:"rect", o_bitmapdata: null, bitmapdata: null, color:0x0, border:1};
+			var $typeSelect:Object  = { o_graphics:"cicle",  graphics:"rect", o_bitmapdata:null,  bitmapdata: null, color:0xFF9900, border:1};
 			
-			var $_obj:Object = $state == "select" ? _type_select : _type_activate;
+			var $_obj:Object = $state == "select" ? typeSelect : typeActivate;
 			if ($_type == "default")
 			{
-				$_obj = $state == "select" ? $_type_select : $_type_activate;
+				$_obj = $state == "select" ? $typeSelect : $typeActivate;
 			}
-			($_o_graphics != null) && ($_obj["o_graphics"] = String($_o_graphics));
-			($_graphics != null) && ($_obj["graphics"] = String($_graphics));
-			($_o_bitmapdata != null) && ($_obj["o_bitmapdata"] = BitmapData($_o_bitmapdata));
-			($_bitmapdata != null) && ($_obj["bitmapdata"] = BitmapData($_bitmapdata));
-			($_color != null) && ($_obj["color"] = uint($_color));
-			($_border != null) && ($_obj["border"] = uint($_border));
-			($_size != null) && ($_obj["size"] = uint($_size));
+			($_o_graphics != null) && ($_obj.o_graphics = String($_o_graphics));
+			($_graphics != null) && ($_obj.graphics = String($_graphics));
+			($_o_bitmapdata != null) && ($_obj.o_bitmapdata = BitmapData($_o_bitmapdata));
+			($_bitmapdata != null) && ($_obj.bitmapdata = BitmapData($_bitmapdata));
+			($_color != null) && ($_obj.color = uint($_color));
+			($_border != null) && ($_obj.border = uint($_border));
+			($_size != null) && ($_obj.size = uint($_size));
 			
 		}
-		public function SetStyle($object:DisplayObject, $style:Object):void
+		public function SetStyle(_disObject:DisplayObject, $style:Object):void
 		{
-			var $_index:int=FindIndex($object);
-			if ($_index != -1) 
-			{
-				var $_info:Object = _Object_list[$_index];
-				var $_EnMoveX :* = $style["enMoveX"];
-				var $_EnMoveY :* = $style["enMoveY"];
-				var $_EnScaleX:* = $style["enScaleX"];
-				var $_EnScaleY:* = $style["enScaleY"];
-				var $_EnSkewX :* = $style["enSkewX"];
-				var $_EnSkewY :* = $style["enSkewY"];
-				var $_EnScale :* = $style["enScale"];
-				var $_EqScale :* = $style["eqScale"];
-				var $_EnRotation:* = $style["enRotation"];
-				var $_EnSetMidPoint:* = $style["enSetMidPoint"];
-				
-				($_EnMoveX != null) && ($_info["style"]["enMoveX"] = Boolean($_EnMoveX));
-				($_EnMoveY != null) && ($_info["style"]["enMoveY"] = Boolean($_EnMoveY));
-				($_EnScaleX != null) && ($_info["style"]["enScaleX"] = Boolean($_EnScaleX));
-				($_EnScaleY != null) && ($_info["style"]["enScaleY"] = Boolean($_EnScaleY));
-				($_EnSkewX != null) && ($_info["style"]["enSkewX"] = Boolean($_EnSkewX));
-				($_EnSkewY != null) && ($_info["style"]["enSkewY"] = Boolean($_EnSkewY));
-				($_EnScale != null) && ($_info["style"]["enScale"] = Boolean($_EnScale));
-				($_EqScale != null) && ($_info["style"]["eqScale"] = Boolean($_EqScale));
-				($_EnRotation != null) && ($_info["style"]["enRotation"] = Boolean($_EnRotation));
-				($_EnSetMidPoint != null) && ($_info["style"]["enSetMidPoint"] = Boolean($_EnSetMidPoint));
-				
+			var _objInfo:Object = findObjectInfo(_disObject);
+			if (!_objInfo) {
+				return;
+			}
+			var $_EnMoveX :* = $style.enMoveX;
+			var $_EnMoveY :* = $style.enMoveY;
+			var $_EnScaleX:* = $style.enScaleX;
+			var $_EnScaleY:* = $style.enScaleY;
+			var $_EnSkewX :* = $style.enSkewX;
+			var $_EnSkewY :* = $style.enSkewY;
+			var $_EnScale :* = $style.enScale;
+			var $_EqScale :* = $style.eqScale;
+			var $_EnRotation:* = $style.enRotation;
+			var $_EnSetMidPoint:* = $style.enSetMidPoint;
+			
+			($_EnMoveX != null) && (_objInfo.style.enMoveX = Boolean($_EnMoveX));
+			($_EnMoveY != null) && (_objInfo.style.enMoveY = Boolean($_EnMoveY));
+			($_EnScaleX != null) && (_objInfo.style.enScaleX = Boolean($_EnScaleX));
+			($_EnScaleY != null) && (_objInfo.style.enScaleY = Boolean($_EnScaleY));
+			($_EnSkewX != null) && (_objInfo.style.enSkewX = Boolean($_EnSkewX));
+			($_EnSkewY != null) && (_objInfo.style.enSkewY = Boolean($_EnSkewY));
+			($_EnScale != null) && (_objInfo.style.enScale = Boolean($_EnScale));
+			($_EqScale != null) && (_objInfo.style.eqScale = Boolean($_EqScale));
+			($_EnRotation != null) && (_objInfo.style.enRotation = Boolean($_EnRotation));
+			($_EnSetMidPoint != null) && (_objInfo.style.enSetMidPoint = Boolean($_EnSetMidPoint));
+		}
+		private var __selectedItem:DisplayObject;
+		public function set selectedItem(_disObject:DisplayObject):void
+		{
+			GraphicsClear();
+			if (!_disObject) {
+				__selectedItem = null;
+				ArrowClear();
+			}else {
+				var _objInfo:Object = findObjectInfo(_disObject);
+				if (!_objInfo) {
+					AddControl(_disObject);
+				}
+				if (__selectedItem) {
+					findObjectInfo(__selectedItem).state = stateClass.normal;
+				}
+				__selectedItem = _disObject;
+				__selectedItem.parent.addChild(__selectedItem);
+				shapeBounds.parent.addChild(shapeBounds);
+				shapeArrow.parent.addChild(shapeArrow);
+				_objInfo.state = stateClass.select;
+				GraphicsDraw(_objInfo.matrix);
+			}
+			if (onSelectChange!=null) {
+				onSelectChange(__selectedItem);
 			}
 		}
-		public function set selectedItem($disObject:DisplayObject):void
-		{
-			var $_index:int=FindIndex($disObject);
-			if ($_index != -1) 
-			{
-				var $_obj_info:Object = _Object_list[$_index];
-				GraphicsClear();
-				(_select_index != -1) && (_Object_list[_select_index]["state"] =  _state.normal );
-				$_obj_info["state"] = _state.select;
-				_select_index = $_index;
-				GraphicsDraw($_obj_info["matrix"]);
-			}
-		}
-		
 		public function get selectedItem():DisplayObject
 		{
-			if (_select_index != -1)
-			{
-				return _Object_list[_select_index]["obj"];
-			}
-			return null;
+			return __selectedItem;
 		}
-		
 		public function set area($rectangle:Rectangle):void
 		{
-			_rectAngle = $rectangle;
+			rectArea = $rectangle;
 		}
 		
 		public function get area():Rectangle
 		{
-			return _rectAngle;
+			return rectArea;
 		}
 		
-		private function EventHadler(evt:MouseEvent):void 
+		private function EventHadler(_evt:MouseEvent):void 
 		{
-			var $_target:*= evt.target;
-			var $_type:String = evt.type;
-			var $_disOjbect:DisplayObject;	
-			var $_selectObject:DisplayObject;	
-			var $_matrix:Object;
-			var $_obj_info:Object;
-			var $_index:int ;
-			var $_state:String;
-			var $_area_num:int;
-			var $_inexistence :int = -1;
+			_evt.updateAfterEvent();
+			var _disObject:DisplayObject = _evt.target as DisplayObject;
+			var _objInfo:Object;
 			
-			evt.updateAfterEvent();
-			$_disOjbect = $_target as DisplayObject;	
-			switch($_type) {
+			mousePoint.x = toolContainer.mouseX;
+			mousePoint.y = toolContainer.mouseY;
+			var _isInRectArea:Boolean = rectArea.containsPoint(mousePoint);
+			
+			var _matrix:Object;
+			var _areaNum:int;
+			switch(_evt.type) {
 				case "mouseDown":
-					if (_select_index != $_inexistence )
-					{
-						$_obj_info = _Object_list[_select_index];
-						$_state = $_obj_info["state"];
-						if ($_state==_state.area)
-						{
-							$_disOjbect = $_obj_info["obj"];
-							$_obj_info["mousePoint0"] = new Point(_container.mouseX, _container.mouseY);
-							$_obj_info["externalPoint"] = ($_disOjbect.parent).globalToLocal($_disOjbect.localToGlobal($_obj_info["internalPoint"]));
-							$_obj_info["state"] = _state.change;
-							
-							return;
-						}
-					}
-					
-					$_index = FindIndex($_disOjbect);
-					if ($_index != $_inexistence)
-					{
-						$_obj_info = _Object_list[$_index];
-						$_state = $_obj_info["state"];
-						$_matrix = $_obj_info["matrix"];
-						
-						if ($_state == _state.select || $_state ==_state.normal)
-						{
-							_select_index = $_index;
-							$_disOjbect.parent.addChild($_disOjbect);
-							_shape_bounds.parent.addChild(_shape_bounds);
-							_shape_arrow.parent.addChild(_shape_arrow);
-							
-							$_obj_info["mousePoint0"] = new Point(_container.mouseX, _container.mouseY);
-							$_obj_info["state"] = _state.drag ;
-							$_obj_info["matrix"]["array"][4] = ($_disOjbect.parent).globalToLocal($_disOjbect.localToGlobal($_obj_info["internalPoint"]));
-							$_obj_info["externalPoint"] = ($_disOjbect.parent).globalToLocal($_disOjbect.localToGlobal($_obj_info["internalPoint"]));
-							GraphicsClear();
-							GraphicsDraw($_matrix);
-							
-						}
-					}else
-					{
-						(_select_index != $_inexistence) && (_Object_list[_select_index]["state"] =  _state.normal );
-						_select_index = $_inexistence;
-						GraphicsClear();
-					}
-				break;
-				case "mouseUp":
-					if (_select_index != $_inexistence )
-					{
-						$_obj_info = _Object_list[_select_index];
-						$_state = $_obj_info["state"];
-						$_matrix = $_obj_info["matrix"];
-						
-						if ($_state==_state.change)
-						{
-							$_disOjbect = $_obj_info["obj"];
-							
-							(_recorde_index != _Recorde_list.length - 1) && (_Recorde_list.splice(_recorde_index+1,_Recorde_list.length));
-							_Recorde_list.push( {
-								disObject: $_disOjbect,
-								matrix_old: $_obj_info["matrix"],
-								matrix_new: _matrix.GetMatrix($_disOjbect,$_obj_info["internalPoint"])
-							});
-							_recorde_index = _Recorde_list.length - 1;
-							
-							$_obj_info["state"] = _state.select;
-							$_obj_info["matrix"] = _matrix.GetMatrix($_disOjbect,$_obj_info["internalPoint"]);
-							_container.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_MOVE));
-							
-							return;
-						}else if ( $_state == _state.drag)
-						{
-							ArrowClear();
-							$_disOjbect = $_obj_info["obj"];
-							
-							(_recorde_index != _Recorde_list.length - 1) && (_Recorde_list.splice(_recorde_index+1,_Recorde_list.length));
-							_Recorde_list.push({
-								disObject: $_disOjbect,
-								matrix_old: $_obj_info["matrix"],
-								matrix_new: _matrix.GetMatrix($_disOjbect,$_obj_info["internalPoint"])
-							});
-							_recorde_index = _Recorde_list.length - 1;
-							
-							$_obj_info["state"]  = _state.select;
-							$_obj_info["matrix"] = _matrix.GetMatrix($_disOjbect,$_obj_info["internalPoint"]);
-					
-							$_obj_info["externalPoint"] = ($_disOjbect.parent).globalToLocal($_disOjbect.localToGlobal($_obj_info["internalPoint"]));
-							
-						}
-						
-					}
-				break;
-				case "mouseMove":
-					var $_isInArea:Boolean = _rectAngle.containsPoint(new Point(_container.mouseX, _container.mouseY));
-					
-					if (!$_isInArea)
-					{
-						ArrowClear();
-						_container.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_UP));
+					if (!_isInRectArea) {
 						return;
 					}
-					
-					GraphicsClear();
-					$_index = FindIndex($_disOjbect);
-					if ($_index != $_inexistence && $_index != _select_index)
-					{
-						$_obj_info  = _Object_list[$_index];
-						$_matrix    = $_obj_info["matrix"];
-						DrawSelectGraphics($_matrix);
+					if (selectedItem) {
+						_objInfo = findObjectInfo(selectedItem);
+						if (_objInfo.state==stateClass.area) {
+							_objInfo.mousePoint0 = new Point(toolContainer.mouseX, toolContainer.mouseY);
+							_objInfo.externalPoint = selectedItem.parent.globalToLocal(selectedItem.localToGlobal(_objInfo.internalPoint));
+							_objInfo.state = stateClass.change;
+							return;
+						}
 					}
-					
-					if (_select_index != $_inexistence)
-					{
-						$_obj_info  = _Object_list[_select_index];
-						$_disOjbect = $_obj_info["obj"];
-						$_matrix    = $_obj_info["matrix"];
-						$_state     = $_obj_info["state"];
-						$_area_num  = GetAreaNum(_select_index);
+					_objInfo = findObjectInfo(_disObject);
+					if (_objInfo) {
+						selectedItem = _disObject;
+						_objInfo.mousePoint0 = new Point(toolContainer.mouseX, toolContainer.mouseY);
+						_objInfo.matrix.array[4] = _disObject.parent.globalToLocal(_disObject.localToGlobal(_objInfo.internalPoint));
+						_objInfo.externalPoint = _disObject.parent.globalToLocal(_disObject.localToGlobal(_objInfo.internalPoint));
+						_objInfo.state = stateClass.drag;
+						GraphicsClear();
+						GraphicsDraw(_objInfo.matrix);
+					}else {
+						selectedItem = null;
+						GraphicsClear();
+					}
+					break;
+				case "mouseUp":
+					if (!selectedItem) {
+						return;
+					}
+					_objInfo = findObjectInfo(selectedItem);
+					if (_objInfo.state == stateClass.change) {
+						(recordIndex != recordeList.length - 1) && (recordeList.splice(recordIndex+1,recordeList.length));
+						recordeList.push( {
+							disObject: selectedItem,
+							matrix_old: _objInfo.matrix,
+							matrix_new: matrixClass.GetMatrix(selectedItem,_objInfo.internalPoint)
+						});
+						recordIndex = recordeList.length - 1;
 						
-						if ($_state == _state.change)
-						{
+						_objInfo.state = stateClass.select;
+						_objInfo.matrix = matrixClass.GetMatrix(selectedItem, _objInfo.internalPoint);
+						toolContainer.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_MOVE));
+					}else if (_objInfo.state == stateClass.drag) {
+						ArrowClear();
+						
+						(recordIndex != recordeList.length - 1) && (recordeList.splice(recordIndex + 1, recordeList.length));
+						recordeList.push({
+							disObject: selectedItem,
+							matrix_old: _objInfo.matrix,
+							matrix_new: matrixClass.GetMatrix(selectedItem,_objInfo.internalPoint)
+						});
+						recordIndex = recordeList.length - 1;
+						
+						_objInfo.state = stateClass.select;
+						_objInfo.matrix = matrixClass.GetMatrix(selectedItem,_objInfo.internalPoint);
+						_objInfo.externalPoint = selectedItem.parent.globalToLocal(selectedItem.localToGlobal(_objInfo.internalPoint));
+					}
+					break;
+				case "mouseMove":
+					_objInfo = findObjectInfo(_disObject);
+					GraphicsClear();
+					if (_objInfo && _disObject != selectedItem) {
+						DrawSelectGraphics(_objInfo.matrix);
+					}
+					_objInfo = findObjectInfo(selectedItem);
+					if (_objInfo) {
+						var _stateClass:String;
+						_disObject = selectedItem;
+						_matrix = _objInfo.matrix;
+						_stateClass = _objInfo.state;
+						_areaNum = GetAreaNum(_objInfo);
+						if (_stateClass == stateClass.change) {
 							GraphicsClear();
-							$_area_num  = $_obj_info["areanum"];
+							_areaNum  = _objInfo.areanum;
 							ArrowMove();
-							SetChange(_select_index, $_area_num);
-							$_matrix    = _matrix.GetMatrix($_disOjbect,$_obj_info["internalPoint"]);
-
-						}else if ($_state == _state.drag)
-						{
+							SetChange(_objInfo, _areaNum);
+							_matrix = matrixClass.GetMatrix(_disObject, _objInfo.internalPoint);
+						}else if (_stateClass == stateClass.drag) {
 							GraphicsClear();
-							SetMove(_select_index);
-							ArrowShow(_shape_arrow.Bmp_move);
+							SetMove(_objInfo);
+							ArrowShow(shapeArrow.Bmp_move);
 							ArrowMove();
-							$_matrix    = _matrix.GetMatrix($_disOjbect,$_obj_info["internalPoint"]);
-							
-						}else if ($_area_num!=$_inexistence)
-						{
+							_matrix    = matrixClass.GetMatrix(_disObject,_objInfo.internalPoint);
+						}else if (_areaNum != -1) {
 							GraphicsClear();
-							$_obj_info["areanum"] = $_area_num;
-							$_obj_info["state"] = _state.area;
-							
-							var $_tmp_bmp:BitmapData = GetArrowBmp($_matrix, $_area_num);
-							var $_isOrigin:Boolean = $_area_num == 4 ? true : false;
-							if ($_tmp_bmp != null) 
-							{
+							_objInfo.areanum = _areaNum;
+							_objInfo.state = stateClass.area;
+							var $_tmp_bmp:BitmapData = GetArrowBmp(_matrix, _areaNum);
+							var $_isOrigin:Boolean = _areaNum == 4 ? true : false;
+							if ($_tmp_bmp != null) {
 								ArrowShow($_tmp_bmp,$_isOrigin);
 								ArrowMove();
 							}
-						}else 
-						{
-							$_obj_info["state"] = _state.select;
+						}else {
+							_objInfo.state = stateClass.select;
 							//GraphicsClear();
 							ArrowClear();
 						}
-						
-						GraphicsDraw($_matrix);
-						
+						GraphicsDraw(_matrix);
 					}
-				break;
+					break;
 			}
 		}
-		
 		//-----------------------------------------------------------------------
-		private function SetMove($index:int):void
+		private function SetMove(_objInfo:Object):void
 		{
-			var $_obj_info:Object = _Object_list[$index];
-			var $_disOjbect:DisplayObject = $_obj_info["obj"];
-			var $_mousePoint0:Point = $_obj_info["mousePoint0"];
-			var $_mousePoint1:Point = new Point(_container.mouseX, _container.mouseY);
-			var $_matrix:Object =  $_obj_info["matrix"];
+			var _disObject:DisplayObject = _objInfo.obj;
+			var $_mousePoint0:Point = _objInfo.mousePoint0;
+			var $_mousePoint1:Point = new Point(toolContainer.mouseX, toolContainer.mouseY);
+			var _matrix:Object =  _objInfo.matrix;
 			
-			var $_EnMoveX:Boolean = $_obj_info["style"]["enMoveX"];
-			var $_EnMoveY:Boolean = $_obj_info["style"]["enMoveY"];
+			var $_EnMoveX:Boolean = _objInfo.style.enMoveX;
+			var $_EnMoveY:Boolean = _objInfo.style.enMoveY;
 			
-			($_EnMoveX) && ($_disOjbect.x = $_matrix["tx"] + $_mousePoint1.x -$_mousePoint0.x);
-			($_EnMoveY) && ($_disOjbect.y = $_matrix["ty"] + $_mousePoint1.y -$_mousePoint0.y);
+			($_EnMoveX) && (_disObject.x = _matrix.tx + $_mousePoint1.x -$_mousePoint0.x);
+			($_EnMoveY) && (_disObject.y = _matrix.ty + $_mousePoint1.y -$_mousePoint0.y);
 		}
-		private function SetMidPoint($index:int):void 
+		private function SetMidPoint(_objInfo:Object):void 
 		{	
-			var $_obj_info:Object = _Object_list[$index];
-			var $_disOjbect:DisplayObject = $_obj_info["obj"];
-			$_obj_info["externalPoint"].x = _container.mouseX;
-			$_obj_info["externalPoint"].y = _container.mouseY;
-			$_obj_info["internalPoint"] = ($_disOjbect).globalToLocal(($_disOjbect.parent).localToGlobal($_obj_info["externalPoint"]));
+			var _disObject:DisplayObject = _objInfo.obj;
+			_objInfo.externalPoint.x = toolContainer.mouseX;
+			_objInfo.externalPoint.y = toolContainer.mouseY;
+			_objInfo.internalPoint = (_disObject).globalToLocal((_disObject.parent).localToGlobal(_objInfo.externalPoint));
 		}
-		private function SetChange($index:int, $area_num:int):void 
+		private function SetChange(_objInfo:Object, $area_num:int):void 
 		{
 			//   ------------------
 			//   [0] 11 [3] 11 [6]
@@ -670,7 +588,7 @@ package ui_2.transformTool
 			if ($area_num == 4) 
 			{
 				$_type = "setMidPoint" ;
-				SetMidPoint($index);
+				SetMidPoint(_objInfo);
 				return;
 			}else if ($area_num == 0 || $area_num == 8 || $area_num == 2 || $area_num == 6) 
 			{
@@ -693,23 +611,21 @@ package ui_2.transformTool
 			} else{
 				return;
 			}
+			var _disObject:DisplayObject = _objInfo.obj;
 			
-			var $_obj_info:Object = _Object_list[$index];
-			var $_disOjbect:DisplayObject = $_obj_info["obj"];
+			var _matrix:Object = _objInfo.matrix;
+			//var $_matrix_new:Object = matrixClass.GetMatrix(_disObject,_objInfo.internalPoint);
+			var $_array:Array = _matrix.array;
+			var _internalPoint:Point = _objInfo.internalPoint;
+			var _externalPoint:Point = _objInfo.externalPoint;
 			
-			var $_matrix:Object = $_obj_info["matrix"];
-			//var $_matrix_new:Object = _matrix.GetMatrix($_disOjbect,$_obj_info["internalPoint"]);
-			var $_array:Array = $_matrix["array"];
-			var $_internalPoint:Point = $_obj_info["internalPoint"];
-			var $_externalPoint:Point = $_obj_info["externalPoint"];
+			var $_EqScale:Boolean = _objInfo.style.eqScale;
+			var $_EnScaleX:Boolean = _objInfo.style.enScaleX;
+			var $_EnScaleY:Boolean = _objInfo.style.enScaleY;
 			
-			var $_EqScale:Boolean = $_obj_info["style"]["eqScale"];
-			var $_EnScaleX:Boolean = $_obj_info["style"]["enScaleX"];
-			var $_EnScaleY:Boolean = $_obj_info["style"]["enScaleY"];
-			
-			var $_mousePoint0:Point = $_obj_info["mousePoint0"];
-			var $_mousePoint1:Point = new Point(_container.mouseX, _container.mouseY);
-			$_obj_info["mousePoint1"] =  $_mousePoint1;
+			var $_mousePoint0:Point = _objInfo.mousePoint0;
+			var $_mousePoint1:Point = new Point(toolContainer.mouseX, toolContainer.mouseY);
+			_objInfo.mousePoint1 =  $_mousePoint1;
 			
 			var $_minW:int = 10 ;
 			var $_minH:int = 10 ;
@@ -718,12 +634,12 @@ package ui_2.transformTool
 			var $_objH:int ;
 			var $_skew_gap:Number ;
 			
-			var $_tx:Number = $_matrix["tx"];
-			var $_ty:Number = $_matrix["ty"];
-			var $_scalex:Number = $_matrix["scalex"];
-			var $_scaley:Number = $_matrix["scaley"];
-			var $_skewx:Number = $_matrix["skewx"];
-			var $_skewy:Number = $_matrix["skewy"];
+			var $_tx:Number = _matrix.tx;
+			var $_ty:Number = _matrix.ty;
+			var $_scalex:Number = _matrix.scalex;
+			var $_scaley:Number = _matrix.scaley;
+			var $_skewx:Number = _matrix.skewx;
+			var $_skewy:Number = _matrix.skewy;
 			var $_angle0:Number;
 			var $_angle1:Number;
 			var $_tmp_obj:Object;
@@ -732,53 +648,53 @@ package ui_2.transformTool
 			switch ($_type) {
 				case "xscale" :
 					if($_EnScaleX){	
-						$_scalex = GetNewScaleX($index, $area_num);
+						$_scalex = GetNewScaleX(_objInfo, $area_num);
 						($_EqScale) && ($_scaley = $_scalex);
 					}
 					break;
 					
 				case "yscale" :
 					if($_EnScaleY){	
-						$_scaley = GetNewScaleY($index, $area_num);
+						$_scaley = GetNewScaleY(_objInfo, $area_num);
 						($_EqScale) && ($_scalex = $_scaley);
 					}
 					break;
 					
 				case "scale" :
 					if($_EnScaleX){	
-						$_scalex = GetNewScaleX($index, $area_num);
+						$_scalex = GetNewScaleX(_objInfo, $area_num);
 						($_EqScale) && ($_scaley = $_scalex);
 					}
 					if($_EnScaleY){	
-						$_scaley = GetNewScaleY($index, $area_num);
+						$_scaley = GetNewScaleY(_objInfo, $area_num);
 						($_EqScale) && ($_scalex = $_scaley);
 					}
 					//$_scaley = $_scalex;
 					break;
 					
 				case "rotation" :
-					$_angle0 = _math.GetAngle($_mousePoint0, $_externalPoint);
-					$_angle1 = _math.GetAngle($_mousePoint1, $_externalPoint);
+					$_angle0 = mathClass.GetAngle($_mousePoint0, _externalPoint);
+					$_angle1 = mathClass.GetAngle($_mousePoint1, _externalPoint);
 					$_skewx  = $_skewx + $_angle1 - $_angle0;
 					$_skewy  = $_skewy + $_angle1 - $_angle0;
 					break;
 				case "xskew" :
-					$_tmp_obj = GetNewSkewY($index, $area_num);
-					$_skewx  = $_tmp_obj["skewx"];
-					$_scaley = $_tmp_obj["scaley"];
+					$_tmp_obj = GetNewSkewY(_objInfo, $area_num);
+					$_skewx  = $_tmp_obj.skewx;
+					$_scaley = $_tmp_obj.scaley;
 					($_EqScale)&& ($_scaley = $_scalex);
 					break;
 				case "yskew" :
-					$_tmp_obj = GetNewSkewX($index, $area_num);
-					$_skewy  = $_tmp_obj["skewy"];
-					$_scalex = $_tmp_obj["scalex"];
+					$_tmp_obj = GetNewSkewX(_objInfo, $area_num);
+					$_skewy  = $_tmp_obj.skewy;
+					$_scalex = $_tmp_obj.scalex;
 					($_EqScale)&& ($_scalex = $_scaley);
 					break;
 				default :
 					break;
 			}
-			$_objW = $_matrix["w"] * $_scalex;
-			$_objH = $_matrix["h"] * $_scaley;
+			$_objW = _matrix.w * $_scalex;
+			$_objH = _matrix.h * $_scaley;
 			$_skew_gap = Math.abs($_skewx - $_skewy)%180;
 			
 			if(($_objW < $_minW && $_objW > -$_minW) || ($_objH < $_minH && $_objH > -$_minH) || ($_skew_gap< 90+$_minSkew && $_skew_gap> 90-$_minSkew))
@@ -786,12 +702,12 @@ package ui_2.transformTool
 				return;
 			}
 				
-			_matrix.SetMatrix($_disOjbect, $_tx, $_ty, $_scalex, $_scaley, $_skewx, $_skewy);
-			_matrix.SetMidPoint($_disOjbect, $_internalPoint, $_externalPoint);
+			matrixClass.SetMatrix(_disObject, $_tx, $_ty, $_scalex, $_scaley, $_skewx, $_skewy);
+			matrixClass.SetMidPoint(_disObject, _internalPoint, _externalPoint);
 			
 		}
 		//-----------------------------------------------------------------------
-		private function GetNewSkewX($index:int, $area_num:int):Object
+		private function GetNewSkewX(_objInfo:Object, $area_num:int):Object
 		{
 			//-------------------
 			//   0   3   6
@@ -799,33 +715,32 @@ package ui_2.transformTool
 			//   2   5   8
 			//-------------------
 			var $_num:int = $area_num == 9 ? 1 : 7; 
-			var $_obj_info:Object = _Object_list[$index];
-			var $_matrix:Object = $_obj_info["matrix"];
-			var $_array:Array = $_matrix["array"];
-			var $_skewx:Number = $_matrix["skewx"];
-			var $_skewy:Number = $_matrix["skewy"];
-			var $_scalex:Number = $_matrix["scalex"];
+			var _matrix:Object = _objInfo.matrix;
+			var $_array:Array = _matrix.array;
+			var $_skewx:Number = _matrix.skewx;
+			var $_skewy:Number = _matrix.skewy;
+			var $_scalex:Number = _matrix.scalex;
 		
 			var $_midPoint:Point = $_array[4];
 			var $_areaPoint:Point= $_array[$_num];
-			var $_mousePoint0:Point = $_obj_info["mousePoint0"];	
-			var $_mousePoint1:Point = $_obj_info["mousePoint1"];	
+			var $_mousePoint0:Point = _objInfo.mousePoint0;	
+			var $_mousePoint1:Point = _objInfo.mousePoint1;	
 
-			var $_mp0:Point = _math.GetCrossPoint( $_mousePoint0, $_skewy, $_midPoint, $_skewx + 90);
-			var $_mp1:Point = _math.GetCrossPoint( $_mousePoint0, $_skewy, $_areaPoint, $_skewx + 90);
-			var $_mp2:Point = _math.GetCrossPoint( $_mousePoint1, $_skewy, $_midPoint, $_skewx + 90);
-			var $_mp3:Point = _math.GetCrossPoint( $_mousePoint1, $_skewy, $_areaPoint, $_skewx + 90);
+			var $_mp0:Point = mathClass.GetCrossPoint( $_mousePoint0, $_skewy, $_midPoint, $_skewx + 90);
+			var $_mp1:Point = mathClass.GetCrossPoint( $_mousePoint0, $_skewy, $_areaPoint, $_skewx + 90);
+			var $_mp2:Point = mathClass.GetCrossPoint( $_mousePoint1, $_skewy, $_midPoint, $_skewx + 90);
+			var $_mp3:Point = mathClass.GetCrossPoint( $_mousePoint1, $_skewy, $_areaPoint, $_skewx + 90);
 			
 			var $_angle:Number ;
-			var $_angle0:Number = _math.GetAngle($_mp3, $_mp0);
-			var $_angle1:Number = _math.GetAngle($_mp0, $_mp3);
+			var $_angle0:Number = mathClass.GetAngle($_mp3, $_mp0);
+			var $_angle1:Number = mathClass.GetAngle($_mp0, $_mp3);
 			
-			var $_tmp_point0:Point = _math.GetCrossPoint( $_midPoint, $_skewy, $_array[1], $_skewx + 90);
-			var $_tmp_point1:Point = _math.GetCrossPoint( $_midPoint, $_skewy, $_array[7], $_skewx + 90);
+			var $_tmp_point0:Point = mathClass.GetCrossPoint( $_midPoint, $_skewy, $_array[1], $_skewx + 90);
+			var $_tmp_point1:Point = mathClass.GetCrossPoint( $_midPoint, $_skewy, $_array[7], $_skewx + 90);
 			
-			var $_s0:Number = _math.GetPos( $_array[1], $_array[7]);
-			var $_s1:Number = _math.GetPos( $_midPoint, $_tmp_point0);
-			var $_s2:Number = _math.GetPos( $_midPoint, $_tmp_point1);
+			var $_s0:Number = mathClass.GetPos( $_array[1], $_array[7]);
+			var $_s1:Number = mathClass.GetPos( $_midPoint, $_tmp_point0);
+			var $_s2:Number = mathClass.GetPos( $_midPoint, $_tmp_point1);
 			
 			var $_isLeft :Boolean = $_s2 > $_s0 && $_s2 > $_s1 ;
 			var $_isRight :Boolean = $_s1 > $_s0 && $_s1 > $_s2 ;
@@ -843,14 +758,14 @@ package ui_2.transformTool
 			if (int($_mp0.x-$_mp1.x)!=0 || int($_mp0.y-$_mp1.y)!=0)
 			{
 				$_skewy  = $_angle;
-				$_mp0 = _math.GetCrossPoint( $_midPoint, $_skewy, $_array[0], $_skewx + 90);
-				$_mp1 = _math.GetCrossPoint( $_midPoint, $_skewy, $_array[8], $_skewx + 90);
-				$_scalex = _math.GetPos($_mp0, $_mp1) / $_matrix["w"];
+				$_mp0 = mathClass.GetCrossPoint( $_midPoint, $_skewy, $_array[0], $_skewx + 90);
+				$_mp1 = mathClass.GetCrossPoint( $_midPoint, $_skewy, $_array[8], $_skewx + 90);
+				$_scalex = mathClass.GetPos($_mp0, $_mp1) / _matrix.w;
 			}
 			
 			return {skewy:$_skewy, scalex:$_scalex};
 		}
-		private function GetNewSkewY($index:int, $area_num:int):Object
+		private function GetNewSkewY(_objInfo:Object, $area_num:int):Object
 		{
 			//-------------------
 			//   0   3   6
@@ -858,33 +773,32 @@ package ui_2.transformTool
 			//   2   5   8
 			//-------------------
 			var $_num:int = $area_num == 11 ? 3 : 5; 
-			var $_obj_info:Object = _Object_list[$index];
-			var $_matrix:Object = $_obj_info["matrix"];
-			var $_array:Array = $_matrix["array"];
-			var $_skewx:Number = $_matrix["skewx"];
-			var $_skewy:Number = $_matrix["skewy"];
-			var $_scaley:Number = $_matrix["scaley"];
+			var _matrix:Object = _objInfo.matrix;
+			var $_array:Array = _matrix.array;
+			var $_skewx:Number = _matrix.skewx;
+			var $_skewy:Number = _matrix.skewy;
+			var $_scaley:Number = _matrix.scaley;
 			
 			var $_midPoint:Point = $_array[4];
 			var $_areaPoint:Point= $_array[$_num];
-			var $_mousePoint0:Point = $_obj_info["mousePoint0"];	
-			var $_mousePoint1:Point = $_obj_info["mousePoint1"];	
+			var $_mousePoint0:Point = _objInfo.mousePoint0;	
+			var $_mousePoint1:Point = _objInfo.mousePoint1;	
 
-			var $_mp0:Point = _math.GetCrossPoint( $_mousePoint0, $_skewx + 90, $_midPoint, $_skewy);
-			var $_mp1:Point = _math.GetCrossPoint( $_mousePoint0, $_skewx + 90, $_areaPoint, $_skewy);
-			var $_mp2:Point = _math.GetCrossPoint( $_mousePoint1, $_skewx + 90, $_midPoint, $_skewy);
-			var $_mp3:Point = _math.GetCrossPoint( $_mousePoint1, $_skewx + 90, $_areaPoint, $_skewy);
+			var $_mp0:Point = mathClass.GetCrossPoint( $_mousePoint0, $_skewx + 90, $_midPoint, $_skewy);
+			var $_mp1:Point = mathClass.GetCrossPoint( $_mousePoint0, $_skewx + 90, $_areaPoint, $_skewy);
+			var $_mp2:Point = mathClass.GetCrossPoint( $_mousePoint1, $_skewx + 90, $_midPoint, $_skewy);
+			var $_mp3:Point = mathClass.GetCrossPoint( $_mousePoint1, $_skewx + 90, $_areaPoint, $_skewy);
 			
 			var $_angle:Number ;
-			var $_angle0:Number = _math.GetAngle($_mp3, $_mp0);
-			var $_angle1:Number = _math.GetAngle($_mp0, $_mp3);
+			var $_angle0:Number = mathClass.GetAngle($_mp3, $_mp0);
+			var $_angle1:Number = mathClass.GetAngle($_mp0, $_mp3);
 			
-			var $_tmp_point0:Point = _math.GetCrossPoint( $_midPoint, $_skewx + 90, $_array[3], $_skewy);
-			var $_tmp_point1:Point = _math.GetCrossPoint( $_midPoint, $_skewx + 90, $_array[5], $_skewy);
+			var $_tmp_point0:Point = mathClass.GetCrossPoint( $_midPoint, $_skewx + 90, $_array[3], $_skewy);
+			var $_tmp_point1:Point = mathClass.GetCrossPoint( $_midPoint, $_skewx + 90, $_array[5], $_skewy);
 			
-			var $_s0:Number = _math.GetPos( $_array[3], $_array[5]);
-			var $_s1:Number = _math.GetPos( $_midPoint, $_tmp_point0);
-			var $_s2:Number = _math.GetPos( $_midPoint, $_tmp_point1);
+			var $_s0:Number = mathClass.GetPos( $_array[3], $_array[5]);
+			var $_s1:Number = mathClass.GetPos( $_midPoint, $_tmp_point0);
+			var $_s2:Number = mathClass.GetPos( $_midPoint, $_tmp_point1);
 			
 			var $_isUp :Boolean = $_s2 > $_s0 && $_s2 > $_s1 ;
 			var $_isDown :Boolean = $_s1 > $_s0 && $_s1 > $_s2 ;
@@ -902,76 +816,74 @@ package ui_2.transformTool
 			if (int($_mp0.x-$_mp1.x)!=0 || int($_mp0.y-$_mp1.y)!=0)
 			{
 				$_skewx  = $_angle-90;
-				$_mp0 = _math.GetCrossPoint( $_midPoint, $_skewx + 90, $_array[0], $_skewy);
-				$_mp1 = _math.GetCrossPoint( $_midPoint, $_skewx + 90, $_array[8], $_skewy);
+				$_mp0 = mathClass.GetCrossPoint( $_midPoint, $_skewx + 90, $_array[0], $_skewy);
+				$_mp1 = mathClass.GetCrossPoint( $_midPoint, $_skewx + 90, $_array[8], $_skewy);
 				
-				$_scaley =  _math.GetPos($_mp0, $_mp1) / $_matrix["h"];
+				$_scaley =  mathClass.GetPos($_mp0, $_mp1) / _matrix.h;
 				
 			}
 			return { skewx:$_skewx, scaley:$_scaley };
 		}
 		
-		private function GetNewScaleX($index:int, $area_num:int):Number
+		private function GetNewScaleX(_objInfo:Object, $area_num:int):Number
 		{
 			//-------------------
 			//   0   3   6
 			//   1   4   7
 			//   2   5   8
 			//-------------------
-			var $_obj_info:Object = _Object_list[$index];
-			var $_matrix:Object = $_obj_info["matrix"];
-			var $_array:Array = $_matrix["array"];
-			var $_skewx:Number = $_matrix.skewx;
-			var $_skewy:Number = $_matrix.skewy;
+			var _matrix:Object = _objInfo.matrix;
+			var $_array:Array = _matrix.array;
+			var $_skewx:Number = _matrix.skewx;
+			var $_skewy:Number = _matrix.skewy;
 			
 			var $_midPoint:Point = $_array[4];
-			var $_mousePoint1:Point = $_obj_info["mousePoint1"];
+			var $_mousePoint1:Point = _objInfo.mousePoint1;
 			var $_areaPoint:Point= $_array[$area_num];
 			
-			var $_mp0:Point = _math.GetCrossPoint( $_midPoint, $_skewy, $_areaPoint, $_skewx + 90);
-			var $_mp1:Point = _math.GetCrossPoint( $_midPoint, $_skewy, $_mousePoint1, $_skewx + 90);
+			var $_mp0:Point = mathClass.GetCrossPoint( $_midPoint, $_skewy, $_areaPoint, $_skewx + 90);
+			var $_mp1:Point = mathClass.GetCrossPoint( $_midPoint, $_skewy, $_mousePoint1, $_skewx + 90);
 			
-			var $_s0:Number = _math.GetPos( $_midPoint, $_mp0);
-			var $_s1:Number = _math.GetPos( $_midPoint, $_mp1);
-			var $_s3:Number = _math.GetPos( $_mp0, $_mp1);
+			var $_s0:Number = mathClass.GetPos( $_midPoint, $_mp0);
+			var $_s1:Number = mathClass.GetPos( $_midPoint, $_mp1);
+			var $_s3:Number = mathClass.GetPos( $_mp0, $_mp1);
 			var $_vetor:int = ($_s3 > $_s1)&&($_s3 > $_s0) ? -1 :1;
 			
-			var $_scalex:Number = $_matrix.scalex;
+			var $_scalex:Number = _matrix.scalex;
 			($_s0 > 1 || $_s0 < -1) && ( $_scalex  = $_scalex *($_s1/$_s0) * $_vetor);	
 			return $_scalex;
 		}
 		
-		private function GetNewScaleY($index:int, $area_num:int):Number
+		private function GetNewScaleY(_objInfo:Object, $area_num:int):Number
 		{
 			//-------------------
 			//   0   3   6
 			//   1   4   7
 			//   2   5   8
 			//-------------------
-			var $_obj_info:Object = _Object_list[$index];
-			var $_matrix:Object = $_obj_info["matrix"];
-			var $_array:Array = $_matrix["array"];
-			var $_skewx:Number = $_matrix.skewx;
-			var $_skewy:Number = $_matrix.skewy;
+			var _matrix:Object = _objInfo.matrix;
+			var $_array:Array = _matrix.array;
+			var $_skewx:Number = _matrix.skewx;
+			var $_skewy:Number = _matrix.skewy;
 			
 			var $_midPoint:Point = $_array[4];
-			var $_mousePoint1:Point = $_obj_info["mousePoint1"];
+			var $_mousePoint1:Point = _objInfo.mousePoint1;
 			var $_areaPoint:Point= $_array[$area_num];
 			
-			var $_mp0:Point = _math.GetCrossPoint( $_midPoint, $_skewx + 90, $_areaPoint, $_skewy);
-			var $_mp1:Point = _math.GetCrossPoint( $_midPoint, $_skewx + 90, $_mousePoint1, $_skewy);
+			var $_mp0:Point = mathClass.GetCrossPoint( $_midPoint, $_skewx + 90, $_areaPoint, $_skewy);
+			var $_mp1:Point = mathClass.GetCrossPoint( $_midPoint, $_skewx + 90, $_mousePoint1, $_skewy);
 			
-			var $_s0:Number = _math.GetPos( $_midPoint, $_mp0);
-			var $_s1:Number = _math.GetPos( $_midPoint, $_mp1);
-			var $_s3:Number = _math.GetPos( $_mp0, $_mp1);
+			var $_s0:Number = mathClass.GetPos( $_midPoint, $_mp0);
+			var $_s1:Number = mathClass.GetPos( $_midPoint, $_mp1);
+			var $_s3:Number = mathClass.GetPos( $_mp0, $_mp1);
 			var $_vetor:int = ($_s3 > $_s1)&&($_s3 > $_s0) ? -1 :1;
 			
-			var $_scaley:Number = $_matrix.scaley;
+			var $_scaley:Number = _matrix.scaley;
 			($_s0 > 1 || $_s0 < -1) && ($_scaley  = $_scaley *($_s1 / $_s0 ) * $_vetor) ;
 			return $_scaley;
 		}
 		
-		private function GetAreaNum($index:int):int
+		private function GetAreaNum(_objInfo:Object):int
 		{
 			//   $areanum--------------
 			//   [0] 11 [3] 11 [6]
@@ -980,28 +892,26 @@ package ui_2.transformTool
 			//    9            10
 			//   [2] 12 [5] 12 [8] [13]
 			//   ----------------------
-			
-			var $_obj_info:Object = _Object_list[$index];
-			var $_matrix:Object = $_obj_info["matrix"];
-			var $_arr:Array = $_matrix["array"];
-			var $_testPoint:Point = new Point(_container.mouseX, _container.mouseY);
+			var _matrix:Object = _objInfo.matrix;
+			var $_arr:Array = _matrix.array;
+			var $_testPoint:Point = new Point(toolContainer.mouseX, toolContainer.mouseY);
 			var $_areaPoint:Point ;
 			var $_isTrue:Boolean ;
-			var $_obj_size0:uint = $_matrix["w"] * $_matrix["scalex"] * 0.25;
-			var $_obj_size1:uint = $_matrix["h"] * $_matrix["scaley"] * 0.25;
+			var $_obj_size0:uint = _matrix.w * _matrix.scalex * 0.25;
+			var $_obj_size1:uint = _matrix.h * _matrix.scaley * 0.25;
 			var $_block_size0:uint = 10;
 			var $_block_size1:uint = 10;
 			var $_block_size2:uint = 8;
 			var $_block_size3:uint = 8;
 			var $_block_size4:uint = 15;
 			
-			var $_EnScaleX:Boolean = $_obj_info["style"]["enScaleX"];
-			var $_EnScaleY:Boolean = $_obj_info["style"]["enScaleY"];
-			var $_EnSkewX:Boolean = $_obj_info["style"]["enSkewX"];
-			var $_EnSkewY:Boolean = $_obj_info["style"]["enSkewY"];
-			var $_EnScale:Boolean = $_obj_info["style"]["enScale"];
-			var $_EnRotation:Boolean = $_obj_info["style"]["enRotation"];
-			var $_EnSetMidPoint:Boolean = $_obj_info["style"]["enSetMidPoint"];
+			var $_EnScaleX:Boolean = _objInfo.style.enScaleX;
+			var $_EnScaleY:Boolean = _objInfo.style.enScaleY;
+			var $_EnSkewX:Boolean = _objInfo.style.enSkewX;
+			var $_EnSkewY:Boolean = _objInfo.style.enSkewY;
+			var $_EnScale:Boolean = _objInfo.style.enScale;
+			var $_EnRotation:Boolean = _objInfo.style.enRotation;
+			var $_EnSetMidPoint:Boolean = _objInfo.style.enSetMidPoint;
 			
 			var $_inexistence:int = -1;
 
@@ -1044,7 +954,7 @@ package ui_2.transformTool
 			while ($_len--)
 			{
 				$_areaPoint = $_arr[$_len];
-				$_isTrue = _isInBounds.IsInRect($_testPoint, $_areaPoint, $_block_size2, $_block_size3);
+				$_isTrue = containTest.IsInRect($_testPoint, $_areaPoint, $_block_size2, $_block_size3);
 				if ($_isTrue)
 				{
 					if (($_len == 1 || $_len == 7) && (!$_EnScaleX)) {
@@ -1061,43 +971,43 @@ package ui_2.transformTool
 				}
 			}
 			//----------------
-			if (_isInBounds.IsInBouds($_testPoint, $_p_arr0)) 
+			if (containTest.IsInBouds($_testPoint, $_p_arr0)) 
 			{
 				if ($_EnSkewY){
 					return 9
 				}else {
 					return $_inexistence;
 				}
-			} else if (_isInBounds.IsInBouds($_testPoint, $_p_arr1)) 
+			} else if (containTest.IsInBouds($_testPoint, $_p_arr1)) 
 			{
 				if ($_EnSkewY) {
 					return 10;
 				}else {
 					return $_inexistence;
 				}
-			} else if (_isInBounds.IsInBouds($_testPoint, $_p_arr2)) 
+			} else if (containTest.IsInBouds($_testPoint, $_p_arr2)) 
 			{
 				if ($_EnSkewX) {
 					return 11;
 				}else {
 					return $_inexistence;
 				}
-			} else if (_isInBounds.IsInBouds($_testPoint, $_p_arr3)) 
+			} else if (containTest.IsInBouds($_testPoint, $_p_arr3)) 
 			{
 				if ($_EnSkewX) {
 					return 12 ;
 				}else {
 					return $_inexistence;
 				}
-			} else if (_isInBounds.IsInBouds($_testPoint, $_p_bounds)) 
+			} else if (containTest.IsInBouds($_testPoint, $_p_bounds)) 
 			{
 				return $_inexistence;
 			}
 			//----------------
-			var $_isTrue0:Boolean = _isInBounds.IsInRect($_testPoint, $_arr[0], $_block_size4, $_block_size4);
-			var $_isTrue1:Boolean = _isInBounds.IsInRect($_testPoint, $_arr[2], $_block_size4, $_block_size4);
-			var $_isTrue2:Boolean = _isInBounds.IsInRect($_testPoint, $_arr[6], $_block_size4, $_block_size4);
-			var $_isTrue3:Boolean = _isInBounds.IsInRect($_testPoint, $_arr[8], $_block_size4, $_block_size4);
+			var $_isTrue0:Boolean = containTest.IsInRect($_testPoint, $_arr[0], $_block_size4, $_block_size4);
+			var $_isTrue1:Boolean = containTest.IsInRect($_testPoint, $_arr[2], $_block_size4, $_block_size4);
+			var $_isTrue2:Boolean = containTest.IsInRect($_testPoint, $_arr[6], $_block_size4, $_block_size4);
+			var $_isTrue3:Boolean = containTest.IsInRect($_testPoint, $_arr[8], $_block_size4, $_block_size4);
 			if ($_isTrue0 || $_isTrue1 || $_isTrue2 || $_isTrue3)
 			{
 				if ($_EnRotation) {
@@ -1120,41 +1030,41 @@ package ui_2.transformTool
 			//   [2] 12 [5] 12 [8] [13]
 			//   ----------------------
 			
-			var $_skewx:Number = $matrix["skewx"];
-			var $_skewy:Number = $matrix["skewy"];
+			var $_skewx:Number = $matrix.skewx;
+			var $_skewy:Number = $matrix.skewy;
 			var $_angle:Number;
 			var $_bmp:BitmapData;
 			
 			if ($areanum == 4 ) 
 			{
-				$_bmp = _shape_arrow["Bmp_cursor"];
+				$_bmp = shapeArrow.Bmp_cursor;
 			}else if ( $areanum == 0 || $areanum == 8 )
 			{
 				$_angle = GetNearAngle(($_skewx + $_skewy )* 0.5 + 45 );
-				($_angle!=-1) && ($_bmp = _shape_arrow["Bmp_resize" + $_angle]);
+				($_angle!=-1) && ($_bmp = shapeArrow["Bmp_resize"+ $_angle]);
 			}else if ($areanum == 2 || $areanum == 6 ) 
 			{
 				$_angle = GetNearAngle(($_skewx + $_skewy )* 0.5 + 135);
-				($_angle!=-1) && ($_bmp = _shape_arrow["Bmp_resize" + $_angle]);
+				($_angle!=-1) && ($_bmp = shapeArrow["Bmp_resize" + $_angle]);
 			}else if ($areanum == 1 || $areanum == 7 ) 
 			{
 				$_angle = GetNearAngle($_skewy);
-				($_angle!=-1) && ($_bmp = _shape_arrow["Bmp_resize" + $_angle]);
+				($_angle!=-1) && ($_bmp = shapeArrow["Bmp_resize" + $_angle]);
 			}else if ($areanum == 3 || $areanum == 5 ) 
 			{
 				$_angle = GetNearAngle($_skewx+270);
-				($_angle!=-1) && ($_bmp = _shape_arrow["Bmp_resize" + $_angle]);
+				($_angle!=-1) && ($_bmp = shapeArrow["Bmp_resize" + $_angle]);
 			}else if ($areanum == 9 || $areanum == 10 ) 
 			{
 				$_angle = GetNearAngle($_skewx+270);
-				($_angle!=-1) && ($_bmp = _shape_arrow["Bmp_skew" + $_angle]);
+				($_angle!=-1) && ($_bmp = shapeArrow["Bmp_skew" + $_angle]);
 			}else if ($areanum == 11 || $areanum == 12 ) 
 			{
 				$_angle = GetNearAngle($_skewy);
-				($_angle!=-1) && ($_bmp = _shape_arrow["Bmp_skew" + $_angle]);
+				($_angle!=-1) && ($_bmp = shapeArrow["Bmp_skew" + $_angle]);
 			}else if ($areanum == 13 ) 
 			{
-				$_bmp = _shape_arrow["Bmp_rotation"];
+				$_bmp = shapeArrow.Bmp_rotation;
 			}
 			
 			return $_bmp;
@@ -1190,58 +1100,65 @@ package ui_2.transformTool
 		//----------------------------------------------------------------------------
 		private function ArrowMove():void
 		{
-			_shape_arrow.x = _container.mouseX;
-			_shape_arrow.y = _container.mouseY;
+			shapeArrow.x = toolContainer.mouseX;
+			shapeArrow.y = toolContainer.mouseY;
 		}
 		private function ArrowShow($bmp:BitmapData, $isOrigin:Boolean = false):void
 		{
 			//var $_bmp:BitmapData = _arr_bmp[$index];
-			_shape_arrow.Show($bmp,$isOrigin);
+			shapeArrow.Show($bmp,$isOrigin);
 			Mouse.hide();
 		}
 		private function ArrowClear():void
 		{
-			_shape_arrow.Clear();
+			shapeArrow.Clear();
 			Mouse.show();
 		}
 		//----------------------------------------------------------------------------
 			
-		private function FindIndex($object:DisplayObject):int 
+		private function FindIndex(_disObject:DisplayObject):int 
 		{
-			var $_len:int=_Object_list.length;
+			var $_len:int=objectInfoList.length;
 			while ($_len--) {
-				var $_object:Object=_Object_list[$_len];
-				if ($_object["obj"] == $object) {
+				var $_object:Object=objectInfoList[$_len];
+				if ($_object.obj == _disObject) {
 					return $_len;
 				}
 			}
 			return -1;
 		}
-		
+		private function findObjectInfo(_object:DisplayObject):Object {
+			for each(var _objectInfo:Object in objectInfoList) {
+				if (_objectInfo.obj == _object) {
+					return _objectInfo;
+				}
+			}
+			return null;
+		}
 		//----------------------------------------------------------------------
 		
 		private function GraphicsClear():void
 		{
-			_shape_bounds.Clear();
+			shapeBounds.Clear();
 		}
 		
 		private function GraphicsDraw($matrix:Object):void
 		{
 			//var $_block_size:Number = 3;
-			var $_arr:Array = $matrix["array"];
+			var $_arr:Array = $matrix.array;
 			var $_len:int = $_arr.length;
 			
-			var $_color:uint = _type_activate["color"] == null? 0x0 : _type_activate["color"];
-			var $_border:uint = _type_activate["border"] == null? 1 : _type_activate["border"];
-			var $_block_size:uint = _type_activate["size"] == null? 3 : _type_activate["size"];
-			var $_graphics:String = _type_activate["graphics"];
-			var $_bitmapdata:BitmapData = _type_activate["bitmapdata"] == null ? _shape_arrow["Bmp_6dn"] : _type_activate["bitmapdata"];
-			var $_o_graphics:String = _type_activate["o_graphics"];
-			var $_o_bitmapdata:BitmapData = _type_activate["o_bitmapdata"] == null ? _shape_arrow["Bmp_6dn"] : _type_activate["o_bitmapdata"];
+			var $_color:uint = typeActivate.color == null? 0x0 : typeActivate.color;
+			var $_border:uint = typeActivate.border == null? 1 : typeActivate.border;
+			var $_block_size:uint = typeActivate.size == null? 3 : typeActivate.size;
+			var $_graphics:String = typeActivate.graphics;
+			var $_bitmapdata:BitmapData = typeActivate.bitmapdata == null ? shapeArrow.Bmp_6dn : typeActivate.bitmapdata;
+			var $_o_graphics:String = typeActivate.o_graphics;
+			var $_o_bitmapdata:BitmapData = typeActivate.o_bitmapdata == null ? shapeArrow.Bmp_6dn : typeActivate.o_bitmapdata;
 			
 			var $_tmp_arr:Array = new Array($_arr[0], $_arr[2], $_arr[8], $_arr[6]);
 			
-			_shape_bounds.CreateLine($_tmp_arr,$_border,$_color);
+			shapeBounds.CreateLine($_tmp_arr,$_border,$_color);
 			
 			while ($_len--)
 			{
@@ -1251,16 +1168,16 @@ package ui_2.transformTool
 					switch($_graphics)
 					{
 						case "rect":
-							_shape_bounds.CreateRect($_arr[$_len].x-$_block_size, $_arr[$_len].y-$_block_size, $_block_size*2, $_block_size*2, $_color);
+							shapeBounds.CreateRect($_arr[$_len].x-$_block_size, $_arr[$_len].y-$_block_size, $_block_size*2, $_block_size*2, $_color);
 							break;
 						case "circle":
-							_shape_bounds.CreateCircle($_arr[$_len].x, $_arr[$_len].y, $_block_size, $_color, $_border, 0xffffff);
+							shapeBounds.CreateCircle($_arr[$_len].x, $_arr[$_len].y, $_block_size, $_color, $_border, 0xffffff);
 							break;
 						case "bmp":
-							_shape_bounds.FillBitmap($_bitmapdata, false, $_arr[$_len].x, $_arr[$_len].y);
+							shapeBounds.FillBitmap($_bitmapdata, false, $_arr[$_len].x, $_arr[$_len].y);
 							break;
 						default:
-							_shape_bounds.CreateRect($_arr[$_len].x - $_block_size, $_arr[$_len].y - $_block_size, $_block_size * 2, $_block_size * 2, $_color);
+							shapeBounds.CreateRect($_arr[$_len].x - $_block_size, $_arr[$_len].y - $_block_size, $_block_size * 2, $_block_size * 2, $_color);
 							break;
 					}
 				}
@@ -1269,16 +1186,16 @@ package ui_2.transformTool
 			switch($_o_graphics)
 			{
 				case "rect":
-					_shape_bounds.CreateRect($_arr[4].x-$_block_size, $_arr[4].y-$_block_size, $_block_size*2, $_block_size*2, $_color);
+					shapeBounds.CreateRect($_arr[4].x-$_block_size, $_arr[4].y-$_block_size, $_block_size*2, $_block_size*2, $_color);
 					break;
 				case "circle":
-					_shape_bounds.CreateCircle($_arr[4].x, $_arr[4].y, $_block_size, 0xffffff, $_border, $_color);
+					shapeBounds.CreateCircle($_arr[4].x, $_arr[4].y, $_block_size, 0xffffff, $_border, $_color);
 					break;
 				case "bmp":
-					_shape_bounds.FillBitmap($_o_bitmapdata, false, $_arr[4].x, $_arr[4].y);
+					shapeBounds.FillBitmap($_o_bitmapdata, false, $_arr[4].x, $_arr[4].y);
 					break;
 				default:
-					_shape_bounds.CreateCircle($_arr[4].x, $_arr[4].y, $_block_size, 0xffffff, $_border, $_color);
+					shapeBounds.CreateCircle($_arr[4].x, $_arr[4].y, $_block_size, 0xffffff, $_border, $_color);
 					break;
 			}
 			
@@ -1286,41 +1203,41 @@ package ui_2.transformTool
 		
 		private function DrawSelectGraphics($matrix:Object):void
 		{
-			var $_arr:Array = $matrix["array"];
+			var $_arr:Array = $matrix.array;
 			var $_len:int = $_arr.length;
 			//var $_block_size:Number = 3;
 			
-			var $_color:uint = _type_select["color"] == null? 0xFF9900 : _type_select["color"];
-			var $_border:uint = _type_select["border"] == null? 1 : _type_select["border"];
-			var $_block_size:uint = _type_select["size"] == null? 3 : _type_select["size"];
-			var $_graphics:String = _type_select["graphics"];
-			var $_bitmapdata:BitmapData = _type_select["bitmapdata"] == null ? _shape_arrow["Bmp_6dn"] : _type_select["bitmapdata"];
-			var $_o_graphics:String = _type_select["o_graphics"];
-			var $_o_bitmapdata:BitmapData = _type_select["o_bitmapdata"] == null ? _shape_arrow["Bmp_6dn"] : _type_select["o_bitmapdata"];
+			var $_color:uint = typeSelect.color == null? 0xFF9900 : typeSelect.color;
+			var $_border:uint = typeSelect.border == null? 1 : typeSelect.border;
+			var $_block_size:uint = typeSelect.size == null? 3 : typeSelect.size;
+			var $_graphics:String = typeSelect.graphics;
+			var $_bitmapdata:BitmapData = typeSelect.bitmapdata == null ? shapeArrow.Bmp_6dn : typeSelect.bitmapdata;
+			var $_o_graphics:String = typeSelect.o_graphics;
+			var $_o_bitmapdata:BitmapData = typeSelect.o_bitmapdata == null ? shapeArrow.Bmp_6dn : typeSelect.o_bitmapdata;
 			
 			var $_tmp_arr:Array = new Array($_arr[0], $_arr[2], $_arr[8], $_arr[6]);
 			
-			_shape_bounds.CreateLine($_tmp_arr,$_border,$_color);
+			shapeBounds.CreateLine($_tmp_arr,$_border,$_color);
 			
 			while ($_len--)
 			{
 				
 				if ($_len != 4)
 				{
-					//_shape_bounds.CreateRect($_arr[$_len].x-$_block_size, $_arr[$_len].y-$_block_size, $_block_size*2, $_block_size*2, $_color);
+					//shapeBounds.CreateRect($_arr[$_len].x-$_block_size, $_arr[$_len].y-$_block_size, $_block_size*2, $_block_size*2, $_color);
 					switch($_graphics)
 					{
 						case "rect":
-							_shape_bounds.CreateRect($_arr[$_len].x-$_block_size, $_arr[$_len].y-$_block_size, $_block_size*2, $_block_size*2, $_color);
+							shapeBounds.CreateRect($_arr[$_len].x-$_block_size, $_arr[$_len].y-$_block_size, $_block_size*2, $_block_size*2, $_color);
 							break;
 						case "circle":
-							_shape_bounds.CreateCircle($_arr[$_len].x, $_arr[$_len].y, $_block_size, $_color, $_border, 0xffffff);
+							shapeBounds.CreateCircle($_arr[$_len].x, $_arr[$_len].y, $_block_size, $_color, $_border, 0xffffff);
 							break;
 						case "bmp":
-							_shape_bounds.FillBitmap($_bitmapdata, false, $_arr[$_len].x, $_arr[$_len].y);
+							shapeBounds.FillBitmap($_bitmapdata, false, $_arr[$_len].x, $_arr[$_len].y);
 							break;
 						default:
-							_shape_bounds.CreateRect($_arr[$_len].x - $_block_size, $_arr[$_len].y - $_block_size, $_block_size * 2, $_block_size * 2, $_color);
+							shapeBounds.CreateRect($_arr[$_len].x - $_block_size, $_arr[$_len].y - $_block_size, $_block_size * 2, $_block_size * 2, $_color);
 							break;
 					}
 				}
@@ -1329,16 +1246,16 @@ package ui_2.transformTool
 			switch($_o_graphics)
 			{
 				case "rect":
-					_shape_bounds.CreateRect($_arr[4].x-$_block_size, $_arr[4].y-$_block_size, $_block_size*2, $_block_size*2, $_color);
+					shapeBounds.CreateRect($_arr[4].x-$_block_size, $_arr[4].y-$_block_size, $_block_size*2, $_block_size*2, $_color);
 					break;
 				case "circle":
-					_shape_bounds.CreateCircle($_arr[4].x, $_arr[4].y, $_block_size, 0xffffff, $_border, $_color);
+					shapeBounds.CreateCircle($_arr[4].x, $_arr[4].y, $_block_size, 0xffffff, $_border, $_color);
 					break;
 				case "bmp":
-					_shape_bounds.FillBitmap($_o_bitmapdata, false, $_arr[4].x, $_arr[4].y);
+					shapeBounds.FillBitmap($_o_bitmapdata, false, $_arr[4].x, $_arr[4].y);
 					break;
 				default:
-					_shape_bounds.CreateCircle($_arr[4].x, $_arr[4].y, $_block_size, 0xffffff, $_border, $_color);
+					shapeBounds.CreateCircle($_arr[4].x, $_arr[4].y, $_block_size, 0xffffff, $_border, $_color);
 					break;
 			}
 		}
