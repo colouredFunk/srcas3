@@ -5,6 +5,8 @@
 	import flash.geom.Rectangle;
 	import flash.display.Stage;
 	import flash.events.Event;
+	import com.greensock.TweenMax;
+	import com.greensock.easing.Cubic;
 	public class Alert extends Sprite {
 		public static var AlertLayer:Sprite;
 		public static var AlertClass:Class;
@@ -29,10 +31,20 @@
 		public var bar:*;
 		
 		protected var item:DisplayObject;
-		protected var maskArea:Sprite;
+		protected var maskArea:SimpleBtn;
 		protected var isYN:Boolean;
-		protected var isDrag:Boolean;
+		protected var dragEnabled:Boolean;
 		protected var isMask:Boolean;
+		public static function createAlert(_str:String,_isYN:Boolean=false,_yes:String=null,_no:String=null):Alert {
+			var _alert:Alert;
+			if (AlertClass) {
+				_alert = new AlertClass();
+			}else {
+				_alert = new Alert();
+			}
+			_alert.alert(_str, _isYN, _yes, _no);
+			return _alert;
+		}
 		public function Alert() {
 			addEventListener(Event.ADDED_TO_STAGE,added);
 		}
@@ -68,12 +80,25 @@
 				stopDrag();
 				adjustXY();
 			};
-			maskArea=new Sprite();
+			maskArea = new SimpleBtn();
 			addChildAt(maskArea,0);
+			maskArea.buttonMode = false;
+			maskArea.release = winkBar;
 			getStyleParams();
 			if (AlertAppear != null) {
 				AlertAppear(this);
 			}
+		}
+		private var isWinking:Boolean;
+		protected function winkBar():void {
+			if (isWinking) {
+				return;
+			}
+			isWinking = true;
+			TweenMax.to(bar, 0.1, { colorMatrixFilter: { contrast:1.5, brightness:1.5 }, yoyo:true, repeat:3 ,ease:Cubic.easeInOut, onComplete:onWinkBarEndHandle } );
+		}
+		protected function onWinkBarEndHandle():void {
+			isWinking = false;
 		}
 		protected function removed(_evt:Event):void {
 			removeEventListener(Event.REMOVED_FROM_STAGE,removed);
@@ -82,6 +107,8 @@
 				removeChild(item);
 				item = null;
 			}
+			callBack = null;
+			
 			//txt_titletxt_showbtn_ybtn_nbtn_xbarmaskAreaitem
 		}
 		public function get text():String{
@@ -137,10 +164,9 @@
 			setStyle();
 		}
 		public function showBtns(_b:Boolean, _isYN:Boolean = false, _yes:String = null, _no:String = null):void {
-			if(_b){
-				btn_y.visible = btn_n.visible = _b;
-			}else{
-				btn_y.visible = btn_n.visible = _b;
+			btn_y.visible = btn_n.visible = _b;
+			if (btn_x) {
+				btn_x.visible = _b;
 			}
 			if(_yes){
 				btn_y.label = _yes;
@@ -169,7 +195,7 @@
 				maskArea.hitArea = null;
 			}
 			isMask = _isMask;
-			isDrag = _isDrag;
+			dragEnabled = _isDrag;
 		}
 		public function remove():void {
 			callBack = null;
@@ -222,16 +248,6 @@
 			}
 			x = int(x);
 			y = int(y);
-		}
-		public static function createAlert(_str:String,_isYN:Boolean=false,_yes:String=null,_no:String=null):Alert {
-			var _alert:Alert;
-			if (AlertClass) {
-				_alert = new AlertClass();
-			}else {
-				_alert = new Alert();
-			}
-			_alert.alert(_str, _isYN, _yes, _no);
-			return _alert;
 		}
 	}
 }
