@@ -2,6 +2,7 @@
 	import flash.display.Sprite;
 	import flash.text.StyleSheet;
 	import flash.text.TextField;
+	import flash.text.TextFormat;
 	public class Txt extends Sprite {
 		//[Inspectable(defaultValue=0,type="int",name="固定高")]
 		private var heightMax:int=0;
@@ -19,10 +20,12 @@
 		public var txt:TextField;
 		public var html:Boolean;
 		public var onChange:Function;
+		protected var textFormat:TextFormat;
 		public function Txt() {
 			init();
 		}
 		protected function init():void {
+			textFormat = new TextFormat();
 			txt.mouseWheelEnabled=false;
 			txt.mouseEnabled=false;
 			//txt.multiline=false;
@@ -70,7 +73,11 @@
 		}
 		[Inspectable(enumeration="left,right,center,none",defaultValue="left",type="String",name="对齐")]
 		public function set autoSize(_autoSize:String):void {
-			txt.autoSize=_autoSize;
+			try{
+				txt.autoSize=_autoSize;
+			}catch (_ero:*) {
+				
+			}
 			setStyle();
 		}
 		public function get type():String {
@@ -95,7 +102,13 @@
 		public function setStyle():void {
 			if (widthMax) {
 				txt.wordWrap=true;
-				txt.width=widthMax;
+				txt.width = widthMax;
+				try{
+					textFormat.align = txt.autoSize;
+					txt.setTextFormat(textFormat);
+				}catch (_ero:*) {
+					
+				}
 			} else {
 				txt.autoSize=txt.autoSize;
 			}

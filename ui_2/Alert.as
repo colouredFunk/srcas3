@@ -15,7 +15,7 @@
 		public static var AlertPoint:Point;
 		public var callBack:Function;
 		
-		private var barWidth:int;
+		public var barWidth:int;
 		private var barHeight:int;
 		private var dx_show:int;
 		private var dy_show:int;
@@ -71,7 +71,10 @@
 			txt_show.html = true;
 			btn_n.autoSize="center";
 			btn_y.autoSize="center";
-			bar.buttonMode = false;
+			bar.rollOver = function():void {
+				this.buttonMode = false;
+				this.rollOver = null;
+			}
 			bar.press = function():void  {
 				parent.addChild(this.parent);
 				startDrag();
@@ -155,10 +158,11 @@
 			showBtns(true, _isYN, _yes, _no);
 			setBar(true,true);
 		}
-		public function addItem(_item:DisplayObject):void {
+		public function addItem(_item:DisplayObject, _itemHeight:uint = 0):void {
 			if (item && contains(item)) {
 				removeChild(item);
 			}
+			itemHeight = _itemHeight;
 			item = _item;
 			addChild(item);
 			setStyle();
@@ -204,10 +208,11 @@
 			}
 		}
 		private var dy_item:uint = 10;
+		private var itemHeight:uint;
 		public function setStyle():void {
 			barHeight = int(txt_show.height + dy_showyn + dy_show + dy_yn);
 			if (item) {
-				barHeight += item.height + dy_item;
+				barHeight += (itemHeight?itemHeight:txt_show.height) + dy_item;
 			}
 			bar.height = barHeight;
 			bar.y = - int(barHeight * 0.5);
