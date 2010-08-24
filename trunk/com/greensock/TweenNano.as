@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.02
- * DATE: 2010-03-01
+ * VERSION: 1.05
+ * DATE: 2010-05-11
  * AS3 (AS2 is also available)
  * UPDATES AND DOCUMENTATION AT: http://www.TweenNano.com
  **/
@@ -29,7 +29,7 @@ package com.greensock {
  * 		<li><b> Fewer overwrite modes </b>- You can either overwrite all or none of the existing tweens of the same 
  * 			object (overwrite:true or overwrite:false) in TweenNano. TweenLite, however, can use OverwriteManager to expand 
  * 			its capabilities and use modes like AUTO, CONCURRENT, PREEXISTING, and ALL_ONSTART
- * 			(see <a href="http://blog.greensock.com/overwritemanager/">http://blog.greensock.com/overwritemanager/</a>
+ * 			(see <a href="http://www.greensock.com/overwritemanager/">http://www.greensock.com/overwritemanager/</a>
  * 			for details).</li>
  * 
  * 		<li><b>Compared to TweenLite, TweenNano is missing the following methods/properties:</b>
@@ -41,6 +41,7 @@ package com.greensock {
  * 				<li>reverse()</li>
  * 				<li>invalidate()</li>
  * 				<li>onStart</li>
+ * 				<li>onInit</li>
  * 				<li>defaultEase</li>
  * 				<li>easeParams</li>
  * 				<li>currentTime</li>
@@ -84,11 +85,15 @@ package com.greensock {
  * 	
  * 	<li><b> overwrite : Boolean</b>		Controls how other tweens of the same object are handled when this tween is created. Here are the options:
  * 										<ul>
- * 			  							<li><b> false (NONE):</b> No tweens are overwritten. This is the fastest mode, but you need to be careful not to create any 
- * 			  										tweens with overlapping properties, otherwise they'll conflict with each other. </li>
+ * 			  							<li><b> false (NONE):</b> No tweens are overwritten. This is the fastest mode, but you need to be careful not 
+ * 													to create any tweens with overlapping properties of the same object that run at the same time, 
+ * 													otherwise they'll conflict with each other. <br /><code>
+ * 												   		TweenNano.to(mc, 1, {x:100, y:200});<br />
+ * 														TweenNano.to(mc, 1, {x:300, delay:2, overwrite:false}); //does NOT overwrite the previous tween.</code></li>
  * 											
  * 										<li><b> true (ALL_IMMEDIATE):</b> This is the default mode in TweenNano. All tweens of the same target
- * 													are completely overwritten immediately when the tween is created. <br /><code>
+ * 													are completely overwritten immediately when the tween is created, regardless of whether or 
+ * 													not any of the properties overlap. <br /><code>
  * 												   		TweenNano.to(mc, 1, {x:100, y:200});<br />
  * 														TweenNano.to(mc, 1, {x:300, delay:2, overwrite:true}); //immediately overwrites the previous tween</code></li>
  * 										</ul></li>
@@ -142,6 +147,9 @@ package com.greensock {
  * 	  
  * 	<li> You can kill all delayedCalls to a particular function using <code>TweenNano.killTweensOf(myFunction);</code>
  * 	  This can be helpful if you want to preempt a call.</li>
+ * 
+ *  <li> If some of your tweens don't appear to be working, read about the <code>overwrite</code> special property
+ * 		above - it is most likely an overwriting issue that could be solved by adding <code>overwrite:false</code> to your vars object.</li>
  * 	  
  * 	<li> Use the <code>TweenNano.from()</code> method to animate things into place. For example, if you have things set up on 
  * 	  the stage in the spot where they should end up, and you just want to animate them into place, you can 
@@ -149,7 +157,7 @@ package com.greensock {
  * 	  
  * 	<li> If you find this class useful, please consider joining Club GreenSock which not only helps to sustain
  * 	  ongoing development, but also gets you bonus plugins, classes and other benefits that are ONLY available 
- * 	  to members. Learn more at <a href="http://blog.greensock.com/club/">http://blog.greensock.com/club/</a></li>
+ * 	  to members. Learn more at <a href="http://www.greensock.com/club/">http://www.greensock.com/club/</a></li>
  * </ul>
  * 
  * <b>Copyright 2010, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
@@ -219,11 +227,11 @@ package com.greensock {
 			}
 			_propTweens = [];
 			this.useFrames = Boolean(vars.useFrames == true);
-			var delay:Number = this.vars.delay || 0;
+			var delay:Number = ("delay" in this.vars) ? Number(this.vars.delay) : 0;
 			this.startTime = (this.useFrames) ? _frame + delay : _time + delay;
 			
 			var a:Array = _masterList[target];
-			if (a == null || int(this.vars.overwrite)) { 
+			if (a == null || int(this.vars.overwrite) == 1 || this.vars.overwrite == null) { 
 				_masterList[target] = [this];
 			} else {
 				a[a.length] = this;
@@ -248,7 +256,7 @@ package com.greensock {
 			if (this.vars.runBackwards) {
 				var pt:Array;
 				var i:int = _propTweens.length;
-				while (i--) {
+				while (--i > -1) {
 					pt = _propTweens[i];
 					pt[1] += pt[2];
 					pt[2] = -pt[2];
@@ -279,7 +287,7 @@ package com.greensock {
 			} else {
 				this.ratio = _ease(time, 0, 1, this.duration);			
 			}
-			while (i--) {
+			while (--i > -1) {
 				pt = _propTweens[i];
 				this.target[pt[0]] = pt[1] + (this.ratio * pt[2]); 
 			}
@@ -396,7 +404,7 @@ package com.greensock {
 			for (tgt in ml) {
 				a = ml[tgt];
 				i = a.length;
-				while (i--) {
+				while (--i > -1) {
 					tween = a[i];
 					t = (tween.useFrames) ? _frame : _time;
 					if (tween.active || (!tween.gc && t >= tween.startTime)) {
@@ -422,7 +430,7 @@ package com.greensock {
 				if (complete) {
 					var a:Array = _masterList[target];
 					var i:int = a.length;
-					while (i--) {
+					while (--i > -1) {
 						if (!TweenNano(a[i]).gc) {
 							TweenNano(a[i]).complete(false);
 						}
