@@ -1,12 +1,8 @@
 ﻿package akdcl.application{
 
 	import flash.display.Sprite;
-	import flash.media.Sound;
-	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
-	import flash.media.SoundLoaderContext;
-
-	import flash.net.URLRequest;
+	import akdcl.media.Sound;
 
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -41,7 +37,6 @@
 		public var repeatMode:uint = 2;
 		public var autoPlayForStop:Boolean;
 		
-		protected var soundChannel:SoundChannel;
 		protected var sound:Sound;
 		protected var musicInfo:Object;
 		protected var musicList:XML;
@@ -56,45 +51,39 @@
 			if (isPluginMode) {
 				return 1;
 			}else if (sound) {
-				return sound.bytesLoaded/sound.bytesTotal;
+				return sound.loaded;
 			}else{
 				return 0;
 			}
 		}
 		//0~1
-		public function get played():Number{
-			if (playState == SOUND_STOP) {
-				return 0;
-			}
-			var _played:Number;
+		public function get played():Number {
 			if (isPluginMode) {
 				var _playingInfo:Object = getMusicPlayingInfo();
 				if (_playingInfo && musicInfo) {
-					_played = int(_playingInfo.currentPosition) / int(musicInfo.duration);
+					return int(_playingInfo.currentPosition) / int(musicInfo.duration);
 				}else {
-					_played = 0;
+					return 0;
 				}
-			}else {
-				_played = position / totalTime;
+			}else if (sound) {
+				return sound.played;
+			}else{
+				return 0;
 			}
-			return _played;
 		}
 		//毫秒为单位
 		public function get totalTime():uint {
 			if (isPluginMode && musicInfo) {
 				return musicInfo.duration * 1000;
 			}else if (sound) {
-				return sound.length / loaded;
+				return sound.totalTime;
 			}else{
-				return Infinity;
+				return 0;
 			}
 		}
 		//毫秒为单位
 		protected var positionRecord:uint;
 		public function get position():uint {
-			if (playState == SOUND_STOP) {
-				return 0;
-			}
 			if (isPluginMode) {
 				var _playingInfo:Object = getMusicPlayingInfo();
 				if (_playingInfo) {
@@ -102,8 +91,8 @@
 				}else {
 					return 0;
 				}
-			}else if (soundChannel) {
-				return soundChannel.position;
+			}else if (sound) {
+				return sound.position;
 			}else{
 				return 0;
 			}
@@ -111,9 +100,24 @@
 		public function timeInfo():String {
 			var _timePlay:String;
 			var _timeTotal:String;
-			_timePlay = Common.formatTime_2(position * 0.001);
-			_timeTotal = Common.formatTime_2(totalTime * 0.001);
+			_timePlay = formatTime_2(position * 0.001);
+			_timeTotal = formatTime_2(totalTime * 0.001);
 			return _timePlay + " / " + _timeTotal;
+		}
+		//将数格式化为时间xx:xx
+		public static function formatTime_2(_n:uint):String {
+			var minutes:uint;
+			var seconds:uint;
+			if (_n<60) {
+				minutes = 0;
+				seconds = _n;
+			} else if (_n<3600) {
+				minutes = Math.floor(_n/60);
+				seconds = _n%60;
+			}
+			var s_m:String = minutes<10 ? "0"+String(minutes) : String(minutes);
+			var s_s:String = seconds<10 ? "0"+String(seconds) : String(seconds);
+			return s_m+":"+s_s;
 		}
 		public function get isPlaying():Boolean {
 			return playState == SOUND_PLAY;
@@ -135,19 +139,18 @@
 			stop();
 			positionRecord = 0;
 			musicInfo = null;
-			try{
+			
+			if (sound) {
 				sound.removeEventListener(Event.ID3, onID3Loaded);
 				sound.removeEventListener(ProgressEvent.PROGRESS,onSoundLoadProgressHandle);
-				sound.removeEventListener(Event.COMPLETE,onSoundLoadCompleteHandle);
-				sound.close();
-			}catch (error:*){
-				
+				sound.removeEventListener(Event.COMPLETE, onSoundLoadCompleteHandle);
+				sound.removeEventListener(Event.SOUND_COMPLETE, onSoundPlayCompleteHandle);
+				sound.stop(true);
 			}
 			var _musicSOURCE:String = String(musicList.list[playId].@src).toLowerCase();
 			
 			if (_musicSOURCE.indexOf(".mp3") < 0) {
 				sound = null;
-				soundChannel = null;
 				if (!isPlugin) {
 					isPluginMode = false;
 					return;
@@ -156,12 +159,11 @@
 				ExternalInterface.call("musicSetSource", _musicSOURCE);
 			}else {
 				isPluginMode = false;
-				sound = new Sound();
+				sound = Sound.loadSound(_musicSOURCE);
 				sound.addEventListener(Event.ID3, onID3Loaded);
 				sound.addEventListener(ProgressEvent.PROGRESS,onSoundLoadProgressHandle);
 				sound.addEventListener(Event.COMPLETE, onSoundLoadCompleteHandle);
-				sound.load(new URLRequest(_musicSOURCE), new SoundLoaderContext(1000, true));
-				
+				sound.addEventListener(Event.SOUND_COMPLETE, onSoundPlayCompleteHandle);
 			}
 			dispatchEvent(new Event(SOUND_IDCHANGE));
 			if (isAutoPlay) {
@@ -178,6 +180,7 @@
 			__playId = -1;
 			playId = 0;
 		}
+		public var defaultVolume:Number = 0.8;
 		private var volumePrev:Number = 0;
 		public function get mute():Boolean{
 			return volume==0;
@@ -196,7 +199,6 @@
 				volume=volumePrev;
 			}
 		}
-		public var defaultVolume:Number = 0.8;
 		private var __volume:Number;
 		public function get volume():Number{
 			if(isNaN(__volume)){
@@ -208,10 +210,8 @@
 			__volume = _volume;
 			if (isPluginMode) {
 				ExternalInterface.call("musicVolume", (__volume * 100));
-			}else if(soundChannel) {
-				var _trans:SoundTransform = soundChannel.soundTransform;
-				_trans.volume = __volume;
-				soundChannel.soundTransform = _trans;
+			}else if(sound) {
+				sound.volume = __volume;
 			}
 			if (bar_volume) {
 				bar_volume.value = __volume;
@@ -254,10 +254,10 @@
 					return;
 				}
 			}
-			if (sound) {
-				addChannel(sound.play(positionRecord));
-			}else if (isPluginMode) {
+			if (isPluginMode) {
 				ExternalInterface.call("musicPlay", _positionTo * 0.001);
+			}else if(sound){
+				sound.play(positionRecord);
 			}
 			volume = volume;
 			__playState = SOUND_PLAY;
@@ -269,9 +269,10 @@
 				return;
 			}
 			positionRecord = position;
-			removeChannel();
 			if(isPluginMode){
 				ExternalInterface.call("musicPause");
+			}else if(sound){
+				sound.stop();
 			}
 			__playState=SOUND_PAUSE;
 			dispatchEvent(new Event(SOUND_STATE_CHANGE));
@@ -282,9 +283,10 @@
 				return;
 			}
 			positionRecord=0;
-			removeChannel();
 			if (isPluginMode) {
 				ExternalInterface.call("musicStop");
+			}else if(sound){
+				sound.stop();
 			}
 			__playState=SOUND_STOP;
 			dispatchEvent(new Event(SOUND_STATE_CHANGE));
@@ -354,11 +356,6 @@
 			}
 		}
 		protected function init():void {
-			ExternalInterface.addCallback("playStateChange", $pluginPlayStateChange);
-			ExternalInterface.addCallback("attachMusic", attachMusic);
-			ExternalInterface.addCallback("play", play);
-			ExternalInterface.addCallback("pause", pause);
-			ExternalInterface.addCallback("stop", stop);
 			addEventListener(SOUND_STATE_CHANGE, onSoundStageChangeHandle);
 			__playState = SOUND_STOP;
 			if (btn_play) {
@@ -394,7 +391,14 @@
 					play(totalTime * Math.min(_value, loaded));
 				}
 			}
-			isPlugin = ExternalInterface.call("initMusicPlayer");
+			if (ExternalInterface.available) {
+				ExternalInterface.addCallback("playStateChange", $pluginPlayStateChange);
+				ExternalInterface.addCallback("attachMusic", attachMusic);
+				ExternalInterface.addCallback("play", play);
+				ExternalInterface.addCallback("pause", pause);
+				ExternalInterface.addCallback("stop", stop);
+				isPlugin = ExternalInterface.call("initMusicPlayer");
+			}
 		}
 		protected function newList(_list:*):void {
 			if (_list is XML) {
@@ -411,17 +415,6 @@
 				} else if (_list is XMLList) {
 					musicList.list=_list;
 				} 
-			}
-		}
-		protected function addChannel(_soundChannel:SoundChannel):void {
-			removeChannel();
-			soundChannel = _soundChannel;
-			soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundPlayCompleteHandle);
-		}
-		protected function removeChannel():void {
-			if (soundChannel) {
-				soundChannel.stop();
-				soundChannel.removeEventListener(Event.SOUND_COMPLETE, onSoundPlayCompleteHandle);
 			}
 		}
 		protected function onSoundPlayProgressHandle(_evt:Event):void {
