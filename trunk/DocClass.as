@@ -18,6 +18,7 @@
 	public class DocClass extends MovieClip {
 		protected static var instance:DocClass;
 		protected var optionsXMLPath:String;
+		protected var isTopAndNoScale:Boolean;
 		public var optionsXML:XML;
 		public static function getInstance():DocClass {
 			return instance;
@@ -33,8 +34,13 @@
 		protected function onInitHandle(_evt:Event):void {
 			Security.allowDomain("*");
 			Security.allowInsecureDomain("*");
-			stage.align=StageAlign.TOP_LEFT;
-			stage.scaleMode = StageScaleMode.SHOW_ALL;
+			if (isTopAndNoScale) {
+				stage.align=StageAlign.TOP;
+				stage.scaleMode = StageScaleMode.NO_SCALE;
+			}else {
+				stage.align=StageAlign.TOP_LEFT;
+				stage.scaleMode = StageScaleMode.SHOW_ALL;
+			}
 			stage.showDefaultContextMenu = false;
 			__widthOrg = loaderInfo.width;
 			__heightOrg = loaderInfo.height;
@@ -46,9 +52,11 @@
 			Common.addContextMenu(this, "SWF:"+widthOrg + " x " + heightOrg, onWHReleaseHandle);
 			//loaderInfo.addEventListener(ProgressEvent.PROGRESS,onLoadingHandle);
 			//loaderInfo.addEventListener(Event.COMPLETE,onLoadedHandle);
-			onLoaded=function():void{
-				if(currentFrame==1){
-					play();
+			if (onLoaded==null) {
+				onLoaded=function():void{
+					if(currentFrame==1){
+						play();
+					}
 				}
 			}
 			optionsXMLPath = flashVars.xml || optionsXMLPath;
@@ -103,7 +111,7 @@
 		}*/
 		protected var loaded_optionsXML:Number = 0;
 		protected function onOptionsXMLLoadingHandle(_evt:ProgressEvent):void {
-			loaded_optionsXML = int(_evt.bytesLoaded / _evt.bytesTotal * 1000) * 0.001;
+			loaded_optionsXML = int(_evt.bytesLoaded / _evt.bytesTotal * 10000) / 10000;
 		}
 		protected function onOptionsXMLLoadedHandle(_evt:Event):void {
 			optionsXML = XML(_evt.currentTarget.data);
@@ -116,7 +124,12 @@
 			if (optionsXMLPath) {
 				_loaded = _loaded * 0.9 + loaded_optionsXML * 0.1;
 			}
-			loaded += (_loaded - loaded) * loadDelay;
+			var _dV:Number = _loaded - loaded;
+			if (_dV>0.001) {
+				loaded += _dV * loadDelay;
+			}else {
+				loaded = 1;
+			}
 		}
 		private var __widthOrg:int;
 		private var __heightOrg:int;
