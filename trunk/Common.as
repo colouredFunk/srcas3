@@ -69,6 +69,16 @@
 				return _a.splice(_i,1);
 			}
 		}
+		public static function getValueString(_value:uint, _dw:uint = 2):String {
+			var _str:String = String(_value);
+			_dw--;
+			var _d:uint = Math.pow(10, _dw);
+			if (_value<_d) {
+				_value += _d;
+				_str = "0" + String(_value).substr(1);
+			}
+			return _str;
+		}
 		//将数格式化为时间xx:xx
 		public static function formatTime_2(_n:uint):String {
 			var minutes:uint;

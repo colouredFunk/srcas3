@@ -45,10 +45,8 @@
 			__widthOrg = loaderInfo.width;
 			__heightOrg = loaderInfo.height;
 			__flashVars = loaderInfo.parameters;
-			paramsObject = { };
 			paramsObject.width = widthOrg;
 			paramsObject.height = heightOrg;
-			paramsObject.flashVars = { };
 			Common.addContextMenu(this, "SWF:"+widthOrg + " x " + heightOrg, onWHReleaseHandle);
 			//loaderInfo.addEventListener(ProgressEvent.PROGRESS,onLoadingHandle);
 			//loaderInfo.addEventListener(Event.COMPLETE,onLoadedHandle);
@@ -65,7 +63,7 @@
 			}
 			addEventListener(Event.ENTER_FRAME,onLoadingHandle);
 		}
-		protected var paramsObject:Object;
+		protected var paramsObject:Object = { width:0, height:0, flashVars: { }};
 		protected function onWHReleaseHandle(_evt:ContextMenuEvent):void {
 			if (optionsXMLPath) {
 				paramsObject.flashVars.xml = optionsXMLPath;
@@ -75,10 +73,10 @@
 			_jsonStr = Common.replaceStr(_jsonStr, '":', ':');
 			_jsonStr = Common.replaceStr(_jsonStr, ',"', ',');
 			_jsonStr = Common.replaceStr(_jsonStr, '"', "'");
-			var _url:String = this.loaderInfo.url;
+			var _url:String = Common.replaceStr(this.loaderInfo.url, "%5F", "_");
 			var _ary:Array = _url.split("/");
 			_url = _ary.pop();
-			//_url = _ary.pop() +"/" + _url;
+			_url = _ary.pop() +"/" + _url;
 			var _str:String = "addSWF('" + _url + "'," +_jsonStr + ");";
 			
 			_str = "<script src='http://www.wanmei.com/public/js/flash.js' type='text/javascript'></script>\r\n\r\n<script type='text/javascript'>\r\n	" + _str;
@@ -128,7 +126,7 @@
 			if (_dV>0.001) {
 				loaded += _dV * loadDelay;
 			}else {
-				loaded = 1;
+				loaded = _loaded;
 			}
 		}
 		private var __widthOrg:int;
