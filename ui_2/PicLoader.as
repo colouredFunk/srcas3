@@ -63,7 +63,7 @@ package ui_2
 				picDic[_path] = Common.loader(_path, onPicLoadedHandle);
 			}
 		}
-		private function onPicLoadedHandle(_evt:Event):void {
+		protected function onPicLoadedHandle(_evt:Event):void {
 			var _loader:Loader = _evt.currentTarget.loader as Loader;
 			(_loader.content as Bitmap).smoothing = true;
 			if (frameClip) {
@@ -72,6 +72,9 @@ package ui_2
 				container.addChild(_loader);
 			}
 			addPic(_loader);
+			if (onLoaded!=null) {
+				onLoaded();
+			}
 		}
 		private function addPic(_pic:DisplayObject):void {
 			autoFitArea.attach(_pic, ScaleMode.PROPORTIONAL_INSIDE, AlignMode.CENTER, AlignMode.CENTER);
@@ -90,9 +93,6 @@ package ui_2
 				_pic.visible = true;
 			}
 			picNow = _pic;
-			if (onLoaded!=null) {
-				onLoaded();
-			}
 		}
 	}
 
