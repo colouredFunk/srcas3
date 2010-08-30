@@ -88,18 +88,19 @@ package zero.swf{
 		}
 		
 		private static const noShortTypes:Object={
+			DefineSceneAndFrameLabelData:true,//测试完去掉
+			DefineShape:true,//测试完去掉 Flash Builder 4 会把这个编译成短tag，Flash CS5 则会编译成长tag
+			DefineSprite:true,//测试完去掉
+			ScriptLimits:true,//测试完去掉 Flash Builder 4 会把这个编译成短tag，Flash CS5 则会编译成长tag
+			SymbolClass:true,//测试完去掉 Flash Builder 4 会把这个编译成短tag，Flash CS5 则会编译成长tag,
+			FrameLabel:true,//测试完去掉
+			
 			DefineBits:true,
 			DefineBitsLossless:true,
 			DefineBitsLossless2:true,
 			DefineBitsJPEG2:true,
 			DefineBitsJPEG3:true,
-			DefineBitsJPEG4:true,
-			
-			DefineSceneAndFrameLabelData:true,//测试完去掉
-			DefineShape:true,//测试完去掉 Flash Builder 4 会把这个编译成短tag，Flash CS5 则会编译成长tag
-			DefineSprite:true,//测试完去掉
-			ScriptLimits:true,//测试完去掉 Flash Builder 4 会把这个编译成短tag，Flash CS5 则会编译成长tag
-			SymbolClass:true//测试完去掉 Flash Builder 4 会把这个编译成短tag，Flash CS5 则会编译成长tag
+			DefineBitsJPEG4:true
 			
 		}//某天偶然发现的一些小图片变成短tag后出错(不知道还会不会有其它tag有这种现像)
 		public static function getHeaderData(type:int,bodyLength:int):ByteArray{
