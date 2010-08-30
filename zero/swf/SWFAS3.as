@@ -16,6 +16,7 @@ package zero.swf{
 	import flash.utils.*;
 	
 	public class SWFAS3 extends SWFLevel1{
+		public var doABCV:Vector.<DoABCWithoutFlagsAndName>;
 		public function SWFAS3(){
 		}
 		override public function initByData(data:ByteArray):void{
@@ -23,18 +24,26 @@ package zero.swf{
 			if(!isAS3){
 				throw new Error("不是 AS3");
 			}
+			doABCV=new Vector.<DoABCWithoutFlagsAndName>();
+			dataAndTags.forEachTag(tag2DoABC);
 		}
-		public function _82272():void{
-			dataAndTags.forEachTag(__82272);
-		}
-		public function __82272(data:ByteArray,tag:Tag,tagV:Vector.<Tag>,tagId:int):void{
+		private function tag2DoABC(data:ByteArray,tag:Tag,tagV:Vector.<Tag>,tagId:int):void{
+			var doABCWithoutFlagsAndName:DoABCWithoutFlagsAndName;
 			switch(tag.type){
 				case TagType.DoABC:
 					var doABC:DoABC=new DoABC();
 					doABC.initByDataNow(data,tag.bodyOffset);
-					var doABCWithoutFlagsAndName:DoABCWithoutFlagsAndName=new DoABCWithoutFlagsAndName();
+					doABCWithoutFlagsAndName=new DoABCWithoutFlagsAndName();
 					doABCWithoutFlagsAndName.ABCData=doABC.ABCData;
-					tag.updateByBodyData(doABCWithoutFlagsAndName);
+					tag.type=TagType.DoABCWithoutFlagsAndName;
+					tag.bodyData=doABCWithoutFlagsAndName;
+					doABCV[doABCV.length]=doABCWithoutFlagsAndName;
+				break;
+				case TagType.DoABCWithoutFlagsAndName:
+					doABCWithoutFlagsAndName=new DoABCWithoutFlagsAndName();
+					doABCWithoutFlagsAndName.initByDataNow(data,tag.bodyOffset);
+					tag.bodyData=doABCWithoutFlagsAndName;
+					doABCV[doABCV.length]=doABCWithoutFlagsAndName;
 				break;
 			}
 		}

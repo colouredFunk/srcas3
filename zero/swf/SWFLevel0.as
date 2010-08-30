@@ -1,6 +1,6 @@
 /***
 SWFLevel0 版本:v1.0
-简要说明:这家伙很懒什么都没写
+简要说明:0级的SWF编码解码, 支持获取和修改 type, Version, FrameSize( wid 和 hei), FrameRate, 解析出每个 tag 的类型, 位置, 和长度(不含 DefineSprite 里的 tag)
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
 创建时间:2010年8月11日 10:30:53
 历次修改:未有修改
@@ -12,9 +12,16 @@ package zero.swf{
 	import flash.events.*;
 	import flash.utils.*;
 	
+	import zero.swf.tag_body.FileAttributes;
+	import zero.swf.tag_body.Metadata;
+	
 	public class SWFLevel0{
-		public var swfDataAndData:SWFDataAndData;
-		public var dataAndBaseInfo:DataAndBaseInfo;
+		public function clear():void{
+			dataAndTags.clear();
+		}
+		
+		private var swfDataAndData:SWFDataAndData;
+		private var dataAndBaseInfo:DataAndBaseInfo;
 		public var dataAndTags:DataAndTags;
 		
 		public function SWFLevel0(){
@@ -57,22 +64,187 @@ package zero.swf{
 		}
 		
 		//
+		private var fileAttributesTag:Tag;
+		private var metadataTag:Tag;
+		
+		private var acceleration:String;//direct 和 gpu 在文档和实际情况中好像是倒过来的...
+		private static const ACC_NORMAL:String="normal ";
+		private static const ACC_DIRECT:String="direct";
+		private static const ACC_GPU:String="gpu";
+		public var isAS3:Boolean;
+		public var accessNetworkOnly:Boolean;
+		public var metadataStr:String;
+		
+		//
 		public function initBySWFData(swfData:ByteArray):void{
 			initByData(swfDataAndData.swfData2Data(swfData));
 		}
 		public function initByData(data:ByteArray):void{
 			dataAndBaseInfo.initByData(data);
 			dataAndTags.initByData(data,dataAndBaseInfo.offset,data.length);
+			tags2Infos();
 		}
+		public function tags2Infos():void{
+			acceleration=ACC_NORMAL;
+			isAS3=false;
+			accessNetworkOnly=false;
+			metadataStr="";
+			fileAttributesTag=null;
+			metadataTag=null;
+			for each(var tag:Tag in dataAndTags.tagV){
+				switch(tag.type){
+					case TagType.FileAttributes:
+						var fileAttributes:FileAttributes;
+						if(tag.tagBody){
+							fileAttributes=tag.tagBody as FileAttributes;
+						}else{
+							fileAttributes=new FileAttributes();
+							fileAttributes.initByData(tag.bodyData,tag.bodyOffset,tag.bodyOffset+tag.bodyLength);
+						}
+						
+						if(fileAttributes.UseDirectBlit){
+							acceleration=ACC_DIRECT;
+						}else if(fileAttributes.UseGPU){
+							acceleration=ACC_GPU;
+						}else{
+							acceleration=ACC_NORMAL;
+						}
+						
+						isAS3=(fileAttributes.ActionScript3==1);
+						accessNetworkOnly=(fileAttributes.UseNetwork==1);
+						fileAttributesTag=tag;
+						fileAttributesTag.tagBody=fileAttributes;
+					break;
+					case TagType.Metadata:
+						var metadata:Metadata;
+						if(tag.tagBody){
+							metadata=tag.tagBody as Metadata;
+						}else{
+							metadata=new Metadata();
+							metadata.initByData(tag.bodyData,tag.bodyOffset,tag.bodyOffset+tag.bodyLength);
+						}
+						
+						metadataStr=metadata.metadata;
+						metadataTag=tag;
+						metadataTag.tagBody=metadata;
+					break;
+				}
+			}
+		}
+		public function infos2Tags():void{
+			///*
+			var tagId:int=dataAndTags.tagV.length;
+			while(--tagId>=0){
+				var tag:Tag=dataAndTags.tagV[tagId];
+				switch(tag.type){
+					case TagType.FileAttributes:
+					case TagType.Metadata:
+						dataAndTags.tagV.splice(tagId,1);
+					break;
+				}
+			}
+			//*/
+			
+			var fileAttributes:FileAttributes=new FileAttributes();
+			switch(acceleration){
+				case ACC_NORMAL:
+					fileAttributes.UseDirectBlit=0;
+					fileAttributes.UseGPU=0;
+				break;
+				case ACC_DIRECT:
+					fileAttributes.UseDirectBlit=1;
+					fileAttributes.UseGPU=0;
+				break;
+				case ACC_GPU:
+					fileAttributes.UseDirectBlit=0;
+					fileAttributes.UseGPU=1;
+				break;
+			}
+			if(isAS3){
+				if(Version<9){
+					throw new Error("Version="+Version+", 不支持AS3");
+					//Version=9;
+				}else{
+					fileAttributes.ActionScript3=1;
+				}
+			}else{
+				fileAttributes.ActionScript3=0;
+			}
+			fileAttributes.UseNetwork=(accessNetworkOnly?1:0);
+			
+			if(metadataStr){
+				fileAttributes.HasMetadata=1;
+				var metadata:Metadata=new Metadata();
+				metadata.metadata=metadataStr;
+				if(!metadataTag){
+					metadataTag=new Tag();
+				}
+				metadataTag.tagBody=metadata;
+				dataAndTags.tagV.unshift(metadataTag);
+			}else{
+				fileAttributes.HasMetadata=0;
+			}
+			
+			if(Version>=8){
+				if(!fileAttributesTag){
+					fileAttributesTag=new Tag();
+				}
+				fileAttributesTag.tagBody=fileAttributes;
+				dataAndTags.tagV.unshift(fileAttributesTag);
+			}
+		}
+		
+		private var newData:ByteArray;
 		public function toSWFData():ByteArray{
-			return swfDataAndData.data2SWFData(toData());
+			prevToData();
+			newData.writeBytes(dataAndTags.toData());
+			var _newData:ByteArray=newData;
+			newData=null;
+			return swfDataAndData.data2SWFData(_newData);
 		}
-		public function toData():ByteArray{
-			var data:ByteArray=new ByteArray();
-			dataAndBaseInfo.getData(data);
-			dataAndTags.getData(data,data.length);
-			return data;
+		
+		public function prevToData():void{
+			newData=new ByteArray();
+			dataAndBaseInfo.getData(newData);
+			newData.position=newData.length;
 		}
+		
+		private var progress_finished:Function;
+		public function toSWFData2(progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
+			prevToData();
+			progress_finished=_progress_finished;
+			dataAndTags.toData2(
+				progress_start,
+				progress_progress,
+				toSWFData2_finished
+			);
+		}
+		private function toSWFData2_finished(dataAndTagsNewData:ByteArray):void{
+			newData.writeBytes(dataAndTagsNewData);
+			
+			var _progress_finished:Function=progress_finished;
+			progress_finished=null;
+			var _newData:ByteArray=newData;
+			newData=null;
+			_progress_finished(swfDataAndData.data2SWFData(_newData));
+		}
+		
+		CONFIG::toXMLAndInitByXML{
+		public function toXML():XML{
+			infos2Tags();
+			var xml:XML=<SWF type={type} Version={Version} FileLength={swfDataAndData.FileLength} wid={wid} hei={hei} FrameRate={FrameRate}/>;
+			xml.appendChild(dataAndTags.toXML());
+			return xml;
+		}
+		public function initByXML(xml:XML):void{
+			type=xml.@type.toString();
+			Version=int(xml.@Version.toString());
+			wid=int(xml.@wid.toString());
+			hei=int(xml.@hei.toString());
+			FrameRate=Number(xml.@FrameRate.toString());
+			dataAndTags.initByXML(xml.tags[0]);
+		}
+		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
 
