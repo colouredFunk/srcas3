@@ -7,9 +7,11 @@ ReplaceStrs 版本:v1.0
 用法举例:这家伙很懒什么都没写
 */
 
-package swf_encode_and_decode{
+package zero.swf{
 	import _swf._record.TagAndName;
 	import _swf._tag._body.SymbolClass;
+	import _swf._fun.*;
+	import swf_encode_and_decode.Tag;
 	
 	import flash.display.*;
 	import flash.events.*;
@@ -18,7 +20,7 @@ package swf_encode_and_decode{
 	public class ReplaceStrs{
 		public static function replace(
 			data:ByteArray,
-			tagV:Vector.<Tag>,
+			tagV:Vector.<swf_encode_and_decode.Tag>,
 			str0Arr:Array,
 			strtArr:Array,
 			symbolClassNameIdArr:Array//,
@@ -40,7 +42,7 @@ package swf_encode_and_decode{
 			for each(var symbolClassNameId:int in symbolClassNameIdArr){
 				symbolClassNameMark[str0Arr[symbolClassNameId]]=strtArr[symbolClassNameId];
 			}
-			for each(var tag:Tag in tagV){
+			for each(var tag:swf_encode_and_decode.Tag in tagV){
 				switch(tag.type){
 					case TagType.DoABC:
 					case TagType.DoABCWithoutFlagsAndName:
@@ -48,7 +50,7 @@ package swf_encode_and_decode{
 						doABCStrsEditor.initByData(data,tag);
 						doABCStrsEditor.replaceStrs(str0Arr,strtArr);
 						newData.writeBytes(
-							Tag.toData_typeAndBodyData(tag.type,doABCStrsEditor.toData())
+							swf_encode_and_decode.Tag.toData_typeAndBodyData(tag.type,doABCStrsEditor.toData())
 						);
 					break;
 					case TagType.SymbolClass:
@@ -60,10 +62,11 @@ package swf_encode_and_decode{
 							}
 						}
 						newData.writeBytes(
-							Tag.toData_typeAndBodyData(TagType.SymbolClass,sc.toDataNow())
+							swf_encode_and_decode.Tag.toData_typeAndBodyData(TagType.SymbolClass,sc.toDataNow())
 						);
 					break;
 					default:
+						trace("不在推荐使用 bodyOffset-headOffset+bodyLength，因为可能等于0");
 						newData.writeBytes(data,tag.headOffset,tag.bodyOffset-tag.headOffset+tag.bodyLength);
 					break;
 				}

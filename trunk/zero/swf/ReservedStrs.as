@@ -7,7 +7,7 @@ ReservedStrs 版本:v1.0
 用法举例:这家伙很懒什么都没写
 */
 
-package swf_encode_and_decode{
+package zero.swf{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;

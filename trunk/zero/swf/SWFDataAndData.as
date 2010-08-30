@@ -29,7 +29,15 @@ package zero.swf{
 			if(swfData.length>8){
 				swfData.position=0;
 				type=swfData.readUTFBytes(3);//压缩和非压缩标记
+				
 				var data:ByteArray=new ByteArray();
+				data.endian=Endian.LITTLE_ENDIAN;
+				
+				//if(data.endian==Endian.BIG_ENDIAN){
+				//	trace("自动把 "+Endian.BIG_ENDIAN+" 转换为 "+Endian.LITTLE_ENDIAN);
+				//	data.endian=Endian.LITTLE_ENDIAN;
+				//}
+				
 				switch(type){
 					case "CWS":
 						data=new ByteArray();
@@ -55,6 +63,7 @@ package zero.swf{
 				if(FileLength!=(swfData[4]|(swfData[5]<<8)|(swfData[6]<<16)|(swfData[7]<<24))){
 					trace("文件长度不符");
 				}
+				
 				return data;
 			}
 			throw new Error("不是有效的SWF文件");
