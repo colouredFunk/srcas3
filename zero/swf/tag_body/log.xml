@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <log>
-  <file className="DebugID" date="2010年8月30日 13:39:33" size="2141"/>
-  <file className="DefineBinaryData" date="2010年8月30日 13:39:33" size="2651"/>
-  <file className="DefineBitsJPEG2" date="2010年8月30日 13:39:33" size="1849"/>
-  <file className="DefineShape" date="2010年8月30日 13:39:33" size="2225"/>
-  <file className="DefineShape2" date="2010年8月30日 13:39:33" size="1600"/>
-  <file className="DefineShape3" date="2010年8月30日 13:39:33" size="1600"/>
-  <file className="DefineShape4" date="2010年8月30日 13:39:33" size="1600"/>
-  <file className="EnableDebugger" date="2010年8月30日 13:39:33" size="1632"/>
-  <file className="EnableDebugger2" date="2010年8月30日 13:39:33" size="1635"/>
-  <file className="FileAttributes" date="2010年8月30日 13:39:33" size="5120"/>
-  <file className="Metadata" date="2010年8月30日 13:39:33" size="4185"/>
-  <file className="Protect" date="2010年8月30日 13:39:33" size="1611"/>
-  <file className="ProductInfo" date="2010年8月30日 13:39:33" size="4476"/>
-  <file className="ScriptLimits" date="2010年8月30日 13:39:33" size="2621"/>
-  <file className="SetBackgroundColor" date="2010年8月30日 13:39:33" size="1784"/>
-  <file className="SymbolClass" date="2010年8月30日 13:39:33" size="3169"/>
-  <file className="DefineSceneAndFrameLabelData" date="2010年8月30日 13:39:33" size="5658"/>
+  <file className="DebugID" date="2010年8月30日 23:04:28" size="2105"/>
+  <file className="DefineBinaryData" date="2010年8月30日 23:04:28" size="2619"/>
+  <file className="DefineBitsJPEG2" date="2010年8月30日 23:04:28" size="1817"/>
+  <file className="DefineSceneAndFrameLabelData" date="2010年8月30日 23:04:28" size="7077"/>
+  <file className="DefineShape" date="2010年8月30日 23:04:28" size="2193"/>
+  <file className="DefineShape2" date="2010年8月30日 23:04:28" size="1570"/>
+  <file className="DefineShape3" date="2010年8月30日 23:04:28" size="1570"/>
+  <file className="DefineShape4" date="2010年8月30日 23:04:28" size="1570"/>
+  <file className="EnableDebugger" date="2010年8月30日 23:04:28" size="1596"/>
+  <file className="EnableDebugger2" date="2010年8月30日 23:04:28" size="1599"/>
+  <file className="FileAttributes" date="2010年8月30日 23:04:28" size="5085"/>
+  <file className="Metadata" date="2010年8月30日 23:04:28" size="4245"/>
+  <file className="Protect" date="2010年8月30日 23:04:28" size="1575"/>
+  <file className="ProductInfo" date="2010年8月30日 23:04:28" size="4438"/>
+  <file className="ScriptLimits" date="2010年8月30日 23:04:28" size="2585"/>
+  <file className="SetBackgroundColor" date="2010年8月30日 23:04:28" size="1748"/>
+  <file className="SymbolClass" date="2010年8月30日 23:04:28" size="3176"/>
 </log>

@@ -13,6 +13,16 @@ package zero.swf.tag_body{
 	import flash.utils.*;
 	
 	public class TagBody{
+		
+		/*
+		public function get Reserved():int{//测试
+			return 0;
+		}
+		public function set Reserved(_Reserved:int):void{//测试
+			
+		}
+		*/
+		
 		public function initByData(data:ByteArray,offset:int,endOffset:int):void{
 			throw new Error("请 override 来使用");
 		}

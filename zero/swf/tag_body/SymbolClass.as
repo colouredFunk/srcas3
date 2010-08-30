@@ -2,11 +2,10 @@
 SymbolClass 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年8月30日 13:08:02 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年8月30日 20:56:05 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
-
 //SymbolClass
 //Field 		Type 			Comment
 //Header 		RECORDHEADER 	Tag type = 76
@@ -16,60 +15,49 @@ SymbolClass 版本:v1.0
 //... ... ...
 //TagN 			U16 			Tag ID for symbol N
 //NameN 		STRING 			Fully-qualified class name for symbol N
-
-
 package zero.swf.tag_body{
 
 	import flash.utils.ByteArray;
 
 	import zero.BytesAndStr16;
-	import zero.gettersetter.UGetterAndSetter;
 	import zero.swf.BytesData;
 
 	public class SymbolClass extends TagBody{
 		public var NumSymbols:int;				//UI16
 		public var TagV:Vector.<int>;			
 		public var NameV:Vector.<String>;		
-		
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):void{
 			NumSymbols=data[offset]|(data[offset+1]<<8);
 			TagV=new Vector.<int>();
 			NameV=new Vector.<String>();
 			offset+=2;
+			//#offsetpp
 			for(var i:int=0;i<NumSymbols;i++){
-				TagV[i]=data[offset]|(data[offset+1]<<8);
-				offset+=2;
-				var strSize:int=1;
-				if(data[offset]){
-					while(data[offset+(strSize++)]){};
-					data.position=offset;
-					NameV[i]=data.readUTFBytes(strSize);
-				}else{
-					NameV[i]="";
-				}
-				offset+=strSize;
-				
+				TagV[i]=data[offset++]|(data[offset++]<<8);
+				var get_str_size:int=0;
+				while(data[offset+(get_str_size++)]){}
+				data.position=offset;
+				NameV[i]=data.readUTFBytes(get_str_size);
+				offset+=get_str_size;
 			}
-			
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
+			//var offset:int=0;//测试
 			NumSymbols=TagV.length;
 			data[0]=NumSymbols;
 			data[1]=NumSymbols>>8;
 			var offset:int=2;
+			//#offsetpp
 			for(var i:int=0;i<NumSymbols;i++){
-				data[offset]=TagV[i];
-				data[offset+1]=TagV[i]>>8;
-				data.position=offset+2;
+				data[offset++]=TagV[i];
+				data[offset++]=TagV[i]>>8;
+				data.position=offset;
 				data.writeUTFBytes(NameV[i]);
 				offset=data.length;
 				data[offset++]=0;//字符串结束
-				
-				
 			}
-			
 			return data;
 		}
 
@@ -86,7 +74,6 @@ package zero.swf.tag_body{
 			for(var i:int=0;i<NumSymbols;i++){
 				listXML.appendChild(<Tag value={TagV[i]}/>);
 				listXML.appendChild(<Name value={NameV[i]}/>);
-				
 			}
 			return xml;
 		}
@@ -101,11 +88,8 @@ package zero.swf.tag_body{
 			for(var i:int=0;i<NumSymbols;i++){
 				TagV[i]=int(TagXMLList[i].@value.toString());
 				NameV[i]=NameXMLList[i].@value.toString();
-				
 			}
-			
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
-
