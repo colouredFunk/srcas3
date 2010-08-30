@@ -1,40 +1,49 @@
 /***
-UGetterAndSetter 版本:v1.0
+BytesData 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年6月13日 13:51:06
+创建时间:2010年8月24日 20:24:29
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.gettersetter{
+package zero.swf{
+	
 	import flash.utils.ByteArray;
-	public class UGetterAndSetter{
-		public static var offset:int;
-		public static function getU(data:ByteArray,_offset:int):uint{
-			var u:uint=0;
-			var step:int=0;
-			do{
-				var value:int=data[_offset++];
-				u|=((value&0x7f)<<step);// value & 0111 1111
-				step+=7;
-			}while(value>>>7);
-			offset=_offset;
-			return u;
+	import zero.BytesAndStr16;
+	import zero.swf.BytesData;
+	
+	public class BytesData{
+		public var ownData:ByteArray;
+		public var dataOffset:int;
+		public var dataLength:int;
+		public function BytesData(){
 		}
-		public static function setU(value:uint,newData:ByteArray,_offset:int):void{
-			while(true){
-				var byteValue:int=value&0x7f;
-				value>>>=7;
-				if(value){
-					newData[_offset++]=0x80|byteValue;
-				}else{
-					newData[_offset++]=byteValue;
-					break;
-				}
+		public function initByData(data:ByteArray,offset:int,endOffset:int):void{
+			ownData=data;
+			dataOffset=offset;
+			dataLength=endOffset-offset;
+		}
+		public function toData():ByteArray{
+			var data:ByteArray=new ByteArray();
+			if(dataLength>0){
+				data.writeBytes(ownData,dataOffset,dataLength);
 			}
-			offset=_offset;
+			return data;
 		}
+		////
+		CONFIG::toXMLAndInitByXML {
+		public function toXML():XML{
+			if(dataLength>0){
+				return <BytesData length={dataLength} value={BytesAndStr16.bytes2str16(ownData,dataOffset,dataLength)}/>;
+			}
+			return <BytesData/>;
+		}
+		public function initByXML(xml:XML):void{
+			var data:ByteArray=BytesAndStr16.str162bytes(xml.@value.toString());
+			initByData(data,0,data.length);
+		}
+		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
 

@@ -54,16 +54,24 @@ OutputPane 版本:v1.0
 			clearTimeout(timeoutId);
 		}
 		public function output(msg:String,style:String=null):void{
+			msg2strArr(msg,style);
+			updateDelay();
+		}
+		public function outputDelay(msg:String,style:String=null):void{
+			msg2strArr(msg,style);
+			clearTimeout(timeoutId);
+			timeoutId=setTimeout(updateDelay,100);
+		}
+		private function msg2strArr(msg:String,style:String=null):void{
 			if(style){
 				strArr[strArr.length]="<span class=\""+style+"\">"+msg+"</span><br>";
 			}else{
 				strArr[strArr.length]=msg+"<br>";
 			}
-			clearTimeout(timeoutId);
-			timeoutId=setTimeout(updateDelay,100);
 		}
 		private function updateDelay():void{
 			txt.htmlText=strArr.join("");
+			txt.validateNow();
 			txt.verticalScrollPosition=txt.mx_internal::getTextField().numLines;
 			txt.validateNow();
 			/*
