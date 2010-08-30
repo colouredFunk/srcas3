@@ -9,7 +9,7 @@ StrGetter 版本:v1.0
 
 package zero.gettersetter{
 	import flash.utils.*;
-	public class StrGetter{
+	public class StrGetter{好像写的不好
 		public static var len:int;
 		public static function getStr1(data:ByteArray,offset:int,endOffset:int):String{
 			if(offset>=endOffset){

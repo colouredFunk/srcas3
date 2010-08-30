@@ -1,39 +1,45 @@
 /***
-UGetterAndSetter 版本:v1.0
+TagBody 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年6月13日 13:51:06
+创建时间:2010年8月22日 09:34:53
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.gettersetter{
-	import flash.utils.ByteArray;
-	public class UGetterAndSetter{
-		public static var offset:int;
-		public static function getU(data:ByteArray,_offset:int):uint{
-			var u:uint=0;
-			var step:int=0;
-			do{
-				var value:int=data[_offset++];
-				u|=((value&0x7f)<<step);// value & 0111 1111
-				step+=7;
-			}while(value>>>7);
-			offset=_offset;
-			return u;
+package zero.swf.tag_body{
+	import flash.display.*;
+	import flash.events.*;
+	import flash.utils.*;
+	
+	public class TagBody{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):void{
+			throw new Error("请 override 来使用");
 		}
-		public static function setU(value:uint,newData:ByteArray,_offset:int):void{
-			while(true){
-				var byteValue:int=value&0x7f;
-				value>>>=7;
-				if(value){
-					newData[_offset++]=0x80|byteValue;
-				}else{
-					newData[_offset++]=byteValue;
-					break;
+		public function toData():ByteArray{
+			throw new Error("请 override 来使用");
+			return null;
+		}
+		CONFIG::toXMLAndInitByXML{
+		public function toXML():XML{
+			throw new Error("请 override 来使用");
+			return null;
+		}
+		public function initByXML(xml:XML):void{
+			throw new Error("请 override 来使用");
+		}
+		}//end of CONFIG::toXMLAndInitByXML
+		
+		public static function getMarkByStrV(strV:Vector.<String>):Object{
+			var mark:Object=new Object();
+			var i:int=0;
+			for each(var str:String in strV){
+				if(str){
+					mark[str]=i;
 				}
+				i++;
 			}
-			offset=_offset;
+			return mark;
 		}
 	}
 }

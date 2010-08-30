@@ -7,7 +7,7 @@ S24GetterAndSetter 版本:v1.0
 用法举例:这家伙很懒什么都没写
 */
 
-package swf_encode_and_decode{
+package zero.gettersetter{
 	import flash.utils.ByteArray;
 	public class S24GetterAndSetter{
 		public static var offset:int;
