@@ -2,11 +2,10 @@
 Metadata 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年8月30日 13:08:02 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年8月30日 17:10:20 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
-
 //The Metadata tag is an optional tag to describe the SWF file to an external process. The tag
 //embeds XML metadata in the SWF file so that, for example, a search engine can locate this
 //tag, access a title for the SWF file, and display that title in search results. Flash Player always
@@ -70,32 +69,26 @@ Metadata 版本:v1.0
 //Field 	Type 			Comment
 //Header 	RECORDHEADER 	Tag type = 77
 //Metadata 	STRING 			XML Metadata
-
-
 package zero.swf.tag_body{
 
 	import flash.utils.ByteArray;
 
 	import zero.BytesAndStr16;
-	import zero.gettersetter.UGetterAndSetter;
 	import zero.swf.BytesData;
 
 	public class Metadata extends TagBody{
 		public var metadata:String;				//STRING
-		
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):void{
-			var strSize:int=1;
-			if(data[offset]){
-				while(data[offset+(strSize++)]){};
-				data.position=offset;
-				metadata=data.readUTFBytes(strSize);
-			}else{
-				metadata="";
-			}
+			var get_str_size:int=0;
+			while(data[offset+(get_str_size++)]){}
+			data.position=offset;
+			metadata=data.readUTFBytes(get_str_size);
+			//offset+=get_str_size;
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
+			//var offset:int=0;//测试
 			//data.position=0;
 			data.writeUTFBytes(metadata);
 			data[data.length]=0;//字符串结束
@@ -108,13 +101,10 @@ package zero.swf.tag_body{
 			return <Metadata
 				metadata={metadata}
 			/>;
-			
 		}
 		override public function initByXML(xml:XML):void{
 			metadata=xml.@metadata.toString();
-			
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
-

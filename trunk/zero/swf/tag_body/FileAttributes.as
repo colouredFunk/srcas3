@@ -2,11 +2,10 @@
 FileAttributes 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年8月30日 13:08:02 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年8月30日 17:42:31 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
-
 //The FileAttributes tag defines characteristics of the SWF file. This tag is required for SWF 8
 //and later and must be the first tag in the SWF file. Additionally, the FileAttributes tag can
 //optionally be included in all SWF file versions.
@@ -45,14 +44,11 @@ FileAttributes 版本:v1.0
 //standalone Flash Player. When a SWF file plays in a web browser plug-in, UseDirectBlit
 //is equivalent to specifying a wmode of "direct" in the tags that embed the SWF inside
 //the HTML page, while UseGPU is equivalent to a wmode of "gpu".
-
-
 package zero.swf.tag_body{
 
 	import flash.utils.ByteArray;
 
 	import zero.BytesAndStr16;
-	import zero.gettersetter.UGetterAndSetter;
 	import zero.swf.BytesData;
 
 	public class FileAttributes extends TagBody{
@@ -61,11 +57,10 @@ package zero.swf.tag_body{
 		public var HasMetadata:int;				
 		public var ActionScript3:int;			
 		public var UseNetwork:int;				
-		
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):void{
 			var flags:int=data[offset];
-			//Reserved=((flags&128)>>>7);			//10000000
+			//Reserved=((flags&128)>>>7);				//10000000
 			UseDirectBlit=((flags&64)>>>6);			//01000000
 			UseGPU=((flags&32)>>>5);				//00100000
 			HasMetadata=((flags&16)>>>4);			//00010000
@@ -74,10 +69,10 @@ package zero.swf.tag_body{
 			UseNetwork=(flags&1);					//00000001
 			
 			//Reserved=data[offset+1]|(data[offset+2]<<8)|(data[offset+3]<<16);
-			
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
+			//var offset:int=0;//测试
 			var flags:int=0;
 			//flags|=(Reserved<<7);					//10000000
 			flags|=(UseDirectBlit<<6);				//01000000
@@ -91,7 +86,6 @@ package zero.swf.tag_body{
 			data[1]=0x00;
 			data[2]=0x00;
 			data[3]=0x00;
-			
 			return data;
 		}
 
@@ -105,7 +99,6 @@ package zero.swf.tag_body{
 				ActionScript3={ActionScript3}
 				UseNetwork={UseNetwork}
 			/>;
-			
 		}
 		override public function initByXML(xml:XML):void{
 			UseDirectBlit=int(xml.@UseDirectBlit.toString());
@@ -113,9 +106,7 @@ package zero.swf.tag_body{
 			HasMetadata=int(xml.@HasMetadata.toString());
 			ActionScript3=int(xml.@ActionScript3.toString());
 			UseNetwork=int(xml.@UseNetwork.toString());
-			
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
-
