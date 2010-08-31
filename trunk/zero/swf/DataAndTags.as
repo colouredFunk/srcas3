@@ -11,6 +11,7 @@ package zero.swf{
 	import flash.utils.*;
 	
 	import zero.BytesAndStr16;
+	import zero.Outputer;
 	import zero.swf.tag_body.TagBody;
 	import zero.swf.tag_body.DefineSprite;
 	import zero.swf.tag_body.FileAttributes;
@@ -69,19 +70,16 @@ package zero.swf{
 		}
 		
 		public function initByData(data:ByteArray,offset:int,endOffset:int):void{
-			//trace("offset="+offset+",endOffset="+endOffset);
 			FrameCount=data[offset++]|(data[offset++]<<8);//帧数是一个int, 在SWF里以 UI16(Unsigned 16-bit integer value, 16位无符号整数) 的结构保存
-			//trace("FrameCount="+FrameCount);
 			tagV=new Vector.<Tag>();
+			var tag:Tag;
 			while(offset<endOffset){
-				var tag:Tag=new Tag();
+				tag=new Tag();
 				tagV[tagV.length]=tag;
 				
 				tag.initByData(data,offset);
-				//trace(TagType.typeNameArr[tag.type]);
 				offset=tag.bodyOffset;
 				var nextTagOffset:int=tag.bodyOffset+tag.bodyLength;
-				///*
 				if(tag.type==TagType.DefineSprite){
 					var defineSprite:DefineSprite=new DefineSprite();
 					defineSprite.id=data[offset++]|(data[offset++]<<8);
@@ -98,16 +96,29 @@ package zero.swf{
 						}
 					}
 				}
-				//*/
 				offset=nextTagOffset;
 			}
 			if(offset===endOffset){
 			}else{
-				throw new Error("offset="+offset+",endOffset="+endOffset+",offset!=endOffset");
+				Outputer.output("最后一个 tag: "+TagType.typeNameArr[tag.type],"brown");
+				Outputer.output("offset="+offset+",endOffset="+endOffset+",offset!=endOffset","brown");
+				if(offset>endOffset){
+					tag.bodyLength+=endOffset-offset;
+					Outputer.output("修正最后一个 tag: tag.bodyLength="+tag.bodyLength,"brown");
+				}else{
+					throw new Error("offset="+offset+",endOffset="+endOffset+",offset!=endOffset");
+				}
+				//if(tag.type==TagType.End){
+				//	
+				//}else{
+				//	
+				//}
 			}
 			
 			if(FrameCount!=getRealFrameCount()){
-				throw new Error("FrameCount="+FrameCount+",realFrameCount="+getRealFrameCount());
+				Outputer.output("FrameCount="+FrameCount+" 不正确","brown");
+				FrameCount=getRealFrameCount();
+				Outputer.output("修正为: "+FrameCount,"brown");
 			}
 			
 			//trace("---------------------------------------");
@@ -222,7 +233,7 @@ package zero.swf{
 				break;
 			}
 			
-			toData_newData.writeBytes(Tag.getHeaderData(tag.type,newBodyData.length));
+			toData_newData.writeBytes(Tag.getHeaderData(tag.type,newBodyData.length,tag.test_isShort));
 			toData_newData.writeBytes(newBodyData);
 		}
 		
@@ -238,7 +249,7 @@ package zero.swf{
 			var xml:XML=<tags FrameCount={FrameCount}/>;
 			var realFrameCount:int=0;
 			for each(var tag:Tag in tagV){
-				var tagXML:XML=<tag type={TagType.typeNameArr[tag.type]} typeNum={tag.type}/>;
+				var tagXML:XML=<tag type={TagType.typeNameArr[tag.type]} typeNum={tag.type} test_isShort={tag.test_isShort}/>;
 				switch(tag.type){
 					case TagType.DefineSprite:
 						var defineSprite:DefineSprite=tag.tagBody as DefineSprite;
@@ -277,6 +288,7 @@ package zero.swf{
 				if(typeName){
 					var tag:Tag=new Tag();
 					tag.type=TagType[typeName];
+					tag.test_isShort=tagXML.@test_isShort.toString()=="true";
 					if(TagType.typeNameArr[tag.type]===typeName){
 						tagV[tagId]=tag;
 						switch(tag.type){
@@ -317,7 +329,7 @@ package zero.swf{
 				throw new Error("未知 typeName="+typeName+",typeNum="+tagXML.@typeNum.toString());
 			}
 			if(FrameCount!=realFrameCount){
-				trace("FrameCount="+FrameCount+",realFrameCount="+realFrameCount);
+				Outputer.output("FrameCount="+FrameCount+",realFrameCount="+realFrameCount,"brown");
 				FrameCount=realFrameCount;
 			}
 		}

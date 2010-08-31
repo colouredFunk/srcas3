@@ -20,6 +20,8 @@ package zero.swf{
 		public var bodyLength:int;
 		public var type:int;
 		
+		public var test_isShort:Boolean;//测试
+		
 		public function Tag(){
 			type=-1;
 		}
@@ -31,6 +33,9 @@ package zero.swf{
 			bodyLength=temp&0x3f;
 			if(bodyLength==0x3f){//长tag
 				bodyLength=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16)|(data[offset++]<<24);
+				test_isShort=false;
+			}else{
+				test_isShort=true;
 			}
 			bodyOffset=offset;
 			
@@ -88,12 +93,19 @@ package zero.swf{
 		}
 		
 		private static const noShortTypes:Object={
-			DefineSceneAndFrameLabelData:true,//测试完去掉
-			DefineShape:true,//测试完去掉 Flash Builder 4 会把这个编译成短tag，Flash CS5 则会编译成长tag
-			DefineSprite:true,//测试完去掉
-			ScriptLimits:true,//测试完去掉 Flash Builder 4 会把这个编译成短tag，Flash CS5 则会编译成长tag
-			SymbolClass:true,//测试完去掉 Flash Builder 4 会把这个编译成短tag，Flash CS5 则会编译成长tag,
-			FrameLabel:true,//测试完去掉
+			//DefineButton:true,//测试完去掉
+			//DefineButton2:true,//测试完去掉
+			//DefineButtonCxform:true,//测试完去掉
+			//DefineSceneAndFrameLabelData:true,//测试完去掉
+			//DefineShape:true,//测试完去掉 Flash Builder 4 会把这个编译成短tag，Flash CS5 则会编译成长tag
+			//DefineSprite:true,//测试完去掉
+			//DoAction:true,//测试完去掉
+			//ExportAssets:true,//测试完去掉
+			//ImportAssets:true,//测试完去掉
+			//JPEGTables:true,//测试完去掉
+			//ScriptLimits:true,//测试完去掉 Flash Builder 4 会把这个编译成短tag，Flash CS5 则会编译成长tag
+			//SymbolClass:true,//测试完去掉 Flash Builder 4 会把这个编译成短tag，Flash CS5 则会编译成长tag,
+			//FrameLabel:true,//测试完去掉
 			
 			DefineBits:true,
 			DefineBitsLossless:true,
@@ -103,7 +115,7 @@ package zero.swf{
 			DefineBitsJPEG4:true
 			
 		}//某天偶然发现的一些小图片变成短tag后出错(不知道还会不会有其它tag有这种现像)
-		public static function getHeaderData(type:int,bodyLength:int):ByteArray{
+		public static function getHeaderData(type:int,bodyLength:int,test_isShort:Boolean):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=type<<6;
 			data[1]=type>>>2;
@@ -111,6 +123,8 @@ package zero.swf{
 				bodyLength<0x3f
 				&&
 				!noShortTypes[TagType.typeNameArr[type]]
+				&&
+				test_isShort
 			){
 				data[0]|=bodyLength;
 			}else{//长tag
