@@ -8,6 +8,7 @@ SWFDataAndData 版本:v1.0
 */
 
 package zero.swf{
+	import zero.Outputer;
 	import flash.display.*;
 	import flash.events.*;
 	import flash.system.Capabilities;
@@ -34,7 +35,7 @@ package zero.swf{
 				data.endian=Endian.LITTLE_ENDIAN;
 				
 				//if(data.endian==Endian.BIG_ENDIAN){
-				//	trace("自动把 "+Endian.BIG_ENDIAN+" 转换为 "+Endian.LITTLE_ENDIAN);
+				//	Outputer.output("自动把 "+Endian.BIG_ENDIAN+" 转换为 "+Endian.LITTLE_ENDIAN);
 				//	data.endian=Endian.LITTLE_ENDIAN;
 				//}
 				
@@ -61,7 +62,11 @@ package zero.swf{
 				
 				FileLength=data.length+8;//SWF文件长度
 				if(FileLength!=(swfData[4]|(swfData[5]<<8)|(swfData[6]<<16)|(swfData[7]<<24))){
-					trace("文件长度不符");
+					Outputer.output(
+						"文件长度不符 FileLength="+FileLength+
+						",ErrorFileLength="+(swfData[4]|(swfData[5]<<8)|(swfData[6]<<16)|(swfData[7]<<24))
+						,"brown"
+					);
 				}
 				
 				return data;

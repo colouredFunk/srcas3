@@ -2,7 +2,7 @@
 FileAttributes 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年8月30日 17:42:31 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年8月31日 17:57:02 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -45,12 +45,7 @@ FileAttributes 版本:v1.0
 //is equivalent to specifying a wmode of "direct" in the tags that embed the SWF inside
 //the HTML page, while UseGPU is equivalent to a wmode of "gpu".
 package zero.swf.tag_body{
-
 	import flash.utils.ByteArray;
-
-	import zero.BytesAndStr16;
-	import zero.swf.BytesData;
-
 	public class FileAttributes extends TagBody{
 		public var UseDirectBlit:int;			
 		public var UseGPU:int;					
@@ -60,13 +55,13 @@ package zero.swf.tag_body{
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):void{
 			var flags:int=data[offset];
-			//Reserved=((flags&128)>>>7);				//10000000
-			UseDirectBlit=((flags&64)>>>6);			//01000000
-			UseGPU=((flags&32)>>>5);				//00100000
-			HasMetadata=((flags&16)>>>4);			//00010000
-			ActionScript3=((flags&8)>>>3);			//00001000
-			//Reserved=((flags&6)>>>1);				//00000110
-			UseNetwork=(flags&1);					//00000001
+			//Reserved=((flags&0x80)>>>7);			//10000000
+			UseDirectBlit=((flags&0x40)>>>6);		//01000000
+			UseGPU=((flags&0x20)>>>5);				//00100000
+			HasMetadata=((flags&0x10)>>>4);			//00010000
+			ActionScript3=((flags&0x08)>>>3);		//00001000
+			//Reserved=((flags&0x06)>>>1);			//00000110
+			UseNetwork=(flags&0x01);				//00000001
 			
 			//Reserved=data[offset+1]|(data[offset+2]<<8)|(data[offset+3]<<16);
 		}
