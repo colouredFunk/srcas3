@@ -22,8 +22,9 @@ package zero.swf.tag_body{
 		}
 
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):void{
+		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			throw new Error("请直接访问 dataAndTags.initByData");
+			return -1;
 		}
 		override public function toData():ByteArray{
 			throw new Error("请直接访问 dataAndTags.toData");
