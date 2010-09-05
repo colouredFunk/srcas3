@@ -1,6 +1,6 @@
 /**
- * VERSION: 0.9
- * DATE: 2010-08-09
+ * VERSION: 0.91
+ * DATE: 2010-09-01
  * AS3
  * UPDATES AND DOCUMENTATION AT: http://www.GreenSock.com/LoaderMax/
  **/
@@ -39,7 +39,7 @@ package com.greensock.loading.data {
  *		var loader:VideoLoader = new VideoLoader("video.flv", new VideoLoaderVars("video", 111500, this, 200, 100, completeHandler, progressHandler) );<br /><br /></code>
  *		
  * <strong>NOTE:</strong> Using VideoLoaderVars is completely optional. If you prefer the shorter synatax with the generic Object, feel
- * free to use it. The purpose of this class is simply to enable code hinting and to allow for strict datatyping. <br /><br />
+ * free to use it. The purpose of this class is simply to enable code hinting and to allow for strict data typing. <br /><br />
  * 
  * <b>Copyright 2010, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
  * 
@@ -74,7 +74,7 @@ package com.greensock.loading.data {
 		/** When <code>true</code>, the loader will report its progress only in terms of the video's buffer which can be very convenient if, for example, you want to display loading progress for the video's buffer or tuck it into a LoaderMax with other loaders and allow the LoaderMax to dispatch its <code>COMPLETE</code> event when the buffer is full instead of waiting for the whole file to download. When <code>bufferMode</code> is <code>true</code>, the VideoLoader will dispatch its <code>COMPLETE</code> event when the buffer is full as opposed to waiting for the entire video to load. You can toggle the <code>bufferMode</code> anytime. Please read the full <code>bufferMode</code> property ASDoc description below for details about how it affects things like <code>bytesTotal</code>.**/
 		public var bufferMode:Boolean;
 		/** A value between 0 and 1 indicating the volume at which the video should play (default is 1).**/
-		public var volume:Number;
+		public var volume:Number = 1;
 		
 		/**
 		 * Constructor 

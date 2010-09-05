@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.3
- * DATE: 2010-08-09
+ * VERSION: 1.4
+ * DATE: 2010-09-01
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -80,12 +80,6 @@ LoaderMax.prioritize("photo1");  //same as LoaderMax.getLoader("photo1").priorit
 
 //start loading
 queue.load();
- 
-//pause loading
-queue.pause();
-
-//resume loading
-queue.resume();
 
 function progressHandler(event:LoaderEvent):void {
     trace("progress: " + event.target.progress);
@@ -108,7 +102,8 @@ function errorHandler(event:LoaderEvent):void {
  * first or use the <code>flushContent</code> parameter in <code>load()</code> like <code>load(true)</code>.<br /><br />
  * 
  * <strong>OPTIONAL VARS PROPERTIES</strong><br />
- * The following special properties can be passed into the LoaderMax constructor via the <code>vars</code> parameter:<br />
+ * The following special properties can be passed into the LoaderMax constructor via the <code>vars</code> 
+ * parameter which can be either a generic object or a <code><a href="data/LoaderMaxVars.html">LoaderMaxVars</a></code> object:<br />
  * <ul>
  * 		<li><strong> name : String</strong> - A name that is used to identify the LoaderMax instance. This name can be fed to the <code>LoaderMax.getLoader()</code> or <code>LoaderMax.getContent()</code> methods or traced at any time. Each loader's name should be unique. If you don't define one, a unique name will be created automatically, like "loader21".</li>
  * 		<li><strong> auditSize : Boolean</strong> - By default, when the LoaderMax begins to load it quickly loops through its children and if it finds any that don't have an <code>estimatedBytes</code> defined, it will briefly open a URLStream in order to attempt to determine its <code>bytesTotal</code>, immediately closing the URLStream once the value has been determined. This causes a brief delay initially, but greatly improves the accuracy of the <code>progress</code> and <code>bytesTotal</code> values. Set <code>auditSize</code> to <code>false</code> to prevent the LoaderMax from auditing its childrens' size (it is <code>true</code> by default). For maximum performance, it is best to define an <code>estimatedBytes</code> value for as many loaders as possible to avoid the delay caused by audits. When the LoaderMax audits an XMLLoader, it cannot recognize loaders that will be created from the XML data nor can it recognize loaders inside subloaded swf files from a SWFLoader (it would take far too long to load sufficient data for that - audits should be as fast as possible). If you do not set an appropriate <code>estimatedSize</code> for XMLLoaders or SWFLoaders that contain LoaderMax loaders, you'll notice that the parent LoaderMax's <code>progress</code> and <code>bytesTotal</code> change when the nested loaders are recognized (this is normal). To control the default <code>auditSize</code> value, use the static <code>LoaderMax.defaultAuditSize</code> property.</li>
@@ -135,13 +130,19 @@ function errorHandler(event:LoaderEvent):void {
  * 		<li><strong> onScriptAccessDenied : Function</strong> - A handler function for <code>LoaderEvent.SCRIPT_ACCESS_DENIED</code> events which are dispatched when one of the LoaderMax's children (or any descendant) is loaded from another domain and no crossdomain.xml is in place to grant full script access for things like smoothing or BitmapData manipulation. Make sure your function accepts a single parameter of type <code>LoaderEvent</code> (<code>com.greensock.events.LoaderEvent</code>).</li>
  * </ul><br /><br />
  * 
+ * <strong>Note:</strong> Using a <code><a href="data/LoaderMaxVars.html">LoaderMaxVars</a></code> instance 
+ * instead of a generic object to define your <code>vars</code> is a bit more verbose but provides 
+ * code hinting and improved debugging because it enforces strict data typing. Use whichever one you prefer.<br /><br />
+ * 
  * <b>Copyright 2010, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
+ * 
+ * @see com.greensock.loading.data.LoaderMaxVars
  * 
  * @author Jack Doyle, jack@greensock.com
  */	
 	public class LoaderMax extends LoaderCore {		
 		/** @private **/
-		public static const version:Number = 1.3;
+		public static const version:Number = 1.4;
 		/** The default value that will be used for the <code>estimatedBytes</code> on loaders that don't declare one in the <code>vars</code> parameter of the constructor. **/
 		public static var defaultEstimatedBytes:uint = 20000;
 		/** Controls the default value of <code>auditSize</code> in LoaderMax instances (normally <code>true</code>). For most situations, the auditSize feature is very convenient for ensuring that the overall progress of LoaderMax instances is reported accurately, but when working with very large quantities of files that have no <code>estimatedBytes</code> defined, some developers prefer to turn auditSize off by default. Of course you can always override the default for individual LoaderMax instances by defining an <code>auditSize</code> value in the <code>vars</code> parameter of the constructor. **/
@@ -166,7 +167,8 @@ function errorHandler(event:LoaderEvent):void {
 		 * 
 		 * @param vars An object containing optional configuration details. For example: <code>new LoaderMax({name:"queue", onComplete:completeHandler, onProgress:progressHandler, maxConnections:3})</code>.<br /><br />
 		 * 
-		 * The following special properties can be passed into the LoaderMax constructor via the <code>vars</code> parameter:<br />
+		 * The following special properties can be passed into the LoaderMax constructor via the <code>vars</code> parameter
+		 * which can be either a generic object or a <code><a href="data/LoaderMaxVars.html">LoaderMaxVars</a></code> object:<br />
 		 * <ul>
 		 * 		<li><strong> name : String</strong> - A name that is used to identify the LoaderMax instance. This name can be fed to the <code>LoaderMax.getLoader()</code> or <code>LoaderMax.getContent()</code> methods or traced at any time. Each loader's name should be unique. If you don't define one, a unique name will be created automatically, like "loader21".</li>
 		 * 		<li><strong> auditSize : Boolean</strong> - By default, when the LoaderMax begins to load it quickly loops through its children and if it finds any that don't have an <code>estimatedBytes</code> defined, it will briefly open a URLStream in order to attempt to determine its <code>bytesTotal</code>, immediately closing the URLStream once the value has been determined. This causes a brief delay initially, but greatly improves the accuracy of the <code>progress</code> and <code>bytesTotal</code> values. Set <code>auditSize</code> to <code>false</code> to prevent the LoaderMax from auditing its childrens' size (it is <code>true</code> by default). For maximum performance, it is best to define an <code>estimatedBytes</code> value for as many loaders as possible to avoid the delay caused by audits. When the LoaderMax audits an XMLLoader, it cannot recognize loaders that will be created from the XML data nor can it recognize loaders inside subloaded swf files from a SWFLoader (it would take far too long to load sufficient data for that - audits should be as fast as possible). If you do not set an appropriate <code>estimatedSize</code> for XMLLoaders or SWFLoaders that contain LoaderMax loaders, you'll notice that the parent LoaderMax's <code>progress</code> and <code>bytesTotal</code> change when the nested loaders are recognized (this is normal). To control the default <code>auditSize</code> value, use the static <code>LoaderMax.defaultAuditSize</code> property.</li>
@@ -192,6 +194,7 @@ function errorHandler(event:LoaderEvent):void {
 		 * 		<li><strong> onHTTPStatus : Function</strong> - A handler function for <code>LoaderEvent.HTTP_STATUS</code> events. Make sure your onHTTPStatus function accepts a single parameter of type <code>LoaderEvent</code> (<code>com.greensock.events.LoaderEvent</code>).</li>
 		 * 		<li><strong> onScriptAccessDenied : Function</strong> - A handler function for <code>LoaderEvent.SCRIPT_ACCESS_DENIED</code> events which are dispatched when one of the LoaderMax's children (or any descendant) is loaded from another domain and no crossdomain.xml is in place to grant full script access for things like smoothing or BitmapData manipulation. Make sure your function accepts a single parameter of type <code>LoaderEvent</code> (<code>com.greensock.events.LoaderEvent</code>).</li>
 		 * </ul>
+		 * @see com.greensock.loading.data.LoaderMaxVars
 		 */
 		public function LoaderMax(vars:Object=null) {
 			super(vars);
@@ -566,7 +569,7 @@ function completeHandler(event:LoaderEvent):void {
 			var loaders:Array = getChildren(includeNested, true);
 			var i:int = loaders.length;
 			while (--i > -1) {
-				LoaderItem(_loaders[i]).url = prependText + LoaderItem(_loaders[i]).url;
+				LoaderItem(loaders[i]).url = prependText + LoaderItem(loaders[i]).url;
 			}
 		}
 		
@@ -605,7 +608,7 @@ function completeHandler(event:LoaderEvent):void {
 			var loader:LoaderItem;
 			var i:int = loaders.length;
 			while (--i > -1) {
-				loader = _loaders[i];
+				loader = loaders[i];
 				loader.url = loader.url.split(fromText).join(toText);
 				if ("alternateURL" in loader.vars) {
 					loader.vars.alternateURL = loader.vars.alternateURL.split(fromText).join(toText);
@@ -835,7 +838,7 @@ function completeHandler(event:LoaderEvent):void {
 		 * @param nameOrURL The name or url associated with the loader that should be found.
 		 * @return The loader associated with the name or url.
 		 */
-		public static function getLoader(nameOrURL:String):LoaderCore {
+		public static function getLoader(nameOrURL:String):* {
 			return (_globalRootLoader != null) ? _globalRootLoader.getLoader(nameOrURL) : null;
 		}
 		
@@ -946,6 +949,44 @@ function completeHandler(event:LoaderEvent):void {
 				}
 			}
 			return true;
+		}
+		
+		/** 
+		 * A value between 0 and 1 indicating the overall loading progress of the LoaderMax based solely on the ratio of child loaders that have 
+		 * completed loading compared to those that haven't - this calculation does not concern itself whatsoever with <code>bytesLoaded</code>
+		 * and <code>bytesTotal</code>. Therefore, <code>steppedProgress</code> is a more crude way of measuring the overall loading progress
+		 * and isn't weighted in terms of file size the way that <code>progress</code> is. The only benefit of using <code>steppedProgress</code>
+		 * instead of <code>progress</code> is that there is never a risk of the value moving backwards the way it can with <code>progress</code>
+		 * when child loaders have inaccurately low estimatedBytes (before LoaderMax audits the file size values). <br /><br />
+		 * 
+		 * For example, let's say you have a LoaderMax that contains 3 ImageLoaders: the first two must load images that are 25k each and the 
+		 * 3rd one must load an image that's 450k. After the first two ImageLoaders finish, the LoaderMax's <code>progress</code> property would 
+		 * report 0.1 (50k loaded out of 500k total) whereas the <code>steppedProgress</code> would report 0.66 (2 loaders out of 3 total have completed). 
+		 * <code>steppedProgress</code> will also "jump" more because the value will only change each time a child loader completes whereas
+		 * <code>progress</code> gets updated much more frequently since it is based on <code>bytesLoaded</code> and <code>bytesTotal</code>.
+		 * However, if you set the <code>estimatedBytes</code> of all of the ImageLoaders in this example to 25600 (25k) and set the LoaderMax's 
+		 * <code>auditSize</code> to <code>false</code>, the <code>progress</code> would read about 0.66 after the first two ImageLoaders complete
+		 * (it still thinks they're all 25k) and then when the 3rd one starts loading and LoaderMax finds out that it's 450k, the <code>bytesTotal</code> 
+		 * would adjust and the <code>progress</code> would jump backwards to 0.1. Of course a solution would be to more accurately set the 
+		 * <code>estimatedBytes</code> and/or leave <code>auditSize true</code> in the LoaderMax, but <code>steppedProgress</code> can be useful 
+		 * if those solutions are problematic for you and you prefer to avoid any backwards adjustment of a preloader progress bar or some other 
+		 * interface element.<br /><br />
+		 **/
+		public function get steppedProgress():Number {
+			var loaded:uint = 0;
+			var total:uint = 0;
+			var status:int;
+			var i:int = _loaders.length;
+			while (--i > -1) {
+				status = LoaderCore(_loaders[i]).status;
+				if (status != LoaderStatus.DISPOSED && !(status == LoaderStatus.PAUSED && this.skipPaused) && !(status == LoaderStatus.FAILED && this.skipFailed)) {
+					total++;
+					if (status == LoaderStatus.COMPLETED) {
+						loaded++;
+					}
+				}
+			}
+			return (total == 0) ? 0 : loaded / total;
 		}
 		
 	}

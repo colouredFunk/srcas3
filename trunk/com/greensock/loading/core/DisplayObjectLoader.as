@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.3
- * DATE: 2010-08-09
+ * VERSION: 1.31
+ * DATE: 2010-09-01
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -143,8 +143,9 @@ package com.greensock.loading.core {
 			if (_gcCycles == 0) {
 				_gcDispatcher.removeEventListener(Event.ENTER_FRAME, _forceGCHandler);
 				_gcDispatcher = null;
+			} else {
+				_gcCycles--;
 			}
-			_gcCycles--;
 			try {
 				new LocalConnection().connect("FORCE_GC");
 				new LocalConnection().connect("FORCE_GC");
