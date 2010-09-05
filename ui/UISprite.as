@@ -8,6 +8,10 @@ package ui{
 	 */
 	public class UISprite extends Sprite {
 		public var userData:Object;
+		private var __isRemoved:Boolean;
+		public function get isRemoved():Boolean {
+			return __isRemoved;
+		}
 		public function UISprite() {
 			init();
 		}
@@ -28,6 +32,7 @@ package ui{
 			}
 			removeEventListener(Event.REMOVED_FROM_STAGE, onRemoveToStageDelayHandler);
 			userData = null;
+			__isRemoved = true;
 		}
 		public function removeChildren():void {
 			var _length:uint = numChildren;
