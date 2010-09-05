@@ -1,6 +1,19 @@
 CHANGE LOG : GREENSOCK LOADERMAX SYSTEM
 ----------------------------------------
 
+2010-09-01
+---------------------------------------------
+LoaderMax				1.4
+DisplayObjectLoader		1.31
+	- Added a new "steppedProgress" property to LoaderMax that is based solely on the ratio of child loaders that have completed loading compared to those that haven't - this calculation does not concern itself whatsoever with bytesLoaded and bytesTotal. See docs for details.
+	- Changed the data type that the static getLoader() method returns to "*" instead of LoaderCore in order to make it easier on developers. Previously, for example, playing a VideoLoader would need to be done like (LoaderMax.getLoader("myVideoLoader") as VideoLoader).playVideo() but now it can simply be LoaderMax.getLoader("myVideoLoader").playVideo()
+	- Fixed minor problem with the forced garbage collection routine in SWFLoader and ImageLoader that gets called after unload() and dispose(true).
+
+2010-08-30
+---------------------------------------------
+LoaderMax			1.31
+	- Fixed problem in LoaderMax.prependURLs() and LoaderMax.replaceURLText() that could cause an error if the includeNested parameter was set to true and there were nested child loaders.
+
 2010-08-12
 ---------------------------------------------
 VideoLoader				1.32
