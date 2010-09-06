@@ -24,9 +24,10 @@ package ui_2
 		private var picDic:Object;
 		public var frameClip:DisplayObject;
 		public var container:DisplayObjectContainer;
-		public var picNow:DisplayObject;
-		public var picPrev:DisplayObject;
+		public var picNow:*;
+		public var picPrev:*;
 		public var onLoaded:Function;
+		public var onChange:Function;
 		public var isTweenShow:Boolean;
 		public function PicLoader() 
 		{
@@ -63,6 +64,21 @@ package ui_2
 				picDic[_path] = Common.loader(_path, onPicLoadedHandle);
 			}
 		}
+		public function addPicByBitmapData(_path:String, _bmd:BitmapData):void {
+			if (picDic[_path]) {
+				
+			}else {
+				var _bmp:Bitmap = new Bitmap(_bmd);
+				_bmp.smoothing = true;
+				if (frameClip) {
+					container.addChildAt(_bmp, getChildIndex(frameClip));
+				}else {
+					container.addChild(_bmp);
+				}
+				_bmp.visible = false;
+				picDic[_path] = _bmp;
+			}
+		}
 		protected function onPicLoadedHandle(_evt:Event):void {
 			var _loader:Loader = _evt.currentTarget.loader as Loader;
 			(_loader.content as Bitmap).smoothing = true;
@@ -71,12 +87,12 @@ package ui_2
 			}else {
 				container.addChild(_loader);
 			}
-			addPic(_loader);
 			if (onLoaded!=null) {
-				onLoaded();
+				onLoaded(_loader);
 			}
+			addPic(_loader);
 		}
-		private function addPic(_pic:DisplayObject):void {
+		private function addPic(_pic:*):void {
 			autoFitArea.attach(_pic, ScaleMode.PROPORTIONAL_INSIDE, AlignMode.CENTER, AlignMode.CENTER);
 			if (isTweenShow) {
 				if (picPrev) {
@@ -93,6 +109,9 @@ package ui_2
 				_pic.visible = true;
 			}
 			picNow = _pic;
+			if (onChange!=null) {
+				onChange();
+			}
 		}
 	}
 
