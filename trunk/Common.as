@@ -38,7 +38,7 @@
 			obj.contextMenu=menu;
 		}
 		//_eachFun(_instanceCopy, _i, _instanceCopy != _instance, _length);
-		public static function copyInstanceToArray(_instance:*, _length:uint, _ary:Array, _eachFun:Function):Array {
+		public static function copyInstanceToArray(_instance:*, _length:uint, _ary:Array, _eachFun:Function, ...args):Array {
 			if (!_ary) {
 				_ary = new Array();
 			}
@@ -51,7 +51,7 @@
 					_ary[_i] = _instanceCopy;
 				}
 				if (_eachFun != null) {
-					_eachFun(_instanceCopy, _i, _instanceCopy != _instance, _length);
+					_eachFun.apply(Common, [_instanceCopy, _i, _instanceCopy != _instance, _length].concat(args));
 				}
 			}
 			return _ary;
