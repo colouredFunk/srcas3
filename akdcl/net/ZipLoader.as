@@ -6,6 +6,7 @@
 	import flash.events.ProgressEvent;
 	import riaidea.utils.zip.ZipArchive;
 	import riaidea.utils.zip.ZipEvent;
+	import flash.utils.ByteArray;
 	/**
 	 * ...
 	 * @author ... Akdcl
@@ -15,6 +16,7 @@
 		private static const FILETYPE_JPG:String = ".jpg";
 		private static const FILETYPE_PNG:String = ".png";
 		public var onContentsLoaded:Function;
+		public var onContentsLoading:Function;
 		public function ZipLoader() {
 			zipArchiveDic = { };
 		}
@@ -63,6 +65,9 @@
 		}
 		private function onZipLoading(_evt:ProgressEvent):void {
 			//加载中
+			if (onContentsLoading!=null) {
+				onContentsLoading(int(_evt.bytesLoaded / _evt.bytesTotal * 100) / 100);
+			}
 		}
 		private function onZipLoaded(_evt:Object):void {
 			var _zipArchive:ZipArchive = (_evt.currentTarget as ZipArchive);
