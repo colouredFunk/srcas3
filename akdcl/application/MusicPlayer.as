@@ -234,6 +234,7 @@
 			switch(playState) {
 				case SOUND_PAUSE:
 				case SOUND_STOP:
+				case WMP_STATE_LIST[9]:
 					play();
 					return true;
 				case SOUND_PLAY:
@@ -324,19 +325,19 @@
 					break;
 				case 4 :
 					//向前
-					__playState = "WMP4";
+					__playState = WMP_STATE_LIST[_id - 1];
 					break;
 				case 5 :
 					//向后
-					__playState = "WMP5";
+					__playState = WMP_STATE_LIST[_id - 1];
 					break;
 				case 6 :
 					//缓冲
-					__playState = "WMP6";
+					__playState = WMP_STATE_LIST[_id - 1];
 					break;
 				case 7 :
 					//等待
-					__playState = "WMP7";
+					__playState = WMP_STATE_LIST[_id - 1];
 					break;
 				case 8 :
 					//完毕
@@ -344,11 +345,11 @@
 					break;
 				case 9 :
 					//连接
-					__playState = "WMP9";
+					__playState = WMP_STATE_LIST[_id - 1];
 					break;
 				case 10 :
 					//就绪
-					__playState = "WMP10";
+					__playState = WMP_STATE_LIST[_id - 1];
 					break;
 			}
 			if (onWMPStateChange!=null) {
