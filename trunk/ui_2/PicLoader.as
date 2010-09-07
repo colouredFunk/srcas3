@@ -35,7 +35,7 @@ package ui_2
 			if (frameClip) {
 				widthMax = frameClip.width;
 				heightMax = frameClip.height;
-			}else if (container) {
+			}else if (container && container.width * container.height != 0) {
 				widthMax = container.width;
 				heightMax = container.height;
 			}else {
