@@ -23,7 +23,7 @@
 			obj:*,
 			caption:String,
 			onSelect:Function=null
-		):void {
+		):ContextMenuItem {
 			var menu:ContextMenu=obj.contextMenu;
 			if(!menu){
 				//trace("新建menu");
@@ -35,7 +35,8 @@
 				item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,onSelect);
 			}
 			menu.customItems.push(item);
-			obj.contextMenu=menu;
+			obj.contextMenu = menu;
+			return item;
 		}
 		//_eachFun(_instanceCopy, _i, _instanceCopy != _instance, _length);
 		public static function copyInstanceToArray(_instance:*, _length:uint, _ary:Array, _eachFun:Function, ...args):Array {
