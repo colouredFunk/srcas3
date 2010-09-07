@@ -7,6 +7,7 @@ package ui
 	 */
 	public class IDPart
 	{
+		public var autoID:Boolean = true;
 		public var onIDChange:Function;
 		private var __length:uint;
 		public function get length():uint{
@@ -20,10 +21,19 @@ package ui
 			return __id;
 		}
 		public function set id(_id:int):void{
-			if (_id<0) {
-				_id = length - 1;
-			}else if (_id > length - 1) {
-				_id = 0;
+			_id %= length;
+			if (_id < 0) {
+				if (autoID) {
+					_id = length - _id;
+				}else {
+					return;
+				}
+			}else if (_id >= length) {
+				if (autoID) {
+					_id = _id - length;
+				}else {
+					return;
+				}
 			}
 			if (__id==_id) {
 				return;
@@ -38,6 +48,9 @@ package ui
 			if (onIDChange!=null) {
 				onIDChange(__id);
 			}
+		}
+		public function remove():void {
+			onIDChange = null;
 		}
 	}
 	
