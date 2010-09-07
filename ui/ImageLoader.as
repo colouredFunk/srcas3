@@ -12,7 +12,7 @@ package ui {
 	import com.greensock.layout.AlignMode;
 	import com.greensock.layout.AutoFitArea;
 	import com.greensock.layout.ScaleMode;
-	import com.greensock.easing.Cubic;
+	import com.greensock.easing.Sine;
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -105,16 +105,22 @@ package ui {
 			hideBMP(bmp);
 			sourceNow = _source;
 		}
+		protected var isHideTweening:Boolean;
 		protected function hideBMP(_content:*):void {
+			if (isHideTweening) {
+				return;
+			}
+			isHideTweening = true;
 			autoFitArea.release(_content);
 			TweenMax.killTweensOf(bmp);
-			TweenMax.to(bmp, 0.2, { alpha:0, ease:Cubic.easeInOut, onComplete:onHideEndHandler } );
+			TweenMax.to(bmp, 12, { alpha:0, useFrames:true, ease:Sine.easeInOut, onComplete:onHideEndHandler } );
 		}
 		private function onHideEndHandler():void {
+			isHideTweening = false;
 			setBMP(bmdNow);
 		}
 		protected function setBMP(_content:*):void {
-			if (!_content) {
+			if (!_content || isHideTweening) {
 				return;
 			}
 			bmp.bitmapData = _content;
@@ -129,7 +135,7 @@ package ui {
 				container.addChild(bmp);
 			}
 			TweenMax.killTweensOf(bmp);
-			TweenMax.to(bmp, 0.3, { alpha:1, ease:Cubic.easeInOut } );
+			TweenMax.to(bmp, 15, { alpha:1, useFrames:true, ease:Sine.easeInOut } );
 			updateArea(bmp);
 		}
 		private const LIMITWH_MAX:uint = 999999;
