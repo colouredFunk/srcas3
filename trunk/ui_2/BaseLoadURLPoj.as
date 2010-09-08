@@ -19,7 +19,10 @@ package ui_2{
 		public var urlLoader:URLLoader;
 		public static var xml:XML;
 		
+		public var needXML:Boolean;
+		
 		public function BaseLoadURLPoj(_defaultXMLPath:String=null,_xmlVarName:String="xml"){
+			needXML=true;
 			if(_defaultXMLPath){
 				defaultXMLPath=_defaultXMLPath;
 			}else{
@@ -30,10 +33,14 @@ package ui_2{
 		}
 		private function added(event:Event):void{
 			this.removeEventListener(Event.ADDED_TO_STAGE,added);
-			this.visible=false;
-			urlLoader=new URLLoader();
-			urlLoader.load(new URLRequest((this.loaderInfo.parameters[xmlVarName]||defaultXMLPath)));
-			urlLoader.addEventListener(Event.COMPLETE,loadXMLComplete);
+			if(needXML){
+				this.visible=false;
+				urlLoader=new URLLoader();
+				urlLoader.load(new URLRequest((this.loaderInfo.parameters[xmlVarName]||defaultXMLPath)));
+				urlLoader.addEventListener(Event.COMPLETE,loadXMLComplete);
+			}else{
+				this["init"]();
+			}
 		}
 		private function loadXMLComplete(event:Event):void{
 			xml=new XML(urlLoader.data);
