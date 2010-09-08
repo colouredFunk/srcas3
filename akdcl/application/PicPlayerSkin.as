@@ -249,6 +249,17 @@
 					if (btn_select) {
 						btn_select.select = true;
 					}
+					if (btnsContainer.mask) {
+						var _x:int;
+						if (btn_select.x < btnsContainer.mask.x) {
+							_x = btnsContainer.mask.x - btn_select.x;
+							TweenMax.to(btnsContainer, 0.3, { x:_x } );
+						}else if (btn_select.x + btn_select.width > btnsContainer.mask.x + btnsContainer.mask.width) {
+							_x = btnsContainer.mask.x + btnsContainer.mask.width - btn_select.width;
+							_x = btn_select.x - _x;
+							TweenMax.to(btnsContainer, 0.3, { x:-_x } );
+						}
+					}
 					break;
 				case PicPlayer.TWEENED:
 					mouseChildren = true;
