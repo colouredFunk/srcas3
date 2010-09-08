@@ -49,7 +49,7 @@
 			paramsObject.height = heightOrg;
 			Common.addContextMenu(this, "SWF:"+widthOrg + " x " + heightOrg, onWHReleaseHandle);
 			//loaderInfo.addEventListener(ProgressEvent.PROGRESS,onLoadingHandle);
-			//loaderInfo.addEventListener(Event.COMPLETE,onLoadedHandle);
+			loaderInfo.addEventListener(Event.COMPLETE,onLoadedHandle);
 			if (onLoaded==null) {
 				onLoaded=function():void{
 					if(currentFrame==1){
@@ -90,7 +90,7 @@
 		protected var loaded:Number = 0;
 		protected function onLoadingHandle(_evt:*):void{
 			gotoAndStop(1);
-			var _loaded:Number = loaderInfo.bytesLoaded / loaderInfo.bytesTotal;
+			var _loaded:Number = loaderInfo.bytesLoaded / getBytesTotal();
 			loadingProgress(_loaded);
 			if (onLoading != null) {
 				onLoading(loaded);
@@ -100,13 +100,18 @@
 				onLoaded();
 			}
 		}
-		/*protected function onLoadedHandle(evt:Event):void{
-			loaderInfo.removeEventListener(ProgressEvent.PROGRESS,onLoadingHandle);
-			loaderInfo.removeEventListener(Event.COMPLETE,onLoadedHandle);
-			if(onLoaded!=null){
-				onLoaded();
+		private var __bytesTotal:int;
+		private function getBytesTotal():int {
+			if (loaderInfo.bytesTotal) {
+				return loaderInfo.bytesTotal;
 			}
-		}*/
+			return __bytesTotal;
+		}
+		protected function onLoadedHandle(evt:Event):void{
+			//loaderInfo.removeEventListener(ProgressEvent.PROGRESS,onLoadingHandle);
+			loaderInfo.removeEventListener(Event.COMPLETE, onLoadedHandle);
+			__bytesTotal = loaderInfo.bytesLoaded;
+		}
 		protected var loaded_optionsXML:Number = 0;
 		protected function onOptionsXMLLoadingHandle(_evt:ProgressEvent):void {
 			loaded_optionsXML = int(_evt.bytesLoaded / _evt.bytesTotal * 10000) / 10000;
