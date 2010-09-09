@@ -9,7 +9,7 @@ BGetterAndSetter 版本:v1.0
 
 package zero.gettersetter{
 	import flash.utils.*;
-	public class BGetterAndSetter{
+	public class BGetterAndSetter{不推荐使用
 		//UB,SB,FB专用
 		private static var data:ByteArray;
 		public static var offset:int;

@@ -2,7 +2,7 @@
 RemoveObject 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年8月31日 14:09:47 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年9月1日 13:07:08 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -22,9 +22,10 @@ package zero.swf.tag_body{
 		public var CharacterId:int;				//UI16
 		public var Depth:int;					//UI16
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):void{
+		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			CharacterId=data[offset]|(data[offset+1]<<8);
 			Depth=data[offset+2]|(data[offset+3]<<8);
+			return offset+4;
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();

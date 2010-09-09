@@ -89,7 +89,12 @@ package zero.swf{
 					var tagBodyClass:Class=activateTagBodyClassV[tag.type];
 					if(tagBodyClass){
 						tag.tagBody=new tagBodyClass();
-						tag.tagBody.initByData(data,offset,nextTagOffset);
+						offset=tag.tagBody.initByData(data,offset,nextTagOffset);
+						if(offset===nextTagOffset){
+							
+						}else{
+							throw new Error("offset="+offset+",nextTagOffset="+nextTagOffset);
+						}
 					}else{
 						if(tag.type==TagType.End){
 							break;

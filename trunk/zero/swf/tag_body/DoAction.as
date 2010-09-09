@@ -2,7 +2,7 @@
 DoAction 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年8月31日 15:00:00 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年9月1日 14:02:08 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -21,25 +21,30 @@ package zero.swf.tag_body{
 	import flash.utils.ByteArray;
 	public class DoAction extends TagBody{
 		public var Actions:ACTIONRECORD;		
+		public var ActionEndFlag:int;			//UI8
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):void{
+		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+			//#offsetpp
 			Actions=new ACTIONRECORD();
-			Actions.initByData(data,offset,endOffset-1);
-			//Reserved=data[offset];
+			offset=Actions.initByData(data,offset,endOffset-1);
+			ActionEndFlag=data[offset++];
+			return offset;
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			//var offset:int=0;//测试
 			//data.position=0;
 			data.writeBytes(Actions.toData());
-			data[data.length]=0x00;
+			data[data.length]=ActionEndFlag;
 			return data;
 		}
 
 		////
 		CONFIG::toXMLAndInitByXML {
 		override public function toXML():XML{
-			var xml:XML=<DoAction>
+			var xml:XML=<DoAction
+				ActionEndFlag={ActionEndFlag}
+			>
 				<Actions/>
 			</DoAction>;
 			xml.Actions.appendChild(Actions.toXML());
@@ -48,6 +53,7 @@ package zero.swf.tag_body{
 		override public function initByXML(xml:XML):void{
 			Actions=new ACTIONRECORD();
 			Actions.initByXML(xml.Actions.children()[0]);
+			ActionEndFlag=int(xml.@ActionEndFlag.toString());
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

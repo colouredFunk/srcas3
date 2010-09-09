@@ -15,17 +15,18 @@ package zero.swf{
 	import flash.events.*;
 	import flash.utils.*;
 	
-	public class SWFAS3 extends SWFLevel1{
+	public class SWFAS3 extends SWFLevel0{
 		public var doABCV:Vector.<DoABCWithoutFlagsAndName>;
 		public function SWFAS3(){
 		}
-		override public function initByData(data:ByteArray):void{
+		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			super.initByData(data);
 			if(!isAS3){
 				throw new Error("不是 AS3");
 			}
 			doABCV=new Vector.<DoABCWithoutFlagsAndName>();
 			dataAndTags.forEachTag(tag2DoABC);
+			return endOffset;
 		}
 		private function tag2DoABC(data:ByteArray,tag:Tag,tagV:Vector.<Tag>,tagId:int):void{
 			var doABCWithoutFlagsAndName:DoABCWithoutFlagsAndName;

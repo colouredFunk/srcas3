@@ -37,8 +37,9 @@ package zero.swf{
 		}
 		*/
 		
-		public function initByData(data:ByteArray,offset:int,endOffset:int):void{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			throw new Error("请 override 来使用");
+			return -1;
 		}
 		public function toData():ByteArray{
 			throw new Error("请 override 来使用");

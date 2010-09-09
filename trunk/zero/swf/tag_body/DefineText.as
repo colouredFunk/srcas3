@@ -2,7 +2,7 @@
 DefineText 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年8月31日 14:09:47 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年9月1日 19:03:18 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -17,16 +17,29 @@ DefineText 版本:v1.0
 //TextRecords 		TEXTRECORD[zero or more] 	Text records.
 //EndOfRecordsFlag 	UI8 						Must be 0.
 package zero.swf.tag_body{
+	import zero.swf.record.RECT;
+	import zero.swf.record.MATRIX;
 	import zero.swf.BytesData;
 	import flash.utils.ByteArray;
 	public class DefineText extends TagBody{
 		public var id:int;						//UI16
-		public var bytesData:BytesData;			
+		public var TextBounds:RECT;				
+		public var TextMatrix:MATRIX;			
+		public var restDatas:BytesData;			
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):void{
+		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			id=data[offset]|(data[offset+1]<<8);
-			bytesData=new BytesData();
-			bytesData.initByData(data,offset+2,endOffset);
+			offset+=2;
+			//#offsetpp
+			TextBounds=new RECT();
+			offset=TextBounds.initByData(data,offset,endOffset);
+			//#offsetpp
+			TextMatrix=new MATRIX();
+			offset=TextMatrix.initByData(data,offset,endOffset);
+			//#offsetpp
+			restDatas=new BytesData();
+			offset=restDatas.initByData(data,offset,endOffset);
+			return offset;
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
@@ -34,8 +47,11 @@ package zero.swf.tag_body{
 			data[0]=id;
 			data[1]=id>>8;
 			data.position=2;
-			data.writeBytes(bytesData.toData());
-			//var offset:int=data.length;
+			data.writeBytes(TextBounds.toData());
+			
+			data.writeBytes(TextMatrix.toData());
+			
+			data.writeBytes(restDatas.toData());
 			return data;
 		}
 
@@ -45,15 +61,23 @@ package zero.swf.tag_body{
 			var xml:XML=<DefineText
 				id={id}
 			>
-				<bytesData/>
+				<TextBounds/>
+				<TextMatrix/>
+				<restDatas/>
 			</DefineText>;
-			xml.bytesData.appendChild(bytesData.toXML());
+			xml.TextBounds.appendChild(TextBounds.toXML());
+			xml.TextMatrix.appendChild(TextMatrix.toXML());
+			xml.restDatas.appendChild(restDatas.toXML());
 			return xml;
 		}
 		override public function initByXML(xml:XML):void{
 			id=int(xml.@id.toString());
-			bytesData=new BytesData();
-			bytesData.initByXML(xml.bytesData.children()[0]);
+			TextBounds=new RECT();
+			TextBounds.initByXML(xml.TextBounds.children()[0]);
+			TextMatrix=new MATRIX();
+			TextMatrix.initByXML(xml.TextMatrix.children()[0]);
+			restDatas=new BytesData();
+			restDatas.initByXML(xml.restDatas.children()[0]);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}
