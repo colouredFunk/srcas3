@@ -13,7 +13,7 @@ package{
 	import flash.utils.*;
 	import flash.external.*;
 	public class GotoURL{
-		public static function gotoURL(xml:XML):void{
+		public static function goto(xml:XML):void{
 			var jsStr:String=xml.@js.toString();
 			if(jsStr){
 				ExternalInterface.call("eval",jsStr);
