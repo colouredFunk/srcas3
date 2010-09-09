@@ -1,50 +1,20 @@
-/***
-BytesData 版本:v1.0
+﻿/***
+Outputer 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年8月24日 20:24:29
+创建时间:2009年7月11日 17:41:48
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.swf{
-	
-	import flash.utils.ByteArray;
-	import zero.BytesAndStr16;
-	import zero.swf.BaseDat;
-	
-	public class BytesData extends BaseDat{
-		public var ownData:ByteArray;
-		public var dataOffset:int;
-		public var dataLength:int;
-		public function BytesData(){
+package zero{
+	public class Outputer{
+		public static var output:Function=trace;
+		public static var outputError:Function=trace;
+		public static function reset():void{
+			output=trace;
+			outputError=trace;
 		}
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			ownData=data;
-			dataOffset=offset;
-			dataLength=endOffset-offset;
-			return endOffset;
-		}
-		override public function toData():ByteArray{
-			var data:ByteArray=new ByteArray();
-			if(dataLength>0){
-				data.writeBytes(ownData,dataOffset,dataLength);
-			}
-			return data;
-		}
-		////
-		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
-			if(dataLength>0){
-				return <BytesData length={dataLength} value={BytesAndStr16.bytes2str16(ownData,dataOffset,dataLength)}/>;
-			}
-			return <BytesData/>;
-		}
-		override public function initByXML(xml:XML):void{
-			var data:ByteArray=BytesAndStr16.str162bytes(xml.@value.toString());
-			initByData(data,0,data.length);
-		}
-		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
 

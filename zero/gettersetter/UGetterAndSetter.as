@@ -9,7 +9,7 @@ UGetterAndSetter 版本:v1.0
 
 package zero.gettersetter{
 	import flash.utils.ByteArray;
-	public class UGetterAndSetter{
+	public class UGetterAndSetter{不推荐使用
 		public static var offset:int;
 		public static function getU(data:ByteArray,_offset:int):uint{
 			var u:uint=0;

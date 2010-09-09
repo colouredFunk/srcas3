@@ -11,7 +11,9 @@ package zero.swf{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
-	import zero.gettersetter.BGetterAndSetter;
+	
+	import zero.swf.record.RECT;
+
 	public class DataAndBaseInfo{
 		public var wid:int;
 		public var hei:int;
@@ -28,34 +30,20 @@ package zero.swf{
 			//获取SWF的宽高帧频帧数
 			
 			//舞台宽高在SWF里是以一个RECT(见 SWF File Format Specification Version 10 第20页 Rectangle record)的结构保存
-			BGetterAndSetter.startGet(data,0);
-			var rect_Nbits:int=BGetterAndSetter.getUB(5);
-			BGetterAndSetter.getSB(rect_Nbits);//Xmin
-			var Xmax:int=BGetterAndSetter.getSB(rect_Nbits);
-			BGetterAndSetter.getSB(rect_Nbits);//Ymin
-			var Ymax:int=BGetterAndSetter.getSB(rect_Nbits);
-			BGetterAndSetter.endGet();
+			var rect:RECT=new RECT();
+			offset=rect.initByData(data,0,data.length);
 			
-			wid=Xmax/20;//获取到的值是以堤为单位, 1堤等于20像素, 所以要除以20
-			hei=Ymax/20;//获取到的值是以堤为单位, 1堤等于20像素, 所以要除以20
+			wid=rect.Xmax/20;//获取到的值是以堤为单位, 1堤等于20像素, 所以要除以20
+			hei=rect.Ymax/20;//获取到的值是以堤为单位, 1堤等于20像素, 所以要除以20
 			
-			offset=BGetterAndSetter.offset;
 			FrameRate=data[offset++]/256+data[offset++];//帧频是一个Number, 在SWF里以 FIXED8(16-bit 8.8 fixed-point number, 16位8.8定点数) 的结构保存
 		}
 		public function getData(data:ByteArray):void{
-			BGetterAndSetter.startSet(data,0);
-			var Xmax:int=wid*20;
-			var Ymax:int=hei*20;
-			var rect_Nbits:int=BGetterAndSetter.getNbitsBySBs(Xmax,Ymax);
-			BGetterAndSetter.setUB(rect_Nbits,5);
-			BGetterAndSetter.setSB(0,rect_Nbits);
-			BGetterAndSetter.setSB(Xmax,rect_Nbits);
-			BGetterAndSetter.setSB(0,rect_Nbits);
-			BGetterAndSetter.setSB(Ymax,rect_Nbits);
-			
-			BGetterAndSetter.endSet();
-			
-			offset=BGetterAndSetter.offset;
+			var rect:RECT=new RECT();
+			rect.Xmax=wid*20;
+			rect.Ymax=hei*20;
+			data.writeBytes(rect.toData());
+			offset=data.length;
 			data[offset++]=FrameRate*256;
 			data[offset++]=FrameRate;
 		}

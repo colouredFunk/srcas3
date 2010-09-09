@@ -2,7 +2,7 @@
 ProductInfo 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年8月31日 14:09:47 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年9月1日 13:07:08 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -55,7 +55,7 @@ package zero.swf.tag_body{
 		public var BuildHigh:uint;				//UI32
 		public var CompilationDate:Number;		//UI64
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):void{
+		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			ProductID=data[offset]|(data[offset+1]<<8)|(data[offset+2]<<16)|(data[offset+3]<<24);
 			Edition=data[offset+4]|(data[offset+5]<<8)|(data[offset+6]<<16)|(data[offset+7]<<24);
 			MajorVersion=data[offset+8];
@@ -73,6 +73,7 @@ package zero.swf.tag_body{
 				+data[offset+23]*1099511627776
 				+data[offset+24]*281474976710656
 				+data[offset+25]*72057594037927940;
+			return offset+26;
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();

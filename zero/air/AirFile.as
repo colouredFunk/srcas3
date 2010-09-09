@@ -34,8 +34,8 @@ package zero.air{
 		private static var getFiles_intervalId:int=-1;
 		public static var getFiles_file:File;
 		private static var getFiles_reg:*;
-		private static var getFiles_noSameFile:Boolean;//忽略相同的 file(只是比较 大小和（日期或名字) ）
-		private static var getFiles_onGetFile:Function;//得到一个 file 后进行处理
+		public static var getFiles_noSameFile:Boolean;//忽略相同的 file(只是比较 大小和（日期或名字) ）
+		public static var getFiles_onGetFile:Function;//得到一个 file 后进行处理
 		private static var getFiles_sameFileMark:Object;
 		private static var getFiles_stack_i:Array;
 		private static var getFiles_stack_list:Array;
@@ -48,15 +48,16 @@ package zero.air{
 		public static var getFiles_onComplete:Function;
 		public static var getFiles_running:Boolean;
 		
-		public static function getFiles(file:File,reg:*=null,noSameFile:Boolean=false,onGetFile:Function=null):void{
+		public static var ignoredFolderRegArr:Array;
+		public static var ignoredFileRegArr:Array;
+		
+		public static function getFiles(file:File,reg:*=null):void{
 			getFiles_running=true;
 			
 			clearInterval(getFiles_intervalId);
 			
 			getFiles_file=file;
 			getFiles_reg=reg;
-			getFiles_noSameFile=noSameFile;
-			getFiles_onGetFile=onGetFile;
 			if(getFiles_noSameFile){
 				getFiles_sameFileMark=new Object();
 			}
@@ -104,11 +105,19 @@ package zero.air{
 				}
 				getFiles_file=getFiles_list[--getFiles_i];
 				if(getFiles_file.isDirectory){
+					if(checkIsIgnored(getFiles_file.name,ignoredFolderRegArr)){
+						trace("被忽略的文件夹: "+decodeURI(getFiles_file.url));
+						continue;
+					}
 					getFiles_stack_list.push(getFiles_list);
 					getFiles_stack_i.push(getFiles_i);
 					getFiles_list=getFiles_file.getDirectoryListing();
 					getFiles_i=getFiles_list.length;
 				}else{
+					if(checkIsIgnored(getFiles_file.name,ignoredFileRegArr)){
+						trace("被忽略的文件: "+decodeURI(getFiles_file.url));
+						continue;
+					}
 					getFiles_totalFileNum++;
 					var fileSize:int,fileTime:int;
 					if(getFiles_reg){
@@ -146,13 +155,34 @@ package zero.air{
 		}
 		private static function getFiles_complete():void{
 			getFiles_running=false;
-			if(getFiles_onProgress!=null){
-				getFiles_onProgress(getFiles_fileList.length,getFiles_totalFileNum);
-			}
-			if(getFiles_onComplete!=null){
-				getFiles_onComplete(getFiles_fileList);
-			}
+			
+			var _getFiles_onProgress:Function=getFiles_onProgress;
+			var _getFiles_onComplete:Function=getFiles_onComplete;
+			var _getFiles_fileList:Array=getFiles_fileList;
+			var _getFiles_totalFileNum:int=getFiles_totalFileNum;
+			
 			getFiles_clear();
+			
+			if(_getFiles_onProgress!=null){
+				_getFiles_onProgress(_getFiles_fileList.length,_getFiles_totalFileNum);
+			}
+			if(_getFiles_onComplete!=null){
+				_getFiles_onComplete(_getFiles_fileList);
+			}
+		}
+		
+		private static function checkIsIgnored(fileName:String,ignoredRegArr:Array):Boolean{
+			for each(var ignoredReg:* in ignoredRegArr){
+				if(ignoredReg is RegExp){
+					if((ignoredReg as RegExp).test(fileName)){
+						return true;
+					}
+				}
+				if(ignoredReg===fileName){
+					return true;
+				}
+			}
+			return false;
 		}
 		
 		/*public static function moveFiles(fileList:Array,srcFolder:File,destFolder:File,isCut:Boolean=false):void{
@@ -177,6 +207,7 @@ package zero.air{
 			}
 		}*/
 		
+		/*
 		private static var moveFiles_intervalId:int=-1;
 		private static var moveFiles_fileList:Array;
 		private static var moveFiles_srcFolderURLLength:int;
@@ -239,7 +270,9 @@ package zero.air{
 			}
 			moveFiles_clear();
 		}
+		*/
 		
+		/*
 		//
 		public static function url2File(rootFolder:String,url:String):File{
 			if(url.substr(url.length-1)=="/"){
@@ -264,6 +297,7 @@ package zero.air{
 			}
 			return null;
 		}
+		*/
 	}
 }
 

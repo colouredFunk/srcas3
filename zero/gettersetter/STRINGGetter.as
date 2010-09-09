@@ -11,7 +11,7 @@ package zero.gettersetter{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
-	public class STRINGGetter{
+	public class STRINGGetter{不推荐使用
 		public static var strSize:int;
 		public static function getStr(data:ByteArray,offset:int):String{
 			strSize=1;

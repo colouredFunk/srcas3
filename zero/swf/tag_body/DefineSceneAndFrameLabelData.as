@@ -2,7 +2,7 @@
 DefineSceneAndFrameLabelData 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年8月31日 14:09:47 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年9月6日 17:21:38 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -29,37 +29,34 @@ DefineSceneAndFrameLabelData 版本:v1.0
 package zero.swf.tag_body{
 	import flash.utils.ByteArray;
 	public class DefineSceneAndFrameLabelData extends TagBody{
-		public var SceneCount:int;				//EncodedU32
 		public var OffsetV:Vector.<int>;		
 		public var NameV:Vector.<String>;		
-		public var FrameLabelCount:int;			//EncodedU32
 		public var FrameNumV:Vector.<int>;		
 		public var FrameLabelV:Vector.<String>;	
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):void{
-			//#offsetpp
-			var get_u_value:int=0;
-			var get_u_step:int=0;
-			do{
-				get_u_value=data[offset++];
-				get_u_value|=((get_u_value&0x7f)<<get_u_step);// get_u_value & 0111 1111
-				get_u_step+=7;
-			}while(get_u_value&0x80);// get_u_value & 1000 0000
-			SceneCount=get_u_value;
-			//
+		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			OffsetV=new Vector.<int>();
 			NameV=new Vector.<String>();
+			
 			//#offsetpp
+			//#offsetpp
+			var SceneCount:int=0;
+			var get_u_step:int=0;
+			do{
+				var get_u_value:int=data[offset++];
+				SceneCount|=((get_u_value&0x7f)<<get_u_step);// get_u_value & 0111 1111
+				get_u_step+=7;
+			}while(get_u_value&0x80);// get_u_value & 1000 0000
+			//
 			for(var i:int=0;i<SceneCount;i++){
 				//#offsetpp
-				get_u_value=0;
+				OffsetV[i]=0;
 				get_u_step=0;
 				do{
 					get_u_value=data[offset++];
-					get_u_value|=((get_u_value&0x7f)<<get_u_step);// get_u_value & 0111 1111
+					OffsetV[i]|=((get_u_value&0x7f)<<get_u_step);// get_u_value & 0111 1111
 					get_u_step+=7;
 				}while(get_u_value&0x80);// get_u_value & 1000 0000
-				OffsetV[i]=get_u_value;
 				//
 				var get_str_size:int=0;
 				while(data[offset+(get_str_size++)]){}
@@ -67,29 +64,27 @@ package zero.swf.tag_body{
 				NameV[i]=data.readUTFBytes(get_str_size);
 				offset+=get_str_size;
 			}
-			//#offsetpp
-			get_u_value=0;
-			get_u_step=0;
-			do{
-				get_u_value=data[offset++];
-				get_u_value|=((get_u_value&0x7f)<<get_u_step);// get_u_value & 0111 1111
-				get_u_step+=7;
-			}while(get_u_value&0x80);// get_u_value & 1000 0000
-			FrameLabelCount=get_u_value;
-			//
 			FrameNumV=new Vector.<int>();
 			FrameLabelV=new Vector.<String>();
 			//#offsetpp
+			//#offsetpp
+			var FrameLabelCount:int=0;
+			get_u_step=0;
+			do{
+				get_u_value=data[offset++];
+				FrameLabelCount|=((get_u_value&0x7f)<<get_u_step);// get_u_value & 0111 1111
+				get_u_step+=7;
+			}while(get_u_value&0x80);// get_u_value & 1000 0000
+			//
 			for(i=0;i<FrameLabelCount;i++){
 				//#offsetpp
-				get_u_value=0;
+				FrameNumV[i]=0;
 				get_u_step=0;
 				do{
 					get_u_value=data[offset++];
-					get_u_value|=((get_u_value&0x7f)<<get_u_step);// get_u_value & 0111 1111
+					FrameNumV[i]|=((get_u_value&0x7f)<<get_u_step);// get_u_value & 0111 1111
 					get_u_step+=7;
 				}while(get_u_value&0x80);// get_u_value & 1000 0000
-				FrameNumV[i]=get_u_value;
 				//
 				get_str_size=0;
 				while(data[offset+(get_str_size++)]){}
@@ -97,12 +92,12 @@ package zero.swf.tag_body{
 				FrameLabelV[i]=data.readUTFBytes(get_str_size);
 				offset+=get_str_size;
 			}
+			return offset;
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			//var offset:int=0;//测试
-			SceneCount=OffsetV.length;
-			FrameLabelCount=FrameNumV.length;
+			var SceneCount:int=OffsetV.length;
 			var offset:int=0;
 			//#offsetpp
 			var set_u_value:int=SceneCount;
@@ -118,9 +113,11 @@ package zero.swf.tag_body{
 			}
 			//
 			//#offsetpp
-			for(var i:int=0;i<SceneCount;i++){
+			var i:int=-1;
+			for each(var Offset:int in OffsetV){
+				i++;
 				//#offsetpp
-				set_u_value=OffsetV[i];
+				set_u_value=Offset;
 				while(true){
 					set_u_byteValue=set_u_value&0x7f;
 					set_u_value>>>=7;
@@ -137,6 +134,7 @@ package zero.swf.tag_body{
 				offset=data.length;
 				data[offset++]=0;//字符串结束
 			}
+			var FrameLabelCount:int=FrameNumV.length;
 			//#offsetpp
 			set_u_value=FrameLabelCount;
 			while(true){
@@ -151,9 +149,11 @@ package zero.swf.tag_body{
 			}
 			//
 			//#offsetpp
-			for(i=0;i<FrameLabelCount;i++){
+			i=-1;
+			for each(var FrameNum:int in FrameNumV){
+				i++;
 				//#offsetpp
-				set_u_value=FrameNumV[i];
+				set_u_value=FrameNum;
 				while(true){
 					set_u_byteValue=set_u_value&0x7f;
 					set_u_value>>>=7;
@@ -176,48 +176,47 @@ package zero.swf.tag_body{
 		////
 		CONFIG::toXMLAndInitByXML {
 		override public function toXML():XML{
-			SceneCount=OffsetV.length;
-			FrameLabelCount=FrameNumV.length;
-			var xml:XML=<DefineSceneAndFrameLabelData
-				SceneCount={SceneCount}
-				FrameLabelCount={FrameLabelCount}
-			>
-				<list vNames="OffsetV,NameV" count={SceneCount}/>
-				<list vNames="FrameNumV,FrameLabelV" count={FrameLabelCount}/>
+			var xml:XML=<DefineSceneAndFrameLabelData>
+				<list vNames="OffsetV,NameV" count={OffsetV.length}/>
+				<list vNames="FrameNumV,FrameLabelV" count={FrameNumV.length}/>
 			</DefineSceneAndFrameLabelData>;
 			var listXML:XML=xml.list[0];
-			for(var i:int=0;i<SceneCount;i++){
-				listXML.appendChild(<Offset value={OffsetV[i]}/>);
+			var i:int=-1;
+			for each(var Offset:int in OffsetV){
+				i++;
+				listXML.appendChild(<Offset value={Offset}/>);
 				listXML.appendChild(<Name value={NameV[i]}/>);
 			}
 			listXML=xml.list[1];
-			for(i=0;i<FrameLabelCount;i++){
-				listXML.appendChild(<FrameNum value={FrameNumV[i]}/>);
+			i=-1;
+			for each(var FrameNum:int in FrameNumV){
+				i++;
+				listXML.appendChild(<FrameNum value={FrameNum}/>);
 				listXML.appendChild(<FrameLabel value={FrameLabelV[i]}/>);
 			}
 			return xml;
 		}
 		override public function initByXML(xml:XML):void{
-			SceneCount=int(xml.@SceneCount.toString());
 			var listXML:XML=xml.list[0];
 			var OffsetXMLList:XMLList=listXML.Offset;
 			OffsetV=new Vector.<int>();
 			var NameXMLList:XMLList=listXML.Name;
 			NameV=new Vector.<String>();
-			SceneCount=OffsetXMLList.length();
-			for(var i:int=0;i<SceneCount;i++){
-				OffsetV[i]=int(OffsetXMLList[i].@value.toString());
+			var i:int=-1;
+			for each(var OffsetXML:XML in OffsetXMLList){
+				i++;
+				OffsetV[i]=int(OffsetXML.@value.toString());
 				NameV[i]=NameXMLList[i].@value.toString();
 			}
-			FrameLabelCount=int(xml.@FrameLabelCount.toString());
 			listXML=xml.list[1];
 			var FrameNumXMLList:XMLList=listXML.FrameNum;
 			FrameNumV=new Vector.<int>();
 			var FrameLabelXMLList:XMLList=listXML.FrameLabel;
 			FrameLabelV=new Vector.<String>();
-			FrameLabelCount=FrameNumXMLList.length();
-			for(i=0;i<FrameLabelCount;i++){
-				FrameNumV[i]=int(FrameNumXMLList[i].@value.toString());
+			i=-1;
+			for each(var FrameNumXML:XML in FrameNumXMLList){
+				i++;
+				FrameNumV[i]=int(FrameNumXML.@value.toString());
 				FrameLabelV[i]=FrameLabelXMLList[i].@value.toString();
 			}
 		}

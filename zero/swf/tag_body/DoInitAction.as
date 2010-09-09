@@ -2,7 +2,7 @@
 DoInitAction 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年8月31日 15:00:00 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年9月1日 14:02:08 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -42,12 +42,16 @@ package zero.swf.tag_body{
 	public class DoInitAction extends TagBody{
 		public var SpriteID:int;				//UI16
 		public var Actions:ACTIONRECORD;		
+		public var ActionEndFlag:int;			//UI8
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):void{
+		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			SpriteID=data[offset]|(data[offset+1]<<8);
+			offset+=2;
+			//#offsetpp
 			Actions=new ACTIONRECORD();
-			Actions.initByData(data,offset+2,endOffset-1);
-			//Reserved=data[offset+2];
+			offset=Actions.initByData(data,offset,endOffset-1);
+			ActionEndFlag=data[offset++];
+			return offset;
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
@@ -56,7 +60,7 @@ package zero.swf.tag_body{
 			data[1]=SpriteID>>8;
 			data.position=2;
 			data.writeBytes(Actions.toData());
-			data[data.length]=0x00;
+			data[data.length]=ActionEndFlag;
 			return data;
 		}
 
@@ -65,6 +69,7 @@ package zero.swf.tag_body{
 		override public function toXML():XML{
 			var xml:XML=<DoInitAction
 				SpriteID={SpriteID}
+				ActionEndFlag={ActionEndFlag}
 			>
 				<Actions/>
 			</DoInitAction>;
@@ -75,6 +80,7 @@ package zero.swf.tag_body{
 			SpriteID=int(xml.@SpriteID.toString());
 			Actions=new ACTIONRECORD();
 			Actions.initByXML(xml.Actions.children()[0]);
+			ActionEndFlag=int(xml.@ActionEndFlag.toString());
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}
