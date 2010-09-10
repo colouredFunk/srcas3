@@ -2,7 +2,7 @@
 MATRIX 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年9月6日 18:14:37 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年9月10日 20:36:37 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -22,24 +22,25 @@ MATRIX 版本:v1.0
 package zero.swf.record{
 	import flash.utils.ByteArray;
 	public class MATRIX extends Record{
-		public var HasScale:int;				
-		public var NScaleBits:int;				
-		public var ScaleX:int;					
-		public var ScaleY:int;					
-		public var HasRotate:int;				
-		public var NRotateBits:int;				
-		public var RotateSkew0:int;				
-		public var RotateSkew1:int;				
-		public var NTranslateBits:int;			
-		public var TranslateX:int;				
-		public var TranslateY:int;				
+		public var HasScale:int;
+		public var NScaleBits:int;
+		public var ScaleX:int;
+		public var ScaleY:int;
+		public var HasRotate:int;
+		public var NRotateBits:int;
+		public var RotateSkew0:int;
+		public var RotateSkew1:int;
+		public var NTranslateBits:int;
+		public var TranslateX:int;
+		public var TranslateY:int;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var bGroupValue:int=(data[offset]<<24)|(data[offset+1]<<16)|(data[offset+2]<<8)|data[offset+3];
-			offset+=4;
 			//#offsetpp
+			offset+=4;
 			HasScale=bGroupValue>>>31;						//10000000 00000000 00000000 00000000
 			//#offsetpp
+			
 			var bGroupBitsOffset:int=1;
 			
 			if(HasScale){
@@ -69,6 +70,7 @@ package zero.swf.record{
 				}
 			}
 			//#offsetpp
+			
 			HasRotate=(bGroupValue<<bGroupBitsOffset)>>>31;
 			++bGroupBitsOffset;
 			
@@ -76,6 +78,7 @@ package zero.swf.record{
 			if(bGroupBitsOffset>=16){if(bGroupBitsOffset>=24){bGroupBitsOffset-=24;bGroupValue=(bGroupValue<<24)|(data[offset++]<<16)|(data[offset++]<<8)|data[offset++];}else{bGroupBitsOffset-=16;bGroupValue=(bGroupValue<<16)|(data[offset++]<<8)|data[offset++];}}else if(bGroupBitsOffset>=8){bGroupBitsOffset-=8;bGroupValue=(bGroupValue<<8)|data[offset++];}
 			
 			//#offsetpp
+			
 			if(HasRotate){
 				NRotateBits=(bGroupValue<<bGroupBitsOffset)>>>27;
 				bGroupBitsOffset+=5;
@@ -105,6 +108,7 @@ package zero.swf.record{
 					
 				}
 				//#offsetpp
+			
 			}
 			NTranslateBits=(bGroupValue<<bGroupBitsOffset)>>>27;
 			bGroupBitsOffset+=5;
@@ -136,10 +140,11 @@ package zero.swf.record{
 			var data:ByteArray=new ByteArray();
 			//var offset:int=0;//测试
 			var bGroupValue:int=0;
-			var offset:int=0;
 			//#offsetpp
+			var offset:int=0;
 			bGroupValue|=HasScale<<31;						//10000000 00000000 00000000 00000000
 			//#offsetpp
+			
 			var bGroupBitsOffset:int=1;
 			
 			if(HasScale){
@@ -166,12 +171,14 @@ package zero.swf.record{
 				
 			}
 			//#offsetpp
+			
 			bGroupValue|=HasRotate<<(32-(++bGroupBitsOffset));
 			
 			//向 data 写入满8位(1字节)的数据:
 			if(bGroupBitsOffset>16){if(bGroupBitsOffset>24){bGroupBitsOffset-=24;data[offset++]=bGroupValue>>24;data[offset++]=bGroupValue>>16;data[offset++]=bGroupValue>>8;bGroupValue<<=24;}else{bGroupBitsOffset-=16;data[offset++]=bGroupValue>>24;data[offset++]=bGroupValue>>16;bGroupValue<<=16;}}else if(bGroupBitsOffset>8){bGroupBitsOffset-=8;data[offset++]=bGroupValue>>24;bGroupValue<<=8;}
 			
 			//#offsetpp
+			
 			if(HasRotate){
 			
 				//计算所需最小位数:
@@ -197,6 +204,7 @@ package zero.swf.record{
 				if(bGroupBitsOffset>16){if(bGroupBitsOffset>24){bGroupBitsOffset-=24;data[offset++]=bGroupValue>>24;data[offset++]=bGroupValue>>16;data[offset++]=bGroupValue>>8;bGroupValue<<=24;}else{bGroupBitsOffset-=16;data[offset++]=bGroupValue>>24;data[offset++]=bGroupValue>>16;bGroupValue<<=16;}}else if(bGroupBitsOffset>8){bGroupBitsOffset-=8;data[offset++]=bGroupValue>>24;bGroupValue<<=8;}
 				
 				//#offsetpp
+			
 			}
 			
 			//计算所需最小位数:

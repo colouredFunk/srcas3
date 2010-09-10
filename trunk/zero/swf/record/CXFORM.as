@@ -2,7 +2,7 @@
 CXFORM 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年9月7日 15:28:24 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年9月10日 20:28:31 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -20,24 +20,26 @@ CXFORM 版本:v1.0
 package zero.swf.record{
 	import flash.utils.ByteArray;
 	public class CXFORM extends Record{
-		public var HasAddTerms:int;				
-		public var HasMultTerms:int;			
-		public var Nbits:int;					
-		public var RedMultTerm:int;				
-		public var GreenMultTerm:int;			
-		public var BlueMultTerm:int;			
-		public var RedAddTerm:int;				
-		public var GreenAddTerm:int;			
-		public var BlueAddTerm:int;				
+		public var HasAddTerms:int;
+		public var HasMultTerms:int;
+		public var Nbits:int;
+		public var RedMultTerm:int;
+		public var GreenMultTerm:int;
+		public var BlueMultTerm:int;
+		public var RedAddTerm:int;
+		public var GreenAddTerm:int;
+		public var BlueAddTerm:int;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var bGroupValue:int=(data[offset]<<24)|(data[offset+1]<<16)|(data[offset+2]<<8)|data[offset+3];
-			offset+=4;
 			//#offsetpp
+			offset+=4;
 			HasAddTerms=bGroupValue>>>31;					//10000000 00000000 00000000 00000000
 			//#offsetpp
+			
 			HasMultTerms=(bGroupValue<<1)>>>31;				//01000000 00000000 00000000 00000000
 			//#offsetpp
+			
 			Nbits=(bGroupValue<<2)>>>28;					//00111100 00000000 00000000 00000000
 			var bGroupBitsOffset:int=6;
 			
@@ -97,12 +99,14 @@ package zero.swf.record{
 			var data:ByteArray=new ByteArray();
 			//var offset:int=0;//测试
 			var bGroupValue:int=0;
-			var offset:int=0;
 			//#offsetpp
+			var offset:int=0;
 			bGroupValue|=HasAddTerms<<31;					//10000000 00000000 00000000 00000000
 			//#offsetpp
+			
 			bGroupValue|=HasMultTerms<<30;					//01000000 00000000 00000000 00000000
 			//#offsetpp
+			
 			
 			//计算所需最小位数:
 			var bGroupMixNum:int=((RedMultTerm<0?-RedMultTerm:RedMultTerm)<<1)|((GreenMultTerm<0?-GreenMultTerm:GreenMultTerm)<<1)|((BlueMultTerm<0?-BlueMultTerm:BlueMultTerm)<<1)|((RedAddTerm<0?-RedAddTerm:RedAddTerm)<<1)|((GreenAddTerm<0?-GreenAddTerm:GreenAddTerm)<<1)|((BlueAddTerm<0?-BlueAddTerm:BlueAddTerm)<<1);
