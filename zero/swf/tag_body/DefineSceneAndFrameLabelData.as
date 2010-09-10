@@ -2,7 +2,7 @@
 DefineSceneAndFrameLabelData 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年9月6日 17:21:38 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年9月9日 22:24:12 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -15,31 +15,31 @@ DefineSceneAndFrameLabelData 版本:v1.0
 //Field 				Type 				Comment
 //Header 				RECORDHEADER 		Tag type = 86
 //SceneCount 			EncodedU32 			Number of scenes
-//Offset1 			EncodedU32 			Frame offset for scene 1
+//Offset1 				EncodedU32 			Frame offset for scene 1
 //Name1 				STRING 				Name of scene 1
 //... ... ...
-//OffsetN 			EncodedU32 			Frame offset for scene N
+//OffsetN 				EncodedU32 			Frame offset for scene N
 //NameN 				STRING 				Name of scene N
-//FrameLabelCount 	EncodedU32 			Number of frame labels
+//FrameLabelCount 		EncodedU32 			Number of frame labels
 //FrameNum1 			EncodedU32 			Frame number of frame label #1 (zero-based, global to symbol)
-//FrameLabel1 		STRING 				Frame label string of frame label #1
+//FrameLabel1 			STRING 				Frame label string of frame label #1
 //... ... ...
 //FrameNumN 			EncodedU32 			Frame number of frame label #N (zero-based, global to symbol)
-//FrameLabelN 		STRING 				Frame label string of frame label #N
+//FrameLabelN 			STRING 				Frame label string of frame label #N
 package zero.swf.tag_body{
 	import flash.utils.ByteArray;
 	public class DefineSceneAndFrameLabelData extends TagBody{
-		public var OffsetV:Vector.<int>;		
-		public var NameV:Vector.<String>;		
-		public var FrameNumV:Vector.<int>;		
-		public var FrameLabelV:Vector.<String>;	
+		public var OffsetV:Vector.<int>;
+		public var NameV:Vector.<String>;
+		public var FrameNumV:Vector.<int>;
+		public var FrameLabelV:Vector.<String>;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			OffsetV=new Vector.<int>();
 			NameV=new Vector.<String>();
+			//#offsetpp
+			//#offsetpp
 			
-			//#offsetpp
-			//#offsetpp
 			var SceneCount:int=0;
 			var get_u_step:int=0;
 			do{
@@ -50,6 +50,7 @@ package zero.swf.tag_body{
 			//
 			for(var i:int=0;i<SceneCount;i++){
 				//#offsetpp
+			
 				OffsetV[i]=0;
 				get_u_step=0;
 				do{
@@ -67,7 +68,9 @@ package zero.swf.tag_body{
 			FrameNumV=new Vector.<int>();
 			FrameLabelV=new Vector.<String>();
 			//#offsetpp
+			
 			//#offsetpp
+			
 			var FrameLabelCount:int=0;
 			get_u_step=0;
 			do{
@@ -78,6 +81,7 @@ package zero.swf.tag_body{
 			//
 			for(i=0;i<FrameLabelCount;i++){
 				//#offsetpp
+			
 				FrameNumV[i]=0;
 				get_u_step=0;
 				do{
@@ -98,8 +102,8 @@ package zero.swf.tag_body{
 			var data:ByteArray=new ByteArray();
 			//var offset:int=0;//测试
 			var SceneCount:int=OffsetV.length;
-			var offset:int=0;
 			//#offsetpp
+			var offset:int=0;
 			var set_u_value:int=SceneCount;
 			while(true){
 				var set_u_byteValue:int=set_u_value&0x7f;
@@ -113,10 +117,12 @@ package zero.swf.tag_body{
 			}
 			//
 			//#offsetpp
+			
 			var i:int=-1;
 			for each(var Offset:int in OffsetV){
 				i++;
 				//#offsetpp
+			
 				set_u_value=Offset;
 				while(true){
 					set_u_byteValue=set_u_value&0x7f;
@@ -130,12 +136,12 @@ package zero.swf.tag_body{
 				}
 				//
 				data.position=offset;
-				data.writeUTFBytes(NameV[i]);
+				data.writeUTFBytes(NameV[i]+"\x00");
 				offset=data.length;
-				data[offset++]=0;//字符串结束
 			}
 			var FrameLabelCount:int=FrameNumV.length;
 			//#offsetpp
+			
 			set_u_value=FrameLabelCount;
 			while(true){
 				set_u_byteValue=set_u_value&0x7f;
@@ -149,10 +155,12 @@ package zero.swf.tag_body{
 			}
 			//
 			//#offsetpp
+			
 			i=-1;
 			for each(var FrameNum:int in FrameNumV){
 				i++;
 				//#offsetpp
+			
 				set_u_value=FrameNum;
 				while(true){
 					set_u_byteValue=set_u_value&0x7f;
@@ -166,9 +174,8 @@ package zero.swf.tag_body{
 				}
 				//
 				data.position=offset;
-				data.writeUTFBytes(FrameLabelV[i]);
+				data.writeUTFBytes(FrameLabelV[i]+"\x00");
 				offset=data.length;
-				data[offset++]=0;//字符串结束
 			}
 			return data;
 		}
