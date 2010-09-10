@@ -40,12 +40,32 @@ package ui {
 		}
 		public function set groupID(_groupID:String):void{
 			__groupID = _groupID;
-			createManager(__groupID);
 		}
+		public function get maxConnections():uint{
+			return createManager(groupID).maxConnections;
+		}
+		public function set maxConnections(_maxConnections:uint):void{
+			createManager(groupID).maxConnections = _maxConnections;
+		}
+		private var __widthArea:uint = 1;
+		public function get widthArea():uint {
+			return __widthArea;
+		};
+		public function set widthArea(_widthArea:uint):void {
+			__widthArea = _widthArea;
+			autoFitArea.width = __widthArea;
+		};
+		private var __heightArea:uint = 1;
+		public function get heightArea():uint {
+			return __heightArea;
+		};
+		public function set heightArea(_heightArea:uint):void {
+			__heightArea = _heightArea;
+			autoFitArea.height = __heightArea;
+		};
 		override protected function init():void {
 			super.init();
 			groupID = getQualifiedClassName(this);
-			createManager(groupID);
 			if (!container) {
 				container = this;
 				if (background) {
@@ -81,22 +101,6 @@ package ui {
 			background = null;
 			autoFitArea.destroy();
 		}
-		private var __widthArea:uint = 1;
-		public function get widthArea():uint {
-			return __widthArea;
-		};
-		public function set widthArea(_widthArea:uint):void {
-			__widthArea = _widthArea;
-			autoFitArea.width = __widthArea;
-		};
-		private var __heightArea:uint = 1;
-		public function get heightArea():uint {
-			return __heightArea;
-		};
-		public function set heightArea(_heightArea:uint):void {
-			__heightArea = _heightArea;
-			autoFitArea.height = __heightArea;
-		};
 		public function load(_source:String, _index:uint = 0):void {
 			if (_source && sourceNow == _source) {
 				return;
@@ -181,10 +185,9 @@ package ui {
 		private static var loaderMax:LoaderMax;
 		private static var allContainer:Sprite = new Sprite();
 		private static var imageLoader:com.greensock.loading.ImageLoader;
-		private static var imageLoaderParams:Object;
+		private static var imageLoaderParams:Object = {container:allContainer};
 		protected static function createManager(_groupID:String):LoaderMax {
 			if (!loaderMaxDic[_groupID]) {
-				imageLoaderParams = { container:allContainer };
 				loaderMax = new LoaderMax( { name:_groupID,
 											onChildProgress:onChildProgressHandler,
 											onChildComplete:onChildCompleteHandler,
@@ -196,10 +199,12 @@ package ui {
 			}
 			return loaderMaxDic[_groupID];
 		}
+		public static var onGroupLoading:Function;
+		public static var onGroupLoaded:Function;
 		protected static function loadBMD(_source:String, _imageLoader:ui.ImageLoader, _index:uint = 0):BitmapData {
 			imageLoader = imageLoaderDic[_source];
 			if (imageLoader) {
-				if (imageLoader.progress == 1) {
+				if (imageLoader.progress == 1 && imageLoader.rawContent && imageLoader.rawContent.bitmapData) {
 					//已经加载完图片
 					return imageLoader.rawContent.bitmapData;
 				}else {
@@ -220,6 +225,7 @@ package ui {
 			imageLoaderParams.name = _source;
 			imageLoader = new com.greensock.loading.ImageLoader(_source, imageLoaderParams);
 			imageLoaderDic[_source] = imageLoader;
+			loaderMax = createManager(_imageLoader.groupID);
 			loaderMax.insert(imageLoader, _index);
 			loaderMax.load();
 			return null;
@@ -261,9 +267,15 @@ package ui {
 		}
 		private static function onProgressHandler(_evt:LoaderEvent):void{
 			//trace(_evt.toString());
+			if (onGroupLoading!=null) {
+				onGroupLoading(_evt.currentTarget.name, _evt.currentTarget.progress);
+			}
 		}
 		private static function onCompleteHandler(_evt:LoaderEvent):void{
 			//trace(_evt.toString());
+			if (onGroupLoaded!=null) {
+				onGroupLoaded(_evt.currentTarget.name);
+			}
 		}
 	}
 }
