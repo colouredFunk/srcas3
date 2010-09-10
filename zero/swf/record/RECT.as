@@ -2,7 +2,7 @@
 RECT 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年9月6日 18:14:37 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年9月10日 20:28:31 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -16,16 +16,16 @@ RECT 版本:v1.0
 package zero.swf.record{
 	import flash.utils.ByteArray;
 	public class RECT extends Record{
-		public var Nbits:int;					
-		public var Xmin:int;					
-		public var Xmax:int;					
-		public var Ymin:int;					
-		public var Ymax:int;					
+		public var Nbits:int;
+		public var Xmin:int;
+		public var Xmax:int;
+		public var Ymin:int;
+		public var Ymax:int;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var bGroupValue:int=(data[offset]<<24)|(data[offset+1]<<16)|(data[offset+2]<<8)|data[offset+3];
-			offset+=4;
 			//#offsetpp
+			offset+=4;
 			Nbits=bGroupValue>>>27;							//11111000 00000000 00000000 00000000
 			var bGroupBitsOffset:int=5;
 			
@@ -67,8 +67,8 @@ package zero.swf.record{
 			var data:ByteArray=new ByteArray();
 			//var offset:int=0;//测试
 			var bGroupValue:int=0;
-			var offset:int=0;
 			//#offsetpp
+			var offset:int=0;
 			
 			//计算所需最小位数:
 			var bGroupMixNum:int=((Xmin<0?-Xmin:Xmin)<<1)|((Xmax<0?-Xmax:Xmax)<<1)|((Ymin<0?-Ymin:Ymin)<<1)|((Ymax<0?-Ymax:Ymax)<<1);
