@@ -7,6 +7,9 @@
 	import flash.geom.*;
 
 	public class ImageCut extends Sprite {
+		public static const wid0:int=130;
+		public static const hei0:int=95;
+		
 		public var freeTran:*;
 		public var rectClip:Sprite;
 		public var frameClip:Sprite;
@@ -23,6 +26,16 @@
 
 		public function ImageCut() {
 			init();
+		}
+		public function setCustomSize(wid:int,hei:int):void{
+			thumbnailBmp.scaleX=wid0/wid;
+			thumbnailBmp.scaleY=hei0/hei;
+			var frame_0:Sprite=rectClip.getChildAt(0) as Sprite;
+			var frameClip:Sprite=rectClip.getChildByName("frameClip") as Sprite;
+			frame_0.width=frameClip.width=wid;
+			frame_0.height=frameClip.height=hei;
+			frame_0.x=frameClip.x=-wid/2;
+			frame_0.y=frameClip.y=-hei/2;
 		}
 		private function init():void {
 			x=Math.round(x);
@@ -48,6 +61,7 @@
 			freeTran.dragRect=new Rectangle(frameClip.x,frameClip.y,frameClip.width,frameClip.height);
 		}
 		public function getBitmapData():BitmapData {
+			trace("bmpThumbnail:",bmpThumbnail.width,"x",bmpThumbnail.height);
 			return bmpThumbnail;
 		}
 		public function setIntact(_bmpIntact:BitmapData):void {
@@ -84,7 +98,11 @@
 			rectClip.x=int(frameClip.x+frameClip.width*0.5);
 			rectClip.y=int(frameClip.y+frameClip.height*0.5);
 			rectClip.rotation=0;
+			
+			//rectClip.width=wid0;
+			//rectClip.height=hei0;
 			rectClip.scaleX=rectClip.scaleY=1;
+			
 			rectClip["frameClip"].visible=false;
 			freeTran.pic=null;
 			freeTran.pic=rectClip;
