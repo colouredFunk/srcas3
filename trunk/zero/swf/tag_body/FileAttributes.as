@@ -2,7 +2,7 @@
 FileAttributes 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年9月6日 18:48:21 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年9月9日 22:07:23 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -47,20 +47,20 @@ FileAttributes 版本:v1.0
 package zero.swf.tag_body{
 	import flash.utils.ByteArray;
 	public class FileAttributes extends TagBody{
-		public var UseDirectBlit:int;			
-		public var UseGPU:int;					
-		public var HasMetadata:int;				
-		public var ActionScript3:int;			
-		public var UseNetwork:int;				
+		public var UseDirectBlit:int;
+		public var UseGPU:int;
+		public var HasMetadata:int;
+		public var ActionScript3:int;
+		public var UseNetwork:int;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var flags:int=data[offset];
-			//Reserved=(flags<<24)>>>31;					//10000000
+			//Reserved=(flags<<24)>>>31;				//10000000
 			UseDirectBlit=(flags<<25)>>>31;				//01000000
 			UseGPU=(flags<<26)>>>31;					//00100000
 			HasMetadata=(flags<<27)>>>31;				//00010000
 			ActionScript3=(flags<<28)>>>31;				//00001000
-			//Reserved=(flags<<29)>>>30;					//00000110
+			//Reserved=(flags<<29)>>>30;				//00000110
 			UseNetwork=flags&0x01;						//00000001
 			//Reserved=data[offset+1]|(data[offset+2]<<8)|(data[offset+3]<<16);
 			return offset+4;

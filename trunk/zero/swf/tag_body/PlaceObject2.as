@@ -2,7 +2,7 @@
 PlaceObject2 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年9月8日 12:38:34 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年9月9日 23:25:14 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -40,22 +40,22 @@ package zero.swf.tag_body{
 	import zero.swf.BytesData;
 	import flash.utils.ByteArray;
 	public class PlaceObject2 extends TagBody{
-		public var PlaceFlagHasClipActions:int;	
-		public var PlaceFlagHasClipDepth:int;	
-		public var PlaceFlagHasName:int;		
-		public var PlaceFlagHasRatio:int;		
+		public var PlaceFlagHasClipActions:int;
+		public var PlaceFlagHasClipDepth:int;
+		public var PlaceFlagHasName:int;
+		public var PlaceFlagHasRatio:int;
 		public var PlaceFlagHasColorTransform:int;
-		public var PlaceFlagHasMatrix:int;		
-		public var PlaceFlagHasCharacter:int;	
-		public var PlaceFlagMove:int;			
-		public var Depth:int;					//UI16
-		public var CharacterId:int;				//UI16
-		public var Matrix:MATRIX;				
+		public var PlaceFlagHasMatrix:int;
+		public var PlaceFlagHasCharacter:int;
+		public var PlaceFlagMove:int;
+		public var Depth:int;							//UI16
+		public var CharacterId:int;						//UI16
+		public var Matrix:MATRIX;
 		public var ColorTransform:CXFORMWITHALPHA;
-		public var Ratio:int;					//UI16
-		public var Name:String;					//STRING
-		public var ClipDepth:int;				//UI16
-		public var ClipActions:BytesData;		
+		public var Ratio:int;							//UI16
+		public var Name:String;							//STRING
+		public var ClipDepth:int;						//UI16
+		public var ClipActions:BytesData;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var flags:int=data[offset];
@@ -68,28 +68,34 @@ package zero.swf.tag_body{
 			PlaceFlagHasCharacter=(flags<<30)>>>31;		//00000010
 			PlaceFlagMove=flags&0x01;					//00000001
 			Depth=data[offset+1]|(data[offset+2]<<8);
-			offset+=3;
 			//#offsetpp
+			offset+=3;
 			if(PlaceFlagHasCharacter){
 				CharacterId=data[offset++]|(data[offset++]<<8);
 			}
 			//#offsetpp
+			
 			if(PlaceFlagHasMatrix){
 				//#offsetpp
+			
 				Matrix=new MATRIX();
 				offset=Matrix.initByData(data,offset,endOffset);
 			}
 			//#offsetpp
+			
 			if(PlaceFlagHasColorTransform){
 				//#offsetpp
+			
 				ColorTransform=new CXFORMWITHALPHA();
 				offset=ColorTransform.initByData(data,offset,endOffset);
 			}
 			//#offsetpp
+			
 			if(PlaceFlagHasRatio){
 				Ratio=data[offset++]|(data[offset++]<<8);
 			}
 			//#offsetpp
+			
 			if(PlaceFlagHasName){
 				var get_str_size:int=0;
 				while(data[offset+(get_str_size++)]){}
@@ -98,12 +104,15 @@ package zero.swf.tag_body{
 				offset+=get_str_size;
 			}
 			//#offsetpp
+			
 			if(PlaceFlagHasClipDepth){
 				ClipDepth=data[offset++]|(data[offset++]<<8);
 			}
 			//#offsetpp
-			if(offset<endOffset){
+			
+			if(PlaceFlagHasClipActions){
 				//#offsetpp
+			
 				ClipActions=new BytesData();
 				offset=ClipActions.initByData(data,offset,endOffset);
 			}
@@ -125,46 +134,48 @@ package zero.swf.tag_body{
 			
 			data[1]=Depth;
 			data[2]=Depth>>8;
-			var offset:int=3;
 			//#offsetpp
+			var offset:int=3;
 			if(PlaceFlagHasCharacter){
 				data[offset++]=CharacterId;
 				data[offset++]=CharacterId>>8;
 			}
 			//#offsetpp
+			
 			if(PlaceFlagHasMatrix){
 				data.position=offset;
 				data.writeBytes(Matrix.toData());
 				offset=data.length;
 			}
 			//#offsetpp
+			
 			if(PlaceFlagHasColorTransform){
 				data.position=offset;
 				data.writeBytes(ColorTransform.toData());
 				offset=data.length;
 			}
 			//#offsetpp
+			
 			if(PlaceFlagHasRatio){
 				data[offset++]=Ratio;
 				data[offset++]=Ratio>>8;
 			}
 			//#offsetpp
+			
 			if(PlaceFlagHasName){
 				data.position=offset;
-				data.writeUTFBytes(Name);
+				data.writeUTFBytes(Name+"\x00");
 				offset=data.length;
-				data[offset++]=0;//字符串结束
 			}
 			//#offsetpp
+			
 			if(PlaceFlagHasClipDepth){
 				data[offset++]=ClipDepth;
 				data[offset++]=ClipDepth>>8;
 			}
-			//#offsetpp
-			if(ClipActions){
+			if(PlaceFlagHasClipActions){
 				data.position=offset;
 				data.writeBytes(ClipActions.toData());
-				offset=data.length;
 			}
 			return data;
 		}
@@ -221,7 +232,7 @@ package zero.swf.tag_body{
 			}else{
 				delete xml.@ClipDepth;
 			}
-			if(ClipActions){
+			if(PlaceFlagHasClipActions){
 				xml.ClipActions.appendChild(ClipActions.toXML());
 			}else{
 				delete xml.ClipActions;
@@ -258,7 +269,7 @@ package zero.swf.tag_body{
 			if(PlaceFlagHasClipDepth){
 				ClipDepth=int(xml.@ClipDepth.toString());
 			}
-			if(xml.ClipActions.length()==1){
+			if(PlaceFlagHasClipActions){
 				ClipActions=new BytesData();
 				ClipActions.initByXML(xml.ClipActions.children()[0]);
 			}
