@@ -20,8 +20,10 @@ package ui
 		public function get id():int{
 			return __id;
 		}
-		public function set id(_id:int):void{
-			_id %= length;
+		public function set id(_id:int):void {
+			if (autoID) {
+				_id %= length;
+			}
 			if (_id < 0) {
 				if (autoID) {
 					_id = length - _id;
@@ -38,12 +40,18 @@ package ui
 			if (__id==_id) {
 				return;
 			}
+			__dir = _id - __id;
 			__id = _id;
 			if (onIDChange!=null) {
 				onIDChange(__id);
 			}
 		}
+		private var __dir:int;
+		public function get dir():int {
+			return __dir;
+		}
 		public function setID(_id:int):void {
+			__dir = _id - __id;
 			__id = _id;
 			if (onIDChange!=null) {
 				onIDChange(__id);
