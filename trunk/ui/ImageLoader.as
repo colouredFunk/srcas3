@@ -101,29 +101,37 @@ package ui {
 			background = null;
 			autoFitArea.destroy();
 		}
-		public function load(_source:String, _index:uint = 0):void {
+		public function load(_source:String, _index:uint = 0, _showImmediately:Boolean = false ):void {
 			if (_source && sourceNow == _source) {
 				return;
 			}
 			bmdNow = loadBMD(_source, this, _index);
-			hideBMP(bmp);
+			if (_showImmediately) {
+				if (bmdNow) {
+					setBMP(bmdNow, _showImmediately);
+				}else {
+					hideBMP(bmp, _showImmediately);
+				}
+			}else {
+				hideBMP(bmp);
+			}
 			sourceNow = _source;
 		}
 		protected var isHideTweening:Boolean;
-		protected function hideBMP(_content:*):void {
+		protected function hideBMP(_content:*, _showImmediately:Boolean = false ):void {
 			if (isHideTweening) {
 				return;
 			}
 			isHideTweening = true;
 			autoFitArea.release(_content);
 			TweenMax.killTweensOf(bmp);
-			TweenMax.to(bmp, 12, { alpha:0, useFrames:true, ease:Sine.easeInOut, onComplete:onHideEndHandler } );
+			TweenMax.to(bmp, _showImmediately?0:12, { alpha:0, useFrames:true, ease:Sine.easeInOut, onComplete:onHideEndHandler } );
 		}
 		private function onHideEndHandler():void {
 			isHideTweening = false;
 			setBMP(bmdNow);
 		}
-		protected function setBMP(_content:*):void {
+		protected function setBMP(_content:*, _showImmediately:Boolean = false ):void {
 			if (!_content || isHideTweening) {
 				return;
 			}
@@ -139,7 +147,7 @@ package ui {
 				container.addChild(bmp);
 			}
 			TweenMax.killTweensOf(bmp);
-			TweenMax.to(bmp, 15, { alpha:1, useFrames:true, ease:Sine.easeInOut } );
+			TweenMax.to(bmp, _showImmediately?0:15, { alpha:1, useFrames:true, ease:Sine.easeInOut } );
 			updateArea(bmp);
 		}
 		private const LIMITWH_MAX:uint = 999999;
