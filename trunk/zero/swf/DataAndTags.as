@@ -93,7 +93,8 @@ package zero.swf{
 						if(offset===nextTagOffset){
 							
 						}else{
-							throw new Error("offset="+offset+",nextTagOffset="+nextTagOffset);
+							//throw new Error(tagBodyClass+" offset="+offset+",nextTagOffset="+nextTagOffset);
+							trace(tagBodyClass+" offset="+offset+",nextTagOffset="+nextTagOffset);
 						}
 					}else{
 						if(tag.type==TagType.End){

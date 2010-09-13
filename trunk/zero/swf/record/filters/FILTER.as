@@ -1,48 +1,17 @@
 /***
-BaseDat 版本:v1.0
+FILTER 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年8月31日 20:15:10
+创建时间:2010年9月11日 16:38:30
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.swf{
-	import flash.utils.ByteArray;
-	import flash.utils.Dictionary;
-	import flash.utils.getQualifiedClassName;
-	
-	public class BaseDat{
-		
-		public function BaseDat(){
+package zero.swf.record.filters{
+	import zero.swf.BaseDat;
+	public class FILTER extends BaseDat{
+		public function FILTER(){
 		}
-		
-		/*
-		public function get Reserved():int{//测试
-			return 0;
-		}
-		public function set Reserved(_Reserved:int):void{//测试
-		
-		}
-		*/
-		
-		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			throw new Error("请 override 来使用");
-			return -1;
-		}
-		public function toData():ByteArray{
-			throw new Error("请 override 来使用");
-			return null;
-		}
-		CONFIG::toXMLAndInitByXML{
-		public function toXML():XML{
-			throw new Error("请 override 来使用");
-			return null;
-		}
-		public function initByXML(xml:XML):void{
-			throw new Error("请 override 来使用");
-		}
-		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
 

@@ -31,13 +31,7 @@ package zero.swf{
 				swfData.position=0;
 				type=swfData.readUTFBytes(3);//压缩和非压缩标记
 				
-				var data:ByteArray=new ByteArray();
-				data.endian=Endian.LITTLE_ENDIAN;
-				
-				//if(data.endian==Endian.BIG_ENDIAN){
-				//	Outputer.output("自动把 "+Endian.BIG_ENDIAN+" 转换为 "+Endian.LITTLE_ENDIAN);
-				//	data.endian=Endian.LITTLE_ENDIAN;
-				//}
+				var data:ByteArray;
 				
 				switch(type){
 					case "CWS":
@@ -68,7 +62,6 @@ package zero.swf{
 						,"brown"
 					);
 				}
-				
 				return data;
 			}
 			throw new Error("不是有效的SWF文件");
