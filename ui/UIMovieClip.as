@@ -26,13 +26,16 @@ package ui{
 			addEventListener(Event.REMOVED_FROM_STAGE, onRemoveToStageDelayHandler);
 		}
 		private function onRemoveToStageDelayHandler(_evt:Event):void {
-			addEventListener(Event.ENTER_FRAME, onRemoveToStageHandler);
-		}
-		protected function onRemoveToStageHandler(_evt:Event):void {
-			removeEventListener(Event.ENTER_FRAME, onRemoveToStageHandler);
-			if (stage) {
-				return;
+			addEventListener(Event.ENTER_FRAME, onRemoveToStageDelayHandler);
+			if (_evt.type == Event.ENTER_FRAME) {
+				removeEventListener(Event.ENTER_FRAME, onRemoveToStageDelayHandler);
+				if (stage) {
+					return;
+				}
+				onRemoveToStageHandler();
 			}
+		}
+		protected function onRemoveToStageHandler():void {
 			removeAllEvent();
 			removeChildren();
 			userData = null;

@@ -180,7 +180,7 @@
 			__playId = -1;
 			playId = 0;
 		}
-		public var defaultVolume:Number = 0.8;
+		public var defaultVolume:Number = 0.5;
 		private var volumePrev:Number = 0;
 		public function get mute():Boolean{
 			return volume==0;

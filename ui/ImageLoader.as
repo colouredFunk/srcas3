@@ -87,10 +87,10 @@ package ui {
 			autoFitArea = new AutoFitArea(container, 0, 0, widthArea, heightArea);
 			//contextMenuItem = Common.addContextMenu(this, "image:--");
 		}
-		override protected function onRemoveToStageHandler(_evt:Event):void {
-			super.onRemoveToStageHandler(_evt);
+		override protected function onRemoveToStageHandler():void {
+			super.onRemoveToStageHandler();
 			if (container!=this) {
-				container.removeChildren();
+				container.removeChild(bmp);
 			}
 			//contextMenuItem = null;
 			bmp.bitmapData = null;
@@ -100,6 +100,7 @@ package ui {
 			foreground = null;
 			background = null;
 			autoFitArea.destroy();
+			trace("removed!");
 		}
 		public function load(_source:String, _index:uint = 0, _showImmediately:Boolean = false ):void {
 			if (_source && sourceNow == _source) {

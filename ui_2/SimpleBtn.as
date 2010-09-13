@@ -29,12 +29,22 @@
 		}*/
 		protected function added(_evt:Event):void {
 			removeEventListener(Event.ADDED_TO_STAGE,added);
-			addEventListener(Event.REMOVED_FROM_STAGE,removed);
+			addEventListener(Event.REMOVED_FROM_STAGE,onRemoveToStageDelayHandler);
 			enabled=true;
 			if(area){
 				hitArea=area;
 				area.visible = false;
 				mouseChildren = false;
+			}
+		}
+		private function onRemoveToStageDelayHandler(_evt:Event):void {
+			addEventListener(Event.ENTER_FRAME, onRemoveToStageDelayHandler);
+			if (_evt.type == Event.ENTER_FRAME) {
+				removeEventListener(Event.ENTER_FRAME, onRemoveToStageDelayHandler);
+				if (stage) {
+					return;
+				}
+				removed(null);
 			}
 		}
 		protected function removed(_evt:Event):void {
