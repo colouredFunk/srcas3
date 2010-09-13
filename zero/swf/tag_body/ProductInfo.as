@@ -2,7 +2,7 @@
 ProductInfo 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年9月9日 22:07:23 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年9月13日 14:33:58 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -27,26 +27,9 @@ ProductInfo 版本:v1.0
 //CompilationDate (UI64)
 //Milliseconds since 1.1.1970
 package zero.swf.tag_body{
+	import zero.swf.vmark.ProductIDAndEditions;
 	import flash.utils.ByteArray;
 	public class ProductInfo extends TagBody{
-		public static const ProductIDV:Vector.<String>=Vector.<String>([
-			"Unknown",
-			"Macromedia Flex for J2EE",
-			"Macromedia Flex for .NET",
-			"Adobe Flex"
-		]);
-		public static const EditionV:Vector.<String>=Vector.<String>([
-			"Developer Edition",
-			"Full Commercial Edition",
-			"Non Commercial Edition",
-			"Educational Edition",
-			"Not For Resale (NFR) Edition",
-			"Trial Edition",
-			"None"
-		]);
-		
-		public static const ProductIDVMark:Object=getMarkByStrV(ProductIDV);
-		public static const EditionVMark:Object=getMarkByStrV(EditionV);
 		public var ProductID:uint;						//UI32
 		public var Edition:uint;						//UI32
 		public var MajorVersion:int;					//UI8
@@ -111,8 +94,8 @@ package zero.swf.tag_body{
 		CONFIG::toXMLAndInitByXML {
 		override public function toXML():XML{
 			return <ProductInfo
-				ProductID={ProductIDV[ProductID]}
-				Edition={EditionV[Edition]}
+				ProductID={ProductIDAndEditions.ProductIDV[ProductID]}
+				Edition={ProductIDAndEditions.EditionV[Edition]}
 				MajorVersion={MajorVersion}
 				MinorVersion={MinorVersion}
 				BuildLow={BuildLow}
@@ -121,8 +104,8 @@ package zero.swf.tag_body{
 			/>;
 		}
 		override public function initByXML(xml:XML):void{
-			ProductID=ProductIDVMark[xml.@ProductID.toString()];
-			Edition=EditionVMark[xml.@Edition.toString()];
+			ProductID=ProductIDAndEditions[xml.@ProductID.toString()];
+			Edition=ProductIDAndEditions[xml.@Edition.toString()];
 			MajorVersion=int(xml.@MajorVersion.toString());
 			MinorVersion=int(xml.@MinorVersion.toString());
 			BuildLow=uint(xml.@BuildLow.toString());
