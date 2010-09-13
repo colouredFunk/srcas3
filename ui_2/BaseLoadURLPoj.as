@@ -35,9 +35,12 @@ package ui_2{
 			this.removeEventListener(Event.ADDED_TO_STAGE,added);
 			if(needXML){
 				this.visible=false;
-				urlLoader=new URLLoader();
-				urlLoader.load(new URLRequest((this.loaderInfo.parameters[xmlVarName]||defaultXMLPath)));
-				urlLoader.addEventListener(Event.COMPLETE,loadXMLComplete);
+				if(defaultXMLPath=="no xml"){
+				}else{
+					urlLoader=new URLLoader();
+					urlLoader.load(new URLRequest((this.loaderInfo.parameters[xmlVarName]||defaultXMLPath)));
+				}
+					urlLoader.addEventListener(Event.COMPLETE,loadXMLComplete);
 			}else{
 				this["init"]();
 			}
