@@ -18,15 +18,6 @@
 			stop();
 			addEventListener(Event.ADDED_TO_STAGE,added);
 		}
-		/*
-		override public function get hitArea():Sprite { return super.hitArea; }
-		
-		override public function set hitArea(value:Sprite):void 
-		{
-			super.hitArea = value;
-			area = value;
-			mouseEnabled = true;
-		}*/
 		protected function added(_evt:Event):void {
 			removeEventListener(Event.ADDED_TO_STAGE,added);
 			addEventListener(Event.REMOVED_FROM_STAGE,onRemoveToStageDelayHandler);
@@ -38,6 +29,9 @@
 			}
 		}
 		private function onRemoveToStageDelayHandler(_evt:Event):void {
+			if (stage && stage.focus == this) {
+				stage.focus = null;
+			}
 			addEventListener(Event.ENTER_FRAME, onRemoveToStageDelayHandler);
 			if (_evt.type == Event.ENTER_FRAME) {
 				removeEventListener(Event.ENTER_FRAME, onRemoveToStageDelayHandler);
@@ -49,9 +43,6 @@
 		}
 		protected function removed(_evt:Event):void {
 			stop();
-			if (stage.focus==this) {
-				stage.focus=null;
-			}
 			removeEventListener(Event.REMOVED_FROM_STAGE,removed);
 			enabled=false;
 			if (needReload) {
@@ -83,8 +74,10 @@
 				addEventListener(MouseEvent.ROLL_OUT,$onRollOut);
 			} else {
 				buttonMode = false;
-				removeEventListener(MouseEvent.MOUSE_DOWN,$onPress);
-				stage.removeEventListener(MouseEvent.MOUSE_UP,$onRelease);
+				removeEventListener(MouseEvent.MOUSE_DOWN, $onPress);
+				if (stage) {
+					stage.removeEventListener(MouseEvent.MOUSE_UP,$onRelease);
+				}
 				removeEventListener(MouseEvent.ROLL_OVER,$onRollOver);
 				removeEventListener(MouseEvent.ROLL_OUT,$onRollOut);
 			}
