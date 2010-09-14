@@ -24,7 +24,7 @@ package ui {
 	 * ...
 	 * @author Akdcl
 	 */
-	public class  ImageLoader extends UIMovieClip {
+	public class  ImageLoader extends Btn {
 		public var container:*;
 		public var foreground:*;
 		public var background:*;
@@ -34,18 +34,18 @@ package ui {
 		protected var bmp:Bitmap;
 		protected var sourceNow:String;
 		protected var bmdNow:BitmapData;
-		private var __groupID:String;
-		public function get groupID():String{
-			return __groupID;
+		private var __imageGroup:String;
+		public function get imageGroup():String{
+			return __imageGroup;
 		}
-		public function set groupID(_groupID:String):void{
-			__groupID = _groupID;
+		public function set imageGroup(_imageGroup:String):void{
+			__imageGroup = _imageGroup;
 		}
 		public function get maxConnections():uint{
-			return createManager(groupID).maxConnections;
+			return createManager(imageGroup).maxConnections;
 		}
 		public function set maxConnections(_maxConnections:uint):void{
-			createManager(groupID).maxConnections = _maxConnections;
+			createManager(imageGroup).maxConnections = _maxConnections;
 		}
 		private var __widthArea:uint = 1;
 		public function get widthArea():uint {
@@ -65,7 +65,7 @@ package ui {
 		};
 		override protected function init():void {
 			super.init();
-			groupID = getQualifiedClassName(this);
+			imageGroup = getQualifiedClassName(this);
 			if (!container) {
 				container = this;
 				if (background) {
@@ -89,7 +89,7 @@ package ui {
 		}
 		override protected function onRemoveToStageHandler():void {
 			super.onRemoveToStageHandler();
-			if (container!=this) {
+			if (container != this) {
 				container.removeChild(bmp);
 			}
 			//contextMenuItem = null;
@@ -100,7 +100,6 @@ package ui {
 			foreground = null;
 			background = null;
 			autoFitArea.destroy();
-			trace("removed!");
 		}
 		public function load(_source:String, _index:uint = 0, _showImmediately:Boolean = false ):void {
 			if (_source && sourceNow == _source) {
@@ -195,18 +194,18 @@ package ui {
 		private static var allContainer:Sprite = new Sprite();
 		private static var imageLoader:com.greensock.loading.ImageLoader;
 		private static var imageLoaderParams:Object = {container:allContainer};
-		protected static function createManager(_groupID:String):LoaderMax {
-			if (!loaderMaxDic[_groupID]) {
-				loaderMax = new LoaderMax( { name:_groupID,
+		protected static function createManager(_imageGroup:String):LoaderMax {
+			if (!loaderMaxDic[_imageGroup]) {
+				loaderMax = new LoaderMax( { name:_imageGroup,
 											onChildProgress:onChildProgressHandler,
 											onChildComplete:onChildCompleteHandler,
 											onProgress:onProgressHandler,
 											onComplete:onCompleteHandler,
 											onError:onErrorHandler
 											} );
-				loaderMaxDic[_groupID] = loaderMax;
+				loaderMaxDic[_imageGroup] = loaderMax;
 			}
-			return loaderMaxDic[_groupID];
+			return loaderMaxDic[_imageGroup];
 		}
 		public static var onGroupLoading:Function;
 		public static var onGroupLoaded:Function;
@@ -219,7 +218,7 @@ package ui {
 				}else {
 					register(_source, _imageLoader);
 					//将正在加载的图片加载优先级提前或退后
-					loaderMax = createManager(_imageLoader.groupID);
+					loaderMax = createManager(_imageLoader.imageGroup);
 					if (imageLoader == loaderMax.getLoader(_source)) {
 						//同组请求图片的情况
 						loaderMax.insert(imageLoader, _index);
@@ -234,7 +233,7 @@ package ui {
 			imageLoaderParams.name = _source;
 			imageLoader = new com.greensock.loading.ImageLoader(_source, imageLoaderParams);
 			imageLoaderDic[_source] = imageLoader;
-			loaderMax = createManager(_imageLoader.groupID);
+			loaderMax = createManager(_imageLoader.imageGroup);
 			loaderMax.insert(imageLoader, _index);
 			loaderMax.load();
 			return null;

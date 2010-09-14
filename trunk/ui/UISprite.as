@@ -8,11 +8,14 @@ package ui{
 	 * @author Akdcl
 	 */
 	public class UISprite extends Sprite {
-		private var listenerDic:Object;
 		public var userData:Object;
 		private var __isRemoved:Boolean;
 		public function get isRemoved():Boolean {
 			return __isRemoved;
+		}
+		override public function set enabled(_enabled:Boolean):void{
+			super.enabled = _enabled;
+			mouseEnabled = mouseChildren = _enabled;
 		}
 		public function UISprite() {
 			init();
@@ -26,6 +29,9 @@ package ui{
 			addEventListener(Event.REMOVED_FROM_STAGE, onRemoveToStageDelayHandler);
 		}
 		private function onRemoveToStageDelayHandler(_evt:Event):void {
+			if (stage && stage.focus == this) {
+				stage.focus = null;
+			}
 			addEventListener(Event.ENTER_FRAME, onRemoveToStageDelayHandler);
 			if (_evt.type == Event.ENTER_FRAME) {
 				removeEventListener(Event.ENTER_FRAME, onRemoveToStageDelayHandler);
@@ -36,25 +42,16 @@ package ui{
 			}
 		}
 		protected function onRemoveToStageHandler():void {
+			hitArea = null;
 			removeAllEvent();
-			removeChildren();
+			removeChildren(this);
+			for each (var _i:* in userData) {
+				delete userData[_i];
+			}
 			userData = null;
 			__isRemoved = true;
 		}
-		public function removeChildren():void {
-			var _length:uint = numChildren;
-			var _children:*;
-			for (var _i:int = _length; _i >= 0; _i-- ) {
-				try {
-					_children = getChildAt(_i);
-				}catch (_ero:*) {
-					
-				}
-				if (_children && contains(_children)) {
-					removeChild(_children);
-				}
-			}
-		}
+		private var listenerDic:Object;
 		override public function addEventListener(_type:String, _listener:Function, _useCapture:Boolean = false, _priority:int = 0, _useWeakReference:Boolean = false):void {
 			super.addEventListener(_type, _listener, _useCapture, _priority, false);
 			if (!listenerDic[_type]) {
@@ -80,6 +77,19 @@ package ui{
 		public function removeAllEvent():void {
 			for (var _type:String in listenerDic) {
 				removeEventByType(_type);
+			}
+		}
+		public static function removeChildren(_disObj:*):void {
+			var _length:uint = _disObj.numChildren;
+			var _children:*;
+			for (var _i:int = _length; _i >= 0; _i-- ) {
+				try {
+					_children = _disObj.getChildAt(_i);
+				}catch (_ero:*) {
+				}
+				if (_children && _disObj.contains(_children)) {
+					_disObj.removeChild(_children);
+				}
 			}
 		}
 	}
