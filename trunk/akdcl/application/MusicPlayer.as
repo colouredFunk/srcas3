@@ -220,6 +220,9 @@
 				btn_volume.select = __volume==0;
 			}
 		}
+		public function setVolume(_volume:Number):void {
+			volume=_volume;
+		}
 		public function get volumeForTweenMax():Number{
 			return volume;
 		}
@@ -395,8 +398,9 @@
 			if (ExternalInterface.available) {
 				ExternalInterface.addCallback("playStateChange", $pluginPlayStateChange);
 				ExternalInterface.addCallback("attachMusic", attachMusic);
+				ExternalInterface.addCallback("attachMusic", attachMusic);
 				ExternalInterface.addCallback("play", play);
-				ExternalInterface.addCallback("pause", pause);
+				ExternalInterface.addCallback("setVolume", setVolume);
 				ExternalInterface.addCallback("stop", stop);
 				isPlugin = ExternalInterface.call("initMusicPlayer");
 			}
