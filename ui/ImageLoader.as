@@ -72,19 +72,13 @@ package ui {
 			imageGroup = getQualifiedClassName(this);
 			if (!container) {
 				container = this;
-				if (background) {
-					__widthArea = background.width;
-					__heightArea = background.height;
-				}
-			}else {
-				//有预置容器
-				if (container.width * container.height > 0) {
-					__widthArea = container.width;
-					__heightArea = container.height;
-				}else if (background) {
-					__widthArea = background.width;
-					__heightArea = background.height;
-				}
+			}
+			if (background) {
+				__widthArea = background.width;
+				__heightArea = background.height;
+			}else if (container.width * container.height > 0) {
+				__widthArea = container.width;
+				__heightArea = container.height;
 			}
 			bmp = new Bitmap();
 			bmp.alpha = 0;
