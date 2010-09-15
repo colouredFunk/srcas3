@@ -93,8 +93,12 @@ package ui {
 			}
 		}
 		private static function buttonCallBack(_button:*, _method:*, ...args):void {
-			if (_method is String && _button[_method] != null) {
-				_method = _button[_method];
+			try {
+				if (_method is String && _button[_method] != null) {
+					_method = _button[_method];
+				}
+			}catch (_ero:*) {
+				
 			}
 			if (_method is Function) {
 				_method.apply(ButtonManager, args);
@@ -115,7 +119,9 @@ package ui {
 					_button.gotoAndStop(frameTo);
 				}
 			}
-			setButtonPlay(_button.aniClip);
+			if (_button.hasOwnProperty("aniClip")) {
+				setButtonPlay(_button.aniClip);
+			}
 		}
 		private static function onEnterFrameHandler(_evt:Event):void {
 			buttonTarget = _evt.target;
