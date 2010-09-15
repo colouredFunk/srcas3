@@ -49,6 +49,7 @@ package ui{
 				delete userData[_i];
 			}
 			userData = null;
+			listenerDic = null;
 			__isRemoved = true;
 		}
 		private var listenerDic:Object;
