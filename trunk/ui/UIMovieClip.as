@@ -70,8 +70,8 @@ package ui{
 			if (!listenerDic[_type]) {
 				return;
 			}
-			for (var _listener:* in listenerDic) {
-				delete listenerDic[_type][_listener];
+			for each(var _listener:* in listenerDic[_type]) {
+				removeEventListener(_type, _listener);
 			}
 			delete listenerDic[_type];
 		}
@@ -93,14 +93,5 @@ package ui{
 				}
 			}
 		}
-		/*public function callMethod(_method:*, ...args):* {
-			if (_method is String && hasOwnProperty(_method)) {
-				_method = this[_method];
-			}
-			if (_method != null) {
-				return _method.apply(this, args);
-			}
-			return null;
-		}*/
 	}
 }

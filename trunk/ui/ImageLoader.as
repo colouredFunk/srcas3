@@ -4,9 +4,6 @@ package ui {
 	import com.greensock.loading.LoaderMax;
 	import com.greensock.loading.ImageLoader;
 	import com.greensock.loading.display.ContentDisplay;
-	import flash.display.Sprite;
-	import flash.events.MouseEvent;
-	import flash.utils.Dictionary;
 	
 	import com.greensock.TweenMax;
 	import com.greensock.layout.AlignMode;
@@ -14,10 +11,16 @@ package ui {
 	import com.greensock.layout.ScaleMode;
 	import com.greensock.easing.Sine;
 	
+	import flash.display.Sprite;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.events.MouseEvent;
 	import flash.events.Event;
+	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;
+	
+	import flash.events.ContextMenuEvent;
+    import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
 	
 	/**
@@ -25,12 +28,13 @@ package ui {
 	 * @author Akdcl
 	 */
 	public class  ImageLoader extends Btn {
+		private static var contextMenuImageLoader:ContextMenu;
+		private static var contextMenuItemImageLoader:ContextMenuItem;
 		public var container:*;
 		public var foreground:*;
 		public var background:*;
 		public var limitWH:Boolean;
 		protected var autoFitArea:AutoFitArea;
-		//protected var contextMenuItem:ContextMenuItem;
 		protected var bmp:Bitmap;
 		protected var sourceNow:String;
 		protected var bmdNow:BitmapData;
@@ -85,14 +89,26 @@ package ui {
 			bmp = new Bitmap();
 			bmp.alpha = 0;
 			autoFitArea = new AutoFitArea(container, 0, 0, widthArea, heightArea);
-			//contextMenuItem = Common.addContextMenu(this, "image:--");
+			if (!contextMenuImageLoader) {
+				contextMenuItemImageLoader = Common.addContextMenu(this, "no image");
+				contextMenuImageLoader = contextMenu;
+				contextMenuImageLoader.addEventListener(ContextMenuEvent.MENU_SELECT, onImageMenuShowHandler);
+			}
+			contextMenu = contextMenuImageLoader;
+		}
+		private static function onImageMenuShowHandler(_evt:ContextMenuEvent):void {
+			
+			var _source:String = (_evt.contextMenuOwner as ImageLoader).sourceNow;
+			if (!_source) {
+				_source = "no image";
+			}
+			contextMenuItemImageLoader.caption = _source;
 		}
 		override protected function onRemoveToStageHandler():void {
 			super.onRemoveToStageHandler();
 			if (container != this) {
 				container.removeChild(bmp);
 			}
-			//contextMenuItem = null;
 			bmp.bitmapData = null;
 			bmdNow = null;
 			sourceNow = null;

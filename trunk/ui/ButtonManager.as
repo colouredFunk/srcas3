@@ -49,6 +49,7 @@ package ui {
 				
 			//}else {
 				buttonCallBack(buttonTarget, ROLL_OVER);
+				buttonCallBack(buttonTarget, "$" + ROLL_OVER);
 			//}
 			setButtonStyle(buttonTarget);
 		}
@@ -63,6 +64,7 @@ package ui {
 				
 			//}else {
 				buttonCallBack(buttonTarget, ROLL_OUT);
+				buttonCallBack(buttonTarget, "$" + ROLL_OUT);
 			//}
 			setButtonStyle(buttonTarget);
 		}
@@ -74,6 +76,7 @@ package ui {
 				}
 				buttonDownDic[buttonTarget] = buttonTarget;
 				buttonCallBack(buttonTarget, PRESS);
+				buttonCallBack(buttonTarget, "$" + PRESS);
 				setButtonStyle(buttonTarget);
 			}
 		}
@@ -85,14 +88,15 @@ package ui {
 				}
 				buttonDownDic[buttonTarget] = null;
 				buttonCallBack(buttonTarget, RELEASE);
+				buttonCallBack(buttonTarget, "$" + RELEASE);
 				setButtonStyle(buttonTarget);
 			}
 		}
 		private static function buttonCallBack(_button:*, _method:*, ...args):void {
-			if (_method is String && _button.hasOwnProperty(_method)) {
+			if (_method is String && _button[_method] != null) {
 				_method = _button[_method];
 			}
-			if (_method != null) {
+			if (_method is Function) {
 				_method.apply(ButtonManager, args);
 			}
 		}
