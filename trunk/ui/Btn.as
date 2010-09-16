@@ -92,6 +92,7 @@ package ui{
 				mouseChildren = false;
 				hitArea = area;
 			}
+			stop();
 		}
 		override protected function onRemoveToStageHandler():void {
 			eEval = null;
