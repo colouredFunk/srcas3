@@ -1,4 +1,4 @@
-package ui{
+﻿package ui{
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.utils.Dictionary;
@@ -13,8 +13,7 @@ package ui{
 		public function get isRemoved():Boolean {
 			return __isRemoved;
 		}
-		override public function set enabled(_enabled:Boolean):void{
-			super.enabled = _enabled;
+		public function set enabled(_enabled:Boolean):void{
 			mouseEnabled = mouseChildren = _enabled;
 		}
 		public function UISprite() {
@@ -49,7 +48,6 @@ package ui{
 				delete userData[_i];
 			}
 			userData = null;
-			listenerDic = null;
 			__isRemoved = true;
 		}
 		private var listenerDic:Object;
