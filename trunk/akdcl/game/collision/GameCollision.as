@@ -11,7 +11,7 @@
 	import ui_2.Btn;
 	import ui_2.ProgressBar;
 	import flash.text.TextFormat;
-	import cn.ronme.display.RonToolTip;
+	//import cn.ronme.display.RonToolTip;
 	
 	import com.greensock.TweenMax;
 	
@@ -35,11 +35,11 @@
 		public var itemTipList:*;
 		public function GameCollision() {
 			
-			RonToolTip.initStage(stage);
-			var _tft:TextFormat = new TextFormat();
-			_tft.size = 12;
-			_tft.color = 0xFFFFFF;
-			RonToolTip.initFormat(_tft, 0xFFFFFF, 0x000000);
+			//RonToolTip.initStage(stage);
+			//var _tft:TextFormat = new TextFormat();
+			//_tft.size = 12;
+			//_tft.color = 0xFFFFFF;
+			//RonToolTip.initFormat(_tft, 0xFFFFFF, 0x000000);
 			
 			itemsList = [btn_item_0, btn_item_1, btn_item_2, btn_item_3, btn_item_4];
 			var _btn:*;
@@ -66,7 +66,7 @@
 				itemsList[_id].txt.visible = true;
 				itemsList[_id].clip.gotoAndStop(_item.type);
 				itemsList[_id].txt.text = "X" + _item.remain;
-				RonToolTip.register(itemsList[_id], itemTipList[_item.type-1]);
+				//RonToolTip.register(itemsList[_id], itemTipList[_item.type-1]);
 			}
 			items.onItemUse = function():void {
 				if (onItemUse!=null) {
