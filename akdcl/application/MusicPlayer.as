@@ -3,6 +3,7 @@
 	import flash.display.Sprite;
 	import flash.media.SoundTransform;
 	import akdcl.media.Sound;
+	import ui.UISprite;
 
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -10,17 +11,17 @@
 	
 	import flash.external.ExternalInterface;
 
-	public class MusicPlayer extends Sprite {
+	public class MusicPlayer extends UISprite {
 		public static const WMP_STATE_LIST:Array = ["停止", "暂停", "播放", "向前", "向后", "缓冲", "等待", "完毕", "连接", "就绪"];
 		
-		public static var SOUND_PLAY:String = "MusicPlayer.soundPlay";
-		public static var SOUND_PAUSE:String = "MusicPlayer.soundPause";
-		public static var SOUND_STOP:String = "MusicPlayer.soundStop";
-		public static var SOUND_COMPLETE:String = "MusicPlayer.soundComplete";
-		public static var SOUND_IDCHANGE:String = "MusicPlayer.soundIdChange";
-		public static var SOUND_STATE_CHANGE:String = "MusicPlayer.soundStateChange";
-		public static var PROGRESS:String = "MusicPlayer.soundLoadProgress";
-		public static var COMPLETE:String = "MusicPlayer.soundLoadComplete";
+		public static var SOUND_PLAY:String = "soundPlay";
+		public static var SOUND_PAUSE:String = "soundPause";
+		public static var SOUND_STOP:String = "soundStop";
+		public static var SOUND_COMPLETE:String = "soundComplete";
+		public static var SOUND_IDCHANGE:String = "soundIdChange";
+		public static var SOUND_STATE_CHANGE:String = "soundStateChange";
+		public static var PROGRESS:String = "soundLoadProgress";
+		public static var COMPLETE:String = "soundLoadComplete";
 		
 		public var btn_play:*;
 		public var btn_stop:*;
@@ -43,9 +44,6 @@
 		protected var isPlugin:Boolean;
 		protected var isPluginMode:Boolean;
 		
-		public function MusicPlayer() {
-			init();
-		}
 		//0~1
 		public function get loaded():Number {
 			if (isPluginMode) {
@@ -174,11 +172,13 @@
 			//sound.id3;
 		}
 		public var isAutoPlay:Boolean;
-		public function attachMusic(_musicList:*, _isAutoPlay:Boolean = true):void {
+		public var musicInfoMore:Object;
+		public function attachMusic(_musicList:*, _isAutoPlay:Boolean = true, _obj:Object = null):void {
 			isAutoPlay = _isAutoPlay;
 			newList(_musicList);
 			__playId = -1;
 			playId = 0;
+			musicInfoMore = _obj;
 		}
 		public var defaultVolume:Number = 0.5;
 		private var volumePrev:Number = 0;
@@ -359,7 +359,8 @@
 				onWMPStateChange(_id);
 			}
 		}
-		protected function init():void {
+		override protected function init():void {
+			super.init();
 			addEventListener(SOUND_STATE_CHANGE, onSoundStageChangeHandle);
 			__playState = SOUND_STOP;
 			if (btn_play) {
@@ -397,7 +398,6 @@
 			}
 			if (ExternalInterface.available) {
 				ExternalInterface.addCallback("playStateChange", $pluginPlayStateChange);
-				ExternalInterface.addCallback("attachMusic", attachMusic);
 				ExternalInterface.addCallback("attachMusic", attachMusic);
 				ExternalInterface.addCallback("play", play);
 				ExternalInterface.addCallback("setVolume", setVolume);

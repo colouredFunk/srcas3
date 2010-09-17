@@ -128,7 +128,7 @@
 				_loaded = _loaded * 0.9 + loaded_optionsXML * 0.1;
 			}
 			var _dV:Number = _loaded - loaded;
-			if (_dV>0.001) {
+			if (_dV > 0.01) {
 				loaded += _dV * loadDelay;
 			}else {
 				loaded = _loaded;
