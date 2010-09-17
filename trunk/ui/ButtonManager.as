@@ -116,7 +116,11 @@ package ui {
 						frameTo = buttonDownDic[_button]?3:1;
 					}
 					frameTo += _button.select?4:0;
-					_button.gotoAndStop(frameTo);
+					if (_button.currentFrame == frameTo) {
+						_button.stop();
+					}else {
+						_button.gotoAndStop(frameTo);
+					}
 				}
 			}
 			if (_button.hasOwnProperty("aniClip")) {
