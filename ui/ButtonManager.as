@@ -48,8 +48,8 @@ package ui {
 			//if (buttonDownDic[buttonTarget]) {
 				
 			//}else {
-				buttonCallBack(buttonTarget, ROLL_OVER);
 				buttonCallBack(buttonTarget, "$" + ROLL_OVER);
+				buttonCallBack(buttonTarget, ROLL_OVER);
 			//}
 			setButtonStyle(buttonTarget);
 		}
@@ -63,8 +63,8 @@ package ui {
 			//if (buttonDownDic[buttonTarget]) {
 				
 			//}else {
-				buttonCallBack(buttonTarget, ROLL_OUT);
 				buttonCallBack(buttonTarget, "$" + ROLL_OUT);
+				buttonCallBack(buttonTarget, ROLL_OUT);
 			//}
 			setButtonStyle(buttonTarget);
 		}
@@ -75,8 +75,8 @@ package ui {
 					continue;
 				}
 				buttonDownDic[buttonTarget] = buttonTarget;
-				buttonCallBack(buttonTarget, PRESS);
 				buttonCallBack(buttonTarget, "$" + PRESS);
+				buttonCallBack(buttonTarget, PRESS);
 				setButtonStyle(buttonTarget);
 			}
 		}
@@ -87,8 +87,8 @@ package ui {
 					continue;
 				}
 				buttonDownDic[buttonTarget] = null;
-				buttonCallBack(buttonTarget, RELEASE);
 				buttonCallBack(buttonTarget, "$" + RELEASE);
+				buttonCallBack(buttonTarget, RELEASE);
 				setButtonStyle(buttonTarget);
 			}
 		}
