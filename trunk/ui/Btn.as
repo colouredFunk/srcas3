@@ -81,6 +81,9 @@ package ui{
 				ExternalInterface.call("eval", eEval);
 			}
 		}
+		internal function $press():void {
+			
+		}
 		override protected function onAddedToStageHandler(_evt:Event):void {
 			super.onAddedToStageHandler(_evt);
 			buttonEnabled = true;
