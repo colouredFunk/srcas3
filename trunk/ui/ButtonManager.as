@@ -92,7 +92,8 @@ package ui {
 				setButtonStyle(buttonTarget);
 			}
 		}
-		private static function buttonCallBack(_button:*, _method:*, ...args):void {
+		private static function buttonCallBack(_button:*, _method:*):void {
+			
 			try {
 				if (_method is String && _button[_method] != null) {
 					_method = _button[_method];
