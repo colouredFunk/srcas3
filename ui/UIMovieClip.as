@@ -13,6 +13,10 @@ package ui{
 		public function get isRemoved():Boolean {
 			return __isRemoved;
 		}
+		private var __isPlaying:Boolean;
+		public function get isPlaying():Boolean {
+			return __isPlaying;
+		}
 		override public function set enabled(_enabled:Boolean):void{
 			super.enabled = _enabled;
 			mouseEnabled = mouseChildren = _enabled;
@@ -52,6 +56,18 @@ package ui{
 			userData = null;
 			listenerDic = null;
 			__isRemoved = true;
+		}
+		override public function play():void {
+			super.play();
+			__isPlaying = true;
+		}
+		override public function stop():void {
+			super.stop();
+			__isPlaying = false;
+		}
+		override public function gotoAndStop(frame:Object, scene:String = null):void {
+			super.gotoAndStop(frame, scene);
+			__isPlaying = false;
 		}
 		private var listenerDic:Object;
 		override public function addEventListener(_type:String, _listener:Function, _useCapture:Boolean = false, _priority:int = 0, _useWeakReference:Boolean = false):void {
