@@ -111,37 +111,51 @@ package ui {
 			background = null;
 			autoFitArea.destroy();
 		}
-		public function load(_source:String, _index:uint = 0, _showImmediately:Boolean = false ):void {
+		public function load(_source:String, _index:uint = 0, _changeImmediately:Boolean = false ):void {
 			if (_source && sourceNow == _source) {
 				return;
 			}
+			var _isReady:Boolean = Boolean(bmdNow);
 			bmdNow = loadBMD(_source, this, _index);
-			if (_showImmediately) {
+			if (_changeImmediately) {
 				if (bmdNow) {
-					setBMP(bmdNow, _showImmediately);
+					setBMP(bmdNow, _changeImmediately);
 				}else {
-					hideBMP(bmp, _showImmediately);
+					hideBMP(bmp, _changeImmediately, onHideEndHandler);
 				}
 			}else {
-				hideBMP(bmp);
+				if (bmdNow && _isReady) {
+					setBMP(bmdNow, _changeImmediately);
+				}else {
+					hideBMP(bmp, _changeImmediately, onHideEndHandler);
+				}
 			}
 			sourceNow = _source;
 		}
+		public function unload(_changeImmediately:Boolean = false):void {
+			hideBMP(bmp, _changeImmediately, onUnloadedHandler);
+		}
 		protected var isHideTweening:Boolean;
-		protected function hideBMP(_content:*, _showImmediately:Boolean = false ):void {
+		protected function hideBMP(_content:*, _changeImmediately:Boolean = false , onHideComplete:Function = null):void {
 			if (isHideTweening) {
 				return;
 			}
 			isHideTweening = true;
 			autoFitArea.release(_content);
 			TweenMax.killTweensOf(bmp);
-			TweenMax.to(bmp, _showImmediately?0:12, { alpha:0, useFrames:true, ease:Sine.easeInOut, onComplete:onHideEndHandler } );
+			TweenMax.to(bmp, _changeImmediately?0:12, { alpha:0, useFrames:true, ease:Sine.easeInOut, onComplete:onHideComplete } );
+		}
+		private function onUnloadedHandler():void {
+			isHideTweening = false;
+			bmp.bitmapData = null;
+			bmdNow = null;
+			sourceNow = null;
 		}
 		private function onHideEndHandler():void {
 			isHideTweening = false;
 			setBMP(bmdNow);
 		}
-		protected function setBMP(_content:*, _showImmediately:Boolean = false ):void {
+		protected function setBMP(_content:*, _changeImmediately:Boolean = false ):void {
 			if (!_content || isHideTweening) {
 				return;
 			}
@@ -157,7 +171,7 @@ package ui {
 				container.addChild(bmp);
 			}
 			TweenMax.killTweensOf(bmp);
-			TweenMax.to(bmp, _showImmediately?0:15, { alpha:1, useFrames:true, ease:Sine.easeInOut } );
+			TweenMax.to(bmp, _changeImmediately?0:15, { alpha:1, useFrames:true, ease:Sine.easeInOut } );
 			updateArea(bmp);
 		}
 		private const LIMITWH_MAX:uint = 999999;

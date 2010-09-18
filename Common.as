@@ -276,7 +276,7 @@
 			var _js:String = String(_xml.attribute(_jsKey));
 			return Boolean(_href || _js);
 		}
-		public static function getURLByXMLNode(_xml:*, _hrefKey:String = "href", _jsKey:String = "js", _targetKey:String = "target"):void {
+		public static function getURLByXMLNode(_xml:*, _data:Object = null, _hrefKey:String = "href", _jsKey:String = "js", _targetKey:String = "target"):void {
 			if (_xml is XMLList) {
 				_xml = _xml[0];
 			}else if (!(_xml is XML)) {
@@ -284,7 +284,7 @@
 			}
 			var _href:String = String(_xml.attribute(_hrefKey));
 			if (_href) {
-				getURL(_href, String(_xml.attribute(_targetKey)));
+				getURL(_href, String(_xml.attribute(_targetKey)), _data);
 				return;
 			}
 			var _js:String = String(_xml.attribute(_jsKey));
