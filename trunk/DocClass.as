@@ -16,11 +16,11 @@
 	
 	import com.adobe.serialization.json.JSON;
 	public class DocClass extends MovieClip {
-		protected static var instance:DocClass;
+		protected static var instance:*;
 		protected var optionsXMLPath:String;
 		protected var isTopAndNoScale:Boolean;
 		public var optionsXML:XML;
-		public static function getInstance():DocClass {
+		public static function getInstance():* {
 			return instance;
 		}
 		public function DocClass() {
