@@ -91,7 +91,6 @@ package ui {
 			contextMenu = contextMenuImageLoader;
 		}
 		private static function onImageMenuShowHandler(_evt:ContextMenuEvent):void {
-			
 			var _source:String = (_evt.contextMenuOwner as ImageLoader).sourceNow;
 			if (!_source) {
 				_source = "no image";
@@ -100,7 +99,7 @@ package ui {
 		}
 		override protected function onRemoveToStageHandler():void {
 			super.onRemoveToStageHandler();
-			if (container != this) {
+			if (container != this && container.contains(bmp)) {
 				container.removeChild(bmp);
 			}
 			bmp.bitmapData = null;
@@ -115,7 +114,7 @@ package ui {
 			if (_source && sourceNow == _source) {
 				return;
 			}
-			var _isReady:Boolean = Boolean(bmdNow);
+			var _isReady:Boolean = !Boolean(bmdNow);
 			bmdNow = loadBMD(_source, this, _index);
 			if (_changeImmediately) {
 				if (bmdNow) {
@@ -255,7 +254,7 @@ package ui {
 			register(_source, _imageLoader);
 			//添加新的加载
 			imageLoaderParams.name = _source;
-			imageLoader = new com.greensock.loading.ImageLoader(_source, imageLoaderParams);
+			imageLoader = new com.greensock.loading.ImageLoader(String(_source), imageLoaderParams);
 			imageLoaderDic[_source] = imageLoader;
 			loaderMax = createManager(_imageLoader.imageGroup);
 			loaderMax.insert(imageLoader, _index);

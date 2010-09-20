@@ -41,6 +41,7 @@
 			}
 		}
 		protected function onRemoveToStageHandler():void {
+			mask = null;
 			hitArea = null;
 			removeAllEvent();
 			removeChildren(this);

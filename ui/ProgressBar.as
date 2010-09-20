@@ -10,6 +10,7 @@ package ui{
 		public var bar:*;
 		public var maskClip:*;
 		public var track:*;
+		public var roundBarWidth:Boolean = true;
 		protected var offXThumb:int;
 		protected var offWidthMaskClip:int;
 		protected var offWidthTrack:int;
@@ -72,7 +73,10 @@ package ui{
 			return _value;
 		}
 		protected function setStyle():void {
-			bar.width = Math.round(value * length);
+			bar.width = value * length;
+			if (roundBarWidth) {
+				bar.width = Math.round(bar.width);
+			}
 			if (thumb) {
 				thumb.x = bar.width + bar.x + offXThumb;
 			}
