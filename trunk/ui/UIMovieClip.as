@@ -24,6 +24,11 @@ package ui{
 		public function UIMovieClip() {
 			init();
 		}
+		public function remove():void {
+			if (parent) {
+				parent.removeChild(this);
+			}
+		}
 		protected function init():void {
 			listenerDic = { };
 			addEventListener(Event.ADDED_TO_STAGE, onAddedToStageHandler);
@@ -47,6 +52,7 @@ package ui{
 		}
 		protected function onRemoveToStageHandler():void {
 			stop();
+			mask = null;
 			hitArea = null;
 			removeAllEvent();
 			removeChildren(this);

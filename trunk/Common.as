@@ -284,7 +284,7 @@
 			}
 			var _href:String = String(_xml.attribute(_hrefKey));
 			if (_href) {
-				getURL(_href, String(_xml.attribute(_targetKey)), _data);
+				getURL(_href, String(_xml.attribute(_targetKey)||"_blank"), _data);
 				return;
 			}
 			var _js:String = String(_xml.attribute(_jsKey));
