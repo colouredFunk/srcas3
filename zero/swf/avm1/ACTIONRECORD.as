@@ -11,10 +11,20 @@ package zero.swf.avm1{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
+	
 	import zero.swf.BytesData;
 	public class ACTIONRECORD extends BytesData{
+		public static var actionRecordV:Vector.<ACTIONRECORD>;
+		public static function reset():void{
+			actionRecordV=new Vector.<ACTIONRECORD>();
+		}
+		public static function clear():void{
+			actionRecordV=null;
+		}
 		public function ACTIONRECORD(){
-			//暂时用着
+			if(actionRecordV){
+				actionRecordV[actionRecordV.length]=this;
+			}
 		}
 		////
 		CONFIG::toXMLAndInitByXML {

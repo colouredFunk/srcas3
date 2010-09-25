@@ -75,6 +75,8 @@ package zero.swf{
 		public var accessNetworkOnly:Boolean;
 		public var metadataStr:String;
 		
+		private var progress_finished:Function;
+		
 		//
 		public function initBySWFData(swfData:ByteArray):void{
 			initByData(swfDataAndData.swfData2Data(swfData));
@@ -209,7 +211,6 @@ package zero.swf{
 			newData.position=newData.length;
 		}
 		
-		private var progress_finished:Function;
 		public function toSWFData2(progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
 			prevToData();
 			progress_finished=_progress_finished;
@@ -236,6 +237,22 @@ package zero.swf{
 			xml.appendChild(dataAndTags.toXML());
 			return xml;
 		}
+		public function toXML2(progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
+			infos2Tags();
+			progress_finished=_progress_finished;
+			dataAndTags.toXML2(
+				progress_start,
+				progress_progress,
+				toXML2_finished
+			);
+		}
+		private function toXML2_finished(dataAndTagsXML:XML):void{
+			var _progress_finished:Function=progress_finished;
+			progress_finished=null;
+			var xml:XML=<SWF type={type} Version={Version} FileLength={swfDataAndData.FileLength} wid={wid} hei={hei} FrameRate={FrameRate}/>;
+			xml.appendChild(dataAndTagsXML);
+			_progress_finished(xml);
+		}
 		public function initByXML(xml:XML):void{
 			type=xml.@type.toString();
 			Version=int(xml.@Version.toString());
@@ -243,6 +260,19 @@ package zero.swf{
 			hei=int(xml.@hei.toString());
 			FrameRate=Number(xml.@FrameRate.toString());
 			dataAndTags.initByXML(xml.tags[0]);
+		}
+		public function initByXML2(xml:XML,progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
+			type=xml.@type.toString();
+			Version=int(xml.@Version.toString());
+			wid=int(xml.@wid.toString());
+			hei=int(xml.@hei.toString());
+			FrameRate=Number(xml.@FrameRate.toString());
+			dataAndTags.initByXML2(
+				xml.tags[0],
+				progress_start,
+				progress_progress,
+				_progress_finished
+			);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

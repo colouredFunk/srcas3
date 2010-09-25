@@ -3,7 +3,9 @@
 	import flash.events.*;
 	import flash.utils.*;
 	import flash.geom.*;
+	import flash.text.*;
 	public class SliderBar extends Sprite {
+		public var txtDh:int=0;
 		private var content:DisplayObject;
 		private var offY:int;
 		private var offX:int;
@@ -40,26 +42,35 @@
 		}
 		public function set scrollContent(_scrollContent:String):void {
 			content=parent.getChildByName(_scrollContent);
-			if (content&&content.height>rectMask.height) {
-				var _rect:Rectangle=content.getBounds(parent);
-				offX=int(x+content.x-_rect.x);
-				offY=int(y+content.y-_rect.y)+heightTB;
-				content.x=offX;
-				rectMask.width=content.width+5;
-				maximum=content.height-rectMask.height+heightTB*2;
-				if (autoSize) {
-					slider.x=rectMask.width+10;
+			if (content){
+				var hei:int;
+				if(content is TextField){
+					//hei=(content as TextField).textHeight+txtDh;
+					hei=(content as TextField).height-txtDh;
+				}else{
+					hei=content.height;
 				}
-				slider.maximum=maximum;
-				slider.length=rectMask.height-slider.y*2;
-				setValue();
-				content.cacheAsBitmap=true;
-				rectMask.cacheAsBitmap=true;
-				content.mask=rectMask;
-				enabled=true;
-			} else {
-				enabled=false;
+				if(hei>rectMask.height) {
+					var _rect:Rectangle=content.getBounds(parent);
+					offX=int(x+content.x-_rect.x);
+					offY=int(y+content.y-_rect.y)+heightTB;
+					content.x=offX;
+					rectMask.width=content.width+5;
+					maximum=content.height-rectMask.height+heightTB*2;
+					if (autoSize) {
+						slider.x=rectMask.width+10;
+					}
+					slider.maximum=maximum;
+					slider.length=rectMask.height-slider.y*2;
+					setValue();
+					content.cacheAsBitmap=true;
+					rectMask.cacheAsBitmap=true;
+					content.mask=rectMask;
+					enabled=true;
+					return;
+				}
 			}
+			enabled=false;
 		}
 		public function setHeight(_h:Number):void{
 			rectMask.height=_h;

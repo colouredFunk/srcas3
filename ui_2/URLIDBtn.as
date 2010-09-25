@@ -11,6 +11,7 @@ package ui_2{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
+	import zero.net.GotoURL;
 	public class URLIDBtn extends IDBtn{
 		public var xmlName:String
 		public function URLIDBtn(_xmlName:String=null){
@@ -26,7 +27,7 @@ package ui_2{
 			release=gotoURL;
 		}
 		public function gotoURL():void{
-			GotoURL.gotoURL(
+			GotoURL.goto(
 				(getDefinitionByName("ui_2.BaseLoadURLPoj") as Object).xml[xmlName][id]
 			);
 		}

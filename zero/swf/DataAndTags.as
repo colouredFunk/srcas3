@@ -12,10 +12,10 @@ package zero.swf{
 	
 	import zero.BytesAndStr16;
 	import zero.Outputer;
-	import zero.swf.tag_body.TagBody;
 	import zero.swf.tag_body.DefineSprite;
 	import zero.swf.tag_body.FileAttributes;
 	import zero.swf.tag_body.Metadata;
+	import zero.swf.tag_body.TagBody;
 
 	public class DataAndTags{
 		private static var activateTagBodyClassV:Vector.<Class>=new Vector.<Class>(0x100);
@@ -63,6 +63,13 @@ package zero.swf{
 		//public var data:ByteArray;
 		public var FrameCount:int;
 		public var tagV:Vector.<Tag>;
+		private var progress_progress:Function;
+		private var progress_finished:Function;
+		private var actionResult:*;
+		private var actionName:String;
+		private var curr_tagId:int;
+		private var curr_frameId:int;
+		private var totalTag:int;
 		
 		public function DataAndTags(){
 			//var defaultData:ByteArray=getDefaultData();
@@ -139,84 +146,29 @@ package zero.swf{
 			return realFrameCount;
 		}
 		
-		private var toData_newData:ByteArray;
-		private var toData_tagId:int;
-		
-		private var progress_progress:Function;
-		private var progress_finished:Function;
+		private var toDataResult:ByteArray;
+		private function toData_start():void{
+			toDataResult=new ByteArray();
+			toDataResult.position=2;
+			curr_frameId=0;
+			curr_tagId=-1;
+		}
+		private function toData_end():void{
+			FrameCount=curr_frameId;
+			toDataResult[0]=FrameCount;
+			toDataResult[1]=FrameCount>>8;
+		}
 		public function toData():ByteArray{
-			///===
-			toData_newData=new ByteArray();
-			toData_newData.position=2;
-			toData_tagId=-1;
-			///===
-			
-			var totalTag:int=tagV.length;
-			while(++toData_tagId<totalTag){
-				toData_step()
-			};
-			
-			///===
-			FrameCount=getRealFrameCount();
-			toData_newData[0]=FrameCount;
-			toData_newData[1]=FrameCount>>8;
-			///===
-			
-			var newData:ByteArray=toData_newData;
-			toData_newData=null;
+			run("toData");
+			var newData:ByteArray=toDataResult;
+			toDataResult=null;
 			return newData;
 		}
-		
-		public function toData2(
-			progress_start:Function,
-			_progress_progress:Function,
-			_progress_finished:Function
-		):void{
-			///===
-			toData_newData=new ByteArray();
-			toData_newData.position=2;
-			toData_tagId=-1;
-			///===
-			
-			progress_progress=_progress_progress;
-			progress_finished=_progress_finished;
-			if(progress_start!=null){
-				progress_start("当前 tag %1 / 总 tag %2",tagV.length);
-			}
-			clearInterval(intervalId);
-			intervalId=setInterval(toData_interval,30);
-		}
-		private function toData_interval():void{
-			
-			var t:int=getTimer();
-			while(getTimer()-t<30){
-				if(++toData_tagId>=tagV.length){
-					clearInterval(intervalId);
-					
-					///===
-					FrameCount=getRealFrameCount();
-					toData_newData[0]=FrameCount;
-					toData_newData[1]=FrameCount>>8;
-					///===
-					
-					progress_progress(tagV.length,tagV.length);
-					
-					var newData:ByteArray=toData_newData;
-					var _progress_finished:Function=progress_finished;
-					
-					toData_newData=null;
-					progress_progress=null;
-					progress_finished=null;
-					
-					_progress_finished(newData);
-					return;
-				}
-				toData_step();
-			}
-			progress_progress(toData_tagId,tagV.length);
+		public function toData2(progress_start:Function,_progress_progress:Function,_progress_finished:Function):void{
+			run("toData",progress_start,_progress_progress,_progress_finished);
 		}
 		private function toData_step():void{
-			var tag:Tag=tagV[toData_tagId];
+			var tag:Tag=tagV[curr_tagId];
 			var newBodyData:ByteArray;
 			switch(tag.type){
 				case TagType.DefineSprite:
@@ -238,106 +190,215 @@ package zero.swf{
 					}
 				break;
 			}
+			if(tag.type==TagType.ShowFrame){
+				curr_frameId++;
+			}
+			//toDataResult.writeBytes(Tag.getHeaderData(tag.type,newBodyData.length,tag.test_isShort));
+			toDataResult.writeBytes(Tag.getHeaderData(tag.type,newBodyData.length));
+			toDataResult.writeBytes(newBodyData);
+		}
+		//
+		private function run(
+			_actionName:String,
+			progress_start:Function=null,
+			_progress_progress:Function=null,
+			_progress_finished:Function=null
+		):void{
+			actionName=_actionName;
+			totalTag=tagV.length;
+			this[actionName+"_start"]();
+			if(_progress_finished!=null){
+				progress_progress=_progress_progress;
+				progress_finished=_progress_finished;
+				if(progress_start!=null){
+					progress_start("当前 tag %1 / 总 tag %2",totalTag);
+				}
+				actionResult=this[actionName+"Result"];
+				clearInterval(intervalId);
+				intervalId=setInterval(action_interval,30);
+			}else{
+				var action_step:Function=this[actionName+"_step"];
+				while(++curr_tagId<totalTag){
+					action_step();
+				};
+				this[actionName+"_end"]();
+			}
+		}
+		private function action_interval():void{
 			
-			toData_newData.writeBytes(Tag.getHeaderData(tag.type,newBodyData.length,tag.test_isShort));
-			toData_newData.writeBytes(newBodyData);
+			var t:int=getTimer();
+			while(getTimer()-t<30){
+				if(++curr_tagId>=totalTag){
+					clearInterval(intervalId);
+					
+					this[actionName+"_end"]();
+					
+					progress_progress(totalTag,totalTag);
+					
+					var _progress_finished:Function=progress_finished;
+					
+					progress_progress=null;
+					progress_finished=null;
+					
+					_progress_finished(actionResult);
+					actionResult=null;
+					return;
+				}
+				this[actionName+"_step"]();
+			}
+			progress_progress(curr_tagId,totalTag);
 		}
 		
-		//public function forEachTag(fun:Function):void{
-		//	var tagId:int=tagV.length;
-		//	while(--tagId>=0){
-		//		fun(data,tagV[tagId],tagV,tagId);
-		//	}
-		//}
+
 		
 		CONFIG::toXMLAndInitByXML{
+		private var toXMLResult:XML;
+		private function toXML_start():void{
+			toXMLResult=<tags FrameCount={FrameCount}/>;
+			curr_frameId=0;
+			curr_tagId=-1;
+		}
+		private function toXML_end():void{
+			FrameCount=curr_frameId;
+			toXMLResult.@FrameCount=FrameCount;
+		}
 		public function toXML():XML{
-			var xml:XML=<tags FrameCount={FrameCount}/>;
-			var realFrameCount:int=0;
-			for each(var tag:Tag in tagV){
-				var tagXML:XML=<tag type={TagType.typeNameArr[tag.type]} typeNum={tag.type} test_isShort={tag.test_isShort}/>;
-				switch(tag.type){
-					case TagType.DefineSprite:
-						var defineSprite:DefineSprite=tag.tagBody as DefineSprite;
-						var defineSpriteXML:XML=<DefineSprite id={defineSprite.id}/>;
-						defineSpriteXML.appendChild(defineSprite.dataAndTags.toXML());
-						tagXML.appendChild(defineSpriteXML);
-					break;
-					default:
-						if(tag.tagBody){
-							tagXML.appendChild(tag.tagBody.toXML());
-						}else{
-							if(tag.bodyData){
-								if(tag.bodyLength>0){
-									tagXML.appendChild(<body length={tag.bodyLength} value={BytesAndStr16.bytes2str16(tag.bodyData,tag.bodyOffset,tag.bodyLength)}/>);
-								}
+			run("toXML");
+			var newXML:XML=toXMLResult;
+			toXMLResult=null;
+			return newXML;
+		}
+		public function toXML2(progress_start:Function,_progress_progress:Function,_progress_finished:Function):void{
+			run("toXML",progress_start,_progress_progress,_progress_finished);
+		}
+		private function toXML_step():void{
+			var tag:Tag=tagV[curr_tagId];
+			//var tagXML:XML=<tag type={TagType.typeNameArr[tag.type]} typeNum={tag.type} test_isShort={tag.test_isShort}/>;
+			var tagXML:XML=<tag type={TagType.typeNameArr[tag.type]} typeNum={tag.type}/>;
+			switch(tag.type){
+				case TagType.DefineSprite:
+					var defineSprite:DefineSprite=tag.tagBody as DefineSprite;
+					var defineSpriteXML:XML=<DefineSprite id={defineSprite.id}/>;
+					defineSpriteXML.appendChild(defineSprite.dataAndTags.toXML());
+					tagXML.appendChild(defineSpriteXML);
+				break;
+				default:
+					if(tag.tagBody){
+						tagXML.appendChild(tag.tagBody.toXML());
+					}else{
+						if(tag.bodyData){
+							if(tag.bodyLength>0){
+								tagXML.appendChild(<body length={tag.bodyLength} value={BytesAndStr16.bytes2str16(tag.bodyData,tag.bodyOffset,tag.bodyLength)}/>);
 							}
 						}
-					break;
-				}
-				if(tag.type==TagType.ShowFrame){
-					tagXML.@frameId=realFrameCount++;
-				}
-				xml.appendChild(tagXML);
+					}
+				break;
 			}
-			FrameCount=realFrameCount;
-			xml.@FrameCount=FrameCount;
-			return xml;
+			if(tag.type==TagType.ShowFrame){
+				tagXML.@frameId=curr_frameId++;
+			}
+			toXMLResult.appendChild(tagXML);
+		}
+		//
+		private var tagXMLList:XMLList;
+		private function initByXML_start(xml:XML):void{
+			FrameCount=int(xml.@FrameCount.toString());
+			tagXMLList=xml.tag;
+			totalTag=tagXMLList.length();
+			tagV=new Vector.<Tag>();
+			curr_frameId=0;
+			curr_tagId=-1;
+		}
+		private function initByXML_end():void{
+			if(FrameCount!=curr_frameId){
+				Outputer.output("FrameCount="+FrameCount+",curr_frameId="+curr_frameId,"brown");
+				FrameCount=curr_frameId;
+			}
 		}
 		public function initByXML(xml:XML):void{
-			FrameCount=int(xml.@FrameCount.toString());
-			var realFrameCount:int=0;
-			tagV=new Vector.<Tag>();
-			var tagId:int=0;
-			for each(var tagXML:XML in xml.tag){
-				var typeName:String=tagXML.@type.toString();
-				if(typeName){
-					var tag:Tag=new Tag();
-					tag.type=TagType[typeName];
-					tag.test_isShort=tagXML.@test_isShort.toString()=="true";
-					if(TagType.typeNameArr[tag.type]===typeName){
-						tagV[tagId]=tag;
-						switch(tag.type){
-							case TagType.DefineSprite:
-								var defineSprite:DefineSprite=new DefineSprite();
-								var defineSpriteXML:XML=tagXML.DefineSprite[0];
-								defineSprite.id=int(defineSpriteXML.@id.toString());
-								defineSprite.dataAndTags.initByXML(defineSpriteXML.tags[0]);
-								tag.tagBody=defineSprite;
-							break;
-							default:
-								if(tagXML.children().length()==0){
-									tag.bodyData=new ByteArray();
+			initByXML_start(xml);
+			while(++curr_tagId<totalTag){
+				initByXML_step();
+			}
+			initByXML_end();
+		}
+		public function initByXML2(xml:XML,progress_start:Function,_progress_progress:Function,_progress_finished:Function):void{
+			initByXML_start(xml);
+			progress_progress=_progress_progress;
+			progress_finished=_progress_finished;
+			if(progress_start!=null){
+				progress_start("当前 tag %1 / 总 tag %2",totalTag);
+			}
+			clearInterval(intervalId);
+			intervalId=setInterval(initByXML_interval,30);
+		}
+		private function initByXML_interval():void{
+			
+			var t:int=getTimer();
+			while(getTimer()-t<30){
+				if(++curr_tagId>=totalTag){
+					clearInterval(intervalId);
+					
+					initByXML_end();
+					
+					progress_progress(totalTag,totalTag);
+					
+					var _progress_finished:Function=progress_finished;
+					
+					progress_progress=null;
+					progress_finished=null;
+					
+					_progress_finished();
+					return;
+				}
+				initByXML_step();
+			}
+			progress_progress(curr_tagId,totalTag);
+		}
+		private function initByXML_step():void{
+			var tagXML:XML=tagXMLList[curr_tagId];
+			var typeName:String=tagXML.@type.toString();
+			if(typeName){
+				var tag:Tag=new Tag();
+				tag.type=TagType[typeName];
+				//tag.test_isShort=tagXML.@test_isShort.toString()=="true";
+				if(TagType.typeNameArr[tag.type]===typeName){
+					tagV[curr_tagId]=tag;
+					switch(tag.type){
+						case TagType.DefineSprite:
+							var defineSprite:DefineSprite=new DefineSprite();
+							var defineSpriteXML:XML=tagXML.DefineSprite[0];
+							defineSprite.id=int(defineSpriteXML.@id.toString());
+							defineSprite.dataAndTags.initByXML(defineSpriteXML.tags[0]);
+							tag.tagBody=defineSprite;
+						break;
+						default:
+							if(tagXML.children().length()==0){
+								tag.bodyData=new ByteArray();
+							}else{
+								var bodyXML:XML=tagXML.children()[0];
+								if(bodyXML.name()=="body"){
+									tag.bodyData=BytesAndStr16.str162bytes(bodyXML.@value.toString());
 								}else{
-									var bodyXML:XML=tagXML.children()[0];
-									if(bodyXML.name()=="body"){
-										tag.bodyData=BytesAndStr16.str162bytes(bodyXML.@value.toString());
+									var TagBodyClass:Class=activateTagBodyClassV[tag.type];
+									if(TagBodyClass){
+										var tagBody:TagBody=new TagBodyClass();
+										tagBody.initByXML(bodyXML);
+										tag.tagBody=tagBody;
 									}else{
-										var TagBodyClass:Class=activateTagBodyClassV[tag.type];
-										if(TagBodyClass){
-											var tagBody:TagBody=new TagBodyClass();
-											tagBody.initByXML(bodyXML);
-											tag.tagBody=tagBody;
-										}else{
-											throw new Error("typeName="+typeName+",TagBodyClass=="+TagBodyClass);
-										}
+										throw new Error("typeName="+typeName+",TagBodyClass=="+TagBodyClass);
 									}
 								}
-							break;
-						}
-						if(tag.type==TagType.ShowFrame){
-							realFrameCount++;
-						}
-						tagId++;
-						continue;
+							}
+						break;
 					}
+					if(tag.type==TagType.ShowFrame){
+						curr_frameId++;
+					}
+					return;
 				}
-				throw new Error("未知 typeName="+typeName+",typeNum="+tagXML.@typeNum.toString());
 			}
-			if(FrameCount!=realFrameCount){
-				Outputer.output("FrameCount="+FrameCount+",realFrameCount="+realFrameCount,"brown");
-				FrameCount=realFrameCount;
-			}
+			throw new Error("未知 typeName="+typeName+",typeNum="+tagXML.@typeNum.toString());
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

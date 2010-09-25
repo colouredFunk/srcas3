@@ -51,7 +51,7 @@ package zero.swf{
 		//private static var testingId:int=0;
 		public static function getRan():String{
 			//if(testingId>=0){
-				//return "简单混淆"+testingId++;
+			//	return "简单混淆"+testingId++;
 			//}
 			var ran:String;
 			if(firstUseStrArr.length>0){
