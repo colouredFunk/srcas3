@@ -20,7 +20,7 @@ package zero.swf{
 		public var bodyLength:int;
 		public var type:int;
 		
-		public var test_isShort:Boolean;//测试
+		//public var test_isShort:Boolean;//测试
 		
 		public function Tag(){
 			type=-1;
@@ -33,10 +33,10 @@ package zero.swf{
 			bodyLength=temp&0x3f;
 			if(bodyLength==0x3f){//长tag
 				bodyLength=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16)|(data[offset++]<<24);
-				test_isShort=false;
-			}else{
-				test_isShort=true;
-			}
+				//test_isShort=false;
+			}//else{
+				//test_isShort=true;
+			//}
 			bodyOffset=offset;
 			
 			__bodyData=data;
@@ -115,7 +115,8 @@ package zero.swf{
 			DefineBitsJPEG4:true
 			
 		}//某天偶然发现的一些小图片变成短tag后出错(不知道还会不会有其它tag有这种现像)
-		public static function getHeaderData(type:int,bodyLength:int,test_isShort:Boolean):ByteArray{
+		//public static function getHeaderData(type:int,bodyLength:int,test_isShort:Boolean):ByteArray{
+		public static function getHeaderData(type:int,bodyLength:int):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=type<<6;
 			data[1]=type>>>2;
@@ -123,8 +124,8 @@ package zero.swf{
 				bodyLength<0x3f
 				&&
 				!noShortTypes[TagType.typeNameArr[type]]
-				&&
-				test_isShort
+				//&&
+				//test_isShort
 			){
 				data[0]|=bodyLength;
 			}else{//长tag

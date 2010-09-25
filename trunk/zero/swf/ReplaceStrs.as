@@ -66,7 +66,7 @@ package zero.swf{
 						);
 					break;
 					default:
-						trace("不在推荐使用 bodyOffset-headOffset+bodyLength，因为可能等于0");
+						//trace("不在推荐使用 bodyOffset-headOffset+bodyLength，因为可能等于0");
 						newData.writeBytes(data,tag.headOffset,tag.bodyOffset-tag.headOffset+tag.bodyLength);
 					break;
 				}
