@@ -42,6 +42,7 @@ package zero.swf.avm1{
 			var actionRecordV:Vector.<ACTIONRECORD>=ACTIONRECORD.actionRecordV;
 			if(encryptFun==null){
 				encryptFun=encrypt1;
+				//encryptFun=TrueStrCode.addCheckTrueStrCodes;
 			}
 			for each(var actionRecord:ACTIONRECORD in actionRecordV){
 				if(actionRecord.dataLength){
@@ -95,9 +96,9 @@ package zero.swf.avm1{
 			//encryptTagData[encryptTagData.length]=0x00;//end
 			actionRecord.initByData(encryptTagData,0,encryptTagData.length);
 			
-			//import zero.BytesAndStr16;
 			//trace(BytesAndStr16.bytes2str16(encryptTagData,0,encryptTagData.length));
 		}
+		
 		public static function encrypt1(actionRecord:ACTIONRECORD):void{
 			var junkCodes:ByteArray=getJunkCodes();
 			
@@ -116,19 +117,8 @@ package zero.swf.avm1{
 					//asv直接跳过
 				break;
 				//*/
-				case 1:
-					i=int(Math.random()*3)+1;
-					encryptTagData[0]=0x96;
-					encryptTagData[1]=i+1;
-					encryptTagData[2]=0x00;
-					encryptTagData[3]=0x00;
-					while(i--){
-						encryptTagData[encryptTagData.length]=int(Math.random()*0xff)+1;
-					}
-					//_push (非空字符串)
-					//配合有效的扰码能使asv挂掉
-				break;
-				case 2:
+				/*
+				case 0:
 					encryptTagData[0]=0x96;
 					encryptTagData[1]=0x02;
 					encryptTagData[2]=0x00;
@@ -145,6 +135,25 @@ package zero.swf.avm1{
 					//_push false(或其它为假的值)
 					//_push true(或其它为真的值)
 					//_or
+					//貌似意义不大
+				break;
+				//*/
+				case 1:
+					var trueStrCode:int=TrueStrCode.getTrueStrCode();
+					
+					encryptTagData[0]=0x96;
+					if(trueStrCode>0xff){
+						encryptTagData[1]=0x03;
+						encryptTagData[4]=trueStrCode>>8;
+						encryptTagData[5]=trueStrCode;
+					}else{
+						encryptTagData[1]=0x02;
+						encryptTagData[4]=trueStrCode;
+					}
+					encryptTagData[2]=0x00;
+					encryptTagData[3]=0x00;
+					//_push (非空字符串)
+					//配合有效的扰码能使asv挂掉
 				break;
 			}
 			
@@ -174,20 +183,8 @@ package zero.swf.avm1{
 			//encryptTagData[encryptTagData.length]=0x00;//end
 			actionRecord.initByData(encryptTagData,0,encryptTagData.length);
 			
-			//import zero.BytesAndStr16;
 			//trace(BytesAndStr16.bytes2str16(encryptTagData,0,encryptTagData.length));
 		}
-		/*
-		private function getActionRecords(actionRecordV:Vector.<ACTIONRECORD>,tagV:Vector.<Tag>):void{
-			for each(var tag:Tag in swf.dataAndTags.tagV){
-				switch(tag.type){
-					case TagType.DefineButton2:
-					break;
-					...
-				}
-			}
-		}
-		//*/
 	}
 }
 
