@@ -123,9 +123,10 @@
 		protected function onOptionsXMLLoadErrorHandle(_evt:IOErrorEvent):void {
 			throw new Error ("ERROR:未读取到XML，请检查是否配置正确!");
 		}
+		protected var optionsXMLPerLoad:Number = 0.1;
 		protected function loadingProgress(_loaded:Number):void {
 			if (optionsXMLPath) {
-				_loaded = _loaded * 0.9 + loaded_optionsXML * 0.1;
+				_loaded = _loaded * (1-optionsXMLPerLoad) + loaded_optionsXML * optionsXMLPerLoad;
 			}
 			var _dV:Number = _loaded - loaded;
 			if (_dV > 0.01) {
