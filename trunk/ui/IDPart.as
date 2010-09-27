@@ -53,9 +53,6 @@ package ui
 		public function setID(_id:int):void {
 			__dir = _id - __id;
 			__id = _id;
-			if (onIDChange!=null) {
-				onIDChange(__id);
-			}
 		}
 		public function remove():void {
 			onIDChange = null;

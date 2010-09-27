@@ -67,6 +67,9 @@ package ui {
 			__heightArea = _heightArea;
 			autoFitArea.height = __heightArea;
 		};
+		public function get source():String {
+			return sourceNow;
+		}
 		override protected function init():void {
 			super.init();
 			imageGroup = getQualifiedClassName(this);
