@@ -74,17 +74,23 @@ package zero.zero3D.objs{
 			
 			vertexV=new Vector.<Number>(6);
 			
-			var meshUvId1:int=meshUvIdV[id1]*2;
-			var meshUvId2:int=meshUvIdV[id2]*2;
-			var meshUvId3:int=meshUvIdV[id3]*2;
-			uvV=Vector.<Number>([
-				meshUvV[meshUvId1],
-				meshUvV[meshUvId1+1],
-				meshUvV[meshUvId2],
-				meshUvV[meshUvId2+1],
-				meshUvV[meshUvId3],
-				meshUvV[meshUvId3+1]
-			]);
+			if(meshUvV){
+				var meshUvId1:int=meshUvIdV[id1]*2;
+				var meshUvId2:int=meshUvIdV[id2]*2;
+				var meshUvId3:int=meshUvIdV[id3]*2;
+				
+				uvV=Vector.<Number>([
+					meshUvV[meshUvId1],
+					meshUvV[meshUvId1+1],
+					meshUvV[meshUvId2],
+					meshUvV[meshUvId2+1],
+					meshUvV[meshUvId3],
+					meshUvV[meshUvId3+1]
+				]);
+			}else{
+				//如果是线框模型可以不用uv
+				uvV=null;
+			}
 			
 			sp=new Sprite();//渲染用
 		}

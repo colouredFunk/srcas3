@@ -36,19 +36,29 @@ package zero.zero3D.objs{
 				}else{
 					matrix3D=new Matrix3D();
 				}
+				
+				
 				for each(var meshXML:XML in geometryXML.mesh){
 					var vertexVXML:XML=meshXML.vertexV[0];
 					var uvVXML:XML=meshXML.uvV[0];
 					
-					var vertexDivisor:int=int(vertexVXML.@divisor.toString());
-					var uvDivisor:int=int(uvVXML.@divisor.toString());
+					var vertexV:Vector.<Number>;
+					var vertexIdV:Vector.<int>;
 					
-					if(vertexDivisor>0&&uvDivisor>0){
-						var vertexV:Vector.<Number>=new Vector.<Number>();
-						var vertexIdV:Vector.<int>=new Vector.<int>();
-						var uvV:Vector.<Number>=new Vector.<Number>();
-						var uvIdV:Vector.<int>=new Vector.<int>();
-						var i:int,str:String;
+					var uvV:Vector.<Number>;
+					var uvIdV:Vector.<int>;
+					
+					var i:int,str:String;
+					
+					if(vertexVXML){
+						var vertexDivisor:int=int(vertexVXML.@divisor.toString());
+						if(vertexDivisor>0){
+						}else{
+							vertexDivisor=1;
+						}
+						
+						vertexV=new Vector.<Number>();
+						vertexIdV=new Vector.<int>();
 						
 						i=0;
 						for each(str in vertexVXML.toString().split(",")){
@@ -58,6 +68,22 @@ package zero.zero3D.objs{
 						for each(str in meshXML.vertexIdV[0].toString().split(",")){
 							vertexIdV[i++]=int(str);
 						}
+					}else{
+						vertexV=null;
+						vertexIdV=null;
+						throw new Error("顶点列表不能为空");
+					}
+					
+					if(uvVXML){
+						var uvDivisor:int=int(uvVXML.@divisor.toString());
+						if(uvDivisor>0){
+						}else{
+							uvDivisor=1;
+						}
+						
+						uvV=new Vector.<Number>();
+						uvIdV=new Vector.<int>();
+						
 						i=0;
 						for each(str in uvVXML.toString().split(",")){
 							uvV[i++]=int(str)/uvDivisor;
@@ -66,31 +92,32 @@ package zero.zero3D.objs{
 						for each(str in meshXML.uvIdV[0].toString().split(",")){
 							uvIdV[i++]=int(str);
 						}
-						
-						var mesh3D:Mesh3D;
-						if(bmds){
-							mesh3D=new Mesh3D(bmds[meshXML.@materialId.toString()],vertexV,uvV,vertexIdV,uvIdV);
-						}else{
-							mesh3D=new Mesh3D(null,vertexV,uvV,vertexIdV,uvIdV);
-							var lineColorStr:String=meshXML.@lineColor.toString();
-							if(lineColorStr){
-							}else{
-								lineColorStr=geometryXML.@lineColor.toString();
-							}
-							if(lineColorStr){
-								mesh3D.lineColor=int(lineColorStr);
-							}else{
-								//mesh3D.lineColor=int(Math.random()*0x1000000);
-								//mesh3D.lineColor=0xffffff;
-							}
-						}
-						
-						mesh3D.matrix3D=matrix3D;
-						geomMeshV[geomMeshV.length]=mesh3D;
-						addChild(mesh3D);
 					}else{
-						throw new Error("未处理");
+						uvV=null;
+						uvIdV=null;
 					}
+						
+					var mesh3D:Mesh3D;
+					if(bmds){
+						mesh3D=new Mesh3D(bmds[meshXML.@materialId.toString()],vertexV,uvV,vertexIdV,uvIdV);
+					}else{
+						mesh3D=new Mesh3D(null,vertexV,uvV,vertexIdV,uvIdV);
+						var lineColorStr:String=meshXML.@lineColor.toString();
+						if(lineColorStr){
+						}else{
+							lineColorStr=geometryXML.@lineColor.toString();
+						}
+						if(lineColorStr){
+							mesh3D.lineColor=int(lineColorStr);
+						}else{
+							//mesh3D.lineColor=int(Math.random()*0x1000000);
+							//mesh3D.lineColor=0xffffff;
+						}
+					}
+					
+					mesh3D.matrix3D=matrix3D;
+					geomMeshV[geomMeshV.length]=mesh3D;
+					addChild(mesh3D);
 				}
 			}
 		}
