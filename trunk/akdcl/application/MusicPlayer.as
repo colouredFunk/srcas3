@@ -145,9 +145,9 @@
 				sound.removeEventListener(Event.SOUND_COMPLETE, onSoundPlayCompleteHandle);
 				sound.stop(true);
 			}
-			var _musicSOURCE:String = String(musicList.list[playId].@src).toLowerCase();
+			var _musicSOURCE:String = String(musicList.list[playId].@src);
 			
-			if (_musicSOURCE.indexOf(".mp3") < 0) {
+			if (_musicSOURCE.toLowerCase().indexOf(".mp3") < 0) {
 				sound = null;
 				if (!isPlugin) {
 					isPluginMode = false;
@@ -201,8 +201,8 @@
 		}
 		private var __volume:Number;
 		public function get volume():Number{
-			if(isNaN(__volume)){
-				return defaultVolume;
+			if (isNaN(__volume)) {
+				__volume = defaultVolume;
 			}
 			return __volume;
 		}
@@ -264,6 +264,7 @@
 				sound.play(positionRecord);
 			}
 			volume = volume;
+			trace(volume);
 			__playState = SOUND_PLAY;
 			dispatchEvent(new Event(SOUND_STATE_CHANGE));
 			addEventListener(Event.ENTER_FRAME, onSoundPlayProgressHandle);
