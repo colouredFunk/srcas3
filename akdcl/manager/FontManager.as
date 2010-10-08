@@ -5,7 +5,7 @@ package akdcl.manager
 	 * ...
 	 * @author Akdcl
 	 */
-	public class FontManager 
+	final public class FontManager 
 	{
 		public static function getFontList(_enumerateDeviceFonts:Boolean = true):Array {
 			var _fontList:Array = Font.enumerateFonts(_enumerateDeviceFonts);
