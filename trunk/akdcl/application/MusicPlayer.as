@@ -146,7 +146,6 @@
 				sound.stop(true);
 			}
 			var _musicSOURCE:String = String(musicList.list[playId].@src);
-			
 			if (_musicSOURCE.toLowerCase().indexOf(".mp3") < 0) {
 				sound = null;
 				if (!isPlugin) {

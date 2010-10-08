@@ -8,7 +8,7 @@ package ui {
 	 * ...
 	 * @author Akdcl
 	 */
-	public class ButtonManager {
+	final public class ButtonManager {
 		private static const INITIALIZE:Boolean = initializeManager();
 		private static const ROLL_OVER = "rollOver";
 		private static const ROLL_OUT = "rollOut";

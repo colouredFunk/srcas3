@@ -16,7 +16,7 @@ package akdcl.manager
 	 * ...
 	 * @author Akdcl
 	 */
-	public class FLManager
+	final public class FLManager
 	{
 		private static var textFormat:TextFormat = new TextFormat();
 		public static function setTextFormat(_size:uint, _color:uint = 0x000000, _font:String = "宋体"):void {
