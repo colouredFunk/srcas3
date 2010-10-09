@@ -2,7 +2,7 @@
 SHAPEWITHSTYLE 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月9日 14:03:45 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月9日 15:53:44 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -26,7 +26,10 @@ package zero.swf.record{
 		public var LineStyles:LINESTYLEARRAY;
 		public var NumFillBits:int;
 		public var NumLineBits:int;
+		
 		public var ShapeRecordV:Vector.<SHAPERECORD>;
+		
+		public var EndShapeRecord:int;					//UI8
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			//#offsetpp
@@ -39,6 +42,8 @@ package zero.swf.record{
 			var flags:int=data[offset++];
 			NumFillBits=(flags<<24)>>>28;				//11110000
 			NumLineBits=flags&0x0f;						//00001111
+			SHAPERECORD.FillBits=NumFillBits;
+			SHAPERECORD.LineBits=NumLineBits;
 			ShapeRecordV=new Vector.<SHAPERECORD>();
 			//#offsetpp
 			
@@ -50,6 +55,9 @@ package zero.swf.record{
 				ShapeRecordV[i]=new SHAPERECORD();
 				offset=ShapeRecordV[i].initByData(data,offset,endOffset);
 			}
+			SHAPERECORD.FillBits=-1;
+			SHAPERECORD.LineBits=-1;
+			EndShapeRecord=data[offset++];
 			return offset;
 		}
 		override public function toData():ByteArray{
@@ -63,10 +71,18 @@ package zero.swf.record{
 			flags|=NumLineBits;							//00001111
 			data[offset]=flags;
 			
-			//ENDSHAPERECORD
-			STYLECHANGERECORD
-			STRAIGHTEDGERECORD
-			CURVEDEDGERECORD
+			SHAPERECORD.FillBits=NumFillBits;
+			SHAPERECORD.LineBits=NumLineBits;
+			//#offsetpp
+			++offset;
+			data.position=offset;
+			for each(var ShapeRecord:SHAPERECORD in ShapeRecordV){
+				data.writeBytes(ShapeRecord.toData());
+			}
+			offset=data.length;
+			SHAPERECORD.FillBits=-1;
+			SHAPERECORD.LineBits=-1;
+			data[offset++]=EndShapeRecord;
 			return data;
 		}
 
@@ -76,6 +92,7 @@ package zero.swf.record{
 			var xml:XML=<SHAPEWITHSTYLE
 				NumFillBits={NumFillBits}
 				NumLineBits={NumLineBits}
+				EndShapeRecord={EndShapeRecord}
 			>
 				<FillStyles/>
 				<LineStyles/>
@@ -107,6 +124,7 @@ package zero.swf.record{
 				ShapeRecordV[i]=new SHAPERECORD();
 				ShapeRecordV[i].initByXML(ShapeRecordXML.children()[0]);
 			}
+			EndShapeRecord=int(xml.@EndShapeRecord.toString());
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}
