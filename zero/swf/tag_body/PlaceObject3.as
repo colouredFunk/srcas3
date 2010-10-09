@@ -142,6 +142,8 @@ package zero.swf.tag_body{
 			//#offsetpp
 			offset+=4;
 			if(PlaceFlagHasClassName||(PlaceFlagHasImage&&PlaceFlagHasCharacter)){
+				//#offsetpp
+			
 				var get_str_size:int=0;
 				while(data[offset+(get_str_size++)]){}
 				data.position=offset;
@@ -177,6 +179,8 @@ package zero.swf.tag_body{
 			//#offsetpp
 			
 			if(PlaceFlagHasName){
+				//#offsetpp
+			
 				get_str_size=0;
 				while(data[offset+(get_str_size++)]){}
 				data.position=offset;

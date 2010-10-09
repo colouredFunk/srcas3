@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="20">
+	<mx:RadioButton x="20" mouseOver="mouseOver(event)" mouseDown="mouseDown(event)" click="click(event)"/>
+	<mx:RadioButton x="80" mouseOver="mouseOver(event)" mouseDown="mouseDown(event)" click="click(event)"/>
+	<mx:RadioButton x="140" mouseOver="mouseOver(event)" mouseDown="mouseDown(event)" click="click(event)"/>
+	<mx:RadioButton x="220" mouseOver="mouseOver(event)" mouseDown="mouseDown(event)" click="click(event)"/>
+	<mx:RadioButton x="300" mouseOver="mouseOver(event)" mouseDown="mouseDown(event)" click="click(event)"/>
+	<fx:Script>
+		<![CDATA[
+			import spark.components.Group;
+			
+			import zero.swf.DataAndTags;
+			
+			private var rbMark:Object;
+			public static var itemView:TagsOptionBoardItemView;
+			private static var isDragging:Boolean;
+			public static function initInstance(container:Group):void{
+				if(itemView){
+					throw new Error("单例");
+				}
+				itemView=new TagsOptionBoardItemView();
+				container.addElement(itemView);
+				itemView.init();
+				container.removeElement(itemView);
+				
+				container.stage.addEventListener(MouseEvent.MOUSE_UP,mouseUp);
+			}
+			private function init():void{
+				var rb0:RadioButton=this.getElementAt(0) as RadioButton;
+				var rb1:RadioButton=this.getElementAt(1) as RadioButton;
+				var rb2:RadioButton=this.getElementAt(2) as RadioButton;
+				var rb3:RadioButton=this.getElementAt(3) as RadioButton;
+				var rb4:RadioButton=this.getElementAt(4) as RadioButton;
+				
+				rb0.label=DataAndTags.structorOption;
+				rb1.label=DataAndTags.resourceOption;
+				rb2.label=DataAndTags.byteCodesOption;
+				rb3.label=DataAndTags.onlyLocationOption;
+				rb4.label=DataAndTags.noOutputOption;
+				
+				rbMark=new Object();
+				rbMark[DataAndTags.structorOption]=rb0;
+				rbMark[DataAndTags.resourceOption]=rb1;
+				rbMark[DataAndTags.byteCodesOption]=rb2;
+				rbMark[DataAndTags.onlyLocationOption]=rb3;
+				rbMark[DataAndTags.noOutputOption]=rb4;
+			}
+			private function mouseOver(event:MouseEvent):void{
+				if(this.parent){
+					if(isDragging){
+						var rb:RadioButton=event.target as RadioButton;
+						//if(rb.enabled){
+						if(rb.visible){
+							var option:String=rb.label;
+							if(select(option)){
+								(this.parent as TagsOptionBoardItem).selectOption(option);
+							}
+						}
+					}
+				}
+			}
+			private function mouseDown(event:MouseEvent):void{
+				if(this.parent){
+					var rb:RadioButton=event.target as RadioButton;
+					//if(rb.enabled){
+					if(rb.visible){
+						isDragging=true;
+						var option:String=rb.label;
+						if(select(option)){
+							(this.parent as TagsOptionBoardItem).selectOption(option);
+						}
+					}
+				}
+			}
+			private static function mouseUp(event:MouseEvent):void{
+				if(isDragging){
+					isDragging=false;
+					//
+				}
+			}
+			private function click(event:MouseEvent):void{
+				//if(this.parent){
+				//	var option:String=(event.target as RadioButton).label;
+				//	(this.parent as TagsOptionBoardItem).selectOption(option);
+				//}
+			}
+			public function select(option:String):Boolean{
+				var rb:RadioButton=rbMark[option];
+				if(rb.selected){
+					return false;
+				}
+				rb.selected=true;
+				return true;
+			}
+			
+			public function setEnabled(...options):void{
+				for each(var rb:RadioButton in rbMark){
+					//rb.enabled=false;
+					rb.visible=false;
+				}
+				for each(var option:String in options){
+					//rbMark[option].enabled=true;
+					rbMark[option].visible=true;
+				}
+			}
+
+		]]>
+	</fx:Script>
+</mx:Canvas>

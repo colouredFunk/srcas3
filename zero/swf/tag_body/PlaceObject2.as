@@ -97,6 +97,8 @@ package zero.swf.tag_body{
 			//#offsetpp
 			
 			if(PlaceFlagHasName){
+				//#offsetpp
+			
 				var get_str_size:int=0;
 				while(data[offset+(get_str_size++)]){}
 				data.position=offset;

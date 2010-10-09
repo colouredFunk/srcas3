@@ -1,0 +1,633 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+/***
+TagsOptionBoard 版本:v1.0
+简要说明:这家伙很懒什么都没写
+创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
+创建时间:2010年9月30日 18:02:05
+历次修改:未有修改
+用法举例:这家伙很懒什么都没写
+*/
+
+-->
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300" xmlns:ui="zero.swf.ui.*"
+		 removedFromStage="removed(event)"
+>
+	<mx:Label x="0" y="0" text="option: "/>
+	<mx:ComboBox id="optionCb" y="0" x="50" width="180" change="change(event)"/>
+	<mx:Button x="240" y="0" label="保存当前" id="btnSaveOption" click="click(event)"/>
+	<mx:DataGrid id="grid" left="0" top="30" right="0" bottom="0">
+		<mx:columns>
+			<mx:DataGridColumn textAlign="center" draggable="false" headerText="typeNum" dataField="@typeNum" width="80"/>
+			<mx:DataGridColumn draggable="false" headerText="type" dataField="@type" width="200"/>
+			<mx:DataGridColumn draggable="false" headerText="输出选项" dataField="@typeNum" sortCompareFunction="sortByOption">
+				<mx:itemRenderer>
+					<fx:Component>
+						<mx:Container>
+							<fx:Script>
+								<![CDATA[
+									override public function set data(_data:Object):void{
+										var item:TagsOptionBoardItem=null;
+										if(this.numChildren){
+											item=this.getElementAt(0) as TagsOptionBoardItem;
+										}
+										var data:XML=_data as XML;
+										var newItem:TagsOptionBoardItem=TagsOptionBoardItem.getItemByData(data);
+										if(item){
+											if(item===newItem){
+												return;
+											}else{
+												this.removeElement(item);
+											}
+										}else if(this.numChildren){
+											throw new Error("只能放 TagsOptionBoardItem");
+											return;
+										}
+										
+										this.addElement(newItem);
+										newItem.init(data);
+									}
+								]]>
+							</fx:Script>
+						</mx:Container>
+					</fx:Component>
+				</mx:itemRenderer>
+			</mx:DataGridColumn>
+		</mx:columns>
+	</mx:DataGrid>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			
+			import zero.Outputer;
+			import zero.air.FileAndStr;
+			import zero.swf.DataAndTags;
+			import zero.swf.TagType;
+			
+			private static const settingFolderPath:String=("file:///"+decodeURI(File.applicationDirectory.nativePath+"/setting")+"/").replace(/\\/g,"/");
+			private static const optionsFolderPath:String=settingFolderPath+"options/";
+			
+			private static var settingXML:XML;
+			private static var settingFile:File;
+			private static var optionXMLs:Object;
+			private static var optionNameArrCol:ArrayCollection;
+			
+			private static var instance:TagsOptionBoard;
+			
+			public static function getCurrOption():XML{
+				initSettings();
+				return optionXMLs[currOptionName];
+			}
+			public static function get currOptionName():String{
+				return settingXML.@selectedOptionName.toString();
+			}
+			public static function set currOptionName(_currOptionName:String):void{
+				settingXML.@selectedOptionName=_currOptionName;
+				instance.optionCb.selectedItem=_currOptionName;
+			}
+			private static function initSettings():void{
+				settingFile=new File(settingFolderPath+"setting.xml");
+				if(settingFile.exists){
+					settingXML=new XML(FileAndStr.readStrFromFile(settingFile));
+				}else{
+					settingXML=<setting selectedOptionName="AS2代码"/>;
+				}
+				
+				var optionsFolder:File=new File(optionsFolderPath);
+				
+				var optionXML:XML,optionFile:File,optionPath:String,i:int,optionName:String;
+				var optionFileArr:Array;
+				if(optionsFolder.exists){
+					optionFileArr=optionsFolder.getDirectoryListing();
+				}
+				if(optionFileArr&&optionFileArr.length){
+				}else{
+					optionFileArr=new Array();
+					i=0;
+					for each(optionXML in (<options>
+							<option name="AS2代码">
+								<tag typeNum="00" type="End" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="01" type="ShowFrame" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="02" type="DefineShape" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="03" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="04" type="PlaceObject" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="05" type="RemoveObject" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="06" type="DefineBits" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="07" type="DefineButton" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="08" type="JPEGTables" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="09"  type="SetBackgroundColor" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="10" type="DefineFont" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="11" type="DefineText" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="12" type="DoAction" option={DataAndTags.structorOption}/>
+								<tag typeNum="13" type="DefineFontInfo" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="14" type="DefineSound" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="15" type="StartSound" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="16" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="17" type="DefineButtonSound" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="18" type="SoundStreamHead" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="19" type="SoundStreamBlock" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="20" type="DefineBitsLossless" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="21" type="DefineBitsJPEG2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="22" type="DefineShape2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="23" type="DefineButtonCxform" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="24" type="Protect" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="25" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="26" type="PlaceObject2" option={DataAndTags.structorOption}/>
+								<!--tag typeNum="27" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="28" type="RemoveObject2" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="29" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="30" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="31" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="32" type="DefineShape3" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="33" type="DefineText2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="34" type="DefineButton2" option={DataAndTags.structorOption}/>
+								<tag typeNum="35" type="DefineBitsJPEG3" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="36" type="DefineBitsLossless2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="37" type="DefineEditText" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="38" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="39" type="DefineSprite" option={DataAndTags.structorOption}/>
+								<!--tag typeNum="40" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="41" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="42" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="43" type="FrameLabel" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="44" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="45" type="SoundStreamHead2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="46" type="DefineMorphShape" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="47" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="48" type="DefineFont2" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="49" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="50" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="51" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="52" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="53" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="54" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="55" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="56" type="ExportAssets" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="57" type="ImportAssets" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="58" type="EnableDebugger" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="59" type="DoInitAction" option={DataAndTags.structorOption}/>
+								<tag typeNum="60" type="DefineVideoStream" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="61" type="VideoFrame" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="62" type="DefineFontInfo2" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="63" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="64" type="EnableDebugger2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="65" type="ScriptLimits" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="66" type="SetTabIndex" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="67" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="68" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="69" type="FileAttributes" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="70" type="PlaceObject3" option={DataAndTags.structorOption}/>
+								<tag typeNum="71" type="ImportAssets2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="72" type="DoABCWithoutFlagsAndName" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="73" type="DefineFontAlignZones" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="74" type="CSMTextSettings" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="75" type="DefineFont3" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="76" type="SymbolClass" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="77" type="Metadata" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="78" type="DefineScalingGrid" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="79" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="80" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="81" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="82" type="DoABC" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="83" type="DefineShape4" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="84" type="DefineMorphShape2" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="85" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="86" type="DefineSceneAndFrameLabelData" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="87" type="DefineBinaryData" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="88" type="DefineFontName" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="89" type="StartSound2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="90" type="DefineBitsJPEG4" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="91" type="DefineFont4" option={DataAndTags.noOutputOption}/>
+							</option>
+							<option name="AS3代码">
+								<tag typeNum="00" type="End" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="01" type="ShowFrame" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="02" type="DefineShape" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="03" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="04" type="PlaceObject" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="05" type="RemoveObject" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="06" type="DefineBits" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="07" type="DefineButton" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="08" type="JPEGTables" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="09"  type="SetBackgroundColor" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="10" type="DefineFont" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="11" type="DefineText" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="12" type="DoAction" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="13" type="DefineFontInfo" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="14" type="DefineSound" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="15" type="StartSound" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="16" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="17" type="DefineButtonSound" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="18" type="SoundStreamHead" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="19" type="SoundStreamBlock" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="20" type="DefineBitsLossless" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="21" type="DefineBitsJPEG2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="22" type="DefineShape2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="23" type="DefineButtonCxform" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="24" type="Protect" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="25" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="26" type="PlaceObject2" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="27" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="28" type="RemoveObject2" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="29" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="30" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="31" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="32" type="DefineShape3" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="33" type="DefineText2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="34" type="DefineButton2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="35" type="DefineBitsJPEG3" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="36" type="DefineBitsLossless2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="37" type="DefineEditText" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="38" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="39" type="DefineSprite" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="40" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="41" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="42" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="43" type="FrameLabel" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="44" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="45" type="SoundStreamHead2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="46" type="DefineMorphShape" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="47" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="48" type="DefineFont2" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="49" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="50" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="51" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="52" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="53" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="54" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="55" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="56" type="ExportAssets" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="57" type="ImportAssets" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="58" type="EnableDebugger" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="59" type="DoInitAction" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="60" type="DefineVideoStream" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="61" type="VideoFrame" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="62" type="DefineFontInfo2" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="63" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="64" type="EnableDebugger2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="65" type="ScriptLimits" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="66" type="SetTabIndex" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="67" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="68" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="69" type="FileAttributes" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="70" type="PlaceObject3" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="71" type="ImportAssets2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="72" type="DoABCWithoutFlagsAndName" option={DataAndTags.structorOption}/>
+								<tag typeNum="73" type="DefineFontAlignZones" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="74" type="CSMTextSettings" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="75" type="DefineFont3" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="76" type="SymbolClass" option={DataAndTags.structorOption}/>
+								<tag typeNum="77" type="Metadata" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="78" type="DefineScalingGrid" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="79" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="80" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="81" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="82" type="DoABC" option={DataAndTags.structorOption}/>
+								<tag typeNum="83" type="DefineShape4" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="84" type="DefineMorphShape2" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="85" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="86" type="DefineSceneAndFrameLabelData" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="87" type="DefineBinaryData" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="88" type="DefineFontName" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="89" type="StartSound2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="90" type="DefineBitsJPEG4" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="91" type="DefineFont4" option={DataAndTags.noOutputOption}/>
+							</option>
+						</options>).option){
+							optionPath=optionsFolderPath+optionXML.@name.toString()+".xml";
+							delete optionXML.@name;
+							optionFile=new File(optionPath);
+							FileAndStr.writeStrToFile('<?xml version="1.0" encoding="utf-8"?>\n'+optionXML.toXMLString(),optionFile);
+							Outputer.output("保存默认 option 至: "+optionPath,"blue");
+							optionFileArr[i++]=optionFile;
+						}
+				}
+				
+				optionNameArrCol=new ArrayCollection();
+				optionXMLs=new Object();
+				for each(optionFile in optionFileArr){
+					addOptionName(optionFile);
+				}
+			}
+			
+			private var optionFile:File;
+			
+			private var removeClose:Function;
+			
+			public function init(addClose:Function,_removeClose:Function):void{
+				//^_^
+				instance=this;
+				
+				if(addClose==null||_removeClose==null){
+					Outputer.output("如果不设置 close 函数，可能会在关闭时无法保存数据");
+				}else{
+					addClose(saveSettings);
+					removeClose=_removeClose;
+				}
+				
+				initSettings();
+				
+				if(currOptionName){
+				}else{
+					currOptionName="临时 option";
+				}
+				if(optionXMLs[currOptionName]){
+				}else{
+					currOptionName="临时 option";
+					addTempOption();
+				}
+				
+				optionCb.dataProvider=optionNameArrCol;
+				currOptionName=currOptionName;
+				
+				optionFile=new File();
+				optionFile.addEventListener(Event.SELECT,saveOptionSelect);
+				
+				trace("optionNameArrCol="+optionNameArrCol);
+				
+				TagsOptionBoardItem.init(this,tagXMLListCol.source,selectOption);
+				
+				TagsOptionBoardItem.initByOptionXML(optionXMLs[currOptionName]);
+				
+				grid.dataProvider=tagXMLListCol;
+			}
+			private function removed(event:Event):void{
+				saveSettings();
+				
+				removeClose(saveSettings);
+				removeClose=null;
+				
+				optionFile.removeEventListener(Event.SELECT,saveOptionSelect);
+				optionFile=null;
+				
+				instance=null;
+			}
+			
+			private function click(event:MouseEvent):void{
+				switch(event.target){
+					case btnSaveOption:
+						optionFile.url=optionsFolderPath;
+						optionFile.browseForSave("保存 option ");
+					break;
+				}
+			}
+			private function change(event:Event):void{
+				switch(event.target){
+					case optionCb:
+						if(currOptionName=="临时 option"){
+							addTempOption();
+						}
+						settingXML.@selectedOptionName=optionCb.selectedItem.toString();
+						TagsOptionBoardItem.initByOptionXML(optionXMLs[currOptionName]);
+					break;
+				}
+			}
+			private function saveOptionSelect(event:Event):void{
+				if(decodeURI(optionFile.parent.url).toLowerCase()===decodeURI(new File(optionsFolderPath).url).toLowerCase()){
+					var optionName:String=optionFile.name;
+					if(/.+\.xml$/i.test(optionName)){
+						optionName=optionName.substr(0,optionName.lastIndexOf("."));
+					}
+					var optionFilePath:String=decodeURI(optionFile.url);
+					optionFile.url=optionFilePath=optionFilePath.substr(0,optionFilePath.lastIndexOf("/"))+"/"+optionName+".xml";
+					
+					if(optionFile.exists){
+						Outputer.output("覆盖 option 至: "+optionFilePath,"brown");
+					}else{
+						Outputer.output("保存 option 至: "+optionFilePath,"blue");
+					}
+					
+					FileAndStr.writeStrToFile('<?xml version="1.0" encoding="utf-8"?>\n'+getCurrOptionXML().toXMLString(),optionFile);
+					
+					currOptionName=addOptionName(optionFile);
+				}else{
+					Outputer.outputError("暂不支持保存到 "+optionsFolderPath+" 之外的目录");
+				}
+			}
+			private function saveSettings():void{
+				trace("saveSettings-----------------------------------");
+				
+				if(currOptionName=="临时 option"){
+					addTempOption();
+				}
+				
+				FileAndStr.writeStrToFile(
+					'<?xml version="1.0" encoding="utf-8"?>\n'+settingXML.toXMLString(),
+					settingFile
+				);
+				
+				trace("settingXML="+settingXML.toXMLString());
+				
+				TagsOptionBoardItem.clear();
+				
+				//trace("currOptionName="+currOptionName);
+				//trace(optionXMLs[currOptionName].toXMLString());
+				trace("-----------------------------------saveSettings");
+			}
+			private function getCurrOptionXML():XML{
+				var optionXML:XML=<option/>
+				var optionMark:Object=TagsOptionBoardItem.getOptionMark();
+				for each(var tagXML:XML in tagXMLListCol.source){
+					var type:String=tagXML.@type.toString();
+					var option:String=optionMark[type];
+					if(option){
+						optionXML.appendChild(<tag typeNum={tagXML.@typeNum.toString()} type={type} option={option}/>);
+					}
+				}
+				return optionXML;
+			}
+			private static function addOptionName(optionFile:File):String{
+				if(optionFile.exists){
+					var optionName:String=optionFile.name;
+					if(/.+\.xml$/i.test(optionName)){
+						optionName=optionName.substr(0,optionName.lastIndexOf("."));
+						if(optionXMLs[optionName]){
+						}else{
+							var L:int=optionNameArrCol.length;
+							if(L){
+								for(var i:int=0;i<L;i++){
+									//考虑更精细的排序, 例如 2 应该比 11 排前
+									if(optionName<optionNameArrCol.getItemAt(i)){
+										optionNameArrCol.addItemAt(optionName,i);
+										break;
+									}
+								}
+								if(i>=L){
+									optionNameArrCol.addItem(optionName);
+								}
+							}else{
+								optionNameArrCol.addItem(optionName);
+							}
+						}
+						optionXMLs[optionName]=new XML(FileAndStr.readStrFromFile(optionFile));
+						return optionName;
+					}else{
+						Outputer.outputError("后缀名必须是\".xml\": "+optionName);
+					}
+				}
+				Outputer.outputError("文件 "+decodeURI(optionFile.url)+" 不存在");
+				return null;
+			}
+			private function addTempOption():void{
+				var optionPath:String=optionsFolderPath+"临时 option.xml";
+				var optionFile:File=new File(optionPath);
+				FileAndStr.writeStrToFile('<?xml version="1.0" encoding="utf-8"?>\n'+getCurrOptionXML().toXMLString(),optionFile);
+				Outputer.output("保存临时 option 至: "+optionPath,"blue");
+				addOptionName(optionFile);
+			}
+			private function selectOption(type:String,option:String):void{
+				if(currOptionName=="临时 option"){
+				}else{
+					addTempOption();
+					currOptionName="临时 option";
+				}
+			}
+			
+			private function sortByOption(data1:XML,data2:XML):int{
+				var type1:String=data1.@type.toString();
+				var type2:String=data2.@type.toString();
+				var option1:String=TagsOptionBoardItem.getOptionByType(type1);
+				var option2:String=TagsOptionBoardItem.getOptionByType(type2);
+				//trace(option1,option2);
+				var dOptionOrder:int=DataAndTags.optionIndexs[option1]-DataAndTags.optionIndexs[option2];
+				//trace(dOptionOrder);
+				if(dOptionOrder>0){
+					return 1;
+				}else if(dOptionOrder<0){
+					return -1;
+				}
+				if(TagType[type1]<TagType[type2]){
+					return -1;
+				}
+				return 1;
+			}
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<s:XMLListCollection id="tagXMLListCol">
+			<fx:XMLList>
+				<tag typeNum="00" type="End"/>
+				<tag typeNum="01" type="ShowFrame"/>
+				<tag typeNum="02" type="DefineShape"/>
+				<!--tag typeNum="03" type=""/-->
+				<tag typeNum="04" type="PlaceObject"/>
+				<tag typeNum="05" type="RemoveObject"/>
+				<tag typeNum="06" type="DefineBits"/>
+				<tag typeNum="07" type="DefineButton"/>
+				<tag typeNum="08" type="JPEGTables"/>
+				<tag typeNum="09"  type="SetBackgroundColor"/>
+				<tag typeNum="10" type="DefineFont"/>
+				<tag typeNum="11" type="DefineText"/>
+				<tag typeNum="12" type="DoAction"/>
+				<tag typeNum="13" type="DefineFontInfo"/>
+				<tag typeNum="14" type="DefineSound"/>
+				<tag typeNum="15" type="StartSound"/>
+				<!--tag typeNum="16" type=""/-->
+				<tag typeNum="17" type="DefineButtonSound"/>
+				<tag typeNum="18" type="SoundStreamHead"/>
+				<tag typeNum="19" type="SoundStreamBlock"/>
+				<tag typeNum="20" type="DefineBitsLossless"/>
+				<tag typeNum="21" type="DefineBitsJPEG2"/>
+				<tag typeNum="22" type="DefineShape2"/>
+				<tag typeNum="23" type="DefineButtonCxform"/>
+				<tag typeNum="24" type="Protect"/>
+				<!--tag typeNum="25" type=""/-->
+				<tag typeNum="26" type="PlaceObject2"/>
+				<!--tag typeNum="27" type=""/-->
+				<tag typeNum="28" type="RemoveObject2"/>
+				<!--tag typeNum="29" type=""/-->
+				<!--tag typeNum="30" type=""/-->
+				<!--tag typeNum="31" type=""/-->
+				<tag typeNum="32" type="DefineShape3"/>
+				<tag typeNum="33" type="DefineText2"/>
+				<tag typeNum="34" type="DefineButton2"/>
+				<tag typeNum="35" type="DefineBitsJPEG3"/>
+				<tag typeNum="36" type="DefineBitsLossless2"/>
+				<tag typeNum="37" type="DefineEditText"/>
+				<!--tag typeNum="38" type=""/-->
+				<tag typeNum="39" type="DefineSprite"/>
+				<!--tag typeNum="40" type=""/-->
+				<!--tag typeNum="41" type=""/-->
+				<!--tag typeNum="42" type=""/-->
+				<tag typeNum="43" type="FrameLabel"/>
+				<!--tag typeNum="44" type=""/-->
+				<tag typeNum="45" type="SoundStreamHead2"/>
+				<tag typeNum="46" type="DefineMorphShape"/>
+				<!--tag typeNum="47" type=""/-->
+				<tag typeNum="48" type="DefineFont2"/>
+				<!--tag typeNum="49" type=""/-->
+				<!--tag typeNum="50" type=""/-->
+				<!--tag typeNum="51" type=""/-->
+				<!--tag typeNum="52" type=""/-->
+				<!--tag typeNum="53" type=""/-->
+				<!--tag typeNum="54" type=""/-->
+				<!--tag typeNum="55" type=""/-->
+				<tag typeNum="56" type="ExportAssets"/>
+				<tag typeNum="57" type="ImportAssets"/>
+				<tag typeNum="58" type="EnableDebugger"/>
+				<tag typeNum="59" type="DoInitAction"/>
+				<tag typeNum="60" type="DefineVideoStream"/>
+				<tag typeNum="61" type="VideoFrame"/>
+				<tag typeNum="62" type="DefineFontInfo2"/>
+				<!--tag typeNum="63" type=""/-->
+				<tag typeNum="64" type="EnableDebugger2"/>
+				<tag typeNum="65" type="ScriptLimits"/>
+				<tag typeNum="66" type="SetTabIndex"/>
+				<!--tag typeNum="67" type=""/-->
+				<!--tag typeNum="68" type=""/-->
+				<tag typeNum="69" type="FileAttributes"/>
+				<tag typeNum="70" type="PlaceObject3"/>
+				<tag typeNum="71" type="ImportAssets2"/>
+				<tag typeNum="72" type="DoABCWithoutFlagsAndName"/>
+				<tag typeNum="73" type="DefineFontAlignZones"/>
+				<tag typeNum="74" type="CSMTextSettings"/>
+				<tag typeNum="75" type="DefineFont3"/>
+				<tag typeNum="76" type="SymbolClass"/>
+				<tag typeNum="77" type="Metadata"/>
+				<tag typeNum="78" type="DefineScalingGrid"/>
+				<!--tag typeNum="79" type=""/-->
+				<!--tag typeNum="80" type=""/-->
+				<!--tag typeNum="81" type=""/-->
+				<tag typeNum="82" type="DoABC"/>
+				<tag typeNum="83" type="DefineShape4"/>
+				<tag typeNum="84" type="DefineMorphShape2"/>
+				<!--tag typeNum="85" type=""/-->
+				<tag typeNum="86" type="DefineSceneAndFrameLabelData"/>
+				<tag typeNum="87" type="DefineBinaryData"/>
+				<tag typeNum="88" type="DefineFontName"/>
+				<tag typeNum="89" type="StartSound2"/>
+				<tag typeNum="90" type="DefineBitsJPEG4"/>
+				<tag typeNum="91" type="DefineFont4"/>
+			</fx:XMLList>
+		</s:XMLListCollection>
+	</fx:Declarations>
+</s:Group>
+
+<!--
+
+// 常忘正则表达式
+// /^\s*|\s*$/					//前后空白						"\nabc d  e 哈 哈\t \r".replace(/^\s*|\s*$/g,"") === "abc d  e 哈 哈"
+// /[\\\/:*?\"<>|]/				//不合法的windows文件名字符集		"\\\/:*?\"<>|\\\/:*哈 哈?\"<>|\\哈 \/:*?\"<>|".replace(/[\\\/:*?\"<>|]/g,"") === "哈 哈哈 "
+// /[a-zA-Z_][a-zA-Z0-9_]*/		//合法的变量名(不考虑中文)
+// value=value.replace(/[^a-zA-Z0-9_]/g,"").replace(/^[0-9]*/,"");//替换不合法的变量名
+// 先把除字母数字下划线的字符去掉,再把开头的数字去掉
+// 想不到怎样能用一个正则表达式搞定...
+
+//正则表达式30分钟入门教程		http://www.unibetter.com/deerchao/zhengzhe-biaodashi-jiaocheng-se.htm
+//正则表达式用法及实例			http://eskimo.blogbus.com/logs/29095458.html
+//常用正则表达式					http://www.williamlong.info/archives/433.html
+
+/*
+
+//常用值
+
+//常用语句块
+
+*/
+
+-->

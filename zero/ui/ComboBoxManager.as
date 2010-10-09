@@ -16,10 +16,10 @@ package zero.ui{
 	//import mx.controls.ComboBox;
 	public class ComboBoxManager{
 		private static var dict:Dictionary=new Dictionary();
-		public static function addCb(cb:*,so:SharedObject,saveId:String,dataProvider:Array=null):void{
+		public static function addCb(cb:*,so:SharedObject,saveId:String,dataProvider:Array=null,setDataProvider:Boolean=false):void{
 			var cbm:ComboBoxManager=new ComboBoxManager();
 			dict[cb]=cbm;
-			cbm.init(cb,so,saveId,dataProvider);
+			cbm.init(cb,so,saveId,dataProvider,setDataProvider);
 		}
 		public static function clearCb(cb:*):void{
 			if(dict[cb]){
@@ -47,7 +47,7 @@ package zero.ui{
 			cb.removeEventListener(FocusEvent.FOCUS_OUT,focusOut);
 			cb=null;
 		}
-		private function init(_cb:*,so:SharedObject,saveId:String,dataProvider:Array):void{
+		private function init(_cb:*,so:SharedObject,saveId:String,dataProvider:Array,setDataProvider:Boolean):void{
 			cb=_cb;
 			if(so){
 				saveObj=so.data[saveId];
@@ -57,7 +57,7 @@ package zero.ui{
 						labelArr:[]
 					}
 				}
-				if(dataProvider&&saveObj.labelArr.length==0){
+				if(dataProvider&&(saveObj.labelArr.length==0||setDataProvider)){
 					saveObj.labelArr=dataProvider;
 				}
 				cb.dataProvider=saveObj.labelArr;

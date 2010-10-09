@@ -75,6 +75,7 @@ package zero.swf.tag_body{
 		public var metadata:String;						//STRING
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+			//#offsetpp
 			var get_str_size:int=0;
 			while(data[offset+(get_str_size++)]){}
 			data.position=offset;

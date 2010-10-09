@@ -78,6 +78,20 @@ package zero.ui{
 			dataV=null;
 			fileList=null;
 		}
+		private function normalizeFileURLByLastFSMFile(fileURL:String):String{
+			if(lastFSMFile){
+				if(fileFilterList){
+					var fileFilter:FileFilter=fileFilterList[0];
+					if(fileFilter.extension.toLowerCase().indexOf("*"+lastFSMFile.type.toLowerCase())==-1){
+						fileURL=lastFSMFile.parent.url;
+					}
+				}else if(browseType==DIR){
+					fileURL=lastFSMFile.parent.url;
+				} 
+				//trace("fileURL="+fileURL);
+			}
+			return fileURL;
+		}
 		public function init(
 			fileTypeName:String,
 			fileTypes:String="*",
@@ -109,9 +123,13 @@ package zero.ui{
 					if(!__fileURL&&lastFSMFile){
 						__fileURL=lastFSMFile.url;
 					}
+					
+					__fileURL=normalizeFileURLByLastFSMFile(__fileURL);
+					
 					if(__fileURL){
 						__file=new FileClass(__fileURL);
-						if(!lastFSMFile){
+						if(lastFSMFile){
+						}else{
 							lastFSMFile=new FileClass(__fileURL);
 						}
 					}else{
@@ -164,11 +182,17 @@ package zero.ui{
 				}catch(e:Error){
 					fileURL=null;
 				}
-				if(!fileURL&&lastFSMFile){
-					__file.url=fileURL=lastFSMFile.url;
+				var lastFileURL:String;
+				if(lastFSMFile){
+					lastFileURL=lastFSMFile.url;
+				}else{
+					lastFileURL=null;
 				}
-				if(!cb.text&&lastFSMFile){
-					__file.url=fileURL=lastFSMFile.url;
+				if(!fileURL&&lastFileURL){
+					__file.url=fileURL=normalizeFileURLByLastFSMFile(lastFileURL);
+				}
+				if(!cb.text&&lastFileURL){
+					__file.url=fileURL=normalizeFileURLByLastFSMFile(lastFileURL);
 				}
 				if(fileURL&&!__file.exists){
 					while(fileURL&&!__file.exists){
