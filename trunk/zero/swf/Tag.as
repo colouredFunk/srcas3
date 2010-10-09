@@ -15,7 +15,7 @@ package zero.swf{
 	import zero.swf.tag_body.TagBody;
 
 	public class Tag{
-		private var headOffset:int;
+		public var headOffset:int;
 		public var bodyOffset:int;
 		public var bodyLength:int;
 		public var type:int;
@@ -78,6 +78,20 @@ package zero.swf{
 			}
 		}
 		
+		public function getDefId():int{
+			if(__tagBody){
+				return __tagBody["id"];
+			}
+			if(__bodyData){
+				if(bodyLength<2){
+					throw new Error("bodyLength="+bodyLength);
+				}
+				return __bodyData[bodyOffset]|(__bodyData[bodyOffset+1]<<8);
+			}
+			throw new Error("未处理");
+			return -1;
+		}
+		
 		public static function getTypeByQualifiedClassName(obj:*):int{
 			var typeName:String=getQualifiedClassName(obj).replace("zero.swf.tag_body::","");
 			if(typeName){
@@ -90,6 +104,14 @@ package zero.swf{
 				throw new Error("typeName="+typeName);
 			}
 			return -1;
+		}
+		public static function getTagBodyClassByType(type:int):Class{
+			try{
+				return getDefinitionByName("zero.swf.tag_body."+TagType.typeNameArr[type]) as Class;
+			}catch(e:Error){
+				//throw new Error("TagBodyClass: "+TagType.typeNameArr[type]+" 未定义");
+			}
+			return null;
 		}
 		
 		private static const noShortTypes:Object={

@@ -59,6 +59,8 @@ package zero.swf.tag_body{
 					get_u_step+=7;
 				}while(get_u_value&0x80);// get_u_value & 1000 0000
 				//
+				//#offsetpp
+			
 				var get_str_size:int=0;
 				while(data[offset+(get_str_size++)]){}
 				data.position=offset;
@@ -90,6 +92,8 @@ package zero.swf.tag_body{
 					get_u_step+=7;
 				}while(get_u_value&0x80);// get_u_value & 1000 0000
 				//
+				//#offsetpp
+			
 				get_str_size=0;
 				while(data[offset+(get_str_size++)]){}
 				data.position=offset;

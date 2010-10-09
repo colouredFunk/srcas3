@@ -29,6 +29,18 @@ package zero.swf{
 			dataAndBaseInfo=new DataAndBaseInfo();
 			dataAndTags=new DataAndTags();
 		}
+		public function copyBaseInfo(swf0:SWFLevel0):void{
+			type=swf0.type;
+			Version=swf0.Version;
+			wid=swf0.wid;
+			hei=swf0.hei;
+			FrameRate=swf0.FrameRate;
+			
+			acceleration=swf0.acceleration;
+			isAS3=swf0.isAS3;
+			accessNetworkOnly=swf0.accessNetworkOnly;
+			metadataStr=swf0.metadataStr;
+		}
 		//
 		public function get type():String{
 			return swfDataAndData.type;
@@ -45,16 +57,16 @@ package zero.swf{
 		
 		//
 		public function get wid():int{
-			return dataAndBaseInfo.wid;
+			return (dataAndBaseInfo.FrameSize.Xmax-dataAndBaseInfo.FrameSize.Xmin)/20;//获取到的值是以堤为单位, 1堤等于20像素, 所以要除以20
 		}
 		public function set wid(_wid:int):void{
-			dataAndBaseInfo.wid=_wid;
+			dataAndBaseInfo.FrameSize.Xmax=_wid*20+dataAndBaseInfo.FrameSize.Xmin;
 		}
 		public function get hei():int{
-			return dataAndBaseInfo.hei;
+			return (dataAndBaseInfo.FrameSize.Ymax-dataAndBaseInfo.FrameSize.Ymin)/20;//获取到的值是以堤为单位, 1堤等于20像素, 所以要除以20
 		}
 		public function set hei(_hei:int):void{
-			dataAndBaseInfo.hei=_hei;
+			dataAndBaseInfo.FrameSize.Ymax=_hei*20+dataAndBaseInfo.FrameSize.Ymin;
 		}
 		public function get FrameRate():Number{
 			return dataAndBaseInfo.FrameRate;
@@ -199,6 +211,9 @@ package zero.swf{
 		private var newData:ByteArray;
 		public function toSWFData():ByteArray{
 			prevToData();
+			
+			insertResTags();
+			
 			newData.writeBytes(dataAndTags.toData());
 			var _newData:ByteArray=newData;
 			newData=null;
@@ -213,6 +228,9 @@ package zero.swf{
 		
 		public function toSWFData2(progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
 			prevToData();
+			
+			insertResTags();
+			
 			progress_finished=_progress_finished;
 			dataAndTags.toData2(
 				progress_start,
@@ -231,14 +249,35 @@ package zero.swf{
 		}
 		
 		CONFIG::toXMLAndInitByXML{
-		public function toXML():XML{
+		private var xml:XML;
+		private function getXML(fileName:String):void{
+			xml=<SWF fileName={fileName} type={type} Version={Version} FileLength={swfDataAndData.FileLength} wid={wid} hei={hei} FrameRate={FrameRate}/>;
+			if(dataAndBaseInfo.FrameSize.Xmin===0){
+			}else{
+				xml.@left=dataAndBaseInfo.FrameSize.Xmin/20;
+			}
+			if(dataAndBaseInfo.FrameSize.Ymin===0){
+			}else{
+				xml.@top=dataAndBaseInfo.FrameSize.Ymin/20;
+			}
+		}
+		public function toXML(fileName:String):XML{
 			infos2Tags();
-			var xml:XML=<SWF type={type} Version={Version} FileLength={swfDataAndData.FileLength} wid={wid} hei={hei} FrameRate={FrameRate}/>;
+			
+			insertResTags();
+			
+			getXML(fileName);
+			
 			xml.appendChild(dataAndTags.toXML());
 			return xml;
 		}
-		public function toXML2(progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
+		public function toXML2(fileName:String,progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
 			infos2Tags();
+			
+			insertResTags();
+			
+			getXML(fileName);
+			
 			progress_finished=_progress_finished;
 			dataAndTags.toXML2(
 				progress_start,
@@ -249,23 +288,34 @@ package zero.swf{
 		private function toXML2_finished(dataAndTagsXML:XML):void{
 			var _progress_finished:Function=progress_finished;
 			progress_finished=null;
-			var xml:XML=<SWF type={type} Version={Version} FileLength={swfDataAndData.FileLength} wid={wid} hei={hei} FrameRate={FrameRate}/>;
 			xml.appendChild(dataAndTagsXML);
 			_progress_finished(xml);
+		}
+		private function initFrameSizeByXML(xml:XML):void{
+			var leftStr:String=xml.@left.toString();
+			if(leftStr){
+				dataAndBaseInfo.FrameSize.Xmin=int(leftStr)*20;
+			}
+			var topStr:String=xml.@top.toString();
+			if(topStr){
+				dataAndBaseInfo.FrameSize.Ymin=int(topStr)*20;
+			}
+			wid=int(xml.@wid.toString());
+			hei=int(xml.@hei.toString());
 		}
 		public function initByXML(xml:XML):void{
 			type=xml.@type.toString();
 			Version=int(xml.@Version.toString());
-			wid=int(xml.@wid.toString());
-			hei=int(xml.@hei.toString());
+			initFrameSizeByXML(xml);
+			
 			FrameRate=Number(xml.@FrameRate.toString());
 			dataAndTags.initByXML(xml.tags[0]);
 		}
 		public function initByXML2(xml:XML,progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
 			type=xml.@type.toString();
 			Version=int(xml.@Version.toString());
-			wid=int(xml.@wid.toString());
-			hei=int(xml.@hei.toString());
+			initFrameSizeByXML(xml);
+			
 			FrameRate=Number(xml.@FrameRate.toString());
 			dataAndTags.initByXML2(
 				xml.tags[0],
@@ -275,6 +325,42 @@ package zero.swf{
 			);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
+		
+		
+		
+		private var resInserter:*;
+		public function insertRes(
+			resData:ByteArray,
+			className:String,
+			type:String,
+			addSymbolClass:Boolean=false
+		):void{
+			if(resInserter){
+			}else{
+				try{
+					var ResInserterClass:Class=getDefinitionByName("zero.swf.ResInserter") as Class;
+				}catch(e:Error){
+					throw new Error("未编译: zero.swf.ResInserter");
+				}
+				resInserter=new ResInserterClass(dataAndTags.tagV);
+			}
+			
+			resInserter.insert(
+				resData,
+				className,
+				type,
+				addSymbolClass
+			)
+		}
+		private function insertResTags():void{
+			if(resInserter){
+				var endTag:Tag=dataAndTags.tagV.pop();
+				var lastShowFrameTag:Tag=dataAndTags.tagV.pop();
+				dataAndTags.tagV=dataAndTags.tagV.concat(resInserter.getTagVAndReset());
+				dataAndTags.tagV.push(lastShowFrameTag);
+				dataAndTags.tagV.push(endTag);
+			}
+		}
 	}
 }
 

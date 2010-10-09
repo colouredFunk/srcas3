@@ -28,6 +28,8 @@ package zero.swf.tag_body{
 			var NumSymbols:int=data[offset++]|(data[offset++]<<8);
 			for(var i:int=0;i<NumSymbols;i++){
 				TagV[i]=data[offset++]|(data[offset++]<<8);
+				//#offsetpp
+			
 				var get_str_size:int=0;
 				while(data[offset+(get_str_size++)]){}
 				data.position=offset;

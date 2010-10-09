@@ -1,8 +1,8 @@
 /***
-SWFInfoGetter 版本:v1.0
+DataMark 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年6月22日 18:53:57
+创建时间:2010年10月4日 14:26:44
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -12,32 +12,39 @@ package zero.swf{
 	import flash.events.*;
 	import flash.utils.*;
 	
-	import zero.swf.record.RECT;
-
-	public class DataAndBaseInfo{
-		public var FrameSize:RECT;
-		public var FrameRate:Number;//舞台宽高在SWF里是以一个RECT(见 SWF File Format Specification Version 10 第20页 Rectangle record)的结构保存
-		public var offset:int;
+	import zero.swf.tag_body.TagBody;
+	
+	public class DataMark{
+		public static var data:ByteArray;//xml 根节点上的 fileName 对应的 data
 		
-		public function DataAndBaseInfo(){
-			FrameSize=new RECT();
-			FrameRate=1;
+		//public static var keyV:Vector.<String>;
+		public static var defineTagMark:Object;
+		public static function reset():void{
+			//keyV=new Vector.<String>();
+			defineTagMark=new Object();
+			getDefineTag=null;
+		}
+		/*
+		public static function addData(data:ByteArray,key:String):void{
+			//initByXML 时以 key 为标记获取对应的 data
+			if(DataMark[key]){
+			}else{
+				keyV[keyV.length]=key;
+			}
+			DataMark[key]=data;
+		}
+		//*/
+		
+		public static function addDefineTag(tag:Tag,resourceKey:String):void{
+			//目前仅限 DefineObjs toXML 时以 defId 为索引记录对应的 data
+			//trace("defId="+defId,"data.length="+data.length);
+			if(defineTagMark[resourceKey]){
+				throw new Error("重复的 resourceKey: "+resourceKey);
+			}
+			defineTagMark[resourceKey]=tag;
 		}
 		
-		public function initByData(data:ByteArray):void{
-			//获取SWF的宽高帧频
-			
-			offset=FrameSize.initByData(data,0,data.length);
-			//trace(FrameSize.toXML().toXMLString());
-			
-			FrameRate=data[offset++]/256+data[offset++];//帧频是一个Number, 在SWF里以 FIXED8(16-bit 8.8 fixed-point number, 16位8.8定点数) 的结构保存
-		}
-		public function getData(data:ByteArray):void{
-			data.writeBytes(FrameSize.toData());
-			offset=data.length;
-			data[offset++]=FrameRate*256;
-			data[offset++]=FrameRate;
-		}
+		public static var getDefineTag:Function;
 	}
 }
 

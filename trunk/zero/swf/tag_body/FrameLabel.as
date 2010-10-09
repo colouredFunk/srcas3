@@ -44,12 +44,14 @@ package zero.swf.tag_body{
 		public var NamedAnchorflag:int;					//UI8
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+			//#offsetpp
 			var get_str_size:int=0;
 			while(data[offset+(get_str_size++)]){}
 			data.position=offset;
 			Name=data.readUTFBytes(get_str_size);
 			offset+=get_str_size;
 			//#offsetpp
+			
 			if(offset<endOffset){
 				NamedAnchorflag=data[offset++];
 			}
