@@ -126,6 +126,7 @@ package ui {
 			if (_button.hasOwnProperty("aniClip")) {
 				setButtonPlay(_button.aniClip);
 			}
+			buttonCallBack(_button, "$setStyle");
 		}
 		private static function onEnterFrameHandler(_evt:Event):void {
 			buttonTarget = _evt.target;

@@ -3,7 +3,7 @@
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import ui_2.SimpleBtn;
-	import ui_2.Slider
+	import ui_2.Slider;
 	
 	import akdcl.application.flvPlayer.FLVPlayer;
 	import fl.video.VideoState;
