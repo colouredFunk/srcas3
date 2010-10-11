@@ -8,8 +8,6 @@
 	public class Slider extends Btn {
 		public var change:Function;
 
-		
-		public var txt:*;
 		public var thumb:*;
 		public var bar:*;
 		public var maskClip:*;
@@ -116,9 +114,6 @@
 			}
 			if (thumb) {
 				thumb.x = bar.width + bar.x + offXThumb;
-			}
-			if (txt) {
-				txt.text = Math.round(value * 100) + " %";
 			}
 			
 			/*scale = length/(maximum-minimum);

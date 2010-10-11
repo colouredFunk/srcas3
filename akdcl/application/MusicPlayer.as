@@ -14,14 +14,10 @@
 	public class MusicPlayer extends UISprite {
 		public static const WMP_STATE_LIST:Array = ["停止", "暂停", "播放", "向前", "向后", "缓冲", "等待", "完毕", "连接", "就绪"];
 		
-		public static var SOUND_PLAY:String = "soundPlay";
-		public static var SOUND_PAUSE:String = "soundPause";
-		public static var SOUND_STOP:String = "soundStop";
-		public static var SOUND_COMPLETE:String = "soundComplete";
-		public static var SOUND_IDCHANGE:String = "soundIdChange";
-		public static var SOUND_STATE_CHANGE:String = "soundStateChange";
-		public static var PROGRESS:String = "soundLoadProgress";
-		public static var COMPLETE:String = "soundLoadComplete";
+		public static var SOUND_PLAY:String = "play";
+		public static var SOUND_PAUSE:String = "pause";
+		public static var SOUND_STOP:String = "stop";
+		public static var SOUND_IDCHANGE:String = "idChange";
 		
 		public var btn_play:*;
 		public var btn_stop:*;
@@ -263,9 +259,8 @@
 				sound.play(positionRecord);
 			}
 			volume = volume;
-			trace(volume);
 			__playState = SOUND_PLAY;
-			dispatchEvent(new Event(SOUND_STATE_CHANGE));
+			dispatchEvent(new Event(Event.CHANGE));
 			addEventListener(Event.ENTER_FRAME, onSoundPlayProgressHandle);
 		}
 		public function pause():void {
@@ -279,7 +274,7 @@
 				sound.stop();
 			}
 			__playState=SOUND_PAUSE;
-			dispatchEvent(new Event(SOUND_STATE_CHANGE));
+			dispatchEvent(new Event(Event.CHANGE));
 			removeEventListener(Event.ENTER_FRAME, onSoundPlayProgressHandle);
 		}
 		public function stop():void {
@@ -293,7 +288,7 @@
 				sound.stop();
 			}
 			__playState=SOUND_STOP;
-			dispatchEvent(new Event(SOUND_STATE_CHANGE));
+			dispatchEvent(new Event(Event.CHANGE));
 			removeEventListener(Event.ENTER_FRAME, onSoundPlayProgressHandle);
 			onSoundPlayProgressHandle(null);
 		}
@@ -361,7 +356,7 @@
 		}
 		override protected function init():void {
 			super.init();
-			addEventListener(SOUND_STATE_CHANGE, onSoundStageChangeHandle);
+			addEventListener(Event.CHANGE, onSoundStageChangeHandle);
 			__playState = SOUND_STOP;
 			if (btn_play) {
 				btn_play.release = autoPlay;
@@ -431,10 +426,10 @@
 			}
 		}
 		protected function onSoundLoadProgressHandle(_evt:ProgressEvent):void {
-			dispatchEvent(new Event(PROGRESS));
+			dispatchEvent(new Event(_evt.type));
 		}
 		protected function onSoundLoadCompleteHandle(_evt:Event):void {
-			dispatchEvent(new Event(COMPLETE));
+			dispatchEvent(new Event(_evt.type));
 		}
 		protected function onSoundPlayCompleteHandle(_evt:Event):void {
 			switch(repeatMode){
@@ -452,7 +447,7 @@
 					stop();
 					break;
 			}
-			dispatchEvent(new Event(SOUND_COMPLETE));
+			dispatchEvent(new Event(_evt.type));
 		}
 		protected function onSoundStageChangeHandle(_evt:Event):void {
 			switch(playState) {
