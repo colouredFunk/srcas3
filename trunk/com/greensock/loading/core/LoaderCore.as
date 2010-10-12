@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.3
- * DATE: 2010-08-09
+ * VERSION: 1.62
+ * DATE: 2010-10-07
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -19,17 +19,17 @@ package com.greensock.loading.core {
 	import flash.utils.getTimer;
 	
 	/** Dispatched when the loader starts loading. **/
-	[Event(name="open", type="com.greensock.events.LoaderEvent")]
+	[Event(name="open", 	type="com.greensock.events.LoaderEvent")]
 	/** Dispatched each time the <code>bytesLoaded</code> value changes while loading (indicating progress). **/
 	[Event(name="progress", type="com.greensock.events.LoaderEvent")]
 	/** Dispatched when the loader completes. **/
 	[Event(name="complete", type="com.greensock.events.LoaderEvent")]
 	/** Dispatched when the loader is canceled while loading which can occur either because of a failure or when a sibling loader is prioritized in a LoaderMax queue. **/
-	[Event(name="cancel", type="com.greensock.events.LoaderEvent")]
+	[Event(name="cancel", 	type="com.greensock.events.LoaderEvent")]
 	/** Dispatched when the loader fails. **/
-	[Event(name="fail", type="com.greensock.events.LoaderEvent")]
+	[Event(name="fail", 	type="com.greensock.events.LoaderEvent")]
 	/** Dispatched when the loader experiences some type of error, like a SECURITY_ERROR or IO_ERROR. **/
-	[Event(name="error", type="com.greensock.events.LoaderEvent")]
+	[Event(name="error", 	type="com.greensock.events.LoaderEvent")]
 /**
  * Serves as the base class for GreenSock loading tools like <code>LoaderMax, ImageLoader, XMLLoader, SWFLoader</code>, etc. 
  * There is no reason to use this class on its own. Please see the documentation for the other classes.
@@ -41,7 +41,7 @@ package com.greensock.loading.core {
  */	
 	public class LoaderCore extends EventDispatcher {
 		/** @private **/
-		public static const version:Number = 1.3;
+		public static const version:Number = 1.62;
 		
 		/** @private **/
 		protected static var _loaderCount:uint = 0;
@@ -112,7 +112,7 @@ package com.greensock.loading.core {
 		 */
 		public function LoaderCore(vars:Object=null) {
 			this.vars = (vars != null) ? vars : {};
-			this.name = (this.vars.name != undefined && this.vars.name != "") ? this.vars.name : "loader" + (_loaderCount++);
+			this.name = (this.vars.name != undefined && String(this.vars.name) != "") ? this.vars.name : "loader" + (_loaderCount++);
 			_cachedBytesLoaded = 0;
 			_cachedBytesTotal = (uint(this.vars.estimatedBytes) != 0) ? uint(this.vars.estimatedBytes) : LoaderMax.defaultEstimatedBytes;
 			this.autoDispose = Boolean(this.vars.autoDispose == true);
@@ -168,7 +168,9 @@ package com.greensock.loading.core {
 				_status = LoaderStatus.LOADING;
 				_time = time;
 				_load();
-				dispatchEvent(new LoaderEvent(LoaderEvent.OPEN, this));
+				if (this.progress < 1) { //in some cases, an OPEN event should be dispatched, like if load() is called on an empty LoaderMax, it will just dispatch a PROGRESS and COMPLETE event right away. It wouldn't make sense to dispatch an OPEN event right after that.
+					dispatchEvent(new LoaderEvent(LoaderEvent.OPEN, this));
+				}
 			} else if (_status == LoaderStatus.COMPLETED) {
 				_completeHandler(null);
 			}
@@ -291,7 +293,12 @@ package com.greensock.loading.core {
 		 * So even if your LoaderMax hasn't begun loading yet, you could <code>prioritize(false)</code> 
 		 * a loader and it will rise to the top of all LoaderMax instances to which it belongs, but not 
 		 * start loading yet. If the goal is to load something immediately, you can just use the 
-		 * <code>load()</code> method.
+		 * <code>load()</code> method.<br /><br />
+		 * 
+		 * You may use the static <code>LoaderMax.prioritize()</code> method instead and simply pass 
+		 * the name or url of the loader as the first parameter like:<br /><br /><code>
+		 * 
+		 * LoaderMax.prioritize("myLoaderName", true);</code><br /><br />
 		 * 
 		 * @param loadNow If <code>true</code> (the default), the loader will start loading immediately (otherwise it is simply placed at the top the queue in any LoaderMax instances to which it belongs).
 		 * @see #load()
@@ -339,7 +346,7 @@ package com.greensock.loading.core {
 		
 		/** @private **/
 		protected static function _activateClass(type:String, loaderClass:Class, extensions:String):Boolean {
-			_types[type] = loaderClass;
+			_types[type.toLowerCase()] = loaderClass;
 			var a:Array = extensions.split(",");
 			var i:int = a.length;
 			while (--i > -1) {
@@ -356,7 +363,10 @@ package com.greensock.loading.core {
 			if (event is ProgressEvent) {
 				_cachedBytesLoaded = (event as ProgressEvent).bytesLoaded;
 				_cachedBytesTotal = (event as ProgressEvent).bytesTotal;
-				_auditedSize = true;
+				if (!_auditedSize) {
+					_auditedSize = true;
+					dispatchEvent(new Event("auditedSize"));
+				}
 			}
 			if (_dispatchProgress && _status == LoaderStatus.LOADING && _cachedBytesLoaded != _cachedBytesTotal) { 
 				dispatchEvent(new LoaderEvent(LoaderEvent.PROGRESS, this));

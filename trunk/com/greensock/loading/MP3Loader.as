@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.31
- * DATE: 2010-08-12
+ * VERSION: 1.6
+ * DATE: 2010-10-02
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -16,14 +16,6 @@ package com.greensock.loading {
 	import flash.media.SoundLoaderContext;
 	import flash.media.SoundTransform;
 	
-	/** Dispatched when the sound finishes playing all the way to the end. **/
-	[Event(name="soundComplete", type="com.greensock.loading.MP3Loader")]
-	/** Dispatched when the sound pauses due to a <code>pauseSound()</code> call or changing the <code>soundPaused</code> property to <code>true</code>. **/
-	[Event(name="soundPause", type="com.greensock.loading.MP3Loader")]
-	/** Dispatched when the sound plays due to a <code>playSound()</code> call or changing the <code>soundPaused</code> property to <code>false</code> or when <code>autoPlay</code> is <code>true</code> and the sound beings playing after enough has been loaded into the buffer. **/
-	[Event(name="soundPlay", type="com.greensock.loading.MP3Loader")]
-	/** Dispatched when progress is made during playback (only dispatched while the sound is playing). **/
-	[Event(name="playProgress", type="com.greensock.loading.MP3Loader")]
 /**
  * Loads an MP3 audio file and also provides convenient playback methods 
  * and properties like <code>pauseSound(), playSound(), gotoSoundTime(), playProgress, volume, 
@@ -40,6 +32,7 @@ package com.greensock.loading {
  * 		<li><strong> autoPlay : Boolean</strong> - By default the MP3 will begin playing immediately when enough of the file has buffered, but to prevent it from autoPlaying, set <code>autoPlay</code> to <code>false</code>.</li>
  * 		<li><strong> repeat : int</strong> - Number of times that the mp3 should repeat. To repeat indefinitely, use -1. Default is 0.</li>
  * 		<li><strong> volume : Number</strong> - A value between 0 and 1 indicating the volume at which the sound should play when the MP3Loader's controls are used to play the sound, like <code>playSound()</code> or when <code>autoPlay</code> is <code>true</code> (default volume is 1).</li>
+ * 		<li><strong> initThreshold : uint</strong> - The minimum number of <code>bytesLoaded</code> to wait for before the <code>LoaderEvent.INIT</code> event is dispatched - the higher the number the more accurate the <code>duration</code> estimate will be when the INIT event is dispatched (the default value is 102400 which is 100k). The MP3's duration cannot be determined with 100% accuracy until it has completely loaded, but it is estimated with more and more accuracy as the file loads.</code>.</li>
  * 		<li><strong> alternateURL : String</strong> - If you define an <code>alternateURL</code>, the loader will initially try to load from its original <code>url</code> and if it fails, it will automatically (and permanently) change the loader's <code>url</code> to the <code>alternateURL</code> and try again. Think of it as a fallback or backup <code>url</code>. It is perfectly acceptable to use the same <code>alternateURL</code> for multiple loaders (maybe a default image for various ImageLoaders for example).</li>
  * 		<li><strong> context : SoundLoaderContext</strong> - To control things like the buffer time and whether or not a policy file is checked, define a <code>SoundLoaderContext</code> object. The default context is null. See Adobe's SoundLoaderContext documentation for details.</li>
  * 		<li><strong> noCache : Boolean</strong> - If <code>noCache</code> is <code>true</code>, a "cacheBusterID" parameter will be appended to the url with a random set of numbers to prevent caching (don't worry, this info is ignored when you <code>getLoader()</code> or <code>getContent()</code> by url and when you're running locally)</li>
@@ -49,7 +42,7 @@ package com.greensock.loading {
  * 		
  * 		<br /><br />----EVENT HANDLER SHORTCUTS----</li>
  * 		<li><strong> onOpen : Function</strong> - A handler function for <code>LoaderEvent.OPEN</code> events which are dispatched when the loader begins loading. Make sure your onOpen function accepts a single parameter of type <code>LoaderEvent</code> (<code>com.greensock.events.LoaderEvent</code>).</li>
- * 		<li><strong> onInit : Function</strong> - A handler function for <code>LoaderEvent.INIT</code> events which will be dispatched when the MP3 has streamed enough of its content to identify the ID3 meta data. Make sure your onInit function accepts a single parameter of type <code>LoaderEvent</code> (<code>com.greensock.events.LoaderEvent</code>).</li>
+ * 		<li><strong> onInit : Function</strong> - A handler function for <code>Event.INIT</code> events which will be dispatched when the <code>bytesLoaded</code> exceeds the <code>initThreshold</code> (100k by default) and the MP3 has streamed enough of its content to identify the ID3 meta data. Make sure your onInit function accepts a single parameter of type <code>LoaderEvent</code> (<code>com.greensock.events.LoaderEvent</code>).</li>
  * 		<li><strong> onProgress : Function</strong> - A handler function for <code>LoaderEvent.PROGRESS</code> events which are dispatched whenever the <code>bytesLoaded</code> changes. Make sure your onProgress function accepts a single parameter of type <code>LoaderEvent</code> (<code>com.greensock.events.LoaderEvent</code>). You can use the LoaderEvent's <code>target.progress</code> to get the loader's progress value or use its <code>target.bytesLoaded</code> and <code>target.bytesTotal</code>.</li>
  * 		<li><strong> onComplete : Function</strong> - A handler function for <code>LoaderEvent.COMPLETE</code> events which are dispatched when the loader has finished loading successfully. Make sure your onComplete function accepts a single parameter of type <code>LoaderEvent</code> (<code>com.greensock.events.LoaderEvent</code>).</li>
  * 		<li><strong> onCancel : Function</strong> - A handler function for <code>LoaderEvent.CANCEL</code> events which are dispatched when loading is aborted due to either a failure or because another loader was prioritized or <code>cancel()</code> was manually called. Make sure your onCancel function accepts a single parameter of type <code>LoaderEvent</code> (<code>com.greensock.events.LoaderEvent</code>).</li>
@@ -149,7 +142,11 @@ package com.greensock.loading {
 		protected var _duration:Number;
 		/** @private Improves performance **/
 		protected var _dispatchPlayProgress:Boolean;
+		/** @private -1 = not initted, no ID3 data, 0 = received ID3 data, 1 = fully initted **/
+		protected var _initPhase:int;
 		
+		/** The minimum number of <code>bytesLoaded</code> to wait for before the <code>LoaderEvent.INIT</code> event is dispatched - the higher the number the more accurate the <code>duration</code> estimate will be when the INIT event is dispatched (the default value is 102400 which is 100k). The MP3's duration cannot be determined with 100% accuracy until it has completely loaded, but it is estimated with more and more accuracy as the file loads. **/
+		public var initThreshold:uint;
 		/** The SoundChannel object that results from the most recent <code>playSound()</code> call (or when <code>autoPlay</code> is <code>true</code> in the constructor's <code>vars</code> parameter). Typically there isn't much reason to use this directly. Instead, use the MP3Loader's controls like <code>playSound(), pauseSound(), gotoSoundTime(), playProgress, duration, soundTime</code>, etc. **/
 		public var channel:SoundChannel;
 		
@@ -166,6 +163,7 @@ package com.greensock.loading {
 		 * 		<li><strong> autoPlay : Boolean</strong> - By default the MP3 will begin playing immediately when enough of the file has buffered, but to prevent it from autoPlaying, set <code>autoPlay</code> to <code>false</code>.</li>
 		 * 		<li><strong> repeat : int</strong> - Number of times that the mp3 should repeat. To repeat indefinitely, use -1. Default is 0.</li>
 		 * 		<li><strong> volume : Number</strong> - A value between 0 and 1 indicating the volume at which the sound should play (default is 1).</li>
+		 * 		<li><strong> initThreshold : uint</strong> - The minimum number of <code>bytesLoaded</code> to wait for before the <code>LoaderEvent.INIT</code> event is dispatched - the higher the number the more accurate the <code>duration</code> estimate will be when the INIT event is dispatched (the default value is 102400 which is 100k). The MP3's duration cannot be determined with 100% accuracy until it has completely loaded, but it is estimated with more and more accuracy as the file loads.</code>.</li>
 		 * 		<li><strong> alternateURL : String</strong> - If you define an <code>alternateURL</code>, the loader will initially try to load from its original <code>url</code> and if it fails, it will automatically (and permanently) change the loader's <code>url</code> to the <code>alternateURL</code> and try again. Think of it as a fallback or backup <code>url</code>. It is perfectly acceptable to use the same <code>alternateURL</code> for multiple loaders (maybe a default image for various ImageLoaders for example).</li>
 		 * 		<li><strong> context : SoundLoaderContext</strong> - To control things like the buffer time and whether or not a policy file is checked, define a <code>SoundLoaderContext</code> object. The default context is null. See Adobe's SoundLoaderContext documentation for details.</li>
 		 * 		<li><strong> noCache : Boolean</strong> - If <code>noCache</code> is <code>true</code>, a "cacheBusterID" parameter will be appended to the url with a random set of numbers to prevent caching (don't worry, this info is ignored when you <code>getLoader()</code> or <code>getContent()</code> by url and when you're running locally)</li>
@@ -175,7 +173,7 @@ package com.greensock.loading {
 		 * 		
 		 * 		<br /><br />----EVENT HANDLER SHORTCUTS----</li>
 		 * 		<li><strong> onOpen : Function</strong> - A handler function for <code>LoaderEvent.OPEN</code> events which are dispatched when the loader begins loading. Make sure your onOpen function accepts a single parameter of type <code>LoaderEvent</code> (<code>com.greensock.events.LoaderEvent</code>).</li>
-		 * 		<li><strong> onInit : Function</strong> - A handler function for <code>Event.INIT</code> events which will be dispatched when the MP3 has streamed enough of its content to identify the ID3 meta data. Make sure your onInit function accepts a single parameter of type <code>LoaderEvent</code> (<code>com.greensock.events.LoaderEvent</code>).</li>
+		 * 		<li><strong> onInit : Function</strong> - A handler function for <code>Event.INIT</code> events which will be dispatched when the <code>bytesLoaded</code> exceeds the <code>initThreshold</code> (100k by default) and the MP3 has streamed enough of its content to identify the ID3 meta data. Make sure your onInit function accepts a single parameter of type <code>LoaderEvent</code> (<code>com.greensock.events.LoaderEvent</code>).</li>
 		 * 		<li><strong> onProgress : Function</strong> - A handler function for <code>LoaderEvent.PROGRESS</code> events which are dispatched whenever the <code>bytesLoaded</code> changes. Make sure your onProgress function accepts a single parameter of type <code>LoaderEvent</code> (<code>com.greensock.events.LoaderEvent</code>). You can use the LoaderEvent's <code>target.progress</code> to get the loader's progress value or use its <code>target.bytesLoaded</code> and <code>target.bytesTotal</code>.</li>
 		 * 		<li><strong> onComplete : Function</strong> - A handler function for <code>LoaderEvent.COMPLETE</code> events which are dispatched when the loader has finished loading successfully. Make sure your onComplete function accepts a single parameter of type <code>LoaderEvent</code> (<code>com.greensock.events.LoaderEvent</code>).</li>
 		 * 		<li><strong> onCancel : Function</strong> - A handler function for <code>LoaderEvent.CANCEL</code> events which are dispatched when loading is aborted due to either a failure or because another loader was prioritized or <code>cancel()</code> was manually called. Make sure your onCancel function accepts a single parameter of type <code>LoaderEvent</code> (<code>com.greensock.events.LoaderEvent</code>).</li>
@@ -192,6 +190,7 @@ package com.greensock.loading {
 			_duration = 0;
 			_soundPaused = true;
 			_soundTransform = new SoundTransform(("volume" in this.vars) ? this.vars.volume : 1);
+			this.initThreshold = ("initThreshold" in this.vars) ? uint(this.vars.initThreshold) : 102400;
 			_initSound();
 		}
 		
@@ -208,6 +207,7 @@ package com.greensock.loading {
 				_sound.removeEventListener("ioError", _failHandler);
 				_sound.removeEventListener(Event.ID3, _id3Handler);
 			}
+			_initPhase = -1;
 			_sound = _content = new Sound();
 			_sound.addEventListener(ProgressEvent.PROGRESS, _progressHandler, false, 0, true);
 			_sound.addEventListener(Event.COMPLETE, _completeHandler, false, 0, true);
@@ -220,6 +220,7 @@ package com.greensock.loading {
 			_context = (this.vars.context is SoundLoaderContext) ? this.vars.context : new SoundLoaderContext(3000);
 			_prepRequest();
 			_soundComplete = false;
+			_initPhase = -1;
 			_position = 0;
 			_duration = 0;
 			try {
@@ -228,7 +229,7 @@ package com.greensock.loading {
 					playSound();
 				}
 			} catch (error:Error) {
-				this._errorHandler(new LoaderEvent(LoaderEvent.ERROR, this, error.message));
+				_errorHandler(new LoaderEvent(LoaderEvent.ERROR, this, error.message));
 			}
 		}
 		
@@ -315,8 +316,21 @@ package com.greensock.loading {
 		
 		/** @private **/
 		protected function _id3Handler(event:Event):void {
-			_duration = _sound.length / 1000;
-			dispatchEvent(new LoaderEvent(LoaderEvent.INIT, this));
+			if (_sound.bytesLoaded > this.initThreshold) {
+				_initPhase = 1;
+				dispatchEvent(new LoaderEvent(LoaderEvent.INIT, this));
+			} else {
+				_initPhase = 0;
+			}
+		}
+		
+		/** @private **/
+		override protected function _progressHandler(event:Event):void {
+			if (_initPhase == 0 && _sound.bytesLoaded > this.initThreshold) {
+				_initPhase = 1;
+				dispatchEvent(new LoaderEvent(LoaderEvent.INIT, this));
+			}
+			super._progressHandler(event);
 		}
 		
 		/** @private **/
@@ -346,6 +360,10 @@ package com.greensock.loading {
 		/** @private **/
 		override protected function _completeHandler(event:Event=null):void {
 			_duration = _sound.length / 1000;
+			if (_initPhase != 1) {
+				_initPhase = 1;
+				dispatchEvent(new LoaderEvent(LoaderEvent.INIT, this));
+			}
 			super._completeHandler(event);
 		}
 		
@@ -406,10 +424,10 @@ package com.greensock.loading {
 			gotoSoundTime(value, !_soundPaused);
 		}
 		
-		/** The duration (in seconds) of the sound. This value is only accurate AFTER the metaData has been received and the <code>INIT</code> event has been dispatched. **/
+		/** The duration (in seconds) of the sound. This value cannot be determined with 100% accuracy until the file has completely loaded, but it is estimated with more and more accuracy as the file loads. **/
 		public function get duration():Number {
-			if (_duration == 0) {
-				_duration = _sound.length / 1000;
+			if (_sound.bytesLoaded < _sound.bytesTotal) {
+				_duration = (_sound.length / 1000) / (_sound.bytesLoaded / _sound.bytesTotal);
 			}
 			return _duration;
 		}

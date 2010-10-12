@@ -1,6 +1,6 @@
 /**
- * VERSION: 0.9
- * DATE: 2010-08-09
+ * VERSION: 0.91
+ * DATE: 2010-09-10
  * AS3
  * UPDATES AND DOCUMENTATION AT: http://www.GreenSock.com/LoaderMax/
  **/
@@ -49,7 +49,8 @@ package com.greensock.loading.data {
 		private static var _vars:Array = ["autoPlay",
 										  "repeat",
 										  "volume",
-										  "context"];
+										  "context",
+										  "initThreshold"];
 		
 		/** By default the MP3 will begin playing immediately when enough of the file has buffered, but to prevent it from autoPlaying, set <code>autoPlay</code> to <code>false</code>. **/
 		public var autoPlay:Boolean = true;
@@ -59,6 +60,8 @@ package com.greensock.loading.data {
  		public var volume:Number = 1;
 		/** To control things like the buffer time and whether or not a policy file is checked, define a <code>SoundLoaderContext</code> object. The default context is null. See Adobe's SoundLoaderContext documentation for details. **/
  		public var context:SoundLoaderContext;
+		/** The minimum number of <code>bytesLoaded</code> to wait for before the <code>LoaderEvent.INIT</code> event is dispatched - the higher the number the more accurate the <code>duration</code> estimate will be when the INIT event is dispatched (the default value is 102400 which is 100k). The MP3's duration cannot be determined with 100% accuracy until it has completely loaded, but it is estimated with more and more accuracy as the file loads. **/
+		public var initThreshold:uint = 102400;
 		
 		/**
 		 * Constructor 
