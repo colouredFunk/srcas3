@@ -36,7 +36,7 @@ package com.greensock.loading.data {
  *		var loader:DataLoader = new DataLoader("getData.php", new DataLoaderVars("myData", 1500, "text", completeHandler, progressHandler) );<br /><br /></code>
  *		
  * <strong>NOTE:</strong> Using DataLoaderVars is completely optional. If you prefer the shorter synatax with the generic Object, feel
- * free to use it. The purpose of this class is simply to enable code hinting and to allow for strict datatyping. <br /><br />
+ * free to use it. The purpose of this class is simply to enable code hinting and to allow for strict data typing. <br /><br />
  * 
  * <b>Copyright 2010, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
  * 

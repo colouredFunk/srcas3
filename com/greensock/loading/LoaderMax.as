@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.4
- * DATE: 2010-09-01
+ * VERSION: 1.63
+ * DATE: 2010-10-08
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -13,26 +13,27 @@ package com.greensock.loading {
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
+	import flash.net.URLRequest;
 	import flash.utils.Dictionary;
 	
 	/** Dispatched when any child of the LoaderMax instance starts loading. So if a LoaderMax contains 5 loaders, the CHILD_OPEN event will be dispatched 5 times during the course of the LoaderMax's load. This can occur even if the LoaderMax itself isn't in the process of loading (because load() or prioritize() could have been called directly on a child loader) **/
-	[Event(name="childOpen", type="com.greensock.events.LoaderEvent")]
+	[Event(name="childOpen", 			type="com.greensock.events.LoaderEvent")]
 	/** Dispatched when any child of the LoaderMax instance dispatches a PROGRESS event. This can occur even if the LoaderMax itself isn't in the process of loading (because load() or prioritize() could have been called directly on a child loader) **/
-	[Event(name="childProgress", type="com.greensock.events.LoaderEvent")]
+	[Event(name="childProgress", 		type="com.greensock.events.LoaderEvent")]
 	/** Dispatched when any child of the LoaderMax instance completes. So if a LoaderMax contains 5 loaders, the CHILD_COMPLETE event will be dispatched 5 times during the course of the LoaderMax's load. This can occur even if the LoaderMax itself isn't in the process of loading (because load() or prioritize() could have been called directly on a child loader) **/
-	[Event(name="childComplete", type="com.greensock.events.LoaderEvent")]
+	[Event(name="childComplete", 		type="com.greensock.events.LoaderEvent")]
 	/** Dispatched when any child of the LoaderMax instance fails to load. This occurs even if the LoaderMax itself isn't in the process of loading (because load() or prioritize() could have been called directly on a child loader) **/
-	[Event(name="childFail", type="com.greensock.events.LoaderEvent")]
+	[Event(name="childFail", 			type="com.greensock.events.LoaderEvent")]
 	/** Dispatched when any child of the LoaderMax instance dispatches a CANCEL event which could occur when another child is prioritized in the queue or when the LoaderMax is canceled while loading the child. CHILD_CANCEL can be dispatched even if the LoaderMax itself isn't in the process of loading (because load() or prioritize() could have been called directly on a child loader) **/
-	[Event(name="childCancel", type="com.greensock.events.LoaderEvent")]
+	[Event(name="childCancel", 			type="com.greensock.events.LoaderEvent")]
 	/** Dispatched when any child of the LoaderMax instance dispatches a SCRIPT_ACCESS_DENIED event. This can occur even if the LoaderMax itself isn't in the process of loading (because load() or prioritize() could have been called directly on a child loader) **/
-	[Event(name="scriptAccessDenied", type="com.greensock.events.LoaderEvent")]
+	[Event(name="scriptAccessDenied", 	type="com.greensock.events.LoaderEvent")]
 	/** Dispatched when any child of the LoaderMax instance dispatches an HTTP_STATUS event. This can occur even if the LoaderMax itself isn't in the process of loading (because load() or prioritize() could have been called directly on a child loader) **/
-	[Event(name="httpStatus", type="com.greensock.events.LoaderEvent")]
+	[Event(name="httpStatus", 			type="com.greensock.events.LoaderEvent")]
 	/** Dispatched when any child of the LoaderMax instance dispatches an IO_ERROR event. This can occur even if the LoaderMax itself isn't in the process of loading (because load() or prioritize() could have been called directly on a child loader) **/
-	[Event(name="ioError", type="com.greensock.events.LoaderEvent")]
+	[Event(name="ioError", 				type="com.greensock.events.LoaderEvent")]
 	/** Dispatched when any child of the LoaderMax instance dispatches a SECURITY_ERROR event. This can occur even if the LoaderMax itself isn't in the process of loading (because load() or prioritize() could have been called directly on a child loader) **/
-	[Event(name="securityError", type="com.greensock.events.LoaderEvent")]
+	[Event(name="securityError", 		type="com.greensock.events.LoaderEvent")]
 /**
  * In its simplest form, a LoaderMax provides a way to group a sequence of loaders together and 
  * report their progress as a whole. It is essentially a queue of loaders. But there are many other 
@@ -142,7 +143,7 @@ function errorHandler(event:LoaderEvent):void {
  */	
 	public class LoaderMax extends LoaderCore {		
 		/** @private **/
-		public static const version:Number = 1.4;
+		public static const version:Number = 1.63;
 		/** The default value that will be used for the <code>estimatedBytes</code> on loaders that don't declare one in the <code>vars</code> parameter of the constructor. **/
 		public static var defaultEstimatedBytes:uint = 20000;
 		/** Controls the default value of <code>auditSize</code> in LoaderMax instances (normally <code>true</code>). For most situations, the auditSize feature is very convenient for ensuring that the overall progress of LoaderMax instances is reported accurately, but when working with very large quantities of files that have no <code>estimatedBytes</code> defined, some developers prefer to turn auditSize off by default. Of course you can always override the default for individual LoaderMax instances by defining an <code>auditSize</code> value in the <code>vars</code> parameter of the constructor. **/
@@ -215,8 +216,8 @@ function errorHandler(event:LoaderEvent):void {
 		 * Analyzes a url or array of urls and attempts to automatically create the appropriate loader(s) based
 		 * on file extension(s) in the url(s), returning either an individual loader like an ImageLoader, 
 		 * SWFLoader, XMLLoader, etc or if an array is passed in, a LoaderMax will be returned containing
-		 * a child for each parsed url in the array. Arrays may also contain loader instances (not just url Strings).
-		 * For example:<br />
+		 * a child for each parsed url (or URLRequest) in the array. Arrays may also contain LoaderCore instances 
+		 * (not just url Strings). For example:<br />
 		 * @example Single loader example:<listing version="3.0">
 import com.greensock.loading.~~;
 import com.greensock.loading.core.~~;
@@ -239,7 +240,6 @@ function completeHandler(event:LoaderEvent):void {
 		 * and add the necessary children based on the contents of the array:<br />
 		 * @example Array example:<listing version="3.0">
 import com.greensock.loading.~~;
-import com.greensock.loading.core.~~;
 import com.greensock.events.LoaderEvent;
  
 //activate the necessary loaders so that their file extensions can be recognized (do this once)
@@ -258,20 +258,22 @@ function completeHandler(event:LoaderEvent):void {
 }
  </listing>
 		 * 
-		 * @param data A String or an array of Strings (and/or loader instances) to parse.
+		 * @param data A String or an array of Strings (and/or LoaderCore instances and/or URLRequest instances) to parse.
 		 * @param vars The <code>vars</code> object to pass the loader's constructor. If <code>data</code> is an array, this <code>vars</code> will be passed to the LoaderMax instance that gets created, and no <code>vars</code> object will be passed to the child loaders that get created.
-		 * @return If <code>data</code> is an array, <code>parse()</code> will return a LoaderMax. Otherwise, it will return the appropriate loader based on the file extension found in the URL.
+		 * @param childrenVars The <code>vars</code> object that will be passed to each child loader's constructor (only applicable when the <code>data</code> parameter is an array which means <code>parse()</code> will return a LoaderMax). For example, if you <code>parse()</code> and array of video urls and want <code>autoPlay</code> set to <code>false</code> for all of them, you'd do <code>LoaderMax.parse(["1.flv","2.f4v","3.mp4"], null, {autoPlay:false});</code>. 
+		 * @return If <code>data</code> is an array, <code>parse()</code> will return a LoaderMax. Otherwise, it will return the appropriate loader based on the file extension found in the URL. In any case, the object returned will be a <code>LoaderCore</code> object (all LoaderMax loaders extend LoaderCore, so if you need to datatype your object use <code>com.greensock.loading.core.LoaderCore</code>). The return value is typed as "*" in order to avoid compiler errors when developers forget to cast ther objects like <code>var image:ImageLoader = LoaderMax.parse("photo.jpg") as ImageLoader</code>
 		 */
-		public static function parse(data:*, vars:Object=null):LoaderCore {
+		public static function parse(data:*, vars:Object=null, childrenVars:Object=null):* {
 			if (data is Array) {
 				var queue:LoaderMax = new LoaderMax(vars);
 				var l:int = data.length;
 				for (var i:int = 0; i < l; i++) {
-					queue.append(LoaderMax.parse(data[i]));
+					queue.append(LoaderMax.parse(data[i], childrenVars));
 				}
 				return queue;
-			} else if (data is String) {
-				var s:String = data.toLowerCase().split("?")[0];
+			} else if (data is String || data is URLRequest) {
+				var s:String = (data is String) ? data : URLRequest(data).url;
+				s = s.toLowerCase().split("?")[0];
 				s = s.substr(s.lastIndexOf(".") + 1);
 				if (s in _extensions) {
 					return new _extensions[s](data, vars);
@@ -617,9 +619,13 @@ function completeHandler(event:LoaderEvent):void {
 		}
 		
 		/**
-		 * Finds a loader inside the LoaderMax based on its name or url. For example:<br /><br /><code>
+		 * Finds a loader based on its name or url. For example:<br /><br /><code>
 		 * 
-		 * var loader:ImageLoader = queue.getLoader("myPhoto1") as ImageLoader;<br /><br /></code>
+		 * var loader:ImageLoader = queue.getLoader("myPhoto1");<br /><br /></code>
+		 * 
+		 * Feel free to use the static <code>LoaderMax.getLoader()</code> method instead of the instance-based <code>getLoader()</code>
+		 * method because the static one will search ALL loaders (the only exception being loaders in a different security
+		 * sandbox, like in subloaded swfs from a different domain that didn't have a crossdomain.xml file in place granting permission). 
 		 * 
 		 * @param nameOrURL The name or url associated with the loader that should be found.
 		 * @return The loader associated with the name or url.
@@ -645,9 +651,13 @@ function completeHandler(event:LoaderEvent):void {
 		}
 		
 		/**
-		 * Finds the content of a loader inside the LoaderMax based on its name or url. For example:<br /><br /><code>
+		 * Finds the content of a loader based on its name or url. For example:<br /><br /><code>
 		 * 
 		 * var image:Bitmap = queue.getContent("myPhoto1");<br /><br /></code>
+		 * 
+		 * Feel free to use the static <code>LoaderMax.getContent()</code> method instead of the instance-based <code>getContent()</code>
+		 * method because the static one will search ALL loaders (the only exception being loaders in a different security
+		 * sandbox, like in subloaded swfs from a different domain that didn't have a crossdomain.xml file in place granting permission). 
 		 * 
 		 * @param nameOrURL The name or url associated with the loader whose content should be found.
 		 * @return The content that was loaded by the loader which varies by the type of loader:
@@ -816,13 +826,17 @@ function completeHandler(event:LoaderEvent):void {
 //---- STATIC METHODS ----------------------------------------------------------------------------
 		
 		/**
-		 * Activates particular loader classes so that they can be utilized by dynamically-loaded content
-		 * (only necessary if XMLLoader needs to recognize nodes like <code>&lt;LoaderMax&gt;, &lt;ImageLoader&gt;,
-		 * &lt;SWFLoader&gt;</code>, etc. inside an XML file and dynamically create instances). 
-		 * You only need to activate the loader classes once in your swf. 
+		 * Activates particular loader classes (like ImageLoader, SWFLoader, etc.) so that they can be 
+		 * recognized inside the <code>parse()</code> method and XMLLoader. For example, if <code>LoaderMax.parse("image.jpg")</code>
+		 * is called without first activating ImageLoader (like <code>LoaderMax.activate([ImageLoader])</code>),
+		 * it wouldn't properly recognize the ".jpg" extension and return the necessary ImageLoader instance. Likewise,
+		 * without activating ImageLoader first, XMLLoader wouldn't be able to recognize <code>&lt;ImageLoader&gt;</code>
+		 * nodes nested inside an XML file. You only need to activate() the loader classes once in your swf. 
 		 * For example:<br /><br /><code>
 		 * 
 		 * LoaderMax.activate([ImageLoader, SWFLoader, MP3Loader, DataLoader, CSSLoader]);</code><br /><br />
+		 * 
+		 * The reason all loaders aren't activated by default is to conserve file size. <br /><br />
 		 * 
 		 * @param loaderClasses An array of loader classes, like <code>[ImageLoader, SWFLoader, MP3Loader]</code>.
 		 */
@@ -905,7 +919,7 @@ function completeHandler(event:LoaderEvent):void {
 		
 //---- GETTERS / SETTERS -------------------------------------------------------------------------
 		
-		/** Number of child loaders currently contained in the LoaderMax instance (does not include deeply nested loaders - only children). **/
+		/** Number of child loaders currently contained in the LoaderMax instance (does not include deeply nested loaders - only children). To get the quantity of all children including nested ones, use <code>getChildren(true, true).length</code> @see #getChildren() **/
 		public function get numChildren():uint {
 			return _loaders.length;
 		}
@@ -952,28 +966,32 @@ function completeHandler(event:LoaderEvent):void {
 		}
 		
 		/** 
-		 * A value between 0 and 1 indicating the overall loading progress of the LoaderMax based solely on the ratio of child loaders that have 
-		 * completed loading compared to those that haven't - this calculation does not concern itself whatsoever with <code>bytesLoaded</code>
-		 * and <code>bytesTotal</code>. Therefore, <code>steppedProgress</code> is a more crude way of measuring the overall loading progress
-		 * and isn't weighted in terms of file size the way that <code>progress</code> is. The only benefit of using <code>steppedProgress</code>
-		 * instead of <code>progress</code> is that there is never a risk of the value moving backwards the way it can with <code>progress</code>
-		 * when child loaders have inaccurately low estimatedBytes (before LoaderMax audits the file size values). <br /><br />
+		 * An unweighted value between 0 and 1 indicating the overall loading progress of the LoaderMax - this calculation does not concern 
+		 * itself whatsoever with <code>bytesLoaded</code> and <code>bytesTotal</code> but rather the ratio of the children that are loaded
+		 * (all having equal weight). Therefore, <code>rawProgress</code> is a more crude way of measuring the overall loading progress and 
+		 * isn't weighted in terms of file size the way that <code>progress</code> is. The only benefit of using <code>rawProgress</code> instead 
+		 * of <code>progress</code> is that there is never a risk of the value moving backwards the way it can with <code>progress</code> 
+		 * when child loaders have inaccurately low estimatedByte values (before LoaderMax audits the file size values). The rate at which
+		 * <code>rawProgress</code> increases may slow down or speed up depending on the file size of the asset currently loading. For example,
+		 * if a LoaderMax contains two loaders, the first for a file that's 100k and the second for a file that's 10,000k, <code>rawProgress</code>
+		 * will move quickly (while loading the 100k file) until it reaches 0.5 and then slow down significantly (while loading the 10,000k file) 
+		 * until it reaches 1. <br /><br />
 		 * 
-		 * For example, let's say you have a LoaderMax that contains 3 ImageLoaders: the first two must load images that are 25k each and the 
+		 * Or let's say you have a LoaderMax that contains 3 ImageLoaders: the first two must load images that are 25k each and the 
 		 * 3rd one must load an image that's 450k. After the first two ImageLoaders finish, the LoaderMax's <code>progress</code> property would 
-		 * report 0.1 (50k loaded out of 500k total) whereas the <code>steppedProgress</code> would report 0.66 (2 loaders out of 3 total have completed). 
-		 * <code>steppedProgress</code> will also "jump" more because the value will only change each time a child loader completes whereas
-		 * <code>progress</code> gets updated much more frequently since it is based on <code>bytesLoaded</code> and <code>bytesTotal</code>.
+		 * report 0.1 (50k loaded out of 500k total) whereas the <code>rawProgress</code> would report 0.66 (2 loaders out of 3 total have completed). 
 		 * However, if you set the <code>estimatedBytes</code> of all of the ImageLoaders in this example to 25600 (25k) and set the LoaderMax's 
 		 * <code>auditSize</code> to <code>false</code>, the <code>progress</code> would read about 0.66 after the first two ImageLoaders complete
 		 * (it still thinks they're all 25k) and then when the 3rd one starts loading and LoaderMax finds out that it's 450k, the <code>bytesTotal</code> 
-		 * would adjust and the <code>progress</code> would jump backwards to 0.1. Of course a solution would be to more accurately set the 
-		 * <code>estimatedBytes</code> and/or leave <code>auditSize true</code> in the LoaderMax, but <code>steppedProgress</code> can be useful 
-		 * if those solutions are problematic for you and you prefer to avoid any backwards adjustment of a preloader progress bar or some other 
-		 * interface element.<br /><br />
+		 * would automatically adjust and the <code>progress</code> would jump backwards to 0.1 (which correctly reflects the weighted progress). 
+		 * Of course a solution would be to more accurately set the <code>estimatedBytes</code> and/or leave <code>auditSize true</code> in the 
+		 * LoaderMax, but <code>rawProgress</code> can be useful if those solutions are undesirable in your scenario and you need to avoid any
+		 * backwards adjustment of a preloader progress bar or some other interface element.<br /><br />
+		 * 
+		 * @see #progress
 		 **/
-		public function get steppedProgress():Number {
-			var loaded:uint = 0;
+		public function get rawProgress():Number {
+			var loaded:Number = 0;
 			var total:uint = 0;
 			var status:int;
 			var i:int = _loaders.length;
@@ -981,9 +999,7 @@ function completeHandler(event:LoaderEvent):void {
 				status = LoaderCore(_loaders[i]).status;
 				if (status != LoaderStatus.DISPOSED && !(status == LoaderStatus.PAUSED && this.skipPaused) && !(status == LoaderStatus.FAILED && this.skipFailed)) {
 					total++;
-					if (status == LoaderStatus.COMPLETED) {
-						loaded++;
-					}
+					loaded += LoaderCore(_loaders[i]).progress;
 				}
 			}
 			return (total == 0) ? 0 : loaded / total;
