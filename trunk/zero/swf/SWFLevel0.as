@@ -224,6 +224,8 @@ package zero.swf{
 			newData=new ByteArray();
 			dataAndBaseInfo.getData(newData);
 			newData.position=newData.length;
+			
+			infos2Tags();
 		}
 		
 		public function toSWFData2(progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
@@ -310,6 +312,8 @@ package zero.swf{
 			
 			FrameRate=Number(xml.@FrameRate.toString());
 			dataAndTags.initByXML(xml.tags[0]);
+			
+			tags2Infos();
 		}
 		public function initByXML2(xml:XML,progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
 			type=xml.@type.toString();
@@ -317,12 +321,23 @@ package zero.swf{
 			initFrameSizeByXML(xml);
 			
 			FrameRate=Number(xml.@FrameRate.toString());
+			
+			progress_finished=_progress_finished;
+			
 			dataAndTags.initByXML2(
 				xml.tags[0],
 				progress_start,
 				progress_progress,
-				_progress_finished
+				initByXMLL2_finished
 			);
+		}
+		private function initByXMLL2_finished():void{
+			var _progress_finished:Function=progress_finished;
+			progress_finished=null;
+			
+			tags2Infos();
+			
+			_progress_finished();
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 		

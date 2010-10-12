@@ -18,10 +18,10 @@ package zero.swf{
 		public static var data:ByteArray;//xml 根节点上的 fileName 对应的 data
 		
 		//public static var keyV:Vector.<String>;
-		public static var defineTagMark:Object;
+		public static var resourceV:Vector.<Object>;
 		public static function reset():void{
 			//keyV=new Vector.<String>();
-			defineTagMark=new Object();
+			resourceV=new Vector.<Object>();
 			getDefineTag=null;
 		}
 		/*
@@ -35,13 +35,8 @@ package zero.swf{
 		}
 		//*/
 		
-		public static function addDefineTag(tag:Tag,resourceKey:String):void{
-			//目前仅限 DefineObjs toXML 时以 defId 为索引记录对应的 data
-			//trace("defId="+defId,"data.length="+data.length);
-			if(defineTagMark[resourceKey]){
-				throw new Error("重复的 resourceKey: "+resourceKey);
-			}
-			defineTagMark[resourceKey]=tag;
+		public static function toXML_addResource(tag:Tag,bodyXML:XML):void{
+			resourceV[resourceV.length]={tag:tag,bodyXML:bodyXML};
 		}
 		
 		public static var getDefineTag:Function;

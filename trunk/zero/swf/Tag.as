@@ -91,6 +91,19 @@ package zero.swf{
 			throw new Error("未处理");
 			return -1;
 		}
+		public function setDefId(defId:int):void{
+			if(__tagBody){
+				__tagBody["id"]=defId;
+			}else if(__bodyData){
+				if(bodyLength<2){
+					throw new Error("bodyLength="+bodyLength);
+				}
+				__bodyData[bodyOffset]=defId;
+				__bodyData[bodyOffset+1]=defId>>8;
+			}else{
+				throw new Error("未处理");
+			}
+		}
 		
 		public static function getTypeByQualifiedClassName(obj:*):int{
 			var typeName:String=getQualifiedClassName(obj).replace("zero.swf.tag_body::","");
