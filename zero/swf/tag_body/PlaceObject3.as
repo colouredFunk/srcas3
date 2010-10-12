@@ -2,7 +2,7 @@
 PlaceObject3 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年9月13日 14:34:36 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月11日 11:09:00 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -13,16 +13,32 @@ PlaceObject3 版本:v1.0
 //there needed to be some way to place a Timeline object using a class imported from
 //another SWF, which does not have a 16-bit character ID in the instantiating SWF.
 //Supported in Flash Player 9.0.45.0 and later.
-//■ The PlaceFlagHasImage field indicates the creation of native Bitmap objects on the
-//display list. When PlaceFlagHasClassName and PlaceFlagHasImage are both defined, this
-//indicates a Bitmap class to be loaded from another SWF. Immediately following the flags
-//is the class name (as above) for the BitmapData class in the loaded SWF. A Bitmap object
-//will be placed with the named BitmapData class as it's internal data. When
-//PlaceFlagHasCharacter and PlaceFlagHasImage are both defined, this indicates a Bitmap
-//from the current SWF. The BitmapData to be used as its internal data will be defined by
-//the following characterID. This only occurs when the BitmapData has a class associated
-//with it. If there is no class associated with the BitmapData, DefineShape should be used
-//with a Bitmap fill. Supported in Flash Player 9.0.45.0 and later.
+
+//■ The PlaceFlagHasImage field indicates the creation of native Bitmap objects on the display list.
+//PlaceFlagHasImage 字段表示在显示列表上放置(创建)(native 本机)位图对象.
+
+//When PlaceFlagHasClassName and PlaceFlagHasImage are both defined, this indicates a Bitmap class to be loaded from another SWF.
+//如果 PlaceFlagHasClassName 和 PlaceFlagHasImage 同时为 1, 表示从另一个SWF加载一个位图类.
+
+//Immediately following the flags is the class name (as above) for the BitmapData class in the loaded SWF.
+//A Bitmap object will be placed with the named BitmapData class as it's internal data.
+
+//When PlaceFlagHasCharacter and PlaceFlagHasImage are both defined, this indicates a Bitmap from the current SWF.
+//如果 PlaceFlagHasCharacter 和 PlaceFlagHasImage 同时为 1, 表示(从当前SWF加载)一个位图.
+
+//The BitmapData to be used as its internal data will be defined by the following characterID.
+
+//This only occurs when the BitmapData has a class associated with it.
+//这个位图必须得有链接类名.
+
+//好像描述的不太正确...
+//具体试验:
+//打开flash cs4，新建一fla，导入一张位图，设置类名为 “Img”，拖位图到场景上，导出，查看结构，发现生成了 PlaceFlagHasImage=1 的 PlaceObject3，但是 ClassName=null
+//所以这里设置类名只是为了在拖放位图元件到场景时能生成 PlaceObject3(如果不设置类名，将生成一个 DefineShape2，然后生成一个 PlaceObject2)
+
+//If there is no class associated with the BitmapData, DefineShape should be used with a Bitmap fill.
+//Supported in Flash Player 9.0.45.0 and later.
+
 //■ The PlaceFlagHasCacheAsBitmap field specifies whether Flash Player should internally
 //cache a display object as a bitmap. Caching can speed up rendering when the object does
 //not change frequently.
@@ -61,7 +77,7 @@ PlaceObject3 版本:v1.0
 //PlaceFlagHasFilterList 			UB[1] 																					Has filter list
 
 //Depth 							UI16 																					Depth of character
-//ClassName 						If PlaceFlagHasClassName or (PlaceFlagHasImage and PlaceFlagHasCharacter), String		Name of the class to place
+//ClassName 						If PlaceFlagHasClassName or (PlaceFlagHasImage and PlaceFlagHasCharacter 描述的不正确), String		Name of the class to place
 //CharacterId 						If PlaceFlagHasCharacter, UI16 															ID of character to place
 //Matrix 							If PlaceFlagHasMatrix, MATRIX 															Transform matrix data
 //ColorTransform 					If PlaceFlagHasColorTransform, CXFORMWITHALPHA											Color transform data
@@ -141,7 +157,7 @@ package zero.swf.tag_body{
 			Depth=data[offset+2]|(data[offset+3]<<8);
 			//#offsetpp
 			offset+=4;
-			if(PlaceFlagHasClassName||(PlaceFlagHasImage&&PlaceFlagHasCharacter)){
+			if(PlaceFlagHasClassName){
 				//#offsetpp
 			
 				var get_str_size:int=0;
@@ -247,7 +263,7 @@ package zero.swf.tag_body{
 			data[3]=Depth>>8;
 			//#offsetpp
 			var offset:int=4;
-			if(ClassName){
+			if(PlaceFlagHasClassName){
 				data.position=offset;
 				data.writeUTFBytes(ClassName+"\x00");
 				offset=data.length;
@@ -346,7 +362,7 @@ package zero.swf.tag_body{
 				<SurfaceFilterList/>
 				<ClipActions/>
 			</PlaceObject3>;
-			if(ClassName){
+			if(PlaceFlagHasClassName){
 				
 			}else{
 				delete xml.@ClassName;
@@ -418,7 +434,7 @@ package zero.swf.tag_body{
 			PlaceFlagHasBlendMode=int(xml.@PlaceFlagHasBlendMode.toString());
 			PlaceFlagHasFilterList=int(xml.@PlaceFlagHasFilterList.toString());
 			Depth=int(xml.@Depth.toString());
-			if(xml.@ClassName){
+			if(PlaceFlagHasClassName){
 				ClassName=xml.@ClassName.toString();
 			}
 			if(PlaceFlagHasCharacter){

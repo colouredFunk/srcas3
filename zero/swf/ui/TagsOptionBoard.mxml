@@ -13,13 +13,25 @@ TagsOptionBoard 版本:v1.0
 -->
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300" xmlns:ui="zero.swf.ui.*"
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="780" height="300" xmlns:ui="zero.swf.ui.*"
 		 removedFromStage="removed(event)"
 >
 	<mx:Label x="0" y="0" text="option: "/>
 	<mx:ComboBox id="optionCb" y="0" x="50" width="180" change="change(event)"/>
 	<mx:Button x="240" y="0" label="保存当前" id="btnSaveOption" click="click(event)"/>
-	<mx:DataGrid id="grid" left="0" top="30" right="0" bottom="0">
+	<s:BorderContainer right="0" id="outputResourceOptionBoard" width="145" height="150" y="30">
+		
+		<s:Label text="资源输出选项: " y="5" x="5"/>
+		
+		<s:RadioButton x="5" y="30" label="输出多个文件" groupName="radiogroup_outputSingleFile" id="rbOutputMultiFile" change="change(event)"/>
+		<s:Label text="修改少量资源时比较方便" y="50" x="5"/>
+		<s:CheckBox label="对资源输出缩略图" x="5" y="60" id="cbOutputResourceIcon" change="change(event)"/>
+		
+		<s:RadioButton x="5" y="95" label="输出单个文件" groupName="radiogroup_outputSingleFile" id="rbOutputSingleFile" change="change(event)"/>
+		<s:Label text="修改大量资源时比较方便" y="115" x="5"/>
+		
+	</s:BorderContainer>
+	<mx:DataGrid id="grid" left="0" top="30" right="150" bottom="0">
 		<mx:columns>
 			<mx:DataGridColumn textAlign="center" draggable="false" headerText="typeNum" dataField="@typeNum" width="80"/>
 			<mx:DataGridColumn draggable="false" headerText="type" dataField="@type" width="200"/>
@@ -71,7 +83,7 @@ TagsOptionBoard 版本:v1.0
 			private static const settingFolderPath:String=("file:///"+decodeURI(File.applicationDirectory.nativePath+"/setting")+"/").replace(/\\/g,"/");
 			private static const optionsFolderPath:String=settingFolderPath+"options/";
 			
-			private static var settingXML:XML;
+			public static var settingXML:XML;
 			private static var settingFile:File;
 			private static var optionXMLs:Object;
 			private static var optionNameArrCol:ArrayCollection;
@@ -94,7 +106,7 @@ TagsOptionBoard 版本:v1.0
 				if(settingFile.exists){
 					settingXML=new XML(FileAndStr.readStrFromFile(settingFile));
 				}else{
-					settingXML=<setting selectedOptionName="AS2代码"/>;
+					settingXML=<setting selectedOptionName="AS2代码" outputIcon/>;
 				}
 				
 				var optionsFolder:File=new File(optionsFolderPath);
@@ -314,13 +326,45 @@ TagsOptionBoard 版本:v1.0
 				}
 			}
 			
+			public static function get outputResourceIcon():Boolean{
+				return settingXML.@outputResourceIcon.toString()=="true";
+			}
+			public static function set outputResourceIcon(_outputResourceIcon:Boolean):void{
+				settingXML.@outputResourceIcon=_outputResourceIcon;
+				if(instance){
+					instance.cbOutputResourceIcon.selected=_outputResourceIcon;
+				}
+				//trace(settingXML.toXMLString());
+			}
+			
+			public static function get outputSingleFile():Boolean{
+				return settingXML.@outputSingleFile.toString()=="true";
+			}
+			public static function set outputSingleFile(_outputSingleFile:Boolean):void{
+				settingXML.@outputSingleFile=_outputSingleFile;
+				if(instance){
+					if(_outputSingleFile){
+						instance.rbOutputSingleFile.selected=true;
+						instance.cbOutputResourceIcon.enabled=false;
+					}else{
+						instance.rbOutputMultiFile.selected=true;
+						instance.cbOutputResourceIcon.enabled=true;
+					}
+				}
+				//trace(settingXML.toXMLString());
+			}
+			
 			private var optionFile:File;
 			
 			private var removeClose:Function;
 			
-			public function init(addClose:Function,_removeClose:Function):void{
+			//private var so:SharedObject;
+			
+			public function init(addClose:Function,_removeClose:Function,so:SharedObject):void{
 				//^_^
 				instance=this;
+				
+				//so=_so;
 				
 				if(addClose==null||_removeClose==null){
 					Outputer.output("如果不设置 close 函数，可能会在关闭时无法保存数据");
@@ -347,16 +391,22 @@ TagsOptionBoard 版本:v1.0
 				optionFile=new File();
 				optionFile.addEventListener(Event.SELECT,saveOptionSelect);
 				
-				trace("optionNameArrCol="+optionNameArrCol);
+				//trace("optionNameArrCol="+optionNameArrCol);
 				
 				TagsOptionBoardItem.init(this,tagXMLListCol.source,selectOption);
 				
-				TagsOptionBoardItem.initByOptionXML(optionXMLs[currOptionName]);
-				
 				grid.dataProvider=tagXMLListCol;
+				
+				outputResourceIcon=outputResourceIcon;
+				outputSingleFile=outputSingleFile;
+				
+				updateOptionMark();
+				
 			}
 			private function removed(event:Event):void{
 				saveSettings();
+				
+				//so=null;
 				
 				removeClose(saveSettings);
 				removeClose=null;
@@ -365,6 +415,23 @@ TagsOptionBoard 版本:v1.0
 				optionFile=null;
 				
 				instance=null;
+			}
+			private function updateOptionMark():void{
+				var optionMark:Object=DataAndTags.getOptionMarkByOptionXML(optionXMLs[currOptionName]);
+				updateOutputResourceOptionBoardEnabledByOptionMark(optionMark);
+				TagsOptionBoardItem.initByOptionMark(optionMark);
+			}
+			private function updateOutputResourceOptionBoardEnabledByOptionMark(optionMark:Object):void{
+				for each(var option:String in optionMark){
+					//trace("option="+option);
+					if(option==DataAndTags.resourceOption){
+						outputResourceOptionBoard.enabled=true;
+						//trace("updateOutputResourceOptionBoardEnabledByOptionMark outputResourceOptionBoard.enabled="+outputResourceOptionBoard.enabled);
+						return;
+					}
+				}
+				outputResourceOptionBoard.enabled=false;
+				//trace("updateOutputResourceOptionBoardEnabledByOptionMark outputResourceOptionBoard.enabled="+outputResourceOptionBoard.enabled);
 			}
 			
 			private function click(event:MouseEvent):void{
@@ -376,13 +443,26 @@ TagsOptionBoard 版本:v1.0
 				}
 			}
 			private function change(event:Event):void{
+				//trace(event.target);
 				switch(event.target){
 					case optionCb:
 						if(currOptionName=="临时 option"){
 							addTempOption();
 						}
 						settingXML.@selectedOptionName=optionCb.selectedItem.toString();
-						TagsOptionBoardItem.initByOptionXML(optionXMLs[currOptionName]);
+						updateOptionMark();
+					break;
+					case rbOutputMultiFile:
+						settingXML.@outputSingleFile=false;
+						trace(settingXML.toXMLString());
+						cbOutputResourceIcon.enabled=true;
+					break;
+					case rbOutputSingleFile:
+						settingXML.@outputSingleFile=true;
+						cbOutputResourceIcon.enabled=false;
+					break;
+					case cbOutputResourceIcon:
+						outputResourceIcon=cbOutputResourceIcon.selected;
 					break;
 				}
 			}
@@ -409,7 +489,7 @@ TagsOptionBoard 版本:v1.0
 				}
 			}
 			private function saveSettings():void{
-				trace("saveSettings-----------------------------------");
+				//trace("saveSettings-----------------------------------");
 				
 				if(currOptionName=="临时 option"){
 					addTempOption();
@@ -420,13 +500,13 @@ TagsOptionBoard 版本:v1.0
 					settingFile
 				);
 				
-				trace("settingXML="+settingXML.toXMLString());
+				//trace("settingXML="+settingXML.toXMLString());
 				
 				TagsOptionBoardItem.clear();
 				
 				//trace("currOptionName="+currOptionName);
 				//trace(optionXMLs[currOptionName].toXMLString());
-				trace("-----------------------------------saveSettings");
+				//trace("-----------------------------------saveSettings");
 			}
 			private function getCurrOptionXML():XML{
 				var optionXML:XML=<option/>
@@ -484,6 +564,12 @@ TagsOptionBoard 版本:v1.0
 				}else{
 					addTempOption();
 					currOptionName="临时 option";
+				}
+				if(option==DataAndTags.resourceOption){
+					outputResourceOptionBoard.enabled=true;
+					//trace("selectOption outputResourceOptionBoard.enabled="+outputResourceOptionBoard.enabled);
+				}else{
+					updateOutputResourceOptionBoardEnabledByOptionMark(TagsOptionBoardItem.getOptionMark());
 				}
 			}
 			
@@ -605,6 +691,7 @@ TagsOptionBoard 版本:v1.0
 				<tag typeNum="91" type="DefineFont4"/>
 			</fx:XMLList>
 		</s:XMLListCollection>
+		<s:RadioButtonGroup id="radiogroup_outputSingleFile"/>
 	</fx:Declarations>
 </s:Group>
 

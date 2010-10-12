@@ -149,7 +149,6 @@ package zero.swf{
 				var TagBodyClass:Class;
 				switch(optionV[tag.type]){
 					case structorOption:
-					case resourceOption:
 						TagBodyClass=Tag.getTagBodyClassByType(tag.type);
 						if(TagBodyClass){
 						}else{
@@ -344,29 +343,38 @@ package zero.swf{
 					case structorOption:
 						if(tag.tagBody){
 							tagXML.appendChild(tag.tagBody.toXML());
-						}
-					break;
-					case resourceOption:
-						var typeName:String=TagType.typeNameArr[tag.type];
-						if(DefineObjs[typeName]){
-							if(tag.tagBody){
-								var defId:int=tag.getDefId();
-								var resourceKey:String=typeName+"_"+defId;
-								DataMark.addDefineTag(tag,resourceKey);
-								tagXML.appendChild(<body defId={defId} resourceKey={resourceKey}/>);
-							}else{
-								throw new Error("暂不支持");
-							}
 						}else{
 							throw new Error("暂不支持");
 						}
 					break;
+					case resourceOption:
+						if(tag.tagBody){
+							throw new Error("暂不支持");
+						}
+						
+						var typeName:String=TagType.typeNameArr[tag.type];
+						
+						if(DefineObjs[typeName]){
+						}else{
+							throw new Error("暂不支持");
+						}
+						
+						var bodyXML:XML=<body defId={tag.getDefId()}/>;
+						DataMark.toXML_addResource(tag,bodyXML);
+						tagXML.appendChild(bodyXML);
+					break;
 					case byteCodesOption:
+						if(tag.tagBody){
+							throw new Error("暂不支持");
+						}
 						if(tag.bodyData&&tag.bodyLength>0){
 							tagXML.appendChild(<body length={tag.bodyLength} value={BytesAndStr16.bytes2str16(tag.bodyData,tag.bodyOffset,tag.bodyLength)}/>);
 						}
 					break;
 					case onlyLocationOption:
+						if(tag.tagBody){
+							throw new Error("暂不支持");
+						}
 						if(tag.bodyData&&tag.bodyLength>0){
 							tagXML.appendChild(<body offset={tag.bodyOffset} length={tag.bodyLength}/>);
 						}
@@ -491,11 +499,11 @@ package zero.swf{
 									tag.type=type;
 									tag.bodyData=BytesAndStr16.str162bytes(valueStr);
 								}else{
-									var resourceKey:String=bodyXML.@resourceKey.toString();
-									if(resourceKey){
+									var resourcePath:String=bodyXML.@resource.toString();
+									if(resourcePath){
 										var defIdStr:String=bodyXML.@defId.toString();
 										if(defIdStr){
-											tag=DataMark.getDefineTag(resourceKey,int(defIdStr));
+											tag=DataMark.getDefineTag(resourcePath,int(defIdStr));
 											if(tag.type===type){
 											}else{
 												Outputer.output("一个 "+TagType.typeNameArr[type]+" 被替换成: "+TagType.typeNameArr[tag.type]+"(可能会引起问题?)","brown");

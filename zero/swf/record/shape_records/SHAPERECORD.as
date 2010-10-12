@@ -8,44 +8,10 @@ SHAPERECORD 版本:v1.0
 */
 
 package zero.swf.record.shape_records{
-	import flash.utils.ByteArray;
-	
 	import zero.swf.BaseDat;
-
 	public class SHAPERECORD extends BaseDat{
-		public static var FillBits:int;
-		public static var LineBits:int;//实在是想不到什么好办法..., SHAPEWITHSTYLE 中会对其进行设置
-		
-		private var ShapeRecord:SHAPERECORD;
 		public function SHAPERECORD(){
 		}
-		override public function initByData(data:ByteArray, offset:int, endOffset:int):int{
-			var flags:int=data[offset];
-			if(flags>>>7){//TypeFlag===1
-				if((flags<<25)>>>31){//StraightFlag===1
-					ShapeRecord=new STRAIGHTEDGERECORD();
-				}else{
-					ShapeRecord=new CURVEDEDGERECORD();
-				}
-			}else{
-				//TypeFlag===0
-				ShapeRecord=new STYLECHANGERECORD();
-			}
-			return ShapeRecord.initByData(data,offset,endOffset);
-		}
-		override public function toData():ByteArray{
-			return ShapeRecord.toData();
-		}
-		CONFIG::toXMLAndInitByXML{
-		override public function toXML():XML{
-			return ShapeRecord.toXML();
-		}
-		override public function initByXML(xml:XML):void{
-			ShapeRecord=new SHAPERECORD();
-			trace("xml="+xml.toXMLString());
-			ShapeRecord.initByXML(xml);
-		}
-		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
 

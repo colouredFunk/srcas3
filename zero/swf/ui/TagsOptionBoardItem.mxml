@@ -40,8 +40,8 @@
 				
 				onSelectOption=_onSelectOption;
 			}
-			public static function initByOptionXML(optionXML:XML):void{
-				optionMark=DataAndTags.getOptionMarkByOptionXML(optionXML);
+			public static function initByOptionMark(_optionMark:Object):void{
+				optionMark=_optionMark;
 				
 				for each(var item:TagsOptionBoardItem in itemMark){
 					if(item.updateOption()){

@@ -26,8 +26,11 @@ FILLSTYLE 版本:v1.0
 //BitmapId 			If type = 0x40, 0x41, 0x42 or 0x43, UI16				ID of bitmap character for fill.
 //BitmapMatrix 		If type = 0x40, 0x41, 0x42 or 0x43, MATRIX				Matrix for bitmap fill.
 package zero.swf.record{
-	import zero.BytesAndStr16;
 	import flash.utils.ByteArray;
+	
+	import zero.BytesAndStr16;
+	import zero.Outputer;
+
 	public class FILLSTYLE extends Record{
 		public var datas:Array;
 		//
@@ -64,7 +67,8 @@ package zero.swf.record{
 					datas=[FillStyleType,BitmapId,BitmapMatrix];
 				break;
 				default:
-					throw new Error("未知 FillStyleType: "+FillStyleType);
+					datas=[];
+					Outputer.outputError("未知 FillStyleType: "+FillStyleType);
 				break;
 			}
 			return offset;
@@ -99,7 +103,7 @@ package zero.swf.record{
 					data.writeBytes(datas[2].toData());
 				break;
 				default:
-					throw new Error("未知 FillStyleType: "+FillStyleType);
+					Outputer.outputError("未知 FillStyleType: "+FillStyleType);
 				break;
 			}
 			return data;
@@ -145,7 +149,7 @@ package zero.swf.record{
 					xml.appendChild(BitmapMatrixXML);
 				break;
 				default:
-					throw new Error("未知 FillStyleType: "+FillStyleType);
+					Outputer.outputError("未知 FillStyleType: "+FillStyleType);
 				break;
 			}
 			return xml;
@@ -182,7 +186,7 @@ package zero.swf.record{
 					datas=[FillStyleType,BitmapId,BitmapMatrix];
 				break;
 				default:
-					throw new Error("未知 FillStyleType: "+FillStyleType);
+					Outputer.outputError("未知 FillStyleType: "+FillStyleType);
 				break;
 			}
 		}
