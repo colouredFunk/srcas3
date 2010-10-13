@@ -26,13 +26,9 @@ package ui{
 			hrefTarget = String(_hrefXML.@target);
 			eEval = String(_hrefXML.@js);
 		}
-		private var __buttonEnabled:Boolean;
-		public function get buttonEnabled():Boolean{
-			return __buttonEnabled;
-		}
-		public function set buttonEnabled(_buttonEnabled:Boolean):void{
-			__buttonEnabled = _buttonEnabled;
-			if (__buttonEnabled) {
+		override public function set enabled(_enabled:Boolean):void{
+			super.enabled = _enabled;
+			if (_enabled) {
 				ButtonManager.addButton(this);
 			}else {
 				ButtonManager.removeButton(this);
@@ -43,6 +39,9 @@ package ui{
 			return __group;
 		}
 		public function set group(_group:String):void {
+			if (__group && _group == __group) {
+				return;
+			}
 			if (__group) {
 				ButtonManager.removeFromGroup(__group, this);
 			}
@@ -86,7 +85,7 @@ package ui{
 		}
 		override protected function onAddedToStageHandler(_evt:Event):void {
 			super.onAddedToStageHandler(_evt);
-			buttonEnabled = true;
+			enabled = true;
 			if (area) {
 				var _length:uint = area.numChildren;
 				for (var _i:uint; _i < _length; _i++ ) {
@@ -103,7 +102,7 @@ package ui{
 			hrefTarget = null;
 			area = null;
 			hitArea = null;
-			buttonEnabled = false;
+			enabled = false;
 			group = null;
 			rollOver = null;
 			rollOut = null;

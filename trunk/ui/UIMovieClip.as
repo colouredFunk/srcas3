@@ -13,7 +13,7 @@ package ui{
 		public function get isRemoved():Boolean {
 			return __isRemoved;
 		}
-		private var __isPlaying:Boolean;
+		private var __isPlaying:Boolean = true;
 		public function get isPlaying():Boolean {
 			return __isPlaying;
 		}

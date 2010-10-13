@@ -1,9 +1,11 @@
-package ui {
+﻿package ui {
 	
 	import com.greensock.events.LoaderEvent;
 	import com.greensock.loading.LoaderMax;
 	import com.greensock.loading.ImageLoader;
 	import com.greensock.loading.display.ContentDisplay;
+	import flash.display.MovieClip;
+	import flash.text.TextField;
 	
 	import com.greensock.TweenMax;
 	import com.greensock.layout.AlignMode;
@@ -30,10 +32,29 @@ package ui {
 	public class  ImageLoader extends Btn {
 		private static var contextMenuImageLoader:ContextMenu;
 		private static var contextMenuItemImageLoader:ContextMenuItem;
+		private static function createMenu(_target:*):void {
+			if (!contextMenuImageLoader) {
+				contextMenuItemImageLoader = Common.addContextMenu(_target, "");
+				contextMenuImageLoader = _target.contextMenu;
+				contextMenuImageLoader.addEventListener(ContextMenuEvent.MENU_SELECT, onImageMenuShowHandler);
+			}
+		}
+		private static function onImageMenuShowHandler(_evt:ContextMenuEvent):void {
+			var _imageLoader:*=_evt.contextMenuOwner as ImageLoader;
+			var _source:String = _imageLoader.sourceNow;
+			if (_source) {
+				_source = _source.split("/").pop();
+			}else {
+				_source = "--";
+			}
+			_source = _source + ":" + _imageLoader.widthArea + " x " + _imageLoader.heightArea;
+			contextMenuItemImageLoader.caption = _source;
+		}
+		public var progressClip:*;
 		public var container:*;
 		public var foreground:*;
 		public var background:*;
-		public var limitWH:Boolean;
+		public var limitSize:Boolean;
 		protected var autoFitArea:AutoFitArea;
 		protected var bmp:Bitmap;
 		protected var sourceNow:String;
@@ -86,21 +107,15 @@ package ui {
 			bmp = new Bitmap();
 			bmp.alpha = 0;
 			autoFitArea = new AutoFitArea(container, 0, 0, widthArea, heightArea);
-			if (!contextMenuImageLoader) {
-				contextMenuItemImageLoader = Common.addContextMenu(this, "no image");
-				contextMenuImageLoader = contextMenu;
-				contextMenuImageLoader.addEventListener(ContextMenuEvent.MENU_SELECT, onImageMenuShowHandler);
-			}
+			createMenu(this);
 			contextMenu = contextMenuImageLoader;
 		}
-		private static function onImageMenuShowHandler(_evt:ContextMenuEvent):void {
-			var _source:String = (_evt.contextMenuOwner as ImageLoader).sourceNow;
-			if (!_source) {
-				_source = "no image";
-			}
-			contextMenuItemImageLoader.caption = _source;
-		}
 		override protected function onRemoveToStageHandler():void {
+			if (progressClip&&progressClip is MovieClip) {
+				progressClip.stop();
+			}
+			TweenMax.killChildTweensOf(this);
+			TweenMax.killTweensOf(bmp);
 			super.onRemoveToStageHandler();
 			if (container != this && container.contains(bmp)) {
 				container.removeChild(bmp);
@@ -108,9 +123,11 @@ package ui {
 			bmp.bitmapData = null;
 			bmdNow = null;
 			sourceNow = null;
+			progressClip = null;
 			container = null;
 			foreground = null;
 			background = null;
+			contextMenu = null;
 			autoFitArea.destroy();
 		}
 		public function load(_source:String, _index:uint = 0, _changeImmediately:Boolean = false ):void {
@@ -189,27 +206,42 @@ package ui {
 				if(widthArea<=1){
 					_scaleMode = ScaleMode.PROPORTIONAL_OUTSIDE;
 					_alignX = AlignMode.LEFT;
-					_widthMax = limitWH?_content.width:LIMITWH_MAX;
-					_heightMax = limitWH?Math.min(_content.height, heightArea):LIMITWH_MAX;
+					_widthMax = limitSize?_content.width:LIMITWH_MAX;
+					_heightMax = limitSize?Math.min(_content.height, heightArea):LIMITWH_MAX;
 				}else if (heightArea<=1) {
 					_scaleMode = ScaleMode.PROPORTIONAL_OUTSIDE;
 					_alignY = AlignMode.TOP;
-					_widthMax = limitWH?Math.min(_content.width, widthArea):LIMITWH_MAX;
-					_heightMax = limitWH?_content.height:LIMITWH_MAX;
+					_widthMax = limitSize?Math.min(_content.width, widthArea):LIMITWH_MAX;
+					_heightMax = limitSize?_content.height:LIMITWH_MAX;
 				}else {
 					_scaleMode = ScaleMode.PROPORTIONAL_INSIDE;
-					_widthMax = limitWH?Math.min(_content.width, widthArea):LIMITWH_MAX;
-					_heightMax = limitWH?Math.min(_content.height, heightArea):LIMITWH_MAX;
+					_widthMax = limitSize?Math.min(_content.width, widthArea):LIMITWH_MAX;
+					_heightMax = limitSize?Math.min(_content.height, heightArea):LIMITWH_MAX;
 				}
 				autoFitArea.attach(_content, _scaleMode, _alignX, _alignY, false, 0, _widthMax, 0, _heightMax);
 			}
 		}
 		protected function onImageLoadingHandler(_evt:LoaderEvent):void {
-			//trace(_evt);
+			if (progressClip) {
+				progressClip.visible = true;
+				if (progressClip is MovieClip) {
+					progressClip.play();
+				}else if (progressClip.hasOwnProperty("text")) {
+					progressClip.text = Math.round(_evt.target.progress * 100) + " %";
+				}else if (progressClip.hasOwnProperty("value")) {
+					progressClip.value = _evt.target.progress;
+				}
+			}
 		}
 		protected function onImageLoadedHandler(_evt:LoaderEvent):void {
 			bmdNow = _evt.target.rawContent.bitmapData;
 			setBMP(bmdNow);
+			if (progressClip) {
+				progressClip.visible = false;
+				if (progressClip is MovieClip) {
+					progressClip.stop();
+				}
+			}
 		}
 		
 		
@@ -286,7 +318,6 @@ package ui {
 			}
 		}
 		private static function onChildCompleteHandler(_evt:LoaderEvent):void {
-			//_evt.target.content.visible = false;
 			var _dic:Dictionary = registeredDic[_evt.target.url];
 			if (!_dic) {
 				return;
@@ -300,13 +331,11 @@ package ui {
 			trace(_evt.toString());
 		}
 		private static function onProgressHandler(_evt:LoaderEvent):void{
-			//trace(_evt.toString());
 			if (onGroupLoading!=null) {
 				onGroupLoading(_evt.currentTarget.name, _evt.currentTarget.progress);
 			}
 		}
 		private static function onCompleteHandler(_evt:LoaderEvent):void{
-			//trace(_evt.toString());
 			if (onGroupLoaded!=null) {
 				onGroupLoaded(_evt.currentTarget.name);
 			}
