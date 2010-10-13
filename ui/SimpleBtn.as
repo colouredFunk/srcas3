@@ -11,13 +11,10 @@
 		public var rollOut:Function;
 		public var press:Function;
 		public var release:Function;
-		private var __buttonEnabled:Boolean;
-		public function get buttonEnabled():Boolean{
-			return __buttonEnabled;
-		}
-		public function set buttonEnabled(_buttonEnabled:Boolean):void{
-			__buttonEnabled = _buttonEnabled;
-			if (__buttonEnabled) {
+		
+		override public function set enabled(_enabled:Boolean):void{
+			super.enabled = _enabled;
+			if (_enabled) {
 				ButtonManager.addButton(this);
 			}else {
 				ButtonManager.removeButton(this);
@@ -25,10 +22,10 @@
 		}
 		override protected function onAddedToStageHandler(_evt:Event):void {
 			super.onAddedToStageHandler(_evt);
-			buttonEnabled = true;
+			enabled = true;
 		}
 		override protected function onRemoveToStageHandler():void {
-			buttonEnabled = false;
+			enabled = false;
 			rollOver = null;
 			rollOut = null;
 			press = null;

@@ -5,51 +5,12 @@
 	 * ...
 	 * @author Akdcl
 	 */
-	public class Slider extends Btn {
+	public class Slider extends ProgressBar {
 		public var change:Function;
-
-		public var thumb:*;
-		public var bar:*;
-		public var maskClip:*;
-		public var track:*;
 		
 		protected var timeHolded:uint;
-		override protected function init():void {
-			super.init();
-			if (thumb) {
-				offXThumb = thumb.x - bar.width - bar.x;
-			}
-			if (maskClip) {
-				offWidthMaskClip = maskClip.width - bar.width;
-				maskClip.cacheAsBitmap = true;
-				bar.cacheAsBitmap = true;
-				maskClip.mask = bar;
-			}
-			if (track) {
-				offWidthTrack = track.width - bar.width;
-			}
-			length = bar.width * scaleX;
-			scaleX = 1;
-		}
-		override internal function $press():void {
-			super.$press();
-			timeHolded = 0;
-			onHoldingHandler(null);
-			addEventListener(Event.ENTER_FRAME, onHoldingHandler);
-		}
-		override internal function $release():void {
-			super.$release();
-			timeHolded = 0;
-			removeEventListener(Event.ENTER_FRAME, onHoldingHandler);
-		}
-		private var __length:uint;
-		public function get length():uint {
-			return __length;
-		}
-		public function set length(_length:uint):void {
-			__length = _length;
-			setValue(value);
-		}
+		protected var scale:Number;
+		
 		private var __maximum:Number = 100;
 		public function get maximum():Number {
 			return __maximum;
@@ -74,54 +35,83 @@
 			__snapInterval = _snapInterval;
 			setStyle();
 		}
-		private var __value:Number = 0;
-		public function get value():Number {
-			return __value;
+		override protected function init():void {
+			$rollOut();
+			isReferenceFromThumb = true;
+			super.init();
 		}
-		public function set value(_value:Number):void {
-			_value = formatValue(_value);
-			if (__value == _value) {
-				return;
+		override protected function onAddedToStageHandler(_evt:Event):void {
+			super.onAddedToStageHandler(_evt);
+			enabled = true;
+		}
+		internal function $rollOver():void {
+			ButtonManager.setButtonClipPlay(thumb, true);
+			ButtonManager.setButtonClipPlay(bar, true);
+			ButtonManager.setButtonClipPlay(track, true);
+		}
+		internal function $rollOut():void {
+			ButtonManager.setButtonClipPlay(thumb, false);
+			ButtonManager.setButtonClipPlay(bar, false);
+			ButtonManager.setButtonClipPlay(track, false);
+		}
+		internal function $press():void {
+			timeHolded = 0;
+			onHoldingHandler(null);
+			addEventListener(Event.ENTER_FRAME, onHoldingHandler);
+		}
+		internal function $release():void {
+			timeHolded = 0;
+			removeEventListener(Event.ENTER_FRAME, onHoldingHandler);
+		}
+		internal function $wheel(_delta:int):void {
+			if (timeHolded == 0) {
+				value += _delta > 0?snapInterval: -snapInterval;
 			}
-			__value = _value;
-			setStyle();
 		}
-		public function setValue(_value:Number):void {
-			__value = formatValue(_value);
-			setStyle();
-		}
-		private function formatValue(_value:Number):Number {
-			if (isNaN(_value)) {
-				_value = 0;
+		protected function onHoldingHandler(_evt:Event):void {
+			if (thumb) {
+				value = Math.round(mouseX / scale / snapInterval) * snapInterval + minimum;
+			}else {
+				value = Math.round((mouseX-bar.x) / scale / snapInterval) * snapInterval + minimum;
 			}
-			if (_value < 0) {
-				_value = 0;
-			} else if (_value > 1) {
-				_value = 1;
+			timeHolded++;
+		}
+		override protected function formatValue(_value:Number):Number {
+			if (_value<minimum) {
+				_value=minimum;
+			} else if (_value>maximum) {
+				_value=maximum;
 			}
 			return _value;
 		}
-		protected var scale:Number;
-		protected var mouseXOff:int;
-		protected function onHoldingHandler(_evt:Event):void {
-			value = Math.round((mouseX - mouseXOff) / scale / snapInterval) * snapInterval + minimum;
-			timeHolded++;
-		}
-		public function setStyle():void {
-			thumb.x = Math.round(value * length);
-			if (bar) {
-				bar.width = Math.round(value * length);
-			}
-			if (thumb) {
-				thumb.x = bar.width + bar.x + offXThumb;
-			}
+		override protected function setStyle():void {
+			scale = length/(maximum-minimum);
+			var _x:uint = Math.round((value-minimum) * scale);
 			
-			/*scale = length/(maximum-minimum);
-			var _x:uint = Math.round((value-minimum)*scale);
-			thumb.x=_x;
-			if (bar) {
-				bar.width=_x;
-			}*/
+			if (isReferenceFromThumb?!thumb:bar) {
+				bar.width = _x;
+				if (roundShow) {
+					bar.width = Math.round(bar.width);
+				}
+				if (thumb) {
+					thumb.x = bar.width + bar.x + offXThumb;
+				}
+			}else {
+				thumb.x = _x;
+				if (roundShow) {
+					thumb.x = Math.round(thumb.x);
+				}
+				if (bar) {
+					var _width:int = Math.round(thumb.x - bar.x - offXThumb);
+					if (_width<0) {
+						_width = 0;
+					}
+					bar.width = _width;
+				}
+			}
+			if (txt) {
+				txt.text = value;
+			}
 		}
 	}
 }

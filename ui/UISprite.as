@@ -13,11 +13,13 @@
 		public function get isRemoved():Boolean {
 			return __isRemoved;
 		}
+		private var __enabled:Boolean = true;
 		public function get enabled():Boolean {
-			return mouseEnabled && mouseChildren;
+			return __enabled;
 		}
 		public function set enabled(_enabled:Boolean):void{
 			mouseEnabled = mouseChildren = _enabled;
+			__enabled = _enabled;
 		}
 		public function UISprite() {
 			init();

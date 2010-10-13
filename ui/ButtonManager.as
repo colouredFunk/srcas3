@@ -14,6 +14,7 @@ package ui {
 		private static const ROLL_OUT = "rollOut";
 		private static const PRESS = "press";
 		private static const RELEASE = "release";
+		private static const MOUSE_WHEEL = "wheel";
 		private static var buttonInDic:Dictionary;
 		private static var buttonDownDic:Dictionary;
 		private static function initializeManager():* {
@@ -26,8 +27,9 @@ package ui {
 			}
 			_button.buttonMode = _buttonMode;
 			_button.addEventListener(MouseEvent.ROLL_OVER, onButtonRollOverHandler);
-			_button.stage.addEventListener(MouseEvent.MOUSE_DOWN, onButtonPressHandler);
-			_button.stage.addEventListener(MouseEvent.MOUSE_UP, onButtonReleaseHandler);
+			_button.stage.addEventListener(MouseEvent.MOUSE_DOWN, onStageMouseDownHandler);
+			_button.stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUpHandler);
+			_button.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onStageMouseWheelHandler);
 			setButtonStyle(_button);
 		}
 		public static function removeButton(_button:*):void {
@@ -68,8 +70,7 @@ package ui {
 			//}
 			setButtonStyle(buttonTarget);
 		}
-		private static function onButtonPressHandler(_evt:MouseEvent):void {
-			//_evt.target;
+		private static function onStageMouseDownHandler(_evt:MouseEvent):void {
 			for each(buttonTarget in buttonInDic) {
 				if (!buttonTarget || buttonDownDic[buttonTarget]) {
 					continue;
@@ -80,8 +81,7 @@ package ui {
 				setButtonStyle(buttonTarget);
 			}
 		}
-		private static function onButtonReleaseHandler(_evt:MouseEvent):void {
-			//_evt.target;
+		private static function onStageMouseUpHandler(_evt:MouseEvent):void {
 			for each(buttonTarget in buttonDownDic) {
 				if (!buttonDownDic[buttonTarget]) {
 					continue;
@@ -90,6 +90,14 @@ package ui {
 				buttonCallBack(buttonTarget, "$" + RELEASE);
 				buttonCallBack(buttonTarget, RELEASE);
 				setButtonStyle(buttonTarget);
+			}
+		}
+		private static function onStageMouseWheelHandler(_evt:MouseEvent):void {
+			for each(buttonTarget in buttonInDic) {
+				if (!buttonTarget) {
+					continue;
+				}
+				buttonCallBack(buttonTarget, "$" + MOUSE_WHEEL, _evt.delta);
 			}
 		}
 		private static function buttonCallBack(_button:*, _method:*, ...args):void {
@@ -106,9 +114,10 @@ package ui {
 		}
 		private static var frameTo:uint;
 		public static function setButtonStyle(_button:*):void {
+			var _isActive:Boolean = buttonInDic[_button] || buttonDownDic[_button] || (_button.hasOwnProperty("select") && _button.select);
 			if (_button is MovieClip) {
 				if (_button.totalFrames > 8) {
-					setButtonPlay(_button);
+					setButtonClipPlay(_button, _isActive);
 				}else {
 					if (buttonInDic[_button]) {
 						frameTo = buttonDownDic[_button]?4:2;
@@ -124,38 +133,48 @@ package ui {
 				}
 			}
 			if (_button.hasOwnProperty("aniClip")) {
-				setButtonPlay(_button.aniClip);
+				setButtonClipPlay(_button.aniClip, _isActive);
 			}
 			buttonCallBack(_button, "$setStyle");
 		}
-		private static function onEnterFrameHandler(_evt:Event):void {
-			buttonTarget = _evt.target;
-			if (!(buttonTarget is MovieClip) || buttonTarget.totalFrames < 2) {
-				buttonTarget.removeEventListener(Event.ENTER_FRAME, onEnterFrameHandler);
-				return;
-			}
-			if (buttonInDic[buttonTarget] || buttonDownDic[buttonTarget] || buttonTarget.select) {
-				if (buttonTarget.currentFrame == buttonTarget.totalFrames) {
-					buttonTarget.removeEventListener(Event.ENTER_FRAME, onEnterFrameHandler);
-				} else {
-					buttonTarget.nextFrame();
-				}
-			}else {
-				if (buttonTarget.currentFrame == 1) {
-					buttonTarget.removeEventListener(Event.ENTER_FRAME, onEnterFrameHandler);
-				} else {
-					buttonTarget.prevFrame();
-				}
-			}
-		}
-		public static function setButtonPlay(_button:*):void {
-			if (! _button) {
+		public static function setButtonClipPlay(_buttonClip:*, _nextFrame:Boolean):void {
+			if (! _buttonClip) {
 				return;
 			}
 			/*if (_clip != this) {
 				_clip.buttonMode = false;
 			}*/
-			_button.addEventListener(Event.ENTER_FRAME, onEnterFrameHandler);
+			if (_nextFrame) {
+				_buttonClip.removeEventListener(Event.ENTER_FRAME, onEnterFramePrevHandler);
+				_buttonClip.addEventListener(Event.ENTER_FRAME, onEnterFrameNextHandler);
+			}else {
+				_buttonClip.removeEventListener(Event.ENTER_FRAME, onEnterFrameNextHandler);
+				_buttonClip.addEventListener(Event.ENTER_FRAME, onEnterFramePrevHandler);
+			}
+		}
+		private static function onEnterFrameNextHandler(_evt:Event):void {
+			var _target:* = _evt.target;
+			if (!(_target is MovieClip) || _target.totalFrames < 2) {
+				_target.removeEventListener(Event.ENTER_FRAME, onEnterFrameNextHandler);
+				return;
+			}
+			if (_target.currentFrame == _target.totalFrames) {
+				_target.removeEventListener(Event.ENTER_FRAME, onEnterFrameNextHandler);
+			} else {
+				_target.nextFrame();
+			}
+		}
+		private static function onEnterFramePrevHandler(_evt:Event):void {
+			var _target:* = _evt.target;
+			if (!(_target is MovieClip) || _target.totalFrames < 2) {
+				_target.removeEventListener(Event.ENTER_FRAME, onEnterFramePrevHandler);
+				return;
+			}
+			if (_target.currentFrame == 1) {
+				_target.removeEventListener(Event.ENTER_FRAME, onEnterFramePrevHandler);
+			} else {
+				_target.prevFrame();
+			}
 		}
 		//
 		private static var groupItemDic:Object = { };

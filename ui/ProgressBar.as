@@ -1,49 +1,35 @@
 package ui{
+	import flash.events.Event;
 	
 	/**
 	 * ...
 	 * @author Akdcl
 	 */
-	public class ProgressBar extends UISprite {
+	public class ProgressBar extends SimpleBtn {
 		public var txt:*;
 		public var thumb:*;
 		public var bar:*;
 		public var maskClip:*;
 		public var track:*;
-		public var roundBarWidth:Boolean = true;
+		
+		public var roundShow:Boolean = true;
+		protected var isReferenceFromThumb:Boolean;
 		protected var offXThumb:int;
 		protected var offWidthMaskClip:int;
 		protected var offWidthTrack:int;
-		override protected function init():void {
-			super.init();
-			if (thumb) {
-				offXThumb = thumb.x - bar.width - bar.x;
-			}
-			if (maskClip) {
-				offWidthMaskClip = maskClip.width - bar.width;
-				maskClip.cacheAsBitmap = true;
-				bar.cacheAsBitmap = true;
-				maskClip.mask = bar;
-			}
-			if (track) {
-				offWidthTrack = track.width - bar.width;
-			}
-			length = bar.width * scaleX;
-			scaleX = 1;
-		}
 		private var __length:uint;
 		public function get length():uint {
 			return __length;
 		}
 		public function set length(_length:uint):void {
 			__length = _length;
-			if (maskClip) {
+			if (maskClip && bar) {
 				maskClip.width = offWidthMaskClip +length;
 			}
 			if (track) {
 				track.width = offWidthTrack +length;
 			}
-			setValue(value);
+			setStyle();
 		}
 		private var __value:Number = 0;
 		public function get value():Number {
@@ -57,11 +43,42 @@ package ui{
 			__value = _value;
 			setStyle();
 		}
-		public function setValue(_value:Number):void {
-			__value = formatValue(_value);
-			setStyle();
+		override protected function init():void {
+			super.init();
+			if (bar && thumb) {
+				offXThumb = thumb.x - bar.width - bar.x;
+			}
+			if (maskClip) {
+				if (bar) {
+					offWidthMaskClip = maskClip.width - bar.width;
+					maskClip.cacheAsBitmap = true;
+					bar.cacheAsBitmap = true;
+					maskClip.mask = bar;
+				}else {
+					maskClip.cacheAsBitmap = true;
+					bar.cacheAsBitmap = true;
+					thumb.mask = maskClip;
+				}
+			}
+			if (track) {
+				if (bar) {
+					offWidthTrack = track.width - bar.width;
+				}else {
+					offWidthTrack = track.width - thumb.x;
+				}
+			}
+			if (isReferenceFromThumb?!thumb:bar) {
+				length = bar.width * scaleX;
+			}else {
+				length = thumb.x * scaleX;
+			}
+			scaleX = 1;
 		}
-		private function formatValue(_value:Number):Number {
+		override protected function onAddedToStageHandler(_evt:Event):void {
+			super.onAddedToStageHandler(_evt);
+			enabled = false;
+		}
+		protected function formatValue(_value:Number):Number {
 			if (isNaN(_value)) {
 				_value = 0;
 			}
@@ -73,12 +90,26 @@ package ui{
 			return _value;
 		}
 		protected function setStyle():void {
-			bar.width = value * length;
-			if (roundBarWidth) {
-				bar.width = Math.round(bar.width);
-			}
-			if (thumb) {
-				thumb.x = bar.width + bar.x + offXThumb;
+			if (isReferenceFromThumb?!thumb:bar) {
+				bar.width = value * length;
+				if (roundShow) {
+					bar.width = Math.round(bar.width);
+				}
+				if (thumb) {
+					thumb.x = bar.width + bar.x + offXThumb;
+				}
+			}else {
+				thumb.x = value * length;
+				if (roundShow) {
+					thumb.x = Math.round(thumb.x);
+				}
+				if (bar) {
+					var _width:int = Math.round(thumb.x - bar.x - offXThumb);
+					if (_width<0) {
+						_width = 0;
+					}
+					bar.width = _width;
+				}
 			}
 			if (txt) {
 				txt.text = Math.round(value * 100) + " %";
