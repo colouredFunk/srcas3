@@ -47,7 +47,7 @@
 			__flashVars = loaderInfo.parameters;
 			paramsObject.width = widthOrg;
 			paramsObject.height = heightOrg;
-			Common.addContextMenu(this, "SWF:"+widthOrg + " x " + heightOrg, onWHReleaseHandle);
+			Common.addContextMenu(this, decodeURI(this.loaderInfo.url).split("/").pop() + ":" + widthOrg + " x " + heightOrg, onWHReleaseHandle);
 			//loaderInfo.addEventListener(ProgressEvent.PROGRESS,onLoadingHandle);
 			loaderInfo.addEventListener(Event.COMPLETE,onLoadedHandle);
 			if (onLoaded==null) {
@@ -73,7 +73,7 @@
 			_jsonStr = Common.replaceStr(_jsonStr, '":', ':');
 			_jsonStr = Common.replaceStr(_jsonStr, ',"', ',');
 			_jsonStr = Common.replaceStr(_jsonStr, '"', "'");
-			var _url:String = Common.replaceStr(this.loaderInfo.url, "%5F", "_");
+			var _url:String = decodeURI(this.loaderInfo.url);
 			var _ary:Array = _url.split("/");
 			_url = _ary.pop();
 			_url = _ary.pop() +"/" + _url;
@@ -81,7 +81,6 @@
 			
 			_str = "<script src='http://www.wanmei.com/public/js/flash.js' type='text/javascript'></script>\r\n\r\n<script type='text/javascript'>\r\n	" + _str;
 			_str = _str + "\r\n</script>";
-			trace(_str);
 			System.setClipboard(_str);
 		}
 		public var onLoading:Function;

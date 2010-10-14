@@ -25,11 +25,11 @@
 			enabled = true;
 		}
 		override protected function onRemoveToStageHandler():void {
-			enabled = false;
 			rollOver = null;
 			rollOut = null;
 			press = null;
 			release = null;
+			enabled = false;
 			super.onRemoveToStageHandler();
 		}
 	}

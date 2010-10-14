@@ -6,6 +6,8 @@ package ui{
 	 * @author Akdcl
 	 */
 	public class ProgressBar extends SimpleBtn {
+		public var change:Function;
+		
 		public var txt:*;
 		public var thumb:*;
 		public var bar:*;
@@ -41,6 +43,9 @@ package ui{
 				return;
 			}
 			__value = _value;
+			if (change != null) {
+				change(__value);
+			}
 			setStyle();
 		}
 		override protected function init():void {
@@ -70,7 +75,11 @@ package ui{
 			if (isReferenceFromThumb?!thumb:bar) {
 				length = bar.width * scaleX;
 			}else {
-				length = thumb.x * scaleX;
+				if (bar) {
+					length = (thumb.x - bar.x)  * scaleX;
+				}else {
+					length = thumb.x  * scaleX;
+				}
 			}
 			scaleX = 1;
 		}

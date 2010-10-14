@@ -135,7 +135,7 @@ package ui {
 			if (_button.hasOwnProperty("aniClip")) {
 				setButtonClipPlay(_button.aniClip, _isActive);
 			}
-			buttonCallBack(_button, "$setStyle");
+			buttonCallBack(_button, "$setStyle", _isActive);
 		}
 		public static function setButtonClipPlay(_buttonClip:*, _nextFrame:Boolean):void {
 			if (! _buttonClip) {
@@ -171,6 +171,7 @@ package ui {
 				return;
 			}
 			if (_target.currentFrame == 1) {
+				_target.stop();
 				_target.removeEventListener(Event.ENTER_FRAME, onEnterFramePrevHandler);
 			} else {
 				_target.prevFrame();
