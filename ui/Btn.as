@@ -68,8 +68,6 @@ package ui{
 				}else {
 					ButtonManager.unselectItem(__group, this);
 				}
-			}else {
-				
 			}
 			ButtonManager.setButtonStyle(this);
 		}
@@ -79,9 +77,6 @@ package ui{
 			}else if(eEval) {
 				ExternalInterface.call("eval", eEval);
 			}
-		}
-		internal function $press():void {
-			
 		}
 		override protected function onAddedToStageHandler(_evt:Event):void {
 			super.onAddedToStageHandler(_evt);
@@ -97,17 +92,17 @@ package ui{
 			stop();
 		}
 		override protected function onRemoveToStageHandler():void {
-			eEval = null;
-			href = null;
-			hrefTarget = null;
-			area = null;
-			hitArea = null;
-			enabled = false;
-			group = null;
 			rollOver = null;
 			rollOut = null;
 			press = null;
 			release = null;
+			
+			eEval = null;
+			href = null;
+			hrefTarget = null;
+			area = null;
+			group = null;
+			enabled = false;
 			super.onRemoveToStageHandler();
 		}
 	}

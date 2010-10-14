@@ -24,7 +24,7 @@
 			caption:String,
 			onSelect:Function=null
 		):ContextMenuItem {
-			var menu:ContextMenu=obj.contextMenu;
+			var menu:ContextMenu = obj?obj.contextMenu:null;
 			if(!menu){
 				//trace("新建menu");
 				menu=new ContextMenu();
@@ -35,7 +35,9 @@
 				item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,onSelect);
 			}
 			menu.customItems.push(item);
-			obj.contextMenu = menu;
+			if (obj) {
+				obj.contextMenu = menu;
+			}
 			return item;
 		}
 		//_eachFun(_instanceCopy, _i, _instanceCopy != _instance, _length);

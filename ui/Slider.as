@@ -6,8 +6,6 @@
 	 * @author Akdcl
 	 */
 	public class Slider extends ProgressBar {
-		public var change:Function;
-		
 		protected var timeHolded:uint;
 		protected var scale:Number;
 		
@@ -36,7 +34,7 @@
 			setStyle();
 		}
 		override protected function init():void {
-			$rollOut();
+			$setStyle(false);
 			isReferenceFromThumb = true;
 			super.init();
 		}
@@ -44,15 +42,16 @@
 			super.onAddedToStageHandler(_evt);
 			enabled = true;
 		}
-		internal function $rollOver():void {
-			ButtonManager.setButtonClipPlay(thumb, true);
-			ButtonManager.setButtonClipPlay(bar, true);
-			ButtonManager.setButtonClipPlay(track, true);
-		}
-		internal function $rollOut():void {
-			ButtonManager.setButtonClipPlay(thumb, false);
-			ButtonManager.setButtonClipPlay(bar, false);
-			ButtonManager.setButtonClipPlay(track, false);
+		internal function $setStyle(_isActive:Boolean):void {
+			if (_isActive) {
+				ButtonManager.setButtonClipPlay(thumb, true);
+				ButtonManager.setButtonClipPlay(bar, true);
+				ButtonManager.setButtonClipPlay(track, true);
+			}else {
+				ButtonManager.setButtonClipPlay(thumb, false);
+				ButtonManager.setButtonClipPlay(bar, false);
+				ButtonManager.setButtonClipPlay(track, false);
+			}
 		}
 		internal function $press():void {
 			timeHolded = 0;
@@ -69,10 +68,10 @@
 			}
 		}
 		protected function onHoldingHandler(_evt:Event):void {
-			if (thumb) {
-				value = Math.round(mouseX / scale / snapInterval) * snapInterval + minimum;
+			if (bar) {
+				value = Math.round((mouseX - bar.x) / scale / snapInterval) * snapInterval + minimum;
 			}else {
-				value = Math.round((mouseX-bar.x) / scale / snapInterval) * snapInterval + minimum;
+				value = Math.round(mouseX / scale / snapInterval) * snapInterval + minimum;
 			}
 			timeHolded++;
 		}
@@ -102,6 +101,7 @@
 					thumb.x = Math.round(thumb.x);
 				}
 				if (bar) {
+					thumb.x+=bar.x;
 					var _width:int = Math.round(thumb.x - bar.x - offXThumb);
 					if (_width<0) {
 						_width = 0;

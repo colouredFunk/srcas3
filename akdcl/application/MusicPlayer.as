@@ -19,15 +19,15 @@
 		public static var SOUND_STOP:String = "stop";
 		public static var SOUND_IDCHANGE:String = "idChange";
 		
-		public var btn_play:*;
-		public var btn_stop:*;
-		public var btn_prev:*;
-		public var btn_next:*;
-		public var bar_volume:*;
-		public var btn_volume:*;
-		public var bar_playProgress:*;
-		public var bar_loadProgress:*;
-		public var txt_playProgress:*;
+		public var btnPlay:*;
+		public var btnStop:*;
+		public var btnPrev:*;
+		public var btnNext:*;
+		public var barVolume:*;
+		public var btnVolume:*;
+		public var barPlayProgress:*;
+		public var barLoadProgress:*;
+		public var txtPlayProgress:*;
 		public var onWMPStateChange:Function;
 		
 		//0:不循环，1:单首循环，2:顺序循环，3:未设置
@@ -208,11 +208,11 @@
 			}else if(sound) {
 				sound.volume = __volume;
 			}
-			if (bar_volume) {
-				bar_volume.value = __volume;
+			if (barVolume) {
+				barVolume.value = __volume;
 			}
-			if (btn_volume) {
-				btn_volume.select = __volume==0;
+			if (btnVolume) {
+				btnVolume.select = __volume==0;
 			}
 		}
 		public function setVolume(_volume:Number):void {
@@ -354,41 +354,41 @@
 				onWMPStateChange(_id);
 			}
 		}
-		override protected function init():void {
-			super.init();
+		override protected function onAddedToStageHandler(_evt:Event):void {
+			super.onAddedToStageHandler(_evt);
 			addEventListener(Event.CHANGE, onSoundStageChangeHandle);
 			__playState = SOUND_STOP;
-			if (btn_play) {
-				btn_play.release = autoPlay;
+			if (btnPlay) {
+				btnPlay.release = autoPlay;
 			}
-			if (btn_stop) {
-				btn_stop.release = stop;
+			if (btnStop) {
+				btnStop.release = stop;
 			}
-			if (btn_prev) {
-				btn_prev.release = prev;
+			if (btnPrev) {
+				btnPrev.release = prev;
 			}
-			if (btn_next) {
-				btn_next.release = next;
+			if (btnNext) {
+				btnNext.release = next;
 			}
-			if (btn_volume) {
-				btn_volume.release = function():void {
+			if (btnVolume) {
+				btnVolume.release = function():void {
 					mute = !mute;
 				}
 			}
-			if (bar_volume) {
-				bar_volume.snapInterval = 0.01;
-				bar_volume.minimum = 0;
-				bar_volume.maximum = 1;
-				bar_volume.change = function(_value:Number,...arg):void {
+			if (barVolume) {
+				barVolume.snapInterval = 0.01;
+				barVolume.minimum = 0;
+				barVolume.maximum = 1;
+				barVolume.change = function(_value:Number,...arg):void {
 					volume = _value;
 				}
 			}
-			if (bar_playProgress) {
-				bar_playProgress.snapInterval = 0.01;
-				bar_playProgress.minimum = 0;
-				bar_playProgress.maximum = 1;
-				bar_playProgress.release = function(_value:Number):void {
-					play(totalTime * Math.min(_value, loaded));
+			if (barPlayProgress) {
+				barPlayProgress.snapInterval = 0.01;
+				barPlayProgress.minimum = 0;
+				barPlayProgress.maximum = 1;
+				barPlayProgress.release = function():void {
+					play(totalTime * Math.min(this.value, loaded));
 				}
 			}
 			if (ExternalInterface.available) {
@@ -418,11 +418,11 @@
 			}
 		}
 		protected function onSoundPlayProgressHandle(_evt:Event):void {
-			if (bar_playProgress) {
-				bar_playProgress.value = played;
+			if (barPlayProgress) {
+				barPlayProgress.value = played;
 			}
-			if (txt_playProgress) {
-				txt_playProgress.text = timeInfo();
+			if (txtPlayProgress) {
+				txtPlayProgress.text = timeInfo();
 			}
 		}
 		protected function onSoundLoadProgressHandle(_evt:ProgressEvent):void {
@@ -452,18 +452,18 @@
 		protected function onSoundStageChangeHandle(_evt:Event):void {
 			switch(playState) {
 				case SOUND_PLAY:
-					if (btn_play) {
-						btn_play.select = true;
+					if (btnPlay) {
+						btnPlay.select = true;
 					}
 					break;
 				case SOUND_PAUSE:
-					if (btn_play) {
-						btn_play.select = false;
+					if (btnPlay) {
+						btnPlay.select = false;
 					}
 					break;
 				case SOUND_STOP:
-					if (btn_play) {
-						btn_play.select = false;
+					if (btnPlay) {
+						btnPlay.select = false;
 					}
 					break;
 			}
