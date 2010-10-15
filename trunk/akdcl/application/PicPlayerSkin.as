@@ -182,6 +182,7 @@
 			if (!_btn) {
 				return;
 			}
+			var _label:String = String(picPlayer.getPicXML(_id).@label);
 			try {
 				_btn.visible=true;
 				_btn.autoSize = "center";
@@ -192,9 +193,8 @@
 						_btn.addChild(_btn.icon);
 					}
 					_btn.icon.addChild(Common.loader(_icon,onIconLoadedHandle));
-					_btn.label = "";
+					_btn.label = _label;
 				}else {
-					var _label:String = String(picPlayer.getPicXML(_id).@label);
 					_btn.label = _label || String(_id + 1);
 				}
 			}catch (_ero:*) {

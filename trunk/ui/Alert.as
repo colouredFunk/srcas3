@@ -1,18 +1,31 @@
 ﻿package ui{
-	import flash.display.DisplayObject;
+	import flash.display.Stage;
 	import flash.display.Sprite;
+	import flash.display.DisplayObject;
+	
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
-	import flash.display.Stage;
 	import flash.events.Event;
-	import com.greensock.TweenMax;
-	import com.greensock.easing.Cubic;
-	public class Alert extends SimpleBtn {
+	import flash.text.TextFieldAutoSize;
+	
+	public class Alert extends UISprite {
 		public static var AlertLayer:Sprite;
 		public static var AlertClass:Class;
 		public static var AlertAppear:Function;
 		public static var TxtMouseEnabled:Boolean;
 		public static var AlertPoint:Point;
+		
+		public static function show(_str:String, _ctrlLabel:* = "确定|取消", _callBack:Function):Alert {
+			var _alert:Alert;
+			if (AlertClass) {
+				_alert = new AlertClass();
+			}else {
+				_alert = new Alert();
+			}
+			_alert.alert(_str, _ctrlLabel);
+			_alert.callBack = _callBack;
+			return _alert;
+		}
 		
 		public var callBack:Function;
 		
@@ -24,35 +37,48 @@
 		private var dy_yn:int;
 		private var dy_x:int;
 		
-		public var txt_title:*;
-		public var txt_show:*;
-		public var btn_y:*;
-		public var btnN:*;
+		protected var offXLabel:int;
+		
+		public var txtTitle:*;
+		public var txtText:*;
+		public var btnY:*;
 		public var btnX:*;
 		public var bar:*;
+		protected var btnList:Array;
 		
 		protected var item:DisplayObject;
-		protected var maskArea:SimpleBtn;
-		protected var isYN:Boolean;
-		protected var dragEnabled:Boolean;
-		protected var isMask:Boolean;
-		public static function createAlert(_str:String,_isYN:Boolean=false,_yes:String=null,_no:String=null):Alert {
-			var _alert:Alert;
-			if (AlertClass) {
-				_alert = new AlertClass();
-			}else {
-				_alert = new Alert();
+		
+		//protected var maskArea:SimpleBtn;
+		//protected var dragEnabled:Boolean;
+		//protected var isMask:Boolean;
+		
+		public function get text():String{
+			return txtText.text;
+		}
+		public function set text(_text:String):void{
+			txtText.text=_text;
+			setStyle();
+		}
+		public function get autoSize():String{
+			return txtText.autoSize;
+		}
+		public function set autoSize(_autoSize:String):void{
+			txtText.autoSize=_autoSize;
+			switch(txtText.autoSize){
+				case "left":
+					txtText.x=-int(barWidth*0.5-dx_show);
+					break;
+				case "right":
+					txtText.x=int(barWidth*0.5-dx_show);
+					break;
+				case "center":
+					txtText.x=0;
+					break;
 			}
-			_alert.alert(_str, _isYN, _yes, _no);
-			return _alert;
 		}
-		public function Alert() {
-			addEventListener(Event.ADDED_TO_STAGE,added);
-		}
-		protected function added(_evt:Event):void {
-			removeEventListener(Event.ADDED_TO_STAGE,added);
-			addEventListener(Event.REMOVED_FROM_STAGE,removed);
-			btn_y.release = function():void {
+		override protected function init():void {
+			super.init();
+			btnY.release = function():void {
 				if((callBack!=null)?(callBack(true)!= false):true){
 					remove();
 				}
@@ -65,81 +91,25 @@
 			if (btnX) {
 				btnX.release = btnN.release;
 			}
-			mouseEnabled = false;
-			txt_show.mouseEnabled = TxtMouseEnabled;
-			txt_show.mouseChildren = TxtMouseEnabled;
-			txt_show.setTxtMouse(TxtMouseEnabled);
-			txt_show.html = true;
-			btnN.autoSize="center";
-			btn_y.autoSize="center";
-			bar.rollOver = function():void {
-				this.buttonMode = false;
-				this.rollOver = null;
-			}
-			bar.press = function():void  {
-				parent.addChild(this.parent);
-				startDrag();
-			};
-			bar.release =function ():void {
-				stopDrag();
-				adjustXY();
-			};
-			maskArea = new SimpleBtn();
-			addChildAt(maskArea,0);
-			maskArea.buttonMode = false;
-			maskArea.release = winkBar;
-			getStyleParams();
-			if (AlertAppear != null) {
-				AlertAppear(this);
-			}
-		}
-		private var isWinking:Boolean;
-		protected function winkBar():void {
-			if (isWinking) {
-				return;
-			}
-			isWinking = true;
-			TweenMax.to(bar, 0.1, { colorMatrixFilter: { contrast:1.5, brightness:1.5 }, yoyo:true, repeat:3 ,ease:Cubic.easeInOut, onComplete:onWinkBarEndHandle } );
-		}
-		protected function onWinkBarEndHandle():void {
-			isWinking = false;
-		}
-		protected function removed(_evt:Event):void {
-			removeEventListener(Event.REMOVED_FROM_STAGE,removed);
-			removeChild(maskArea);
-			if (item && contains(item)) {
-				removeChild(item);
-				item = null;
-			}
-			callBack = null;
 			
-			//txt_titletxt_showbtn_ybtnNbtnXbarmaskAreaitem
-		}
-		public function get text():String{
-			return txt_show.text;
-		}
-		public function set text(_text:String):void{
-			txt_show.text=_text;
-			setStyle();
-		}
-		public function get autoSize():String{
-			return txt_show.autoSize;
-		}
-		public function set autoSize(_autoSize:String):void{
-			txt_show.autoSize=_autoSize;
-			switch(txt_show.autoSize){
-				case "left":
-					txt_show.x=-int(barWidth*0.5-dx_show);
-					break;
-				case "right":
-					txt_show.x=int(barWidth*0.5-dx_show);
-					break;
-				case "center":
-					txt_show.x=0;
-					break;
-			}
-		}
-		public function alert(_alert:String,_isYN:Boolean=false,_yes:String=null,_no:String=null):void{
+			
+			offXLabel = btnY.x;
+			__labelWidth = int(btnY.width);
+			
+			btnList = [btnY];
+			mouseEnabled = false;
+			txtText.html = true;
+			txtText.enabled = false;
+			bar.press = pressBar;
+			bar.release = releaseBar;
+			
+			
+			
+			
+			
+			
+			
+			
 			if(!stage){
 				if(AlertLayer){
 					AlertLayer.addChild(this);
@@ -151,81 +121,107 @@
 						y=int(AlertLayer.stage.stageHeight*0.5);
 					}
 				}else{
-					trace("AlertLayer is undefined!" );
+					trace("AlertLayer is undefined!");
 					return;
 				}
 			}
 			text=_alert.split("\r\n").join("\r");
 			showBtns(true, _isYN, _yes, _no);
 			setBar(true,true);
+			
+			
+			
+			
+			
 		}
-		public function addItem(_item:DisplayObject, _itemHeight:uint = 0):void {
-			if (item && contains(item)) {
-				removeChild(item);
-			}
-			if (itemHeight!=0) {
-				itemHeight = _itemHeight;
-			}else {
-				itemHeight = _item.height;
-			}
-			item = _item;
-			addChild(item);
-			setStyle();
+		override protected function onRemoveToStageHandler():void {
+			super.onRemoveToStageHandler();
 		}
-		public function showBtns(_b:Boolean, _isYN:Boolean = false, _yes:String = null, _no:String = null):void {
-			btn_y.visible = btnN.visible = _b;
-			if (btnX) {
-				btnX.visible = _b;
-			}
-			if(_yes){
-				btn_y.label = _yes;
-			}
-			if(_no){
-				btnN.label = _no;
-			}
-			if (_isYN) {
-				btn_y.x = - btnN.x;
-				btnN.visible = true;
-			} else {
-				btn_y.x = 0;
-				btnN.visible = false;
-			}
-			isYN = _isYN;
+		protected function pressBar():void {
+			parent.addChild(this);
+			startDrag();
 		}
-		public function setBar(_isDrag:Boolean = false, _isMask:Boolean = false):void {
-			if (_isDrag) {
-				bar.enabled = true;
-			} else {
-				bar.enabled = false;
-			}
-			if(_isMask){
-				maskArea.hitArea = (parent as Sprite);
-			}else{
-				maskArea.hitArea = null;
-			}
-			isMask = _isMask;
-			dragEnabled = _isDrag;
+		protected function releaseBar():void {
+			parent.addChild(this);
+			startDrag();
 		}
-		public function remove():void {
-			callBack = null;
-			if (parent) {
-				parent.removeChild(this);
+		private var __labelWidth:uint;
+		public function get labelWidth():uint{
+			return __labelWidth;
+		}
+		public function set labelWidth(_labelWidth:uint):void{
+			__labelWidth = _labelWidth;
+		}
+		protected var labelList:Array;
+		public function get label():* {
+			return labelList;
+		}
+		public function set label(_label:*):void {
+			if (_label is Number) {
+				switch(_label) {
+					case 0:
+						_label = "";
+					break;
+					case 1:
+						_label="确定"
+					break;
+					case 2:
+						_label="确定|取消"
+					break;
+					default:
+					_label = "确定|取消";
+					for (var _i:uint = 2; _i < _label; _i++ ) {
+						_label += "| ";
+					}
+				}
+			}
+			_label = String(_label);
+			labelList = _label.split("|");
+			Common.copyInstanceToArray(btnY, Math.max(labelList.length, btnList.length), btnList, setBtn);
+		}
+		protected function setBtn(_btn:*, _id:uint, ...args):void {
+			addChildAt(_btn, getChildIndex(btnY));
+			_btn.widthMax = labelWidth;
+			_btn.label = labelList[_id];
+			_btn.autoSize = labelAutoSize;
+			switch(labelAutoSize) {
+				case TextFieldAutoSize.LEFT:
+					_btn.x = offXLabel + labelWidth * _id;
+				break;
+				case TextFieldAutoSize.CENTER:
+				break;
+				case TextFieldAutoSize.RIGHT;
+					_btn.x = offXLabel + labelWidth * _id;
+				break;
 			}
 		}
+		
+		/*
+		private var isWinking:Boolean;
+		protected function winkBar():void {
+			if (isWinking) {
+				return;
+			}
+			isWinking = true;
+			TweenMax.to(bar, 0.1, { colorMatrixFilter: { contrast:1.5, brightness:1.5 }, yoyo:true, repeat:3 ,ease:Cubic.easeInOut, onComplete:onWinkBarEndHandle } );
+		}
+		protected function onWinkBarEndHandle():void {
+			isWinking = false;
+		}*/
 		private var dy_item:uint = 10;
 		private var itemHeight:uint;
 		public function setStyle():void {
-			barHeight = int(txt_show.height + dy_showyn + dy_show + dy_yn);
+			barHeight = int(txtText.height + dy_showyn + dy_show + dy_yn);
 			if (item) {
-				barHeight += (itemHeight?itemHeight:txt_show.height) + dy_item;
+				barHeight += (itemHeight?itemHeight:txtText.height) + dy_item;
 			}
 			bar.height = barHeight;
 			bar.y = - int(barHeight * 0.5);
-			txt_show.y = bar.y + dy_show;
+			txtText.y = bar.y + dy_show;
 			if (item) {
-				item.y = txt_show.y + txt_show.height + dy_item;
+				item.y = txtText.y + txtText.height + dy_item;
 			}
-			btnN.y = btn_y.y = bar.y + barHeight - dy_yn;
+			btnN.y = btnY.y = bar.y + barHeight - dy_yn;
 			if (btnX) {
 				btnX.y = dy_x - barHeight * 0.5;
 			}
@@ -233,15 +229,15 @@
 		}
 		protected function getStyleParams():void {
 			barWidth = int(bar.width);
-			dx_show = int(txt_show.x - bar.x);
-			dy_show = int(txt_show.y - bar.y);
-			dy_yn = int(bar.y + bar.height - btn_y.y);
+			dx_show = int(txtText.x - bar.x);
+			dy_show = int(txtText.y - bar.y);
+			dy_yn = int(bar.y + bar.height - btnY.y);
 			if (btnX) {
 				dy_x = int(btnX.y - bar.y);
 			}
-			dy_showyn = int(btn_y.y - txt_show.y - txt_show.height);
-			if (!txt_show.widthMax) {
-				txt_show.widthMax = barWidth - dx_show * 2;
+			dy_showyn = int(btnY.y - txtText.y - txtText.height);
+			if (!txtText.widthMax) {
+				txtText.widthMax = barWidth - dx_show * 2;
 			}
 		}
 		private function adjustXY():void {

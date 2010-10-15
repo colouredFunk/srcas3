@@ -9,15 +9,11 @@
 		protected var textFormat:TextFormat;
 		override protected function init():void {
 			super.init();
-			textFormat = new TextFormat();
-			txt.mouseWheelEnabled=false;
-			txt.mouseEnabled=false;
-			//txt.multiline=false;
-			txt.wordWrap=false;
-			txt.autoSize="left";
-		}
-		public function setTxtMouse(_b:Boolean):void {
-			txt.mouseEnabled=_b;
+			txt.mouseWheelEnabled = false;
+			txt.mouseEnabled = false;
+			txt.selectable = false;
+			txt.wordWrap = false;
+			txt.autoSize = "left";
 		}
 		protected var __widthMax:int;
 		[Inspectable(defaultValue=0,type="int",name="0_固定宽")]
@@ -55,7 +51,7 @@
 		[Inspectable(enumeration="left,right,center,none",defaultValue="left",type="String",name="对齐")]
 		public function set autoSize(_autoSize:String):void {
 			try{
-				txt.autoSize=_autoSize;
+				txt.autoSize = _autoSize;
 			}catch (_ero:*) {
 				
 			}
@@ -69,13 +65,13 @@
 			txt.type=_type;
 		}
 		public function set selectable(_selectable:Boolean):void {
-			txt.selectable=_selectable;
+			txt.selectable = _selectable;
 		}
 		public function set maxChars(_maxChars:int):void {
-			txt.maxChars=_maxChars;
+			txt.maxChars = _maxChars;
 		}
 		public function set restrict(_restrict:String):void {
-			txt.restrict=_restrict;
+			txt.restrict = _restrict;
 		}
 		public function set styleSheet(_styleSheet:StyleSheet):void {
 			txt.styleSheet = _styleSheet;
@@ -84,7 +80,10 @@
 			if (widthMax) {
 				txt.wordWrap=true;
 				txt.width = widthMax;
-				try{
+				try {
+					if (!textFormat) {
+						textFormat = new TextFormat();
+					}
 					textFormat.align = txt.autoSize;
 					txt.setTextFormat(textFormat);
 				}catch (_ero:*) {
