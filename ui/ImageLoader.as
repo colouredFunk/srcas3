@@ -224,12 +224,12 @@
 		protected function onImageLoadingHandler(_evt:LoaderEvent):void {
 			if (progressClip) {
 				progressClip.visible = true;
-				if (progressClip is MovieClip) {
-					progressClip.play();
-				}else if (progressClip.hasOwnProperty("text")) {
+				if (progressClip.hasOwnProperty("text")) {
 					progressClip.text = Math.round(_evt.target.progress * 100) + " %";
 				}else if (progressClip.hasOwnProperty("value")) {
 					progressClip.value = _evt.target.progress;
+				}else if (progressClip is MovieClip) {
+					progressClip.play();
 				}
 			}
 		}
