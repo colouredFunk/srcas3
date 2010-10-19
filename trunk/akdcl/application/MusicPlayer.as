@@ -12,7 +12,7 @@
 	import flash.external.ExternalInterface;
 
 	public class MusicPlayer extends UISprite {
-		public static const WMP_STATE_LIST:Array = ["停止", "暂停", "播放", "向前", "向后", "缓冲", "等待", "完毕", "连接", "就绪"];
+		public static const WMP_STATE_LIST:Array = ["", "停止", "暂停", "播放", "向前", "向后", "缓冲", "等待", "完毕", "连接", "就绪", "重新连接"];
 		
 		public static var SOUND_PLAY:String = "play";
 		public static var SOUND_PAUSE:String = "pause";
@@ -43,7 +43,12 @@
 		//0~1
 		public function get loaded():Number {
 			if (isPluginMode) {
-				return 1;
+				var _playingInfo:Object = getMusicPlayingInfo();
+				if (_playingInfo) {
+					return int(_playingInfo.downloadProgress) * 0.01;
+				}else {
+					return 1;
+				}
 			}else if (sound) {
 				return sound.loaded;
 			}else{
@@ -161,10 +166,9 @@
 			dispatchEvent(new Event(SOUND_IDCHANGE));
 			if (isAutoPlay) {
 				play();
+			}else {
+				stop();
 			}
-		}
-		protected function onID3Loaded(_evt:Event):void {
-			//sound.id3;
 		}
 		public var isAutoPlay:Boolean;
 		public var musicInfoMore:Object;
@@ -232,7 +236,7 @@
 			switch(playState) {
 				case SOUND_PAUSE:
 				case SOUND_STOP:
-				case WMP_STATE_LIST[9]:
+				case WMP_STATE_LIST[10]:
 					play();
 					return true;
 				case SOUND_PLAY:
@@ -300,6 +304,17 @@
 			playId++;
 			play();
 		}
+		public function get bufferingProgress():Number {
+			var _progress:Number = 0;
+			var _playingInfo:Object = getMusicPlayingInfo();
+			if (_playingInfo) {
+				_progress = int(_playingInfo.bufferingProgress) * 0.01;
+			}
+			return _progress;
+		}
+		protected function onID3Loaded(_evt:Event):void {
+			//sound.id3;
+		}
 		protected function getMusicPlayingInfo():Object {
 			if (isPluginMode) {
 				return ExternalInterface.call("getMusicPlayingInfo");
@@ -323,19 +338,19 @@
 					break;
 				case 4 :
 					//向前
-					__playState = WMP_STATE_LIST[_id - 1];
+					__playState = WMP_STATE_LIST[_id];
 					break;
 				case 5 :
 					//向后
-					__playState = WMP_STATE_LIST[_id - 1];
+					__playState = WMP_STATE_LIST[_id];
 					break;
 				case 6 :
 					//缓冲
-					__playState = WMP_STATE_LIST[_id - 1];
+					__playState = WMP_STATE_LIST[_id];
 					break;
 				case 7 :
 					//等待
-					__playState = WMP_STATE_LIST[_id - 1];
+					__playState = WMP_STATE_LIST[_id];
 					break;
 				case 8 :
 					//完毕
@@ -343,11 +358,21 @@
 					break;
 				case 9 :
 					//连接
-					__playState = WMP_STATE_LIST[_id - 1];
+					__playState = WMP_STATE_LIST[_id];
 					break;
 				case 10 :
 					//就绪
-					__playState = WMP_STATE_LIST[_id - 1];
+					__playState = WMP_STATE_LIST[_id];
+					//if (isAutoPlay) {
+						play();
+					//}
+					break;
+				case 11 :
+					//重新连接
+					__playState = WMP_STATE_LIST[_id];
+					//var _musicList:*= musicList;
+					//attachMusic("", false);
+					//attachMusic(_musicList, true);
 					break;
 			}
 			if (onWMPStateChange!=null) {
