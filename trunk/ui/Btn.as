@@ -78,8 +78,8 @@ package ui{
 				ExternalInterface.call("eval", eEval);
 			}
 		}
-		override protected function onAddedToStageHandler(_evt:Event):void {
-			super.onAddedToStageHandler(_evt);
+		override protected function init():void {
+			super.init();
 			enabled = true;
 			if (area) {
 				var _length:uint = area.numChildren;

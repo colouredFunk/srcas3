@@ -1,4 +1,5 @@
 package ui {
+	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.display.MovieClip;
@@ -15,27 +16,40 @@ package ui {
 		private static const PRESS = "press";
 		private static const RELEASE = "release";
 		private static const MOUSE_WHEEL = "wheel";
+		private static var buttonDic:Dictionary;
 		private static var buttonInDic:Dictionary;
 		private static var buttonDownDic:Dictionary;
+		private static var tempSprite:Sprite;
 		private static function initializeManager():* {
+			buttonDic = new Dictionary();
 			buttonInDic = new Dictionary();
 			buttonDownDic = new Dictionary();
+			tempSprite = new Sprite();
+			tempSprite.addEventListener(Event.ENTER_FRAME, checkStage);
+		}
+		private static function checkStage(_evt:Event):void {
+			for each(var _button:* in buttonDic) {
+				if (_button.stage) {
+					_button.stage.addEventListener(MouseEvent.MOUSE_DOWN, onStageMouseDownHandler);
+					_button.stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUpHandler);
+					_button.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onStageMouseWheelHandler);
+					tempSprite.removeEventListener(Event.ENTER_FRAME, checkStage);
+					tempSprite = null;
+					return;
+				}
+			}
 		}
 		public static function addButton(_button:*, _buttonMode:Boolean = true):void {
-			if (!_button.stage) {
-				return;
-			}
 			_button.buttonMode = _buttonMode;
 			_button.addEventListener(MouseEvent.ROLL_OVER, onButtonRollOverHandler);
-			_button.stage.addEventListener(MouseEvent.MOUSE_DOWN, onStageMouseDownHandler);
-			_button.stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUpHandler);
-			_button.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onStageMouseWheelHandler);
+			buttonDic[_button] = _button;
 			setButtonStyle(_button);
 		}
 		public static function removeButton(_button:*):void {
 			_button.buttonMode = false;
 			_button.removeEventListener(MouseEvent.ROLL_OVER, onButtonRollOverHandler);
 			_button.removeEventListener(MouseEvent.ROLL_OUT, onButtonRollOutHandler);
+			delete buttonDic[_button];
 			delete buttonInDic[_button];
 			delete buttonDownDic[_button];
 		}

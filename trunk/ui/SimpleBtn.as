@@ -20,8 +20,8 @@
 				ButtonManager.removeButton(this);
 			}
 		}
-		override protected function onAddedToStageHandler(_evt:Event):void {
-			super.onAddedToStageHandler(_evt);
+		override protected function init():void {
+			super.init();
 			enabled = true;
 		}
 		override protected function onRemoveToStageHandler():void {

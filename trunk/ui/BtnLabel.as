@@ -2,6 +2,7 @@
 	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.text.StyleSheet;
+	import flash.text.TextFieldAutoSize;
 	public class BtnLabel extends Btn {
 		public var txt:*;
 		public var bar:*;
@@ -42,24 +43,40 @@
 			$setStyle(false);
 		}
 		override protected function init():void {
+			xOff = int(bar.x - txt.x);
+			yOff = int(bar.y - txt.y);
+			widthAdd = -xOff * 2;
+			heightAdd = -yOff * 2;
 			super.init();
-			widthAdd = bar.width - txt.width;
-			heightAdd = bar.height - txt.height;
-			xOff = bar.x - txt.x;
-			yOff = bar.y - txt.y;
 		}
 		internal function $setStyle(_isActive:Boolean):void {
-			if (bar) {
-				bar.width = __widthMax?__widthMax:(txt.width + widthAdd);
-				bar.height = __heightMax?__heightMax:(txt.height + heightAdd);
-				if (txt.autoSize == "right") {
-					bar.x = int(txt.x - txt.width + xOff);
-				} else if (txt.autoSize == "center") {
-					bar.x = int(txt.x - txt.width * 0.5 + xOff);
-				} else {
-					bar.x = int(txt.x + xOff);
+			if (totalFrames > 8) {
+				if (bar) {
+					if (txt.autoSize == TextFieldAutoSize.RIGHT) {
+					} else if (txt.autoSize == TextFieldAutoSize.CENTER) {
+					} else {
+					}
 				}
-				bar.y = int(txt.y + yOff);
+			}else {
+				if (bar) {
+					if (txt.width + widthAdd > __widthMax && txt.width + widthAdd * 0.25 < __widthMax) {
+						bar.width = __widthMax;
+					}else {
+						bar.width = int(txt.width + widthAdd);
+					}
+					if (txt.autoSize == TextFieldAutoSize.RIGHT) {
+						bar.x = -bar.width;
+						txt.x = int((txt.width - bar.width) * 0.5);
+					} else if (txt.autoSize == TextFieldAutoSize.CENTER) {
+						bar.x = -int(bar.width * 0.5);
+						txt.x = 0;
+					} else {
+						bar.x = 0;
+						txt.x = -int((txt.width - bar.width) * 0.5);
+					}
+					bar.y = 0;
+					txt.y = bar.y - yOff;
+				}
 			}
 			if (endClip) {
 				endClip.x = txt.txt.x + txt.width;
