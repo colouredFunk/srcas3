@@ -8,8 +8,9 @@ Sprite3D 版本:v1.0
 */
 
 package zero.zero3D.objs{
-	import zero.zero3D.cameras.*;
 	import flash.display.*;
+	
+	import zero.zero3D.cameras.*;
 	public class Sprite3D extends VerticesObj3D implements IRenderUnit{
 		public var sprite:Sprite;
 		public function Sprite3D(_sprite:Sprite){
@@ -35,8 +36,8 @@ package zero.zero3D.objs{
 		public function get focalLength():Number{
 			return focalLengthV[0];//以原点的 focalLength 作为 focalLength
 		}
-		public function render(container:Sprite):void{
-			container.addChild(sprite);
+		public function render(container:*):void{
+			(container as Sprite).addChild(sprite);
 			sprite.x=screenVertexV[0];
 			sprite.y=screenVertexV[1];
 		}

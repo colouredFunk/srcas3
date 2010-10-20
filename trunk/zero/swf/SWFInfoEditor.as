@@ -15,7 +15,6 @@ package zero.swf{
 	import zero.swf.tag_body.DebugID;
 	import zero.swf.tag_body.EnableDebugger2;
 	import zero.swf.tag_body.ScriptLimits;
-	import zero.swf.tag_body.SetBackgroundColor;
 	//import zero.swf.tag_body.ProductInfo;
 	
 	public class SWFInfoEditor{
@@ -24,7 +23,6 @@ package zero.swf{
 		public var debugIDStr:String;
 		public var MaxRecursionDepth:int;
 		public var ScriptTimeoutSeconds:int;
-		public var bgColor:int;
 		
 		public function SWFInfoEditor(){
 			bgColor=0xffffff;
@@ -63,16 +61,6 @@ package zero.swf{
 						MaxRecursionDepth=scriptLimits.MaxRecursionDepth;
 						ScriptTimeoutSeconds=scriptLimits.ScriptTimeoutSeconds;
 					break;
-					case TagType.SetBackgroundColor:
-						var setBackgroundColor:SetBackgroundColor;
-						if(tag.tagBody){
-							setBackgroundColor=tag.tagBody as SetBackgroundColor;
-						}else{
-							setBackgroundColor=new SetBackgroundColor();
-							setBackgroundColor.initByData(tag.bodyData,tag.bodyOffset,tag.bodyOffset+tag.bodyLength);
-						}
-						bgColor=setBackgroundColor.BackgroundColor;
-					break;
 				}
 			}
 		}
@@ -100,7 +88,6 @@ package zero.swf{
 					case TagType.EnableDebugger2:
 					case TagType.DebugID:
 					case TagType.ScriptLimits:
-					case TagType.SetBackgroundColor:
 						tagV.splice(tagId,1);
 					break;
 				}
@@ -133,13 +120,6 @@ package zero.swf{
 				tag.tagBody=scriptLimits;
 				tagV.unshift(tag);
 			}
-			
-			//
-			var setBackgroundColor:SetBackgroundColor=new SetBackgroundColor();
-			setBackgroundColor.BackgroundColor=bgColor;
-			tag=new Tag();
-			tag.tagBody=setBackgroundColor;
-			tagV.unshift(tag);
 			
 			//
 			if(metadataTag){

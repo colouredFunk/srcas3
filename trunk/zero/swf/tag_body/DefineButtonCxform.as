@@ -2,7 +2,7 @@
 DefineButtonCxform 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年9月10日 22:21:25 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月17日 10:48:15 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -25,10 +25,10 @@ package zero.swf.tag_body{
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			ButtonId=data[offset]|(data[offset+1]<<8);
-			ButtonColorTransformV=new Vector.<CXFORM>();
 			//#offsetpp
 			offset+=2;
 			var i:int=-1;
+			ButtonColorTransformV=new Vector.<CXFORM>();
 			while(offset<endOffset){
 				i++;
 				//#offsetpp
@@ -71,8 +71,8 @@ package zero.swf.tag_body{
 			ButtonId=int(xml.@ButtonId.toString());
 			var listXML:XML=xml.list[0];
 			var ButtonColorTransformXMLList:XMLList=listXML.ButtonColorTransform;
-			ButtonColorTransformV=new Vector.<CXFORM>();
 			var i:int=-1;
+			ButtonColorTransformV=new Vector.<CXFORM>(ButtonColorTransformXMLList.length());
 			for each(var ButtonColorTransformXML:XML in ButtonColorTransformXMLList){
 				i++;
 				ButtonColorTransformV[i]=new CXFORM();

@@ -1,42 +1,21 @@
 /***
-SWFInfoGetter 版本:v1.0
+Txt 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年6月22日 18:53:57
+创建时间:2010年10月14日 21:10:31
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.swf{
+package zero.html{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
 	
-	import zero.swf.record.RECT;
-
-	public class DataAndBaseInfo{
-		public var FrameSize:RECT;
-		public var FrameRate:Number;//舞台宽高在SWF里是以一个RECT(见 SWF File Format Specification Version 10 第20页 Rectangle record)的结构保存
-		public var offset:int;
-		
-		public function DataAndBaseInfo(){
-			FrameSize=new RECT();
-			FrameRate=1;
-		}
-		
-		public function initByData(data:ByteArray):void{
-			//获取SWF的宽高帧频
-			
-			offset=FrameSize.initByData(data,0,data.length);
-			//trace(FrameSize.toXML().toXMLString());
-			
-			FrameRate=data[offset++]/256+data[offset++];//帧频是一个Number, 在SWF里以 FIXED8(16-bit 8.8 fixed-point number, 16位8.8定点数) 的结构保存
-		}
-		public function getData(data:ByteArray):void{
-			data.writeBytes(FrameSize.toData());
-			offset=data.length;
-			data[offset++]=FrameRate*256;
-			data[offset++]=FrameRate;
+	public class Txt extends HTMLElement{
+		public function Txt(){
+			this.border=true;
+			this.background=true;
 		}
 	}
 }

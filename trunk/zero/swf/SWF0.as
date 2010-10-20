@@ -1,5 +1,5 @@
 ﻿/***
-SWFDataAndData 版本:v1.0
+SWF0 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
 创建时间:2010年5月9日 23:04:24
@@ -8,21 +8,50 @@ SWFDataAndData 版本:v1.0
 */
 
 package zero.swf{
-	import zero.Outputer;
 	import flash.display.*;
 	import flash.events.*;
 	import flash.system.Capabilities;
 	import flash.utils.*;
+	
+	import zero.Outputer;
 
-	public class SWFDataAndData{
+	public class SWF0{
 		public static const playerVersion:int=int(Capabilities.version.match(/\d+,/)[0].replace(",",""));//例如 WIN 10,0,22,91 抽出 10;
+		
+		public static const baseInfoNameV:Vector.<String>=Vector.<String>([
+			"type","Version"
+		]);
+		
 		public var type:String;
 		public var Version:int=playerVersion;
 		public var FileLength:int;
 		
-		public function SWFDataAndData(){
-			type="CWS";
-			Version=playerVersion;
+		public var data:ByteArray;
+		
+		public function SWF0(
+			_type:String="CWS",
+			_Version:int=0
+		){
+			type=_type;
+			Version=_Version>0?_Version:playerVersion;
+		}
+		public function copyBaseInfo(swf:SWF0):void{
+			var swfBaseInfoNameV:Vector.<String>=swf["constructor"].baseInfoNameV;
+			var baseInfoNameV:Vector.<String>=this["constructor"].baseInfoNameV;
+			for each(var baseInfoName:String in swfBaseInfoNameV){
+				if(baseInfoNameV.indexOf(baseInfoName)==-1){
+					
+				}else{
+					this[baseInfoName]=swf[baseInfoName];
+				}
+			}
+		}
+		
+		public function initBySWFData(swfData:ByteArray):void{
+			data=swfData2Data(swfData);
+		}
+		public function toSWFData():ByteArray{
+			return data2SWFData(data);
 		}
 		
 		public function swfData2Data(swfData:ByteArray):ByteArray{
@@ -31,12 +60,11 @@ package zero.swf{
 				swfData.position=0;
 				type=swfData.readUTFBytes(3);//压缩和非压缩标记
 				
-				var data:ByteArray;
+				var data:ByteArray=new ByteArray();
+				data.writeBytes(swfData,8);
 				
 				switch(type){
 					case "CWS":
-						data=new ByteArray();
-						data.writeBytes(swfData,8);
 						try{
 							data.uncompress();
 						}catch(e:Error){
@@ -44,8 +72,6 @@ package zero.swf{
 						}
 					break;
 					case "FWS":
-						data=new ByteArray();
-						data.writeBytes(swfData,8);
 					break;
 					default:
 						throw new Error("不是有效的SWF文件");
@@ -62,6 +88,7 @@ package zero.swf{
 						,"brown"
 					);
 				}
+				
 				return data;
 			}
 			throw new Error("不是有效的SWF文件");
@@ -72,14 +99,13 @@ package zero.swf{
 			
 			FileLength=data.length+8;
 			
-			//if(type=="CWS"){
-			//	data.compress();
-			//}
+			var newData:ByteArray;
 			if(type=="CWS"){
-				var compressData:ByteArray=new ByteArray();
-				compressData.writeBytes(data);
-				compressData.compress();//不直接用data.compress()是因为防止改变传入的data
-				data=compressData;
+				newData=new ByteArray();
+				newData.writeBytes(data);
+				newData.compress();
+			}else{
+				newData=data;
 			}
 			
 			var swfData:ByteArray=new ByteArray();
@@ -90,7 +116,7 @@ package zero.swf{
 			swfData[6]=FileLength>>16;
 			swfData[7]=FileLength>>24;
 			swfData.position=8;
-			swfData.writeBytes(data);
+			swfData.writeBytes(newData);
 			return swfData;
 		}
 	}

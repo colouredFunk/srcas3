@@ -8,12 +8,12 @@ Camera3D 版本:v1.0
 */
 
 package zero.zero3D.cameras{
-	import zero.zero3D.*;
-	import zero.zero3D.objs.*;
-	
 	import flash.display.*;
 	import flash.geom.*;
 	import flash.utils.*;
+	
+	import zero.zero3D.*;
+	import zero.zero3D.objs.*;
 	public class Camera3D extends Obj3D{
 		
 		public var scene3D:Scene3D;
@@ -56,7 +56,8 @@ package zero.zero3D.cameras{
 				}
 			}
 		}
-		public function output(container:Sprite):void{
+		public function output(container:DisplayObject):void{
+			//trace("output");
 			//输出图像到一个容器里
 			cameraMatrix3D.rawData=matrix3D.rawData;
 			cameraMatrix3D.invert();
@@ -85,10 +86,15 @@ package zero.zero3D.cameras{
 			}
 			//trace("render 耗时: "+(getTimer()-t)+" 毫秒");
 		}
-		public function outputByContainerDict(containerDict:Dictionary):void{
+		public function outputByContainerDict(containerDict:Dictionary,graMark:Object=null,containerKeyDict:Dictionary=null):void{
 			var obj1:*,obj2:*;
-			for each(var container:Sprite in containerDict){
+			var container:Sprite;
+			for each(container in containerDict){
 				container.graphics.clear();
+				var i:int=container.numChildren;
+				while(--i>=0){
+					container.removeChildAt(i);
+				}
 			}
 			for(obj1 in containerDict){
 				if(containerDict[obj1].visible){
@@ -96,7 +102,22 @@ package zero.zero3D.cameras{
 						(obj2 as Obj3D).visible=false;
 					}
 					(obj1 as Obj3D).visible=true;
-					output(containerDict[obj1]);
+					container=containerDict[obj1];
+					if(graMark&&containerKeyDict){
+						//记录渲染过的，以便下次直接读取(经实验发现很耗内存...)
+						var key:String=containerKeyDict[container];
+						if(key){
+							var gra:Shape=graMark[key];
+							if(gra){
+							}else{
+								graMark[key]=gra=new Shape();
+								output(gra);
+							}
+							container.addChild(gra);
+							continue;
+						}
+					}
+					output(container);
 				}
 			}
 		}

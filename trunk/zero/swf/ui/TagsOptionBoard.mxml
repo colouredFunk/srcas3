@@ -31,7 +31,7 @@ TagsOptionBoard 版本:v1.0
 		<s:Label text="修改大量资源时比较方便" y="115" x="5"/>
 		
 	</s:BorderContainer>
-	<mx:DataGrid id="grid" left="0" top="30" right="150" bottom="0">
+	<mx:DataGrid id="grid" left="0" top="30" right="150" bottom="22">
 		<mx:columns>
 			<mx:DataGridColumn textAlign="center" draggable="false" headerText="typeNum" dataField="@typeNum" width="80"/>
 			<mx:DataGridColumn draggable="false" headerText="type" dataField="@type" width="200"/>
@@ -70,10 +70,13 @@ TagsOptionBoard 版本:v1.0
 			</mx:DataGridColumn>
 		</mx:columns>
 	</mx:DataGrid>
+	<s:Label x="250" bottom="5" text="全选:"/>
+	<ui:TagsOptionBoardItemView x="280" bottom="0" id="ctrlAllItemView"/>
 	
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
+			import mx.collections.XMLListCollection;
 			
 			import zero.Outputer;
 			import zero.air.FileAndStr;
@@ -106,7 +109,7 @@ TagsOptionBoard 版本:v1.0
 				if(settingFile.exists){
 					settingXML=new XML(FileAndStr.readStrFromFile(settingFile));
 				}else{
-					settingXML=<setting selectedOptionName="AS2代码" outputIcon/>;
+					settingXML=<setting selectedOptionName="输出位图为资源" outputIcon="false"/>;
 				}
 				
 				var optionsFolder:File=new File(optionsFolderPath);
@@ -121,6 +124,100 @@ TagsOptionBoard 版本:v1.0
 					optionFileArr=new Array();
 					i=0;
 					for each(optionXML in (<options>
+							<option name="输出位图为资源">
+								<tag typeNum="00" type="End" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="01" type="ShowFrame" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="02" type="DefineShape" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="03" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="04" type="PlaceObject" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="05" type="RemoveObject" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="06" type="DefineBits" option={DataAndTags.resourceOption}/>
+								<tag typeNum="07" type="DefineButton" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="08" type="JPEGTables" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="09"  type="SetBackgroundColor" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="10" type="DefineFont" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="11" type="DefineText" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="12" type="DoAction" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="13" type="DefineFontInfo" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="14" type="DefineSound" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="15" type="StartSound" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="16" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="17" type="DefineButtonSound" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="18" type="SoundStreamHead" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="19" type="SoundStreamBlock" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="20" type="DefineBitsLossless" option={DataAndTags.resourceOption}/>
+								<tag typeNum="21" type="DefineBitsJPEG2" option={DataAndTags.resourceOption}/>
+								<tag typeNum="22" type="DefineShape2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="23" type="DefineButtonCxform" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="24" type="Protect" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="25" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="26" type="PlaceObject2" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="27" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="28" type="RemoveObject2" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="29" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="30" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="31" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="32" type="DefineShape3" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="33" type="DefineText2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="34" type="DefineButton2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="35" type="DefineBitsJPEG3" option={DataAndTags.resourceOption}/>
+								<tag typeNum="36" type="DefineBitsLossless2" option={DataAndTags.resourceOption}/>
+								<tag typeNum="37" type="DefineEditText" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="38" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="39" type="DefineSprite" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="40" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="41" type="ProductInfo" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="42" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="43" type="FrameLabel" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="44" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="45" type="SoundStreamHead2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="46" type="DefineMorphShape" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="47" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="48" type="DefineFont2" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="49" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="50" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="51" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="52" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="53" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="54" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="55" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="56" type="ExportAssets" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="57" type="ImportAssets" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="58" type="EnableDebugger" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="59" type="DoInitAction" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="60" type="DefineVideoStream" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="61" type="VideoFrame" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="62" type="DefineFontInfo2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="63" type="DebugID" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="64" type="EnableDebugger2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="65" type="ScriptLimits" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="66" type="SetTabIndex" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="67" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="68" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="69" type="FileAttributes" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="70" type="PlaceObject3" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="71" type="ImportAssets2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="72" type="DoABCWithoutFlagsAndName" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="73" type="DefineFontAlignZones" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="74" type="CSMTextSettings" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="75" type="DefineFont3" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="76" type="SymbolClass" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="77" type="Metadata" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="78" type="DefineScalingGrid" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="79" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="80" type="" option={DataAndTags.noOutputOption}/-->
+								<!--tag typeNum="81" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="82" type="DoABC" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="83" type="DefineShape4" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="84" type="DefineMorphShape2" option={DataAndTags.noOutputOption}/>
+								<!--tag typeNum="85" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="86" type="DefineSceneAndFrameLabelData" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="87" type="DefineBinaryData" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="88" type="DefineFontName" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="89" type="StartSound2" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="90" type="DefineBitsJPEG4" option={DataAndTags.resourceOption}/>
+								<tag typeNum="91" type="DefineFont4" option={DataAndTags.noOutputOption}/>
+							</option>
 							<option name="AS2代码">
 								<tag typeNum="00" type="End" option={DataAndTags.noOutputOption}/>
 								<tag typeNum="01" type="ShowFrame" option={DataAndTags.noOutputOption}/>
@@ -163,7 +260,7 @@ TagsOptionBoard 版本:v1.0
 								<!--tag typeNum="38" type="" option={DataAndTags.noOutputOption}/-->
 								<tag typeNum="39" type="DefineSprite" option={DataAndTags.structorOption}/>
 								<!--tag typeNum="40" type="" option={DataAndTags.noOutputOption}/-->
-								<!--tag typeNum="41" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="41" type="ProductInfo" option={DataAndTags.noOutputOption}/>
 								<!--tag typeNum="42" type="" option={DataAndTags.noOutputOption}/-->
 								<tag typeNum="43" type="FrameLabel" option={DataAndTags.noOutputOption}/>
 								<!--tag typeNum="44" type="" option={DataAndTags.noOutputOption}/-->
@@ -185,7 +282,7 @@ TagsOptionBoard 版本:v1.0
 								<tag typeNum="60" type="DefineVideoStream" option={DataAndTags.noOutputOption}/>
 								<tag typeNum="61" type="VideoFrame" option={DataAndTags.noOutputOption}/>
 								<tag typeNum="62" type="DefineFontInfo2" option={DataAndTags.noOutputOption}/>
-								<!--tag typeNum="63" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="63" type="DebugID" option={DataAndTags.noOutputOption}/>
 								<tag typeNum="64" type="EnableDebugger2" option={DataAndTags.noOutputOption}/>
 								<tag typeNum="65" type="ScriptLimits" option={DataAndTags.noOutputOption}/>
 								<tag typeNum="66" type="SetTabIndex" option={DataAndTags.noOutputOption}/>
@@ -257,7 +354,7 @@ TagsOptionBoard 版本:v1.0
 								<!--tag typeNum="38" type="" option={DataAndTags.noOutputOption}/-->
 								<tag typeNum="39" type="DefineSprite" option={DataAndTags.noOutputOption}/>
 								<!--tag typeNum="40" type="" option={DataAndTags.noOutputOption}/-->
-								<!--tag typeNum="41" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="41" type="ProductInfo" option={DataAndTags.noOutputOption}/>
 								<!--tag typeNum="42" type="" option={DataAndTags.noOutputOption}/-->
 								<tag typeNum="43" type="FrameLabel" option={DataAndTags.noOutputOption}/>
 								<!--tag typeNum="44" type="" option={DataAndTags.noOutputOption}/-->
@@ -279,7 +376,7 @@ TagsOptionBoard 版本:v1.0
 								<tag typeNum="60" type="DefineVideoStream" option={DataAndTags.noOutputOption}/>
 								<tag typeNum="61" type="VideoFrame" option={DataAndTags.noOutputOption}/>
 								<tag typeNum="62" type="DefineFontInfo2" option={DataAndTags.noOutputOption}/>
-								<!--tag typeNum="63" type="" option={DataAndTags.noOutputOption}/-->
+								<tag typeNum="63" type="DebugID" option={DataAndTags.noOutputOption}/>
 								<tag typeNum="64" type="EnableDebugger2" option={DataAndTags.noOutputOption}/>
 								<tag typeNum="65" type="ScriptLimits" option={DataAndTags.noOutputOption}/>
 								<tag typeNum="66" type="SetTabIndex" option={DataAndTags.noOutputOption}/>
@@ -359,6 +456,7 @@ TagsOptionBoard 版本:v1.0
 			private var removeClose:Function;
 			
 			//private var so:SharedObject;
+			private var tagXMLListCol:XMLListCollection;
 			
 			public function init(addClose:Function,_removeClose:Function,so:SharedObject):void{
 				//^_^
@@ -393,6 +491,18 @@ TagsOptionBoard 版本:v1.0
 				
 				//trace("optionNameArrCol="+optionNameArrCol);
 				
+				ctrlAllItemView.init(ctrlAllItem);
+				
+				var tagsXML:XML=<tags/>;
+				var typeNum:int=0;
+				for each(var typeName:String in TagType.typeNameArr){
+					if(typeName){
+						tagsXML.appendChild(<tag type={typeName} typeNum={typeNum}/>);
+					}
+					typeNum++;
+				}
+				
+				tagXMLListCol=new XMLListCollection(tagsXML.tag);
 				TagsOptionBoardItem.init(this,tagXMLListCol.source,selectOption);
 				
 				grid.dataProvider=tagXMLListCol;
@@ -416,6 +526,20 @@ TagsOptionBoard 版本:v1.0
 				
 				instance=null;
 			}
+			
+			private function ctrlAllItem(option:String):void{
+				var optionMark:Object=new Object();
+				var typeNum:int=0;
+				for each(var typeName:String in TagType.typeNameArr){
+					if(typeName){
+						optionMark[typeName]=option;
+					}
+					typeNum++;
+				}
+				updateOutputResourceOptionBoardEnabledByOptionMark(optionMark);
+				TagsOptionBoardItem.initByOptionMark(optionMark);
+			}
+			
 			private function updateOptionMark():void{
 				var optionMark:Object=DataAndTags.getOptionMarkByOptionXML(optionXMLs[currOptionName]);
 				updateOutputResourceOptionBoardEnabledByOptionMark(optionMark);
@@ -454,7 +578,7 @@ TagsOptionBoard 版本:v1.0
 					break;
 					case rbOutputMultiFile:
 						settingXML.@outputSingleFile=false;
-						trace(settingXML.toXMLString());
+						//trace(settingXML.toXMLString());
 						cbOutputResourceIcon.enabled=true;
 					break;
 					case rbOutputSingleFile:
@@ -586,113 +710,13 @@ TagsOptionBoard 版本:v1.0
 				}else if(dOptionOrder<0){
 					return -1;
 				}
-				if(TagType[type1]<TagType[type2]){
+				if(type1<type2){
 					return -1;
 				}
 				return 1;
 			}
 		]]>
 	</fx:Script>
-	
-	<fx:Declarations>
-		<s:XMLListCollection id="tagXMLListCol">
-			<fx:XMLList>
-				<tag typeNum="00" type="End"/>
-				<tag typeNum="01" type="ShowFrame"/>
-				<tag typeNum="02" type="DefineShape"/>
-				<!--tag typeNum="03" type=""/-->
-				<tag typeNum="04" type="PlaceObject"/>
-				<tag typeNum="05" type="RemoveObject"/>
-				<tag typeNum="06" type="DefineBits"/>
-				<tag typeNum="07" type="DefineButton"/>
-				<tag typeNum="08" type="JPEGTables"/>
-				<tag typeNum="09"  type="SetBackgroundColor"/>
-				<tag typeNum="10" type="DefineFont"/>
-				<tag typeNum="11" type="DefineText"/>
-				<tag typeNum="12" type="DoAction"/>
-				<tag typeNum="13" type="DefineFontInfo"/>
-				<tag typeNum="14" type="DefineSound"/>
-				<tag typeNum="15" type="StartSound"/>
-				<!--tag typeNum="16" type=""/-->
-				<tag typeNum="17" type="DefineButtonSound"/>
-				<tag typeNum="18" type="SoundStreamHead"/>
-				<tag typeNum="19" type="SoundStreamBlock"/>
-				<tag typeNum="20" type="DefineBitsLossless"/>
-				<tag typeNum="21" type="DefineBitsJPEG2"/>
-				<tag typeNum="22" type="DefineShape2"/>
-				<tag typeNum="23" type="DefineButtonCxform"/>
-				<tag typeNum="24" type="Protect"/>
-				<!--tag typeNum="25" type=""/-->
-				<tag typeNum="26" type="PlaceObject2"/>
-				<!--tag typeNum="27" type=""/-->
-				<tag typeNum="28" type="RemoveObject2"/>
-				<!--tag typeNum="29" type=""/-->
-				<!--tag typeNum="30" type=""/-->
-				<!--tag typeNum="31" type=""/-->
-				<tag typeNum="32" type="DefineShape3"/>
-				<tag typeNum="33" type="DefineText2"/>
-				<tag typeNum="34" type="DefineButton2"/>
-				<tag typeNum="35" type="DefineBitsJPEG3"/>
-				<tag typeNum="36" type="DefineBitsLossless2"/>
-				<tag typeNum="37" type="DefineEditText"/>
-				<!--tag typeNum="38" type=""/-->
-				<tag typeNum="39" type="DefineSprite"/>
-				<!--tag typeNum="40" type=""/-->
-				<!--tag typeNum="41" type=""/-->
-				<!--tag typeNum="42" type=""/-->
-				<tag typeNum="43" type="FrameLabel"/>
-				<!--tag typeNum="44" type=""/-->
-				<tag typeNum="45" type="SoundStreamHead2"/>
-				<tag typeNum="46" type="DefineMorphShape"/>
-				<!--tag typeNum="47" type=""/-->
-				<tag typeNum="48" type="DefineFont2"/>
-				<!--tag typeNum="49" type=""/-->
-				<!--tag typeNum="50" type=""/-->
-				<!--tag typeNum="51" type=""/-->
-				<!--tag typeNum="52" type=""/-->
-				<!--tag typeNum="53" type=""/-->
-				<!--tag typeNum="54" type=""/-->
-				<!--tag typeNum="55" type=""/-->
-				<tag typeNum="56" type="ExportAssets"/>
-				<tag typeNum="57" type="ImportAssets"/>
-				<tag typeNum="58" type="EnableDebugger"/>
-				<tag typeNum="59" type="DoInitAction"/>
-				<tag typeNum="60" type="DefineVideoStream"/>
-				<tag typeNum="61" type="VideoFrame"/>
-				<tag typeNum="62" type="DefineFontInfo2"/>
-				<!--tag typeNum="63" type=""/-->
-				<tag typeNum="64" type="EnableDebugger2"/>
-				<tag typeNum="65" type="ScriptLimits"/>
-				<tag typeNum="66" type="SetTabIndex"/>
-				<!--tag typeNum="67" type=""/-->
-				<!--tag typeNum="68" type=""/-->
-				<tag typeNum="69" type="FileAttributes"/>
-				<tag typeNum="70" type="PlaceObject3"/>
-				<tag typeNum="71" type="ImportAssets2"/>
-				<tag typeNum="72" type="DoABCWithoutFlagsAndName"/>
-				<tag typeNum="73" type="DefineFontAlignZones"/>
-				<tag typeNum="74" type="CSMTextSettings"/>
-				<tag typeNum="75" type="DefineFont3"/>
-				<tag typeNum="76" type="SymbolClass"/>
-				<tag typeNum="77" type="Metadata"/>
-				<tag typeNum="78" type="DefineScalingGrid"/>
-				<!--tag typeNum="79" type=""/-->
-				<!--tag typeNum="80" type=""/-->
-				<!--tag typeNum="81" type=""/-->
-				<tag typeNum="82" type="DoABC"/>
-				<tag typeNum="83" type="DefineShape4"/>
-				<tag typeNum="84" type="DefineMorphShape2"/>
-				<!--tag typeNum="85" type=""/-->
-				<tag typeNum="86" type="DefineSceneAndFrameLabelData"/>
-				<tag typeNum="87" type="DefineBinaryData"/>
-				<tag typeNum="88" type="DefineFontName"/>
-				<tag typeNum="89" type="StartSound2"/>
-				<tag typeNum="90" type="DefineBitsJPEG4"/>
-				<tag typeNum="91" type="DefineFont4"/>
-			</fx:XMLList>
-		</s:XMLListCollection>
-		<s:RadioButtonGroup id="radiogroup_outputSingleFile"/>
-	</fx:Declarations>
 </s:Group>
 
 <!--

@@ -13,6 +13,22 @@ package zero.zero3D.objs{
 	import flash.geom.Matrix3D;
 
 	public class DAEAdvance extends Obj3DContainer{
+		public function setDrawValues(
+			lineColor:int,
+			lineThickness:int,
+			lineAlpha:Number,
+			fillColor:int,
+			fillAlpha:Number
+		):void{
+			for each(var mesh3D:Mesh3D in obj3DV){
+				mesh3D.lineColor=lineColor;
+				mesh3D.lineThickness=lineThickness;
+				mesh3D.lineAlpha=lineAlpha;
+				
+				mesh3D.fillColor=fillColor;
+				mesh3D.fillAlpha=fillAlpha;
+			}
+		}
 		public var meshMark:Object;
 		public function DAEAdvance(){
 		}

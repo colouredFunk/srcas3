@@ -14,32 +14,30 @@ package zero.swf{
 	
 	public class DefineObjs{
 		public static const SWF:String="swf";
-		public static const JPG:String="jpg";
-		public static const PNG:String="png";
-		public static const GIF:String="gif";
+		public static const IMG:String="img";
 		public static const BMP:String="bmp";
 		public static const MP3:String="mp3";
 		public static const DAT:String="dat";
 		
 		public static const DefineShape:String=SWF;
-		public static const DefineBits:String=DAT;
-		public static const DefineButton:String=SWF;
+		public static const DefineBits:String=IMG;
+		public static const DefineButton:String=DAT;
 		public static const DefineFont:String=DAT;
 		public static const DefineText:String=DAT;
 		public static const DefineFontInfo:String=DAT;
 		public static const DefineSound:String=DAT;
 			//public static const DefineButtonSound:int=17;
-		public static const DefineBitsLossless:String=DAT;
-		public static const DefineBitsJPEG2:String=JPG;
+		public static const DefineBitsLossless:String=IMG;
+		public static const DefineBitsJPEG2:String=IMG;
 		public static const DefineShape2:String=SWF;
 			//public static const DefineButtonCxform:int=23;
 		public static const DefineShape3:String=SWF;
 		public static const DefineText2:String=DAT;
-		public static const DefineButton2:String=SWF;
-		public static const DefineBitsJPEG3:String=JPG;
-		public static const DefineBitsLossless2:String=DAT;
+		public static const DefineButton2:String=DAT;
+		public static const DefineBitsJPEG3:String=IMG;
+		public static const DefineBitsLossless2:String=IMG;
 		public static const DefineEditText:String=DAT;
-		public static const DefineSprite:String=SWF;
+		public static const DefineSprite:String=DAT;
 		public static const DefineMorphShape:String=DAT;
 		public static const DefineFont2:String=DAT;
 		public static const DefineVideoStream:String=DAT;
@@ -51,7 +49,7 @@ package zero.swf{
 		public static const DefineMorphShape2:String=DAT;
 		public static const DefineBinaryData:String=DAT;
 			//DefineFontName:String=DAT;//FontID UI16 ID for this font to which this refers 没看懂...宁可信其有，不可信其无(经证实是指向 DefineFont 的)
-		public static const DefineBitsJPEG4:String=DAT;
+		public static const DefineBitsJPEG4:String=IMG;
 		public static const DefineFont4:String=DAT;
 	}
 }

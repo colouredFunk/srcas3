@@ -117,7 +117,7 @@ package zero.zero3D.objs{
 			return __focalLength;
 		}
 		
-		public function render(container:Sprite):void{
+		public function render(container:*):void{
 			container.addChild(sp);
 			var g:Graphics=sp.graphics;
 			

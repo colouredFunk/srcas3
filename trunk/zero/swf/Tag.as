@@ -127,7 +127,8 @@ package zero.swf{
 			return null;
 		}
 		
-		private static const noShortTypes:Object={
+		//在结构文档里搜索 RECORDHEADER (long) 可搜索得到
+		private static const recordHeaderMustBeLongTypes:Object={
 			//DefineButton:true,//测试完去掉
 			//DefineButton2:true,//测试完去掉
 			//DefineButtonCxform:true,//测试完去掉
@@ -143,11 +144,12 @@ package zero.swf{
 			//FrameLabel:true,//测试完去掉
 			
 			DefineBits:true,
-			DefineBitsLossless:true,
-			DefineBitsLossless2:true,
 			DefineBitsJPEG2:true,
 			DefineBitsJPEG3:true,
-			DefineBitsJPEG4:true
+			DefineBitsJPEG4:true,
+			DefineBitsLossless:true,
+			DefineBitsLossless2:true,
+			SoundStreamBlock:true
 			
 		}//某天偶然发现的一些小图片变成短tag后出错(不知道还会不会有其它tag有这种现像)
 		//public static function getHeaderData(type:int,bodyLength:int,test_isShort:Boolean):ByteArray{
@@ -155,20 +157,15 @@ package zero.swf{
 			var data:ByteArray=new ByteArray();
 			data[0]=type<<6;
 			data[1]=type>>>2;
-			if(
-				bodyLength<0x3f
-				&&
-				!noShortTypes[TagType.typeNameArr[type]]
-				//&&
-				//test_isShort
-			){
-				data[0]|=bodyLength;
-			}else{//长tag
+			if(bodyLength>=0x3f||recordHeaderMustBeLongTypes[TagType.typeNameArr[type]]){//||!test_isShort
+				//长tag
 				data[0]|=0x3f;
 				data[2]=bodyLength;
 				data[3]=bodyLength>>8;
 				data[4]=bodyLength>>16;
 				data[5]=bodyLength>>24;
+			}else{
+				data[0]|=bodyLength;
 			}
 			return data;
 		}

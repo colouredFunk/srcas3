@@ -8,8 +8,8 @@ SHAPERECORD 版本:v1.0
 */
 
 package zero.swf.record.shape_records{
-	import zero.swf.BaseDat;
-	public class SHAPERECORD extends BaseDat{
+	import zero.swf.record.Record;
+	public class SHAPERECORD extends Record{
 		public function SHAPERECORD(){
 		}
 	}

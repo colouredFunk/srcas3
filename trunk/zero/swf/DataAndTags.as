@@ -16,9 +16,13 @@ package zero.swf{
 	import zero.swf.tag_body.DefineSprite;
 	import zero.swf.tag_body.FileAttributes;
 	import zero.swf.tag_body.Metadata;
+	import zero.swf.tag_body.SetBackgroundColor;
 	import zero.swf.tag_body.TagBody;
 
 	public class DataAndTags extends BaseDat{
+		public static var ignoreUnknownTag:Boolean=true;
+		public static var currSrcName:String;
+		
 		public static const structorOption:String="结构";
 		public static const resourceOption:String="资源";
 		public static const byteCodesOption:String="字节码";
@@ -36,6 +40,7 @@ package zero.swf{
 			
 			mustBeStructorTagBodyClasses[TagType.FileAttributes]=FileAttributes;
 			mustBeStructorTagBodyClasses[TagType.Metadata]=Metadata;
+			mustBeStructorTagBodyClasses[TagType.SetBackgroundColor]=SetBackgroundColor;
 			
 			var optionIndexs:Object=new Object();
 			optionIndexs[structorOption]=0;
@@ -140,31 +145,47 @@ package zero.swf{
 			var tag:Tag;
 			while(offset<endOffset){
 				tag=new Tag();
+				tag.initByData(data,offset);
+				var typeName:String=TagType.typeNameArr[tag.type];
+				
+				offset=tag.bodyOffset;
+				var nextTagOffset:int=offset+tag.bodyLength;
+				
+				if(typeName){
+					
+				}else{
+					Outputer.outputError("未知 type: "+tag.type+",typeName="+typeName);
+					if(ignoreUnknownTag){
+						offset=nextTagOffset;
+						continue;
+					}
+				}
+				
 				tagV[tagV.length]=tag;
 				
-				tag.initByData(data,offset);
-				offset=tag.bodyOffset;
-				var nextTagOffset:int=tag.bodyOffset+tag.bodyLength;
-				
 				var TagBodyClass:Class;
-				switch(optionV[tag.type]){
-					case structorOption:
-						TagBodyClass=Tag.getTagBodyClassByType(tag.type);
-						if(TagBodyClass){
-						}else{
-							throw new Error("TagBodyClass: "+TagType.typeNameArr[tag.type]+" 未定义");
-						}
-					break;
-					default:
-						TagBodyClass=null;
-					break;
+				if(typeName){
+					switch(optionV[tag.type]){
+						case structorOption:
+							TagBodyClass=Tag.getTagBodyClassByType(tag.type);
+							if(TagBodyClass){
+							}else{
+								throw new Error("TagBodyClass: "+typeName+" 未定义");
+							}
+						break;
+						default:
+							TagBodyClass=null;
+						break;
+					}
+				}else{
+					TagBodyClass=null;
 				}
 				if(TagBodyClass){
 					tag.tagBody=new TagBodyClass();
 					offset=tag.tagBody.initByData(data,offset,nextTagOffset);
 					if(offset===nextTagOffset){
 					}else{
-						Outputer.outputError(TagType.typeNameArr[tag.type]+" offset="+offset+",nextTagOffset="+nextTagOffset);
+						Outputer.outputError(typeName+" offset="+offset+",nextTagOffset="+nextTagOffset);
 					}
 				}else{
 					if(tag.type==TagType.End){
@@ -178,7 +199,7 @@ package zero.swf{
 			}
 			if(offset===endOffset){
 			}else{
-				Outputer.output("最后一个 tag: "+TagType.typeNameArr[tag.type],"brown");
+				Outputer.output("最后一个 tag: "+typeName,"brown");
 				Outputer.output("offset="+offset+",endOffset="+endOffset+",offset!=endOffset","brown");
 				if(offset>endOffset){
 					tag.bodyLength+=endOffset-offset;
@@ -328,7 +349,16 @@ package zero.swf{
 		}
 		private function toXML_step():void{
 			var tag:Tag=tagV[curr_childId];
-			if(optionV[tag.type]===noOutputOption){
+			var typeName:String=TagType.typeNameArr[tag.type];
+			if(typeName){
+				
+			}else{
+				Outputer.outputError("未知 type: "+tag.type+",typeName="+typeName);
+				if(ignoreUnknownTag){
+					return;
+				}
+			}
+			if(typeName&&(optionV[tag.type]===noOutputOption)){
 				//如果不是用同一个swf的数据的则可能会出错
 				if(toXML_startOffset==-1){
 					toXML_startOffset=tag.headOffset;
@@ -336,10 +366,23 @@ package zero.swf{
 				toXML_endOffset=tag.bodyOffset+tag.bodyLength;
 			}else{
 				checkAddDataBlock();
-				//var tagXML:XML=<tag type={TagType.typeNameArr[tag.type]} typeNum={tag.type} test_isShort={tag.test_isShort}/>;
-				var tagXML:XML=<tag type={TagType.typeNameArr[tag.type]} typeNum={tag.type}/>;
 				
-				switch(optionV[tag.type]){
+				var tagXML:XML;
+				if(typeName){
+					//var tagXML:XML=<tag type={typeName} typeNum={tag.type} test_isShort={tag.test_isShort}/>;
+					tagXML=<tag type={typeName} typeNum={tag.type}/>;
+				}else{
+					//var tagXML:XML=<tag type="未知" typeNum={tag.type} test_isShort={tag.test_isShort}/>;
+					tagXML=<tag type="未知" typeNum={tag.type}/>;
+				}
+				
+				var option:String;
+				if(typeName){
+					option=optionV[tag.type];
+				}else{
+					option=defaultOption;
+				}
+				switch(option){
 					case structorOption:
 						if(tag.tagBody){
 							tagXML.appendChild(tag.tagBody.toXML());
@@ -352,15 +395,13 @@ package zero.swf{
 							throw new Error("暂不支持");
 						}
 						
-						var typeName:String=TagType.typeNameArr[tag.type];
-						
 						if(DefineObjs[typeName]){
 						}else{
 							throw new Error("暂不支持");
 						}
 						
 						var bodyXML:XML=<body defId={tag.getDefId()}/>;
-						DataMark.toXML_addResource(tag,bodyXML);
+						DataMark.toXML_addResourceTag(tag,bodyXML);
 						tagXML.appendChild(bodyXML);
 					break;
 					case byteCodesOption:
@@ -376,7 +417,7 @@ package zero.swf{
 							throw new Error("暂不支持");
 						}
 						if(tag.bodyData&&tag.bodyLength>0){
-							tagXML.appendChild(<body offset={tag.bodyOffset} length={tag.bodyLength}/>);
+							tagXML.appendChild(<body src={currSrcName} offset={tag.bodyOffset} length={tag.bodyLength}/>);
 						}
 					break;
 					//case noOutputOption:
@@ -398,7 +439,7 @@ package zero.swf{
 		private function checkAddDataBlock():void{
 			//trace("toXML_startOffset="+toXML_startOffset,"toXML_endOffset="+toXML_endOffset);
 			if(toXML_startOffset<toXML_endOffset){
-				toXMLResult.appendChild(<dataBlock offset={toXML_startOffset} length={toXML_endOffset-toXML_startOffset}/>);
+				toXMLResult.appendChild(<dataBlock src={currSrcName} offset={toXML_startOffset} length={toXML_endOffset-toXML_startOffset}/>);
 				toXML_startOffset=-1;
 				toXML_endOffset=-1
 			}
@@ -463,112 +504,116 @@ package zero.swf{
 		private function initByXML_step():void{
 			var tagsChildXML:XML=initByData_tagsChildrenXMLList[curr_childId];
 			var tag:Tag;
-			var offsetStr:String,lengthStr:String;
+			var offsetStr:String,lengthStr:String,srcStr:String;
 			
 			if(tagsChildXML.name().toString()=="dataBlock"){
 				offsetStr=tagsChildXML.@offset.toString();
 				lengthStr=tagsChildXML.@length.toString();
-				if(offsetStr&&lengthStr){
+				srcStr=tagsChildXML.@src.toString();
+				if(offsetStr&&lengthStr&&srcStr){
 					var offset:int=int(offsetStr);
 					var endOffset:int=offset+int(lengthStr);
-					for each(tag in getTagV(DataMark.data,offset,endOffset)){
+					for each(tag in getTagV(DataMark.getDataBySrcAndMark(srcStr),offset,endOffset)){
 						//trace("tag="+tag);
 						tagV[tagV.length]=tag;
 					}
 					//trace("------------------");
 				}else{
-					Outputer.outputError("offsetStr="+offsetStr+",lengthStr="+lengthStr);
+					Outputer.outputError("offsetStr="+offsetStr+",lengthStr="+lengthStr+",srcStr="+srcStr);
 				}
 			}else{
+				var type:int;
 				var typeName:String=tagsChildXML.@type.toString();
-				if(typeName){
-					var type:int=TagType[typeName];
-					//tag.test_isShort=tagXML.@test_isShort.toString()=="true";
-					if(TagType.typeNameArr[type]===typeName){
-						if(tagsChildXML.children().length()==0){
-							tag=new Tag();
-							tag.type=type;
-							tag.bodyData=new ByteArray();
-						}else{
-							var bodyXML:XML=tagsChildXML.children()[0];
-							if(bodyXML.name()=="body"){
-								var valueStr:String=bodyXML.@value.toString();
-								if(valueStr){
-									//字节码
-									tag=new Tag();
-									tag.type=type;
-									tag.bodyData=BytesAndStr16.str162bytes(valueStr);
-								}else{
-									var resourcePath:String=bodyXML.@resource.toString();
-									if(resourcePath){
-										var defIdStr:String=bodyXML.@defId.toString();
-										if(defIdStr){
-											tag=DataMark.getDefineTag(resourcePath,int(defIdStr));
-											if(tag.type===type){
-											}else{
-												Outputer.output("一个 "+TagType.typeNameArr[type]+" 被替换成: "+TagType.typeNameArr[tag.type]+"(可能会引起问题?)","brown");
-											}
-										}
-									}else{
-										lengthStr=bodyXML.@length.toString();
-										if(lengthStr){
-											if(lengthStr=="0"){
-												tag=new Tag();
-												tag.type=type;
-												tag.bodyData=new ByteArray();
-											}else{
-												//这时 offset 和 length 都是必须的
-												offsetStr=bodyXML.@offset.toString();
-												if(offsetStr){
-													//var resourceStr:String=bodyXML.@resourceStr.toString();
-													//if(resourceStr){
-													//	var data:ByteArray=DataMark[resourceStr];
-													//}
-													//暂时还只是从整个SWF里取数据:
-													if(DataMark.data){
-														tag=new Tag();
-														tag.type=type;
-														tag.bodyData=DataMark.data;
-														tag.bodyOffset=int(offsetStr);
-														tag.bodyLength=int(lengthStr);
-													}else{
-														Outputer.outputError("DataMark.data="+DataMark.data+",极可能是因为没和原来的SWF放一块...");
-														tag=new Tag();
-														tag.type=type;
-														tag.bodyData=new ByteArray();
-													}
-												}else{
-													throw new Error("offsetStr="+offsetStr);
-												}
-											}
-										}else{
-											tag=new Tag();
-											tag.type=type;
-											tag.bodyData=new ByteArray();
-										}
-									}
-								}
-							}else{
-								var TagBodyClass:Class=Tag.getTagBodyClassByType(type);
-								if(TagBodyClass){
-								}else{
-									throw new Error("TagBodyClass: "+typeName+" 未定义");
-								}
-								var tagBody:TagBody=new TagBodyClass();
-								tagBody.initByXML(bodyXML);
-								tag=new Tag();
-								tag.tagBody=tagBody;
-							}
-						}
-						tagV[tagV.length]=tag;
-						
-						if(tag.type==TagType.ShowFrame){
-							curr_frameId++;
-						}
+				//Outputer.output("typeName="+typeName);
+				if(typeName&&TagType[typeName]){
+					type=TagType[typeName];
+				}else{
+					type=int(tagsChildXML.@typeNum.toString());
+					typeName=TagType.typeNameArr[type];
+				}
+				
+				if(typeName&&TagType[typeName]===type){
+					
+				}else{
+					Outputer.outputError("未知 type: "+type+",typeName="+typeName);
+					if(ignoreUnknownTag){
 						return;
 					}
 				}
-				Outputer.outputError("未知 typeName="+typeName+",typeNum="+tagsChildXML.@typeNum.toString());
+				
+				if(tagsChildXML.children().length()==0){
+					tag=new Tag();
+					tag.type=type;
+					tag.bodyData=new ByteArray();
+				}else{
+					var bodyXML:XML=tagsChildXML.children()[0];
+					if(bodyXML.name()=="body"){
+						var valueStr:String=bodyXML.@value.toString();
+						if(valueStr){
+							//字节码
+							tag=new Tag();
+							tag.type=type;
+							tag.bodyData=BytesAndStr16.str162bytes(valueStr);
+						}else{
+							var resourcePath:String=bodyXML.@resource.toString();
+							if(resourcePath){
+								var defIdStr:String=bodyXML.@defId.toString();
+								if(defIdStr){
+									tag=DataMark.initByXML_getResourceTag(bodyXML);
+									if(tag.type===type){
+									}else{
+										Outputer.output("一个 "+typeName+" 被替换成: "+TagType.typeNameArr[tag.type]+"(可能会引起问题?)","brown");
+									}
+								}
+							}else{
+								lengthStr=bodyXML.@length.toString();
+								if(lengthStr){
+									if(lengthStr=="0"){
+										tag=new Tag();
+										tag.type=type;
+										tag.bodyData=new ByteArray();
+									}else{
+										//这时 offset 和 length 都是必须的
+										offsetStr=bodyXML.@offset.toString();
+										if(offsetStr){
+											srcStr=bodyXML.@src.toString();
+											if(srcStr){
+												tag=new Tag();
+												tag.type=type;
+												tag.bodyData=DataMark.getDataBySrcAndMark(srcStr);
+												tag.bodyOffset=int(offsetStr);
+												tag.bodyLength=int(lengthStr);
+											}else{
+												throw new Error("srcStr="+srcStr);
+											}
+										}else{
+											throw new Error("offsetStr="+offsetStr);
+										}
+									}
+								}else{
+									tag=new Tag();
+									tag.type=type;
+									tag.bodyData=new ByteArray();
+								}
+							}
+						}
+					}else{
+						var TagBodyClass:Class=Tag.getTagBodyClassByType(type);
+						if(TagBodyClass){
+						}else{
+							throw new Error("TagBodyClass: "+typeName+" 未定义");
+						}
+						var tagBody:TagBody=new TagBodyClass();
+						tagBody.initByXML(bodyXML);
+						tag=new Tag();
+						tag.tagBody=tagBody;
+					}
+				}
+				tagV[tagV.length]=tag;
+				
+				if(tag.type==TagType.ShowFrame){
+					curr_frameId++;
+				}
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML

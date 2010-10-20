@@ -2,7 +2,7 @@
 FILTERLIST 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年9月13日 14:39:52 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月18日 13:18:58 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -30,21 +30,23 @@ FILTERLIST 版本:v1.0
 //ColorMatrixFilter 	If FilterID = 6, COLORMATRIXFILTER		Color Matrix filter
 //GradientBevelFilter 	If FilterID = 7, GRADIENTBEVELFILTER	Gradient Bevel filter
 package zero.swf.record{
-	import zero.swf.vmark.FilterClasses;
+	import zero.swf.vmark.FilterTypes;
 	import zero.swf.record.filters.FILTER;
 	import flash.utils.ByteArray;
 	public class FILTERLIST extends Record{
 		public var FilterV:Vector.<FILTER>;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			FilterV=new Vector.<FILTER>();
 			//#offsetpp
 			var NumberOfFilters:int=data[offset++];
+			FilterV=new Vector.<FILTER>(NumberOfFilters);
 			for(var i:int=0;i<NumberOfFilters;i++){
+				var FilterID:int=data[offset++];
 				//#offsetpp
 			
-				FilterV[i]=new FilterClasses.FilterClassV[data[offset++]]();
+				FilterV[i]=new FilterTypes.classV[FilterID]();
 				offset=FilterV[i].initByData(data,offset,endOffset);
+				FilterV[i].FilterID=FilterID;
 			}
 			return offset;
 		}
@@ -56,7 +58,7 @@ package zero.swf.record{
 			//#offsetpp
 			var offset:int=1;
 			for each(var Filter:FILTER in FilterV){
-				data[offset++]=FilterClasses.FilterClassVDict[Filter["constructor"]];
+				data[offset++]=Filter.FilterID;
 				data.position=offset;
 				data.writeBytes(Filter.toData());
 				offset=data.length;
@@ -72,7 +74,7 @@ package zero.swf.record{
 			</FILTERLIST>;
 			var listXML:XML=xml.list[0];
 			for each(var Filter:FILTER in FilterV){
-				var itemXML:XML=<Filter/>;
+				var itemXML:XML=<Filter FilterID={FilterTypes.typeV[Filter.FilterID]}/>;
 				itemXML.appendChild(Filter.toXML());
 				listXML.appendChild(itemXML);
 			}
@@ -81,13 +83,14 @@ package zero.swf.record{
 		override public function initByXML(xml:XML):void{
 			var listXML:XML=xml.list[0];
 			var FilterXMLList:XMLList=listXML.Filter;
-			FilterV=new Vector.<FILTER>();
 			var i:int=-1;
+			FilterV=new Vector.<FILTER>(FilterXMLList.length());
 			for each(var FilterXML:XML in FilterXMLList){
 				i++;
-				var FilterXMLNode:XML=FilterXML.children()[0]
-				FilterV[i]=new FilterClasses[FilterXMLNode.name().toString()]();
-				FilterV[i].initByXML(FilterXMLNode);
+				var FilterID:int=FilterTypes[FilterXML.@FilterID.toString()];
+				FilterV[i]=new FilterTypes.classV[FilterID]();
+				FilterV[i].initByXML(FilterXML.children()[0]);
+				FilterV[i].FilterID=FilterID;
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML

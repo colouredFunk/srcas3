@@ -35,13 +35,13 @@ package zero.swf{
 				//if(tag is DefineSprite){//一般来说 DefineSprite 内不会有 DefineObj
 				//	_getAvalibleDefineObjIdV((tag.bodyData as DefineSprite).tags.tagV);
 				//}else{
-					var name:String=TagType.typeNameArr[tag.type];
-					if(name){
-						if(DefineObjs[name]){
+					var typeName:String=TagType.typeNameArr[tag.type];
+					if(typeName){
+						if(DefineObjs[typeName]){
 							var id:int=tag.getDefId();
 							
 							if(avalibleDefineObjIdMark[id]){
-								throw new Error("发现重复的 id:"+id+",name="+name);
+								throw new Error("发现重复的 id:"+id+",typeName="+typeName);
 							}
 							avalibleDefineObjIdMark[id]=true;
 						}

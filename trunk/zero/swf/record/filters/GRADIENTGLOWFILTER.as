@@ -2,7 +2,7 @@
 GRADIENTGLOWFILTER 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年9月11日 16:19:17 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月18日 18:01:23 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -29,6 +29,7 @@ GRADIENTGLOWFILTER 版本:v1.0
 //OnTop 			UB[1] 			OnTop mode
 //Passes 			UB[4] 			Number of blur passes
 package zero.swf.record.filters{
+	import zero.BytesAndStr16;
 	import flash.utils.ByteArray;
 	public class GRADIENTGLOWFILTER extends FILTER{
 		public var GradientColorV:Vector.<uint>;
@@ -45,10 +46,10 @@ package zero.swf.record.filters{
 		public var Passes:int;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			GradientColorV=new Vector.<uint>();
-			GradientRatioV=new Vector.<int>();
 			//#offsetpp
 			var NumColors:int=data[offset++];
+			GradientColorV=new Vector.<uint>(NumColors);
+			GradientRatioV=new Vector.<int>(NumColors);
 			for(var i:int=0;i<NumColors;i++){
 				GradientColorV[i]=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++]|(data[offset++]<<24);
 				GradientRatioV[i]=data[offset++];
@@ -131,7 +132,7 @@ package zero.swf.record.filters{
 			var i:int=-1;
 			for each(var GradientColor:uint in GradientColorV){
 				i++;
-				listXML.appendChild(<GradientColor value={GradientColor}/>);
+				listXML.appendChild(<GradientColor value={"0x"+BytesAndStr16._16V[(GradientColor>>24)&0xff]+BytesAndStr16._16V[(GradientColor>>16)&0xff]+BytesAndStr16._16V[(GradientColor>>8)&0xff]+BytesAndStr16._16V[GradientColor&0xff]}/>);
 				listXML.appendChild(<GradientRatio value={GradientRatioV[i]}/>);
 			}
 			return xml;
@@ -139,10 +140,10 @@ package zero.swf.record.filters{
 		override public function initByXML(xml:XML):void{
 			var listXML:XML=xml.list[0];
 			var GradientColorXMLList:XMLList=listXML.GradientColor;
-			GradientColorV=new Vector.<uint>();
 			var GradientRatioXMLList:XMLList=listXML.GradientRatio;
-			GradientRatioV=new Vector.<int>();
 			var i:int=-1;
+			GradientColorV=new Vector.<uint>(GradientColorXMLList.length());
+			GradientRatioV=new Vector.<int>(GradientRatioXMLList.length());
 			for each(var GradientColorXML:XML in GradientColorXMLList){
 				i++;
 				GradientColorV[i]=uint(GradientColorXML.@value.toString());
