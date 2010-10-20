@@ -290,7 +290,7 @@
 				return;
 			}
 			var _js:String = String(_xml.attribute(_jsKey));
-			if (_js) {
+			if (_js&&ExternalInterface.available) {
 				ExternalInterface.call("eval", _js);
 			}
 		}
@@ -312,7 +312,11 @@
 			switch(_browserName) {
 				case "Firefox":
 				case "IE":
-					ExternalInterface.call(WINDOW_OPEN_FUNCTION, _url, _target, "");
+					if (ExternalInterface.available) {
+						ExternalInterface.call(WINDOW_OPEN_FUNCTION, _url, _target, "");
+					}else {
+						navigateToURL(_request,_target);
+					}
 					break;
 				case "Safari":
 				case "Opera":

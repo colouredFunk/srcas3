@@ -15,6 +15,12 @@
 			txt.wordWrap = false;
 			txt.autoSize = "left";
 		}
+		override protected function onRemoveToStageHandler():void {
+			super.onRemoveToStageHandler();
+			//txt.setTextFormat(null);
+			textFormat = null;
+			txt = null;
+		}
 		protected var __widthMax:int;
 		[Inspectable(defaultValue=0,type="int",name="0_固定宽")]
 		public function get widthMax():int{

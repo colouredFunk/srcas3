@@ -131,7 +131,7 @@
 			}else if (_playId>musicList.list.length()-1){
 				_playId = 0;
 			}
-			if (__playId == _playId) {
+			if (__playId == _playId && musicList.list.length() > 1) {
 				return;
 			}
 			__playId = _playId;
@@ -379,8 +379,8 @@
 				onWMPStateChange(_id);
 			}
 		}
-		override protected function onAddedToStageHandler(_evt:Event):void {
-			super.onAddedToStageHandler(_evt);
+		override protected function init():void {
+			super.init();
 			addEventListener(Event.CHANGE, onSoundStageChangeHandle);
 			__playState = SOUND_STOP;
 			if (btnPlay) {
@@ -424,6 +424,23 @@
 				ExternalInterface.addCallback("stop", stop);
 				isPlugin = ExternalInterface.call("initMusicPlayer");
 			}
+		}
+		override protected function onRemoveToStageHandler():void {
+			stop();
+			super.onRemoveToStageHandler();
+			btnPlay = null;
+			btnStop = null;
+			btnPrev = null;
+			btnNext = null;
+			barVolume = null;
+			btnVolume = null;
+			barPlayProgress = null;
+			barLoadProgress = null;
+			txtPlayProgress = null;
+			onWMPStateChange = null;
+			musicInfo = null;
+			musicList = null;
+			sound = null;
 		}
 		protected function newList(_list:*):void {
 			if (_list is XML) {
