@@ -1,101 +1,76 @@
 /***
-SWFLevel0 版本:v1.0
-简要说明:0级的SWF编码解码, 支持获取和修改 type, Version, FrameSize( wid 和 hei), FrameRate, 解析出每个 tag 的类型, 位置, 和长度(不含 DefineSprite 里的 tag)
+SWF2 版本:v1.0
+简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年8月11日 10:30:53
+创建时间:2010年10月14日 16:26:16
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
 package zero.swf{
-	import flash.display.*;
-	import flash.events.*;
-	import flash.utils.*;
+	import flash.utils.ByteArray;
+	import flash.utils.getDefinitionByName;
 	
 	import zero.swf.tag_body.FileAttributes;
 	import zero.swf.tag_body.Metadata;
+	import zero.swf.tag_body.SetBackgroundColor;
 	
-	public class SWFLevel0{
-		public function clear():void{
-			dataAndTags.clear();
-		}
+	public class SWF2 extends SWF1{
+		public static const baseInfoNameV:Vector.<String>=SWF0.baseInfoNameV.concat(Vector.<String>([
+			"acceleration","isAS3","accessNetworkOnly","metadataStr","bgColor"
+		]));
 		
-		private var swfDataAndData:SWFDataAndData;
-		private var dataAndBaseInfo:DataAndBaseInfo;
-		public var dataAndTags:DataAndTags;
+		public var tagV:Vector.<Tag>;
 		
-		public function SWFLevel0(){
-			swfDataAndData=new SWFDataAndData();
-			dataAndBaseInfo=new DataAndBaseInfo();
-			dataAndTags=new DataAndTags();
-		}
-		public function copyBaseInfo(swf0:SWFLevel0):void{
-			type=swf0.type;
-			Version=swf0.Version;
-			wid=swf0.wid;
-			hei=swf0.hei;
-			FrameRate=swf0.FrameRate;
+		private var dataAndTags:DataAndTags;
+		
+		public function SWF2(
+			_type:String="CWS",
+			_Version:int=0,
+			_width:Number=800,
+			_height:Number=600,
+			_FrameRate:Number=30,
+			_isAS3:Boolean=true,
+			_accessNetworkOnly:Boolean=false,
+			_bgColor:int=0xffffff
+		){
+			super(_type,_Version,_width,_height,_FrameRate);
 			
-			acceleration=swf0.acceleration;
-			isAS3=swf0.isAS3;
-			accessNetworkOnly=swf0.accessNetworkOnly;
-			metadataStr=swf0.metadataStr;
+			isAS3=_isAS3;
+			accessNetworkOnly=_accessNetworkOnly;
+			bgColor=_bgColor;
 		}
-		//
-		public function get type():String{
-			return swfDataAndData.type;
-		}
-		public function set type(_type:String):void{
-			swfDataAndData.type=_type;
-		}
-		public function get Version():int{
-			return swfDataAndData.Version;
-		}
-		public function set Version(_Version:int):void{
-			swfDataAndData.Version=_Version;
-		}
-		
-		//
-		public function get wid():int{
-			return (dataAndBaseInfo.FrameSize.Xmax-dataAndBaseInfo.FrameSize.Xmin)/20;//获取到的值是以堤为单位, 1堤等于20像素, 所以要除以20
-		}
-		public function set wid(_wid:int):void{
-			dataAndBaseInfo.FrameSize.Xmax=_wid*20+dataAndBaseInfo.FrameSize.Xmin;
-		}
-		public function get hei():int{
-			return (dataAndBaseInfo.FrameSize.Ymax-dataAndBaseInfo.FrameSize.Ymin)/20;//获取到的值是以堤为单位, 1堤等于20像素, 所以要除以20
-		}
-		public function set hei(_hei:int):void{
-			dataAndBaseInfo.FrameSize.Ymax=_hei*20+dataAndBaseInfo.FrameSize.Ymin;
-		}
-		public function get FrameRate():Number{
-			return dataAndBaseInfo.FrameRate;
-		}
-		public function set FrameRate(_FrameRate:Number):void{
-			dataAndBaseInfo.FrameRate=_FrameRate;
+		public function clear():void{
+			if(dataAndTags){
+				dataAndTags.clear();
+			}
 		}
 		
 		//
 		private var fileAttributesTag:Tag;
 		private var metadataTag:Tag;
+		private var setBackgroundColorTag:Tag;
 		
-		private var acceleration:String;//direct 和 gpu 在文档和实际情况中好像是倒过来的...
+		public var acceleration:String;//direct 和 gpu 在文档和实际情况中好像是倒过来的...
+		
 		private static const ACC_NORMAL:String="normal ";
 		private static const ACC_DIRECT:String="direct";
 		private static const ACC_GPU:String="gpu";
+		
 		public var isAS3:Boolean;
 		public var accessNetworkOnly:Boolean;
 		public var metadataStr:String;
+		public var bgColor:int;
 		
 		private var progress_finished:Function;
 		
 		//
-		public function initBySWFData(swfData:ByteArray):void{
-			initByData(swfDataAndData.swfData2Data(swfData));
-		}
-		public function initByData(data:ByteArray):void{
-			dataAndBaseInfo.initByData(data);
-			dataAndTags.initByData(data,dataAndBaseInfo.offset,data.length);
+		override public function initByData(_data:ByteArray):void{
+			var data:ByteArray=initBaseInfoByData(_data);
+			var dataAndTags:DataAndTags=new DataAndTags();
+			dataAndTags.initByData(data,0,data.length);
+			tagV=dataAndTags.tagV;
+			
 			tags2Infos();
 		}
 		public function tags2Infos():void{
@@ -103,9 +78,11 @@ package zero.swf{
 			isAS3=false;
 			accessNetworkOnly=false;
 			metadataStr="";
+			bgColor=0xffffff;
 			fileAttributesTag=null;
 			metadataTag=null;
-			for each(var tag:Tag in dataAndTags.tagV){
+			setBackgroundColorTag=null;
+			for each(var tag:Tag in tagV){
 				switch(tag.type){
 					case TagType.FileAttributes:
 						var fileAttributes:FileAttributes;
@@ -142,18 +119,32 @@ package zero.swf{
 						metadataTag=tag;
 						metadataTag.tagBody=metadata;
 					break;
+					case TagType.SetBackgroundColor:
+						var setBackgroundColor:SetBackgroundColor=new SetBackgroundColor();
+						if(tag.tagBody){
+							setBackgroundColor=tag.tagBody as SetBackgroundColor;
+						}else{
+							setBackgroundColor=new SetBackgroundColor();
+							setBackgroundColor.initByData(tag.bodyData,tag.bodyOffset,tag.bodyOffset+tag.bodyLength);
+						}
+						
+						bgColor=setBackgroundColor.BackgroundColor;
+						setBackgroundColorTag=tag;
+						setBackgroundColorTag.tagBody=setBackgroundColor;
+					break;
 				}
 			}
 		}
 		public function infos2Tags():void{
 			///*
-			var tagId:int=dataAndTags.tagV.length;
+			var tagId:int=tagV.length;
 			while(--tagId>=0){
-				var tag:Tag=dataAndTags.tagV[tagId];
+				var tag:Tag=tagV[tagId];
 				switch(tag.type){
 					case TagType.FileAttributes:
 					case TagType.Metadata:
-						dataAndTags.tagV.splice(tagId,1);
+					case TagType.SetBackgroundColor:
+						tagV.splice(tagId,1);
 					break;
 				}
 			}
@@ -186,6 +177,14 @@ package zero.swf{
 			}
 			fileAttributes.UseNetwork=(accessNetworkOnly?1:0);
 			
+			var setBackgroundColor:SetBackgroundColor=new SetBackgroundColor();
+			setBackgroundColor.BackgroundColor=bgColor;
+			if(!setBackgroundColorTag){
+				setBackgroundColorTag=new Tag();
+			}
+			setBackgroundColorTag.tagBody=setBackgroundColor;
+			tagV.unshift(setBackgroundColorTag);
+			
 			if(metadataStr){
 				fileAttributes.HasMetadata=1;
 				var metadata:Metadata=new Metadata();
@@ -194,7 +193,7 @@ package zero.swf{
 					metadataTag=new Tag();
 				}
 				metadataTag.tagBody=metadata;
-				dataAndTags.tagV.unshift(metadataTag);
+				tagV.unshift(metadataTag);
 			}else{
 				fileAttributes.HasMetadata=0;
 			}
@@ -204,34 +203,32 @@ package zero.swf{
 					fileAttributesTag=new Tag();
 				}
 				fileAttributesTag.tagBody=fileAttributes;
-				dataAndTags.tagV.unshift(fileAttributesTag);
+				tagV.unshift(fileAttributesTag);
 			}
 		}
 		
-		private var newData:ByteArray;
-		public function toSWFData():ByteArray{
-			prevToData();
-			
-			insertResTags();
-			
-			newData.writeBytes(dataAndTags.toData());
-			var _newData:ByteArray=newData;
-			newData=null;
-			return swfDataAndData.data2SWFData(_newData);
-		}
-		
-		public function prevToData():void{
-			newData=new ByteArray();
-			dataAndBaseInfo.getData(newData);
-			newData.position=newData.length;
-			
+		override public function toData():ByteArray{
 			infos2Tags();
-		}
-		
-		public function toSWFData2(progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
-			prevToData();
 			
 			insertResTags();
+			
+			var data:ByteArray=baseInfo2Data();
+			data.position=data.length;
+			var dataAndTags:DataAndTags=new DataAndTags();
+			dataAndTags.tagV=tagV;
+			
+			data.writeBytes(dataAndTags.toData());
+			return data;
+		}
+		public function toSWFData2(progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
+			infos2Tags();
+			
+			insertResTags();
+			
+			data=baseInfo2Data();
+			data.position=data.length;
+			dataAndTags=new DataAndTags();
+			dataAndTags.tagV=tagV;
 			
 			progress_finished=_progress_finished;
 			dataAndTags.toData2(
@@ -241,46 +238,51 @@ package zero.swf{
 			);
 		}
 		private function toSWFData2_finished(dataAndTagsNewData:ByteArray):void{
-			newData.writeBytes(dataAndTagsNewData);
+			data.writeBytes(dataAndTagsNewData);
 			
 			var _progress_finished:Function=progress_finished;
 			progress_finished=null;
-			var _newData:ByteArray=newData;
-			newData=null;
-			_progress_finished(swfDataAndData.data2SWFData(_newData));
+			dataAndTags=null;
+			var _data:ByteArray=data;
+			data=null;
+			_progress_finished(data2SWFData(_data));
 		}
 		
 		CONFIG::toXMLAndInitByXML{
 		private var xml:XML;
-		private function getXML(fileName:String):void{
-			xml=<SWF fileName={fileName} type={type} Version={Version} FileLength={swfDataAndData.FileLength} wid={wid} hei={hei} FrameRate={FrameRate}/>;
-			if(dataAndBaseInfo.FrameSize.Xmin===0){
+		private function getXML():void{
+			xml=<SWF type={type} Version={Version} FileLength={FileLength} width={width} height={height} FrameRate={FrameRate}/>;
+			if(x===0){
 			}else{
-				xml.@left=dataAndBaseInfo.FrameSize.Xmin/20;
+				xml.@x=x;
 			}
-			if(dataAndBaseInfo.FrameSize.Ymin===0){
+			if(y===0){
 			}else{
-				xml.@top=dataAndBaseInfo.FrameSize.Ymin/20;
+				xml.@y=y;
 			}
 		}
-		public function toXML(fileName:String):XML{
+		public function toXML():XML{
 			infos2Tags();
 			
 			insertResTags();
 			
-			getXML(fileName);
+			getXML();
 			
+			var dataAndTags:DataAndTags=new DataAndTags();
+			dataAndTags.tagV=tagV;
 			xml.appendChild(dataAndTags.toXML());
 			return xml;
 		}
-		public function toXML2(fileName:String,progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
+		public function toXML2(progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
 			infos2Tags();
 			
 			insertResTags();
 			
-			getXML(fileName);
+			getXML();
 			
 			progress_finished=_progress_finished;
+			dataAndTags=new DataAndTags();
+			dataAndTags.tagV=tagV;
 			dataAndTags.toXML2(
 				progress_start,
 				progress_progress,
@@ -290,20 +292,26 @@ package zero.swf{
 		private function toXML2_finished(dataAndTagsXML:XML):void{
 			var _progress_finished:Function=progress_finished;
 			progress_finished=null;
+			dataAndTags=null;
 			xml.appendChild(dataAndTagsXML);
 			_progress_finished(xml);
 		}
 		private function initFrameSizeByXML(xml:XML):void{
-			var leftStr:String=xml.@left.toString();
-			if(leftStr){
-				dataAndBaseInfo.FrameSize.Xmin=int(leftStr)*20;
+			var xStr:String=xml.@x.toString();
+			if(xStr){
+				x=Number(xStr);
+			}else{
+				x=0;
 			}
-			var topStr:String=xml.@top.toString();
-			if(topStr){
-				dataAndBaseInfo.FrameSize.Ymin=int(topStr)*20;
+			var yStr:String=xml.@y.toString();
+			if(yStr){
+				y=Number(yStr);
+			}else{
+				y=0;
 			}
-			wid=int(xml.@wid.toString());
-			hei=int(xml.@hei.toString());
+			width=Number(xml.@width.toString());
+			height=Number(xml.@height.toString());
+			//trace("width="+width,"height="+height);
 		}
 		public function initByXML(xml:XML):void{
 			type=xml.@type.toString();
@@ -311,7 +319,9 @@ package zero.swf{
 			initFrameSizeByXML(xml);
 			
 			FrameRate=Number(xml.@FrameRate.toString());
+			var dataAndTags:DataAndTags=new DataAndTags();
 			dataAndTags.initByXML(xml.tags[0]);
+			tagV=dataAndTags.tagV;
 			
 			tags2Infos();
 		}
@@ -324,6 +334,7 @@ package zero.swf{
 			
 			progress_finished=_progress_finished;
 			
+			dataAndTags=new DataAndTags();
 			dataAndTags.initByXML2(
 				xml.tags[0],
 				progress_start,
@@ -334,6 +345,9 @@ package zero.swf{
 		private function initByXMLL2_finished():void{
 			var _progress_finished:Function=progress_finished;
 			progress_finished=null;
+			
+			tagV=dataAndTags.tagV;
+			dataAndTags=null;
 			
 			tags2Infos();
 			
@@ -357,7 +371,7 @@ package zero.swf{
 				}catch(e:Error){
 					throw new Error("未编译: zero.swf.ResInserter");
 				}
-				resInserter=new ResInserterClass(dataAndTags.tagV);
+				resInserter=new ResInserterClass(tagV);
 			}
 			
 			resInserter.insert(
@@ -369,11 +383,11 @@ package zero.swf{
 		}
 		private function insertResTags():void{
 			if(resInserter){
-				var endTag:Tag=dataAndTags.tagV.pop();
-				var lastShowFrameTag:Tag=dataAndTags.tagV.pop();
-				dataAndTags.tagV=dataAndTags.tagV.concat(resInserter.getTagVAndReset());
-				dataAndTags.tagV.push(lastShowFrameTag);
-				dataAndTags.tagV.push(endTag);
+				var endTag:Tag=tagV.pop();
+				var lastShowFrameTag:Tag=tagV.pop();
+				tagV=tagV.concat(resInserter.getTagVAndReset());
+				tagV.push(lastShowFrameTag);
+				tagV.push(endTag);
 			}
 		}
 	}

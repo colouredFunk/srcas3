@@ -38,7 +38,7 @@ package zero.zero3D.objs{
 			return focalLengthV[0];//以原点的 focalLength 作为 focalLength
 		}
 		
-		public function render(container:Sprite):void{
+		public function render(container:*):void{
 			container.addChild(sprite);
 			var g:Graphics=sprite.graphics;
 			

@@ -2,7 +2,7 @@
 LINESTYLEARRAY 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月9日 11:40:05 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月17日 10:53:59 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -21,7 +21,6 @@ package zero.swf.record{
 		public var LineStylesV:Vector.<LINESTYLE>;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			LineStylesV=new Vector.<LINESTYLE>();
 			//#offsetpp
 			//#offsetpp
 			
@@ -29,6 +28,7 @@ package zero.swf.record{
 			if(LineStyleCount==0xff){
 				LineStyleCount=data[offset++]|(data[offset++]<<8);
 			}
+			LineStylesV=new Vector.<LINESTYLE>(LineStyleCount);
 			for(var i:int=0;i<LineStyleCount;i++){
 				//#offsetpp
 			
@@ -76,8 +76,8 @@ package zero.swf.record{
 		override public function initByXML(xml:XML):void{
 			var listXML:XML=xml.list[0];
 			var LineStylesXMLList:XMLList=listXML.LineStyles;
-			LineStylesV=new Vector.<LINESTYLE>();
 			var i:int=-1;
+			LineStylesV=new Vector.<LINESTYLE>(LineStylesXMLList.length());
 			for each(var LineStylesXML:XML in LineStylesXMLList){
 				i++;
 				LineStylesV[i]=new LINESTYLE();

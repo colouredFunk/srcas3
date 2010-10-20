@@ -2,7 +2,7 @@
 CLIPACTIONS 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年9月12日 18:19:02 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月17日 10:53:58 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -31,10 +31,10 @@ package zero.swf.record{
 			offset+=2;
 			AllEventFlags=new CLIPEVENTFLAGS();
 			offset=AllEventFlags.initByData(data,offset,endOffset);
-			ClipActionRecordV=new Vector.<CLIPACTIONRECORD>();
 			//#offsetpp
 			
 			var i:int=-1;
+			ClipActionRecordV=new Vector.<CLIPACTIONRECORD>();
 			while(offset<endOffset-6){
 				i++;
 				//#offsetpp
@@ -100,8 +100,8 @@ package zero.swf.record{
 			AllEventFlags.initByXML(xml.AllEventFlags.children()[0]);
 			var listXML:XML=xml.list[0];
 			var ClipActionRecordXMLList:XMLList=listXML.ClipActionRecord;
-			ClipActionRecordV=new Vector.<CLIPACTIONRECORD>();
 			var i:int=-1;
+			ClipActionRecordV=new Vector.<CLIPACTIONRECORD>(ClipActionRecordXMLList.length());
 			for each(var ClipActionRecordXML:XML in ClipActionRecordXMLList){
 				i++;
 				ClipActionRecordV[i]=new CLIPACTIONRECORD();

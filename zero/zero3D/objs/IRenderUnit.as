@@ -11,7 +11,7 @@ package zero.zero3D.objs{
 	import flash.display.*;
 	public interface IRenderUnit{
 		function get focalLength():Number;
-		function render(container:Sprite):void;
+		function render(container:*):void;
 	}
 }
 

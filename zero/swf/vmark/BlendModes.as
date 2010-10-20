@@ -2,7 +2,7 @@
 BlendModes 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年9月13日 14:31:20 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月18日 12:21:11 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -10,27 +10,6 @@ BlendModes 版本:v1.0
 package zero.swf.vmark{
 	import flash.utils.ByteArray;
 	public class BlendModes extends VMark{
-		public static const BlendModeV:Vector.<String>=get_BlendModeV();
-		private static function get_BlendModeV():Vector.<String>{
-			var BlendModeV:Vector.<String>=new Vector.<String>(15);
-			BlendModeV.fixed=true;
-			BlendModeV[0]="normal";
-			BlendModeV[1]="normal_too";
-			BlendModeV[2]="layer";
-			BlendModeV[3]="multiply";
-			BlendModeV[4]="screen";
-			BlendModeV[5]="lighten";
-			BlendModeV[6]="darken";
-			BlendModeV[7]="difference";
-			BlendModeV[8]="add";
-			BlendModeV[9]="subtract";
-			BlendModeV[10]="invert";
-			BlendModeV[11]="alpha";
-			BlendModeV[12]="erase";
-			BlendModeV[13]="overlay";
-			BlendModeV[14]="hardlight";
-			return BlendModeV;
-		}
 		public static const normal:int=0;
 		public static const normal_too:int=1;
 		public static const layer:int=2;
@@ -46,6 +25,29 @@ package zero.swf.vmark{
 		public static const erase:int=12;
 		public static const overlay:int=13;
 		public static const hardlight:int=14;
+		
+		public static const blendModeV:Vector.<String>=get_blendModeV();
+		private static function get_blendModeV():Vector.<String>{
+			var blendModeV:Vector.<String>=new Vector.<String>(15);
+			blendModeV.fixed=true;
+			blendModeV[0]="normal";
+			blendModeV[1]="normal_too";
+			blendModeV[2]="layer";
+			blendModeV[3]="multiply";
+			blendModeV[4]="screen";
+			blendModeV[5]="lighten";
+			blendModeV[6]="darken";
+			blendModeV[7]="difference";
+			blendModeV[8]="add";
+			blendModeV[9]="subtract";
+			blendModeV[10]="invert";
+			blendModeV[11]="alpha";
+			blendModeV[12]="erase";
+			blendModeV[13]="overlay";
+			blendModeV[14]="hardlight";
+			return blendModeV;
+		}
+		
 		////
 		//
 

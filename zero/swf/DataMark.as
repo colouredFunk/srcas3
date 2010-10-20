@@ -15,31 +15,30 @@ package zero.swf{
 	import zero.swf.tag_body.TagBody;
 	
 	public class DataMark{
-		public static var data:ByteArray;//xml 根节点上的 fileName 对应的 data
-		
-		//public static var keyV:Vector.<String>;
+		private static var getDataBySrcMark:Object;
 		public static var resourceV:Vector.<Object>;
-		public static function reset():void{
-			//keyV=new Vector.<String>();
-			resourceV=new Vector.<Object>();
-			getDefineTag=null;
-		}
-		/*
-		public static function addData(data:ByteArray,key:String):void{
-			//initByXML 时以 key 为标记获取对应的 data
-			if(DataMark[key]){
-			}else{
-				keyV[keyV.length]=key;
-			}
-			DataMark[key]=data;
-		}
-		//*/
 		
-		public static function toXML_addResource(tag:Tag,bodyXML:XML):void{
+		public static function reset():void{
+			getDataBySrcMark=new Object();
+			getDataBySrc=null;
+			resourceV=new Vector.<Object>();
+			initByXML_getResourceTag=null;
+		}
+		
+		public static function toXML_addResourceTag(tag:Tag,bodyXML:XML):void{
 			resourceV[resourceV.length]={tag:tag,bodyXML:bodyXML};
 		}
 		
-		public static var getDefineTag:Function;
+		public static var getDataBySrc:Function;
+		public static function getDataBySrcAndMark(src:String):ByteArray{
+			if(getDataBySrcMark[src]){
+			}else{
+				getDataBySrcMark[src]=getDataBySrc(src);
+			}
+			
+			return getDataBySrcMark[src];
+		}
+		public static var initByXML_getResourceTag:Function;
 	}
 }
 

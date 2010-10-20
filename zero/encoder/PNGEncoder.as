@@ -10,7 +10,7 @@ package zero.encoder{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
-	public class PNGEncoder{
+	public class PNGEncoder{推荐使用 mx.graphics.codec.PNGEncoder;
 		public static function encode(bmd:BitmapData,biBitCount:int=24,isRev:Boolean=false):ByteArray{
 			var bmdData:ByteArray=new ByteArray();
 			

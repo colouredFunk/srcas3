@@ -8,9 +8,7 @@
 		<![CDATA[
 			import spark.components.Group;
 			
-			import zero.swf.DataAndTags;
-			import zero.swf.Tag;
-			import zero.swf.TagType;
+			import zero.swf.*;
 			
 			private static var bmpMark:Object;
 			
@@ -130,42 +128,54 @@
 				if(option&&option==_option){
 					return false;
 				}
-				option=_option;
 				
-				selectOptionAndSetEnabled();
+				if(selectOptionAndSetEnabled(_option)){
+					option=_option;
+				}//else{
+					//trace("type="+type,"_option="+_option);
+				//}
 				
 				return true;
 			}
-			private function selectOptionAndSetEnabled():void{
-				TagsOptionBoardItemView.itemView.select(option);
-				var hasTagBodyClass:Boolean=true;
-				if(zero.swf.Tag.getTagBodyClassByType(TagType[type])){
-					hasTagBodyClass=true;
-				}else{
-					hasTagBodyClass=false;
-				}
+			private function selectOptionAndSetEnabled(_option:String):Boolean{
+				var enabledOptionArr:Array;
 				if(DataAndTags.mustBeStructorTagBodyClasses[TagType[type]]){
-					TagsOptionBoardItemView.itemView.setEnabled(
-						DataAndTags.structorOption
-					);
+					enabledOptionArr=[DataAndTags.structorOption];
 				}else{
-					if(hasTagBodyClass){
-						TagsOptionBoardItemView.itemView.setEnabled(
-							DataAndTags.structorOption,
-							DataAndTags.resourceOption,
-							DataAndTags.byteCodesOption,
-							DataAndTags.onlyLocationOption,
-							DataAndTags.noOutputOption
-						);
+					enabledOptionArr=[
+						DataAndTags.byteCodesOption,
+						DataAndTags.onlyLocationOption,
+						DataAndTags.noOutputOption
+					];
+					
+					var hasTagBodyClass:Boolean=true;
+					if(Tag.getTagBodyClassByType(TagType[type])){
+						hasTagBodyClass=true;
 					}else{
-						TagsOptionBoardItemView.itemView.setEnabled(
-							DataAndTags.resourceOption,
-							DataAndTags.byteCodesOption,
-							DataAndTags.onlyLocationOption,
-							DataAndTags.noOutputOption
-						);
+						hasTagBodyClass=false;
+					}
+					
+					if(hasTagBodyClass){
+						enabledOptionArr.push(DataAndTags.structorOption);
+					}
+					switch(DefineObjs[type]){
+						case DefineObjs.IMG:
+						case DefineObjs.SWF:
+							enabledOptionArr.push(DataAndTags.resourceOption);
+						break;
 					}
 				}
+				
+				TagsOptionBoardItemView.itemView.setEnabled(enabledOptionArr);
+				
+				if(enabledOptionArr.indexOf(_option)==-1){
+					if(option){
+						TagsOptionBoardItemView.itemView.select(option);
+					}
+					return false;
+				}
+				TagsOptionBoardItemView.itemView.select(_option);
+				return true;
 			}
 			public function clear():void{
 				//if(type){
@@ -183,7 +193,7 @@
 					}
 					currItem=this;
 					sp.alpha=0;
-					selectOptionAndSetEnabled();
+					selectOptionAndSetEnabled(option);
 					this.addElement(TagsOptionBoardItemView.itemView);
 					_stage.addEventListener(MouseEvent.MOUSE_MOVE,checkHit);
 				}

@@ -8,8 +8,9 @@ FILTER 版本:v1.0
 */
 
 package zero.swf.record.filters{
-	import zero.swf.BaseDat;
-	public class FILTER extends BaseDat{
+	import zero.swf.record.Record;
+	public class FILTER extends Record{
+		public var FilterID:int;
 		public function FILTER(){
 		}
 	}

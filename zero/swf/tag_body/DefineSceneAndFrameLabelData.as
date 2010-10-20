@@ -2,7 +2,7 @@
 DefineSceneAndFrameLabelData 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年9月9日 22:24:12 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月17日 11:56:34 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -35,29 +35,49 @@ package zero.swf.tag_body{
 		public var FrameLabelV:Vector.<String>;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			OffsetV=new Vector.<int>();
-			NameV=new Vector.<String>();
 			//#offsetpp
 			//#offsetpp
 			
-			var SceneCount:int=0;
-			var get_u_step:int=0;
-			do{
-				var get_u_value:int=data[offset++];
-				SceneCount|=((get_u_value&0x7f)<<get_u_step);// get_u_value & 0111 1111
-				get_u_step+=7;
-			}while(get_u_value&0x80);// get_u_value & 1000 0000
+			if(data[offset]>>>7){
+				if(data[offset+1]>>>7){
+					if(data[offset+2]>>>7){
+						if(data[offset+3]>>>7){
+							var SceneCount:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);
+						}else{
+							SceneCount=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);
+						}
+					}else{
+						SceneCount=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);
+					}
+				}else{
+					SceneCount=(data[offset++]&0x7f)|(data[offset++]<<7);
+				}
+			}else{
+				SceneCount=data[offset++];
+			}
 			//
+			OffsetV=new Vector.<int>(SceneCount);
+			NameV=new Vector.<String>(SceneCount);
 			for(var i:int=0;i<SceneCount;i++){
 				//#offsetpp
 			
-				OffsetV[i]=0;
-				get_u_step=0;
-				do{
-					get_u_value=data[offset++];
-					OffsetV[i]|=((get_u_value&0x7f)<<get_u_step);// get_u_value & 0111 1111
-					get_u_step+=7;
-				}while(get_u_value&0x80);// get_u_value & 1000 0000
+				if(data[offset]>>>7){
+					if(data[offset+1]>>>7){
+						if(data[offset+2]>>>7){
+							if(data[offset+3]>>>7){
+								OffsetV[i]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);
+							}else{
+								OffsetV[i]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);
+							}
+						}else{
+							OffsetV[i]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);
+						}
+					}else{
+						OffsetV[i]=(data[offset++]&0x7f)|(data[offset++]<<7);
+					}
+				}else{
+					OffsetV[i]=data[offset++];
+				}
 				//
 				//#offsetpp
 			
@@ -67,30 +87,50 @@ package zero.swf.tag_body{
 				NameV[i]=data.readUTFBytes(get_str_size);
 				offset+=get_str_size;
 			}
-			FrameNumV=new Vector.<int>();
-			FrameLabelV=new Vector.<String>();
 			//#offsetpp
 			
 			//#offsetpp
 			
-			var FrameLabelCount:int=0;
-			get_u_step=0;
-			do{
-				get_u_value=data[offset++];
-				FrameLabelCount|=((get_u_value&0x7f)<<get_u_step);// get_u_value & 0111 1111
-				get_u_step+=7;
-			}while(get_u_value&0x80);// get_u_value & 1000 0000
+			if(data[offset]>>>7){
+				if(data[offset+1]>>>7){
+					if(data[offset+2]>>>7){
+						if(data[offset+3]>>>7){
+							var FrameLabelCount:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);
+						}else{
+							FrameLabelCount=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);
+						}
+					}else{
+						FrameLabelCount=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);
+					}
+				}else{
+					FrameLabelCount=(data[offset++]&0x7f)|(data[offset++]<<7);
+				}
+			}else{
+				FrameLabelCount=data[offset++];
+			}
 			//
+			FrameNumV=new Vector.<int>(FrameLabelCount);
+			FrameLabelV=new Vector.<String>(FrameLabelCount);
 			for(i=0;i<FrameLabelCount;i++){
 				//#offsetpp
 			
-				FrameNumV[i]=0;
-				get_u_step=0;
-				do{
-					get_u_value=data[offset++];
-					FrameNumV[i]|=((get_u_value&0x7f)<<get_u_step);// get_u_value & 0111 1111
-					get_u_step+=7;
-				}while(get_u_value&0x80);// get_u_value & 1000 0000
+				if(data[offset]>>>7){
+					if(data[offset+1]>>>7){
+						if(data[offset+2]>>>7){
+							if(data[offset+3]>>>7){
+								FrameNumV[i]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);
+							}else{
+								FrameNumV[i]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);
+							}
+						}else{
+							FrameNumV[i]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);
+						}
+					}else{
+						FrameNumV[i]=(data[offset++]&0x7f)|(data[offset++]<<7);
+					}
+				}else{
+					FrameNumV[i]=data[offset++];
+				}
 				//
 				//#offsetpp
 			
@@ -108,16 +148,32 @@ package zero.swf.tag_body{
 			var SceneCount:int=OffsetV.length;
 			//#offsetpp
 			var offset:int=0;
-			var set_u_value:int=SceneCount;
-			while(true){
-				var set_u_byteValue:int=set_u_value&0x7f;
-				set_u_value>>>=7;
-				if(set_u_value){
-					data[offset++]=0x80|set_u_byteValue;
+			if(SceneCount>>>7){
+				if(SceneCount>>>14){
+					if(SceneCount>>>21){
+						if(SceneCount>>>28){
+							data[offset++]=(SceneCount&0x7f)|0x80;
+							data[offset++]=((SceneCount>>>7)&0x7f)|0x80;
+							data[offset++]=((SceneCount>>>14)&0x7f)|0x80;
+							data[offset++]=((SceneCount>>>21)&0x7f)|0x80;
+							data[offset++]=SceneCount>>>28;
+						}else{
+							data[offset++]=(SceneCount&0x7f)|0x80;
+							data[offset++]=((SceneCount>>>7)&0x7f)|0x80;
+							data[offset++]=((SceneCount>>>14)&0x7f)|0x80;
+							data[offset++]=SceneCount>>>21;
+						}
+					}else{
+						data[offset++]=(SceneCount&0x7f)|0x80;
+						data[offset++]=((SceneCount>>>7)&0x7f)|0x80;
+						data[offset++]=SceneCount>>>14;
+					}
 				}else{
-					data[offset++]=set_u_byteValue;
-					break;
+					data[offset++]=(SceneCount&0x7f)|0x80;
+					data[offset++]=SceneCount>>>7;
 				}
+			}else{
+				data[offset++]=SceneCount;
 			}
 			//
 			//#offsetpp
@@ -127,16 +183,32 @@ package zero.swf.tag_body{
 				i++;
 				//#offsetpp
 			
-				set_u_value=Offset;
-				while(true){
-					set_u_byteValue=set_u_value&0x7f;
-					set_u_value>>>=7;
-					if(set_u_value){
-						data[offset++]=0x80|set_u_byteValue;
+				if(Offset>>>7){
+					if(Offset>>>14){
+						if(Offset>>>21){
+							if(Offset>>>28){
+								data[offset++]=(Offset&0x7f)|0x80;
+								data[offset++]=((Offset>>>7)&0x7f)|0x80;
+								data[offset++]=((Offset>>>14)&0x7f)|0x80;
+								data[offset++]=((Offset>>>21)&0x7f)|0x80;
+								data[offset++]=Offset>>>28;
+							}else{
+								data[offset++]=(Offset&0x7f)|0x80;
+								data[offset++]=((Offset>>>7)&0x7f)|0x80;
+								data[offset++]=((Offset>>>14)&0x7f)|0x80;
+								data[offset++]=Offset>>>21;
+							}
+						}else{
+							data[offset++]=(Offset&0x7f)|0x80;
+							data[offset++]=((Offset>>>7)&0x7f)|0x80;
+							data[offset++]=Offset>>>14;
+						}
 					}else{
-						data[offset++]=set_u_byteValue;
-						break;
+						data[offset++]=(Offset&0x7f)|0x80;
+						data[offset++]=Offset>>>7;
 					}
+				}else{
+					data[offset++]=Offset;
 				}
 				//
 				data.position=offset;
@@ -146,16 +218,32 @@ package zero.swf.tag_body{
 			var FrameLabelCount:int=FrameNumV.length;
 			//#offsetpp
 			
-			set_u_value=FrameLabelCount;
-			while(true){
-				set_u_byteValue=set_u_value&0x7f;
-				set_u_value>>>=7;
-				if(set_u_value){
-					data[offset++]=0x80|set_u_byteValue;
+			if(FrameLabelCount>>>7){
+				if(FrameLabelCount>>>14){
+					if(FrameLabelCount>>>21){
+						if(FrameLabelCount>>>28){
+							data[offset++]=(FrameLabelCount&0x7f)|0x80;
+							data[offset++]=((FrameLabelCount>>>7)&0x7f)|0x80;
+							data[offset++]=((FrameLabelCount>>>14)&0x7f)|0x80;
+							data[offset++]=((FrameLabelCount>>>21)&0x7f)|0x80;
+							data[offset++]=FrameLabelCount>>>28;
+						}else{
+							data[offset++]=(FrameLabelCount&0x7f)|0x80;
+							data[offset++]=((FrameLabelCount>>>7)&0x7f)|0x80;
+							data[offset++]=((FrameLabelCount>>>14)&0x7f)|0x80;
+							data[offset++]=FrameLabelCount>>>21;
+						}
+					}else{
+						data[offset++]=(FrameLabelCount&0x7f)|0x80;
+						data[offset++]=((FrameLabelCount>>>7)&0x7f)|0x80;
+						data[offset++]=FrameLabelCount>>>14;
+					}
 				}else{
-					data[offset++]=set_u_byteValue;
-					break;
+					data[offset++]=(FrameLabelCount&0x7f)|0x80;
+					data[offset++]=FrameLabelCount>>>7;
 				}
+			}else{
+				data[offset++]=FrameLabelCount;
 			}
 			//
 			//#offsetpp
@@ -165,16 +253,32 @@ package zero.swf.tag_body{
 				i++;
 				//#offsetpp
 			
-				set_u_value=FrameNum;
-				while(true){
-					set_u_byteValue=set_u_value&0x7f;
-					set_u_value>>>=7;
-					if(set_u_value){
-						data[offset++]=0x80|set_u_byteValue;
+				if(FrameNum>>>7){
+					if(FrameNum>>>14){
+						if(FrameNum>>>21){
+							if(FrameNum>>>28){
+								data[offset++]=(FrameNum&0x7f)|0x80;
+								data[offset++]=((FrameNum>>>7)&0x7f)|0x80;
+								data[offset++]=((FrameNum>>>14)&0x7f)|0x80;
+								data[offset++]=((FrameNum>>>21)&0x7f)|0x80;
+								data[offset++]=FrameNum>>>28;
+							}else{
+								data[offset++]=(FrameNum&0x7f)|0x80;
+								data[offset++]=((FrameNum>>>7)&0x7f)|0x80;
+								data[offset++]=((FrameNum>>>14)&0x7f)|0x80;
+								data[offset++]=FrameNum>>>21;
+							}
+						}else{
+							data[offset++]=(FrameNum&0x7f)|0x80;
+							data[offset++]=((FrameNum>>>7)&0x7f)|0x80;
+							data[offset++]=FrameNum>>>14;
+						}
 					}else{
-						data[offset++]=set_u_byteValue;
-						break;
+						data[offset++]=(FrameNum&0x7f)|0x80;
+						data[offset++]=FrameNum>>>7;
 					}
+				}else{
+					data[offset++]=FrameNum;
 				}
 				//
 				data.position=offset;
@@ -210,10 +314,10 @@ package zero.swf.tag_body{
 		override public function initByXML(xml:XML):void{
 			var listXML:XML=xml.list[0];
 			var OffsetXMLList:XMLList=listXML.Offset;
-			OffsetV=new Vector.<int>();
 			var NameXMLList:XMLList=listXML.Name;
-			NameV=new Vector.<String>();
 			var i:int=-1;
+			OffsetV=new Vector.<int>(OffsetXMLList.length());
+			NameV=new Vector.<String>(NameXMLList.length());
 			for each(var OffsetXML:XML in OffsetXMLList){
 				i++;
 				OffsetV[i]=int(OffsetXML.@value.toString());
@@ -221,10 +325,10 @@ package zero.swf.tag_body{
 			}
 			listXML=xml.list[1];
 			var FrameNumXMLList:XMLList=listXML.FrameNum;
-			FrameNumV=new Vector.<int>();
 			var FrameLabelXMLList:XMLList=listXML.FrameLabel;
-			FrameLabelV=new Vector.<String>();
 			i=-1;
+			FrameNumV=new Vector.<int>(FrameNumXMLList.length());
+			FrameLabelV=new Vector.<String>(FrameLabelXMLList.length());
 			for each(var FrameNumXML:XML in FrameNumXMLList){
 				i++;
 				FrameNumV[i]=int(FrameNumXML.@value.toString());

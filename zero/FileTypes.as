@@ -42,8 +42,8 @@ package zero{
 			_7790:EXE
 		}
 		
-		public static function getType(fileData:ByteArray,fileName:String=null):String{
-			var type:String=typeMark["_"+fileData[0]+fileData[1]];
+		public static function getType(fileData:ByteArray,fileName:String=null,offset:int=0):String{
+			var type:String=typeMark["_"+fileData[offset]+fileData[offset+1]];
 			if(type){
 				return type;
 			}

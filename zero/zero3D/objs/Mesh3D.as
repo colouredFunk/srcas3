@@ -75,7 +75,7 @@ package zero.zero3D.objs{
 			throw new Error("未处理");
 			return -1;
 		}
-		public function render(container:Sprite):void{
+		public function render(container:*):void{
 			if(bmd||bmdArr){
 				throw new Error("未处理");
 			}else{

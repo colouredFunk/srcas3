@@ -16,9 +16,10 @@ package zero.swf{
 	import flash.system.LoaderContext;
 	import flash.utils.*;
 	
+	import mx.graphics.codec.PNGEncoder;
+	
 	import zero.Outputer;
 	import zero.air.FileAndData;
-	import zero.encoder.PNGEncoder;
 	
 	public class SWF2Icon{
 		private static var startTime:int=0;
@@ -26,13 +27,19 @@ package zero.swf{
 		private static var fileV:Vector.<File>=new Vector.<File>();
 		private static var currFile:File;
 		private static var loader:Loader=initLoader();
+		
+		private static var wid:int;
+		private static var hei:int;
+		
 		private static function initLoader():Loader{
 			
 			var loader:Loader=new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadComplete);
 			return loader;
 		}
-		public static function swfFile2Icon(swfFile:File):void{
+		public static function swfFile2Icon(swfFile:File,_wid:int,_hei:int):void{
+			wid=_wid;
+			hei=_hei;
 			fileV.push(swfFile);
 			if(currFile){
 			}else{
@@ -53,8 +60,8 @@ package zero.swf{
 			var iconBmd:BitmapData=new BitmapData(loader.contentLoaderInfo.width,loader.contentLoaderInfo.height,true,0x00000000);
 			iconBmd.draw(loader);
 			var pngFileURL:String=currFile.url;
-			pngFileURL=pngFileURL.substr(0,pngFileURL.lastIndexOf("."))+".png";
-			FileAndData.writeDataToURL(PNGEncoder.encode(iconBmd),pngFileURL);
+			pngFileURL=pngFileURL.substr(0,pngFileURL.lastIndexOf("."))+"_icon.png";
+			FileAndData.writeDataToURL(new PNGEncoder().encode(iconBmd),pngFileURL);
 			currFile=null;
 			if(fileV.length){
 				load();
@@ -64,42 +71,110 @@ package zero.swf{
 		}
 		
 		private static var intervalId:int=-1;
+		private static var itemV:Vector.<Object>;
+		private static var itemId:int;
+		private static var resourceV:Vector.<Object>;
+		private static var xmlFolderURL:String;
+		public static function items2Icon(_itemV:Vector.<Object>,_resourceV:Vector.<Object>,_wid:int,_hei:int,_xmlFolderURL:String):void{
+			wid=_wid;
+			hei=_hei;
+			
+			itemV=_itemV;
+			resourceV=_resourceV;
+			xmlFolderURL=_xmlFolderURL;
+			
+			clearInterval(intervalId);
+			itemId=-1;
+			intervalId=setInterval(item2Icon,30);
+		}
+		private static function item2Icon():void{
+			var t:int=getTimer();
+			while(getTimer()-t<30){
+				if(++itemId>=itemV.length){
+					clearInterval(intervalId);
+					Outputer.output("items2Icon 完成","green");
+					return;
+				}
+				var iconBmd:BitmapData=new BitmapData(wid,hei,true,0x00000000);
+				var item:*=itemV[itemId];
+				var dspObj:DisplayObject;
+				if(item is BitmapData){
+					dspObj=new Bitmap(item);
+				}else if(item is Sprite){
+					dspObj=item;
+				}else{
+					throw new Error("暂不支持的 item: "+item);
+				}
+				var rect:Rectangle=dspObj.getBounds(dspObj);
+				var scale:Number;
+				if(wid*rect.height<rect.width*hei){
+					scale=wid/rect.width;
+				}else{
+					scale=hei/rect.height;
+				}
+				
+				iconBmd.draw(dspObj,new Matrix(scale,0,0,scale,-rect.x*scale+(wid-rect.width*scale)/2,-rect.y*scale+(hei-rect.height*scale)/2));
+				
+				var iconPath:String=xmlFolderURL+resourceV[itemId].bodyXML.@resource.toString();
+				FileAndData.writeDataToURL(new PNGEncoder().encode(iconBmd),iconPath=iconPath.substr(0,iconPath.lastIndexOf("."))+"_icon.png");
+			}
+			if(getTimer()-startTime>1000){
+				startTime=getTimer();
+				Outputer.output("items2Icon 剩余: "+(itemV.length-itemId));
+			}
+		}
+		
+		/*
 		private static var mc:MovieClip;
 		private static var resourceV:Vector.<Object>;
-		private static var d:int=0;
 		private static var xmlFolderURL:String;
-		public static function mc2Icon(_mc:MovieClip,_resourceV:Vector.<Object>,_d:int,_xmlFolderURL:String):void{
-			clearInterval(intervalId);
+		public static function mc2Icon(_mc:MovieClip,_resourceV:Vector.<Object>,_wid:int,_hei:int,_xmlFolderURL:String):void{
+			wid=_wid;
+			hei=_hei;
 			
 			mc=_mc;
 			resourceV=_resourceV;
-			d=_d;
 			xmlFolderURL=_xmlFolderURL;
 			
 			mc.gotoAndStop(1);
-			intervalId=setInterval(mc2IconStep,30);
+			mc.play();
+			mc2IconStep();
 		}
 		private static function mc2IconStep():void{
-			var rect:Rectangle=mc.getBounds(mc);
-			//trace(rect);//好像出问题了
+			var frameId:int=mc.currentFrame-1;
+			//trace("frameId="+frameId);
+			mc.addFrameScript(frameId,null);
 			
-			var iconBmd:BitmapData=new BitmapData(Math.round(rect.width)+d*2,Math.round(rect.height)+d*2,true,0x00000000);
-			iconBmd.draw(mc,new Matrix(1,0,0,1,d-Math.round(rect.x),d-Math.round(rect.y)));
-			var iconPath:String=xmlFolderURL+resourceV[mc.currentFrame-1].bodyXML.@resource.toString();
-			FileAndData.writeDataToURL(PNGEncoder.encode(iconBmd),iconPath=iconPath.substr(0,iconPath.lastIndexOf("."))+".png");
+			var sp:Sprite=mc.getChildAt(0) as Sprite;
+			var child:DisplayObject=sp.getChildAt(0);
+			var iconBmd:BitmapData=new BitmapData(wid,hei,true,0x00000000);
 			
-			if(mc.currentFrame<mc.totalFrames){
+			var rect:Rectangle=sp.getBounds(sp);
+			var scale:Number;
+			if(wid*rect.height<rect.width*hei){
+				scale=wid/rect.width;
+			}else{
+				scale=hei/rect.height;
+			}
+			
+			iconBmd.draw(sp,new Matrix(scale,0,0,scale,-rect.x*scale+(wid-rect.width*scale)/2,-rect.y*scale+(hei-rect.height*scale)/2));
+			
+			var iconPath:String=xmlFolderURL+resourceV[frameId].bodyXML.@resource.toString();
+			FileAndData.writeDataToURL(new PNGEncoder().encode(iconBmd),iconPath=iconPath.substr(0,iconPath.lastIndexOf("."))+"_icon.png");
+			
+			
+			if(frameId+1<mc.totalFrames){
+				mc.addFrameScript(frameId+1,mc2IconStep);
+				
 				if(getTimer()-startTime>1000){
 					startTime=getTimer();
-					Outputer.output("mc2Icon 剩余: "+(mc.totalFrames-mc.currentFrame+1));
+					Outputer.output("mc2Icon 剩余: "+(mc.totalFrames-frameId));
 				}
-				
-				mc.nextFrame();
 			}else{
-				clearInterval(intervalId);
 				Outputer.output("mc2Icon 完成","green");
 			}
 		}
+		*/
 	}
 }
 

@@ -2,7 +2,7 @@
 ImportAssets 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年9月9日 22:45:45 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月17日 10:48:15 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -41,11 +41,11 @@ package zero.swf.tag_body{
 			data.position=offset;
 			URL=data.readUTFBytes(get_str_size);
 			offset+=get_str_size;
-			TagV=new Vector.<int>();
-			NameV=new Vector.<String>();
 			//#offsetpp
 			
 			var Count:int=data[offset++]|(data[offset++]<<8);
+			TagV=new Vector.<int>(Count);
+			NameV=new Vector.<String>(Count);
 			for(var i:int=0;i<Count;i++){
 				TagV[i]=data[offset++]|(data[offset++]<<8);
 				//#offsetpp
@@ -101,10 +101,10 @@ package zero.swf.tag_body{
 			URL=xml.@URL.toString();
 			var listXML:XML=xml.list[0];
 			var TagXMLList:XMLList=listXML.Tag;
-			TagV=new Vector.<int>();
 			var NameXMLList:XMLList=listXML.Name;
-			NameV=new Vector.<String>();
 			var i:int=-1;
+			TagV=new Vector.<int>(TagXMLList.length());
+			NameV=new Vector.<String>(NameXMLList.length());
 			for each(var TagXML:XML in TagXMLList){
 				i++;
 				TagV[i]=int(TagXML.@value.toString());
