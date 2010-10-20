@@ -13,11 +13,11 @@ package zero.swf{
 	import zero.BytesAndStr16;
 	import zero.Outputer;
 	import zero.swf.avm1.Op;
-	import zero.swf.tag_body.DefineSprite;
-	import zero.swf.tag_body.FileAttributes;
-	import zero.swf.tag_body.Metadata;
-	import zero.swf.tag_body.SetBackgroundColor;
-	import zero.swf.tag_body.TagBody;
+	import zero.swf.tagBodys.DefineSprite;
+	import zero.swf.tagBodys.FileAttributes;
+	import zero.swf.tagBodys.Metadata;
+	import zero.swf.tagBodys.SetBackgroundColor;
+	import zero.swf.tagBodys.TagBody;
 
 	public class DataAndTags extends BaseDat{
 		public static var ignoreUnknownTag:Boolean=true;

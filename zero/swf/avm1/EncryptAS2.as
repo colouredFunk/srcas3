@@ -16,11 +16,11 @@ package zero.swf.avm1{
 	import zero.swf.SWFLevel0;
 	import zero.swf.Tag;
 	import zero.swf.TagType;
-	import zero.swf.tag_body.DefineButton2;
-	import zero.swf.tag_body.DoAction;
-	import zero.swf.tag_body.DoInitAction;
-	import zero.swf.tag_body.PlaceObject2;
-	import zero.swf.tag_body.PlaceObject3;
+	import zero.swf.tagBodys.DefineButton2;
+	import zero.swf.tagBodys.DoAction;
+	import zero.swf.tagBodys.DoInitAction;
+	import zero.swf.tagBodys.PlaceObject2;
+	import zero.swf.tagBodys.PlaceObject3;
 	
 	public class EncryptAS2{
 		public static var totalActionRecord:int;

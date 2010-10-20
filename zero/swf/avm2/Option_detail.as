@@ -31,7 +31,7 @@ Option_detail 版本:v1.0
 //CONSTANT_StaticProtectedNs 	0x1A 	Namespace
 //CONSTANT_PrivateNs 			0x05 	namespace
 package zero.swf.avm2{
-	import zero.swf.vmark.ConstantKind;
+	import zero.swf.vmarks.ConstantKind;
 	import flash.utils.ByteArray;
 	public class Option_detail extends AVM2Obj{
 		public var val:int;								//u30

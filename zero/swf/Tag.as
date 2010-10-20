@@ -12,7 +12,7 @@ package zero.swf{
 	import flash.events.*;
 	import flash.utils.*;
 	
-	import zero.swf.tag_body.TagBody;
+	import zero.swf.tagBodys.TagBody;
 
 	public class Tag{
 		public var headOffset:int;
@@ -106,7 +106,7 @@ package zero.swf{
 		}
 		
 		public static function getTypeByQualifiedClassName(obj:*):int{
-			var typeName:String=getQualifiedClassName(obj).replace("zero.swf.tag_body::","");
+			var typeName:String=getQualifiedClassName(obj).replace("zero.swf.tagBodys::","");
 			if(typeName){
 				var type:int=TagType[typeName];
 				if(TagType.typeNameArr[type]===typeName){
@@ -120,7 +120,7 @@ package zero.swf{
 		}
 		public static function getTagBodyClassByType(type:int):Class{
 			try{
-				return getDefinitionByName("zero.swf.tag_body."+TagType.typeNameArr[type]) as Class;
+				return getDefinitionByName("zero.swf.tagBodys."+TagType.typeNameArr[type]) as Class;
 			}catch(e:Error){
 				//throw new Error("TagBodyClass: "+TagType.typeNameArr[type]+" 未定义");
 			}
