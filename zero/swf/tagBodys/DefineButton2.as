@@ -2,7 +2,7 @@
 DefineButton2 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月17日 10:48:15 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月20日 14:54:30 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -43,25 +43,21 @@ package zero.swf.tagBodys{
 			//Reserved=(flags<<24)>>>25;				//11111110
 			TrackAsMenu=flags&0x01;						//00000001
 			//Reserved=data[offset+3]|(data[offset+4]<<8);
-			//#offsetpp
 			offset+=5;
 			var i:int=-1;
 			CharacterV=new Vector.<BUTTONRECORD>();
 			while(data[offset]){
 				i++;
-				//#offsetpp
 			
 				CharacterV[i]=new BUTTONRECORD();
 				offset=CharacterV[i].initByData(data,offset,endOffset);
 			}
 			CharacterEndFlag=data[offset++];
-			//#offsetpp
 			
 			i=-1;
 			ActionsV=new Vector.<BUTTONCONDACTION>();
 			while(offset<endOffset){
 				i++;
-				//#offsetpp
 			
 				ActionsV[i]=new BUTTONCONDACTION();
 				offset=ActionsV[i].initByData(data,offset,endOffset);
@@ -70,7 +66,6 @@ package zero.swf.tagBodys{
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
-			//var offset:int=0;//测试
 			data[0]=id;
 			data[1]=id>>8;
 			var flags:int=0;
@@ -80,7 +75,6 @@ package zero.swf.tagBodys{
 			
 			data[3]=0x00;
 			data[4]=0x00;
-			//#offsetpp
 			data.position=5;
 			for each(var Character:BUTTONRECORD in CharacterV){
 				data.writeBytes(Character.toData());
@@ -116,44 +110,62 @@ package zero.swf.tagBodys{
 				TrackAsMenu={TrackAsMenu}
 				CharacterEndFlag={CharacterEndFlag}
 			>
-				<list vNames="CharacterV" count={CharacterV.length}/>
-				<list vNames="ActionsV" count={ActionsV.length}/>
+				<CharacterList/>
+				<ActionsList/>
 			</DefineButton2>;
-			var listXML:XML=xml.list[0];
-			for each(var Character:BUTTONRECORD in CharacterV){
-				var itemXML:XML=<Character/>;
-				itemXML.appendChild(Character.toXML());
-				listXML.appendChild(itemXML);
+			if(CharacterV.length){
+				var listXML:XML=xml.CharacterList[0];
+				listXML.@count=CharacterV.length;
+				for each(var Character:BUTTONRECORD in CharacterV){
+					var itemXML:XML=<Character/>;
+					itemXML.appendChild(Character.toXML());
+					listXML.appendChild(itemXML);
+				}
+			}else{
+				delete xml.CharacterList;
 			}
-			listXML=xml.list[1];
-			for each(var Actions:BUTTONCONDACTION in ActionsV){
-				itemXML=<Actions/>;
-				itemXML.appendChild(Actions.toXML());
-				listXML.appendChild(itemXML);
+			if(ActionsV.length){
+				listXML=xml.ActionsList[0];
+				listXML.@count=ActionsV.length;
+				for each(var Actions:BUTTONCONDACTION in ActionsV){
+					itemXML=<Actions/>;
+					itemXML.appendChild(Actions.toXML());
+					listXML.appendChild(itemXML);
+				}
+			}else{
+				delete xml.ActionsList;
 			}
 			return xml;
 		}
 		override public function initByXML(xml:XML):void{
 			id=int(xml.@id.toString());
 			TrackAsMenu=int(xml.@TrackAsMenu.toString());
-			var listXML:XML=xml.list[0];
-			var CharacterXMLList:XMLList=listXML.Character;
-			var i:int=-1;
-			CharacterV=new Vector.<BUTTONRECORD>(CharacterXMLList.length());
-			for each(var CharacterXML:XML in CharacterXMLList){
-				i++;
-				CharacterV[i]=new BUTTONRECORD();
-				CharacterV[i].initByXML(CharacterXML.children()[0]);
+			if(xml.CharacterList.length()){
+				var listXML:XML=xml.CharacterList[0];
+				var CharacterXMLList:XMLList=listXML.Character;
+				var i:int=-1;
+				CharacterV=new Vector.<BUTTONRECORD>(CharacterXMLList.length());
+				for each(var CharacterXML:XML in CharacterXMLList){
+					i++;
+					CharacterV[i]=new BUTTONRECORD();
+					CharacterV[i].initByXML(CharacterXML.children()[0]);
+				}
+			}else{
+				CharacterV=new Vector.<BUTTONRECORD>();
 			}
 			CharacterEndFlag=int(xml.@CharacterEndFlag.toString());
-			listXML=xml.list[1];
-			var ActionsXMLList:XMLList=listXML.Actions;
-			i=-1;
-			ActionsV=new Vector.<BUTTONCONDACTION>(ActionsXMLList.length());
-			for each(var ActionsXML:XML in ActionsXMLList){
-				i++;
-				ActionsV[i]=new BUTTONCONDACTION();
-				ActionsV[i].initByXML(ActionsXML.children()[0]);
+			if(xml.ActionsList.length()){
+				listXML=xml.ActionsList[0];
+				var ActionsXMLList:XMLList=listXML.Actions;
+				i=-1;
+				ActionsV=new Vector.<BUTTONCONDACTION>(ActionsXMLList.length());
+				for each(var ActionsXML:XML in ActionsXMLList){
+					i++;
+					ActionsV[i]=new BUTTONCONDACTION();
+					ActionsV[i].initByXML(ActionsXML.children()[0]);
+				}
+			}else{
+				ActionsV=new Vector.<BUTTONCONDACTION>();
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML
