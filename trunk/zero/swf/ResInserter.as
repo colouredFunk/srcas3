@@ -12,9 +12,9 @@ package zero.swf{
 	import flash.events.*;
 	import flash.utils.*;
 	
-	import zero.swf.tag_body.DefineBinaryData;
-	import zero.swf.tag_body.DefineBitsJPEG2;
-	import zero.swf.tag_body.SymbolClass;
+	import zero.swf.tagBodys.DefineBinaryData;
+	import zero.swf.tagBodys.DefineBitsJPEG2;
+	import zero.swf.tagBodys.SymbolClass;
 	
 	public class ResInserter{
 		public static const BITMAP:String="Bmd";

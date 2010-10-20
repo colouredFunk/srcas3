@@ -50,8 +50,8 @@ Traits_info 版本:v1.0
 //ATTR_Override 	0x2 	Is used with Trait_Method, Trait_Getter and Trait_Setter. It marks a method that has been overridden in this class
 //ATTR_Metadata 	0x4 	Is used to signal that the fields metadata_count and metadata follow the data field in the traits_info entry
 package zero.swf.avm2{
-	import zero.swf.vmark.TraitAttributes;
-	import zero.swf.vmark.TraitTypes;
+	import zero.swf.vmarks.TraitAttributes;
+	import zero.swf.vmarks.TraitTypes;
 	import zero.swf.avm2.traits.Trait;
 	import flash.utils.ByteArray;
 	public class Traits_info extends AVM2Obj{

@@ -27,7 +27,7 @@ Trait_slot 版本:v1.0
 //This field exists only when vindex is non-zero. It is used to determine how vindex will be interpreted.
 //See the "Constant Kind" table above for details.
 package zero.swf.avm2.traits{
-	import zero.swf.vmark.ConstantKind;
+	import zero.swf.vmarks.ConstantKind;
 	import flash.utils.ByteArray;
 	public class Trait_slot extends Trait{
 		public var slot_id:int;							//u30

@@ -71,8 +71,8 @@ Constant_pool 版本:v1.0
 package zero.swf.avm2{
 	import zero.swf.avm2.Namespace_info;
 	import zero.swf.avm2.Ns_set_info;
-	import zero.swf.vmark.MultinameKind;
-	import zero.swf.avm2.multiname.Multiname_info;
+	import zero.swf.vmarks.MultinameKind;
+	import zero.swf.avm2.multinames.Multiname_info;
 	import flash.utils.Endian;
 	import flash.utils.ByteArray;
 	public class Constant_pool extends AVM2Obj{

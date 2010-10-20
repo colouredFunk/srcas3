@@ -12,7 +12,7 @@ package zero.swf{
 	import flash.events.*;
 	import flash.utils.*;
 	
-	import zero.swf.tag_body.TagBody;
+	import zero.swf.tagBodys.TagBody;
 	
 	public class DataMark{
 		private static var getDataBySrcMark:Object;

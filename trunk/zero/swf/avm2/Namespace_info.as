@@ -32,7 +32,7 @@ Namespace_info 版本:v1.0
 //				u30 name
 //			}
 package zero.swf.avm2{
-	import zero.swf.vmark.NamespaceKind;
+	import zero.swf.vmarks.NamespaceKind;
 	import flash.utils.ByteArray;
 	public class Namespace_info extends AVM2Obj{
 		public var kind:int;							//u8

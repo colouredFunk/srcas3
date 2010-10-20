@@ -11,9 +11,9 @@ package zero.swf{
 	import flash.utils.ByteArray;
 	import flash.utils.getDefinitionByName;
 	
-	import zero.swf.tag_body.FileAttributes;
-	import zero.swf.tag_body.Metadata;
-	import zero.swf.tag_body.SetBackgroundColor;
+	import zero.swf.tagBodys.FileAttributes;
+	import zero.swf.tagBodys.Metadata;
+	import zero.swf.tagBodys.SetBackgroundColor;
 	
 	public class SWF2 extends SWF1{
 		public static const baseInfoNameV:Vector.<String>=SWF0.baseInfoNameV.concat(Vector.<String>([

@@ -12,10 +12,10 @@ package zero.swf{
 	import flash.events.*;
 	import flash.utils.*;
 	
-	import zero.swf.tag_body.DebugID;
-	import zero.swf.tag_body.EnableDebugger2;
-	import zero.swf.tag_body.ScriptLimits;
-	//import zero.swf.tag_body.ProductInfo;
+	import zero.swf.tagBodys.DebugID;
+	import zero.swf.tagBodys.EnableDebugger2;
+	import zero.swf.tagBodys.ScriptLimits;
+	//import zero.swf.tagBodys.ProductInfo;
 	
 	public class SWFInfoEditor{
 		

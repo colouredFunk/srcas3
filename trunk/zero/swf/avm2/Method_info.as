@@ -51,7 +51,7 @@ Method_info 版本:v1.0
 
 //This entry may be present only if the HAS_PARAM_NAMES flag is set in flags.
 package zero.swf.avm2{
-	import zero.swf.vmark.MethodFlags;
+	import zero.swf.vmarks.MethodFlags;
 	import zero.swf.avm2.Option_info;
 	import flash.utils.ByteArray;
 	public class Method_info extends AVM2Obj{

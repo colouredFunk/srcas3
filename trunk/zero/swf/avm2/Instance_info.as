@@ -49,7 +49,7 @@ Instance_info 版本:v1.0
 //The value of trait_count is the number of elements in the trait array. The trait array defines the set
 //of traits of a class instance. The next section defines the meaning of the traits_info structure.
 package zero.swf.avm2{
-	import zero.swf.vmark.InstanceFlags;
+	import zero.swf.vmarks.InstanceFlags;
 	import zero.swf.avm2.Traits_info;
 	import flash.utils.ByteArray;
 	public class Instance_info extends AVM2Obj{

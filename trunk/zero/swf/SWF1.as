@@ -10,7 +10,7 @@ SWF1 版本:v1.0
 package zero.swf{
 	import flash.utils.ByteArray;
 	
-	import zero.swf.record.RECT;
+	import zero.swf.records.RECT;
 	
 	public class SWF1 extends SWF0{
 		public static const baseInfoNameV:Vector.<String>=SWF0.baseInfoNameV.concat(Vector.<String>([
