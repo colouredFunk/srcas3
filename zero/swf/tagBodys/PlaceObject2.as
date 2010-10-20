@@ -2,7 +2,7 @@
 PlaceObject2 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年9月11日 19:07:57 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月20日 15:10:44 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -68,36 +68,28 @@ package zero.swf.tagBodys{
 			PlaceFlagHasCharacter=(flags<<30)>>>31;		//00000010
 			PlaceFlagMove=flags&0x01;					//00000001
 			Depth=data[offset+1]|(data[offset+2]<<8);
-			//#offsetpp
 			offset+=3;
 			if(PlaceFlagHasCharacter){
 				CharacterId=data[offset++]|(data[offset++]<<8);
 			}
-			//#offsetpp
 			
 			if(PlaceFlagHasMatrix){
-				//#offsetpp
 			
 				Matrix=new MATRIX();
 				offset=Matrix.initByData(data,offset,endOffset);
 			}
-			//#offsetpp
 			
 			if(PlaceFlagHasColorTransform){
-				//#offsetpp
 			
 				ColorTransform=new CXFORMWITHALPHA();
 				offset=ColorTransform.initByData(data,offset,endOffset);
 			}
-			//#offsetpp
 			
 			if(PlaceFlagHasRatio){
 				Ratio=data[offset++]|(data[offset++]<<8);
 			}
-			//#offsetpp
 			
 			if(PlaceFlagHasName){
-				//#offsetpp
 			
 				var get_str_size:int=0;
 				while(data[offset+(get_str_size++)]){}
@@ -105,15 +97,12 @@ package zero.swf.tagBodys{
 				Name=data.readUTFBytes(get_str_size);
 				offset+=get_str_size;
 			}
-			//#offsetpp
 			
 			if(PlaceFlagHasClipDepth){
 				ClipDepth=data[offset++]|(data[offset++]<<8);
 			}
-			//#offsetpp
 			
 			if(PlaceFlagHasClipActions){
-				//#offsetpp
 			
 				ClipActions=new CLIPACTIONS();
 				offset=ClipActions.initByData(data,offset,endOffset);
@@ -122,7 +111,6 @@ package zero.swf.tagBodys{
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
-			//var offset:int=0;//测试
 			var flags:int=0;
 			flags|=PlaceFlagHasClipActions<<7;			//10000000
 			flags|=PlaceFlagHasClipDepth<<6;			//01000000
@@ -136,40 +124,34 @@ package zero.swf.tagBodys{
 			
 			data[1]=Depth;
 			data[2]=Depth>>8;
-			//#offsetpp
 			var offset:int=3;
 			if(PlaceFlagHasCharacter){
 				data[offset++]=CharacterId;
 				data[offset++]=CharacterId>>8;
 			}
-			//#offsetpp
 			
 			if(PlaceFlagHasMatrix){
 				data.position=offset;
 				data.writeBytes(Matrix.toData());
 				offset=data.length;
 			}
-			//#offsetpp
 			
 			if(PlaceFlagHasColorTransform){
 				data.position=offset;
 				data.writeBytes(ColorTransform.toData());
 				offset=data.length;
 			}
-			//#offsetpp
 			
 			if(PlaceFlagHasRatio){
 				data[offset++]=Ratio;
 				data[offset++]=Ratio>>8;
 			}
-			//#offsetpp
 			
 			if(PlaceFlagHasName){
 				data.position=offset;
 				data.writeUTFBytes(Name+"\x00");
 				offset=data.length;
 			}
-			//#offsetpp
 			
 			if(PlaceFlagHasClipDepth){
 				data[offset++]=ClipDepth;
