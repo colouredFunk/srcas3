@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<log>
+  <file className="DebugID" date="2010年10月20日 09:49:20" size="2161"/>
+  <file className="DefineBinaryData" date="2010年10月20日 09:49:20" size="2650"/>
+  <file className="DefineBits" date="2010年10月20日 09:49:20" size="2481"/>
+  <file className="DefineBitsJPEG2" date="2010年10月20日 09:49:20" size="2890"/>
+  <file className="DefineBitsJPEG3" date="2010年10月20日 09:49:20" size="4266"/>
+  <file className="DefineBitsJPEG4" date="2010年10月20日 09:49:20" size="3744"/>
+  <file className="DefineButton" date="2010年10月20日 09:49:20" size="4296"/>
+  <file className="DefineButton2" date="2010年10月20日 09:49:20" size="5607"/>
+  <file className="DefineButtonCxform" date="2010年10月20日 09:49:20" size="3075"/>
+  <file className="DefineSceneAndFrameLabelData" date="2010年10月20日 09:49:20" size="11269"/>
+  <file className="DefineShape" date="2010年10月20日 09:49:20" size="2590"/>
+  <file className="DefineShape2" date="2010年10月20日 09:49:20" size="1955"/>
+  <file className="DefineSprite" date="2010年10月20日 09:49:20" size="1611"/>
+  <file className="DefineText" date="2010年10月20日 09:49:20" size="2780"/>
+  <file className="DoABC" date="2010年10月20日 09:49:20" size="2470"/>
+  <file className="DoABCWithoutFlagsAndName" date="2010年10月20日 09:49:20" size="1637"/>
+  <file className="DoAction" date="2010年10月20日 09:49:20" size="2191"/>
+  <file className="DoInitAction" date="2010年10月20日 09:49:20" size="3851"/>
+  <file className="EnableDebugger" date="2010年10月20日 09:49:20" size="1526"/>
+  <file className="EnableDebugger2" date="2010年10月20日 09:49:20" size="1529"/>
+  <file className="ExportAssets" date="2010年10月20日 09:49:20" size="3597"/>
+  <file className="FileAttributes" date="2010年10月20日 09:49:20" size="5124"/>
+  <file className="FrameLabel" date="2010年10月20日 09:49:20" size="3578"/>
+  <file className="ImportAssets" date="2010年10月20日 09:49:20" size="4218"/>
+  <file className="ImportAssets2" date="2010年10月20日 09:49:20" size="4489"/>
+  <file className="Metadata" date="2010年10月20日 09:49:20" size="4143"/>
+  <file className="PlaceObject" date="2010年10月20日 09:49:20" size="3701"/>
+  <file className="PlaceObject2" date="2010年10月20日 09:49:20" size="9341"/>
+  <file className="PlaceObject3" date="2010年10月20日 09:49:20" size="17205"/>
+  <file className="ProductInfo" date="2010年10月20日 09:49:20" size="4075"/>
+  <file className="Protect" date="2010年10月20日 09:49:20" size="1505"/>
+  <file className="RemoveObject" date="2010年10月20日 09:49:20" size="1756"/>
+  <file className="RemoveObject2" date="2010年10月20日 09:49:20" size="1472"/>
+  <file className="ScriptLimits" date="2010年10月20日 09:49:20" size="2602"/>
+  <file className="SetBackgroundColor" date="2010年10月20日 09:49:20" size="1778"/>
+  <file className="SymbolClass" date="2010年10月20日 09:49:20" size="3054"/>
+</log>

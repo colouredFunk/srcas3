@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<log>
+  <file className="BUTTONCONDACTION" date="2010年10月20日 09:49:20" size="6021"/>
+  <file className="BUTTONRECORD_within_DefineButton" date="2010年10月20日 09:49:20" size="6104"/>
+  <file className="BUTTONRECORD" date="2010年10月20日 09:49:20" size="7632"/>
+  <file className="CLIPACTIONRECORD" date="2010年10月20日 09:49:20" size="3453"/>
+  <file className="CLIPACTIONS" date="2010年10月20日 09:49:20" size="4191"/>
+  <file className="CLIPEVENTFLAGS" date="2010年10月20日 09:49:20" size="8421"/>
+  <file className="CXFORM" date="2010年10月20日 09:49:20" size="11937"/>
+  <file className="CXFORMWITHALPHA" date="2010年10月20日 09:49:21" size="14863"/>
+  <file className="FILTERLIST" date="2010年10月20日 09:49:21" size="3658"/>
+  <file className="MATRIX" date="2010年10月20日 09:49:21" size="18816"/>
+  <file className="RECT" date="2010年10月20日 09:49:21" size="7812"/>
+  <file className="FILLSTYLEARRAY" date="2010年10月20日 09:49:21" size="3203"/>
+  <file className="FILLSTYLE" date="2010年10月20日 09:49:21" size="6495"/>
+  <file className="GRADIENT" date="2010年10月20日 09:49:21" size="3642"/>
+  <file className="FOCALGRADIENT" date="2010年10月20日 09:49:21" size="4129"/>
+  <file className="GRADRECORD" date="2010年10月20日 09:49:21" size="1694"/>
+  <file className="GRADRECORD_Color_RGBA" date="2010年10月20日 09:49:21" size="1811"/>
+  <file className="LINESTYLEARRAY" date="2010年10月20日 09:49:21" size="3027"/>
+  <file className="LINESTYLE" date="2010年10月20日 09:49:21" size="2036"/>
+  <file className="LINESTYLE_Color_RGBA" date="2010年10月20日 09:49:21" size="2153"/>
+  <file className="LINESTYLE2" date="2010年10月20日 09:49:21" size="7274"/>
+  <file className="FillAndLineStyles" date="2010年10月20日 09:49:21" size="2381"/>
+</log>
