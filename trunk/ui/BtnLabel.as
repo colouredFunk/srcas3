@@ -43,11 +43,19 @@
 			$setStyle(false);
 		}
 		override protected function init():void {
-			xOff = int(bar.x - txt.x);
-			yOff = int(bar.y - txt.y);
+			if (bar) {
+				xOff = int(bar.x - txt.x);
+				yOff = int(bar.y - txt.y);
+			}
 			widthAdd = -xOff * 2;
 			heightAdd = -yOff * 2;
 			super.init();
+		}
+		override protected function onRemoveToStageHandler():void {
+			super.onRemoveToStageHandler();
+			txt = null;
+			bar = null;
+			endClip = null;
 		}
 		internal function $setStyle(_isActive:Boolean):void {
 			if (totalFrames > 8) {

@@ -104,6 +104,7 @@
 				__widthArea = container.width;
 				__heightArea = container.height;
 			}
+			setProgressClip(false);
 			bmp = new Bitmap();
 			bmp.alpha = 0;
 			autoFitArea = new AutoFitArea(container, 0, 0, widthArea, heightArea);
@@ -111,9 +112,6 @@
 			contextMenu = contextMenuImageLoader;
 		}
 		override protected function onRemoveToStageHandler():void {
-			if (progressClip&&progressClip is MovieClip) {
-				progressClip.stop();
-			}
 			TweenMax.killChildTweensOf(this);
 			TweenMax.killTweensOf(bmp);
 			super.onRemoveToStageHandler();
@@ -222,21 +220,27 @@
 			}
 		}
 		protected function onImageLoadingHandler(_evt:LoaderEvent):void {
-			if (progressClip) {
-				progressClip.visible = true;
-				if (progressClip.hasOwnProperty("text")) {
-					progressClip.text = Math.round(_evt.target.progress * 100) + " %";
-				}else if (progressClip.hasOwnProperty("value")) {
-					progressClip.value = _evt.target.progress;
-				}else if (progressClip is MovieClip) {
-					progressClip.play();
-				}
-			}
+			setProgressClip(_evt.target.progress);
 		}
 		protected function onImageLoadedHandler(_evt:LoaderEvent):void {
 			bmdNow = _evt.target.rawContent.bitmapData;
 			setBMP(bmdNow);
-			if (progressClip) {
+			setProgressClip(false);
+		}
+		protected function setProgressClip(_progress:*):void {
+			if (!progressClip) {
+				return;
+			}
+			if (_progress is Number) {
+				progressClip.visible = true;
+				if (progressClip.hasOwnProperty("text")) {
+					progressClip.text = Math.round(_progress * 100) + " %";
+				}else if (progressClip.hasOwnProperty("value")) {
+					progressClip.value = _progress;
+				}else if (progressClip is MovieClip) {
+					progressClip.play();
+				}
+			}else {
 				progressClip.visible = false;
 				if (progressClip is MovieClip) {
 					progressClip.stop();

@@ -34,12 +34,8 @@
 			setStyle();
 		}
 		override protected function init():void {
-			$setStyle(false);
 			isReferenceFromThumb = true;
 			super.init();
-		}
-		override protected function onAddedToStageHandler(_evt:Event):void {
-			super.onAddedToStageHandler(_evt);
 			enabled = true;
 		}
 		internal function $setStyle(_isActive:Boolean):void {

@@ -82,10 +82,16 @@ package ui{
 				}
 			}
 			scaleX = 1;
-		}
-		override protected function onAddedToStageHandler(_evt:Event):void {
-			super.onAddedToStageHandler(_evt);
 			enabled = false;
+		}
+		override protected function onRemoveToStageHandler():void {
+			super.onRemoveToStageHandler();
+			change = null;
+			txt = null;
+			thumb = null;
+			bar = null;
+			maskClip = null;
+			track = null;
 		}
 		protected function formatValue(_value:Number):Number {
 			if (isNaN(_value)) {

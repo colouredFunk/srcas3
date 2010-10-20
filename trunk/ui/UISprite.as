@@ -1,4 +1,5 @@
 ﻿package ui{
+	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.utils.Dictionary;
@@ -77,6 +78,9 @@
 				}catch (_ero:*) {
 				}
 				if (_children && _disObj.contains(_children)) {
+					if (_children is MovieClip) {
+						_children.stop();
+					}
 					_disObj.removeChild(_children);
 				}
 			}
