@@ -2,7 +2,7 @@
 DefineSceneAndFrameLabelData 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月17日 11:56:34 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月20日 14:54:30 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -36,7 +36,6 @@ package zero.swf.tagBodys{
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			//#offsetpp
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -59,7 +58,6 @@ package zero.swf.tagBodys{
 			OffsetV=new Vector.<int>(SceneCount);
 			NameV=new Vector.<String>(SceneCount);
 			for(var i:int=0;i<SceneCount;i++){
-				//#offsetpp
 			
 				if(data[offset]>>>7){
 					if(data[offset+1]>>>7){
@@ -79,7 +77,6 @@ package zero.swf.tagBodys{
 					OffsetV[i]=data[offset++];
 				}
 				//
-				//#offsetpp
 			
 				var get_str_size:int=0;
 				while(data[offset+(get_str_size++)]){}
@@ -87,9 +84,7 @@ package zero.swf.tagBodys{
 				NameV[i]=data.readUTFBytes(get_str_size);
 				offset+=get_str_size;
 			}
-			//#offsetpp
 			
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -112,7 +107,6 @@ package zero.swf.tagBodys{
 			FrameNumV=new Vector.<int>(FrameLabelCount);
 			FrameLabelV=new Vector.<String>(FrameLabelCount);
 			for(i=0;i<FrameLabelCount;i++){
-				//#offsetpp
 			
 				if(data[offset]>>>7){
 					if(data[offset+1]>>>7){
@@ -132,7 +126,6 @@ package zero.swf.tagBodys{
 					FrameNumV[i]=data[offset++];
 				}
 				//
-				//#offsetpp
 			
 				get_str_size=0;
 				while(data[offset+(get_str_size++)]){}
@@ -144,9 +137,7 @@ package zero.swf.tagBodys{
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
-			//var offset:int=0;//测试
 			var SceneCount:int=OffsetV.length;
-			//#offsetpp
 			var offset:int=0;
 			if(SceneCount>>>7){
 				if(SceneCount>>>14){
@@ -176,12 +167,10 @@ package zero.swf.tagBodys{
 				data[offset++]=SceneCount;
 			}
 			//
-			//#offsetpp
 			
 			var i:int=-1;
 			for each(var Offset:int in OffsetV){
 				i++;
-				//#offsetpp
 			
 				if(Offset>>>7){
 					if(Offset>>>14){
@@ -216,7 +205,6 @@ package zero.swf.tagBodys{
 				offset=data.length;
 			}
 			var FrameLabelCount:int=FrameNumV.length;
-			//#offsetpp
 			
 			if(FrameLabelCount>>>7){
 				if(FrameLabelCount>>>14){
@@ -246,12 +234,10 @@ package zero.swf.tagBodys{
 				data[offset++]=FrameLabelCount;
 			}
 			//
-			//#offsetpp
 			
 			i=-1;
 			for each(var FrameNum:int in FrameNumV){
 				i++;
-				//#offsetpp
 			
 				if(FrameNum>>>7){
 					if(FrameNum>>>14){
@@ -292,47 +278,67 @@ package zero.swf.tagBodys{
 		CONFIG::toXMLAndInitByXML {
 		override public function toXML():XML{
 			var xml:XML=<DefineSceneAndFrameLabelData>
-				<list vNames="OffsetV,NameV" count={OffsetV.length}/>
-				<list vNames="FrameNumV,FrameLabelV" count={FrameNumV.length}/>
+				<OffsetAndNameList/>
+				<FrameNumAndFrameLabelList/>
 			</DefineSceneAndFrameLabelData>;
-			var listXML:XML=xml.list[0];
-			var i:int=-1;
-			for each(var Offset:int in OffsetV){
-				i++;
-				listXML.appendChild(<Offset value={Offset}/>);
-				listXML.appendChild(<Name value={NameV[i]}/>);
+			if(OffsetV.length){
+				var listXML:XML=xml.OffsetAndNameList[0];
+				listXML.@count=OffsetV.length;
+				var i:int=-1;
+				for each(var Offset:int in OffsetV){
+					i++;
+					listXML.appendChild(<Offset value={Offset}/>);
+					listXML.appendChild(<Name value={NameV[i]}/>);
+				}
+			}else{
+				delete xml.OffsetAndNameList;
 			}
-			listXML=xml.list[1];
-			i=-1;
-			for each(var FrameNum:int in FrameNumV){
-				i++;
-				listXML.appendChild(<FrameNum value={FrameNum}/>);
-				listXML.appendChild(<FrameLabel value={FrameLabelV[i]}/>);
+			if(FrameNumV.length){
+				listXML=xml.FrameNumAndFrameLabelList[0];
+				listXML.@count=FrameNumV.length;
+				i=-1;
+				for each(var FrameNum:int in FrameNumV){
+					i++;
+					listXML.appendChild(<FrameNum value={FrameNum}/>);
+					listXML.appendChild(<FrameLabel value={FrameLabelV[i]}/>);
+				}
+			}else{
+				delete xml.FrameNumAndFrameLabelList;
 			}
 			return xml;
 		}
 		override public function initByXML(xml:XML):void{
-			var listXML:XML=xml.list[0];
-			var OffsetXMLList:XMLList=listXML.Offset;
-			var NameXMLList:XMLList=listXML.Name;
-			var i:int=-1;
-			OffsetV=new Vector.<int>(OffsetXMLList.length());
-			NameV=new Vector.<String>(NameXMLList.length());
-			for each(var OffsetXML:XML in OffsetXMLList){
-				i++;
-				OffsetV[i]=int(OffsetXML.@value.toString());
-				NameV[i]=NameXMLList[i].@value.toString();
+			if(xml.OffsetAndNameList.length()){
+				var listXML:XML=xml.OffsetAndNameList[0];
+				var OffsetXMLList:XMLList=listXML.Offset;
+				var NameXMLList:XMLList=listXML.Name;
+				var i:int=-1;
+				OffsetV=new Vector.<int>(OffsetXMLList.length());
+				NameV=new Vector.<String>(NameXMLList.length());
+				for each(var OffsetXML:XML in OffsetXMLList){
+					i++;
+					OffsetV[i]=int(OffsetXML.@value.toString());
+					NameV[i]=NameXMLList[i].@value.toString();
+				}
+			}else{
+				OffsetV=new Vector.<int>();
+				NameV=new Vector.<String>();
 			}
-			listXML=xml.list[1];
-			var FrameNumXMLList:XMLList=listXML.FrameNum;
-			var FrameLabelXMLList:XMLList=listXML.FrameLabel;
-			i=-1;
-			FrameNumV=new Vector.<int>(FrameNumXMLList.length());
-			FrameLabelV=new Vector.<String>(FrameLabelXMLList.length());
-			for each(var FrameNumXML:XML in FrameNumXMLList){
-				i++;
-				FrameNumV[i]=int(FrameNumXML.@value.toString());
-				FrameLabelV[i]=FrameLabelXMLList[i].@value.toString();
+			if(xml.FrameNumAndFrameLabelList.length()){
+				listXML=xml.FrameNumAndFrameLabelList[0];
+				var FrameNumXMLList:XMLList=listXML.FrameNum;
+				var FrameLabelXMLList:XMLList=listXML.FrameLabel;
+				i=-1;
+				FrameNumV=new Vector.<int>(FrameNumXMLList.length());
+				FrameLabelV=new Vector.<String>(FrameLabelXMLList.length());
+				for each(var FrameNumXML:XML in FrameNumXMLList){
+					i++;
+					FrameNumV[i]=int(FrameNumXML.@value.toString());
+					FrameLabelV[i]=FrameLabelXMLList[i].@value.toString();
+				}
+			}else{
+				FrameNumV=new Vector.<int>();
+				FrameLabelV=new Vector.<String>();
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML
