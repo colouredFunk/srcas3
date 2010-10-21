@@ -15,6 +15,9 @@
 	import flash.system.System;
 	
 	import com.adobe.serialization.json.JSON;
+	
+	import zero.SWFVarsGetter;
+	
 	public class DocClass extends MovieClip {
 		protected static var instance:*;
 		protected var optionsXMLPath:String;
@@ -97,8 +100,16 @@
 			}
 			if (loaded == 1 && onLoaded != null) {
 				removeEventListener(Event.ENTER_FRAME, onLoadingHandle);
-				onLoaded();
+				//onLoad();
+				onLoadedAndAddVersionInfo();
 			}
+		}
+		private function onLoadedAndAddVersionInfo():void{
+			SWFVarsGetter.init(this.loaderInfo.bytes,onSWFVarsGetterInit);
+			onLoaded();
+		}
+		private function onSWFVarsGetterInit():void{
+			Common.addContextMenu(this, "发布时间: "+SWFVarsGetter.getModifyDate());
 		}
 		private var __bytesTotal:int;
 		private function getBytesTotal():int {
