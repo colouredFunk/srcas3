@@ -34,15 +34,69 @@ package zero{
 			var SWFVars:*=loader.contentLoaderInfo.applicationDomain.getDefinition("SWFVars");
 			__init=SWFVars.init;
 			__getVar=SWFVars.getVar;
+			if(onInit!=null&&swfData){
+				__init(swfData);
+				swfData=null;
+				onInit();
+				onInit=null;
+			}
 		}
 		
-		public static function init(swfData:ByteArray):void{
-			checkInit();
-			__init(swfData);
+		private static var onInit:Function;
+		private static var swfData:ByteArray;
+		public static function init(_swfData:ByteArray,_onInit:Function=null):void{
+			if(_onInit==null){
+				checkInit();
+			}else{
+				try{
+					checkInit();
+				}catch(e:Error){
+					onInit=_onInit;
+					swfData=_swfData;
+					return;
+				}
+			}
+			__init(_swfData);
+			if(_onInit==null){
+			}else{
+				_onInit();
+			}
 		}
 		public static function getVar(varName:String):*{
 			checkInit();
 			return __getVar(varName);
+		}
+		public static function getModifyDate():String{
+			var metadataStr:String=getVar("metadataStr").replace(/^\s*|\s*$/g,"");
+			if(metadataStr){
+				try{
+					var metadata:XML=new XML(metadataStr);
+				}catch(e:Error){
+					return null;
+				}
+				var metadataName:String=null;
+				try{
+					metadataName=metadata.name().toString();
+				}catch(e:Error){
+					return null;
+				}
+				if(metadataName){
+					//trace(metadata.toXMLString());
+					var rdf:Namespace=metadata.namespace("rdf");
+					var DescriptionXML:XML=metadata.rdf::Description[0];
+					if(DescriptionXML){
+						//trace(DescriptionXML.toXMLString());
+						var xmp:Namespace=DescriptionXML.namespace("xmp");
+						//trace("xmp="+xmp);
+						var ModifyDateXML:XML=DescriptionXML.xmp::ModifyDate[0];
+						if(ModifyDateXML){
+							//trace(ModifyDateXML.toXMLString());
+							return ModifyDateXML.toString();
+						}
+					}
+				}
+			}
+			return null;
 		}
 		private static function checkInit():void{
 			if(__init==null){
