@@ -2,7 +2,7 @@
 GenericName 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月18日 13:50:19 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月20日 16:20:00 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -21,7 +21,6 @@ package zero.swf.avm2.multinames{
 		public var ParamV:Vector.<int>;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			//#offsetpp
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
 					if(data[offset+2]>>>7){
@@ -40,9 +39,7 @@ package zero.swf.avm2.multinames{
 				TypeDefinition=data[offset++];
 			}
 			//
-			//#offsetpp
 			
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -64,7 +61,6 @@ package zero.swf.avm2.multinames{
 			//
 			ParamV=new Vector.<int>(ParamCount);
 			for(var i:int=0;i<ParamCount;i++){
-				//#offsetpp
 			
 				if(data[offset]>>>7){
 					if(data[offset+1]>>>7){
@@ -89,8 +85,6 @@ package zero.swf.avm2.multinames{
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
-			//var offset:int=0;//测试
-			//#offsetpp
 			var offset:int=0;
 			if(TypeDefinition>>>7){
 				if(TypeDefinition>>>14){
@@ -121,7 +115,6 @@ package zero.swf.avm2.multinames{
 			}
 			//
 			var ParamCount:int=ParamV.length;
-			//#offsetpp
 			
 			if(ParamCount>>>7){
 				if(ParamCount>>>14){
@@ -151,10 +144,8 @@ package zero.swf.avm2.multinames{
 				data[offset++]=ParamCount;
 			}
 			//
-			//#offsetpp
 			
 			for each(var Param:int in ParamV){
-				//#offsetpp
 			
 				if(Param>>>7){
 					if(Param>>>14){
@@ -194,23 +185,32 @@ package zero.swf.avm2.multinames{
 			var xml:XML=<GenericName
 				TypeDefinition={TypeDefinition}
 			>
-				<list vNames="ParamV" count={ParamV.length}/>
+				<ParamList/>
 			</GenericName>;
-			var listXML:XML=xml.list[0];
-			for each(var Param:int in ParamV){
-				listXML.appendChild(<Param value={Param}/>);
+			if(ParamV.length){
+				var listXML:XML=xml.ParamList[0];
+				listXML.@count=ParamV.length;
+				for each(var Param:int in ParamV){
+					listXML.appendChild(<Param value={Param}/>);
+				}
+			}else{
+				delete xml.ParamList;
 			}
 			return xml;
 		}
 		override public function initByXML(xml:XML):void{
 			TypeDefinition=int(xml.@TypeDefinition.toString());
-			var listXML:XML=xml.list[0];
-			var ParamXMLList:XMLList=listXML.Param;
-			var i:int=-1;
-			ParamV=new Vector.<int>(ParamXMLList.length());
-			for each(var ParamXML:XML in ParamXMLList){
-				i++;
-				ParamV[i]=int(ParamXML.@value.toString());
+			if(xml.ParamList.length()){
+				var listXML:XML=xml.ParamList[0];
+				var ParamXMLList:XMLList=listXML.Param;
+				var i:int=-1;
+				ParamV=new Vector.<int>(ParamXMLList.length());
+				for each(var ParamXML:XML in ParamXMLList){
+					i++;
+					ParamV[i]=int(ParamXML.@value.toString());
+				}
+			}else{
+				ParamV=new Vector.<int>();
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML

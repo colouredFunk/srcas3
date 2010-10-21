@@ -2,7 +2,7 @@
 FILTERLIST 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月18日 13:18:58 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月20日 16:08:28 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -37,12 +37,10 @@ package zero.swf.records{
 		public var FilterV:Vector.<FILTER>;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			//#offsetpp
 			var NumberOfFilters:int=data[offset++];
 			FilterV=new Vector.<FILTER>(NumberOfFilters);
 			for(var i:int=0;i<NumberOfFilters;i++){
 				var FilterID:int=data[offset++];
-				//#offsetpp
 			
 				FilterV[i]=new FilterTypes.classV[FilterID]();
 				offset=FilterV[i].initByData(data,offset,endOffset);
@@ -52,10 +50,8 @@ package zero.swf.records{
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
-			//var offset:int=0;//测试
 			var NumberOfFilters:int=FilterV.length;
 			data[0]=NumberOfFilters;
-			//#offsetpp
 			var offset:int=1;
 			for each(var Filter:FILTER in FilterV){
 				data[offset++]=Filter.FilterID;
@@ -70,27 +66,36 @@ package zero.swf.records{
 		CONFIG::toXMLAndInitByXML {
 		override public function toXML():XML{
 			var xml:XML=<FILTERLIST>
-				<list vNames="FilterV" count={FilterV.length}/>
+				<FilterList/>
 			</FILTERLIST>;
-			var listXML:XML=xml.list[0];
-			for each(var Filter:FILTER in FilterV){
-				var itemXML:XML=<Filter FilterID={FilterTypes.typeV[Filter.FilterID]}/>;
-				itemXML.appendChild(Filter.toXML());
-				listXML.appendChild(itemXML);
+			if(FilterV.length){
+				var listXML:XML=xml.FilterList[0];
+				listXML.@count=FilterV.length;
+				for each(var Filter:FILTER in FilterV){
+					var itemXML:XML=<Filter FilterID={FilterTypes.typeV[Filter.FilterID]}/>;
+					itemXML.appendChild(Filter.toXML());
+					listXML.appendChild(itemXML);
+				}
+			}else{
+				delete xml.FilterList;
 			}
 			return xml;
 		}
 		override public function initByXML(xml:XML):void{
-			var listXML:XML=xml.list[0];
-			var FilterXMLList:XMLList=listXML.Filter;
-			var i:int=-1;
-			FilterV=new Vector.<FILTER>(FilterXMLList.length());
-			for each(var FilterXML:XML in FilterXMLList){
-				i++;
-				var FilterID:int=FilterTypes[FilterXML.@FilterID.toString()];
-				FilterV[i]=new FilterTypes.classV[FilterID]();
-				FilterV[i].initByXML(FilterXML.children()[0]);
-				FilterV[i].FilterID=FilterID;
+			if(xml.FilterList.length()){
+				var listXML:XML=xml.FilterList[0];
+				var FilterXMLList:XMLList=listXML.Filter;
+				var i:int=-1;
+				FilterV=new Vector.<FILTER>(FilterXMLList.length());
+				for each(var FilterXML:XML in FilterXMLList){
+					i++;
+					var FilterID:int=FilterTypes[FilterXML.@FilterID.toString()];
+					FilterV[i]=new FilterTypes.classV[FilterID]();
+					FilterV[i].initByXML(FilterXML.children()[0]);
+					FilterV[i].FilterID=FilterID;
+				}
+			}else{
+				FilterV=new Vector.<FILTER>();
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML

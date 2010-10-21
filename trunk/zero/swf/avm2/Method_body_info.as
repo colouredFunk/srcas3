@@ -2,7 +2,7 @@
 Method_body_info 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月19日 20:10:40 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月20日 16:25:32 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -56,7 +56,7 @@ Method_body_info 版本:v1.0
 //The value of trait_count is the number of elements in the trait array. The trait array contains all
 //the traits for this method body (see above for more information on traits).
 package zero.swf.avm2{
-	import zero.swf.avm2.Codes;
+	import zero.swf.avm2.codes.Codes;
 	import zero.swf.avm2.Exception_info;
 	import zero.swf.avm2.Traits_info;
 	import flash.utils.ByteArray;
@@ -72,7 +72,6 @@ package zero.swf.avm2{
 		public var traits_infoV:Vector.<Traits_info>;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			//#offsetpp
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
 					if(data[offset+2]>>>7){
@@ -91,7 +90,6 @@ package zero.swf.avm2{
 				method=data[offset++];
 			}
 			//
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -111,7 +109,6 @@ package zero.swf.avm2{
 				max_stack=data[offset++];
 			}
 			//
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -131,7 +128,6 @@ package zero.swf.avm2{
 				local_count=data[offset++];
 			}
 			//
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -151,7 +147,6 @@ package zero.swf.avm2{
 				init_scope_depth=data[offset++];
 			}
 			//
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -171,7 +166,6 @@ package zero.swf.avm2{
 				max_scope_depth=data[offset++];
 			}
 			//
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -191,13 +185,10 @@ package zero.swf.avm2{
 				codes_length=data[offset++];
 			}
 			//
-			//#offsetpp
 			
 			codes=new Codes();
 			offset=codes.initByData(data,offset,offset+codes_length);
-			//#offsetpp
 			
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -219,14 +210,11 @@ package zero.swf.avm2{
 			//
 			exception_infoV=new Vector.<Exception_info>(exception_info_count);
 			for(var i:int=0;i<exception_info_count;i++){
-				//#offsetpp
 			
 				exception_infoV[i]=new Exception_info();
 				offset=exception_infoV[i].initByData(data,offset,endOffset);
 			}
-			//#offsetpp
 			
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -248,7 +236,6 @@ package zero.swf.avm2{
 			//
 			traits_infoV=new Vector.<Traits_info>(traits_info_count);
 			for(i=0;i<traits_info_count;i++){
-				//#offsetpp
 			
 				traits_infoV[i]=new Traits_info();
 				offset=traits_infoV[i].initByData(data,offset,endOffset);
@@ -257,8 +244,6 @@ package zero.swf.avm2{
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
-			//var offset:int=0;//测试
-			//#offsetpp
 			var offset:int=0;
 			if(method>>>7){
 				if(method>>>14){
@@ -288,7 +273,6 @@ package zero.swf.avm2{
 				data[offset++]=method;
 			}
 			//
-			//#offsetpp
 			
 			if(max_stack>>>7){
 				if(max_stack>>>14){
@@ -318,7 +302,6 @@ package zero.swf.avm2{
 				data[offset++]=max_stack;
 			}
 			//
-			//#offsetpp
 			
 			if(local_count>>>7){
 				if(local_count>>>14){
@@ -348,7 +331,6 @@ package zero.swf.avm2{
 				data[offset++]=local_count;
 			}
 			//
-			//#offsetpp
 			
 			if(init_scope_depth>>>7){
 				if(init_scope_depth>>>14){
@@ -378,7 +360,6 @@ package zero.swf.avm2{
 				data[offset++]=init_scope_depth;
 			}
 			//
-			//#offsetpp
 			
 			if(max_scope_depth>>>7){
 				if(max_scope_depth>>>14){
@@ -408,7 +389,6 @@ package zero.swf.avm2{
 				data[offset++]=max_scope_depth;
 			}
 			//
-			//#offsetpp
 			
 			if(codes_length>>>7){
 				if(codes_length>>>14){
@@ -442,7 +422,6 @@ package zero.swf.avm2{
 			data.writeBytes(codes.toData());
 			offset=data.length;
 			var exception_info_count:int=exception_infoV.length;
-			//#offsetpp
 			
 			if(exception_info_count>>>7){
 				if(exception_info_count>>>14){
@@ -472,7 +451,6 @@ package zero.swf.avm2{
 				data[offset++]=exception_info_count;
 			}
 			//
-			//#offsetpp
 			
 			data.position=offset;
 			for each(var exception_info:Exception_info in exception_infoV){
@@ -480,7 +458,6 @@ package zero.swf.avm2{
 			}
 			offset=data.length;
 			var traits_info_count:int=traits_infoV.length;
-			//#offsetpp
 			
 			if(traits_info_count>>>7){
 				if(traits_info_count>>>14){
@@ -510,7 +487,6 @@ package zero.swf.avm2{
 				data[offset++]=traits_info_count;
 			}
 			//
-			//#offsetpp
 			
 			data.position=offset;
 			for each(var traits_info:Traits_info in traits_infoV){
@@ -531,21 +507,31 @@ package zero.swf.avm2{
 				codes_length={codes_length}
 			>
 				<codes/>
-				<list vNames="exception_infoV" count={exception_infoV.length}/>
-				<list vNames="traits_infoV" count={traits_infoV.length}/>
+				<exception_infoList/>
+				<traits_infoList/>
 			</Method_body_info>;
 			xml.codes.appendChild(codes.toXML());
-			var listXML:XML=xml.list[0];
-			for each(var exception_info:Exception_info in exception_infoV){
-				var itemXML:XML=<exception_info/>;
-				itemXML.appendChild(exception_info.toXML());
-				listXML.appendChild(itemXML);
+			if(exception_infoV.length){
+				var listXML:XML=xml.exception_infoList[0];
+				listXML.@count=exception_infoV.length;
+				for each(var exception_info:Exception_info in exception_infoV){
+					var itemXML:XML=<exception_info/>;
+					itemXML.appendChild(exception_info.toXML());
+					listXML.appendChild(itemXML);
+				}
+			}else{
+				delete xml.exception_infoList;
 			}
-			listXML=xml.list[1];
-			for each(var traits_info:Traits_info in traits_infoV){
-				itemXML=<traits_info/>;
-				itemXML.appendChild(traits_info.toXML());
-				listXML.appendChild(itemXML);
+			if(traits_infoV.length){
+				listXML=xml.traits_infoList[0];
+				listXML.@count=traits_infoV.length;
+				for each(var traits_info:Traits_info in traits_infoV){
+					itemXML=<traits_info/>;
+					itemXML.appendChild(traits_info.toXML());
+					listXML.appendChild(itemXML);
+				}
+			}else{
+				delete xml.traits_infoList;
 			}
 			return xml;
 		}
@@ -558,23 +544,31 @@ package zero.swf.avm2{
 			codes_length=int(xml.@codes_length.toString());
 			codes=new Codes();
 			codes.initByXML(xml.codes.children()[0]);
-			var listXML:XML=xml.list[0];
-			var exception_infoXMLList:XMLList=listXML.exception_info;
-			var i:int=-1;
-			exception_infoV=new Vector.<Exception_info>(exception_infoXMLList.length());
-			for each(var exception_infoXML:XML in exception_infoXMLList){
-				i++;
-				exception_infoV[i]=new Exception_info();
-				exception_infoV[i].initByXML(exception_infoXML.children()[0]);
+			if(xml.exception_infoList.length()){
+				var listXML:XML=xml.exception_infoList[0];
+				var exception_infoXMLList:XMLList=listXML.exception_info;
+				var i:int=-1;
+				exception_infoV=new Vector.<Exception_info>(exception_infoXMLList.length());
+				for each(var exception_infoXML:XML in exception_infoXMLList){
+					i++;
+					exception_infoV[i]=new Exception_info();
+					exception_infoV[i].initByXML(exception_infoXML.children()[0]);
+				}
+			}else{
+				exception_infoV=new Vector.<Exception_info>();
 			}
-			listXML=xml.list[1];
-			var traits_infoXMLList:XMLList=listXML.traits_info;
-			i=-1;
-			traits_infoV=new Vector.<Traits_info>(traits_infoXMLList.length());
-			for each(var traits_infoXML:XML in traits_infoXMLList){
-				i++;
-				traits_infoV[i]=new Traits_info();
-				traits_infoV[i].initByXML(traits_infoXML.children()[0]);
+			if(xml.traits_infoList.length()){
+				listXML=xml.traits_infoList[0];
+				var traits_infoXMLList:XMLList=listXML.traits_info;
+				i=-1;
+				traits_infoV=new Vector.<Traits_info>(traits_infoXMLList.length());
+				for each(var traits_infoXML:XML in traits_infoXMLList){
+					i++;
+					traits_infoV[i]=new Traits_info();
+					traits_infoV[i].initByXML(traits_infoXML.children()[0]);
+				}
+			}else{
+				traits_infoV=new Vector.<Traits_info>();
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML

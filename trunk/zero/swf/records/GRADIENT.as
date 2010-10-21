@@ -2,7 +2,7 @@
 GRADIENT 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月18日 22:44:47 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月20日 16:08:28 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -35,11 +35,9 @@ package zero.swf.records{
 			SpreadMode=(flags<<24)>>>30;				//11000000
 			InterpolationMode=(flags<<26)>>>30;			//00110000
 			NumGradients=flags&0x0f;					//00001111
-			//#offsetpp
 			++offset;
 			GradientRecordV=new Vector.<GRADRECORD>(NumGradients);
 			for(var i:int=0;i<NumGradients;i++){
-				//#offsetpp
 			
 				GradientRecordV[i]=new GRADRECORD();
 				offset=GradientRecordV[i].initByData(data,offset,endOffset);
@@ -48,14 +46,12 @@ package zero.swf.records{
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
-			//var offset:int=0;//测试
 			var flags:int=0;
 			flags|=SpreadMode<<6;						//11000000
 			flags|=InterpolationMode<<4;				//00110000
 			flags|=NumGradients;						//00001111
 			data[0]=flags;
 			
-			//#offsetpp
 			data.position=1;
 			for each(var GradientRecord:GRADRECORD in GradientRecordV){
 				data.writeBytes(GradientRecord.toData());
@@ -71,13 +67,18 @@ package zero.swf.records{
 				InterpolationMode={InterpolationMode}
 				NumGradients={NumGradients}
 			>
-				<list vNames="GradientRecordV" count={GradientRecordV.length}/>
+				<GradientRecordList/>
 			</GRADIENT>;
-			var listXML:XML=xml.list[0];
-			for each(var GradientRecord:GRADRECORD in GradientRecordV){
-				var itemXML:XML=<GradientRecord/>;
-				itemXML.appendChild(GradientRecord.toXML());
-				listXML.appendChild(itemXML);
+			if(GradientRecordV.length){
+				var listXML:XML=xml.GradientRecordList[0];
+				listXML.@count=GradientRecordV.length;
+				for each(var GradientRecord:GRADRECORD in GradientRecordV){
+					var itemXML:XML=<GradientRecord/>;
+					itemXML.appendChild(GradientRecord.toXML());
+					listXML.appendChild(itemXML);
+				}
+			}else{
+				delete xml.GradientRecordList;
 			}
 			return xml;
 		}
@@ -85,14 +86,18 @@ package zero.swf.records{
 			SpreadMode=int(xml.@SpreadMode.toString());
 			InterpolationMode=int(xml.@InterpolationMode.toString());
 			NumGradients=int(xml.@NumGradients.toString());
-			var listXML:XML=xml.list[0];
-			var GradientRecordXMLList:XMLList=listXML.GradientRecord;
-			var i:int=-1;
-			GradientRecordV=new Vector.<GRADRECORD>(GradientRecordXMLList.length());
-			for each(var GradientRecordXML:XML in GradientRecordXMLList){
-				i++;
-				GradientRecordV[i]=new GRADRECORD();
-				GradientRecordV[i].initByXML(GradientRecordXML.children()[0]);
+			if(xml.GradientRecordList.length()){
+				var listXML:XML=xml.GradientRecordList[0];
+				var GradientRecordXMLList:XMLList=listXML.GradientRecord;
+				var i:int=-1;
+				GradientRecordV=new Vector.<GRADRECORD>(GradientRecordXMLList.length());
+				for each(var GradientRecordXML:XML in GradientRecordXMLList){
+					i++;
+					GradientRecordV[i]=new GRADRECORD();
+					GradientRecordV[i].initByXML(GradientRecordXML.children()[0]);
+				}
+			}else{
+				GradientRecordV=new Vector.<GRADRECORD>();
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML

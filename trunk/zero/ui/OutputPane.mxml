@@ -24,7 +24,7 @@ OutputPane 版本:v1.0
 		<fx:String id="cssStr">
 			<![CDATA[
 			.red 	{color: #cc0000;}
-			.green 	{color: #00cc00;}
+			.green 	{color: #006600;}
 			.blue 	{color: #0000cc;}
 			.brown	{color: #ff6600;}
 			.grey	{color: #bbbbbb;}

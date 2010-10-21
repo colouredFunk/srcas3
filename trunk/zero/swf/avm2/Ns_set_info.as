@@ -2,7 +2,7 @@
 Ns_set_info 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月17日 13:03:55 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月20日 16:25:31 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -25,7 +25,6 @@ package zero.swf.avm2{
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			//#offsetpp
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -47,7 +46,6 @@ package zero.swf.avm2{
 			//
 			nsV=new Vector.<int>(integer_count);
 			for(var i:int=0;i<integer_count;i++){
-				//#offsetpp
 			
 				if(data[offset]>>>7){
 					if(data[offset+1]>>>7){
@@ -72,9 +70,7 @@ package zero.swf.avm2{
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
-			//var offset:int=0;//测试
 			var integer_count:int=nsV.length;
-			//#offsetpp
 			var offset:int=0;
 			if(integer_count>>>7){
 				if(integer_count>>>14){
@@ -104,10 +100,8 @@ package zero.swf.avm2{
 				data[offset++]=integer_count;
 			}
 			//
-			//#offsetpp
 			
 			for each(var ns:int in nsV){
-				//#offsetpp
 			
 				if(ns>>>7){
 					if(ns>>>14){
@@ -145,22 +139,31 @@ package zero.swf.avm2{
 		CONFIG::toXMLAndInitByXML {
 		override public function toXML():XML{
 			var xml:XML=<Ns_set_info>
-				<list vNames="nsV" count={nsV.length}/>
+				<nsList/>
 			</Ns_set_info>;
-			var listXML:XML=xml.list[0];
-			for each(var ns:int in nsV){
-				listXML.appendChild(<ns value={ns}/>);
+			if(nsV.length){
+				var listXML:XML=xml.nsList[0];
+				listXML.@count=nsV.length;
+				for each(var ns:int in nsV){
+					listXML.appendChild(<ns value={ns}/>);
+				}
+			}else{
+				delete xml.nsList;
 			}
 			return xml;
 		}
 		override public function initByXML(xml:XML):void{
-			var listXML:XML=xml.list[0];
-			var nsXMLList:XMLList=listXML.ns;
-			var i:int=-1;
-			nsV=new Vector.<int>(nsXMLList.length());
-			for each(var nsXML:XML in nsXMLList){
-				i++;
-				nsV[i]=int(nsXML.@value.toString());
+			if(xml.nsList.length()){
+				var listXML:XML=xml.nsList[0];
+				var nsXMLList:XMLList=listXML.ns;
+				var i:int=-1;
+				nsV=new Vector.<int>(nsXMLList.length());
+				for each(var nsXML:XML in nsXMLList){
+					i++;
+					nsV[i]=int(nsXML.@value.toString());
+				}
+			}else{
+				nsV=new Vector.<int>();
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML

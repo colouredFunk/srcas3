@@ -2,7 +2,7 @@
 Metadata_info 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月19日 15:05:31 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月20日 16:25:31 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -25,7 +25,6 @@ package zero.swf.avm2{
 		public var item_infoV:Vector.<Item_info>;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			//#offsetpp
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
 					if(data[offset+2]>>>7){
@@ -44,9 +43,7 @@ package zero.swf.avm2{
 				name=data[offset++];
 			}
 			//
-			//#offsetpp
 			
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -68,7 +65,6 @@ package zero.swf.avm2{
 			//
 			item_infoV=new Vector.<Item_info>(item_count);
 			for(var i:int=0;i<item_count;i++){
-				//#offsetpp
 			
 				item_infoV[i]=new Item_info();
 				offset=item_infoV[i].initByData(data,offset,endOffset);
@@ -77,8 +73,6 @@ package zero.swf.avm2{
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
-			//var offset:int=0;//测试
-			//#offsetpp
 			var offset:int=0;
 			if(name>>>7){
 				if(name>>>14){
@@ -109,7 +103,6 @@ package zero.swf.avm2{
 			}
 			//
 			var item_count:int=item_infoV.length;
-			//#offsetpp
 			
 			if(item_count>>>7){
 				if(item_count>>>14){
@@ -139,7 +132,6 @@ package zero.swf.avm2{
 				data[offset++]=item_count;
 			}
 			//
-			//#offsetpp
 			
 			data.position=offset;
 			for each(var item_info:Item_info in item_infoV){
@@ -154,26 +146,35 @@ package zero.swf.avm2{
 			var xml:XML=<Metadata_info
 				name={name}
 			>
-				<list vNames="item_infoV" count={item_infoV.length}/>
+				<item_infoList/>
 			</Metadata_info>;
-			var listXML:XML=xml.list[0];
-			for each(var item_info:Item_info in item_infoV){
-				var itemXML:XML=<item_info/>;
-				itemXML.appendChild(item_info.toXML());
-				listXML.appendChild(itemXML);
+			if(item_infoV.length){
+				var listXML:XML=xml.item_infoList[0];
+				listXML.@count=item_infoV.length;
+				for each(var item_info:Item_info in item_infoV){
+					var itemXML:XML=<item_info/>;
+					itemXML.appendChild(item_info.toXML());
+					listXML.appendChild(itemXML);
+				}
+			}else{
+				delete xml.item_infoList;
 			}
 			return xml;
 		}
 		override public function initByXML(xml:XML):void{
 			name=int(xml.@name.toString());
-			var listXML:XML=xml.list[0];
-			var item_infoXMLList:XMLList=listXML.item_info;
-			var i:int=-1;
-			item_infoV=new Vector.<Item_info>(item_infoXMLList.length());
-			for each(var item_infoXML:XML in item_infoXMLList){
-				i++;
-				item_infoV[i]=new Item_info();
-				item_infoV[i].initByXML(item_infoXML.children()[0]);
+			if(xml.item_infoList.length()){
+				var listXML:XML=xml.item_infoList[0];
+				var item_infoXMLList:XMLList=listXML.item_info;
+				var i:int=-1;
+				item_infoV=new Vector.<Item_info>(item_infoXMLList.length());
+				for each(var item_infoXML:XML in item_infoXMLList){
+					i++;
+					item_infoV[i]=new Item_info();
+					item_infoV[i].initByXML(item_infoXML.children()[0]);
+				}
+			}else{
+				item_infoV=new Vector.<Item_info>();
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML

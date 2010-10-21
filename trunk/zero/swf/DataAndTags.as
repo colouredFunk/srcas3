@@ -33,23 +33,7 @@ package zero.swf{
 		
 		public static var mustBeStructorTagBodyClasses:Vector.<Class>;
 		
-		public static var optionIndexs:Object=getOptionIndexs();
-		private static function getOptionIndexs():Object{
-			mustBeStructorTagBodyClasses=new Vector.<Class>(TagType.typeNameArr.length);
-			mustBeStructorTagBodyClasses.fixed=true;
-			
-			mustBeStructorTagBodyClasses[TagType.FileAttributes]=FileAttributes;
-			mustBeStructorTagBodyClasses[TagType.Metadata]=Metadata;
-			mustBeStructorTagBodyClasses[TagType.SetBackgroundColor]=SetBackgroundColor;
-			
-			var optionIndexs:Object=new Object();
-			optionIndexs[structorOption]=0;
-			optionIndexs[resourceOption]=1;
-			optionIndexs[byteCodesOption]=2;
-			optionIndexs[onlyLocationOption]=3;
-			optionIndexs[noOutputOption]=4;
-			return optionIndexs;
-		}
+		public static var optionIndexs:Object;
 		
 		private static var optionV:Vector.<String>;
 		public static function setOption(optionXML:XML):void{
@@ -78,6 +62,27 @@ package zero.swf{
 				optionMark[tagXML.@type.toString()]=tagXML.@option.toString();
 			}
 			return optionMark;
+		}
+		
+		private static var firstInitValue:Boolean=firstInit();
+		private static function firstInit():Boolean{
+			mustBeStructorTagBodyClasses=new Vector.<Class>(TagType.typeNameArr.length);
+			mustBeStructorTagBodyClasses.fixed=true;
+			
+			mustBeStructorTagBodyClasses[TagType.FileAttributes]=FileAttributes;
+			mustBeStructorTagBodyClasses[TagType.Metadata]=Metadata;
+			mustBeStructorTagBodyClasses[TagType.SetBackgroundColor]=SetBackgroundColor;
+			
+			optionIndexs=new Object();
+			optionIndexs[structorOption]=0;
+			optionIndexs[resourceOption]=1;
+			optionIndexs[byteCodesOption]=2;
+			optionIndexs[onlyLocationOption]=3;
+			optionIndexs[noOutputOption]=4;
+			
+			setOption(<option/>);
+			
+			return true;
 		}
 		
 		private var intervalId:int=-1;

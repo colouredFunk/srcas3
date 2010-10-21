@@ -2,7 +2,7 @@
 Method_info 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月19日 14:52:15 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月20日 16:45:16 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -64,7 +64,6 @@ package zero.swf.avm2{
 		public var param_nameV:Vector.<int>;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			//#offsetpp
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
 					if(data[offset+2]>>>7){
@@ -83,7 +82,6 @@ package zero.swf.avm2{
 				param_count=data[offset++];
 			}
 			//
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -103,11 +101,9 @@ package zero.swf.avm2{
 				return_type=data[offset++];
 			}
 			//
-			//#offsetpp
 			
 			param_typeV=new Vector.<int>(param_count);
 			for(var i:int=0;i<param_count;i++){
-				//#offsetpp
 			
 				if(data[offset]>>>7){
 					if(data[offset+1]>>>7){
@@ -128,7 +124,6 @@ package zero.swf.avm2{
 				}
 				//
 			}
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -149,22 +144,17 @@ package zero.swf.avm2{
 			}
 			//
 			flags=data[offset++];
-			//#offsetpp
 			
 			if(flags&MethodFlags.HAS_OPTIONAL){
-				//#offsetpp
 			
 				option_info=new Option_info();
 				offset=option_info.initByData(data,offset,endOffset);
 			}
-			//#offsetpp
 			
 			if(flags&MethodFlags.HAS_PARAM_NAMES){
-				//#offsetpp
 			
 				param_nameV=new Vector.<int>(param_count);
 				for(i=0;i<param_count;i++){
-					//#offsetpp
 			
 					if(data[offset]>>>7){
 						if(data[offset+1]>>>7){
@@ -190,8 +180,6 @@ package zero.swf.avm2{
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
-			//var offset:int=0;//测试
-			//#offsetpp
 			var offset:int=0;
 			if(param_count>>>7){
 				if(param_count>>>14){
@@ -221,7 +209,6 @@ package zero.swf.avm2{
 				data[offset++]=param_count;
 			}
 			//
-			//#offsetpp
 			
 			if(return_type>>>7){
 				if(return_type>>>14){
@@ -251,10 +238,8 @@ package zero.swf.avm2{
 				data[offset++]=return_type;
 			}
 			//
-			//#offsetpp
 			
 			for each(var param_type:int in param_typeV){
-				//#offsetpp
 			
 				if(param_type>>>7){
 					if(param_type>>>14){
@@ -285,7 +270,6 @@ package zero.swf.avm2{
 				}
 				//
 			}
-			//#offsetpp
 			
 			if(name>>>7){
 				if(name>>>14){
@@ -316,20 +300,16 @@ package zero.swf.avm2{
 			}
 			//
 			data[offset++]=flags;
-			//#offsetpp
 			
 			if(option_info){
 				data.position=offset;
 				data.writeBytes(option_info.toData());
 				offset=data.length;
 			}
-			//#offsetpp
 			
 			if(param_nameV){
-				//#offsetpp
 			
 				for each(var param_name:int in param_nameV){
-					//#offsetpp
 			
 					if(param_name>>>7){
 						if(param_name>>>14){
@@ -380,40 +360,49 @@ package zero.swf.avm2{
 					"|"+MethodFlags.flagV[flags&MethodFlags.HAS_PARAM_NAMES]
 				).replace(/\|null/g,"").substr(1)}
 			>
-				<list vNames="param_typeV" count={param_typeV.length}/>
+				<param_typeList/>
 				<option_info/>
-				<list vNames="param_nameV"/>
+				<param_nameList/>
 			</Method_info>;
-			var listXML:XML=xml.list[0];
-			for each(var param_type:int in param_typeV){
-				listXML.appendChild(<param_type value={param_type}/>);
+			if(param_typeV.length){
+				var listXML:XML=xml.param_typeList[0];
+				listXML.@count=param_typeV.length;
+				for each(var param_type:int in param_typeV){
+					listXML.appendChild(<param_type value={param_type}/>);
+				}
+			}else{
+				delete xml.param_typeList;
 			}
 			if(option_info){
 				xml.option_info.appendChild(option_info.toXML());
 			}else{
 				delete xml.option_info;
 			}
-			if(param_nameV){
-				listXML=xml.list[1];
+			if(param_nameV&&param_nameV.length){
+				listXML=xml.param_nameList[0];
+				listXML.@count=param_nameV.length;
 				for each(var param_name:int in param_nameV){
 					listXML.appendChild(<param_name value={param_name}/>);
 				}
-				xml.list[1].@count=param_nameV.length;
 			}else{
-				delete xml.list[1];
+				delete xml.param_nameList;
 			}
 			return xml;
 		}
 		override public function initByXML(xml:XML):void{
 			param_count=int(xml.@param_count.toString());
 			return_type=int(xml.@return_type.toString());
-			var listXML:XML=xml.list[0];
-			var param_typeXMLList:XMLList=listXML.param_type;
-			var i:int=-1;
-			param_typeV=new Vector.<int>(param_typeXMLList.length());
-			for each(var param_typeXML:XML in param_typeXMLList){
-				i++;
-				param_typeV[i]=int(param_typeXML.@value.toString());
+			if(xml.param_typeList.length()){
+				var listXML:XML=xml.param_typeList[0];
+				var param_typeXMLList:XMLList=listXML.param_type;
+				var i:int=-1;
+				param_typeV=new Vector.<int>(param_typeXMLList.length());
+				for each(var param_typeXML:XML in param_typeXMLList){
+					i++;
+					param_typeV[i]=int(param_typeXML.@value.toString());
+				}
+			}else{
+				param_typeV=new Vector.<int>();
 			}
 			name=int(xml.@name.toString());
 			
@@ -426,8 +415,8 @@ package zero.swf.avm2{
 				option_info=new Option_info();
 				option_info.initByXML(xml.option_info.children()[0]);
 			}
-			if(xml.list.length()>1){
-				listXML=xml.list[1];
+			if(xml.param_nameList.length()){
+				listXML=xml.param_nameList[0];
 				var param_nameXMLList:XMLList=listXML.param_name;
 				i=-1;
 				param_nameV=new Vector.<int>(param_nameXMLList.length());

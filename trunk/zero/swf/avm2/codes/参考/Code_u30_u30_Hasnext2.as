@@ -1,17 +1,37 @@
 /***
-Codes 版本:v1.0
+Code_u30_u30_Hasnext2 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月19日 20:05:01
+创建时间:2010年7月11日 22:49:38
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.swf.avm2{
-	import zero.swf.BytesData;
-	public class Codes extends BytesData{
-		public function Codes(){
+package zero.swf.avm2.codes{
+	import zero.swf.avm2._classObj.IClassObj;
+	import flash.display.*;
+	import flash.events.*;
+	import flash.utils.*;
+	public class Code_u30_u30_Hasnext2 extends Code_u30_u30 implements ICodeObj,IClassObj{
+		//
+		public function Code_u30_u30_Hasnext2(object_reg:int,index_reg:int){
+			u30_1=object_reg;
+			u30_2=index_reg;
 		}
+		//
+		public function toXML(xmlName:String):XML{
+			var xml:XML=new XML("<"+Op.op_v[op]+"/>");
+			xml.@object_reg=u30_1;
+			xml.@index_reg=u30_2;
+			return xml;
+		}
+		override public function toString():String{
+			return Op.op_v[op]+" "+u30_1+" "+u30_2;
+		}
+		public function putObjsInLists():void{}
+		public function putMethodsInList():void{}
+		public function putStrsInList():void{}
+		public function doStrByType():void{}
 	}
 }
 

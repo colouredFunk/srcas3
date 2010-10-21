@@ -11,6 +11,7 @@
 			import zero.swf.*;
 			
 			private static var bmpMark:Object;
+			private static var enabledOptionMark:Object;
 			
 			private static var optionMark:Object;
 			private static var itemMark:Object;
@@ -27,9 +28,39 @@
 				if(bmpMark){
 				}else{
 					bmpMark=new Object();
+					enabledOptionMark=new Object();
 					for each(tagXML in tagXMLList){
 						var type:String=tagXML.@type.toString();
 						bmpMark[type]=new Bitmap(new BitmapData(400,20,true,0x00000000));
+						
+						var enabledOptionArr:Array;
+						if(DataAndTags.mustBeStructorTagBodyClasses[TagType[type]]){
+							enabledOptionArr=[DataAndTags.structorOption];
+						}else{
+							enabledOptionArr=[
+								DataAndTags.byteCodesOption,
+								DataAndTags.onlyLocationOption,
+								DataAndTags.noOutputOption
+							];
+							
+							var hasTagBodyClass:Boolean=true;
+							if(Tag.getTagBodyClassByType(TagType[type])){
+								hasTagBodyClass=true;
+							}else{
+								hasTagBodyClass=false;
+							}
+							
+							if(hasTagBodyClass){
+								enabledOptionArr.push(DataAndTags.structorOption);
+							}
+							switch(DefineObjs[type]){
+								case DefineObjs.IMG:
+								case DefineObjs.SWF:
+									enabledOptionArr.push(DataAndTags.resourceOption);
+								break;
+							}
+						}
+						enabledOptionMark[type]=enabledOptionArr;
 					}
 					TagsOptionBoardItemView.initInstance(container);
 				}
@@ -38,13 +69,35 @@
 				
 				onSelectOption=_onSelectOption;
 			}
-			public static function initByOptionMark(_optionMark:Object):void{
+			public static function initByOptionMark(_optionMark:Object,checkOldOption:Boolean):void{
+				var oldOptionMark:Object=optionMark;
 				optionMark=_optionMark;
+				var item:TagsOptionBoardItem;
+				for each(var type:String in TagType.typeNameArr){
+					if(type){
+						var option:String=optionMark[type];
+						if(option){
+							if(enabledOptionMark[type].indexOf(option)==-1){
+							}else{
+								continue;
+							}
+						}
+						if(checkOldOption){
+							optionMark[type]=oldOptionMark[type]||itemMark[type].option||DataAndTags.defaultOption;
+						}else{
+							optionMark[type]=DataAndTags.defaultOption;
+						}
+					}
+				}
 				
-				for each(var item:TagsOptionBoardItem in itemMark){
-					if(item.updateOption()){
-						item.updateBmd();
-						//trace("update: "+item.type);
+				for each(item in itemMark){
+					var oldOption:String=item.option;
+					item.updateOption();
+					if(item.option){
+						if(item.option==oldOption){
+						}else{
+							item.updateBmd();
+						}
 					}
 				}
 			}
@@ -118,7 +171,7 @@
 				sp.addEventListener(MouseEvent.MOUSE_OVER,mouseOver);
 				swfLoader.source=sp;
 			}
-			private function updateOption():Boolean{
+			private function updateOption():void{
 				var _option:String=getOptionByType(type);
 				//if(_option==DataAndTags.structorOption){
 				//	trace(type,"_option="+_option);
@@ -126,45 +179,13 @@
 				delete optionMark[type];
 				
 				if(option&&option==_option){
-					return false;
+					return;
 				}
 				
-				if(selectOptionAndSetEnabled(_option)){
-					option=_option;
-				}//else{
-					//trace("type="+type,"_option="+_option);
-				//}
-				
-				return true;
+				selectOptionAndSetEnabled(_option);
 			}
-			private function selectOptionAndSetEnabled(_option:String):Boolean{
-				var enabledOptionArr:Array;
-				if(DataAndTags.mustBeStructorTagBodyClasses[TagType[type]]){
-					enabledOptionArr=[DataAndTags.structorOption];
-				}else{
-					enabledOptionArr=[
-						DataAndTags.byteCodesOption,
-						DataAndTags.onlyLocationOption,
-						DataAndTags.noOutputOption
-					];
-					
-					var hasTagBodyClass:Boolean=true;
-					if(Tag.getTagBodyClassByType(TagType[type])){
-						hasTagBodyClass=true;
-					}else{
-						hasTagBodyClass=false;
-					}
-					
-					if(hasTagBodyClass){
-						enabledOptionArr.push(DataAndTags.structorOption);
-					}
-					switch(DefineObjs[type]){
-						case DefineObjs.IMG:
-						case DefineObjs.SWF:
-							enabledOptionArr.push(DataAndTags.resourceOption);
-						break;
-					}
-				}
+			private function selectOptionAndSetEnabled(_option:String):void{
+				var enabledOptionArr:Array=enabledOptionMark[type];
 				
 				TagsOptionBoardItemView.itemView.setEnabled(enabledOptionArr);
 				
@@ -172,10 +193,10 @@
 					if(option){
 						TagsOptionBoardItemView.itemView.select(option);
 					}
-					return false;
+					return;
 				}
-				TagsOptionBoardItemView.itemView.select(_option);
-				return true;
+				option=_option;
+				TagsOptionBoardItemView.itemView.select(option);
 			}
 			public function clear():void{
 				//if(type){
@@ -216,7 +237,8 @@
 				updateBmd();
 				if(onSelectOption==null){
 				}else{
-					onSelectOption(type,option);
+					//onSelectOption(type,option);
+					onSelectOption();
 				}
 			}
 			private function updateBmd():void{

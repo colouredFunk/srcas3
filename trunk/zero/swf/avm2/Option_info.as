@@ -2,7 +2,7 @@
 Option_info 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月18日 23:10:23 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月20日 16:25:31 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -25,7 +25,6 @@ package zero.swf.avm2{
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			//#offsetpp
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -47,7 +46,6 @@ package zero.swf.avm2{
 			//
 			option_detailV=new Vector.<Option_detail>(option_detail_count);
 			for(var i:int=0;i<option_detail_count;i++){
-				//#offsetpp
 			
 				option_detailV[i]=new Option_detail();
 				offset=option_detailV[i].initByData(data,offset,endOffset);
@@ -56,9 +54,7 @@ package zero.swf.avm2{
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
-			//var offset:int=0;//测试
 			var option_detail_count:int=option_detailV.length;
-			//#offsetpp
 			var offset:int=0;
 			if(option_detail_count>>>7){
 				if(option_detail_count>>>14){
@@ -88,7 +84,6 @@ package zero.swf.avm2{
 				data[offset++]=option_detail_count;
 			}
 			//
-			//#offsetpp
 			
 			data.position=offset;
 			for each(var option_detail:Option_detail in option_detailV){
@@ -101,25 +96,34 @@ package zero.swf.avm2{
 		CONFIG::toXMLAndInitByXML {
 		override public function toXML():XML{
 			var xml:XML=<Option_info>
-				<list vNames="option_detailV" count={option_detailV.length}/>
+				<option_detailList/>
 			</Option_info>;
-			var listXML:XML=xml.list[0];
-			for each(var option_detail:Option_detail in option_detailV){
-				var itemXML:XML=<option_detail/>;
-				itemXML.appendChild(option_detail.toXML());
-				listXML.appendChild(itemXML);
+			if(option_detailV.length){
+				var listXML:XML=xml.option_detailList[0];
+				listXML.@count=option_detailV.length;
+				for each(var option_detail:Option_detail in option_detailV){
+					var itemXML:XML=<option_detail/>;
+					itemXML.appendChild(option_detail.toXML());
+					listXML.appendChild(itemXML);
+				}
+			}else{
+				delete xml.option_detailList;
 			}
 			return xml;
 		}
 		override public function initByXML(xml:XML):void{
-			var listXML:XML=xml.list[0];
-			var option_detailXMLList:XMLList=listXML.option_detail;
-			var i:int=-1;
-			option_detailV=new Vector.<Option_detail>(option_detailXMLList.length());
-			for each(var option_detailXML:XML in option_detailXMLList){
-				i++;
-				option_detailV[i]=new Option_detail();
-				option_detailV[i].initByXML(option_detailXML.children()[0]);
+			if(xml.option_detailList.length()){
+				var listXML:XML=xml.option_detailList[0];
+				var option_detailXMLList:XMLList=listXML.option_detail;
+				var i:int=-1;
+				option_detailV=new Vector.<Option_detail>(option_detailXMLList.length());
+				for each(var option_detailXML:XML in option_detailXMLList){
+					i++;
+					option_detailV[i]=new Option_detail();
+					option_detailV[i].initByXML(option_detailXML.children()[0]);
+				}
+			}else{
+				option_detailV=new Vector.<Option_detail>();
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML

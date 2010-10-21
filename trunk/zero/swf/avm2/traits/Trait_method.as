@@ -2,7 +2,7 @@
 Trait_method 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月19日 15:54:33 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月20日 16:22:57 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -24,7 +24,6 @@ package zero.swf.avm2.traits{
 		public var methodi:int;							//u30
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			//#offsetpp
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
 					if(data[offset+2]>>>7){
@@ -43,7 +42,6 @@ package zero.swf.avm2.traits{
 				disp_id=data[offset++];
 			}
 			//
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -67,8 +65,6 @@ package zero.swf.avm2.traits{
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
-			//var offset:int=0;//测试
-			//#offsetpp
 			var offset:int=0;
 			if(disp_id>>>7){
 				if(disp_id>>>14){
@@ -98,7 +94,6 @@ package zero.swf.avm2.traits{
 				data[offset++]=disp_id;
 			}
 			//
-			//#offsetpp
 			
 			if(methodi>>>7){
 				if(methodi>>>14){
