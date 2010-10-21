@@ -42,6 +42,7 @@
 				stage.scaleMode = StageScaleMode.SHOW_ALL;
 			}
 			stage.showDefaultContextMenu = false;
+			tabChildren = false;
 			__widthOrg = loaderInfo.width;
 			__heightOrg = loaderInfo.height;
 			__flashVars = loaderInfo.parameters;
