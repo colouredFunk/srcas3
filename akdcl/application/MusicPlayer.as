@@ -2,17 +2,18 @@
 
 	import flash.display.Sprite;
 	import flash.media.SoundTransform;
-	import akdcl.media.Sound;
-	import ui.UISprite;
 
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
 	
 	import flash.external.ExternalInterface;
+	import flash.utils.setTimeout;
+	import akdcl.media.Sound;
+	import ui.UISprite;
 
 	public class MusicPlayer extends UISprite {
-		public static const WMP_STATE_LIST:Array = ["", "停止", "暂停", "播放", "向前", "向后", "缓冲", "等待", "完毕", "连接", "就绪", "重新连接"];
+		public static const WMP_STATE_LIST:Array = ["连接超时", "停止", "暂停", "播放", "向前", "向后", "正在缓冲", "等待...", "完毕", "正在连接", "就绪", "重新连接"];
 		
 		public static var SOUND_PLAY:String = "play";
 		public static var SOUND_PAUSE:String = "pause";
@@ -33,9 +34,10 @@
 		//0:不循环，1:单首循环，2:顺序循环，3:未设置
 		public var repeatMode:uint = 2;
 		public var autoPlayForStop:Boolean;
+		public var mmsFix:Boolean;
 		
 		protected var sound:Sound;
-		protected var musicInfo:Object;
+		public var musicInfo:Object;
 		protected var musicList:XML;
 		protected var isPlugin:Boolean;
 		protected var isPluginMode:Boolean;
@@ -236,7 +238,6 @@
 			switch(playState) {
 				case SOUND_PAUSE:
 				case SOUND_STOP:
-				case WMP_STATE_LIST[10]:
 					play();
 					return true;
 				case SOUND_PLAY:
@@ -261,9 +262,12 @@
 				ExternalInterface.call("musicPlay", _positionTo * 0.001);
 			}else if(sound){
 				sound.play(positionRecord);
+				$play();
 			}
-			volume = volume;
+		}
+		protected function $play():void {
 			__playState = SOUND_PLAY;
+			volume = volume;
 			dispatchEvent(new Event(Event.CHANGE));
 			addEventListener(Event.ENTER_FRAME, onSoundPlayProgressHandle);
 		}
@@ -271,12 +275,15 @@
 			if (playState == SOUND_PAUSE) {
 				return;
 			}
-			positionRecord = position;
 			if(isPluginMode){
 				ExternalInterface.call("musicPause");
 			}else if(sound){
 				sound.stop();
+				$pause();
 			}
+		}
+		protected function $pause():void {
+			positionRecord = position;
 			__playState=SOUND_PAUSE;
 			dispatchEvent(new Event(Event.CHANGE));
 			removeEventListener(Event.ENTER_FRAME, onSoundPlayProgressHandle);
@@ -285,12 +292,15 @@
 			if (playState==SOUND_STOP) {
 				return;
 			}
-			positionRecord=0;
 			if (isPluginMode) {
 				ExternalInterface.call("musicStop");
 			}else if(sound){
 				sound.stop();
+				$stop();
 			}
+		}
+		protected function $stop():void {
+			positionRecord=0;
 			__playState=SOUND_STOP;
 			dispatchEvent(new Event(Event.CHANGE));
 			removeEventListener(Event.ENTER_FRAME, onSoundPlayProgressHandle);
@@ -323,18 +333,23 @@
 		}
 		protected function $pluginPlayStateChange(_id:uint):void {
 			switch (_id) {
+				case 0 :
+					//连接超时
+					__playState = WMP_STATE_LIST[_id];
+					resetWMPPlay();
+					break;
 				case 1 :
 					//停止
-					stop();
+					$stop();
 					break;
 				case 2 :
 					//暂停
-					pause();
+					$pause();
 					break;
 				case 3 :
 					//播放
 					musicInfo = ExternalInterface.call("getMusicInfo");
-					__playState = SOUND_PLAY;
+					$play();
 					break;
 				case 4 :
 					//向前
@@ -369,15 +384,32 @@
 					break;
 				case 11 :
 					//重新连接
-					__playState = WMP_STATE_LIST[_id];
 					//var _musicList:*= musicList;
 					//attachMusic("", false);
 					//attachMusic(_musicList, true);
+					__playState = WMP_STATE_LIST[_id];
 					break;
+			}
+			if (_id == 6 && mmsFix) {
+				bufferingTime = 0;
+				addEventListener(Event.ENTER_FRAME, onWMPBufferingHandler);
+			}else {
+				removeEventListener(Event.ENTER_FRAME, onWMPBufferingHandler);
 			}
 			if (onWMPStateChange!=null) {
 				onWMPStateChange(_id);
 			}
+		}
+		private var bufferingTime:uint;
+		private function onWMPBufferingHandler(e:Event):void {
+			bufferingTime++;
+			if (bufferingTime / 30 > 20) {
+				resetWMPPlay();
+			}
+		}
+		private function resetWMPPlay():void {
+			stop();
+			setTimeout(play, 300);
 		}
 		override protected function init():void {
 			super.init();
@@ -489,7 +521,7 @@
 					stop();
 					break;
 			}
-			dispatchEvent(new Event(_evt.type));
+			dispatchEvent(new Event(_evt?_evt.type:Event.COMPLETE));
 		}
 		protected function onSoundStageChangeHandle(_evt:Event):void {
 			switch(playState) {
