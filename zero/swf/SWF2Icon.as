@@ -85,6 +85,9 @@ package zero.swf{
 			
 			clearInterval(intervalId);
 			itemId=-1;
+			
+			Outputer.output("items2Icon 开始, 共 "+itemV.length+" 个.","green");
+			
 			intervalId=setInterval(item2Icon,30);
 		}
 		private static function item2Icon():void{

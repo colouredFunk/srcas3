@@ -2,7 +2,7 @@
 Traits_info 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月19日 18:58:12 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月20日 16:47:02 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -62,7 +62,6 @@ package zero.swf.avm2{
 		public var metadataV:Vector.<int>;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			//#offsetpp
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
 					if(data[offset+2]>>>7){
@@ -89,12 +88,9 @@ package zero.swf.avm2{
 			offset=trait.initByData(data,offset,endOffset);
 			//
 			
-			//#offsetpp
 			
 			if(kind_attributes&TraitAttributes.Metadata){
-				//#offsetpp
 			
-				//#offsetpp
 			
 				if(data[offset]>>>7){
 					if(data[offset+1]>>>7){
@@ -116,7 +112,6 @@ package zero.swf.avm2{
 				//
 				metadataV=new Vector.<int>(metadata_count);
 				for(var i:int=0;i<metadata_count;i++){
-					//#offsetpp
 			
 					if(data[offset]>>>7){
 						if(data[offset+1]>>>7){
@@ -142,8 +137,6 @@ package zero.swf.avm2{
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
-			//var offset:int=0;//测试
-			//#offsetpp
 			var offset:int=0;
 			if(name>>>7){
 				if(name>>>14){
@@ -181,11 +174,9 @@ package zero.swf.avm2{
 			data.position=offset;
 			data.writeBytes(trait.toData());
 			offset=data.length;
-			//#offsetpp
 			
 			if(metadataV){
 				var metadata_count:int=metadataV.length;
-				//#offsetpp
 			
 				if(metadata_count>>>7){
 					if(metadata_count>>>14){
@@ -215,10 +206,8 @@ package zero.swf.avm2{
 					data[offset++]=metadata_count;
 				}
 				//
-				//#offsetpp
 			
 				for each(var metadata:int in metadataV){
-					//#offsetpp
 			
 					if(metadata>>>7){
 						if(metadata>>>14){
@@ -266,17 +255,17 @@ package zero.swf.avm2{
 				kind_trait_type={TraitTypes.typeV[kind_trait_type]}
 			>
 				<trait/>
-				<list vNames="metadataV"/>
+				<metadataList/>
 			</Traits_info>;
 			xml.trait.appendChild(trait.toXML());
-			if(metadataV){
-				var listXML:XML=xml.list[0];
+			if(metadataV&&metadataV.length){
+				var listXML:XML=xml.metadataList[0];
+				listXML.@count=metadataV.length;
 				for each(var metadata:int in metadataV){
 					listXML.appendChild(<metadata value={metadata}/>);
 				}
-				xml.list[0].@count=metadataV.length;
 			}else{
-				delete xml.list[0];
+				delete xml.metadataList;
 			}
 			return xml;
 		}
@@ -294,8 +283,8 @@ package zero.swf.avm2{
 			trait=new TraitTypes.classV[kind_trait_type]();
 			trait.initByXML(traitXML);
 			//
-			if(xml.list.length()>0){
-				var listXML:XML=xml.list[0];
+			if(xml.metadataList.length()){
+				var listXML:XML=xml.metadataList[0];
 				var metadataXMLList:XMLList=listXML.metadata;
 				var i:int=-1;
 				metadataV=new Vector.<int>(metadataXMLList.length());

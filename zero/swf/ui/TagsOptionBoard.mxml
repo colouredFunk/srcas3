@@ -13,29 +13,17 @@ TagsOptionBoard 版本:v1.0
 -->
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="780" height="300" xmlns:ui="zero.swf.ui.*"
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="780" height="400" xmlns:ui="zero.swf.ui.*"
 		 removedFromStage="removed(event)"
 >
 	<mx:Label x="0" y="0" text="option: "/>
 	<mx:ComboBox id="optionCb" y="0" x="50" width="180" change="change(event)"/>
 	<mx:Button x="240" y="0" label="保存当前" id="btnSaveOption" click="click(event)"/>
-	<s:BorderContainer right="0" id="outputResourceOptionBoard" width="145" height="150" y="30">
-		
-		<s:Label text="资源输出选项: " y="5" x="5"/>
-		
-		<s:RadioButton x="5" y="30" label="输出多个文件" groupName="radiogroup_outputSingleFile" id="rbOutputMultiFile" change="change(event)"/>
-		<s:Label text="修改少量资源时比较方便" y="50" x="5"/>
-		<s:CheckBox label="对资源输出缩略图" x="5" y="60" id="cbOutputResourceIcon" change="change(event)"/>
-		
-		<s:RadioButton x="5" y="95" label="输出单个文件" groupName="radiogroup_outputSingleFile" id="rbOutputSingleFile" change="change(event)"/>
-		<s:Label text="修改大量资源时比较方便" y="115" x="5"/>
-		
-	</s:BorderContainer>
-	<mx:DataGrid id="grid" left="0" top="30" right="150" bottom="22">
+	<mx:DataGrid id="grid" left="0" top="30" right="170" bottom="22">
 		<mx:columns>
 			<mx:DataGridColumn textAlign="center" draggable="false" headerText="typeNum" dataField="@typeNum" width="80"/>
 			<mx:DataGridColumn draggable="false" headerText="type" dataField="@type" width="200"/>
-			<mx:DataGridColumn draggable="false" headerText="输出选项" dataField="@typeNum" sortCompareFunction="sortByOption">
+			<mx:DataGridColumn draggable="false" headerText="输出选项(点击此标题可以排序)" dataField="@typeNum" sortCompareFunction="sortByOption">
 				<mx:itemRenderer>
 					<fx:Component>
 						<mx:Container>
@@ -70,8 +58,37 @@ TagsOptionBoard 版本:v1.0
 			</mx:DataGridColumn>
 		</mx:columns>
 	</mx:DataGrid>
+	
 	<s:Label x="250" bottom="5" text="全选:"/>
 	<ui:TagsOptionBoardItemView x="280" bottom="0" id="ctrlAllItemView"/>
+	
+	
+	<s:BorderContainer right="0" id="outputResourceOptionBoard" width="165" height="150" y="30">
+		
+		<s:Label text="资源输出选项: " y="5" x="5"/>
+		
+		<s:RadioButton x="5" y="30" label="输出多个文件" groupName="radiogroup_outputSingleFile" id="rbOutputMultiFile" change="change(event)"/>
+		<s:Label text="修改少量资源时比较方便" y="50" x="5"/>
+		<s:CheckBox label="对资源输出缩略图" x="5" y="60" id="cbOutputResourceIcon" change="change(event)"/>
+		
+		<s:RadioButton x="5" y="95" label="输出单个文件" groupName="radiogroup_outputSingleFile" id="rbOutputSingleFile" change="change(event)"/>
+		<s:Label text="修改大量资源时比较方便" y="115" x="5"/>
+		
+	</s:BorderContainer>
+	<s:BorderContainer right="0" id="outputDoABCOptionBoard" width="165" height="200" y="190">
+		
+		<s:Label text="DoABC 输出选项: " y="5" x="5"/>
+		<s:RadioButton x="5" y="30" label="level 0" groupName="radiogroup_outputDoABC" id="rbOutputDoABCLevel0" change="change(event)"/>
+		<s:Label text="仅输出常池的 integer, &#xA; uinteger, double, string 数组" y="50" x="5"/>
+		
+		<s:RadioButton x="5" y="90" label="level 1" groupName="radiogroup_outputDoABC" id="rbOutputDoABCLevel1" change="change(event)"/>
+		<s:Label text="输出全部结构" y="110" x="5"/>
+		
+		<s:RadioButton x="5" y="150" label="level 2" groupName="radiogroup_outputDoABC" id="rbOutputDoABCLevel2" change="change(event)"/>
+		<s:Label text="输出类结构" y="170" x="5"/>
+		
+	</s:BorderContainer>
+	
 	
 	<fx:Script>
 		<![CDATA[
@@ -82,6 +99,7 @@ TagsOptionBoard 版本:v1.0
 			import zero.air.FileAndStr;
 			import zero.swf.DataAndTags;
 			import zero.swf.TagType;
+			import zero.swf.avm2.AVM2Obj;
 			
 			private static const settingFolderPath:String=("file:///"+decodeURI(File.applicationDirectory.nativePath+"/setting")+"/").replace(/\\/g,"/");
 			private static const optionsFolderPath:String=settingFolderPath+"options/";
@@ -109,7 +127,7 @@ TagsOptionBoard 版本:v1.0
 				if(settingFile.exists){
 					settingXML=new XML(FileAndStr.readStrFromFile(settingFile));
 				}else{
-					settingXML=<setting selectedOptionName="输出位图为资源" outputIcon="false"/>;
+					settingXML=<setting selectedOptionName="输出位图为资源"/>;
 				}
 				
 				var optionsFolder:File=new File(optionsFolderPath);
@@ -451,6 +469,20 @@ TagsOptionBoard 版本:v1.0
 				//trace(settingXML.toXMLString());
 			}
 			
+			public static function get outputDoABCLevel():int{
+				var outputDoABCLevelStr:String=settingXML.@outputDoABCLevel.toString();
+				if(outputDoABCLevelStr){
+					return int(outputDoABCLevelStr);
+				}
+				return AVM2Obj.decodeLevel;
+			}
+			public static function set outputDoABCLevel(_outputDoABCLevel:int):void{
+				settingXML.@outputDoABCLevel=_outputDoABCLevel;
+				if(instance){
+					instance["rbOutputDoABCLevel"+_outputDoABCLevel].selected=true;
+				}
+			}
+			
 			private var optionFile:File;
 			
 			private var removeClose:Function;
@@ -497,20 +529,23 @@ TagsOptionBoard 版本:v1.0
 				var typeNum:int=0;
 				for each(var typeName:String in TagType.typeNameArr){
 					if(typeName){
-						tagsXML.appendChild(<tag type={typeName} typeNum={typeNum}/>);
+						tagsXML.appendChild(<tag type={typeName} typeNum={typeNum<10?"0"+typeNum:typeNum}/>);
 					}
 					typeNum++;
 				}
 				
 				tagXMLListCol=new XMLListCollection(tagsXML.tag);
-				TagsOptionBoardItem.init(this,tagXMLListCol.source,selectOption);
+				TagsOptionBoardItem.init(this,tagXMLListCol.source,selectOptionAndUpdate);
 				
 				grid.dataProvider=tagXMLListCol;
 				
 				outputResourceIcon=outputResourceIcon;
 				outputSingleFile=outputSingleFile;
+				outputDoABCLevel=outputDoABCLevel;
 				
 				updateOptionMark();
+				
+				selectOptionAndUpdate(false);
 				
 			}
 			private function removed(event:Event):void{
@@ -536,26 +571,25 @@ TagsOptionBoard 版本:v1.0
 					}
 					typeNum++;
 				}
+				TagsOptionBoardItem.initByOptionMark(optionMark,true);
 				updateOutputResourceOptionBoardEnabledByOptionMark(optionMark);
-				TagsOptionBoardItem.initByOptionMark(optionMark);
+				
+				selectOptionAndUpdate();
 			}
 			
 			private function updateOptionMark():void{
 				var optionMark:Object=DataAndTags.getOptionMarkByOptionXML(optionXMLs[currOptionName]);
+				TagsOptionBoardItem.initByOptionMark(optionMark,false);
 				updateOutputResourceOptionBoardEnabledByOptionMark(optionMark);
-				TagsOptionBoardItem.initByOptionMark(optionMark);
 			}
 			private function updateOutputResourceOptionBoardEnabledByOptionMark(optionMark:Object):void{
 				for each(var option:String in optionMark){
-					//trace("option="+option);
 					if(option==DataAndTags.resourceOption){
 						outputResourceOptionBoard.enabled=true;
-						//trace("updateOutputResourceOptionBoardEnabledByOptionMark outputResourceOptionBoard.enabled="+outputResourceOptionBoard.enabled);
 						return;
 					}
 				}
 				outputResourceOptionBoard.enabled=false;
-				//trace("updateOutputResourceOptionBoardEnabledByOptionMark outputResourceOptionBoard.enabled="+outputResourceOptionBoard.enabled);
 			}
 			
 			private function click(event:MouseEvent):void{
@@ -575,6 +609,7 @@ TagsOptionBoard 版本:v1.0
 						}
 						settingXML.@selectedOptionName=optionCb.selectedItem.toString();
 						updateOptionMark();
+						selectOptionAndUpdate(false);
 					break;
 					case rbOutputMultiFile:
 						settingXML.@outputSingleFile=false;
@@ -587,6 +622,15 @@ TagsOptionBoard 版本:v1.0
 					break;
 					case cbOutputResourceIcon:
 						outputResourceIcon=cbOutputResourceIcon.selected;
+					break;
+					case rbOutputDoABCLevel0:
+						outputDoABCLevel=0;
+					break;
+					case rbOutputDoABCLevel1:
+						outputDoABCLevel=1;
+					break;
+					case rbOutputDoABCLevel2:
+						outputDoABCLevel=2;
 					break;
 				}
 			}
@@ -679,21 +723,37 @@ TagsOptionBoard 版本:v1.0
 			private function addTempOption():void{
 				var optionPath:String=optionsFolderPath+"临时 option.xml";
 				var optionFile:File=new File(optionPath);
-				FileAndStr.writeStrToFile('<?xml version="1.0" encoding="utf-8"?>\n'+getCurrOptionXML().toXMLString(),optionFile);
-				Outputer.output("保存临时 option 至: "+optionPath,"blue");
+				var oldOptionStr:String=null;
+				if(optionFile.exists){
+					oldOptionStr=FileAndStr.readStrFromFile(optionFile);
+				}
+				var optionStr:String='<?xml version="1.0" encoding="utf-8"?>\n'+getCurrOptionXML().toXMLString();
+				if(oldOptionStr==optionStr){
+				}else{
+					FileAndStr.writeStrToFile(optionStr,optionFile);
+					Outputer.output("保存临时 option 至: "+optionPath,"blue");
+				}
 				addOptionName(optionFile);
 			}
-			private function selectOption(type:String,option:String):void{
-				if(currOptionName=="临时 option"){
-				}else{
-					addTempOption();
-					currOptionName="临时 option";
+			private function selectOptionAndUpdate(autoSaveTempOption:Boolean=true):void{
+				if(autoSaveTempOption){
+					if(currOptionName=="临时 option"){
+					}else{
+						addTempOption();
+						currOptionName="临时 option";
+					}
 				}
-				if(option==DataAndTags.resourceOption){
-					outputResourceOptionBoard.enabled=true;
-					//trace("selectOption outputResourceOptionBoard.enabled="+outputResourceOptionBoard.enabled);
+				
+				updateOutputResourceOptionBoardEnabledByOptionMark(TagsOptionBoardItem.getOptionMark());
+				
+				if(
+					TagsOptionBoardItem.getOptionByType(TagType.typeNameArr[TagType.DoABC])==DataAndTags.structorOption
+					||
+					TagsOptionBoardItem.getOptionByType(TagType.typeNameArr[TagType.DoABCWithoutFlagsAndName])==DataAndTags.structorOption
+				){
+					outputDoABCOptionBoard.enabled=true;
 				}else{
-					updateOutputResourceOptionBoardEnabledByOptionMark(TagsOptionBoardItem.getOptionMark());
+					outputDoABCOptionBoard.enabled=false;
 				}
 			}
 			

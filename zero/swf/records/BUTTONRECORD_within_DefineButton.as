@@ -2,7 +2,7 @@
 BUTTONRECORD_within_DefineButton 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年9月12日 18:24:49 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月20日 16:08:28 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -74,14 +74,12 @@ package zero.swf.records{
 			ButtonStateUp=flags&0x01;					//00000001
 			CharacterID=data[offset+1]|(data[offset+2]<<8);
 			PlaceDepth=data[offset+3]|(data[offset+4]<<8);
-			//#offsetpp
 			offset+=5;
 			PlaceMatrix=new MATRIX();
 			return PlaceMatrix.initByData(data,offset,endOffset);
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
-			//var offset:int=0;//测试
 			var flags:int=0;
 			//flags|=Reserved<<6;						//11000000
 			flags|=ButtonHasBlendMode<<5;				//00100000

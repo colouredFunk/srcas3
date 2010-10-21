@@ -8,8 +8,47 @@ AVM2Obj 版本:v1.0
 */
 
 package zero.swf.avm2{
+	import flash.utils.getQualifiedClassName;
+	
 	import zero.swf.BaseDat;
+
 	public class AVM2Obj extends BaseDat{
+		private static const ABCClassNameV:Vector.<String>=Vector.<String>([
+			"ABCFileWithSimpleConstant_pool",
+			"ABCFile",
+			"ABCFileAdvance"
+		]);
+		
+		public static var decodeLevel:int=ABCClassNameV.length-1;//0,1,2
+		
+		private static var abcClassV:Vector.<Class>=new Vector.<Class>(ABCClassNameV.length);
+		public static function activateClass(ABCClass:Class):void{
+			abcClassV[getClassIdByClassName(getQualifiedClassName(ABCClass))]=ABCClass;
+		}
+		private static function getClassIdByClassName(className:String):int{
+			var classId:int=ABCClassNameV.indexOf(className.replace("zero.swf.avm2::",""));
+			if(classId==-1){
+				throw new Error("不支持的 ABCClass: "+className+", 请使用以下的 ABCClass: zero.swf.avm2::"+ABCClassNameV.join("zero.swf.avm2::"));
+			}
+			return classId;
+		}
+		
+		public static function getClassByClassId(classId:int):Class{
+			if(classId>=0&&classId<abcClassV.length){
+				if(abcClassV[classId]){
+					return abcClassV[classId];
+				}
+				throw new Error("请先调用 zero.swf.avm2.AVM2Obj.activateClass(zero.swf.avm2."+ABCClassNameV[classId]+")");
+			}else{
+				throw new Error("classId="+classId+", 超出范围: 0~"+(abcClassV.length-1));
+			}
+			return null;
+		}
+		public static function getClassByClassName(className:String):Class{
+			return abcClassV[getClassIdByClassName(className)];
+		}
+		
+		
 		public function AVM2Obj(){
 		}
 	}

@@ -466,43 +466,52 @@ package zero.swf.records{
 		override public function toXML():XML{
 			var xml:XML=<SHAPEWITHSTYLE>
 				<fillAndLineStyles/>
-				<list vNames="ShapeRecordV" count={ShapeRecordV.length}/>
+				<ShapeRecordList/>
 			</SHAPEWITHSTYLE>;
 			xml.fillAndLineStyles.appendChild(fillAndLineStyles.toXML());
-			var listXML:XML=xml.list[0];
-			for each(var ShapeRecord:SHAPERECORD in ShapeRecordV){
-				var itemXML:XML=<ShapeRecord/>;
-				itemXML.appendChild(ShapeRecord.toXML());
-				listXML.appendChild(itemXML);
+			if(ShapeRecordV.length){
+				var listXML:XML=xml.ShapeRecordList[0];
+				listXML.@count=ShapeRecordV.length;
+				for each(var ShapeRecord:SHAPERECORD in ShapeRecordV){
+					var itemXML:XML=<ShapeRecord/>;
+					itemXML.appendChild(ShapeRecord.toXML());
+					listXML.appendChild(itemXML);
+				}
+			}else{
+				delete xml.ShapeRecordList;
 			}
 			return xml;
 		}
 		override public function initByXML(xml:XML):void{
 			fillAndLineStyles=new FillAndLineStyles();
 			fillAndLineStyles.initByXML(xml.fillAndLineStyles.children()[0]);
-			//trace("fillAndLineStyles="+fillAndLineStyles.toXML().toXMLString());
-			var listXML:XML=xml.list[0];
-			var ShapeRecordXMLList:XMLList=listXML.ShapeRecord;
-			ShapeRecordV=new Vector.<SHAPERECORD>();
-			var i:int=-1;
-			for each(var ShapeRecordXML:XML in ShapeRecordXMLList){
-				i++;
-				var ShapeRecordXMLNode:XML=ShapeRecordXML.children()[0];
-				switch(ShapeRecordXMLNode.name().toString()){
-					case "STYLECHANGERECORD":
-						ShapeRecordV[i]=new STYLECHANGERECORD();
-					break;
-					case "STRAIGHTEDGERECORD":
-						ShapeRecordV[i]=new STRAIGHTEDGERECORD();
-					break;
-					case "CURVEDEDGERECORD":
-						ShapeRecordV[i]=new CURVEDEDGERECORD();
-					break;
-					default:
-						throw new Error("奇怪的 ShapeRecordXMLNode.name(): "+ShapeRecordXMLNode.name().toString());
-					break;
+			
+			if(xml.ShapeRecordList.length()){
+				var listXML:XML=xml.ShapeRecordList[0];
+				var ShapeRecordXMLList:XMLList=listXML.ShapeRecord;
+				var i:int=-1;
+				ShapeRecordV=new Vector.<SHAPERECORD>(ShapeRecordXMLList.length());
+				for each(var ShapeRecordXML:XML in ShapeRecordXMLList){
+					i++;
+					var ShapeRecordXMLNode:XML=ShapeRecordXML.children()[0];
+					switch(ShapeRecordXMLNode.name().toString()){
+						case "STYLECHANGERECORD":
+							ShapeRecordV[i]=new STYLECHANGERECORD();
+						break;
+						case "STRAIGHTEDGERECORD":
+							ShapeRecordV[i]=new STRAIGHTEDGERECORD();
+						break;
+						case "CURVEDEDGERECORD":
+							ShapeRecordV[i]=new CURVEDEDGERECORD();
+						break;
+						default:
+							throw new Error("奇怪的 ShapeRecordXMLNode.name(): "+ShapeRecordXMLNode.name().toString());
+						break;
+					}
+					ShapeRecordV[i].initByXML(ShapeRecordXMLNode);
 				}
-				ShapeRecordV[i].initByXML(ShapeRecordXMLNode);
+			}else{
+				ShapeRecordV=new Vector.<SHAPERECORD>();
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML

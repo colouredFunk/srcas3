@@ -2,7 +2,7 @@
 Constant_pool 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月18日 22:02:57 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月21日 15:48:07 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -87,7 +87,6 @@ package zero.swf.avm2{
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			data.endian=Endian.LITTLE_ENDIAN;
 			//#offsetpp
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -109,7 +108,6 @@ package zero.swf.avm2{
 			//
 			integerV=new Vector.<int>(integer_count);
 			for(var i:int=1;i<integer_count;i++){
-				//#offsetpp
 			
 				if(data[offset]>>>7){
 					if(data[offset+1]>>>7){
@@ -130,9 +128,7 @@ package zero.swf.avm2{
 				}
 				//
 			}
-			//#offsetpp
 			
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -154,7 +150,6 @@ package zero.swf.avm2{
 			//
 			uintegerV=new Vector.<int>(uinteger_count);
 			for(i=1;i<uinteger_count;i++){
-				//#offsetpp
 			
 				if(data[offset]>>>7){
 					if(data[offset+1]>>>7){
@@ -175,9 +170,7 @@ package zero.swf.avm2{
 				}
 				//
 			}
-			//#offsetpp
 			
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -203,9 +196,7 @@ package zero.swf.avm2{
 				doubleV[i]=data.readDouble();
 			}
 			offset=data.position;
-			//#offsetpp
 			
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -227,7 +218,6 @@ package zero.swf.avm2{
 			//
 			stringV=new Vector.<String>(string_count);
 			for(i=1;i<string_count;i++){
-				//#offsetpp
 			
 				if(data[offset]>>>7){
 					if(data[offset+1]>>>7){
@@ -272,9 +262,7 @@ package zero.swf.avm2{
 				stringV[i]=get_str_str;
 				//
 			}
-			//#offsetpp
 			
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -296,14 +284,11 @@ package zero.swf.avm2{
 			//
 			namespace_infoV=new Vector.<Namespace_info>(namespace_info_count);
 			for(i=1;i<namespace_info_count;i++){
-				//#offsetpp
 			
 				namespace_infoV[i]=new Namespace_info();
 				offset=namespace_infoV[i].initByData(data,offset,endOffset);
 			}
-			//#offsetpp
 			
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -325,14 +310,11 @@ package zero.swf.avm2{
 			//
 			ns_set_infoV=new Vector.<Ns_set_info>(ns_set_info_count);
 			for(i=1;i<ns_set_info_count;i++){
-				//#offsetpp
 			
 				ns_set_infoV[i]=new Ns_set_info();
 				offset=ns_set_infoV[i].initByData(data,offset,endOffset);
 			}
-			//#offsetpp
 			
-			//#offsetpp
 			
 			if(data[offset]>>>7){
 				if(data[offset+1]>>>7){
@@ -355,7 +337,6 @@ package zero.swf.avm2{
 			multiname_infoV=new Vector.<Multiname_info>(multiname_info_count);
 			for(i=1;i<multiname_info_count;i++){
 				var kind:int=data[offset++];
-				//#offsetpp
 			
 				multiname_infoV[i]=new MultinameKind.classV[kind]();
 				offset=multiname_infoV[i].initByData(data,offset,endOffset);
@@ -365,10 +346,8 @@ package zero.swf.avm2{
 		}
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
-			//var offset:int=0;//测试
 			data.endian=Endian.LITTLE_ENDIAN;
 			var integer_count:int=integerV.length;
-			//#offsetpp
 			var offset:int=0;
 			if(integer_count>>>7){
 				if(integer_count>>>14){
@@ -398,15 +377,13 @@ package zero.swf.avm2{
 				data[offset++]=integer_count;
 			}
 			//
-			//#offsetpp
 			
 			var i:int=0;
 			for each(var integer:int in integerV){
 				if(i<1){
-					i++;
-					continue;
-				}
-				//#offsetpp
+						i++;
+						continue;
+					}
 			
 				if(integer>>>7){
 					if(integer>>>14){
@@ -438,7 +415,6 @@ package zero.swf.avm2{
 				//
 			}
 			var uinteger_count:int=uintegerV.length;
-			//#offsetpp
 			
 			if(uinteger_count>>>7){
 				if(uinteger_count>>>14){
@@ -468,15 +444,13 @@ package zero.swf.avm2{
 				data[offset++]=uinteger_count;
 			}
 			//
-			//#offsetpp
 			
 			i=0;
 			for each(var uinteger:int in uintegerV){
 				if(i<1){
-					i++;
-					continue;
-				}
-				//#offsetpp
+						i++;
+						continue;
+					}
 			
 				if(uinteger>>>7){
 					if(uinteger>>>14){
@@ -508,7 +482,6 @@ package zero.swf.avm2{
 				//
 			}
 			var double_count:int=doubleV.length;
-			//#offsetpp
 			
 			if(double_count>>>7){
 				if(double_count>>>14){
@@ -538,20 +511,18 @@ package zero.swf.avm2{
 				data[offset++]=double_count;
 			}
 			//
-			//#offsetpp
 			
 			i=0;
 			data.position=offset;
 			for each(var double:Number in doubleV){
 				if(i<1){
-					i++;
-					continue;
-				}
+						i++;
+						continue;
+					}
 				data.writeDouble(double);
 			}
 			offset=data.length;
 			var string_count:int=stringV.length;
-			//#offsetpp
 			
 			if(string_count>>>7){
 				if(string_count>>>14){
@@ -581,14 +552,13 @@ package zero.swf.avm2{
 				data[offset++]=string_count;
 			}
 			//
-			//#offsetpp
 			
 			i=0;
 			for each(var string:String in stringV){
 				if(i<1){
-					i++;
-					continue;
-				}
+						i++;
+						continue;
+					}
 				var set_str_data:ByteArray=new ByteArray();
 				set_str_data.writeUTFBytes(string);
 				var set_str_size:int=set_str_data.length;
@@ -625,7 +595,6 @@ package zero.swf.avm2{
 				//
 			}
 			var namespace_info_count:int=namespace_infoV.length;
-			//#offsetpp
 			
 			if(namespace_info_count>>>7){
 				if(namespace_info_count>>>14){
@@ -655,20 +624,18 @@ package zero.swf.avm2{
 				data[offset++]=namespace_info_count;
 			}
 			//
-			//#offsetpp
 			
 			i=0;
 			data.position=offset;
 			for each(var namespace_info:Namespace_info in namespace_infoV){
 				if(i<1){
-					i++;
-					continue;
-				}
+						i++;
+						continue;
+					}
 				data.writeBytes(namespace_info.toData());
 			}
 			offset=data.length;
 			var ns_set_info_count:int=ns_set_infoV.length;
-			//#offsetpp
 			
 			if(ns_set_info_count>>>7){
 				if(ns_set_info_count>>>14){
@@ -698,20 +665,18 @@ package zero.swf.avm2{
 				data[offset++]=ns_set_info_count;
 			}
 			//
-			//#offsetpp
 			
 			i=0;
 			data.position=offset;
 			for each(var ns_set_info:Ns_set_info in ns_set_infoV){
 				if(i<1){
-					i++;
-					continue;
-				}
+						i++;
+						continue;
+					}
 				data.writeBytes(ns_set_info.toData());
 			}
 			offset=data.length;
 			var multiname_info_count:int=multiname_infoV.length;
-			//#offsetpp
 			
 			if(multiname_info_count>>>7){
 				if(multiname_info_count>>>14){
@@ -741,14 +706,13 @@ package zero.swf.avm2{
 				data[offset++]=multiname_info_count;
 			}
 			//
-			//#offsetpp
 			
 			i=0;
 			for each(var multiname_info:Multiname_info in multiname_infoV){
 				if(i<1){
-					i++;
-					continue;
-				}
+						i++;
+						continue;
+					}
 				data[offset++]=multiname_info.kind;
 				data.position=offset;
 				data.writeBytes(multiname_info.toData());
@@ -761,185 +725,242 @@ package zero.swf.avm2{
 		CONFIG::toXMLAndInitByXML {
 		override public function toXML():XML{
 			var xml:XML=<Constant_pool>
-				<list vNames="integerV" count={integerV.length}/>
-				<list vNames="uintegerV" count={uintegerV.length}/>
-				<list vNames="doubleV" count={doubleV.length}/>
-				<list vNames="stringV" count={stringV.length}/>
-				<list vNames="namespace_infoV" count={namespace_infoV.length}/>
-				<list vNames="ns_set_infoV" count={ns_set_infoV.length}/>
-				<list vNames="multiname_infoV" count={multiname_infoV.length}/>
+				<integerList/>
+				<uintegerList/>
+				<doubleList/>
+				<stringList/>
+				<namespace_infoList/>
+				<ns_set_infoList/>
+				<multiname_infoList/>
 			</Constant_pool>;
-			var listXML:XML=xml.list[0];
-			var i:int=0;
-			for each(var integer:int in integerV){
-				if(i<1){
-					i++;
-					continue;
+			if(integerV.length){
+				var listXML:XML=xml.integerList[0];
+				listXML.@count=integerV.length;
+				var i:int=0;
+				for each(var integer:int in integerV){
+					if(i<1){
+						i++;
+						continue;
+					}
+					listXML.appendChild(<integer value={integer}/>);
 				}
-				listXML.appendChild(<integer value={integer}/>);
+			}else{
+				delete xml.integerList;
 			}
-			listXML=xml.list[1];
-			i=0;
-			for each(var uinteger:int in uintegerV){
-				if(i<1){
-					i++;
-					continue;
+			if(uintegerV.length){
+				listXML=xml.uintegerList[0];
+				listXML.@count=uintegerV.length;
+				i=0;
+				for each(var uinteger:int in uintegerV){
+					if(i<1){
+						i++;
+						continue;
+					}
+					listXML.appendChild(<uinteger value={uinteger}/>);
 				}
-				listXML.appendChild(<uinteger value={uinteger}/>);
+			}else{
+				delete xml.uintegerList;
 			}
-			listXML=xml.list[2];
-			i=0;
-			for each(var double:Number in doubleV){
-				if(i<1){
-					i++;
-					continue;
+			if(doubleV.length){
+				listXML=xml.doubleList[0];
+				listXML.@count=doubleV.length;
+				i=0;
+				for each(var double:Number in doubleV){
+					if(i<1){
+						i++;
+						continue;
+					}
+					listXML.appendChild(<double value={double}/>);
 				}
-				listXML.appendChild(<double value={double}/>);
+			}else{
+				delete xml.doubleList;
 			}
-			listXML=xml.list[3];
-			i=0;
-			for each(var string:String in stringV){
-				if(i<1){
-					i++;
-					continue;
+			if(stringV.length){
+				listXML=xml.stringList[0];
+				listXML.@count=stringV.length;
+				i=0;
+				for each(var string:String in stringV){
+					if(i<1){
+						i++;
+						continue;
+					}
+					listXML.appendChild(<string value={string/*要求10.1.52.14或以上的播放器 或 2.0.2.12610 以上的 air 才能正确的处理 "\x00"*/}/>);
 				}
-				listXML.appendChild(<string value={string/*要求10.1.52.14或以上的播放器 或 2.0.2.12610 以上的 air 才能正确的处理 "\x00"*/}/>);
+			}else{
+				delete xml.stringList;
 			}
-			listXML=xml.list[4];
-			i=0;
-			for each(var namespace_info:Namespace_info in namespace_infoV){
-				if(i<1){
-					i++;
-					continue;
+			if(namespace_infoV.length){
+				listXML=xml.namespace_infoList[0];
+				listXML.@count=namespace_infoV.length;
+				i=0;
+				for each(var namespace_info:Namespace_info in namespace_infoV){
+					if(i<1){
+						i++;
+						continue;
+					}
+					var itemXML:XML=<namespace_info/>;
+					itemXML.appendChild(namespace_info.toXML());
+					listXML.appendChild(itemXML);
 				}
-				var itemXML:XML=<namespace_info/>;
-				itemXML.appendChild(namespace_info.toXML());
-				listXML.appendChild(itemXML);
+			}else{
+				delete xml.namespace_infoList;
 			}
-			listXML=xml.list[5];
-			i=0;
-			for each(var ns_set_info:Ns_set_info in ns_set_infoV){
-				if(i<1){
-					i++;
-					continue;
+			if(ns_set_infoV.length){
+				listXML=xml.ns_set_infoList[0];
+				listXML.@count=ns_set_infoV.length;
+				i=0;
+				for each(var ns_set_info:Ns_set_info in ns_set_infoV){
+					if(i<1){
+						i++;
+						continue;
+					}
+					itemXML=<ns_set_info/>;
+					itemXML.appendChild(ns_set_info.toXML());
+					listXML.appendChild(itemXML);
 				}
-				itemXML=<ns_set_info/>;
-				itemXML.appendChild(ns_set_info.toXML());
-				listXML.appendChild(itemXML);
+			}else{
+				delete xml.ns_set_infoList;
 			}
-			listXML=xml.list[6];
-			i=0;
-			for each(var multiname_info:Multiname_info in multiname_infoV){
-				if(i<1){
-					i++;
-					continue;
+			if(multiname_infoV.length){
+				listXML=xml.multiname_infoList[0];
+				listXML.@count=multiname_infoV.length;
+				i=0;
+				for each(var multiname_info:Multiname_info in multiname_infoV){
+					if(i<1){
+						i++;
+						continue;
+					}
+					itemXML=<multiname_info kind={MultinameKind.kindV[multiname_info.kind]}/>;
+					itemXML.appendChild(multiname_info.toXML());
+					listXML.appendChild(itemXML);
 				}
-				itemXML=<multiname_info kind={MultinameKind.kindV[multiname_info.kind]}/>;
-				itemXML.appendChild(multiname_info.toXML());
-				listXML.appendChild(itemXML);
+			}else{
+				delete xml.multiname_infoList;
 			}
 			return xml;
 		}
 		override public function initByXML(xml:XML):void{
-			var listXML:XML=xml.list[0];
-			var integerXMLList:XMLList=listXML.integer;
+			if(xml.integerList.length()){
+				var listXML:XML=xml.integerList[0];
+				var integerXMLList:XMLList=listXML.integer;
 			
-			if(integerXMLList.length()){
-			var i:int=0;
-			integerV=new Vector.<int>(integerXMLList.length()+1);
-			for each(var integerXML:XML in integerXMLList){
-				i++;
-				integerV[i]=int(integerXML.@value.toString());
-			}
+				if(integerXMLList.length()){
+					var i:int=0;
+					integerV=new Vector.<int>(integerXMLList.length()+1);
+					for each(var integerXML:XML in integerXMLList){
+						i++;
+						integerV[i]=int(integerXML.@value.toString());
+					}
+				}else{
+					integerV=new Vector.<int>();
+				}
 			}else{
 				integerV=new Vector.<int>();
 			}
+			if(xml.uintegerList.length()){
+				listXML=xml.uintegerList[0];
+				var uintegerXMLList:XMLList=listXML.uinteger;
 			
-			listXML=xml.list[1];
-			var uintegerXMLList:XMLList=listXML.uinteger;
-			
-			if(uintegerXMLList.length()){
-			i=0;
-			uintegerV=new Vector.<int>(uintegerXMLList.length()+1);
-			for each(var uintegerXML:XML in uintegerXMLList){
-				i++;
-				uintegerV[i]=int(uintegerXML.@value.toString());
-			}
+				if(uintegerXMLList.length()){
+					i=0;
+					uintegerV=new Vector.<int>(uintegerXMLList.length()+1);
+					for each(var uintegerXML:XML in uintegerXMLList){
+						i++;
+						uintegerV[i]=int(uintegerXML.@value.toString());
+					}
+				}else{
+					uintegerV=new Vector.<int>();
+				}
 			}else{
 				uintegerV=new Vector.<int>();
 			}
+			if(xml.doubleList.length()){
+				listXML=xml.doubleList[0];
+				var doubleXMLList:XMLList=listXML.double;
 			
-			listXML=xml.list[2];
-			var doubleXMLList:XMLList=listXML.double;
-			
-			if(doubleXMLList.length()){
-			i=0;
-			doubleV=new Vector.<Number>(doubleXMLList.length()+1);
-			for each(var doubleXML:XML in doubleXMLList){
-				i++;
-				doubleV[i]=Number(doubleXML.@value.toString());
-			}
+				if(doubleXMLList.length()){
+					i=0;
+					doubleV=new Vector.<Number>(doubleXMLList.length()+1);
+					for each(var doubleXML:XML in doubleXMLList){
+						i++;
+						doubleV[i]=Number(doubleXML.@value.toString());
+					}
+				}else{
+					doubleV=new Vector.<Number>();
+				}
 			}else{
 				doubleV=new Vector.<Number>();
 			}
+			if(xml.stringList.length()){
+				listXML=xml.stringList[0];
+				var stringXMLList:XMLList=listXML.string;
 			
-			listXML=xml.list[3];
-			var stringXMLList:XMLList=listXML.string;
-			
-			if(stringXMLList.length()){
-			i=0;
-			stringV=new Vector.<String>(stringXMLList.length()+1);
-			for each(var stringXML:XML in stringXMLList){
-				i++;
-				stringV[i]=stringXML.@value.toString();
-			}
+				if(stringXMLList.length()){
+					i=0;
+					stringV=new Vector.<String>(stringXMLList.length()+1);
+					for each(var stringXML:XML in stringXMLList){
+						i++;
+						stringV[i]=stringXML.@value.toString();
+					}
+				}else{
+					stringV=new Vector.<String>();
+				}
 			}else{
 				stringV=new Vector.<String>();
 			}
+			if(xml.namespace_infoList.length()){
+				listXML=xml.namespace_infoList[0];
+				var namespace_infoXMLList:XMLList=listXML.namespace_info;
 			
-			listXML=xml.list[4];
-			var namespace_infoXMLList:XMLList=listXML.namespace_info;
-			
-			if(namespace_infoXMLList.length()){
-			i=0;
-			namespace_infoV=new Vector.<Namespace_info>(namespace_infoXMLList.length()+1);
-			for each(var namespace_infoXML:XML in namespace_infoXMLList){
-				i++;
-				namespace_infoV[i]=new Namespace_info();
-				namespace_infoV[i].initByXML(namespace_infoXML.children()[0]);
-			}
+				if(namespace_infoXMLList.length()){
+					i=0;
+					namespace_infoV=new Vector.<Namespace_info>(namespace_infoXMLList.length()+1);
+					for each(var namespace_infoXML:XML in namespace_infoXMLList){
+						i++;
+						namespace_infoV[i]=new Namespace_info();
+						namespace_infoV[i].initByXML(namespace_infoXML.children()[0]);
+					}
+				}else{
+					namespace_infoV=new Vector.<Namespace_info>();
+				}
 			}else{
 				namespace_infoV=new Vector.<Namespace_info>();
 			}
+			if(xml.ns_set_infoList.length()){
+				listXML=xml.ns_set_infoList[0];
+				var ns_set_infoXMLList:XMLList=listXML.ns_set_info;
 			
-			listXML=xml.list[5];
-			var ns_set_infoXMLList:XMLList=listXML.ns_set_info;
-			
-			if(ns_set_infoXMLList.length()){
-			i=0;
-			ns_set_infoV=new Vector.<Ns_set_info>(ns_set_infoXMLList.length()+1);
-			for each(var ns_set_infoXML:XML in ns_set_infoXMLList){
-				i++;
-				ns_set_infoV[i]=new Ns_set_info();
-				ns_set_infoV[i].initByXML(ns_set_infoXML.children()[0]);
-			}
+				if(ns_set_infoXMLList.length()){
+					i=0;
+					ns_set_infoV=new Vector.<Ns_set_info>(ns_set_infoXMLList.length()+1);
+					for each(var ns_set_infoXML:XML in ns_set_infoXMLList){
+						i++;
+						ns_set_infoV[i]=new Ns_set_info();
+						ns_set_infoV[i].initByXML(ns_set_infoXML.children()[0]);
+					}
+				}else{
+					ns_set_infoV=new Vector.<Ns_set_info>();
+				}
 			}else{
 				ns_set_infoV=new Vector.<Ns_set_info>();
 			}
+			if(xml.multiname_infoList.length()){
+				listXML=xml.multiname_infoList[0];
+				var multiname_infoXMLList:XMLList=listXML.multiname_info;
 			
-			listXML=xml.list[6];
-			var multiname_infoXMLList:XMLList=listXML.multiname_info;
-			
-			if(multiname_infoXMLList.length()){
-			i=0;
-			multiname_infoV=new Vector.<Multiname_info>(multiname_infoXMLList.length()+1);
-			for each(var multiname_infoXML:XML in multiname_infoXMLList){
-				i++;
-				var kind:int=MultinameKind[multiname_infoXML.@kind.toString()];
-				multiname_infoV[i]=new MultinameKind.classV[kind]();
-				multiname_infoV[i].initByXML(multiname_infoXML.children()[0]);
-				multiname_infoV[i].kind=kind;
-			}
+				if(multiname_infoXMLList.length()){
+					i=0;
+					multiname_infoV=new Vector.<Multiname_info>(multiname_infoXMLList.length()+1);
+					for each(var multiname_infoXML:XML in multiname_infoXMLList){
+						i++;
+						var kind:int=MultinameKind[multiname_infoXML.@kind.toString()];
+						multiname_infoV[i]=new MultinameKind.classV[kind]();
+						multiname_infoV[i].initByXML(multiname_infoXML.children()[0]);
+						multiname_infoV[i].kind=kind;
+					}
+				}else{
+					multiname_infoV=new Vector.<Multiname_info>();
+				}
 			}else{
 				multiname_infoV=new Vector.<Multiname_info>();
 			}
