@@ -109,7 +109,10 @@
 			onLoaded();
 		}
 		private function onSWFVarsGetterInit():void{
-			Common.addContextMenu(this, "发布时间: "+SWFVarsGetter.getModifyDate());
+			var modifyDate:String=SWFVarsGetter.getModifyDate();
+			if(modifyDate){
+				Common.addContextMenu(this, "发布时间:"+modifyDate.split("+")[0].replace("T"," "));
+			}
 		}
 		private var __bytesTotal:int;
 		private function getBytesTotal():int {
