@@ -8,62 +8,8 @@ Advance 版本:v1.0
 */
 
 package zero.swf.avm2.advance{
-	import flash.display.*;
-	import flash.events.*;
-	import flash.utils.*;
-	
-	import zero.swf.avm2.ABCFile;
-	import zero.swf.avm2.AVM2Obj;
-	
 	public class Advance{
-		public static var abcFile:ABCFile;
-		public static var currAdvanceABCFile:AdvanceABCFile;
-		public static var stringMark:Object;
-		/*
-		public static function getInfo(id:int,name:String,startId:int=0):*{
-			if(v<startId){
-				return null;
-			}
-			var v:*=abcFile[name+"V"];
-			if(id<v.length){
-				return v[id];
-			}
-			throw new Error("id="+id+" 超出范围, abcFile."+name+"V.length="+v.length);
-			return null;
-		}
-		
-		public function Advance(){
-		}
-		
-		public function getString(parentInfo:AVM2Obj,name:String):void{
-			this[name]=getInfo(parentInfo[name],"string",1);
-		}
-		public function getAdvance(parentInfo:AVM2Obj,name:String,advanceClass:*):void{
-			this[name]=advanceClass.getAdvanceById(parentInfo[name]);
-		}
-		public function getAdvancesByIds(parentInfo:AVM2Obj,name:String,advanceClass:*,advanceVClass:*):void{
-			var v:Vector.<int>=parentInfo[name+"V"];
-			if(v&&v.length){
-				var advanceV:*=this[name+"V"]=new advanceVClass();
-				var i:int=-1;
-				for each(var id:int in v){
-					i++;
-					advanceV[i]=advanceClass.getAdvanceById(id);
-				}
-			}
-		}
-		public function getAdvancesByInfos(parentInfo:AVM2Obj,name:String,advanceClass:*,advanceVClass:*):void{
-			var v:*=parentInfo[name+"V"];
-			if(v&&v.length){
-				var advanceV:*=this[name+"V"]=new advanceVClass();
-				var i:int=-1;
-				for each(var info:AVM2Obj in v){
-					i++;
-					advanceV[i]=advanceClass.getAdvanceByInfo(info);
-				}
-			}
-		}
-		*/
+		public static var test_total:int;
 	}
 }
 
