@@ -11,7 +11,10 @@
 	import flash.utils.setTimeout;
 	import akdcl.media.Sound;
 	import ui.UISprite;
-
+	
+	import flash.ui.ContextMenu;
+	import flash.ui.ContextMenuItem;
+	import flash.events.ContextMenuEvent;
 	public class MusicPlayer extends UISprite {
 		public static const WMP_STATE_LIST:Array = ["连接超时", "停止", "暂停", "播放", "向前", "向后", "正在缓冲", "等待...", "完毕", "正在连接", "就绪", "重新连接"];
 		
@@ -19,6 +22,21 @@
 		public static var SOUND_PAUSE:String = "pause";
 		public static var SOUND_STOP:String = "stop";
 		public static var SOUND_IDCHANGE:String = "idChange";
+		
+		private static var contextMenuMusicPlayer:ContextMenu;
+		private static var contextMenuItemMusicPlayer:ContextMenuItem;
+		private static function createMenu(_target:*):void {
+			if (!contextMenuMusicPlayer) {
+				contextMenuItemMusicPlayer = Common.addContextMenu(_target, "");
+				contextMenuMusicPlayer = _target.contextMenu;
+				contextMenuMusicPlayer.addEventListener(ContextMenuEvent.MENU_SELECT, onImageMenuShowHandler);
+			}
+		}
+		private static function onImageMenuShowHandler(_evt:ContextMenuEvent):void {
+			var _musicPlayer:*=_evt.contextMenuOwner as MusicPlayer;
+			//var _source:String = _musicPlayer.sourceNow;
+			contextMenuItemMusicPlayer.caption = "MusicPlayer";
+		}
 		
 		public var btnPlay:*;
 		public var btnStop:*;
@@ -379,7 +397,7 @@
 					//就绪
 					__playState = WMP_STATE_LIST[_id];
 					//if (isAutoPlay) {
-						play();
+						resetWMPPlay();
 					//}
 					break;
 				case 11 :
@@ -441,11 +459,14 @@
 				}
 			}
 			if (barPlayProgress) {
+				if (!barLoadProgress&&barPlayProgress.progressBar) {
+					barLoadProgress = barPlayProgress.progressBar;
+				}
 				barPlayProgress.snapInterval = 0.01;
 				barPlayProgress.minimum = 0;
 				barPlayProgress.maximum = 1;
 				barPlayProgress.release = function():void {
-					play(totalTime * Math.min(this.value, loaded));
+					play(totalTime * Math.min(this.value, loaded * 0.98));
 				}
 			}
 			if (ExternalInterface.available) {
@@ -456,6 +477,8 @@
 				ExternalInterface.addCallback("stop", stop);
 				isPlugin = ExternalInterface.call("initMusicPlayer");
 			}
+			//createMenu(this);
+			//contextMenu = contextMenuMusicPlayer;
 		}
 		override protected function onRemoveToStageHandler():void {
 			stop();
@@ -500,6 +523,9 @@
 			}
 		}
 		protected function onSoundLoadProgressHandle(_evt:ProgressEvent):void {
+			if (barLoadProgress) {
+				barLoadProgress.value = loaded;
+			}
 			dispatchEvent(new Event(_evt.type));
 		}
 		protected function onSoundLoadCompleteHandle(_evt:Event):void {
