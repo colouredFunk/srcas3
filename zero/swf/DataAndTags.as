@@ -12,7 +12,6 @@ package zero.swf{
 	
 	import zero.BytesAndStr16;
 	import zero.Outputer;
-	import zero.swf.avm1.Op;
 	import zero.swf.funs.DataMark;
 	import zero.swf.tagBodys.DefineSprite;
 	import zero.swf.tagBodys.FileAttributes;

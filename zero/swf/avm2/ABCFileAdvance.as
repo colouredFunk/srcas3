@@ -10,36 +10,43 @@ ABCFileAdvance 版本:v1.0
 package zero.swf.avm2{
 	import flash.utils.*;
 	
-	import zero.swf.avm2.advance.AdvanceABCFile;
+	import zero.swf.avm2.advance.Advance;
+	import zero.swf.avm2.advance.AdvanceABC;
 
 	public class ABCFileAdvance extends ABCFile{
-		public var advanceABCFile:AdvanceABCFile;
+		public var advanceABC:AdvanceABC;
 		public function ABCFileAdvance(){
 		}
 		
-		override public function initByData(data:ByteArray, offset:int, endOffset:int):int{
+		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			offset=super.initByData(data,offset,endOffset);
 			
-			advanceABCFile=new AdvanceABCFile();
-			advanceABCFile.initByInfo(this);
+			advanceABC=new AdvanceABC();
+			advanceABC.initByInfo(this);
 			
 			return offset;
 		}
 		
 		override public function toData():ByteArray{
-			return advanceABCFile.toInfo().toData();
+			advanceABC.toInfo(this);
+			
+			return super.toData();
 		}
 		
 		
 		CONFIG::toXMLAndInitByXML {
 		override public function toXML():XML{
-			var xml:XML=advanceABCFile.toXML();
-			xml.setName("ABCFileAdvance");
+			var xml:XML=<ABCFileAdvance/>;
+			
+			xml.appendChild(advanceABC.toXML());
+			
 			return xml;
 		}
 		override public function initByXML(xml:XML):void{
-			advanceABCFile=new AdvanceABCFile();
-			advanceABCFile.initByXML(xml);
+			
+			advanceABC=new AdvanceABC();
+			advanceABC.initByXML(xml.children()[0]);
+			
 		}
 		}
 	}

@@ -2,7 +2,7 @@
 AdvanceNamespace_info 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月24日 15:05:08 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月24日 15:05:08 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -36,34 +36,32 @@ package zero.swf.avm2.advance{
 	import flash.utils.ByteArray;
 	import zero.swf.avm2.Namespace_info;
 	public class AdvanceNamespace_info extends Advance{
-		public var infoId:int;
-		public function initByInfoId(_infoId:int):void{
-			initByInfo(abcFile.namespace_infoV[_infoId]);
-		}
+		public var realInfoId:int;	//toInfo 后重新计算的 id
+		private var infoId:int;	//从 swf 或 xml 直接读取过来的 id
+		
 		public var kind:int;							//direct
 		public var name:String;							//string
 		//
-		public function initByInfo(info:Namespace_info):void{
-			kind=info.kind;
-			if(info.name<1){
-				name="";
-			}else if(info.name<abcFile.stringV.length){
-				name=abcFile.stringV[info.name];
-			}else{
-				throw new Error("info.name="+info.name+" 超出范围, abcFile.stringV.length="+abcFile.stringV.length);
-			}
+		public function AdvanceNamespace_info(){
+			trace("AdvanceNamespace_info test_total="+(++test_total));
+		}
+		public function initByInfo(_infoId:int,namespace_info:Namespace_info):void{
+			infoId=_infoId;
+			
+			kind=namespace_info.kind;
+			name=AdvanceABC.currInstance.getStringById(namespace_info.name);
 		}
 		public function toInfo():Namespace_info{
-			var info:Namespace_info=new Namespace_info();
-			info.kind=kind;
-			info.name=stringMark["~"+name];
-			return info;
+			var namespace_info:Namespace_info=new Namespace_info();
+			namespace_info.kind=kind;
+			namespace_info.name=AdvanceABC.currInstance.stringMark["~"+name];
+			return namespace_info;
 		}
 
 		////
 		CONFIG::toXMLAndInitByXML {
 		public function toXML():XML{
-			var xml:XML=<AdvanceNamespace_info
+			var xml:XML=<AdvanceNamespace_info infoId={infoId}
 				kind={NamespaceKind.kindV[kind]}
 				name={name}
 			/>;
@@ -71,6 +69,8 @@ package zero.swf.avm2.advance{
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
+			infoId=int(xml.@infoId.toString());
+			
 			kind=NamespaceKind[xml.@kind.toString()];
 			name=xml.@name.toString();
 		}
