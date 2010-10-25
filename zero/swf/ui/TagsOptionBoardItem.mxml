@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="20"
+>
+	<mx:SWFLoader id="swfLoader" scaleContent="false"/>
+	<fx:Script>
+		<![CDATA[
+			import spark.components.Group;
+			
+			import zero.swf.*;
+			
+			private static var bmpMark:Object;
+			private static var enabledOptionMark:Object;
+			
+			private static var optionMark:Object;
+			private static var itemMark:Object;
+			private static var _stage:Stage;
+			private static var currItem:TagsOptionBoardItem;
+			private static var onSelectOption:Function;
+			public static function init(
+				container:Group,
+				tagXMLList:XMLList,
+				_onSelectOption:Function
+			):void{
+				_stage=container.stage;
+				var tagXML:XML;
+				if(bmpMark){
+				}else{
+					bmpMark=new Object();
+					enabledOptionMark=new Object();
+					for each(tagXML in tagXMLList){
+						var type:String=tagXML.@type.toString();
+						bmpMark[type]=new Bitmap(new BitmapData(400,20,true,0x00000000));
+						
+						var enabledOptionArr:Array;
+						if(DataAndTags.mustBeStructorTagBodyClasses[TagType[type]]){
+							enabledOptionArr=[DataAndTags.structorOption];
+						}else{
+							enabledOptionArr=[
+								DataAndTags.byteCodesOption,
+								DataAndTags.onlyLocationOption,
+								DataAndTags.noOutputOption
+							];
+							
+							var hasTagBodyClass:Boolean=true;
+							if(Tag.getTagBodyClassByType(TagType[type])){
+								hasTagBodyClass=true;
+							}else{
+								hasTagBodyClass=false;
+							}
+							
+							if(hasTagBodyClass){
+								enabledOptionArr.push(DataAndTags.structorOption);
+							}
+							switch(DefineObjs[type]){
+								case DefineObjs.IMG:
+								case DefineObjs.SWF:
+									enabledOptionArr.push(DataAndTags.resourceOption);
+								break;
+							}
+						}
+						enabledOptionMark[type]=enabledOptionArr;
+					}
+					TagsOptionBoardItemView.initInstance(container);
+				}
+				
+				itemMark=new Object();
+				
+				onSelectOption=_onSelectOption;
+			}
+			public static function initByOptionMark(_optionMark:Object,checkOldOption:Boolean):void{
+				var oldOptionMark:Object=optionMark;
+				optionMark=_optionMark;
+				var item:TagsOptionBoardItem;
+				for each(var type:String in TagType.typeNameArr){
+					if(type){
+						var option:String=optionMark[type];
+						if(option){
+							if(enabledOptionMark[type].indexOf(option)==-1){
+							}else{
+								continue;
+							}
+						}
+						if(checkOldOption){
+							optionMark[type]=oldOptionMark[type]||itemMark[type].option||DataAndTags.defaultOption;
+						}else{
+							optionMark[type]=DataAndTags.defaultOption;
+						}
+					}
+				}
+				
+				for each(item in itemMark){
+					var oldOption:String=item.option;
+					item.updateOption();
+					if(item.option){
+						if(item.option==oldOption){
+						}else{
+							item.updateBmd();
+						}
+					}
+				}
+			}
+			public static function getOptionMark():Object{
+				var newOptionMark:Object=new Object();
+				for(var type:String in optionMark){
+					newOptionMark[type]=optionMark[type];
+				}
+				for each(var item:TagsOptionBoardItem in itemMark){
+					if(newOptionMark[item.type]){
+						throw new Error("貌似出错了?");
+					}
+					newOptionMark[item.type]=item.option;
+				}
+				return newOptionMark;
+			}
+			
+			public static function clear():void{
+				for each(var item:TagsOptionBoardItem in itemMark){
+					item.clear();
+				}
+				itemMark=null;
+				optionMark=null;
+				_stage=null;
+				currItem=null;
+				
+				onSelectOption=null;
+			}
+			public static function getItemByData(data:XML):TagsOptionBoardItem{
+				var type:String=data.@type.toString();
+				var item:TagsOptionBoardItem=itemMark[type];
+				if(item){
+				}else{
+					itemMark[type]=item=new TagsOptionBoardItem();
+				}
+				return item;
+			}
+			public static function getOptionByType(type:String):String{
+				if(DataAndTags.mustBeStructorTagBodyClasses[TagType[type]]){
+					return DataAndTags.structorOption;
+				}
+				if(optionMark[type]){
+					return optionMark[type];
+				}
+				if(itemMark[type]&&itemMark[type].option){
+					return itemMark[type].option;
+				}
+				return DataAndTags.defaultOption;
+			}
+			
+			public var type:String;
+			public var option:String;
+			private var bmd:BitmapData;
+			private var sp:Sprite;
+			public function init(data:XML):void{
+				if(type){
+					return;
+				}
+				
+				type=data.@type.toString();
+				
+				bmd=bmpMark[type].bitmapData;
+				
+				updateOption();
+				
+				updateBmd();
+				
+				sp=new Sprite();
+				sp.addChild(bmpMark[type]);
+				//sp.buttonMode=true;//测试
+				sp.addEventListener(MouseEvent.MOUSE_OVER,mouseOver);
+				swfLoader.source=sp;
+			}
+			private function updateOption():void{
+				var _option:String=getOptionByType(type);
+				//if(_option==DataAndTags.structorOption){
+				//	trace(type,"_option="+_option);
+				//}
+				delete optionMark[type];
+				
+				if(option&&option==_option){
+					return;
+				}
+				
+				selectOptionAndSetEnabled(_option);
+			}
+			private function selectOptionAndSetEnabled(_option:String):void{
+				var enabledOptionArr:Array=enabledOptionMark[type];
+				
+				TagsOptionBoardItemView.itemView.setEnabled(enabledOptionArr);
+				
+				if(enabledOptionArr.indexOf(_option)==-1){
+					if(option){
+						TagsOptionBoardItemView.itemView.select(option);
+					}
+					return;
+				}
+				option=_option;
+				TagsOptionBoardItemView.itemView.select(option);
+			}
+			public function clear():void{
+				//if(type){
+					bmd=null;
+					sp.removeEventListener(MouseEvent.MOUSE_OVER,mouseOver);
+					_stage.removeEventListener(MouseEvent.MOUSE_MOVE,checkHit);
+					sp=null;
+				//}
+			}
+			private function mouseOver(event:MouseEvent):void{
+				if(TagsOptionBoardItemView.itemView.parent==this){
+				}else{
+					if(currItem){
+						currItem.removeViewAndShowSp();
+					}
+					currItem=this;
+					sp.alpha=0;
+					selectOptionAndSetEnabled(option);
+					this.addElement(TagsOptionBoardItemView.itemView);
+					_stage.addEventListener(MouseEvent.MOUSE_MOVE,checkHit);
+				}
+			}
+			private function checkHit(event:Event):void{
+				if(sp.hitTestPoint(_stage.mouseX,_stage.mouseY)){
+				}else{
+					removeViewAndShowSp();
+				}
+			}
+			private function removeViewAndShowSp():void{
+				if(TagsOptionBoardItemView.itemView.parent==this){
+					this.removeElement(TagsOptionBoardItemView.itemView);
+				}
+				sp.alpha=1;
+				_stage.removeEventListener(MouseEvent.MOUSE_MOVE,checkHit);
+			}
+			public function selectOption(_option:String):void{
+				option=_option;
+				updateBmd();
+				if(onSelectOption==null){
+				}else{
+					//onSelectOption(type,option);
+					onSelectOption();
+				}
+			}
+			private function updateBmd():void{
+				TagsOptionBoardItemView.itemView.validateNow();
+				
+				//trace("updateBmd type="+type);
+				
+				bmd.fillRect(bmd.rect,0x00000000);
+				bmd.draw(TagsOptionBoardItemView.itemView);
+			}
+		]]>
+	</fx:Script>
+</mx:Canvas>
