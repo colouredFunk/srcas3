@@ -13,11 +13,12 @@
 	import flash.system.ApplicationDomain;
 	
 	public class Alert extends UISprite {
-		public static var alertLayer:Sprite;
+		public static var alertLayer:*;
 		public static var ClassAlert:Class;
 		public static var alertPoint:Point;
 		private static var dataClassAlert:ByteArray;
-		public static function init(_layer:*, _Class:Class=null):void {
+		private static var delayCallBack:Function;
+		public static function init(_layer:*= null, _Class:Class = null):void {
 			alertLayer = _layer;
 			if (_Class) {
 				ClassAlert = _Class;
@@ -42,20 +43,35 @@
 			var _loaderInfo:LoaderInfo = event.currentTarget as LoaderInfo;
 			_loaderInfo.removeEventListener(Event.COMPLETE,defaultSkinLoadedHandler);
 			ClassAlert = _loaderInfo.applicationDomain.getDefinition("ui.Alert") as Class;
+			if (delayCallBack!=null) {
+				delayCallBack();
+				delayCallBack = null;
+			}
 		}
 		public static function show(_str:String, _ctrlLabel:* = "确定", _callBack:Function = null, _Class:Class=null):Alert {
 			if (!alertLayer) {
-				throw Error("Alert.alertLayer is undefined!\nAlert.init(layer);");
-				return;
+				if (ButtonManager.stage) {
+					init(ButtonManager.stage);
+					delayCallBack = function():void {
+						show(_str, _ctrlLabel, _callBack);
+					}
+					return null;
+				}else {
+					throw Error("Alert.alertLayer is undefined!\nAlert.init(layer);");
+					return null;
+				}
 			}
 			var _alert:Alert;
 			if (_Class) {
 				_alert = new _Class();
 			}else if (ClassAlert) {
-				trace(123);
 				_alert = new ClassAlert();
 			}else {
-				_alert = new Alert();
+				init(ButtonManager.stage);
+				delayCallBack = function():void {
+					show(_str, _ctrlLabel, _callBack);
+				}
+				return null;;
 			}
 			_alert.text = _str;
 			_alert.label = _ctrlLabel;
@@ -301,7 +317,7 @@
 			var _perWidth:uint = (barWidth - offXLabel * 2) / (labelList.length);
 			switch(labelsAutoSize) {
 				case TextFieldAutoSize.CENTER:
-					_btn.x = barWidth * 0.5 + _perWidth * (_id - (labelList.length - 1) * 0.5);
+					_btn.x = int(barWidth * 0.5 + _perWidth * (_id - (labelList.length - 1) * 0.5));
 				break;
 				case TextFieldAutoSize.RIGHT:
 					_btn.x = barWidth - offXLabel - _perWidth * (labelList.length - _id - 1);
