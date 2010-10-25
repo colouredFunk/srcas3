@@ -1,5 +1,6 @@
 package ui {
 	import flash.display.Sprite;
+	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.display.MovieClip;
@@ -10,6 +11,7 @@ package ui {
 	 * @author Akdcl
 	 */
 	final public class ButtonManager {
+		public static var stage:Stage;
 		private static const INITIALIZE:Boolean = initializeManager();
 		private static const ROLL_OVER = "rollOver";
 		private static const ROLL_OUT = "rollOut";
@@ -30,9 +32,10 @@ package ui {
 		private static function checkStage(_evt:Event):void {
 			for each(var _button:* in buttonDic) {
 				if (_button.stage) {
-					_button.stage.addEventListener(MouseEvent.MOUSE_DOWN, onStageMouseDownHandler);
-					_button.stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUpHandler);
-					_button.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onStageMouseWheelHandler);
+					stage = _button.stage;
+					stage.addEventListener(MouseEvent.MOUSE_DOWN, onStageMouseDownHandler);
+					stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUpHandler);
+					stage.addEventListener(MouseEvent.MOUSE_WHEEL, onStageMouseWheelHandler);
 					tempSprite.removeEventListener(Event.ENTER_FRAME, checkStage);
 					tempSprite = null;
 					return;
