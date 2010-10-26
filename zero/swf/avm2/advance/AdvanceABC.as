@@ -128,7 +128,10 @@ AdvanceABC 版本:v1.0
 //entry consists of a variable length method_body_info structure which contains the instructions for an
 //individual method or function.
 package zero.swf.avm2.advance{
+	import flash.utils.*;
+	
 	import zero.swf.avm2.ABCFile;
+	import zero.swf.avm2.AVM2Obj;
 	import zero.swf.avm2.Class_info;
 	import zero.swf.avm2.Instance_info;
 	import zero.swf.avm2.Metadata_info;
@@ -138,348 +141,639 @@ package zero.swf.avm2.advance{
 	import zero.swf.avm2.Namespace_info;
 	import zero.swf.avm2.Ns_set_info;
 	import zero.swf.avm2.Script_info;
+	import zero.swf.vmarks.ConstantKind;
 	
 	public class AdvanceABC extends Advance{
-		public static var currInstance:AdvanceABC;
+		public static const INTEGER:String="integer";
+		public static const UINTEGER:String="uinteger";
+		public static const DOUBLE:String="double";
+		public static const STRING:String="string";
+		public static const NAMESPACE_INFO:String="namespace_info";
+		public static const NS_SET_INFO:String="ns_set_info";
+		public static const MULTINAME_INFO:String="multiname_info";
+		public static const METHOD:String="method";
+		public static const METADATA_INFO:String="metadata_info";
+		public static const CLASS:String="class";
+		public static const SCRIPT_INFO:String="script_info";
 		
-		private function reset():void{
-			test_total=0;
-			currInstance=this;
+		
+		private static const vNameV:Vector.<String>=Vector.<String>([
+			INTEGER,
+			UINTEGER,
+			DOUBLE,
+			STRING,
+			NAMESPACE_INFO,
+			NS_SET_INFO,
+			MULTINAME_INFO,
+			METHOD,
+			METADATA_INFO,
+			CLASS,
+			SCRIPT_INFO
+		]);
+		private static const vClassV:Vector.<Class>=Vector.<Class>([
+			Vector.<int>,
+			Vector.<int>,
+			Vector.<Number>,
+			Vector.<String>,
+			Vector.<AdvanceNamespace_info>,
+			Vector.<AdvanceNs_set_info>,
+			Vector.<AdvanceMultiname_info>,
+			Vector.<AdvanceMethod>,
+			Vector.<AdvanceMetadata_info>,
+			Vector.<AdvanceClass>,
+			Vector.<AdvanceScript_info>
+		]);
+		private static var vInfoClasses:Object;
+		private static var vClasses:Object;
+		
+		public static var currInstance:AdvanceABC=firstInit();
+		private static function firstInit():AdvanceABC{
+			vInfoClasses=new Object();
+			vInfoClasses[NAMESPACE_INFO]=AdvanceNamespace_info;
+			vInfoClasses[NS_SET_INFO]=AdvanceNs_set_info;
+			vInfoClasses[MULTINAME_INFO]=AdvanceMultiname_info;
+			vInfoClasses[METHOD]=AdvanceMethod;
+			vInfoClasses[METADATA_INFO]=AdvanceMetadata_info;
+			vInfoClasses[CLASS]=AdvanceClass;
+			vInfoClasses[SCRIPT_INFO]=AdvanceScript_info;
 			
-			test_total=0;
+			vClasses=new Object();
+			var i:int=-1;
+			for each(var vName:String in vNameV){
+				i++;
+				vClasses[vName]=vClassV[i];
+			}
 			
-			currInstance=this;
-			
-			namespace_infoMark=new Object();
-			ns_set_infoMark=new Object();
-			multiname_infoMark=new Object();
-			namespace_infoV=new Vector.<AdvanceNamespace_info>(1);
-			ns_set_infoV=new Vector.<AdvanceNs_set_info>(1);
-			multiname_infoV=new Vector.<AdvanceMultiname_info>(1);
+			return null;
 		}
-		private function clear():void{
-			var i:int;
-			
-			i=0;
-			for each(var namespace_info:AdvanceNamespace_info in namespace_infoV){
-				if(i<1){
-					i++;
-					continue;
-				}
-				namespace_info.realInfoId=-1;
-			}
-			i=0;
-			for each(var ns_set_info:AdvanceNs_set_info in ns_set_infoV){
-				if(i<1){
-					i++;
-					continue;
-				}
-				ns_set_info.realInfoId=-1;
-			}
-			i=0;
-			for each(var multiname_info:AdvanceMultiname_info in multiname_infoV){
-				if(i<1){
-					i++;
-					continue;
-				}
-				multiname_info.realInfoId=-1;
-			}
-			
-			currInstance=null;
-			namespace_infoMark=null;
-			ns_set_infoMark=null;
-			multiname_infoMark=null;
-			namespace_infoV=null;
-			ns_set_infoV=null;
-			multiname_infoV=null;
+		
+		private function getDefaultInfo0s():void{
+			//- -
+			namespace_infoV[0]=null;
+			ns_set_infoV[0]=null;
+			multiname_infoV[0]=AdvanceDefaultMultiname_info.instance;
 		}
 		
 		public var abcFile:ABCFile;
 		
-		public var stringMark:Object;
+		public var minor_version:int;
+		public var major_version:int;
 		
-		public var minor_version:int;					//direct
-		public var major_version:int;					//direct
+		private var dicts:Object;
 		
-		private var namespace_infoMark:Object;
-		private var ns_set_infoMark:Object;
-		private var multiname_infoMark:Object;
-		
-		public var namespace_infoV:Vector.<AdvanceNamespace_info>;
-		public var ns_set_infoV:Vector.<AdvanceNs_set_info>;
-		public var multiname_infoV:Vector.<AdvanceMultiname_info>;
-		
+		private var integerV:Vector.<int>;
+		private var uintegerV:Vector.<int>;
+		private var doubleV:Vector.<Number>;
+		private var stringV:Vector.<String>;
+		private var namespace_infoV:Vector.<AdvanceNamespace_info>;
+		private var ns_set_infoV:Vector.<AdvanceNs_set_info>;
+		private var multiname_infoV:Vector.<AdvanceMultiname_info>;
+		private var metadata_infoV:Vector.<AdvanceMetadata_info>;
+		private var methodV:Vector.<AdvanceMethod>;
 		public var classV:Vector.<AdvanceClass>;
+		public var script_infoV:Vector.<AdvanceScript_info>;
 		
-		//
-		public function getStringById(id:int):String{
-			if(id<1){
-				return "";
-			}
-			if(id<abcFile.stringV.length){
-				return abcFile.stringV[id];
-			}
-			throw new Error("id="+id+" 超出范围, abcFile.stringV.length="+abcFile.stringV.length);
-			return null;
-		}
-		public function getNamespace_infoById(id:int):AdvanceNamespace_info{
-			if(id<1){
-				return null;
-			}
-			if(id<namespace_infoV.length){
-				return namespace_infoV[id];
-			}
-			throw new Error("id="+id+" 超出范围, namespace_infoV.length="+namespace_infoV.length);
-			return null;
-		}
-		public function getNs_set_infoById(id:int):AdvanceNs_set_info{
-			if(id<1){
-				return null;
-			}
-			if(id<ns_set_infoV.length){
-				return ns_set_infoV[id];
-			}
-			throw new Error("id="+id+" 超出范围, ns_set_infoV.length="+ns_set_infoV.length);
-			return null;
-		}
-		public function getMultiname_infoById(id:int):AdvanceMultiname_info{
-			if(id<1){
-				return null;
-			}
-			if(id<multiname_infoV.length){
-				return multiname_infoV[id];
-			}
-			throw new Error("id="+id+" 超出范围, multiname_infoV.length="+multiname_infoV.length);
-			return null;
-		}
-		public function initByInfo(_abcFile:ABCFile):void{
-			trace("initByInfo========================================");
+		private var method_body_info_arr:Array;
+		
+		public function initByABCFile(_abcFile:ABCFile):void{
+			trace("initByABCFile========================================");
 			abcFile=_abcFile;
-			reset();
 			
 			minor_version=abcFile.minor_version;
 			major_version=abcFile.major_version;
 			
 			var i:int;
 			
-			var multiname_info:Multiname_info;
-			var instance_info:Instance_info;
+			//为各级 getInfoByIdAndVName 作准备
+			test_total_new=0;
+			currInstance=this;
 			
-			//var clazz:AdvanceClass;
-			
-			i=-1;
-			for each(var namespace_info:Namespace_info in abcFile.namespace_infoV){
-				if(++i<1){
-					continue;
-				}
-				namespace_infoV[i]=new AdvanceNamespace_info();
-				namespace_infoV[i].initByInfo(i,namespace_info);
-			}
+			var vName:String;
 			
 			i=-1;
-			for each(var ns_set_info:Ns_set_info in abcFile.ns_set_infoV){
-				if(++i<1){
-					continue;
-				}
-				ns_set_infoV[i]=new AdvanceNs_set_info();
-				ns_set_infoV[i].initByInfo(i,ns_set_info);
-			}
-			
-			i=-1;
-			for each(multiname_info in abcFile.multiname_infoV){
-				if(++i<1){
-					continue;
-				}
-				multiname_infoV[i]=new AdvanceMultiname_info();
-			}
-			//考虑到 GenericName 会引用某个 Multiname_info，所以先全部 new AdvanceMultiname_info() 再全部 initByInfo(multiname_info)：
-			i=-1;
-			for each(multiname_info in abcFile.multiname_infoV){
-				if(++i<1){
-					continue;
-				}
-				multiname_infoV[i].initByInfo(i,multiname_info);
-			}
-			
-			i=-1;
-			classV=new Vector.<AdvanceClass>(abcFile.instance_infoV.length);
-			for each(instance_info in abcFile.instance_infoV){
+			for each(vName in vNameV){
 				i++;
-				classV[i]=new AdvanceClass();
+				if(
+					vName==INTEGER
+					||
+					vName==UINTEGER
+					||
+					vName==DOUBLE
+					||
+					vName==STRING
+				){
+					this[vName+"V"]=abcFile[vName+"V"];
+				}else if(vName==METHOD){
+					this[vName+"V"]=new vClassV[i](abcFile.method_infoV.length);
+				}else if(vName==CLASS||vName==SCRIPT_INFO){
+				}else{
+					this[vName+"V"]=new vClassV[i](abcFile[vName+"V"].length);
+				}
 			}
+			
+			stringV[0]="";
+			getDefaultInfo0s();
+			
+			method_body_info_arr=new Array();
+			for each(var method_body_info:Method_body_info in abcFile.method_body_infoV){
+				method_body_info_arr[method_body_info.method]=method_body_info;
+			}
+			classV=new Vector.<AdvanceClass>(abcFile.instance_infoV.length);
+			script_infoV=new Vector.<AdvanceScript_info>(abcFile.script_infoV.length);
+			//准备完毕
+			
 			//
 			i=-1;
-			for each(instance_info in abcFile.instance_infoV){
+			for each(var instance_info:Instance_info in abcFile.instance_infoV){
 				i++;
-				classV[i].initByInfos(instance_info,abcFile.class_infoV[i]);
+				getInfoByIdAndVName(i,CLASS);
 			}
+			i=-1;
+			for each(var script_info:Script_info in abcFile.script_infoV){
+				i++;
+				getInfoByIdAndVName(i,SCRIPT_INFO);
+			}
+			//
 			
-			clear();
+			method_body_info_arr=null;
+			
+			currInstance=null;
+			
+			for each(vName in vNameV){
+				if(vName==CLASS||vName==SCRIPT_INFO){
+				}else{
+					this[vName+"V"]=null;
+				}
+			}
 		}
-		public function toInfo(_abcFile:ABCFile):void{
-			trace("toInfo========================================");
+		public function getInfoByIdAndVName(id:int,vName:String):*{
+			if(id==0){
+				if(
+					vName==INTEGER
+					||
+					vName==UINTEGER
+					||
+					vName==DOUBLE
+				){
+					id=-1;
+				}/*else{
+					if(vName==STRING){
+						return "";
+					}else if(
+						vName==NAMESPACE_INFO
+						||
+						vName==NS_SET_INFO
+					){
+						return null;
+					}else if(vName==MULTINAME_INFO){
+						return null;//?
+					}
+				}
+				*/
+			}
+			if(id>=0){
+				var v:*=this[vName+"V"];
+				if(id<v.length){
+					if(
+						vName==INTEGER
+						||
+						vName==UINTEGER
+						||
+						vName==DOUBLE
+						||
+						vName==STRING
+					){
+						return v[id];
+					}
+					
+					var info:*=v[id];
+					if(info){
+						
+					}else{
+						//"先里后外"，所以先 initByInfo() 或 initByInfos() 然后 v[id]=info
+						info=new vInfoClasses[vName]();
+						if(vName==METHOD){
+							info.initByInfos(id,abcFile.method_infoV[id],method_body_info_arr[id]);
+						}else if(vName==CLASS){
+							info.initByInfos(id,abcFile.instance_infoV[id],abcFile.class_infoV[id]);
+						}else{
+							info.initByInfo(id,abcFile[vName+"V"][id]);
+						}
+						v[id]=info;
+					}
+					return info;
+				}
+			}
+			throw new Error("id="+id+" 超出范围, "+vName+"V.length="+v.length);
+			return null;
+		}
+		
+		public function getInfoVByIdsAndVName(advance:Advance,avm2Obj:AVM2Obj,infoVName:String,vName:String):void{
+			var idV:Vector.<int>=avm2Obj[infoVName];
+			var infoV:*=advance[infoVName]=new vClasses[vName](idV.length);
+			var i:int=-1;
+			for each(var id:int in idV){
+				i++;
+				infoV[i]=getInfoByIdAndVName(id,vName);
+			}
+		}
+		//
+		
+		public function getABCFile(_abcFile:ABCFile):void{
+			trace("getABCFile========================================");
 			abcFile=_abcFile;
-			reset();
 			
 			abcFile.minor_version=minor_version;
 			abcFile.major_version=major_version;
 			
-			abcFile.integerV=new Vector.<int>();
-			abcFile.uintegerV=new Vector.<int>();
-			abcFile.doubleV=new Vector.<Number>();
-			abcFile.stringV=new Vector.<String>();
-			abcFile.namespace_infoV=new Vector.<Namespace_info>();
-			abcFile.ns_set_infoV=new Vector.<Ns_set_info>();
-			abcFile.multiname_infoV=new Vector.<Multiname_info>();
+			var i:int;
+			
+			//为各级 getIdByInfoAndVName 作准备
+			test_total_new=0;
+			currInstance=this;
+			
+			var vName:String;
+			
+			dicts=new Object();
+			for each(vName in vNameV){
+				dicts[vName]=new Dictionary();
+			}
+			
+			abcFile.integerV=new Vector.<int>(1);
+			abcFile.uintegerV=new Vector.<int>(1);
+			abcFile.doubleV=new Vector.<Number>(1);
+			abcFile.stringV=new Vector.<String>(1);
+			abcFile.namespace_infoV=new Vector.<Namespace_info>(1);
+			abcFile.ns_set_infoV=new Vector.<Ns_set_info>(1);
+			abcFile.multiname_infoV=new Vector.<Multiname_info>(1);
+			
 			abcFile.method_infoV=new Vector.<Method_info>();
 			abcFile.metadata_infoV=new Vector.<Metadata_info>();
 			abcFile.instance_infoV=new Vector.<Instance_info>();
 			abcFile.class_infoV=new Vector.<Class_info>();
 			abcFile.script_infoV=new Vector.<Script_info>();
 			abcFile.method_body_infoV=new Vector.<Method_body_info>();
+			//准备完毕
 			
-			var i:int;
-			
-			i=-1;
+			//
 			for each(var clazz:AdvanceClass in classV){
-				i++;
-				var instance_info:Instance_info=new Instance_info();
-				var class_info:Class_info=new Class_info();
-				clazz.toInfos(instance_info,class_info);
-				abcFile.instance_infoV[i]=instance_info;
-				abcFile.class_infoV[i]=class_info;
+				getIdByInfoAndVName(clazz,CLASS);
+			}
+			for each(var script_info:AdvanceScript_info in script_infoV){
+				getIdByInfoAndVName(script_info,SCRIPT_INFO);
+			}
+			//
+			
+			if(abcFile.integerV.length>1){
+			}else{
+				abcFile.integerV=new Vector.<int>();
+			}
+			if(abcFile.uintegerV.length>1){
+			}else{
+				abcFile.uintegerV=new Vector.<int>();
+			}
+			if(abcFile.doubleV.length>1){
+			}else{
+				abcFile.doubleV=new Vector.<Number>();
+			}
+			if(abcFile.stringV.length>1){
+			}else{
+				abcFile.stringV=new Vector.<String>();
+			}
+			if(abcFile.namespace_infoV.length>1){
+			}else{
+				abcFile.namespace_infoV=new Vector.<Namespace_info>();
+			}
+			if(abcFile.ns_set_infoV.length>1){
+			}else{
+				abcFile.ns_set_infoV=new Vector.<Ns_set_info>();
+			}
+			if(abcFile.multiname_infoV.length>1){
+			}else{
+				abcFile.multiname_infoV=new Vector.<Multiname_info>();
 			}
 			
-			i=-1;
-			for each(var namespace_info:AdvanceNamespace_info in namespace_infoV){
-				if(++i<1){
-					continue;
-				}
-				abcFile.namespace_infoV[i]=namespace_info.toInfo();
-			}
+			currInstance=null;
 			
-			i=-1;
-			for each(var ns_set_info:AdvanceNs_set_info in ns_set_infoV){
-				if(++i<1){
-					continue;
-				}
-				abcFile.ns_set_infoV[i]=ns_set_info.toInfo();
-			}
-			
-			i=-1;
-			for each(var multiname_info:AdvanceMultiname_info in multiname_infoV){
-				if(++i<1){
-					continue;
-				}
-				abcFile.multiname_infoV[i]=multiname_info.toInfo();
-			}
-			
-			clear();
+			dicts=null;
 		}
 		
-		public function getNamespace_infoId(namespace_info:AdvanceNamespace_info):int{
-			if(namespace_info.realInfoId==-1){
-				namespace_info.realInfoId=namespace_infoV.length;
-				namespace_infoV[namespace_infoV.length]=namespace_info;
+		public function getIdByInfoAndVName(info:*,vName:String):int{
+			var dict:Dictionary=dicts[vName];
+			
+			if(
+				vName==INTEGER
+				||
+				vName==UINTEGER
+				||
+				vName==DOUBLE
+				||
+				vName==STRING
+			){
+				if(info===null||info===undefined){
+					throw new Error("info="+info);
+				}else{
+					if(dict["~"+info]){
+						//因为可能 info=="prototype" 之类，所以要加 "~"
+						//因为 constant_pool 里的数组都是从1开始，所以只要 if(id) 即可
+					}else{
+						dict["~"+info]=abcFile[vName+"V"].length;
+						abcFile[vName+"V"][dict["~"+info]]=info;
+					}
+					return dict["~"+info];
+				}
+			}else{
+				if(info){
+					if(dict[info]>=0){
+					}else{
+						dict[info]=info.toInfoId();
+					}
+					return dict[info];
+				}
+				throw new Error("info="+info);
 			}
-			return namespace_info.realInfoId;
+		
+			return -1;
 		}
-		public function getNs_set_infoId(ns_set_info:AdvanceNs_set_info):int{
-			if(ns_set_info.realInfoId==-1){
-				ns_set_info.realInfoId=ns_set_infoV.length;
-				ns_set_infoV[ns_set_infoV.length]=ns_set_info;
+		public function getIdsByInfoVAndVName(advance:Advance,avm2Obj:AVM2Obj,infoVName:String,vName:String):void{
+			var infoV:*=advance[infoVName];
+			var idV:Vector.<int>=avm2Obj[infoVName]=new Vector.<int>(infoV.length);
+			var i:int=-1;
+			for each(var info:* in infoV){
+				i++;
+				idV[i]=getIdByInfoAndVName(info,vName);
 			}
-			return ns_set_info.realInfoId;
 		}
-		public function getMultiname_infoId(multiname_info:AdvanceMultiname_info):int{
-			if(multiname_info.realInfoId==-1){
-				multiname_info.realInfoId=multiname_infoV.length;
-				multiname_infoV[multiname_infoV.length]=multiname_info;
-			}
-			return multiname_info.realInfoId;
-		}
-
+		
 		////
 	CONFIG::toXMLAndInitByXML {
-		public function getNamespace_infoByXML(xml:XML):AdvanceNamespace_info{
-			var key:String=xml.toXMLString();
-			var namespace_info:AdvanceNamespace_info=namespace_infoMark[key];
-			if(namespace_info){
-			}else{
-				namespace_info=new AdvanceNamespace_info();
-				namespace_info.initByXML(xml);
-				namespace_infoV[namespace_infoV.length]=namespace_info;
-			}
-			return namespace_info;
-		}
-		public function getNs_set_infoByXML(xml:XML):AdvanceNs_set_info{
-			var key:String=xml.toXMLString();
-			var ns_set_info:AdvanceNs_set_info=ns_set_infoMark[key];
-			if(ns_set_info){
-			}else{
-				ns_set_info=new AdvanceNs_set_info();
-				ns_set_info.initByXML(xml);
-				ns_set_infoV[ns_set_infoV.length]=ns_set_info;
-			}
-			return ns_set_info;
-		}
-		public function getMultiname_infoByXML(xml:XML):AdvanceMultiname_info{
-			var key:String=xml.toXMLString();
-			var multiname_info:AdvanceMultiname_info=multiname_infoMark[key];
-			if(multiname_info){
-			}else{
-				multiname_info=new AdvanceMultiname_info();
-				multiname_info.initByXML(xml);
-				multiname_infoV[multiname_infoV.length]=multiname_info;
-			}
-			return multiname_info;
-		}
 		public function toXML():XML{
 			trace("toXML========================================");
-			reset();
+			
+			//为各级 toXML 作准备
+			test_total_new=0;
+			currInstance=this;
+			//准备完毕
 			
 			var xml:XML=<AdvanceABC
 				minor_version={minor_version}
 				major_version={major_version}
-			>
-				<classes/>
-			</AdvanceABC>;
+			/>;
 			
-			var classesXML:XML=xml.classes[0];
-			classesXML.@count=classV.length;
+			var classListXML:XML=<classList/>;
+			classListXML.@count=classV.length;
 			for each(var clazz:AdvanceClass in classV){
-				classesXML.appendChild(clazz.toXML());
+				classListXML.appendChild(clazz.toXML());
 			}
+			xml.appendChild(classListXML);
 			
-			clear();
+			var script_infoListXML:XML=<script_infoList/>;
+			script_infoListXML.@count=script_infoV.length;
+			for each(var script_info:AdvanceScript_info in script_infoV){
+				script_infoListXML.appendChild(script_info.toXML());
+			}
+			xml.appendChild(script_infoListXML);
+			
+			currInstance=null;
 			
 			return xml;
 		}
+		
+		public function getInfoListXMLByInfoVAndVName(advance:Advance,name:String,vName:String):XML{
+			return advance.getInfoListXMLByInfoV(
+						name,!(
+							vName==INTEGER
+							||
+							vName==UINTEGER
+							||
+							vName==DOUBLE
+							||
+							vName==STRING
+					));
+		}
+		
+		private var marks:Object;
 		public function initByXML(xml:XML):void{
 			trace("initByXML========================================");
-			reset();
 			
 			minor_version=int(xml.@minor_version.toString());
 			major_version=int(xml.@major_version.toString());
 			
-			var i:int;
-			var AdvanceClassXML:XML;
+			//为各级 getInfoByXMLAndVName 作准备
+			test_total_new=0;
+			currInstance=this;
 			
-			var AdvanceClassXMLList:XMLList=xml.classes[0].AdvanceClass;
-			classV=new Vector.<AdvanceClass>(AdvanceClassXMLList.length());
-			i=-1;
-			for each(AdvanceClassXML in AdvanceClassXMLList){
-				i++;
-				classV[i]=new AdvanceClass();
-			}
-			i=-1;
-			for each(AdvanceClassXML in AdvanceClassXMLList){
-				i++;
-				classV[i].initByXML(AdvanceClassXML);
+			var vName:String;
+			
+			marks=new Object();
+			for each(vName in vNameV){
+				marks[vName]=new Object();
 			}
 			
-			clear();
+			var i:int=-1;
+			for each(vName in vNameV){
+				i++;
+				if(
+					vName==INTEGER
+					||
+					vName==UINTEGER
+					||
+					vName==DOUBLE
+					||
+					vName==STRING
+				){
+				}else if(
+					vName==NAMESPACE_INFO
+					||
+					vName==NS_SET_INFO
+					||
+					vName==MULTINAME_INFO
+				){
+					this[vName+"V"]=new vClassV[i](1);
+				}else{
+					this[vName+"V"]=new vClassV[i]();
+				}
+			}
+			getDefaultInfo0s();
+			//准备完毕
+			
+			for each(var AdvanceClassXML:XML in xml.classList[0].children()){
+				getInfoByXMLAndVName(AdvanceClassXML,CLASS);
+			}
+			for each(var AdvanceScript_infoXML:XML in xml.script_infoList[0].children()){
+				getInfoByXMLAndVName(AdvanceScript_infoXML,SCRIPT_INFO);
+			}
+			
+			//trace("methodV="+methodV);
+			
+			currInstance=null;
+			
+			for each(vName in vNameV){
+				if(vName==CLASS||vName==SCRIPT_INFO){
+				}else{
+					this[vName+"V"]=null;
+				}
+			}
+			marks=null;
+		}
+		public function getInfoByXMLAndVName(xml:XML,vName:String):*{
+			var key:String=xml.toXMLString();
+			if(key==='<AdvanceMultiname_info kind="*"/>'){
+				return AdvanceDefaultMultiname_info.instance;
+			}
+			var info:*=marks[vName][key];
+			if(info){
+			}else{
+				marks[vName][key]=info=new vInfoClasses[vName]();
+				info.initByXML(xml);
+				this[vName+"V"][this[vName+"V"].length]=info;
+			}
+			return info;
+		}
+		public function getInfoVByInfoListXMLAndVName(advance:Advance,name:String,xml:XML,vName:String):void{
+			var infoXMLList:XMLList=xml[name+"List"][0][name];
+			var i:int=-1;
+			var infoV:*=advance[name+"V"]=new vClasses[vName](infoXMLList.length());
+			for each(var infoXML:XML in infoXMLList){
+				i++;
+				infoV[i]=getInfoByXMLAndVName(infoXML.children()[0],vName);
+			}
 		}
 	}//end of CONFIG::toXMLAndInitByXML
+	
+	public function getConstValueByIdAndKind(advance:Advance,name:String,id:int,kind:int):void{
+		switch(kind){
+			case ConstantKind.Int:
+				advance[name]=getInfoByIdAndVName(id,INTEGER);
+			break;
+			case ConstantKind.UInt:
+				advance[name]=getInfoByIdAndVName(id,UINTEGER);
+			break;
+			case ConstantKind.Double:
+				advance[name]=getInfoByIdAndVName(id,DOUBLE);
+			break;
+			case ConstantKind.Utf8:
+				advance[name]=getInfoByIdAndVName(id,STRING);
+			break;
+			case ConstantKind.True:
+			case ConstantKind.False:
+			case ConstantKind.Null:
+			case ConstantKind.Undefined:
+				advance[name]=kind;//看了几个 swf, id 都是 和 kind 相等
+			break;
+			case ConstantKind.Namespace:
+			case ConstantKind.PackageNamespace:
+			case ConstantKind.PackageInternalNs:
+			case ConstantKind.ProtectedNamespace:
+			case ConstantKind.ExplicitNamespace:
+			case ConstantKind.StaticProtectedNs:
+			case ConstantKind.PrivateNs:
+				advance[name]=getInfoByIdAndVName(id,NAMESPACE_INFO);
+			break;
+			default:
+				throw new Error("未知 kind: "+kind);
+			break;
+		}
+	}
+	public function getIdByKindAndConstValue(kind:int,value:*):int{
+		switch(kind){
+			case ConstantKind.Int:
+				return getIdByInfoAndVName(value,INTEGER);
+			break;
+			case ConstantKind.UInt:
+				return getIdByInfoAndVName(value,UINTEGER);
+			break;
+			case ConstantKind.Double:
+				return getIdByInfoAndVName(value,DOUBLE);
+			break;
+			case ConstantKind.Utf8:
+				return getIdByInfoAndVName(value,STRING);
+			break;
+			case ConstantKind.True:
+			case ConstantKind.False:
+			case ConstantKind.Null:
+			case ConstantKind.Undefined:
+				return kind;//看了几个 swf, id 都是 和 kind 相等
+			break;
+			case ConstantKind.Namespace:
+			case ConstantKind.PackageNamespace:
+			case ConstantKind.PackageInternalNs:
+			case ConstantKind.ProtectedNamespace:
+			case ConstantKind.ExplicitNamespace:
+			case ConstantKind.StaticProtectedNs:
+			case ConstantKind.PrivateNs:
+				return getIdByInfoAndVName(value,NAMESPACE_INFO);
+			break;
+			default:
+				throw new Error("未知 kind: "+kind);
+			break;
+		}
+		return -1;
+	}
+	public function getXMLByKindAndConstValue(name:String,xml:XML,kind:int,value:*):void{
+		switch(kind){
+			case ConstantKind.Int:
+			case ConstantKind.UInt:
+			case ConstantKind.Double:
+			case ConstantKind.Utf8:
+				xml["@"+name]=value;
+			break;
+			case ConstantKind.True:
+			case ConstantKind.False:
+			case ConstantKind.Null:
+			case ConstantKind.Undefined:
+			break;
+			case ConstantKind.Namespace:
+			case ConstantKind.PackageNamespace:
+			case ConstantKind.PackageInternalNs:
+			case ConstantKind.ProtectedNamespace:
+			case ConstantKind.ExplicitNamespace:
+			case ConstantKind.StaticProtectedNs:
+			case ConstantKind.PrivateNs:
+				if(value){
+					var infoXML:XML=new XML("<"+name+"/>");
+					infoXML.appendChild(value.toXML());
+					xml.appendChild(infoXML);
+				}
+			break;
+			default:
+				throw new Error("未知 kind: "+kind);
+			break;
+		}
+	}
+	public function getConstValueByXMLAndKind(advance:Advance,name:String,xml:XML,kind:int):void{
+		switch(kind){
+			case ConstantKind.Int:
+				advance[name]=int(xml["@"+name].toString());
+			break;
+			case ConstantKind.UInt:
+				advance[name]=uint(xml["@"+name].toString());
+			break;
+			case ConstantKind.Double:
+				advance[name]=Number(xml["@"+name].toString());
+			break;
+			case ConstantKind.Utf8:
+				advance[name]=xml["@"+name].toString();
+			break;
+			case ConstantKind.True:
+			case ConstantKind.False:
+			case ConstantKind.Null:
+			case ConstantKind.Undefined:
+				advance[name]=kind;//看了几个 swf, id 都是 和 kind 相等
+			break;
+			case ConstantKind.Namespace:
+			case ConstantKind.PackageNamespace:
+			case ConstantKind.PackageInternalNs:
+			case ConstantKind.ProtectedNamespace:
+			case ConstantKind.ExplicitNamespace:
+			case ConstantKind.StaticProtectedNs:
+			case ConstantKind.PrivateNs:
+				getInfoVByInfoListXMLAndVName(advance,name,xml,AdvanceABC.NAMESPACE_INFO);
+			break;
+			default:
+				throw new Error("未知 kind: "+kind);
+			break;
+		}
+	}
 	}
 }

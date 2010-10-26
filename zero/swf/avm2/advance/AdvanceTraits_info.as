@@ -1,54 +1,39 @@
 /***
-ABCFileAdvance 版本:v1.0
+AdvanceTraits_info 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月21日 16:42:25
+创建时间:2010年10月25日 21:00:19
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.swf.avm2{
-	import flash.utils.*;
-	
-	import zero.swf.avm2.advance.Advance;
-	import zero.swf.avm2.advance.AdvanceABC;
+package zero.swf.avm2.advance{
+	import zero.swf.avm2.Traits_info;
 
-	public class ABCFileAdvance extends ABCFile{
-		public var advanceABC:AdvanceABC;
-		public function ABCFileAdvance(){
+	public class AdvanceTraits_info extends Advance{
+		public function AdvanceTraits_info(){
+			未完成
 		}
 		
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			offset=super.initByData(data,offset,endOffset);
+		public function initByInfo(traits_info:Traits_info):void{
+		}
+		public function toInfo():Traits_info{
+			var traits_info:Traits_info=new Traits_info();
 			
-			advanceABC=new AdvanceABC();
-			advanceABC.initByABCFile(this);
-			
-			return offset;
+			return traits_info;
 		}
 		
-		override public function toData():ByteArray{
-			advanceABC.getABCFile(this);
-			
-			return super.toData();
-		}
-		
-		
+		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
-			var xml:XML=<ABCFileAdvance/>;
-			
-			xml.appendChild(advanceABC.toXML());
+		public function toXML():XML{
+			var xml:XML=<AdvanceTraits_info/>;
 			
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
-			
-			advanceABC=new AdvanceABC();
-			advanceABC.initByXML(xml.children()[0]);
+		public function initByXML(xml:XML):void{
 			
 		}
-		}
+		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
 

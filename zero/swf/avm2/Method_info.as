@@ -2,7 +2,7 @@
 Method_info 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月23日 16:44:56 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月26日 21:33:55 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -69,7 +69,6 @@ package zero.swf.avm2{
 	import zero.swf.avm2.Option_detail;
 	import flash.utils.ByteArray;
 	public class Method_info extends AVM2Obj{
-		public var param_count:int;						//u30
 		public var return_type:int;						//u30
 		public var param_typeV:Vector.<int>;
 		public var name:int;							//u30
@@ -78,7 +77,7 @@ package zero.swf.avm2{
 		public var param_nameV:Vector.<int>;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){param_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{param_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{param_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{param_count=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{param_count=data[offset++];}
+			if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var param_count:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{param_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{param_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{param_count=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{param_count=data[offset++];}
 			//param_count
 			
 			if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){return_type=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{return_type=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{return_type=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{return_type=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{return_type=data[offset++];}
@@ -122,6 +121,7 @@ package zero.swf.avm2{
 		override public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var offset:int=0;
+			var param_count:int=param_typeV.length;
 			if(param_count>>>7){if(param_count>>>14){if(param_count>>>21){if(param_count>>>28){data[offset++]=(param_count&0x7f)|0x80;data[offset++]=((param_count>>>7)&0x7f)|0x80;data[offset++]=((param_count>>>14)&0x7f)|0x80;data[offset++]=((param_count>>>21)&0x7f)|0x80;data[offset++]=param_count>>>28;}else{data[offset++]=(param_count&0x7f)|0x80;data[offset++]=((param_count>>>7)&0x7f)|0x80;data[offset++]=((param_count>>>14)&0x7f)|0x80;data[offset++]=param_count>>>21;}}else{data[offset++]=(param_count&0x7f)|0x80;data[offset++]=((param_count>>>7)&0x7f)|0x80;data[offset++]=param_count>>>14;}}else{data[offset++]=(param_count&0x7f)|0x80;data[offset++]=param_count>>>7;}}else{data[offset++]=param_count;}
 			//param_count
 			
@@ -166,7 +166,6 @@ package zero.swf.avm2{
 		CONFIG::toXMLAndInitByXML {
 		override public function toXML():XML{
 			var xml:XML=<Method_info
-				param_count={param_count}
 				return_type={return_type}
 				name={name}
 				flags={(
@@ -182,6 +181,7 @@ package zero.swf.avm2{
 				<option_detailList/>
 				<param_nameList/>
 			</Method_info>;
+			
 			if(param_typeV.length){
 				var listXML:XML=xml.param_typeList[0];
 				listXML.@count=param_typeV.length;
@@ -214,7 +214,6 @@ package zero.swf.avm2{
 			return xml;
 		}
 		override public function initByXML(xml:XML):void{
-			param_count=int(xml.@param_count.toString());
 			return_type=int(xml.@return_type.toString());
 			if(xml.param_typeList.length()){
 				var listXML:XML=xml.param_typeList[0];
