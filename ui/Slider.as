@@ -33,6 +33,9 @@
 			__snapInterval = _snapInterval;
 			setStyle();
 		}
+		public function get isHold():Boolean {
+			return timeHolded > 0;
+		}
 		override protected function init():void {
 			isReferenceFromThumb = true;
 			super.init();
