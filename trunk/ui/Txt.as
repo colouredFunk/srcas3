@@ -99,11 +99,11 @@
 				txt.autoSize=txt.autoSize;
 			}
 			if (txt.autoSize=="left") {
-				txt.x=0;
+				//txt.x=0;
 			} else if (txt.autoSize == "right") {
-				txt.x=- int(txt.width);
+				//txt.x=- int(txt.width);
 			} else if (txt.autoSize == "center") {
-				txt.x=- int(txt.width*0.5);
+				//txt.x=- int(txt.width*0.5);
 			}
 		}
 	}

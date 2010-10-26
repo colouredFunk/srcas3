@@ -1,7 +1,7 @@
 ﻿package ui{
+	import flash.display.DisplayObject;
 	import flash.display.LoaderInfo;
 	import flash.display.Sprite;
-	import flash.display.DisplayObject;
 	
 	import flash.geom.Point;
 	import flash.events.Event;
@@ -16,6 +16,7 @@
 		public static var alertLayer:*;
 		public static var ClassAlert:Class;
 		public static var alertPoint:Point;
+		private static var alertLast:Alert;
 		private static var dataClassAlert:ByteArray;
 		private static var delayCallBack:Function;
 		public static function init(_layer:*= null, _Class:Class = null):void {
@@ -51,11 +52,15 @@
 		public static function show(_str:String, _ctrlLabel:* = "确定", _callBack:Function = null, _Class:Class=null):Alert {
 			if (!alertLayer) {
 				if (ButtonManager.stage) {
-					init(ButtonManager.stage);
-					delayCallBack = function():void {
-						show(_str, _ctrlLabel, _callBack);
+					if (_Class) {
+						init(ButtonManager.stage, _Class);
+					}else {
+						init(ButtonManager.stage);
+						delayCallBack = function():void {
+							show(_str, _ctrlLabel, _callBack);
+						}
+						return null;
 					}
-					return null;
 				}else {
 					throw Error("Alert.alertLayer is undefined!\nAlert.init(layer);");
 					return null;
@@ -67,18 +72,20 @@
 			}else if (ClassAlert) {
 				_alert = new ClassAlert();
 			}else {
-				init(ButtonManager.stage);
+				init(alertLayer);
 				delayCallBack = function():void {
 					show(_str, _ctrlLabel, _callBack);
 				}
 				return null;;
 			}
-			_alert.text = _str;
 			_alert.label = _ctrlLabel;
+			_alert.text = _str;
 			_alert.callBack = _callBack;
 			alertLayer.addChild(_alert);
 			return _alert;
 		}
+		
+		//
 		public var callBack:Function;
 		
 		public var txtTitle:*;
@@ -223,6 +230,7 @@
 			
 			txtText.autoSize = "left";
 			txtText.mouseWheelEnabled = false;
+			txtText.mouseEnabled = false;
 			btnList = [btnY];
 			bar.press = pressBar;
 			bar.release = releaseBar;
@@ -258,12 +266,23 @@
 				y = int(stage.stageHeight * 0.5 - barHeight * 0.5);
 			}
 		}
+		protected var dragX:int;
+		protected var dragY:int;
 		protected function pressBar():void {
+			dragX = mouseX;
+			dragY = mouseY;
 			parent.addChild(this);
-			startDrag();
+			//startDrag();
+			addEventListener(Event.ENTER_FRAME, onDragingHandler);
 		}
 		protected function releaseBar():void {
-			stopDrag();
+			//stopDrag();
+			removeEventListener(Event.ENTER_FRAME, onDragingHandler);
+			adjustXY();
+		}
+		protected function onDragingHandler(_evt:Event = null):void {
+			x = parent.mouseX-dragX;
+			y = parent.mouseY-dragY;
 			adjustXY();
 		}
 		private var isWinking:Boolean;
@@ -271,11 +290,11 @@
 			if (isWinking) {
 				return;
 			}
-			isWinking = true;
+			//isWinking = true;
 			//TweenMax.to(bar, 0.1, { colorMatrixFilter: { contrast:1.5, brightness:1.5 }, yoyo:true, repeat:3 ,ease:Cubic.easeInOut, onComplete:onWinkBarEndHandle } );
 		}
 		protected function onWinkBarEndHandle():void {
-			isWinking = false;
+			//isWinking = false;
 		}
 		protected function setBtn(_btn:*, _id:uint, ...args):void {
 			if (args[1]) {
@@ -330,19 +349,6 @@
 			_btn.y = barHeight - dYBtnTopToBarBottom;
 		}
 		protected function adjustXY():void {
-			/*
-			var _rect:Rectangle = getRect(stage);
-			if ( - x > _rect.left) {
-				x = - _rect.left;
-			} else if (x > stage.stageWidth - _rect.right) {
-				x = stage.stageWidth - _rect.right;
-			}
-			if ( - y > _rect.top) {
-				y = - _rect.top;
-			} else if (y > stage.stageHeight - _rect.bottom) {
-				y = stage.stageHeight - _rect.bottom;
-			}
-			*/
 			if (!stage) {
 				return;
 			}
