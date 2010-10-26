@@ -8,8 +8,63 @@ Advance 版本:v1.0
 */
 
 package zero.swf.avm2.advance{
+	import zero.swf.avm2.AVM2Obj;
+	
 	public class Advance{
-		public static var test_total:int;
+		public static var test_total_new:int;
+		public function Advance(){
+			trace(this+", test_total_new="+(++test_total_new));
+		}
+		
+		public function getInfoVByAVM2Objs(avm2Obj:AVM2Obj,infoVName:String,infoClass:Class,infoVClass:*,infoInfoVName:String=null):void{
+			var avm2ObjV:*=avm2Obj[infoVName];
+			var infoV:*=this[infoInfoVName||infoVName]=new infoVClass(avm2ObjV.length);
+			var i:int=-1;
+			for each(avm2Obj in avm2ObjV){
+				i++;
+				infoV[i]=new infoClass();
+				infoV[i].initByInfo(avm2Obj);
+			}
+		}
+		
+		public function getAVM2ObjsByInfoV(avm2Obj:AVM2Obj,infoVName:String,avm2ObjClass:Class,avm2ObjVClass:*,infoInfoVName:String=null):void{
+			var infoV:*=this[infoInfoVName||infoVName];
+			var avm2ObjV:*=avm2Obj[infoVName]=new avm2ObjVClass(infoV.length);
+			var i:int=-1;
+			for each(var info:* in infoV){
+				i++;
+				avm2ObjV[i]=info.toInfo();
+			}
+		}
+		
+		////
+		CONFIG::toXMLAndInitByXML {
+		public function getInfoListXMLByInfoV(name:String,isAdvance:Boolean):XML{
+			var infoV:*=this[name+"V"];
+			var infoListXML:XML=new XML("<"+name+"List count=\""+infoV.length+"\"/>");
+			for each(var info:* in infoV){
+				var infoXML:XML=new XML("<"+name+"/>");
+				if(isAdvance){
+					infoXML.appendChild(info.toXML());
+				}else{
+					infoXML.@value=info;
+				}
+				infoListXML.appendChild(infoXML);
+			}
+			return infoListXML;
+		}
+		
+		public function getInfoVByInfoListXML(name:String,xml:XML,infoClass:Class,infoVClass:*):void{
+			var infoXMLList:XMLList=xml[name+"List"][0][name];
+			var i:int=-1;
+			var infoV:*=this[name+"V"]=new infoVClass(infoXMLList.length());
+			for each(var infoXML:XML in infoXMLList){
+				i++;
+				infoV[i]=new infoClass();
+				infoV[i].initByXML(infoXML.children()[0]);
+			}
+		}
+		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
 

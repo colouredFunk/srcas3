@@ -154,6 +154,9 @@ package zero.swf.avm2{
 						//ParamV[i]
 					}
 				break;
+				default:
+					throw new Error("未知 kind: "+kind);
+				break;
 			}
 			
 			return offset;
@@ -214,6 +217,9 @@ package zero.swf.avm2{
 					}
 					
 				break;
+				default:
+					throw new Error("未知 kind: "+kind);
+				break;
 			}
 			
 			return data;
@@ -261,6 +267,9 @@ package zero.swf.avm2{
 						xml.appendChild(listXML);
 					}
 				break;
+				default:
+					throw new Error("未知 kind: "+kind);
+				break;
 			}
 			
 			return xml;
@@ -305,6 +314,9 @@ package zero.swf.avm2{
 					}else{
 						ParamV=new Vector.<int>();
 					}
+				break;
+				default:
+					throw new Error("未知 kind: "+kind);
 				break;
 			}
 		}

@@ -23,33 +23,25 @@ package zero.swf.avm2.advance{
 	import zero.swf.avm2.advance.AdvanceABC;
 
 	public class AdvanceNs_set_info extends Advance{
-		public var realInfoId:int;	//toInfo 后重新计算的 id
 		private var infoId:int;	//从 swf 或 xml 直接读取过来的 id
 		
 		public var nsV:Vector.<AdvanceNamespace_info>;
 		//
 		public function AdvanceNs_set_info(){
-			trace("AdvanceNs_set_info test_total="+(++test_total));
 		}
 		public function initByInfo(_infoId:int,ns_set_info:Ns_set_info):void{
 			infoId=_infoId;
 			
-			nsV=new Vector.<AdvanceNamespace_info>(ns_set_info.nsV.length);
-			var i:int=-1;
-			for each(var ns:int in ns_set_info.nsV){
-				i++;
-				nsV[i]=AdvanceABC.currInstance.getNamespace_infoById(ns);
-			}
+			AdvanceABC.currInstance.getInfoVByIdsAndVName(this,ns_set_info,"nsV",AdvanceABC.NAMESPACE_INFO);
 		}
-		public function toInfo():Ns_set_info{
+		public function toInfoId():int{
 			var ns_set_info:Ns_set_info=new Ns_set_info();
-			ns_set_info.nsV=new Vector.<int>(nsV.length);
-			var i:int=-1;
-			for each(var ns:AdvanceNamespace_info in nsV){
-				i++;
-				ns_set_info.nsV[i]=AdvanceABC.currInstance.getNamespace_infoId(ns);
-			}
-			return ns_set_info;
+			
+			AdvanceABC.currInstance.getIdsByInfoVAndVName(this,ns_set_info,"nsV",AdvanceABC.NAMESPACE_INFO);
+			
+			//--
+			AdvanceABC.currInstance.abcFile.ns_set_infoV.push(ns_set_info);
+			return AdvanceABC.currInstance.abcFile.ns_set_infoV.length-1;
 		}
 
 		////
@@ -57,26 +49,15 @@ package zero.swf.avm2.advance{
 		public function toXML():XML{
 			var xml:XML=<AdvanceNs_set_info infoId={infoId}/>;
 			
-			var listXML:XML=<nsList/>;
-			listXML.@count=nsV.length;
-			for each(var ns:AdvanceNamespace_info in nsV){
-				listXML.appendChild(ns.toXML());
-			}
-			xml.appendChild(listXML);
+			xml.appendChild(AdvanceABC.currInstance.getInfoListXMLByInfoVAndVName(this,"ns",AdvanceABC.NAMESPACE_INFO));
 			
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
 			infoId=int(xml.@infoId.toString());
 			
-			var listXML:XML=xml.nsList[0];
-			var nsXMLList:XMLList=listXML.ns;
-			var i:int=-1;
-			nsV=new Vector.<AdvanceNamespace_info>(nsXMLList.length());
-			for each(var nsXML:XML in nsXMLList){
-				i++;
-				nsV[i]=AdvanceABC.currInstance.getNamespace_infoByXML(nsXML);
-			}
+			AdvanceABC.currInstance.getInfoVByInfoListXMLAndVName(this,"ns",xml,AdvanceABC.NAMESPACE_INFO);
+			
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

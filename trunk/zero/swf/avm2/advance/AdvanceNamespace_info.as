@@ -33,40 +33,39 @@ AdvanceNamespace_info 版本:v1.0
 //			}
 package zero.swf.avm2.advance{
 	import zero.swf.vmarks.NamespaceKind;
-	import flash.utils.ByteArray;
 	import zero.swf.avm2.Namespace_info;
 	public class AdvanceNamespace_info extends Advance{
-		public var realInfoId:int;	//toInfo 后重新计算的 id
 		private var infoId:int;	//从 swf 或 xml 直接读取过来的 id
 		
-		public var kind:int;							//direct
-		public var name:String;							//string
+		public var kind:int;
+		public var name:String;
 		//
 		public function AdvanceNamespace_info(){
-			trace("AdvanceNamespace_info test_total="+(++test_total));
 		}
 		public function initByInfo(_infoId:int,namespace_info:Namespace_info):void{
 			infoId=_infoId;
 			
 			kind=namespace_info.kind;
-			name=AdvanceABC.currInstance.getStringById(namespace_info.name);
+			name=AdvanceABC.currInstance.getInfoByIdAndVName(namespace_info.name,AdvanceABC.STRING);
 		}
-		public function toInfo():Namespace_info{
+		public function toInfoId():int{
 			var namespace_info:Namespace_info=new Namespace_info();
+			
 			namespace_info.kind=kind;
-			namespace_info.name=AdvanceABC.currInstance.stringMark["~"+name];
-			return namespace_info;
+			namespace_info.name=AdvanceABC.currInstance.getIdByInfoAndVName(name,AdvanceABC.STRING);
+			
+			//--
+			AdvanceABC.currInstance.abcFile.namespace_infoV.push(namespace_info);
+			return AdvanceABC.currInstance.abcFile.namespace_infoV.length-1;
 		}
 
 		////
 		CONFIG::toXMLAndInitByXML {
 		public function toXML():XML{
-			var xml:XML=<AdvanceNamespace_info infoId={infoId}
+			return <AdvanceNamespace_info infoId={infoId}
 				kind={NamespaceKind.kindV[kind]}
 				name={name}
 			/>;
-			
-			return xml;
 		}
 		public function initByXML(xml:XML):void{
 			infoId=int(xml.@infoId.toString());

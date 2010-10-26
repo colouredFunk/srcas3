@@ -27,10 +27,12 @@ Exception_info 版本:v1.0
 //An index into the string array of the constant pool that identifies the name of the type of exception that
 //is to be monitored during the reign of this handler. A value of zero means the any type ("*") and implies
 //that this exception handler will catch any type of exception thrown.
+//文档里是错的...不是 string_v 而是 multiname_info_v
 
 //This index into the string array of the constant pool defines the name of the variable that is to receive
 //the exception object when the exception is thrown and control is transferred to target location. If the
 //value is zero then there is no name associated with the exception object.
+//文档里是错的...不是 string_v 而是 multiname_info_v
 package zero.swf.avm2{
 	import flash.utils.ByteArray;
 	public class Exception_info extends AVM2Obj{
