@@ -51,6 +51,7 @@
 			}
 		}
 		protected function onRemoveToStageHandler():void {
+			scrollRect = null;
 			mask = null;
 			hitArea = null;
 			EventManager.removeTargetAllEvent(this);
