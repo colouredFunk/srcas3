@@ -10,14 +10,13 @@ package ui{
 	public class  TxtAutoRoll extends UISprite{
 		public var txt:TextField;
 		public var rollSpeed:Number = 1;
-		protected var textWidth:uint;
-		override protected function init():void {
-			super.init();
-			textWidth = txt.width;
+		private var __textWidth:Number;
+		public function get textWidth():Number{
+			return __textWidth;
 		}
-		override protected function onRemoveToStageHandler():void {
-			super.onRemoveToStageHandler();
-			txt = null;
+		public function set textWidth(_textWidth:Number):void{
+			__textWidth = _textWidth;
+			fixScrollRect();
 		}
 		private var __text:String;
 		public function get text():String {
@@ -28,14 +27,38 @@ package ui{
 				__text = _text;
 				txt.text = __text;
 				txt.autoSize = TextFieldAutoSize.LEFT;
-				scrollRect = new Rectangle(0, 0, textWidth, txt.height);
 				if (__text && txt.width > textWidth) {
 					txt.x = textWidth;
+					fixScrollRect();
 					addEventListener(Event.ENTER_FRAME, onRollingHandler);
 				}else {
 					txt.x = int((textWidth - txt.width) * 0.5);
 					removeEventListener(Event.ENTER_FRAME, onRollingHandler);
 				}
+			}
+		}
+		override protected function init():void {
+			super.init();
+			if (txt) {
+				textWidth = txt.width;
+			}else {
+				txt = new TextField();
+				addChild(txt);
+				textWidth = 100;
+			}
+			txt.multiline = false;
+			txt.wordWrap = false;
+		}
+		override protected function onRemoveToStageHandler():void {
+			super.onRemoveToStageHandler();
+			txt = null;
+		}
+		protected function fixScrollRect():void {
+			if (scrollRect) {
+				scrollRect.width = textWidth;
+				scrollRect.height = txt.height;
+			}else {
+				scrollRect = new Rectangle(0, 0, __textWidth, txt.height);
 			}
 		}
 		protected function onRollingHandler(_evt:Event):void {

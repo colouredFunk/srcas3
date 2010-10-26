@@ -2,29 +2,29 @@
 {
 	import flash.display.DisplayObjectContainer;
 	import flash.display.DisplayObject;
-	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.geom.Rectangle;
+	import ui.UIMovieClip;
 	
 	/**
 	 * ...
 	 * @author Akdcl
 	 */
-	public class MaskAni extends MovieClip
+	public class MaskAni extends UIMovieClip
 	{
 		public static var maskAniLayer:DisplayObjectContainer;
 		public var speed:uint = 1;
 		public var delay:uint = 0;
+		public var onUpdate:Function;
+		public var onComplete:Function;
 		private var isTempAsBmp:Boolean;
 		private var masked:DisplayObject;
-		public var onComplete:Function;
-		public var onUpdate:Function;
-		public function MaskAni() {
+		override protected function init():void {
+			super.init();
 			stop();
-			this.addEventListener(Event.REMOVED_FROM_STAGE, removed);
 		}
-		private function removed(_evt:Event):void {
-			this.removeEventListener(Event.REMOVED_FROM_STAGE, removed);
+		override protected function onRemoveToStageHandler():void {
+			super.onRemoveToStageHandler();
 			masked = null;
 			onComplete = null;
 			onUpdate = null;
@@ -76,15 +76,15 @@
 				onUpdate();
 			}
 		}
-		public function remove():void {
-			masked.mask=null;
+		override public function remove():void {
+			super.remove();
+			masked.mask = null;
 			if (isTempAsBmp) {
 				masked.cacheAsBitmap = false;
 			}
 			if (onComplete != null) {
 				onComplete(masked);
 			}
-			maskAniLayer.removeChild(this);
 		}
 	}
 	

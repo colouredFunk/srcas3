@@ -51,6 +51,7 @@ package ui{
 		}
 		protected function onRemoveToStageHandler():void {
 			stop();
+			scrollRect = null;
 			mask = null;
 			hitArea = null;
 			EventManager.removeTargetAllEvent(this);
