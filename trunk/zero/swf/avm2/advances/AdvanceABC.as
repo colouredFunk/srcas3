@@ -127,7 +127,7 @@ AdvanceABC 版本:v1.0
 
 //entry consists of a variable length method_body_info structure which contains the instructions for an
 //individual method or function.
-package zero.swf.avm2.advance{
+package zero.swf.avm2.advances{
 	import flash.utils.*;
 	
 	import zero.swf.avm2.ABCFile;

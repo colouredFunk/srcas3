@@ -35,7 +35,7 @@ AdvanceException_info 版本:v1.0
 //value is zero then there is no name associated with the exception object.
 //文档里是错的...不是 string_v 而是 multiname_info_v
 
-package zero.swf.avm2.advance{
+package zero.swf.avm2.advances{
 	import zero.swf.avm2.Exception_info;
 	public class AdvanceException_info extends Advance{
 		public var from:int;
@@ -45,25 +45,60 @@ package zero.swf.avm2.advance{
 		public var var_name:AdvanceMultiname_info;
 		
 		public function AdvanceException_info(){
-			未完成
 		}
 		
 		public function initByInfo(exception_info:Exception_info):void{
+			from=exception_info.from;
+			to=exception_info.to;
+			target=exception_info.target;
+			
+			exc_type=AdvanceABC.currInstance.getInfoByIdAndVName(exception_info.exc_type,AdvanceABC.MULTINAME_INFO);
+			
+			var_name=AdvanceABC.currInstance.getInfoByIdAndVName(exception_info.var_name,AdvanceABC.MULTINAME_INFO);
 		}
 		public function toInfo():Exception_info{
 			var exception_info:Exception_info=new Exception_info();
 			
+			exception_info.from=from;
+			exception_info.to=to;
+			exception_info.target=target;
+			
+			exception_info.exc_type=AdvanceABC.currInstance.getIdByInfoAndVName(exc_type,AdvanceABC.MULTINAME_INFO);
+			
+			exception_info.var_name=AdvanceABC.currInstance.getIdByInfoAndVName(var_name,AdvanceABC.MULTINAME_INFO);
+		
 			return exception_info;
 		}
 		
 		////
 		CONFIG::toXMLAndInitByXML {
 		public function toXML():XML{
-			var xml:XML=<AdvanceTraits_info/>;
+			var xml:XML=<AdvanceException_info
+				from={from}
+				to={to}
+				target={target}
+			/>;
+			
+			var infoXML:XML;
+			
+			infoXML=<exc_type/>;
+			infoXML.appendChild(exc_type.toXML());
+			xml.appendChild(infoXML);
+			
+			infoXML=<var_name/>;
+			infoXML.appendChild(var_name.toXML());
+			xml.appendChild(infoXML);
 			
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
+			from=int(xml.@from.toString());
+			to=int(xml.@to.toString());
+			target=int(xml.@target.toString());
+			
+			exc_type=AdvanceABC.currInstance.getInfoByXMLAndVName(xml.exc_type.children()[0],AdvanceABC.MULTINAME_INFO);
+		
+			var_name=AdvanceABC.currInstance.getInfoByXMLAndVName(xml.var_name.children()[0],AdvanceABC.MULTINAME_INFO);
 			
 		}
 		}//end of CONFIG::toXMLAndInitByXML

@@ -7,7 +7,7 @@ Advance 版本:v1.0
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.swf.avm2.advance{
+package zero.swf.avm2.advances{
 	import zero.swf.avm2.AVM2Obj;
 	
 	public class Advance{

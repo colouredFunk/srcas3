@@ -19,8 +19,9 @@ AdvanceMetadata_info 版本:v1.0
 //item_count denotes the number of items that follow in the items array.
 //name 是在 constant_pool.string_v 中的id
 
-package zero.swf.avm2.advance{
+package zero.swf.avm2.advances{
 	import zero.swf.avm2.Metadata_info;
+	import zero.swf.avm2.Item_info;
 	
 	public class AdvanceMetadata_info extends Advance{
 		private var infoId:int;	//从 swf 或 xml 直接读取过来的 id
@@ -29,18 +30,21 @@ package zero.swf.avm2.advance{
 		public var item_infoV:Vector.<AdvanceItem_info>;
 		
 		public function AdvanceMetadata_info(){
-			未完成
 		}
 		
 		public function initByInfo(_infoId:int,metadata_info:Metadata_info):void{
 			infoId=_infoId;
 			
 			name=AdvanceABC.currInstance.getInfoByIdAndVName(metadata_info.name,AdvanceABC.STRING);
+			
+			getInfoVByAVM2Objs(metadata_info,"item_infoV",AdvanceItem_info,Vector.<AdvanceItem_info>);
 		}
 		public function toInfoId():int{
 			var metadata_info:Metadata_info=new Metadata_info();
 			
 			metadata_info.name=AdvanceABC.currInstance.getIdByInfoAndVName(name,AdvanceABC.STRING);
+			
+			getAVM2ObjsByInfoV(metadata_info,"item_infoV",Item_info,Vector.<Item_info>);
 			
 			//--
 			AdvanceABC.currInstance.abcFile.metadata_infoV.push(metadata_info);
@@ -54,10 +58,14 @@ package zero.swf.avm2.advance{
 					name={name}
 				/>;
 				
+				xml.appendChild(getInfoListXMLByInfoV("item_info",true));
+				
 				return xml;
 			}
 			public function initByXML(xml:XML):void{
 				infoId=int(xml.@infoId.toString());
+				
+				getInfoVByInfoListXML("item_info",xml,AdvanceItem_info,Vector.<AdvanceItem_info>);
 				
 				name=xml.@name.toString();
 			}

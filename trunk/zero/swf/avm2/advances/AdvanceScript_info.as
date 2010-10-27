@@ -23,7 +23,7 @@ AdvanceScript_info 版本:v1.0
 //The value of trait_count is the number of entries in the trait array. The trait array is the set of traits
 //defined by the script.
 
-package zero.swf.avm2.advance{
+package zero.swf.avm2.advances{
 	import zero.swf.avm2.Script_info;
 	import zero.swf.avm2.Traits_info;
 	

@@ -31,7 +31,7 @@ AdvanceNamespace_info 版本:v1.0
 //				u8 kind
 //				u30 name
 //			}
-package zero.swf.avm2.advance{
+package zero.swf.avm2.advances{
 	import zero.swf.vmarks.NamespaceKind;
 	import zero.swf.avm2.Namespace_info;
 	public class AdvanceNamespace_info extends Advance{

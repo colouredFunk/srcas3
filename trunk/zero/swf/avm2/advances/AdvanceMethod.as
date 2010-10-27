@@ -116,7 +116,7 @@ AdvanceMethod 版本:v1.0
 //The value of trait_count is the number of elements in the trait array. The trait array contains all
 //the traits for this method body (see above for more information on traits).
 
-package zero.swf.avm2.advance{
+package zero.swf.avm2.advances{
 	import zero.swf.BytesData;
 	import zero.swf.avm2.Method_body_info;
 	import zero.swf.avm2.Method_info;

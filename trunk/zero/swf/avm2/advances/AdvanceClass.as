@@ -62,7 +62,7 @@ AdvanceClass 版本:v1.0
 
 //The value of trait_count is the number of entries in the trait array. The trait array holds the traits
 //for the class (see above for information on traits).
-package zero.swf.avm2.advance{
+package zero.swf.avm2.advances{
 	import zero.swf.avm2.Class_info;
 	import zero.swf.avm2.Instance_info;
 	import zero.swf.avm2.Traits_info;
