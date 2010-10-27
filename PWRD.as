@@ -79,7 +79,7 @@ package {
 			urlLoader.removeEventListener(Event.COMPLETE, onIsLoginRequestCompleteHandler);
 			isRequesting = false;
 			if (callBack!=null) {
-				callBack(urlLoader.data);
+				callBack(String(urlLoader.data).replace(/\D/g, ""));
 				callBack = null;
 			}
 		}
