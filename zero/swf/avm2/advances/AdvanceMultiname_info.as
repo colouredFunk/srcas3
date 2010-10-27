@@ -32,7 +32,7 @@ AdvanceMultiname_info 版本:v1.0
 //Those constants ending in "A" (such as CONSTANT_QNameA) represent the names of attributes.
 
 // (ns(一个namespace)或ns_set(多个namespace)) 和 name (一个字符串) 组成的复合结构
-package zero.swf.avm2.advance{
+package zero.swf.avm2.advances{
 	import zero.swf.avm2.Multiname_info;
 	import zero.swf.vmarks.MultinameKind;
 	

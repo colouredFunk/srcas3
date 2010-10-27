@@ -18,9 +18,9 @@ AdvanceNs_set_info 版本:v1.0
 //the namespace array of the constant pool.
 //ns是在 constant_pool.namespace_info_v 中的id
 //No entry in the ns array may be zero.
-package zero.swf.avm2.advance{
+package zero.swf.avm2.advances{
 	import zero.swf.avm2.Ns_set_info;
-	import zero.swf.avm2.advance.AdvanceABC;
+	import zero.swf.avm2.advances.AdvanceABC;
 
 	public class AdvanceNs_set_info extends Advance{
 		private var infoId:int;	//从 swf 或 xml 直接读取过来的 id

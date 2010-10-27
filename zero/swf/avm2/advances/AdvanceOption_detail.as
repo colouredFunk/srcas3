@@ -34,7 +34,7 @@ AdvanceOption_detail 版本:v1.0
 
 //很像 Trait_slot 的 vindex 和 vkind 合起
 
-package zero.swf.avm2.advance{
+package zero.swf.avm2.advances{
 	import zero.swf.avm2.Option_detail;
 	import zero.swf.vmarks.ConstantKind;
 	
