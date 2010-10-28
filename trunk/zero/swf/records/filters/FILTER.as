@@ -8,11 +8,27 @@ FILTER 版本:v1.0
 */
 
 package zero.swf.records.filters{
-	import zero.swf.records.Record;
-	public class FILTER extends Record{
+	import flash.utils.ByteArray;
+	public class FILTER{//没什么实质功能，主要是为了方便 Vector.<FILTER>
 		public var FilterID:int;
 		public function FILTER(){
 		}
+		
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+			return -1;
+		}
+		public function toData():ByteArray{
+			return null;
+		}
+		
+		////
+		CONFIG::toXMLAndInitByXML {
+		public function toXML():XML{
+			return null;
+		}
+		public function initByXML(xml:XML):void{
+		}
+		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
 

@@ -15,16 +15,16 @@ GRADRECORD 版本:v1.0
 package zero.swf.records{
 	import zero.BytesAndStr16;
 	import flash.utils.ByteArray;
-	public class GRADRECORD extends Record{
+	public class GRADRECORD{
 		public var Ratio:int;							//UI8
 		public var Color:int;							//RGB
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			Ratio=data[offset];
 			Color=(data[offset+1]<<16)|(data[offset+2]<<8)|data[offset+3];
 			return offset+4;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=Ratio;
 			data[1]=Color>>16;
@@ -35,13 +35,13 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			return <GRADRECORD
 				Ratio={Ratio}
 				Color={"0x"+BytesAndStr16._16V[(Color>>16)&0xff]+BytesAndStr16._16V[(Color>>8)&0xff]+BytesAndStr16._16V[Color&0xff]}
 			/>;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			Ratio=int(xml.@Ratio.toString());
 			Color=int(xml.@Color.toString());
 		}

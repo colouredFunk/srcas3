@@ -21,7 +21,7 @@ CXFORMWITHALPHA 版本:v1.0
 //AlphaAddTerm 			If HasAddTerms = 1, SB[Nbits] 		Transparency addition value
 package zero.swf.records{
 	import flash.utils.ByteArray;
-	public class CXFORMWITHALPHA extends Record{
+	public class CXFORMWITHALPHA{
 		public var HasAddTerms:int;
 		public var HasMultTerms:int;
 		public var Nbits:int;
@@ -34,7 +34,7 @@ package zero.swf.records{
 		public var BlueAddTerm:int;
 		public var AlphaAddTerm:int;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var bGroupValue:int=(data[offset]<<24)|(data[offset+1]<<16)|(data[offset+2]<<8)|data[offset+3];
 			offset+=4;
 			HasAddTerms=bGroupValue>>>31;					//10000000 00000000 00000000 00000000
@@ -110,7 +110,7 @@ package zero.swf.records{
 			
 			return offset-int(4-bGroupBitsOffset/8);
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var bGroupValue:int=0;
 			var offset:int=0;
@@ -183,7 +183,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			return <CXFORMWITHALPHA
 				HasAddTerms={HasAddTerms}
 				HasMultTerms={HasMultTerms}
@@ -198,7 +198,7 @@ package zero.swf.records{
 				AlphaAddTerm={AlphaAddTerm}
 			/>;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			HasAddTerms=int(xml.@HasAddTerms.toString());
 			HasMultTerms=int(xml.@HasMultTerms.toString());
 			Nbits=int(xml.@Nbits.toString());

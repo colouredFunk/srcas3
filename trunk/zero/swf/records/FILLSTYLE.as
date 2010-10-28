@@ -28,10 +28,10 @@ FILLSTYLE 版本:v1.0
 package zero.swf.records{
 	import zero.BytesAndStr16;
 	import flash.utils.ByteArray;
-	public class FILLSTYLE extends Record{
+	public class FILLSTYLE{
 		public var datas:Array;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var FillStyleType:int=data[offset++];
 			switch(FillStyleType){
 				case 0x00:
@@ -68,7 +68,7 @@ package zero.swf.records{
 			}
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var FillStyleType:int=datas[0];
 			data[0]=FillStyleType;
@@ -105,7 +105,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<FILLSTYLE>
 				
 			</FILLSTYLE>;
@@ -148,7 +148,7 @@ package zero.swf.records{
 			}
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			var FillStyleType:int=int(xml.@FillStyleType.toString());
 			switch(FillStyleType){
 				case 0x00:

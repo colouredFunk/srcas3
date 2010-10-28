@@ -33,10 +33,10 @@ package zero.swf.records{
 	import zero.swf.vmarks.FilterTypes;
 	import zero.swf.records.filters.FILTER;
 	import flash.utils.ByteArray;
-	public class FILTERLIST extends Record{
+	public class FILTERLIST{
 		public var FilterV:Vector.<FILTER>;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var NumberOfFilters:int=data[offset++];
 			FilterV=new Vector.<FILTER>(NumberOfFilters);
 			for(var i:int=0;i<NumberOfFilters;i++){
@@ -48,7 +48,7 @@ package zero.swf.records{
 			}
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var NumberOfFilters:int=FilterV.length;
 			data[0]=NumberOfFilters;
@@ -64,7 +64,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<FILTERLIST>
 				<FilterList/>
 			</FILTERLIST>;
@@ -81,7 +81,7 @@ package zero.swf.records{
 			}
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			if(xml.FilterList.length()){
 				var listXML:XML=xml.FilterList[0];
 				var FilterXMLList:XMLList=listXML.Filter;

@@ -24,12 +24,12 @@ package zero.swf.records{
 	import zero.swf.records.shape_records.STRAIGHTEDGERECORD;
 	import zero.swf.records.shape_records.STYLECHANGERECORD;
 
-	public class SHAPEWITHSTYLE extends Record{
+	public class SHAPEWITHSTYLE{
 		public var fillAndLineStyles:FillAndLineStyles;
 		
 		public var ShapeRecordV:Vector.<SHAPERECORD>;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var newStyles:FillAndLineStyles=new FillAndLineStyles();
 			offset=newStyles.initByData(data,offset,endOffset);
 			//trace("newStyles.NumFillBits="+newStyles.NumFillBits,"newStyles.NumLineBits="+newStyles.NumLineBits);
@@ -245,7 +245,7 @@ package zero.swf.records{
 			}
 			return offset-int(4-bGroupBitsOffset/8);
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			
 			data.writeBytes(fillAndLineStyles.toData());
@@ -463,7 +463,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<SHAPEWITHSTYLE>
 				<fillAndLineStyles/>
 				<ShapeRecordList/>
@@ -482,7 +482,7 @@ package zero.swf.records{
 			}
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			fillAndLineStyles=new FillAndLineStyles();
 			fillAndLineStyles.initByXML(xml.fillAndLineStyles.children()[0]);
 			

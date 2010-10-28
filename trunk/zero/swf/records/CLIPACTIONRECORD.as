@@ -17,13 +17,13 @@ package zero.swf.records{
 	import zero.swf.vmarks.KeyPressKeyCodes;
 	import zero.swf.avm1.ACTIONRECORD;
 	import flash.utils.ByteArray;
-	public class CLIPACTIONRECORD extends Record{
+	public class CLIPACTIONRECORD{
 		public var EventFlags:CLIPEVENTFLAGS;
 		public var ActionRecordSize:uint;				//UI32
 		public var KeyCode:int;							//UI8
 		public var Actions:ACTIONRECORD;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			EventFlags=new CLIPEVENTFLAGS();
 			offset=EventFlags.initByData(data,offset,endOffset);
 			ActionRecordSize=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16)|(data[offset++]<<24);
@@ -36,7 +36,7 @@ package zero.swf.records{
 			Actions=new ACTIONRECORD();
 			return Actions.initByData(data,offset,endOffset);
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data.writeBytes(EventFlags.toData());
 			var offset:int=data.length;
@@ -57,7 +57,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<CLIPACTIONRECORD
 				ActionRecordSize={ActionRecordSize}
 				KeyCode={KeyPressKeyCodes.keyCodeV[KeyCode]}
@@ -74,7 +74,7 @@ package zero.swf.records{
 			xml.Actions.appendChild(Actions.toXML());
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			EventFlags=new CLIPEVENTFLAGS();
 			EventFlags.initByXML(xml.EventFlags.children()[0]);
 			ActionRecordSize=uint(xml.@ActionRecordSize.toString());

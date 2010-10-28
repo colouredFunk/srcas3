@@ -52,7 +52,7 @@ BUTTONRECORD_within_DefineButton 版本:v1.0
 package zero.swf.records{
 	import zero.swf.records.MATRIX;
 	import flash.utils.ByteArray;
-	public class BUTTONRECORD_within_DefineButton extends Record{
+	public class BUTTONRECORD_within_DefineButton{
 		public var ButtonHasBlendMode:int;
 		public var ButtonHasFilterList:int;
 		public var ButtonStateHitTest:int;
@@ -63,7 +63,7 @@ package zero.swf.records{
 		public var PlaceDepth:int;						//UI16
 		public var PlaceMatrix:MATRIX;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var flags:int=data[offset];
 			//Reserved=(flags<<24)>>>30;				//11000000
 			ButtonHasBlendMode=(flags<<26)>>>31;		//00100000
@@ -78,7 +78,7 @@ package zero.swf.records{
 			PlaceMatrix=new MATRIX();
 			return PlaceMatrix.initByData(data,offset,endOffset);
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var flags:int=0;
 			//flags|=Reserved<<6;						//11000000
@@ -101,7 +101,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<BUTTONRECORD_within_DefineButton
 				ButtonHasBlendMode={ButtonHasBlendMode}
 				ButtonHasFilterList={ButtonHasFilterList}
@@ -117,7 +117,7 @@ package zero.swf.records{
 			xml.PlaceMatrix.appendChild(PlaceMatrix.toXML());
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			ButtonHasBlendMode=int(xml.@ButtonHasBlendMode.toString());
 			ButtonHasFilterList=int(xml.@ButtonHasFilterList.toString());
 			ButtonStateHitTest=int(xml.@ButtonStateHitTest.toString());

@@ -27,14 +27,14 @@ FOCALGRADIENT 版本:v1.0
 package zero.swf.records{
 	import zero.swf.records.GRADRECORD;
 	import flash.utils.ByteArray;
-	public class FOCALGRADIENT extends Record{
+	public class FOCALGRADIENT{
 		public var SpreadMode:int;
 		public var InterpolationMode:int;
 		public var NumGradients:int;
 		public var GradientRecordV:Vector.<GRADRECORD>;
 		public var FocalPoint:Number;					//FIXED8
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var flags:int=data[offset];
 			SpreadMode=(flags<<24)>>>30;				//11000000
 			InterpolationMode=(flags<<26)>>>30;			//00110000
@@ -49,7 +49,7 @@ package zero.swf.records{
 			FocalPoint=data[offset++]/256+data[offset++];
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var flags:int=0;
 			flags|=SpreadMode<<6;						//11000000
@@ -69,7 +69,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<FOCALGRADIENT
 				SpreadMode={SpreadMode}
 				InterpolationMode={InterpolationMode}
@@ -91,7 +91,7 @@ package zero.swf.records{
 			}
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			SpreadMode=int(xml.@SpreadMode.toString());
 			InterpolationMode=int(xml.@InterpolationMode.toString());
 			NumGradients=int(xml.@NumGradients.toString());

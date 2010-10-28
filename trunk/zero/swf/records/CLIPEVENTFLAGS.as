@@ -37,7 +37,7 @@ CLIPEVENTFLAGS 版本:v1.0
 //Reserved 					If SWF version >= 6, UB[8] 	Always 0
 package zero.swf.records{
 	import flash.utils.ByteArray;
-	public class CLIPEVENTFLAGS extends Record{
+	public class CLIPEVENTFLAGS{
 		public var ClipEventKeyUp:int;
 		public var ClipEventKeyDown:int;
 		public var ClipEventMouseUp:int;
@@ -59,7 +59,7 @@ package zero.swf.records{
 		public var ClipEventDragOut:int;
 		public var ReservedFlags:int;					//UB[8]
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			ClipEventConstruct=-1;
 			ReservedFlags=-1;
 			var flags:int=data[offset];
@@ -94,7 +94,7 @@ package zero.swf.records{
 			}
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var flags:int=0;
 			flags|=ClipEventKeyUp<<7;					//10000000
@@ -135,7 +135,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<CLIPEVENTFLAGS
 				ClipEventKeyUp={ClipEventKeyUp}
 				ClipEventKeyDown={ClipEventKeyDown}
@@ -172,7 +172,7 @@ package zero.swf.records{
 			}
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			ClipEventConstruct=-1;
 			ReservedFlags=-1;
 			ClipEventKeyUp=int(xml.@ClipEventKeyUp.toString());
