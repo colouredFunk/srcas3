@@ -37,6 +37,39 @@ package zero.swf.avm2.advances{
 	import zero.swf.vmarks.MultinameKind;
 	
 	public class AdvanceMultiname_info extends Advance{
+		
+		private static const QName_memberV:Vector.<Member>=Vector.<Member>([
+			new Member("kind",null,{kindClass:MultinameKind}),
+			new Member("name",Member.STRING),
+			new Member("ns",Member.NAMESPACE_INFO),
+		]);
+		
+		private static const Multiname_memberV:Vector.<Member>=Vector.<Member>([
+			new Member("kind",null,{kindClass:MultinameKind}),
+			new Member("name",Member.STRING),
+			new Member("ns_set",Member.NS_SET_INFO),
+		]);
+		
+		private static const RTQName_memberV:Vector.<Member>=Vector.<Member>([
+			new Member("kind",null,{kindClass:MultinameKind}),
+			new Member("name",Member.STRING),
+		]);
+		
+		private static const RTQNameL_memberV:Vector.<Member>=Vector.<Member>([
+			new Member("kind",null,{kindClass:MultinameKind})
+		]);
+		
+		private static const MultinameL_memberV:Vector.<Member>=Vector.<Member>([
+			new Member("kind",null,{kindClass:MultinameKind}),
+			new Member("ns_set",Member.NS_SET_INFO),
+		]);
+		
+		private static const GenericName_memberV:Vector.<Member>=Vector.<Member>([
+			new Member("kind",null,{kindClass:MultinameKind}),
+			new Member("TypeDefinition",Member.MULTINAME_INFO),
+			new Member("Param",Member.MULTINAME_INFO,{isList:true}),
+		]);
+		
 		private var infoId:int;	//从 swf 或 xml 直接读取过来的 id
 		
 		public var kind:int;
@@ -55,9 +88,7 @@ package zero.swf.avm2.advances{
 		public function initByInfo(_infoId:int,multiname_info:Multiname_info):void{
 			infoId=_infoId;
 			
-			kind=multiname_info.kind;
-			
-			switch(kind){
+			switch(multiname_info.kind){
 				case MultinameKind.QName:
 				case MultinameKind.QNameA:
 					//multiname_kind_QName
@@ -73,9 +104,7 @@ package zero.swf.avm2.advances{
 					//name是在 constant_pool.string_v 中的id
 					//ns或name如果是 0 则表示 "*"
 					
-					name=AdvanceABC.currInstance.getInfoByIdAndVName(multiname_info.name,AdvanceABC.STRING);
-					
-					ns=AdvanceABC.currInstance.getInfoByIdAndVName(multiname_info.ns,AdvanceABC.NAMESPACE_INFO);
+					initByInfo_fun(multiname_info,QName_memberV);
 				break;
 				case MultinameKind.Multiname:
 				case MultinameKind.MultinameA:
@@ -92,9 +121,7 @@ package zero.swf.avm2.advances{
 					//name如果是 0 则表示 "*"
 					//ns_set不能是 0
 					
-					name=AdvanceABC.currInstance.getInfoByIdAndVName(multiname_info.name,AdvanceABC.STRING);
-					
-					ns_set=AdvanceABC.currInstance.getInfoByIdAndVName(multiname_info.ns_set,AdvanceABC.NS_SET_INFO);
+					initByInfo_fun(multiname_info,Multiname_memberV);
 				break;
 				case MultinameKind.RTQName:
 				case MultinameKind.RTQNameA:
@@ -107,7 +134,7 @@ package zero.swf.avm2.advances{
 					//name是在 constant_pool.string_v 中的id
 					//name如果是 0 则表示 "*"
 					
-					name=AdvanceABC.currInstance.getInfoByIdAndVName(multiname_info.name,AdvanceABC.STRING);
+					initByInfo_fun(multiname_info,RTQName_memberV);
 				break;
 				case MultinameKind.RTQNameL:
 				case MultinameKind.RTQNameLA:
@@ -118,6 +145,7 @@ package zero.swf.avm2.advances{
 					//This kind has no associated data.
 					//什么都没有...
 					
+					initByInfo_fun(multiname_info,RTQNameL_memberV);
 				break;
 				case MultinameKind.MultinameL:
 				case MultinameKind.MultinameLA:
@@ -130,7 +158,7 @@ package zero.swf.avm2.advances{
 					//ns_set是在 constant_pool.ns_set_info_v 中的id
 					//ns_set不能是 0
 					
-					ns_set=AdvanceABC.currInstance.getInfoByIdAndVName(multiname_info.ns_set,AdvanceABC.NS_SET_INFO);
+					initByInfo_fun(multiname_info,MultinameL_memberV);
 				break;
 				case MultinameKind.GenericName:
 					//0x1D can be considered a GenericName multiname, and is declared as such: 
@@ -142,52 +170,50 @@ package zero.swf.avm2.advances{
 					//[ParamCount] is a U8 (U30?) of how many parameters there are 
 					//[ParamX] is a U30 into the multiname table. 
 					
-					TypeDefinition=AdvanceABC.currInstance.getInfoByIdAndVName(multiname_info.TypeDefinition,AdvanceABC.MULTINAME_INFO);
-					
-					AdvanceABC.currInstance.getInfoVByIdsAndVName(this,multiname_info,"ParamV",AdvanceABC.MULTINAME_INFO);
+					initByInfo_fun(multiname_info,GenericName_memberV);
 				break;
 				default:
-					throw new Error("未知 kind: "+kind);
+					throw new Error("未知 kind: "+multiname_info.kind);
 				break;
 			}
 		}
 		public function toInfoId():int{
 			var multiname_info:Multiname_info=new Multiname_info();
-			multiname_info.kind=kind;
 			
 			switch(kind){
 				case MultinameKind.QName:
 				case MultinameKind.QNameA:
-					multiname_info.ns=AdvanceABC.currInstance.getIdByInfoAndVName(ns,AdvanceABC.NAMESPACE_INFO);
 					
-					multiname_info.name=AdvanceABC.currInstance.getIdByInfoAndVName(name,AdvanceABC.STRING);
+					toInfo_fun(multiname_info,QName_memberV);
 					
 				break;
 				case MultinameKind.Multiname:
 				case MultinameKind.MultinameA:
-					multiname_info.name=AdvanceABC.currInstance.getIdByInfoAndVName(name,AdvanceABC.STRING);
 					
-					multiname_info.ns_set=AdvanceABC.currInstance.getIdByInfoAndVName(ns_set,AdvanceABC.NS_SET_INFO);
+					toInfo_fun(multiname_info,Multiname_memberV);
 					
 				break;
 				case MultinameKind.RTQName:
 				case MultinameKind.RTQNameA:
-					multiname_info.name=AdvanceABC.currInstance.getIdByInfoAndVName(name,AdvanceABC.STRING);
+					
+					toInfo_fun(multiname_info,RTQName_memberV);
 					
 				break;
 				case MultinameKind.RTQNameL:
 				case MultinameKind.RTQNameLA:
 					
+					toInfo_fun(multiname_info,RTQNameL_memberV);
+					
 				break;
 				case MultinameKind.MultinameL:
 				case MultinameKind.MultinameLA:
-					multiname_info.ns_set=AdvanceABC.currInstance.getIdByInfoAndVName(ns_set,AdvanceABC.NS_SET_INFO);
+					
+					toInfo_fun(multiname_info,MultinameL_memberV);
 					
 				break;
 				case MultinameKind.GenericName:
-					multiname_info.TypeDefinition=AdvanceABC.currInstance.getIdByInfoAndVName(TypeDefinition,AdvanceABC.MULTINAME_INFO);
 					
-					AdvanceABC.currInstance.getIdsByInfoVAndVName(this,multiname_info,"ParamV",AdvanceABC.MULTINAME_INFO);
+					toInfo_fun(multiname_info,GenericName_memberV);
 					
 				break;
 				default:
@@ -203,46 +229,42 @@ package zero.swf.avm2.advances{
 		////
 		CONFIG::toXMLAndInitByXML {
 		public function toXML():XML{
-			var xml:XML=<AdvanceMultiname_info infoId={infoId}
-				kind={MultinameKind.kindV[kind]}
-			/>;
+			var xml:XML;
 			
-			var infoXML:XML;
 			switch(kind){
 				case MultinameKind.QName:
 				case MultinameKind.QNameA:
-					infoXML=<ns/>;
-					infoXML.appendChild(ns.toXML());
-					xml.appendChild(infoXML);
-					xml.@name=name;
+					
+					xml=toXML_fun(QName_memberV);
+					
 				break;
 				case MultinameKind.Multiname:
 				case MultinameKind.MultinameA:
-					xml.@name=name;
-					infoXML=<ns_set/>;
-					infoXML.appendChild(ns_set.toXML());
-					xml.appendChild(infoXML);
+					
+					xml=toXML_fun(Multiname_memberV);
+					
 				break;
 				case MultinameKind.RTQName:
 				case MultinameKind.RTQNameA:
-					xml.@name=name;
+					
+					xml=toXML_fun(RTQName_memberV);
+					
 				break;
 				case MultinameKind.RTQNameL:
 				case MultinameKind.RTQNameLA:
-					//
+					
+					xml=toXML_fun(RTQNameL_memberV);
+					
 				break;
 				case MultinameKind.MultinameL:
 				case MultinameKind.MultinameLA:
-					infoXML=<ns_set/>;
-					infoXML.appendChild(ns_set.toXML());
-					xml.appendChild(infoXML);
+					
+					xml=toXML_fun(MultinameL_memberV);
+					
 				break;
 				case MultinameKind.GenericName:
-					infoXML=<TypeDefinition/>;
-					infoXML.appendChild(TypeDefinition.toXML());
-					xml.appendChild(infoXML);
 					
-					xml.appendChild(AdvanceABC.currInstance.getInfoListXMLByInfoVAndVName(this,"Param",AdvanceABC.MULTINAME_INFO));
+					xml=toXML_fun(GenericName_memberV);
 					
 				break;
 				default:
@@ -250,43 +272,50 @@ package zero.swf.avm2.advances{
 				break;
 			}
 			
+			xml.@infoId=infoId;
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
 			infoId=int(xml.@infoId.toString());
 			
-			kind=MultinameKind[xml.@kind.toString()];
-			
-			switch(kind){
+			switch(MultinameKind[xml.@kind.toString()]){
 				case MultinameKind.QName:
 				case MultinameKind.QNameA:
-					ns=AdvanceABC.currInstance.getInfoByXMLAndVName(xml.ns.children()[0],AdvanceABC.NAMESPACE_INFO);
-					name=xml.@name.toString();
+					
+					initByXML_fun(xml,QName_memberV);
+					
 				break;
 				case MultinameKind.Multiname:
 				case MultinameKind.MultinameA:
-					name=xml.@name.toString();
-					ns_set=AdvanceABC.currInstance.getInfoByXMLAndVName(xml.ns_set.children()[0],AdvanceABC.NS_SET_INFO);
+					
+					initByXML_fun(xml,Multiname_memberV);
+					
 				break;
 				case MultinameKind.RTQName:
 				case MultinameKind.RTQNameA:
-					name=xml.@name.toString();
+					
+					initByXML_fun(xml,RTQName_memberV);
+					
 				break;
 				case MultinameKind.RTQNameL:
 				case MultinameKind.RTQNameLA:
-					//
+					
+					initByXML_fun(xml,RTQNameL_memberV);
+					
 				break;
 				case MultinameKind.MultinameL:
 				case MultinameKind.MultinameLA:
-					ns_set=AdvanceABC.currInstance.getInfoByXMLAndVName(xml.ns_set.children()[0],AdvanceABC.NS_SET_INFO);
+					
+					initByXML_fun(xml,MultinameL_memberV);
+					
 				break;
 				case MultinameKind.GenericName:
-					TypeDefinition=AdvanceABC.currInstance.getInfoByXMLAndVName(xml.TypeDefinition.children()[0],AdvanceABC.MULTINAME_INFO);
 					
-					AdvanceABC.currInstance.getInfoVByInfoListXMLAndVName(this,"Param",xml,AdvanceABC.MULTINAME_INFO);
+					initByXML_fun(xml,GenericName_memberV);
+					
 				break;
 				default:
-					throw new Error("未知 kind: "+kind);
+					throw new Error("未知 kind: "+xml.@kind.toString());
 				break;
 			}
 		}

@@ -24,17 +24,17 @@ public class StatusManager{
 	public static var statusCount:int;
 	public static var onStatus:Function;
 	
-	private static var urlLoader:URLLoader;
+	private static var statusURLLoader:URLLoader;
 	
 	public static function loadXML(url:String):void{
-		urlLoader=new URLLoader();
-		urlLoader.addEventListener(Event.COMPLETE,loadXMLComplete);
-		urlLoader.load(new URLRequest(url));
+		statusURLLoader=new URLLoader();
+		statusURLLoader.addEventListener(Event.COMPLETE,loadXMLComplete);
+		statusURLLoader.load(new URLRequest(url));
 	}
 	private static function loadXMLComplete(event:Event):void{
-		var xml:XML=new XML(urlLoader.data);
-		urlLoader.removeEventListener(Event.COMPLETE,loadXMLComplete);
-		urlLoader=null;
+		var xml:XML=new XML(statusURLLoader.data);
+		statusURLLoader.removeEventListener(Event.COMPLETE,loadXMLComplete);
+		statusURLLoader=null;
 		init(xml);
 	}
 	public static function init(_xml:XML):void{
@@ -52,21 +52,30 @@ public class StatusManager{
 				break;
 			}
 		}
-		urlLoader=new URLLoader();
-		urlLoader.dataFormat=URLLoaderDataFormat.VARIABLES;
-		urlLoader.addEventListener(Event.COMPLETE,loadStatusFinished);
-		urlLoader.addEventListener(IOErrorEvent.IO_ERROR,loadStatusError);
+		statusURLLoader=new URLLoader();
+		statusURLLoader.dataFormat=URLLoaderDataFormat.VARIABLES;
+		statusURLLoader.addEventListener(Event.COMPLETE,loadStatusFinished);
+		statusURLLoader.addEventListener(IOErrorEvent.IO_ERROR,loadStatusError);
 		
 		onInit();
 	}
 	
 	
-	public static function loadStatus(_onLoadStatus:Function=null,xmlName:String=null):void{
+	public static function loadStatus(_onLoadStatus:Function=null,xmlName:String=null,varObj:Object=null):void{
 		onLoadStatus=_onLoadStatus;
-		urlLoader.load(new URLRequest(getValue(xmlName||"action","url")));
+		var request:URLRequest=new URLRequest(getValue(xmlName||"action","url"));
+		if(varObj){
+			var urlVariables:URLVariables=new URLVariables();
+			for(var varName:String in varObj){
+				urlVariables[varName]=varObj[varName];
+			}
+			request.data=urlVariables;
+			request.method=URLRequestMethod.POST;
+		}
+		statusURLLoader.load(request);
 	}
 	private static function loadStatusFinished(event:Event):void{
-		currXML=statusXMLs[urlLoader.data.status];
+		currXML=statusXMLs[statusURLLoader.data.status];
 		if(currXML){
 		}else{
 			currXML=errorXML;
@@ -80,18 +89,18 @@ public class StatusManager{
 	private static function checkStatus():void{
 		var msg:String=currXML.@msg.toString();
 		if(msg){
-			msgPopUp(ReplaceVars.replace(msg,urlLoader.data),currXML.@btnLabel.toString()).callBack=runStatus;
+			msgPopUp(ReplaceVars.replace(msg,statusURLLoader.data),currXML.@btnLabel.toString()).callBack=runStatus;
 		}else{
 			runStatus(true);
 		}
 	}
 	private static function runStatus(alertCallBackB:Boolean,noRemoveAlert:Boolean=false):void{
 		if(alertCallBackB){
-			GotoURL.goto(currXML,urlLoader.data);
+			GotoURL.goto(currXML,statusURLLoader.data);
 			switch(currXML.@status.toString()){
 				case "1":
 					//默认是提示用户要登录
-					GotoURL.goto(getValue("login"),urlLoader.data);
+					GotoURL.goto(getValue("login"),statusURLLoader.data);
 				break;
 				case "2":
 					//默认是正常状态
@@ -109,10 +118,13 @@ public class StatusManager{
 	}
 	
 	public static function getValue(xmlName:String,attName:String=null):*{
-		if(attName){
-			return StatusManager[xmlName+"XML"]["@"+attName].toString();
+		if(StatusManager[xmlName+"XML"]){
+			if(attName){
+				return StatusManager[xmlName+"XML"]["@"+attName].toString();
+			}
+			return StatusManager[xmlName+"XML"];
 		}
-		return StatusManager[xmlName+"XML"];
+		throw new Error("找不到 xml 节点, xmlName="+xmlName);
 	}
 }
 }

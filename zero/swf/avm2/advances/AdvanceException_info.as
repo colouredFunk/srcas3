@@ -38,6 +38,15 @@ AdvanceException_info 版本:v1.0
 package zero.swf.avm2.advances{
 	import zero.swf.avm2.Exception_info;
 	public class AdvanceException_info extends Advance{
+		
+		private static const memberV:Vector.<Member>=Vector.<Member>([
+			new Member("from"),
+			new Member("to"),
+			new Member("target"),
+			new Member("exc_type",Member.MULTINAME_INFO),
+			new Member("var_name",Member.MULTINAME_INFO)
+		]);
+		
 		public var from:int;
 		public var to:int;
 		public var target:int;
@@ -48,24 +57,12 @@ package zero.swf.avm2.advances{
 		}
 		
 		public function initByInfo(exception_info:Exception_info):void{
-			from=exception_info.from;
-			to=exception_info.to;
-			target=exception_info.target;
-			
-			exc_type=AdvanceABC.currInstance.getInfoByIdAndVName(exception_info.exc_type,AdvanceABC.MULTINAME_INFO);
-			
-			var_name=AdvanceABC.currInstance.getInfoByIdAndVName(exception_info.var_name,AdvanceABC.MULTINAME_INFO);
+			initByInfo_fun(exception_info,memberV);
 		}
 		public function toInfo():Exception_info{
 			var exception_info:Exception_info=new Exception_info();
 			
-			exception_info.from=from;
-			exception_info.to=to;
-			exception_info.target=target;
-			
-			exception_info.exc_type=AdvanceABC.currInstance.getIdByInfoAndVName(exc_type,AdvanceABC.MULTINAME_INFO);
-			
-			exception_info.var_name=AdvanceABC.currInstance.getIdByInfoAndVName(var_name,AdvanceABC.MULTINAME_INFO);
+			toInfo_fun(exception_info,memberV);
 		
 			return exception_info;
 		}
@@ -73,33 +70,10 @@ package zero.swf.avm2.advances{
 		////
 		CONFIG::toXMLAndInitByXML {
 		public function toXML():XML{
-			var xml:XML=<AdvanceException_info
-				from={from}
-				to={to}
-				target={target}
-			/>;
-			
-			var infoXML:XML;
-			
-			infoXML=<exc_type/>;
-			infoXML.appendChild(exc_type.toXML());
-			xml.appendChild(infoXML);
-			
-			infoXML=<var_name/>;
-			infoXML.appendChild(var_name.toXML());
-			xml.appendChild(infoXML);
-			
-			return xml;
+			return toXML_fun(memberV);
 		}
 		public function initByXML(xml:XML):void{
-			from=int(xml.@from.toString());
-			to=int(xml.@to.toString());
-			target=int(xml.@target.toString());
-			
-			exc_type=AdvanceABC.currInstance.getInfoByXMLAndVName(xml.exc_type.children()[0],AdvanceABC.MULTINAME_INFO);
-		
-			var_name=AdvanceABC.currInstance.getInfoByXMLAndVName(xml.var_name.children()[0],AdvanceABC.MULTINAME_INFO);
-			
+			initByXML_fun(xml,memberV);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

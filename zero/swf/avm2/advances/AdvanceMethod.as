@@ -118,14 +118,33 @@ AdvanceMethod 版本:v1.0
 
 package zero.swf.avm2.advances{
 	import zero.swf.BytesData;
+	import zero.swf.avm2.Exception_info;
 	import zero.swf.avm2.Method_body_info;
 	import zero.swf.avm2.Method_info;
 	import zero.swf.avm2.Option_detail;
-	import zero.swf.avm2.Exception_info;
 	import zero.swf.avm2.Traits_info;
 	import zero.swf.vmarks.MethodFlags;
 	
 	public class AdvanceMethod extends Advance{
+		
+		private static const Method_info_memberV:Vector.<Member>=Vector.<Member>([
+			new Member("return_type",Member.MULTINAME_INFO),
+			new Member("param_type",Member.MULTINAME_INFO,{isList:true}),
+			new Member("name",Member.STRING),
+			new Member("flags",null,{flagClass:MethodFlags}),
+			new Member("option_detail",Member.OPTION_DETIAL,{isList:true,curr:Member.CURR_CASE}),
+			new Member("param_name",Member.STRING,{isList:true,curr:Member.CURR_CASE})
+		]);
+		
+		private static const Method_body_info_memberV:Vector.<Member>=Vector.<Member>([
+			new Member("max_stack"),
+			new Member("local_count"),
+			new Member("init_scope_depth"),
+			new Member("max_scope_depth"),
+			new Member("exception_info",Member.EXCEPTION_INFO,{isList:true}),
+			new Member("traits_info",Member.TRAITS_INFO,{isList:true})
+		]);
+		
 		private var infoId:int;	//从 swf 或 xml 直接读取过来的 id
 		
 		public var return_type:AdvanceMultiname_info;
@@ -149,70 +168,28 @@ package zero.swf.avm2.advances{
 		public function initByInfos(_infoId:int,method_info:Method_info,method_body_info:Method_body_info):void{
 			infoId=_infoId;
 			
-			return_type=AdvanceABC.currInstance.getInfoByIdAndVName(method_info.return_type,AdvanceABC.MULTINAME_INFO);
-			
-			AdvanceABC.currInstance.getInfoVByIdsAndVName(this,method_info,"param_typeV",AdvanceABC.MULTINAME_INFO);
-			
-			name=AdvanceABC.currInstance.getInfoByIdAndVName(method_info.name,AdvanceABC.STRING);
-			
-			flags=method_info.flags;
-			
-			if(flags&MethodFlags.HAS_OPTIONAL){
-				getInfoVByAVM2Objs(method_info,"option_detailV",AdvanceOption_detail,Vector.<AdvanceOption_detail>);
-			}
-			
-			if(flags&MethodFlags.HAS_PARAM_NAMES){
-				AdvanceABC.currInstance.getInfoVByIdsAndVName(this,method_info,"param_nameV",AdvanceABC.STRING);
-			}
+			initByInfo_fun(method_info,Method_info_memberV,method_info.flags&MethodFlags.HAS_OPTIONAL,method_info.flags&MethodFlags.HAS_PARAM_NAMES);
 			
 			if(method_body_info){
 				//如果是接口则 method_body_info==null
-				max_stack=method_body_info.max_stack;
-				local_count=method_body_info.local_count;
-				init_scope_depth=method_body_info.init_scope_depth;
-				max_scope_depth=method_body_info.max_scope_depth;
+				
+				initByInfo_fun(method_body_info,Method_body_info_memberV);
 				
 				codes=method_body_info.codes;
-				
-				getInfoVByAVM2Objs(method_body_info,"exception_infoV",AdvanceException_info,Vector.<AdvanceException_info>);
-				
-				getInfoVByAVM2Objs(method_body_info,"traits_infoV",AdvanceTraits_info,Vector.<AdvanceTraits_info>);
 			}
 		}
 		
 		public function toInfoId():int{
 			var method_info:Method_info=new Method_info();
-			if(return_type){
-				method_info.return_type=AdvanceABC.currInstance.getIdByInfoAndVName(return_type,AdvanceABC.MULTINAME_INFO);
-			}
 			
-			AdvanceABC.currInstance.getIdsByInfoVAndVName(this,method_info,"param_typeV",AdvanceABC.MULTINAME_INFO);
-			
-			method_info.name=AdvanceABC.currInstance.getIdByInfoAndVName(name,AdvanceABC.STRING);
-			
-			method_info.flags=flags;
-			
-			if(option_detailV){
-				getAVM2ObjsByInfoV(method_info,"option_detailV",Option_detail,Vector.<Option_detail>);
-			}
-			
-			if(param_nameV){
-				AdvanceABC.currInstance.getIdsByInfoVAndVName(this,method_info,"param_nameV",AdvanceABC.STRING);
-			}
+			toInfo_fun(method_info,Method_info_memberV);
 			
 			if(codes){
 				var method_body_info:Method_body_info=new Method_body_info();
 				
-				method_body_info.max_stack=max_stack;
-				method_body_info.local_count=local_count;
-				method_body_info.init_scope_depth=init_scope_depth;
-				method_body_info.max_scope_depth=max_scope_depth;
+				toInfo_fun(method_body_info,Method_body_info_memberV);
 				
 				method_body_info.codes=codes;
-				
-				getAVM2ObjsByInfoV(method_body_info,"exception_infoV",Exception_info,Vector.<Exception_info>);
-				
-				getAVM2ObjsByInfoV(method_body_info,"traits_infoV",Traits_info,Vector.<Traits_info>);
 				
 				AdvanceABC.currInstance.abcFile.method_body_infoV.push(method_body_info);
 			}
@@ -225,99 +202,32 @@ package zero.swf.avm2.advances{
 		////
 		CONFIG::toXMLAndInitByXML {
 		public function toXML():XML{
-			var xml:XML=<AdvanceMethod infoId={infoId}
-				name={name}
-				flags={(
-					"|"+MethodFlags.flagV[flags&MethodFlags.NEED_ARGUMENTS]+
-					"|"+MethodFlags.flagV[flags&MethodFlags.NEED_ACTIVATION]+
-					"|"+MethodFlags.flagV[flags&MethodFlags.NEED_REST]+
-					"|"+MethodFlags.flagV[flags&MethodFlags.HAS_OPTIONAL]+
-					"|"+MethodFlags.flagV[flags&MethodFlags.SET_DXNS]+
-					"|"+MethodFlags.flagV[flags&MethodFlags.HAS_PARAM_NAMES]
-				).replace(/\|null/g,"").substr(1)}
-			/>;
-			
-			var infoXML:XML;
-			
-			if(return_type){
-				infoXML=<return_type/>;
-				infoXML.appendChild(return_type.toXML());
-				xml.appendChild(infoXML);
-			}
-			
-			if(param_typeV.length){
-				xml.appendChild(AdvanceABC.currInstance.getInfoListXMLByInfoVAndVName(this,"param_type",AdvanceABC.MULTINAME_INFO));
-			}
-			
-			if(option_detailV){
-				xml.appendChild(getInfoListXMLByInfoV("option_detail",true));
-			}
-			
-			if(param_nameV){
-				xml.appendChild(AdvanceABC.currInstance.getInfoListXMLByInfoVAndVName(this,"param_name",AdvanceABC.STRING));
-			}
+			var xml:XML=toXML_fun(Method_info_memberV);
 			
 			if(codes){
+				toXML_fun(Method_body_info_memberV,xml);
 				
-				xml.@max_stack=max_stack;
-				xml.@local_count=local_count;
-				xml.@init_scope_depth=init_scope_depth;
-				xml.@max_scope_depth=max_scope_depth;
-				
-				infoXML=<codes/>;
+				var infoXML:XML=<codes/>;
 				infoXML.appendChild(codes.toXML());
 				xml.appendChild(infoXML);
-				
-				xml.appendChild(getInfoListXMLByInfoV("exception_info",true));
-				
-				xml.appendChild(getInfoListXMLByInfoV("traits_info",true));
 			}
 			
+			xml.@infoId=infoId;
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
 			infoId=int(xml.@infoId.toString());
 			
-			if(xml.return_type.length()){
-				return_type=AdvanceABC.currInstance.getInfoByXMLAndVName(xml.return_type.children()[0],AdvanceABC.MULTINAME_INFO);
-			}
-			
-			if(xml.param_typeList.length()){
-				AdvanceABC.currInstance.getInfoVByInfoListXMLAndVName(this,"param_type",xml,AdvanceABC.MULTINAME_INFO);
-			}else{
-				param_typeV=new Vector.<AdvanceMultiname_info>();
-			}
-			
-			name=xml.@name.toString();
-			
-			flags=0;
-			for each(var flagsStr:String in xml.@flags.toString().split("|")){
-				flags|=MethodFlags[flagsStr];
-			}
-			
-			if(option_detailV){
-				getInfoVByInfoListXML("option_detail",xml,AdvanceOption_detail,Vector.<AdvanceOption_detail>);
-			}
-			
-			if(param_nameV){
-				AdvanceABC.currInstance.getInfoVByInfoListXMLAndVName(this,"param_name",xml,AdvanceABC.STRING);
-			}
+			initByXML_fun(xml,Method_info_memberV);
 			
 			var codesXML:XML=xml.codes[0];
 			
 			if(codesXML){
 				
-				max_stack=int(xml.@max_stack.toString());
-				local_count=int(xml.@local_count.toString());
-				init_scope_depth=int(xml.@init_scope_depth.toString());
-				max_scope_depth=int(xml.@max_scope_depth.toString());
+				initByXML_fun(xml,Method_body_info_memberV);
 				
 				codes=new BytesData();
 				codes.initByXML(codesXML.children()[0]);
-				
-				getInfoVByInfoListXML("exception_info",xml,AdvanceException_info,Vector.<AdvanceException_info>);
-				
-				getInfoVByInfoListXML("traits_info",xml,AdvanceTraits_info,Vector.<AdvanceTraits_info>);
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML

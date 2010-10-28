@@ -28,10 +28,16 @@ package zero.swf.avm2.advances{
 	import zero.swf.avm2.Traits_info;
 	
 	public class AdvanceScript_info extends Advance{
+		
+		private static const memberV:Vector.<Member>=Vector.<Member>([
+			new Member("init",Member.METHOD),
+			new Member("traits_info",Member.TRAITS_INFO,{isList:true}),
+		]);
+		
 		private var infoId:int;	//从 swf 或 xml 直接读取过来的 id
 		
-		public var init:AdvanceMethod;										//method
-		public var traits_infoV:Vector.<AdvanceTraits_info>;				//traits_info
+		public var init:AdvanceMethod;
+		public var traits_infoV:Vector.<AdvanceTraits_info>;
 		
 		public function AdvanceScript_info(){
 		}
@@ -39,16 +45,12 @@ package zero.swf.avm2.advances{
 		public function initByInfo(_infoId:int,script_info:Script_info):void{
 			infoId=_infoId;
 			
-			init=AdvanceABC.currInstance.getInfoByIdAndVName(script_info.init,AdvanceABC.METHOD);
-			
-			getInfoVByAVM2Objs(script_info,"traits_infoV",AdvanceTraits_info,Vector.<AdvanceTraits_info>);
+			initByInfo_fun(script_info,memberV);
 		}
 		public function toInfoId():int{
 			var script_info:Script_info=new Script_info();
 			
-			script_info.init=AdvanceABC.currInstance.getIdByInfoAndVName(init,AdvanceABC.METHOD);
-			
-			getAVM2ObjsByInfoV(script_info,"traits_infoV",Traits_info,Vector.<Traits_info>);
+			toInfo_fun(script_info,memberV);
 			
 			//--
 			AdvanceABC.currInstance.abcFile.script_infoV.push(script_info);
@@ -58,20 +60,15 @@ package zero.swf.avm2.advances{
 		////
 		CONFIG::toXMLAndInitByXML {
 		public function toXML():XML{
-			var xml:XML=<AdvanceScriptInfo infoId={infoId}/>;
+			var xml:XML=toXML_fun(memberV);
 			
-			var infoXML:XML=<init/>;
-			infoXML.appendChild(init.toXML());
-			xml.appendChild(infoXML);
-			
-			xml.appendChild(getInfoListXMLByInfoV("traits_info",true));
-			
+			xml.@infoId=infoId;
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
-			init=AdvanceABC.currInstance.getInfoByXMLAndVName(xml.init.children()[0],AdvanceABC.METHOD);
+			infoId=int(xml.@infoId.toString());
 			
-			getInfoVByInfoListXML("traits_info",xml,AdvanceTraits_info,Vector.<AdvanceTraits_info>);
+			initByXML_fun(xml,memberV);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

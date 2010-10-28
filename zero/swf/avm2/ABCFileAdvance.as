@@ -10,8 +10,8 @@ ABCFileAdvance 版本:v1.0
 package zero.swf.avm2{
 	import flash.utils.*;
 	
-	import zero.swf.avm2.advance.Advance;
-	import zero.swf.avm2.advance.AdvanceABC;
+	import zero.swf.avm2.advances.Advance;
+	import zero.swf.avm2.advances.AdvanceABC;
 
 	public class ABCFileAdvance extends ABCFile{
 		public var advanceABC:AdvanceABC;
