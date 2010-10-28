@@ -41,7 +41,7 @@
 		}
 		private static function onImageMenuShowHandler(_evt:ContextMenuEvent):void {
 			var _imageLoader:*=_evt.contextMenuOwner as ImageLoader;
-			var _source:String = _imageLoader.sourceNow;
+			var _source:String = _imageLoader.source;
 			if (_source) {
 				_source = _source.split("/").pop();
 			}else {
@@ -57,7 +57,6 @@
 		public var limitSize:Boolean;
 		protected var autoFitArea:AutoFitArea;
 		protected var bmp:Bitmap;
-		protected var sourceNow:String;
 		protected var bmdNow:BitmapData;
 		private var __imageGroup:String;
 		public function get imageGroup():String{
@@ -71,6 +70,12 @@
 		}
 		public function set maxConnections(_maxConnections:uint):void{
 			createManager(imageGroup).maxConnections = _maxConnections;
+		}
+		public function get noCache():Boolean{
+			return createManager(imageGroup).vars.noCache;
+		}
+		public function set noCache(_noCache:Boolean):void{
+			createManager(imageGroup).vars.noCache = _noCache;
 		}
 		private var __widthArea:uint = 1;
 		public function get widthArea():uint {
@@ -88,8 +93,9 @@
 			__heightArea = _heightArea;
 			autoFitArea.height = __heightArea;
 		};
+		protected var __source:String;
 		public function get source():String {
-			return sourceNow;
+			return __source;
 		}
 		override protected function init():void {
 			super.init();
@@ -120,7 +126,7 @@
 			}
 			bmp.bitmapData = null;
 			bmdNow = null;
-			sourceNow = null;
+			__source = null;
 			progressClip = null;
 			container = null;
 			foreground = null;
@@ -128,12 +134,18 @@
 			contextMenu = null;
 			autoFitArea.destroy();
 		}
-		public function load(_source:String, _index:uint = 0, _changeImmediately:Boolean = false ):void {
-			if (_source && sourceNow == _source) {
+		public function load(_source:*, _index:uint = 0, _changeImmediately:Boolean = false ):void {
+			if (_source && __source == _source) {
 				return;
 			}
-			var _isReady:Boolean = !Boolean(bmdNow);
-			bmdNow = loadBMD(_source, this, _index);
+			__source = _source;
+			if (_source is BitmapData) {
+				bmdNow = _source;
+				__source = null;
+			}else {
+				var _isReady:Boolean = !Boolean(bmdNow);
+				bmdNow = loadBMD(_source, this, _index);
+			}
 			if (_changeImmediately) {
 				if (bmdNow) {
 					setBMP(bmdNow, _changeImmediately);
@@ -147,7 +159,6 @@
 					hideBMP(bmp, _changeImmediately, onHideEndHandler);
 				}
 			}
-			sourceNow = _source;
 		}
 		public function unload(_changeImmediately:Boolean = false):void {
 			hideBMP(bmp, _changeImmediately, onUnloadedHandler);
@@ -166,7 +177,7 @@
 			isHideTweening = false;
 			bmp.bitmapData = null;
 			bmdNow = null;
-			sourceNow = null;
+			__source = null;
 		}
 		private function onHideEndHandler():void {
 			isHideTweening = false;
@@ -259,6 +270,7 @@
 		protected static function createManager(_imageGroup:String):LoaderMax {
 			if (!loaderMaxDic[_imageGroup]) {
 				loaderMax = new LoaderMax( { name:_imageGroup,
+											noCache:false,
 											onChildProgress:onChildProgressHandler,
 											onChildComplete:onChildCompleteHandler,
 											onProgress:onProgressHandler,
@@ -290,18 +302,21 @@
 					return null;
 				}
 			}
-			register(_source, _imageLoader);
 			//添加新的加载
+			register(_source, _imageLoader);
+			loaderMax = createManager(_imageLoader.imageGroup);
+			
 			imageLoaderParams.name = _source;
+			imageLoaderParams.noCache = loaderMax.vars.noCache;
 			imageLoader = new com.greensock.loading.ImageLoader(String(_source), imageLoaderParams);
 			imageLoaderDic[_source] = imageLoader;
-			loaderMax = createManager(_imageLoader.imageGroup);
+			
 			loaderMax.insert(imageLoader, _index);
 			loaderMax.load();
 			return null;
 		}
 		private static function register(_source:String, _imageLoader:ui.ImageLoader):void {
-			deregister(_imageLoader.sourceNow, _imageLoader);
+			deregister(_imageLoader.__source, _imageLoader);
 			if (!registeredDic[_source]) {
 				registeredDic[_source] = new Dictionary();
 			}

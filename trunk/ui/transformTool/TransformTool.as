@@ -58,7 +58,7 @@
 				//enSclaeY:Boolean 是否可以沿Y轴拉伸
 				//enSkewX:Boolean 是否可以沿X轴斜切
 				//enSkewY:Boolean 是否可以沿Y轴斜切
-				//enSclae:Boolean  是否可以拉伸
+				//enScale:Boolean  是否可以拉伸
 				//eqScale:Boolean  是否限制等比
 				//enRotation:Boolean  是否可以旋转
 				//enSetMidPoint:Boolean  是否设置中心点
@@ -134,6 +134,7 @@ package ui.transformTool
 		//-------------------------------------------------
 		private static var mousePoint:Point = new Point();
 		public var onSelectChange:Function;
+		public var onChanging:Function;
 		
 		public function TransformTool(_container:DisplayObjectContainer = null) 
 		{	
@@ -543,6 +544,9 @@ package ui.transformTool
 							SetChange(_objInfo, _areaNum);
 							_matrix = matrixClass.GetMatrix(selectedItem, _objInfo.internalPoint);
 							GraphicsDraw(_matrix);
+							if (onChanging!=null) {
+								onChanging();
+							}
 						}else if (_stateClass == stateClass.drag) {
 							passRoll = true;
 							GraphicsClear();
@@ -551,6 +555,9 @@ package ui.transformTool
 							ArrowMove();
 							_matrix    = matrixClass.GetMatrix(selectedItem,_objInfo.internalPoint);
 							GraphicsDraw(_matrix);
+							if (onChanging!=null) {
+								onChanging();
+							}
 						}else if (_areaNum != -1) {
 							passRoll = true;
 							GraphicsClear();

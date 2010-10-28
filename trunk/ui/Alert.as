@@ -314,7 +314,6 @@
 					case 0:
 					break;
 					case 1:
-						_btn.userData.btnFlag = true;
 					break;
 					case 2:
 						_btn.userData.btnFlag = (_id == 0);
@@ -328,8 +327,14 @@
 			}
 		}
 		protected function btnRelease(_flag:*):void {
-			if ((callBack != null)?(callBack(_flag) != false):true) {
-				remove();
+			if (_flag!=null) {
+				if ((callBack != null)?(callBack(_flag) != false):true) {
+					remove();
+				}
+			}else {
+				if ((callBack != null)?(callBack() != false):true) {
+					remove();
+				}
 			}
 		}
 		protected function setBtnStyle(_btn:*, _id:uint, ...args):void {

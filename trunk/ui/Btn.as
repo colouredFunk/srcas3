@@ -23,7 +23,7 @@ package ui{
 				return;
 			}
 			href = String(_hrefXML.@href);
-			hrefTarget = String(_hrefXML.@target);
+			hrefTarget = String(_hrefXML.@target) || hrefTarget;
 			eEval = String(_hrefXML.@js);
 		}
 		override public function set enabled(_enabled:Boolean):void{
