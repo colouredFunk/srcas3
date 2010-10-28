@@ -32,9 +32,9 @@
 				throw new Error ("ERROR:DocClass Singleton already constructed!");
 			}
 			instance = this;
-			loaderInfo.addEventListener(Event.INIT, onInitHandle);
+			loaderInfo.addEventListener(Event.INIT, onInitHandler);
 		}
-		protected function onInitHandle(_evt:Event):void {
+		protected function onInitHandler(_evt:Event):void {
 			Security.allowDomain("*");
 			Security.allowInsecureDomain("*");
 			if (isTopAndNoScale) {
@@ -51,9 +51,9 @@
 			__flashVars = loaderInfo.parameters;
 			paramsObject.width = widthOrg;
 			paramsObject.height = heightOrg;
-			Common.addContextMenu(this, decodeURI(this.loaderInfo.url).split("/").pop() + ":" + widthOrg + " x " + heightOrg, onWHReleaseHandle);
-			//loaderInfo.addEventListener(ProgressEvent.PROGRESS,onLoadingHandle);
-			loaderInfo.addEventListener(Event.COMPLETE,onLoadedHandle);
+			Common.addContextMenu(this, decodeURI(this.loaderInfo.url).split("/").pop() + ":" + widthOrg + " x " + heightOrg, onWHReleaseHandler);
+			//loaderInfo.addEventListener(ProgressEvent.PROGRESS,onLoadingHandler);
+			loaderInfo.addEventListener(Event.COMPLETE,onLoadedHandler);
 			if (onLoaded==null) {
 				onLoaded=function():void{
 					if(currentFrame==1){
@@ -63,12 +63,12 @@
 			}
 			optionsXMLPath = flashVars.xml || optionsXMLPath;
 			if (optionsXMLPath) {
-				Common.urlLoader(optionsXMLPath, onOptionsXMLLoadedHandle, onOptionsXMLLoadingHandle,onOptionsXMLLoadErrorHandle);
+				Common.urlLoader(optionsXMLPath, onOptionsXMLLoadedHandler, onOptionsXMLLoadingHandler,onOptionsXMLLoadErrorHandler);
 			}
-			addEventListener(Event.ENTER_FRAME,onLoadingHandle);
+			addEventListener(Event.ENTER_FRAME,onLoadingHandler);
 		}
 		protected var paramsObject:Object = { width:0, height:0, flashVars: { }};
-		protected function onWHReleaseHandle(_evt:ContextMenuEvent):void {
+		protected function onWHReleaseHandler(_evt:ContextMenuEvent):void {
 			if (optionsXMLPath) {
 				paramsObject.flashVars.xml = optionsXMLPath;
 			}
@@ -91,7 +91,7 @@
 		public var onLoaded:Function;
 		public var loadDelay:Number = 1;
 		protected var loaded:Number = 0;
-		protected function onLoadingHandle(_evt:*):void{
+		protected function onLoadingHandler(_evt:*):void{
 			gotoAndStop(1);
 			var _loaded:Number = loaderInfo.bytesLoaded / getBytesTotal();
 			loadingProgress(_loaded);
@@ -99,7 +99,7 @@
 				onLoading(loaded);
 			}
 			if (loaded == 1 && onLoaded != null) {
-				removeEventListener(Event.ENTER_FRAME, onLoadingHandle);
+				removeEventListener(Event.ENTER_FRAME, onLoadingHandler);
 				//onLoad();
 				onLoadedAndAddVersionInfo();
 			}
@@ -121,20 +121,20 @@
 			}
 			return __bytesTotal;
 		}
-		protected function onLoadedHandle(evt:Event):void{
-			//loaderInfo.removeEventListener(ProgressEvent.PROGRESS,onLoadingHandle);
-			loaderInfo.removeEventListener(Event.COMPLETE, onLoadedHandle);
+		protected function onLoadedHandler(evt:Event):void{
+			//loaderInfo.removeEventListener(ProgressEvent.PROGRESS,onLoadingHandler);
+			loaderInfo.removeEventListener(Event.COMPLETE, onLoadedHandler);
 			__bytesTotal = loaderInfo.bytesLoaded;
 		}
 		protected var loaded_optionsXML:Number = 0;
-		protected function onOptionsXMLLoadingHandle(_evt:ProgressEvent):void {
+		protected function onOptionsXMLLoadingHandler(_evt:ProgressEvent):void {
 			loaded_optionsXML = int(_evt.bytesLoaded / _evt.bytesTotal * 10000) / 10000;
 		}
-		protected function onOptionsXMLLoadedHandle(_evt:Event):void {
+		protected function onOptionsXMLLoadedHandler(_evt:Event):void {
 			optionsXML = XML(_evt.currentTarget.data);
 			loaded_optionsXML = 1;
 		}
-		protected function onOptionsXMLLoadErrorHandle(_evt:IOErrorEvent):void {
+		protected function onOptionsXMLLoadErrorHandler(_evt:IOErrorEvent):void {
 			throw new Error ("ERROR:未读取到XML，请检查是否配置正确!");
 		}
 		protected var optionsXMLPerLoad:Number = 0.1;
