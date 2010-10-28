@@ -1,47 +1,51 @@
 /***
-AdvanceItem_info 版本:v1.0
+AdvanceTrait_class 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月26日 22:48:13
+创建时间:2010年10月27日 19:40:01
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
-//The item_info entry consists of item_count elements that are interpreted as key/value pairs of indices into the
-//string table of the constant pool. If the value of key is zero, this is a keyless entry and only carries a value.
-
-//item_info
+//trait_class
 //{
-//	u30 key
-//	u30 value
+//	u30 slot_id
+//	u30 classi
 //}
 
-package zero.swf.avm2.advances{
-	import zero.swf.avm2.Item_info;
-	
-	public class AdvanceItem_info extends Advance{
+//The slot_id field is an integer from 0 to N and is used to identify a position in which this trait resides. A
+//value of 0 requests the AVM2 to assign a position.
+
+//The classi field is an index that points into the class array of the abcFile entry.
+
+package zero.swf.avm2.advances.traits{
+	import zero.swf.avm2.advances.Member;
+	import zero.swf.avm2.advances.AdvanceABC;
+	import zero.swf.avm2.advances.AdvanceClass;
+	import zero.swf.avm2.traits.Trait_class;
+
+	public class AdvanceTrait_class extends AdvanceTrait{
 		
 		private static const memberV:Vector.<Member>=Vector.<Member>([
-			new Member("key",Member.STRING),
-			new Member("value",Member.STRING)
+			new Member("slot_id"),
+			new Member("classi",Member.CLASS)
 		]);
 		
-		public var key:String;
-		public var value:String;
-		//
-		public function AdvanceItem_info(){
-			
+		public var slot_id:int;
+		public var classi:AdvanceClass;
+		
+		public function AdvanceTrait_class(){
 		}
 		
-		public function initByInfo(item_info:Item_info):void{
-			initByInfo_fun(item_info,memberV);
+		public function initByInfo(trait_class:Trait_class):void{
+			initByInfo_fun(trait_class,memberV);
 		}
-		public function toInfo():Item_info{
-			var item_info:Item_info=new Item_info();
+		public function toInfo():Trait_class{
+			var trait_class:Trait_class=new Trait_class();
 			
-			toInfo_fun(item_info,memberV);
+			toInfo_fun(trait_class,memberV);
 			
-			return item_info;
+			return trait_class;
 		}
 		
 		////

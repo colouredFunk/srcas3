@@ -68,6 +68,22 @@ package zero.swf.avm2.advances{
 	import zero.swf.avm2.Traits_info;
 	import zero.swf.vmarks.InstanceFlags;
 	public class AdvanceClass extends Advance{
+		
+		private static const Instance_info_memberV:Vector.<Member>=Vector.<Member>([
+			new Member("name",Member.MULTINAME_INFO),
+			new Member("super_name",Member.MULTINAME_INFO),
+			new Member("flags",null,{flagClass:InstanceFlags}),
+			new Member("protectedNs",Member.NAMESPACE_INFO,{curr:Member.CURR_CASE}),
+			new Member("intrf",Member.MULTINAME_INFO,{isList:true}),
+			new Member("iinit",Member.METHOD),
+			new Member("itraits_info",Member.TRAITS_INFO,{isList:true})
+		]);
+		
+		private static const Class_info_memberV:Vector.<Member>=Vector.<Member>([
+			new Member("cinit",Member.METHOD),
+			new Member("ctraits_info",Member.TRAITS_INFO,{isList:true})
+		]);
+		
 		private var infoId:int;	//从 swf 或 xml 直接读取过来的 id
 		
 		public var name:AdvanceMultiname_info;									//multiname_info
@@ -77,62 +93,25 @@ package zero.swf.avm2.advances{
 		public var intrfV:Vector.<AdvanceMultiname_info>;						//namespace_info
 		
 		public var iinit:AdvanceMethod;										//method
-		public var iTraits_infoV:Vector.<AdvanceTraits_info>;					//traits_info
+		public var itraits_infoV:Vector.<AdvanceTraits_info>;					//traits_info
 		
 		public var cinit:AdvanceMethod;										//method
-		public var cTraits_infoV:Vector.<AdvanceTraits_info>;					//traits_info
+		public var ctraits_infoV:Vector.<AdvanceTraits_info>;					//traits_info
 		
 		//
 		public function initByInfos(_infoId:int,instance_info:Instance_info,class_info:Class_info):void{
 			infoId=_infoId;
 			
-			name=AdvanceABC.currInstance.getInfoByIdAndVName(instance_info.name,AdvanceABC.MULTINAME_INFO);
+			initByInfo_fun(instance_info,Instance_info_memberV,instance_info.flags&InstanceFlags.ClassProtectedNs);
 			
-			super_name=AdvanceABC.currInstance.getInfoByIdAndVName(instance_info.super_name,AdvanceABC.MULTINAME_INFO);
-			
-			flags=instance_info.flags;
-			
-			if(flags&InstanceFlags.ClassProtectedNs){
-				protectedNs=AdvanceABC.currInstance.getInfoByIdAndVName(instance_info.protectedNs,AdvanceABC.NAMESPACE_INFO);
-			}else{
-				protectedNs=null;
-			}
-			
-			AdvanceABC.currInstance.getInfoVByIdsAndVName(this,instance_info,"intrfV",AdvanceABC.MULTINAME_INFO);
-			
-			iinit=AdvanceABC.currInstance.getInfoByIdAndVName(instance_info.iinit,AdvanceABC.METHOD);
-			
-			getInfoVByAVM2Objs(instance_info,"traits_infoV",AdvanceTraits_info,Vector.<AdvanceTraits_info>,"iTraits_infoV");
-			
-			cinit=AdvanceABC.currInstance.getInfoByIdAndVName(class_info.cinit,AdvanceABC.METHOD);
-			
-			getInfoVByAVM2Objs(class_info,"traits_infoV",AdvanceTraits_info,Vector.<AdvanceTraits_info>,"cTraits_infoV");
+			initByInfo_fun(class_info,Class_info_memberV);
 		}
 		public function toInfoId():int{
 			var instance_info:Instance_info=new Instance_info();
 			var class_info:Class_info=new Class_info();
-			instance_info.name=AdvanceABC.currInstance.getIdByInfoAndVName(name,AdvanceABC.MULTINAME_INFO);
 			
-			if(super_name){
-				instance_info.super_name=AdvanceABC.currInstance.getIdByInfoAndVName(super_name,AdvanceABC.MULTINAME_INFO);
-			}
-			
-			instance_info.flags=flags;
-			
-			if(protectedNs){
-				instance_info.protectedNs=AdvanceABC.currInstance.getIdByInfoAndVName(protectedNs,AdvanceABC.NAMESPACE_INFO);
-			}
-			
-			AdvanceABC.currInstance.getIdsByInfoVAndVName(this,instance_info,"intrfV",AdvanceABC.MULTINAME_INFO);
-			
-			instance_info.iinit=AdvanceABC.currInstance.getIdByInfoAndVName(iinit,AdvanceABC.METHOD);
-			
-			getAVM2ObjsByInfoV(instance_info,"traits_infoV",Traits_info,Vector.<Traits_info>,"iTraits_infoV");
-			
-			class_info.cinit=AdvanceABC.currInstance.getIdByInfoAndVName(cinit,AdvanceABC.METHOD);
-			
-			getAVM2ObjsByInfoV(class_info,"traits_infoV",Traits_info,Vector.<Traits_info>,"cTraits_infoV");
-			
+			toInfo_fun(instance_info,Instance_info_memberV);
+			toInfo_fun(class_info,Class_info_memberV);
 			
 			//--
 			AdvanceABC.currInstance.abcFile.instance_infoV.push(instance_info);
@@ -143,82 +122,18 @@ package zero.swf.avm2.advances{
 		////
 		CONFIG::toXMLAndInitByXML {
 		public function toXML():XML{
-			var xml:XML=<AdvanceClass infoId={infoId}
-				flags={(
-					"|"+InstanceFlags.flagV[flags&InstanceFlags.ClassSealed]+
-					"|"+InstanceFlags.flagV[flags&InstanceFlags.ClassFinal]+
-					"|"+InstanceFlags.flagV[flags&InstanceFlags.ClassInterface]+
-					"|"+InstanceFlags.flagV[flags&InstanceFlags.ClassProtectedNs]
-				).replace(/\|null/g,"").substr(1)}
-			/>;
+			var xml:XML=toXML_fun(Instance_info_memberV);
 			
-			var infoXML:XML;
+			toXML_fun(Class_info_memberV,xml);
 			
-			infoXML=<name/>;
-			infoXML.appendChild(name.toXML());
-			xml.appendChild(infoXML);
-			
-			if(super_name){
-				infoXML=<super_name/>;
-				infoXML.appendChild(super_name.toXML());
-				xml.appendChild(infoXML);
-			}
-			
-			if(protectedNs){
-				infoXML=<protectedNs/>;
-				infoXML.appendChild(protectedNs.toXML());
-				xml.appendChild(infoXML);
-			}
-			
-			if(intrfV.length){
-				xml.appendChild(AdvanceABC.currInstance.getInfoListXMLByInfoVAndVName(this,"intrf",AdvanceABC.MULTINAME_INFO));
-			}
-			
-			infoXML=<iinit/>;
-			infoXML.appendChild(iinit.toXML());
-			xml.appendChild(infoXML);
-			
-			xml.appendChild(getInfoListXMLByInfoV("iTraits_info",true));
-			
-			infoXML=<cinit/>;
-			infoXML.appendChild(cinit.toXML());
-			xml.appendChild(infoXML);
-			
-			xml.appendChild(getInfoListXMLByInfoV("cTraits_info",true));
-			
+			xml.@infoId=infoId;
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
 			infoId=int(xml.@infoId.toString());
 			
-			name=AdvanceABC.currInstance.getInfoByXMLAndVName(xml.name.children()[0],AdvanceABC.MULTINAME_INFO);
-			
-			if(xml.super_name.length()){
-				super_name=AdvanceABC.currInstance.getInfoByXMLAndVName(xml.super_name.children()[0],AdvanceABC.MULTINAME_INFO);
-			}
-			
-			flags=0;
-			for each(var flagsStr:String in xml.@flags.toString().split("|")){
-				flags|=InstanceFlags[flagsStr];
-			}
-			
-			if(xml.protectedNs.length()){
-				protectedNs=AdvanceABC.currInstance.getInfoByXMLAndVName(xml.protectedNs.children()[0],AdvanceABC.NAMESPACE_INFO);
-			}
-			
-			if(xml.intrfList.length()){
-				AdvanceABC.currInstance.getInfoVByInfoListXMLAndVName(this,"intrf",xml,AdvanceABC.MULTINAME_INFO);
-			}else{
-				intrfV=new Vector.<AdvanceMultiname_info>();
-			}
-			
-			iinit=AdvanceABC.currInstance.getInfoByXMLAndVName(xml.iinit.children()[0],AdvanceABC.METHOD);
-			
-			getInfoVByInfoListXML("iTraits_info",xml,AdvanceTraits_info,Vector.<AdvanceTraits_info>);
-			
-			cinit=AdvanceABC.currInstance.getInfoByXMLAndVName(xml.cinit.children()[0],AdvanceABC.METHOD);
-			
-			getInfoVByInfoListXML("cTraits_info",xml,AdvanceTraits_info,Vector.<AdvanceTraits_info>);
+			initByXML_fun(xml,Instance_info_memberV);
+			initByXML_fun(xml,Class_info_memberV);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

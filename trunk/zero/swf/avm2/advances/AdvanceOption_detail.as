@@ -39,6 +39,12 @@ package zero.swf.avm2.advances{
 	import zero.swf.vmarks.ConstantKind;
 	
 	public class AdvanceOption_detail extends Advance{
+		
+		private static const memberV:Vector.<Member>=Vector.<Member>([
+			new Member("kind",null,{kindClass:ConstantKind}),
+			new Member("val",null,{constKindName:"kind"})//这里把 kind 放在了 val 前面
+		]);
+		
 		public var val:*;
 		public var kind:int;
 		
@@ -46,14 +52,12 @@ package zero.swf.avm2.advances{
 		}
 		
 		public function initByInfo(option_detail:Option_detail):void{
-			kind=option_detail.kind;
-			AdvanceABC.currInstance.getConstValueByIdAndKind(this,"val",option_detail.val,kind);
+			initByInfo_fun(option_detail,memberV);
 		}
 		public function toInfo():Option_detail{
 			var option_detail:Option_detail=new Option_detail();
 			
-			option_detail.kind=kind;
-			option_detail.val=AdvanceABC.currInstance.getIdByKindAndConstValue(kind,val);
+			toInfo_fun(option_detail,memberV);
 			
 			return option_detail;
 		}
@@ -61,18 +65,10 @@ package zero.swf.avm2.advances{
 		////
 		CONFIG::toXMLAndInitByXML {
 		public function toXML():XML{
-			var xml:XML=<AdvanceOption_detail
-				kind={ConstantKind.kindV[kind]}
-			/>;
-			
-			AdvanceABC.currInstance.getXMLByKindAndConstValue("val",xml,kind,val);
-			
-			return xml;
+			return toXML_fun(memberV);
 		}
 		public function initByXML(xml:XML):void{
-			kind=ConstantKind[xml.@kind.toString()];
-			
-			AdvanceABC.currInstance.getConstValueByXMLAndKind(this,"val",xml,kind);
+			initByXML_fun(xml,memberV);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

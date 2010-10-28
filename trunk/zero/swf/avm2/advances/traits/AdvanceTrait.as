@@ -8,9 +8,7 @@ AdvanceTrait 版本:v1.0
 */
 
 package zero.swf.avm2.advances.traits{
-	import flash.display.*;
-	import flash.events.*;
-	import flash.utils.*;
+	import zero.swf.avm2.advances.Advance;
 	
 	public class AdvanceTrait extends Advance{
 		public function AdvanceTrait(){

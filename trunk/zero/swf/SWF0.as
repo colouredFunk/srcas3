@@ -82,10 +82,9 @@ package zero.swf{
 				
 				FileLength=data.length+8;//SWF文件长度
 				if(FileLength!=(swfData[4]|(swfData[5]<<8)|(swfData[6]<<16)|(swfData[7]<<24))){
-					Outputer.output(
+					trace(
 						"文件长度不符 FileLength="+FileLength+
 						",ErrorFileLength="+(swfData[4]|(swfData[5]<<8)|(swfData[6]<<16)|(swfData[7]<<24))
-						,"brown"
 					);
 				}
 				

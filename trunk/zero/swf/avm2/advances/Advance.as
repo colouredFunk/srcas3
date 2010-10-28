@@ -8,17 +8,299 @@ Advance 版本:v1.0
 */
 
 package zero.swf.avm2.advances{
+	import flash.utils.getQualifiedClassName;
+	
 	import zero.swf.avm2.AVM2Obj;
 	
 	public class Advance{
-		public static var test_total_new:int;
+		//public static var test_total_new:int;
 		public function Advance(){
-			trace(this+", test_total_new="+(++test_total_new));
+			//trace(this+", test_total_new="+(++test_total_new));
+		}
+		public function initByInfo_fun(avm2Obj:AVM2Obj,memberV:Vector.<Member>,...rests):void{
+			var restId:int=0;
+			for each(var member:Member in memberV){
+				if(member.curr==Member.CURR_CASE){
+					if(rests[restId++]){
+					}else{
+						continue;
+					}
+				}
+				
+				if(Member.fromABCFileMark[member.type]){
+					if(member.isList){
+						AdvanceABC.currInstance.getInfoVByIdsAndVName(this,avm2Obj,member.name+"V",member.type);
+					}else{
+						//if(Member.directMark[member.type]){
+							//
+						//}else{
+							//
+						//}
+						this[member.name]=AdvanceABC.currInstance.getInfoByIdAndVName(avm2Obj[member.name],member.type);
+					}
+				}else{
+					if(member.isList){
+						getInfoVByAVM2Objs(avm2Obj,member.name+"V",MemberClasses[member.type],MemberClasses[member.type+"VClass"]);
+					}else if(member.constKindName){
+						this[member.name]=AdvanceABC.currInstance.getConstValueByIdAndKind(member.name,avm2Obj[member.name],this[member.constKindName])
+					}else{
+						if(member.classV){
+							this[member.name]=new (member.classV[this[member.classVIdName]])();
+							this[member.name].initByInfo(avm2Obj[member.name]);
+						}else{
+							//if(member.kindClass){
+							//	只在 toXML 或 initByXML 时有用
+							//}eles if(member.flagClass){
+							//	只在 toXML 或 initByXML 时有用
+							//}eles{
+								if(member.type==Member.DIRECT_INT){
+									this[member.name]=avm2Obj[member.name];
+								}else{
+									if(Member.directMark[member.type]){
+										throw new Error("未处理");
+									}else{
+										throw new Error("未处理");
+									}
+								}
+							//}
+						}
+					}
+				}
+			}
 		}
 		
-		public function getInfoVByAVM2Objs(avm2Obj:AVM2Obj,infoVName:String,infoClass:Class,infoVClass:*,infoInfoVName:String=null):void{
+		public function toInfo_fun(avm2Obj:AVM2Obj,memberV:Vector.<Member>):void{
+			for each(var member:Member in memberV){
+				if(member.curr==Member.CURR_CASE){
+					if(member.isList){
+						if(this[member.name+"V"]){
+						}else{
+							continue;
+						}
+					}else{
+						if(this[member.name]){
+						}else{
+							continue;
+						}
+					}
+				}
+				
+				if(Member.fromABCFileMark[member.type]){
+					if(member.isList){
+						AdvanceABC.currInstance.getIdsByInfoVAndVName(this,avm2Obj,member.name+"V",member.type);
+					}else{
+						//if(Member.directMark[member.type]){
+							//
+						//}else{
+							//
+						//}
+						avm2Obj[member.name]=AdvanceABC.currInstance.getIdByInfoAndVName(this[member.name],member.type);
+					}
+				}else{
+					if(member.isList){
+						getAVM2ObjsByInfoV(avm2Obj,member.name+"V",MemberClasses[member.type+"AVM2ObjClass"],MemberClasses[member.type+"AVM2ObjVClass"]);
+					}else if(member.constKindName){
+						avm2Obj[member.name]=AdvanceABC.currInstance.getIdByKindAndConstValue(this[member.constKindName],this[member.name]);
+					}else{
+						if(member.classV){
+							avm2Obj[member.name]=this[member.name].toInfo();
+						}else{
+							if(member.type==Member.DIRECT_INT){
+								avm2Obj[member.name]=this[member.name];
+							}else{
+								//if(member.kindClass){
+								//	只在 toXML 或 initByXML 时有用
+								//}eles if(member.flagClass){
+								//	只在 toXML 或 initByXML 时有用
+								//}eles{
+									if(Member.directMark[member.type]){
+										throw new Error("未处理");
+									}else{
+										throw new Error("未处理");
+									}
+								//}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		public function toXML_fun(memberV:Vector.<Member>,xml:XML=null):XML{
+			var className:String=getQualifiedClassName(this);
+			xml||(xml=new XML("<"+className.substr(className.lastIndexOf("::")+2)+"/>"));
+			
+			for each(var member:Member in memberV){
+				if(member.curr==Member.CURR_CASE){
+					//未考虑 int, uint, string 之类 为 0 或 "" 的情况
+					if(member.isList){
+						if(this[member.name+"V"]&&this[member.name+"V"].length){
+						}else{
+							continue;
+						}
+					}else{
+						if(this[member.name]){
+							
+						}else{
+							continue;
+						}
+					}
+				}else{
+					if(member.isList){
+						if(this[member.name+"V"].length){
+						}else{
+							continue;
+						}
+					}
+				}
+				
+				var infoXML:XML;
+				
+				if(Member.fromABCFileMark[member.type]){
+					if(member.isList){
+						xml.appendChild(AdvanceABC.currInstance.getInfoListXMLByInfoVAndVName(this,member.name,member.type));
+					}else{
+						if(Member.directMark[member.type]){
+							xml["@"+member.name]=this[member.name];
+						}else{
+							infoXML=new XML("<"+member.name+"/>");
+							infoXML.appendChild(this[member.name].toXML());
+							xml.appendChild(infoXML);
+						}
+					}
+				}else{
+					if(member.isList){
+						xml.appendChild(getInfoListXMLByInfoV(member.name,true));
+					}else if(member.constKindName){
+						AdvanceABC.currInstance.getXMLByKindAndConstValue(member.name,xml,this[member.constKindName],this[member.name]);
+					}else{
+						if(member.classV){
+							infoXML=new XML("<"+member.name+"/>");
+							infoXML.appendChild(this[member.name].toXML());
+							xml.appendChild(infoXML);
+						}else{
+							if(member.kindClass){
+								xml["@"+member.name]=member.kindClass[member.kindVName][this[member.name]];
+							}else if(member.flagClass){
+								var flagsStr:String="";
+								for each(var flagStr:String in member.flagClass["flagV"]){
+									if(this[member.name]&member.flagClass[flagStr]){
+										flagsStr+="|"+flagStr;
+									}
+								}
+								xml["@"+member.name]=flagsStr.substr(1);
+							}else{
+								if(member.type==Member.DIRECT_INT){
+									xml["@"+member.name]=this[member.name];
+								}else{
+									if(Member.directMark[member.type]){
+										xml["@"+member.name]=this[member.name];
+									}else{
+										infoXML=new XML("<"+member.name+"/>");
+										infoXML.appendChild(this[member.name].toXML());
+										xml.appendChild(infoXML);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			return xml;
+		}
+		
+		public function initByXML_fun(xml:XML,memberV:Vector.<Member>):void{
+			for each(var member:Member in memberV){
+				if(member.curr==Member.CURR_CASE){
+					if(member.isList){
+						if(xml[member.name+"List"].length()){
+						}else{
+							continue;
+						}
+					}else{
+						if(xml[member.name].length()){
+						}else{
+							continue;
+						}
+					}
+				}else{
+					if(member.isList){
+						if(xml[member.name+"List"].length()){
+						}else{
+							this[member.name+"V"]=new MemberClasses[member.type+"VClass"]();
+							continue;
+						}
+					}
+				}
+				
+				if(Member.fromABCFileMark[member.type]){
+					if(member.isList){
+						AdvanceABC.currInstance.getInfoVByInfoListXMLAndVName(this,member.name,xml,member.type);
+					}else{
+						if(Member.directMark[member.type]){
+							this[member.name]=getValueByStringAndType(xml["@"+member.name].toString(),member.type);
+						}else{
+							this[member.name]=AdvanceABC.currInstance.getInfoByXMLAndVName(xml[member.name].children()[0],member.type);
+						}
+					}
+				}else{
+					if(member.isList){
+						getInfoVByInfoListXML(member.name,xml,MemberClasses[member.type],MemberClasses[member.type+"VClass"]);
+					}else if(member.constKindName){
+						AdvanceABC.currInstance.getConstValueByXMLAndKind(this,member.name,xml,this[member.constKindName]);
+					}else{
+						if(member.classV){
+							this[member.name]=new (member.classV[this[member.classVIdName]])();
+							this[member.name].initByXML(xml[member.name].children()[0]);
+						}else{
+							if(member.kindClass){
+								this[member.name]=member.kindClass[xml["@"+member.name].toString()];
+							}else if(member.flagClass){
+								this[member.name]=0;
+								for each(var flagStr:String in xml["@"+member.name].toString().split("|")){
+									this[member.name]|=member.flagClass[flagStr];
+								}
+							}else{
+								if(member.type==Member.DIRECT_INT){
+									this[member.name]=int(xml["@"+member.name].toString());
+								}else{
+									if(Member.directMark[member.type]){
+										this[member.name]=getValueByStringAndType(xml["@"+member.name].toString(),member.type);
+									}else{
+										//this[member.name]=new (member.classV[this[member.classVIdName]])();
+										//this[member.name].initByXML(xml[member.name].children()[0]);
+										throw new Error("未处理");
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		public static function getValueByStringAndType(str:String,type:String):*{
+			switch(type){
+				case Member.INTEGER:
+					return int(str);
+				break;
+				case Member.UINTEGER:
+					return uint(str);
+				break;
+				case Member.DOUBLE:
+					return Number(str);
+				break;
+				case Member.STRING:
+					return str;
+				break;
+			}
+			throw new Error("getValueByStringAndType 不支持的 type: "+type);
+			return undefined;
+		}
+		
+		public function getInfoVByAVM2Objs(avm2Obj:AVM2Obj,infoVName:String,infoClass:Class,infoVClass:*):void{
 			var avm2ObjV:*=avm2Obj[infoVName];
-			var infoV:*=this[infoInfoVName||infoVName]=new infoVClass(avm2ObjV.length);
+			var infoV:*=this[infoVName]=new infoVClass(avm2ObjV.length);
 			var i:int=-1;
 			for each(avm2Obj in avm2ObjV){
 				i++;
@@ -27,8 +309,8 @@ package zero.swf.avm2.advances{
 			}
 		}
 		
-		public function getAVM2ObjsByInfoV(avm2Obj:AVM2Obj,infoVName:String,avm2ObjClass:Class,avm2ObjVClass:*,infoInfoVName:String=null):void{
-			var infoV:*=this[infoInfoVName||infoVName];
+		public function getAVM2ObjsByInfoV(avm2Obj:AVM2Obj,infoVName:String,avm2ObjClass:Class,avm2ObjVClass:*):void{
+			var infoV:*=this[infoVName];
 			var avm2ObjV:*=avm2Obj[infoVName]=new avm2ObjVClass(infoV.length);
 			var i:int=-1;
 			for each(var info:* in infoV){

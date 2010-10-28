@@ -52,10 +52,24 @@ AdvanceTraits_info 版本:v1.0
 //ATTR_Metadata 	0x4 	Is used to signal that the fields metadata_count and metadata follow the data field in the traits_info entry
 
 package zero.swf.avm2.advances{
+	import zero.swf.avm2.AVM2Obj;
+	import zero.swf.avm2.Metadata_info;
 	import zero.swf.avm2.Traits_info;
 	import zero.swf.avm2.advances.traits.AdvanceTrait;
+	import zero.swf.avm2.advances.traits.AdvanceTraitTypes;
+	import zero.swf.vmarks.TraitAttributes;
+	import zero.swf.vmarks.TraitTypes;
 
 	public class AdvanceTraits_info extends Advance{
+		
+		private static const memberV:Vector.<Member>=Vector.<Member>([
+			new Member("name",Member.MULTINAME_INFO),
+			new Member("kind_attributes",null,{flagClass:TraitAttributes}),
+			new Member("kind_trait_type",null,{kindClass:TraitTypes,kindVName:"typeV"}),
+			new Member("trait",Member.TRAIT,{classV:AdvanceTraitTypes.classV,classVIdName:"kind_trait_type"}),
+			new Member("metadata",Member.METADATA_INFO,{isList:true,curr:Member.CURR_CASE}),
+		]);
+		
 		public var name:AdvanceMultiname_info;
 		public var kind_attributes:int;
 		public var kind_trait_type:int;
@@ -66,9 +80,12 @@ package zero.swf.avm2.advances{
 		}
 		
 		public function initByInfo(traits_info:Traits_info):void{
+			initByInfo_fun(traits_info,memberV,traits_info.kind_attributes&TraitAttributes.Metadata);
 		}
 		public function toInfo():Traits_info{
 			var traits_info:Traits_info=new Traits_info();
+			
+			toInfo_fun(traits_info,memberV);
 			
 			return traits_info;
 		}
@@ -76,12 +93,10 @@ package zero.swf.avm2.advances{
 		////
 		CONFIG::toXMLAndInitByXML {
 		public function toXML():XML{
-			var xml:XML=<AdvanceTraits_info/>;
-			
-			return xml;
+			return toXML_fun(memberV);
 		}
 		public function initByXML(xml:XML):void{
-			
+			initByXML_fun(xml,memberV);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

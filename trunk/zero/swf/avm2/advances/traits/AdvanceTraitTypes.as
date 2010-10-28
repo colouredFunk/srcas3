@@ -1,39 +1,27 @@
 /***
-AdvanceDefaultMultiname_info 版本:v1.0
+AdvanceTraitTypes 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月26日 18:13:49
+创建时间:2010年10月27日 20:10:44
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.swf.avm2.advances{
-	import zero.swf.avm2.Multiname_info;
-	
-	public class AdvanceDefaultMultiname_info extends AdvanceMultiname_info{
-		public static const instance:AdvanceDefaultMultiname_info=new AdvanceDefaultMultiname_info();
-		
-		public function AdvanceDefaultMultiname_info(){
-			if(instance){
-				throw new Error("这东西不是用来 new 的...");
-			}
+package zero.swf.avm2.advances.traits{
+	public class AdvanceTraitTypes{
+		public static const classV:Vector.<Class>=get_classV();
+		private static function get_classV():Vector.<Class>{
+			var classV:Vector.<Class>=new Vector.<Class>(7);
+			classV.fixed=true;
+			classV[0]=zero.swf.avm2.advances.traits.AdvanceTrait_slot;
+			classV[1]=zero.swf.avm2.advances.traits.AdvanceTrait_method;
+			classV[2]=zero.swf.avm2.advances.traits.AdvanceTrait_method;
+			classV[3]=zero.swf.avm2.advances.traits.AdvanceTrait_method;
+			classV[4]=zero.swf.avm2.advances.traits.AdvanceTrait_class;
+			classV[5]=zero.swf.avm2.advances.traits.AdvanceTrait_function;
+			classV[6]=zero.swf.avm2.advances.traits.AdvanceTrait_slot;
+			return classV;
 		}
-		
-		override public function initByInfo(_infoId:int,multiname_info:Multiname_info):void{
-			
-		}
-		override public function toInfoId():int{
-			return 0;
-		}
-		
-		////
-		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
-			return <AdvanceMultiname_info kind="*"/>;
-		}
-		override public function initByXML(xml:XML):void{
-		}
-		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
 

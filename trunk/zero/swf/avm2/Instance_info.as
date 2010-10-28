@@ -2,7 +2,7 @@
 Instance_info 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月20日 16:25:31 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月27日 19:43:21 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -59,7 +59,7 @@ package zero.swf.avm2{
 		public var protectedNs:int;						//u30
 		public var intrfV:Vector.<int>;
 		public var iinit:int;							//u30
-		public var traits_infoV:Vector.<Traits_info>;
+		public var itraits_infoV:Vector.<Traits_info>;
 		//
 		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){name=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{name=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{name=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{name=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{name=data[offset++];}
@@ -89,13 +89,13 @@ package zero.swf.avm2{
 			//iinit
 			
 			
-			if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var traits_info_count:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{traits_info_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{traits_info_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{traits_info_count=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{traits_info_count=data[offset++];}
-			//traits_info_count
-			traits_infoV=new Vector.<Traits_info>(traits_info_count);
-			for(i=0;i<traits_info_count;i++){
+			if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var itraits_info_count:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{itraits_info_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{itraits_info_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{itraits_info_count=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{itraits_info_count=data[offset++];}
+			//itraits_info_count
+			itraits_infoV=new Vector.<Traits_info>(itraits_info_count);
+			for(i=0;i<itraits_info_count;i++){
 			
-				traits_infoV[i]=new Traits_info();
-				offset=traits_infoV[i].initByData(data,offset,endOffset);
+				itraits_infoV[i]=new Traits_info();
+				offset=itraits_infoV[i].initByData(data,offset,endOffset);
 			}
 			return offset;
 		}
@@ -127,14 +127,14 @@ package zero.swf.avm2{
 			
 			if(iinit>>>7){if(iinit>>>14){if(iinit>>>21){if(iinit>>>28){data[offset++]=(iinit&0x7f)|0x80;data[offset++]=((iinit>>>7)&0x7f)|0x80;data[offset++]=((iinit>>>14)&0x7f)|0x80;data[offset++]=((iinit>>>21)&0x7f)|0x80;data[offset++]=iinit>>>28;}else{data[offset++]=(iinit&0x7f)|0x80;data[offset++]=((iinit>>>7)&0x7f)|0x80;data[offset++]=((iinit>>>14)&0x7f)|0x80;data[offset++]=iinit>>>21;}}else{data[offset++]=(iinit&0x7f)|0x80;data[offset++]=((iinit>>>7)&0x7f)|0x80;data[offset++]=iinit>>>14;}}else{data[offset++]=(iinit&0x7f)|0x80;data[offset++]=iinit>>>7;}}else{data[offset++]=iinit;}
 			//iinit
-			var traits_info_count:int=traits_infoV.length;
+			var itraits_info_count:int=itraits_infoV.length;
 			
-			if(traits_info_count>>>7){if(traits_info_count>>>14){if(traits_info_count>>>21){if(traits_info_count>>>28){data[offset++]=(traits_info_count&0x7f)|0x80;data[offset++]=((traits_info_count>>>7)&0x7f)|0x80;data[offset++]=((traits_info_count>>>14)&0x7f)|0x80;data[offset++]=((traits_info_count>>>21)&0x7f)|0x80;data[offset++]=traits_info_count>>>28;}else{data[offset++]=(traits_info_count&0x7f)|0x80;data[offset++]=((traits_info_count>>>7)&0x7f)|0x80;data[offset++]=((traits_info_count>>>14)&0x7f)|0x80;data[offset++]=traits_info_count>>>21;}}else{data[offset++]=(traits_info_count&0x7f)|0x80;data[offset++]=((traits_info_count>>>7)&0x7f)|0x80;data[offset++]=traits_info_count>>>14;}}else{data[offset++]=(traits_info_count&0x7f)|0x80;data[offset++]=traits_info_count>>>7;}}else{data[offset++]=traits_info_count;}
-			//traits_info_count
+			if(itraits_info_count>>>7){if(itraits_info_count>>>14){if(itraits_info_count>>>21){if(itraits_info_count>>>28){data[offset++]=(itraits_info_count&0x7f)|0x80;data[offset++]=((itraits_info_count>>>7)&0x7f)|0x80;data[offset++]=((itraits_info_count>>>14)&0x7f)|0x80;data[offset++]=((itraits_info_count>>>21)&0x7f)|0x80;data[offset++]=itraits_info_count>>>28;}else{data[offset++]=(itraits_info_count&0x7f)|0x80;data[offset++]=((itraits_info_count>>>7)&0x7f)|0x80;data[offset++]=((itraits_info_count>>>14)&0x7f)|0x80;data[offset++]=itraits_info_count>>>21;}}else{data[offset++]=(itraits_info_count&0x7f)|0x80;data[offset++]=((itraits_info_count>>>7)&0x7f)|0x80;data[offset++]=itraits_info_count>>>14;}}else{data[offset++]=(itraits_info_count&0x7f)|0x80;data[offset++]=itraits_info_count>>>7;}}else{data[offset++]=itraits_info_count;}
+			//itraits_info_count
 			
 			data.position=offset;
-			for each(var traits_info:Traits_info in traits_infoV){
-				data.writeBytes(traits_info.toData());
+			for each(var itraits_info:Traits_info in itraits_infoV){
+				data.writeBytes(itraits_info.toData());
 			}
 			return data;
 		}
@@ -155,7 +155,7 @@ package zero.swf.avm2{
 				iinit={iinit}
 			>
 				<intrfList/>
-				<traits_infoList/>
+				<itraits_infoList/>
 			</Instance_info>;
 			if(protectedNs){
 				
@@ -171,16 +171,16 @@ package zero.swf.avm2{
 			}else{
 				delete xml.intrfList;
 			}
-			if(traits_infoV.length){
-				listXML=xml.traits_infoList[0];
-				listXML.@count=traits_infoV.length;
-				for each(var traits_info:Traits_info in traits_infoV){
-					var itemXML:XML=<traits_info/>;
-					itemXML.appendChild(traits_info.toXML());
+			if(itraits_infoV.length){
+				listXML=xml.itraits_infoList[0];
+				listXML.@count=itraits_infoV.length;
+				for each(var itraits_info:Traits_info in itraits_infoV){
+					var itemXML:XML=<itraits_info/>;
+					itemXML.appendChild(itraits_info.toXML());
 					listXML.appendChild(itemXML);
 				}
 			}else{
-				delete xml.traits_infoList;
+				delete xml.itraits_infoList;
 			}
 			return xml;
 		}
@@ -209,18 +209,18 @@ package zero.swf.avm2{
 				intrfV=new Vector.<int>();
 			}
 			iinit=int(xml.@iinit.toString());
-			if(xml.traits_infoList.length()){
-				listXML=xml.traits_infoList[0];
-				var traits_infoXMLList:XMLList=listXML.traits_info;
+			if(xml.itraits_infoList.length()){
+				listXML=xml.itraits_infoList[0];
+				var itraits_infoXMLList:XMLList=listXML.itraits_info;
 				i=-1;
-				traits_infoV=new Vector.<Traits_info>(traits_infoXMLList.length());
-				for each(var traits_infoXML:XML in traits_infoXMLList){
+				itraits_infoV=new Vector.<Traits_info>(itraits_infoXMLList.length());
+				for each(var itraits_infoXML:XML in itraits_infoXMLList){
 					i++;
-					traits_infoV[i]=new Traits_info();
-					traits_infoV[i].initByXML(traits_infoXML.children()[0]);
+					itraits_infoV[i]=new Traits_info();
+					itraits_infoV[i].initByXML(itraits_infoXML.children()[0]);
 				}
 			}else{
-				traits_infoV=new Vector.<Traits_info>();
+				itraits_infoV=new Vector.<Traits_info>();
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML
