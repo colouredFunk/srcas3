@@ -63,7 +63,7 @@ package {
 				if (!_otherParams) {
 					_otherParams = { };
 				}
-				_otherParams.sessionName = _session;
+				_otherParams.session = _session;
 				_otherParams.path = _path;
 				return ExternalInterface.call(JS_LOGIN, _otherParams );
 			}
