@@ -21,7 +21,7 @@ MATRIX 版本:v1.0
 //TranslateY 		SB[NTranslateBits] 					y translate value in twips
 package zero.swf.records{
 	import flash.utils.ByteArray;
-	public class MATRIX extends Record{
+	public class MATRIX{
 		public var HasScale:int;
 		public var NScaleBits:int;
 		public var ScaleX:int;
@@ -34,7 +34,7 @@ package zero.swf.records{
 		public var TranslateX:int;
 		public var TranslateY:int;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var bGroupValue:int=(data[offset]<<24)|(data[offset+1]<<16)|(data[offset+2]<<8)|data[offset+3];
 			offset+=4;
 			HasScale=bGroupValue>>>31;						//10000000 00000000 00000000 00000000
@@ -131,7 +131,7 @@ package zero.swf.records{
 			
 			return offset-int(4-bGroupBitsOffset/8);
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var bGroupValue:int=0;
 			var offset:int=0;
@@ -222,7 +222,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			return <MATRIX
 				HasScale={HasScale}
 				NScaleBits={NScaleBits}
@@ -237,7 +237,7 @@ package zero.swf.records{
 				TranslateY={TranslateY}
 			/>;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			HasScale=int(xml.@HasScale.toString());
 			NScaleBits=int(xml.@NScaleBits.toString());
 			ScaleX=int(xml.@ScaleX.toString());

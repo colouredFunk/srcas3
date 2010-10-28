@@ -17,10 +17,10 @@ LINESTYLEARRAY 版本:v1.0
 package zero.swf.records{
 	import zero.swf.records.LINESTYLE;
 	import flash.utils.ByteArray;
-	public class LINESTYLEARRAY extends Record{
+	public class LINESTYLEARRAY{
 		public var LineStylesV:Vector.<LINESTYLE>;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			//#offsetpp
 			
 			var LineStyleCount:int=data[offset++];
@@ -35,7 +35,7 @@ package zero.swf.records{
 			}
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var LineStyleCount:int=LineStylesV.length;
 			var offset:int=0;
@@ -56,7 +56,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<LINESTYLEARRAY>
 				<LineStylesList/>
 			</LINESTYLEARRAY>;
@@ -73,7 +73,7 @@ package zero.swf.records{
 			}
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			if(xml.LineStylesList.length()){
 				var listXML:XML=xml.LineStylesList[0];
 				var LineStylesXMLList:XMLList=listXML.LineStyles;

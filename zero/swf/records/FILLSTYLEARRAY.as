@@ -19,10 +19,10 @@ FILLSTYLEARRAY 版本:v1.0
 package zero.swf.records{
 	import zero.swf.records.FILLSTYLE;
 	import flash.utils.ByteArray;
-	public class FILLSTYLEARRAY extends Record{
+	public class FILLSTYLEARRAY{
 		public var FillStylesV:Vector.<FILLSTYLE>;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			//#offsetpp
 			
 			var FillStyleCount:int=data[offset++];
@@ -37,7 +37,7 @@ package zero.swf.records{
 			}
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var FillStyleCount:int=FillStylesV.length;
 			var offset:int=0;
@@ -58,7 +58,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<FILLSTYLEARRAY>
 				<FillStylesList/>
 			</FILLSTYLEARRAY>;
@@ -75,7 +75,7 @@ package zero.swf.records{
 			}
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			if(xml.FillStylesList.length()){
 				var listXML:XML=xml.FillStylesList[0];
 				var FillStylesXMLList:XMLList=listXML.FillStyles;

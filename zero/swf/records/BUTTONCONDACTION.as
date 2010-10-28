@@ -42,7 +42,7 @@ package zero.swf.records{
 	import zero.swf.vmarks.KeyPressKeyCodes;
 	import zero.swf.avm1.ACTIONRECORD;
 	import flash.utils.ByteArray;
-	public class BUTTONCONDACTION extends Record{
+	public class BUTTONCONDACTION{
 		public var CondActionSize:int;					//UI16
 		public var CondIdleToOverDown:int;
 		public var CondOutDownToIdle:int;
@@ -57,7 +57,7 @@ package zero.swf.records{
 		public var Actions:ACTIONRECORD;
 		public var ActionEndFlag:int;					//UI8
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			CondActionSize=data[offset]|(data[offset+1]<<8);
 			if(CondActionSize){
 				endOffset=offset+CondActionSize;
@@ -80,7 +80,7 @@ package zero.swf.records{
 			ActionEndFlag=data[offset++];
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=0x00;//CondActionSize
 			data[1]=0x00;//CondActionSize
@@ -108,7 +108,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<BUTTONCONDACTION
 				CondActionSize={CondActionSize}
 				CondIdleToOverDown={CondIdleToOverDown}
@@ -128,7 +128,7 @@ package zero.swf.records{
 			xml.Actions.appendChild(Actions.toXML());
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			CondActionSize=int(xml.@CondActionSize.toString());
 			CondIdleToOverDown=int(xml.@CondIdleToOverDown.toString());
 			CondOutDownToIdle=int(xml.@CondOutDownToIdle.toString());

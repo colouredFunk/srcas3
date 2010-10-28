@@ -55,7 +55,7 @@ package zero.swf.records{
 	import zero.swf.records.FILTERLIST;
 	import zero.swf.vmarks.BlendModes;
 	import flash.utils.ByteArray;
-	public class BUTTONRECORD extends Record{
+	public class BUTTONRECORD{
 		public var ButtonHasBlendMode:int;
 		public var ButtonHasFilterList:int;
 		public var ButtonStateHitTest:int;
@@ -69,7 +69,7 @@ package zero.swf.records{
 		public var FilterList:FILTERLIST;
 		public var BlendMode:int;						//UI8
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var flags:int=data[offset];
 			//Reserved=(flags<<24)>>>30;				//11000000
 			ButtonHasBlendMode=(flags<<26)>>>31;		//00100000
@@ -98,7 +98,7 @@ package zero.swf.records{
 			}
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var flags:int=0;
 			//flags|=Reserved<<6;						//11000000
@@ -131,7 +131,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<BUTTONRECORD
 				ButtonHasBlendMode={ButtonHasBlendMode}
 				ButtonHasFilterList={ButtonHasFilterList}
@@ -161,7 +161,7 @@ package zero.swf.records{
 			}
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			ButtonHasBlendMode=int(xml.@ButtonHasBlendMode.toString());
 			ButtonHasFilterList=int(xml.@ButtonHasFilterList.toString());
 			ButtonStateHitTest=int(xml.@ButtonStateHitTest.toString());

@@ -18,16 +18,16 @@ LINESTYLE_Color_RGBA 版本:v1.0
 package zero.swf.records{
 	import zero.BytesAndStr16;
 	import flash.utils.ByteArray;
-	public class LINESTYLE_Color_RGBA extends Record{
+	public class LINESTYLE_Color_RGBA{
 		public var Width:int;							//UI16
 		public var Color:uint;							//RGBA
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			Width=data[offset]|(data[offset+1]<<8);
 			Color=(data[offset+2]<<16)|(data[offset+3]<<8)|data[offset+4]|(data[offset+5]<<24);
 			return offset+6;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=Width;
 			data[1]=Width>>8;
@@ -40,13 +40,13 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			return <LINESTYLE_Color_RGBA
 				Width={Width}
 				Color={"0x"+BytesAndStr16._16V[(Color>>24)&0xff]+BytesAndStr16._16V[(Color>>16)&0xff]+BytesAndStr16._16V[(Color>>8)&0xff]+BytesAndStr16._16V[Color&0xff]}
 			/>;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			Width=int(xml.@Width.toString());
 			Color=uint(xml.@Color.toString());
 		}

@@ -2,7 +2,7 @@
 CXFORM 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月20日 16:08:28 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月28日 19:56:20 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -19,7 +19,7 @@ CXFORM 版本:v1.0
 //BlueAddTerm 	If HasAddTerms = 1, SB[Nbits] 	Blue addition value
 package zero.swf.records{
 	import flash.utils.ByteArray;
-	public class CXFORM extends Record{
+	public class CXFORM{
 		public var HasAddTerms:int;
 		public var HasMultTerms:int;
 		public var Nbits:int;
@@ -30,7 +30,7 @@ package zero.swf.records{
 		public var GreenAddTerm:int;
 		public var BlueAddTerm:int;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var bGroupValue:int=(data[offset]<<24)|(data[offset+1]<<16)|(data[offset+2]<<8)|data[offset+3];
 			offset+=4;
 			HasAddTerms=bGroupValue>>>31;					//10000000 00000000 00000000 00000000
@@ -92,7 +92,7 @@ package zero.swf.records{
 			
 			return offset-int(4-bGroupBitsOffset/8);
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var bGroupValue:int=0;
 			var offset:int=0;
@@ -153,7 +153,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			return <CXFORM
 				HasAddTerms={HasAddTerms}
 				HasMultTerms={HasMultTerms}
@@ -166,7 +166,7 @@ package zero.swf.records{
 				BlueAddTerm={BlueAddTerm}
 			/>;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			HasAddTerms=int(xml.@HasAddTerms.toString());
 			HasMultTerms=int(xml.@HasMultTerms.toString());
 			Nbits=int(xml.@Nbits.toString());

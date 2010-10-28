@@ -18,13 +18,13 @@ package zero.swf.records{
 	import zero.swf.records.CLIPEVENTFLAGS;
 	import zero.swf.records.CLIPACTIONRECORD;
 	import flash.utils.ByteArray;
-	public class CLIPACTIONS extends Record{
+	public class CLIPACTIONS{
 		public var AllEventFlags:CLIPEVENTFLAGS;
 		public var ClipActionRecordV:Vector.<CLIPACTIONRECORD>;
 		public var ClipActionEndFlag1:int;				//UI16
 		public var ClipActionEndFlag2:int;				//UI16
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			ClipActionEndFlag2=-1;
 			//Reserved=data[offset]|(data[offset+1]<<8);
 			offset+=2;
@@ -46,7 +46,7 @@ package zero.swf.records{
 			}
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=0x00;
 			data[1]=0x00;
@@ -67,7 +67,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<CLIPACTIONS
 				ClipActionEndFlag1={ClipActionEndFlag1}
 				ClipActionEndFlag2={ClipActionEndFlag2}
@@ -94,7 +94,7 @@ package zero.swf.records{
 			}
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			ClipActionEndFlag2=-1;
 			AllEventFlags=new CLIPEVENTFLAGS();
 			AllEventFlags.initByXML(xml.AllEventFlags.children()[0]);

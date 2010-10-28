@@ -15,14 +15,14 @@ RECT 版本:v1.0
 //Ymax 			SB[Nbits] 	y maximum position for rectangle in twips
 package zero.swf.records{
 	import flash.utils.ByteArray;
-	public class RECT extends Record{
+	public class RECT{
 		public var Nbits:int;
 		public var Xmin:int;
 		public var Xmax:int;
 		public var Ymin:int;
 		public var Ymax:int;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var bGroupValue:int=(data[offset]<<24)|(data[offset+1]<<16)|(data[offset+2]<<8)|data[offset+3];
 			offset+=4;
 			Nbits=bGroupValue>>>27;							//11111000 00000000 00000000 00000000
@@ -62,7 +62,7 @@ package zero.swf.records{
 			
 			return offset-int(4-bGroupBitsOffset/8);
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var bGroupValue:int=0;
 			var offset:int=0;
@@ -103,7 +103,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			return <RECT
 				Nbits={Nbits}
 				Xmin={Xmin}
@@ -112,7 +112,7 @@ package zero.swf.records{
 				Ymax={Ymax}
 			/>;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			Nbits=int(xml.@Nbits.toString());
 			Xmin=int(xml.@Xmin.toString());
 			Xmax=int(xml.@Xmax.toString());
