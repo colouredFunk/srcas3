@@ -26,15 +26,8 @@
 		public var onUpload:Function;
 		public var onUploading:Function;
 		public var onUploadComplete:Function;
-		
 		public var onFailed:Function;
-
-		public function FileRef() {
-			init();
-		}
-		private function init():void{
-		}
-		public function remove(_evt:Event):void{
+		public function remove():void{
 			removeEventListener(Event.SELECT, selectFile);
 			removeEventListener(IOErrorEvent.IO_ERROR, error);
 			removeEventListener(Event.COMPLETE, loadComplete);

@@ -59,7 +59,7 @@
 			}
 			return _ary;
 		}
-		public static function objToString(_obj:Object):String {
+		public static function objectToString(_obj:Object):String {
 			var _str:String="";
 			for (var _i:String in _obj) {
 				_str+=_i+" : "+_obj[_i]+"\n";

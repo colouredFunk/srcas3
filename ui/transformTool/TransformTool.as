@@ -162,11 +162,16 @@ package ui.transformTool
 			typeSelect = { o_graphics:"cicle",  graphics:"rect", o_bitmapdata:null,  bitmapdata: null, color:0xFF9900 };
 			
 		}
-		public function Init():void
+		public function Init(_stageMouse:Boolean = false):void
 		{
 			toolContainer.addChild(shapeBounds);
 			toolContainer.addChild(shapeArrow);
-			toolContainer.stage.addEventListener( MouseEvent.MOUSE_MOVE, EventHadler);
+			if (_stageMouse) {
+				toolContainer.stage.addEventListener( MouseEvent.MOUSE_MOVE, EventHadler);
+			}else {
+				toolContainer.addEventListener( MouseEvent.MOUSE_MOVE, EventHadler);
+				toolContainer.addEventListener(MouseEvent.ROLL_OUT, EventHadler);
+			}
 			toolContainer.addEventListener( MouseEvent.MOUSE_DOWN, EventHadler);
 			toolContainer.stage.addEventListener( MouseEvent.MOUSE_UP, EventHadler);
 		}
@@ -515,6 +520,7 @@ package ui.transformTool
 						_objInfo.externalPoint = selectedItem.parent.globalToLocal(selectedItem.localToGlobal(_objInfo.internalPoint));
 					}
 					break;
+				case "rollOut":
 				case "mouseMove":
 					/*var _parent:*=event.target;
 					while(_parent){
