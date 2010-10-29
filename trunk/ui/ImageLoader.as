@@ -47,7 +47,7 @@
 			}else {
 				_source = "--";
 			}
-			_source = _source + ":" + _imageLoader.widthArea + " x " + _imageLoader.heightArea;
+			_source = _source + ":" + _imageLoader.areaWidth + " x " + _imageLoader.areaHeight;
 			contextMenuItemImageLoader.caption = _source;
 		}
 		public var progressClip:*;
@@ -77,21 +77,21 @@
 		public function set noCache(_noCache:Boolean):void{
 			createManager(imageGroup).vars.noCache = _noCache;
 		}
-		private var __widthArea:uint = 1;
-		public function get widthArea():uint {
-			return __widthArea;
+		private var __areaWidth:uint = 1;
+		public function get areaWidth():uint {
+			return __areaWidth;
 		};
-		public function set widthArea(_widthArea:uint):void {
-			__widthArea = _widthArea;
-			autoFitArea.width = __widthArea;
+		public function set areaWidth(_areaWidth:uint):void {
+			__areaWidth = _areaWidth;
+			autoFitArea.width = __areaWidth;
 		};
-		private var __heightArea:uint = 1;
-		public function get heightArea():uint {
-			return __heightArea;
+		private var __areaHeight:uint = 1;
+		public function get areaHeight():uint {
+			return __areaHeight;
 		};
-		public function set heightArea(_heightArea:uint):void {
-			__heightArea = _heightArea;
-			autoFitArea.height = __heightArea;
+		public function set areaHeight(_areaHeight:uint):void {
+			__areaHeight = _areaHeight;
+			autoFitArea.height = __areaHeight;
 		};
 		protected var __source:String;
 		public function get source():String {
@@ -104,16 +104,16 @@
 				container = this;
 			}
 			if (background) {
-				__widthArea = background.width;
-				__heightArea = background.height;
+				__areaWidth = background.width;
+				__areaHeight = background.height;
 			}else if (container.width * container.height > 0) {
-				__widthArea = container.width;
-				__heightArea = container.height;
+				__areaWidth = container.width;
+				__areaHeight = container.height;
 			}
 			setProgressClip(false);
 			bmp = new Bitmap();
 			bmp.alpha = 0;
-			autoFitArea = new AutoFitArea(container, 0, 0, widthArea, heightArea);
+			autoFitArea = new AutoFitArea(container, 0, 0, areaWidth, areaHeight);
 			createMenu(this);
 			contextMenu = contextMenuImageLoader;
 		}
@@ -204,7 +204,7 @@
 		}
 		private const LIMITWH_MAX:uint = 999999;
 		protected function updateArea(_content:*):void {
-			if (widthArea + heightArea <= 2) {
+			if (areaWidth + areaHeight <= 2) {
 				//原始大小显示
 			}else {
 				var _widthMax:uint;
@@ -212,20 +212,20 @@
 				var _scaleMode:String
 				var _alignX:String = AlignMode.CENTER;
 				var _alignY:String = AlignMode.CENTER;
-				if(widthArea<=1){
+				if(areaWidth<=1){
 					_scaleMode = ScaleMode.PROPORTIONAL_OUTSIDE;
 					_alignX = AlignMode.LEFT;
 					_widthMax = limitSize?_content.width:LIMITWH_MAX;
-					_heightMax = limitSize?Math.min(_content.height, heightArea):LIMITWH_MAX;
-				}else if (heightArea<=1) {
+					_heightMax = limitSize?Math.min(_content.height, areaHeight):LIMITWH_MAX;
+				}else if (areaHeight<=1) {
 					_scaleMode = ScaleMode.PROPORTIONAL_OUTSIDE;
 					_alignY = AlignMode.TOP;
-					_widthMax = limitSize?Math.min(_content.width, widthArea):LIMITWH_MAX;
+					_widthMax = limitSize?Math.min(_content.width, areaWidth):LIMITWH_MAX;
 					_heightMax = limitSize?_content.height:LIMITWH_MAX;
 				}else {
 					_scaleMode = ScaleMode.PROPORTIONAL_INSIDE;
-					_widthMax = limitSize?Math.min(_content.width, widthArea):LIMITWH_MAX;
-					_heightMax = limitSize?Math.min(_content.height, heightArea):LIMITWH_MAX;
+					_widthMax = limitSize?Math.min(_content.width, areaWidth):LIMITWH_MAX;
+					_heightMax = limitSize?Math.min(_content.height, areaHeight):LIMITWH_MAX;
 				}
 				autoFitArea.attach(_content, _scaleMode, _alignX, _alignY, false, 0, _widthMax, 0, _heightMax);
 			}

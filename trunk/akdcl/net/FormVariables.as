@@ -4,65 +4,23 @@
 	public class FormVariables {
 		private var variables:Object;
 		private var _boundary:String;
-		
 		public function get length():int {
 			var count:int = 0;
 			for (var name:String in this.variables)
 				count ++;
 			return count;
 		}
-		
 		public function get boundary():String {
 			return "----------------------------7m" + this._boundary;	
 		}
-		
 		public function get contentType():String {
 			return "multipart/form-data; boundary=" + this.boundary;	
 		}
-		
 		public function get data():ByteArray {
-			var result:ByteArray = new ByteArray();
-			var filename:String;
-			
-			if (this.length > 0) {
-				for (var name:String in this.variables) {
-					result.writeUTFBytes("--" + this.boundary + "\r\n");
-					if (this.variables[name] is ByteArray) {
-						filename = createRandomKey(8);
-						result.writeUTFBytes("Content-Disposition: form-data; name=\"" + name + "\"; filename=\"\\" + filename + ".jpg\"\r\n");
-						result.writeUTFBytes("Content-Type: application/octet-stream\r\n\r\n");
-						result.writeBytes(this.variables[name]);
-					} else {
-						result.writeUTFBytes("Content-Disposition: form-data; name=\"" + name + "\"\r\n\r\n");
-						result.writeUTFBytes(this.variables[name]);
-					}
-					result.writeUTFBytes("\r\n");
-				}
-				result.writeUTFBytes("--" + this.boundary + "--\r\n");
-			}
-			return result;
+			return getData();
 		}
 		public function get dataGBK():ByteArray {
-			var result:ByteArray = new ByteArray();
-			var filename:String;
-			
-			if (this.length > 0) {
-				for (var name:String in this.variables) {
-					result.writeUTFBytes("--" + this.boundary + "\r\n");
-					if (this.variables[name] is ByteArray) {
-						filename = createRandomKey(8);
-						result.writeMultiByte("Content-Disposition: form-data; name=\"" + name + "\"; filename=\"\\" + filename + ".jpg\"\r\n", 'gbk');
-						result.writeUTFBytes("Content-Type: application/octet-stream\r\n\r\n");
-						result.writeBytes(this.variables[name]);
-					} else {
-						result.writeMultiByte("Content-Disposition: form-data; name=\"" + name + "\"\r\n\r\n",'gbk');
-						result.writeMultiByte(this.variables[name],'gbk');
-					}
-					result.writeUTFBytes("\r\n");
-				}
-				result.writeUTFBytes("--" + this.boundary + "--\r\n");
-			}
-			return result;
+			return getData("gbk");
 		}
 		public function FormVariables(variables:Object = null) {
 			if (variables)
@@ -72,7 +30,6 @@
 			
 			this._boundary = createBoundary();
 		}
-		
 		public function decode(data:String):String {
 			if (!data) return data;
 			var urlInfo:Array = data.split("?");
@@ -88,7 +45,6 @@
 			
 			return url;
 		}
-		
 		public function add(name:String, value:*):void {
 			if(!value){
 				return;
@@ -98,7 +54,6 @@
 			else
 				this.variables[name] = value.toString();
 		}
-		
 		public function addFile(name:String, value:*, charset:String = "UTF-8"):void {
 			if (value is ByteArray) {
 				this.add(name, value);
@@ -115,15 +70,43 @@
 				this.add(name, fileBytes);
 			}
 		}
-		
 		public function remove(name:String):void {
 			delete this.variables[name];
 		}
-		
+		public function removeAll():void {
+			for (var _name:String in variables) {
+				remove(_name);
+			}
+		}
 		public function replace(name:String, value:*):void {
 			add(name, value);
 		}
-		
+		private function getData(_type:String=null):ByteArray {
+			var result:ByteArray = new ByteArray();
+			var filename:String;
+			
+			if (this.length > 0) {
+				for (var name:String in this.variables) {
+					result.writeUTFBytes("--" + this.boundary + "\r\n");
+					if (this.variables[name] is ByteArray) {
+						filename = createRandomKey(8);
+						result.writeUTFBytes("Content-Disposition: form-data; name=\"" + name + "\"; filename=\"\\" + filename + ".jpg\"\r\n");
+						result.writeUTFBytes("Content-Type: application/octet-stream\r\n\r\n");
+						result.writeBytes(this.variables[name]);
+					} else {
+						result.writeUTFBytes("Content-Disposition: form-data; name=\"" + name + "\"\r\n\r\n");
+						if (_type) {
+							result.writeMultiByte(this.variables[name],_type);
+						}else {
+							result.writeUTFBytes(this.variables[name]);
+						}
+					}
+					result.writeUTFBytes("\r\n");
+				}
+				result.writeUTFBytes("--" + this.boundary + "--\r\n");
+			}
+			return result;
+		}
 		private function createBoundary():String {
 			return createRandomKey(11);	
 		}
@@ -142,7 +125,6 @@
 				result = max;
 			return result;
 		}
-		
 		private function hex(number:int):String {
 			if (number < 10)
 				return String(number);
