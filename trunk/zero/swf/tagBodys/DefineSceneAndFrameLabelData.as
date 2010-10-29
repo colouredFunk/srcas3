@@ -28,13 +28,13 @@ DefineSceneAndFrameLabelData 版本:v1.0
 //FrameLabelN 			STRING 				Frame label string of frame label #N
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class DefineSceneAndFrameLabelData extends TagBody{
+	public class DefineSceneAndFrameLabelData{
 		public var OffsetV:Vector.<int>;
 		public var NameV:Vector.<String>;
 		public var FrameNumV:Vector.<int>;
 		public var FrameLabelV:Vector.<String>;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			//#offsetpp
 			
 			if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var SceneCount:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{SceneCount=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{SceneCount=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{SceneCount=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{SceneCount=data[offset++];}
@@ -71,7 +71,7 @@ package zero.swf.tagBodys{
 			}
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var SceneCount:int=OffsetV.length;
 			var offset:int=0;
@@ -108,7 +108,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<DefineSceneAndFrameLabelData>
 				<OffsetAndNameList/>
 				<FrameNumAndFrameLabelList/>
@@ -139,7 +139,7 @@ package zero.swf.tagBodys{
 			}
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			if(xml.OffsetAndNameList.length()){
 				var listXML:XML=xml.OffsetAndNameList[0];
 				var OffsetXMLList:XMLList=listXML.Offset;

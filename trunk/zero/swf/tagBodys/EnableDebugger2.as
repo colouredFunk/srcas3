@@ -12,10 +12,10 @@ EnableDebugger2 版本:v1.0
 //Password 		Null-terminated STRING.(0 is NULL)	MD5-encrypted password
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class EnableDebugger2 extends TagBody{
+	public class EnableDebugger2{
 		public var password:String;						//Password
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			if(endOffset-offset==31){
 				data.position=offset+2;
 				password=data.readUTFBytes(28);
@@ -24,7 +24,7 @@ package zero.swf.tagBodys{
 			password="";
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			if(password){
 				data.writeUTFBytes("\x00\x00"+password+"\x00");
@@ -34,12 +34,12 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			return <EnableDebugger2
 				password={password}
 			/>;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			password=xml.@password.toString();
 		}
 		}//end of CONFIG::toXMLAndInitByXML

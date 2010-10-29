@@ -21,13 +21,13 @@ package zero.swf.tagBodys{
 	import zero.swf.records.MATRIX;
 	import zero.swf.BytesData;
 	import flash.utils.ByteArray;
-	public class DefineText extends TagBody{
+	public class DefineText{
 		public var id:int;								//UI16
 		public var TextBounds:RECT;
 		public var TextMatrix:MATRIX;
 		public var restDatas:BytesData;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			id=data[offset]|(data[offset+1]<<8);
 			offset+=2;
 			TextBounds=new RECT();
@@ -39,7 +39,7 @@ package zero.swf.tagBodys{
 			restDatas=new BytesData();
 			return restDatas.initByData(data,offset,endOffset);
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=id;
 			data[1]=id>>8;
@@ -52,7 +52,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<DefineText
 				id={id}
 			>
@@ -65,7 +65,7 @@ package zero.swf.tagBodys{
 			xml.restDatas.appendChild(restDatas.toXML());
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			id=int(xml.@id.toString());
 			TextBounds=new RECT();
 			TextBounds.initByXML(xml.TextBounds.children()[0]);

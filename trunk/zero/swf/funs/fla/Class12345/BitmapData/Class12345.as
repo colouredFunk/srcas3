@@ -13,7 +13,7 @@ package{
 	import flash.utils.*;
 	
 	public class Class12345 extends BitmapData{
-		public function Class12345(){
+		public function Class12345(...args){
 			super(0,0);
 		}
 	}

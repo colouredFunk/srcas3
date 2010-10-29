@@ -46,14 +46,14 @@ FileAttributes 版本:v1.0
 //the HTML page, while UseGPU is equivalent to a wmode of "gpu".
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class FileAttributes extends TagBody{
+	public class FileAttributes{
 		public var UseDirectBlit:int;
 		public var UseGPU:int;
 		public var HasMetadata:int;
 		public var ActionScript3:int;
 		public var UseNetwork:int;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var flags:int=data[offset];
 			//Reserved=(flags<<24)>>>31;				//10000000
 			UseDirectBlit=(flags<<25)>>>31;				//01000000
@@ -65,7 +65,7 @@ package zero.swf.tagBodys{
 			//Reserved=data[offset+1]|(data[offset+2]<<8)|(data[offset+3]<<16);
 			return offset+4;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var flags:int=0;
 			//flags|=Reserved<<7;						//10000000
@@ -85,7 +85,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			return <FileAttributes
 				UseDirectBlit={UseDirectBlit}
 				UseGPU={UseGPU}
@@ -94,7 +94,7 @@ package zero.swf.tagBodys{
 				UseNetwork={UseNetwork}
 			/>;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			UseDirectBlit=int(xml.@UseDirectBlit.toString());
 			UseGPU=int(xml.@UseGPU.toString());
 			HasMetadata=int(xml.@HasMetadata.toString());

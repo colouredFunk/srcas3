@@ -23,12 +23,12 @@ package zero.swf.tagBodys{
 	import zero.swf.records.RECT;
 	import zero.swf.records.SHAPEWITHSTYLE;
 	import flash.utils.ByteArray;
-	public class DefineShape extends TagBody{
+	public class DefineShape{
 		public var id:int;								//UI16
 		public var ShapeBounds:RECT;
 		public var Shapes:SHAPEWITHSTYLE;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			id=data[offset]|(data[offset+1]<<8);
 			offset+=2;
 			ShapeBounds=new RECT();
@@ -37,7 +37,7 @@ package zero.swf.tagBodys{
 			Shapes=new SHAPEWITHSTYLE();
 			return Shapes.initByData(data,offset,endOffset);
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=id;
 			data[1]=id>>8;
@@ -49,7 +49,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<DefineShape
 				id={id}
 			>
@@ -60,7 +60,7 @@ package zero.swf.tagBodys{
 			xml.Shapes.appendChild(Shapes.toXML());
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			id=int(xml.@id.toString());
 			ShapeBounds=new RECT();
 			ShapeBounds.initByXML(xml.ShapeBounds.children()[0]);

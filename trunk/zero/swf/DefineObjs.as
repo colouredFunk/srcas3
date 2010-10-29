@@ -20,9 +20,9 @@ package zero.swf{
 		
 		public static const DefineShape:String=SWF;
 		public static const DefineBits:String=IMG;
-		public static const DefineButton:String=DAT;
+		public static const DefineButton:String=SWF;//20101029
 		public static const DefineFont:String=DAT;
-		public static const DefineText:String=DAT;
+		public static const DefineText:String=SWF;//20101029
 		public static const DefineFontInfo:String=DAT;
 		public static const DefineSound:String=DAT;
 			//public static const DefineButtonSound:int=17;
@@ -31,12 +31,12 @@ package zero.swf{
 		public static const DefineShape2:String=SWF;
 			//public static const DefineButtonCxform:int=23;
 		public static const DefineShape3:String=SWF;
-		public static const DefineText2:String=DAT;
-		public static const DefineButton2:String=DAT;
+		public static const DefineText2:String=SWF;//20101029
+		public static const DefineButton2:String=SWF;//20101029
 		public static const DefineBitsJPEG3:String=IMG;
 		public static const DefineBitsLossless2:String=IMG;
-		public static const DefineEditText:String=DAT;
-		public static const DefineSprite:String=DAT;
+		public static const DefineEditText:String=SWF;//20101029
+		public static const DefineSprite:String=DAT;//20101029	SWF//貌似引起问题了
 		public static const DefineMorphShape:String=DAT;
 		public static const DefineFont2:String=DAT;
 		public static const DefineVideoStream:String=DAT;

@@ -15,12 +15,12 @@ DoABC 版本:v1.0
 package zero.swf.tagBodys{
 	import zero.swf.avm2.AVM2Obj;
 	import flash.utils.ByteArray;
-	public class DoABC extends TagBody{
+	public class DoABC{
 		public var Flags:uint;							//UI32
 		public var Name:String;							//STRING
 		public var ABCData:AVM2Obj;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			Flags=data[offset]|(data[offset+1]<<8)|(data[offset+2]<<16)|(data[offset+3]<<24);
 			offset+=4;
 			var get_str_size:int=0;
@@ -33,7 +33,7 @@ package zero.swf.tagBodys{
 			
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=Flags;
 			data[1]=Flags>>8;
@@ -47,7 +47,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<DoABC
 				Flags={Flags}
 				Name={Name}
@@ -57,7 +57,7 @@ package zero.swf.tagBodys{
 			xml.ABCData.appendChild(ABCData.toXML());
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			Flags=uint(xml.@Flags.toString());
 			Name=xml.@Name.toString();
 			var ABCDataXML:XML=xml.ABCData.children()[0];

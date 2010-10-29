@@ -34,13 +34,13 @@ package zero.swf.tagBodys{
 	import zero.swf.records.MATRIX;
 	import zero.swf.records.CXFORM;
 	import flash.utils.ByteArray;
-	public class PlaceObject extends TagBody{
+	public class PlaceObject{
 		public var CharacterId:int;						//UI16
 		public var Depth:int;							//UI16
 		public var Matrix:MATRIX;
 		public var ColorTransform:CXFORM;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			CharacterId=data[offset]|(data[offset+1]<<8);
 			Depth=data[offset+2]|(data[offset+3]<<8);
 			offset+=4;
@@ -54,7 +54,7 @@ package zero.swf.tagBodys{
 			}
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=CharacterId;
 			data[1]=CharacterId>>8;
@@ -71,7 +71,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<PlaceObject
 				CharacterId={CharacterId}
 				Depth={Depth}
@@ -87,7 +87,7 @@ package zero.swf.tagBodys{
 			}
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			CharacterId=int(xml.@CharacterId.toString());
 			Depth=int(xml.@Depth.toString());
 			Matrix=new MATRIX();

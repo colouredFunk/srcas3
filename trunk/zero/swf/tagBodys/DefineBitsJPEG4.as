@@ -22,7 +22,7 @@ DefineBitsJPEG4 版本:v1.0
 package zero.swf.tagBodys{
 	import zero.swf.BytesData;
 	import flash.utils.ByteArray;
-	public class DefineBitsJPEG4 extends TagBody{
+	public class DefineBitsJPEG4{
 		public var id:int;								//UI16
 		
 		public var AlphaDataOffset:uint;				//UI32
@@ -30,7 +30,7 @@ package zero.swf.tagBodys{
 		public var ImageData:BytesData;
 		public var BitmapAlphaData:BytesData;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			id=data[offset]|(data[offset+1]<<8);
 			
 			AlphaDataOffset=data[offset+2]|(data[offset+3]<<8)|(data[offset+4]<<16)|(data[offset+5]<<24);
@@ -42,7 +42,7 @@ package zero.swf.tagBodys{
 			BitmapAlphaData=new BytesData();
 			return BitmapAlphaData.initByData(data,offset,endOffset);
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=id;
 			data[1]=id>>8;
@@ -61,7 +61,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<DefineBitsJPEG4
 				id={id}
 				AlphaDataOffset={AlphaDataOffset}
@@ -75,7 +75,7 @@ package zero.swf.tagBodys{
 			xml.BitmapAlphaData.appendChild(BitmapAlphaData.toXML());
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			id=int(xml.@id.toString());
 			
 			AlphaDataOffset=uint(xml.@AlphaDataOffset.toString());

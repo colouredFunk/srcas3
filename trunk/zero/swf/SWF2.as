@@ -10,15 +10,78 @@ SWF2 版本:v1.0
 package zero.swf{
 	import flash.utils.ByteArray;
 	import flash.utils.getDefinitionByName;
+	import flash.utils.getQualifiedClassName;
 	
 	import zero.swf.tagBodys.FileAttributes;
 	import zero.swf.tagBodys.Metadata;
-	import zero.swf.tagBodys.SetBackgroundColor;
 	
 	public class SWF2 extends SWF1{
+		public static const TagTypeOrderV:Vector.<int>=Vector.<int>([
+			//TagType.FileAttributes,
+			//TagType.Metadata,
+			TagType.SetBackgroundColor,
+			TagType.EnableDebugger,
+			TagType.EnableDebugger2,
+			TagType.DebugID,
+			TagType.ScriptLimits,
+			TagType.ProductInfo
+		]);
+		
+		private static var getSetValueTagBodyClasses:Vector.<Class>=new Vector.<Class>(TagType.typeNameArr.length);
+		private static var getSetValueMemberNames:Vector.<String>=new Vector.<String>(TagType.typeNameArr.length);
+		private static var getSetValueValueNames:Vector.<String>=new Vector.<String>(TagType.typeNameArr.length);
+		private static var getSetValueDefaultValues:Vector.<Object>=new Vector.<Object>(TagType.typeNameArr.length);
+		public static function addGetSetValueTagBody(
+			TagBodyClass:Class,
+			memberName:String,
+			valueName:String,
+			defaultValue:*
+		):void{
+			/*
+			使用方法，例如添加读写背景颜色的功能：
+			
+			SWF2.addGetSetValueTagBody(
+				SetBackgroundColor,
+				"BackgroundColor",
+				"bgColor",
+				0xffffff
+			);
+			var swf:SWF2=new SWF2();
+			swf.setValue("bgColor",0xff3300);
+			trace("bgColor="+swf.getValue("bgColor"));
+			
+			*/
+			
+			if(TagBodyClass==Metadata||TagBodyClass==FileAttributes){
+				throw new Error("TagBodyClass="+TagBodyClass+" 已经被征用");
+			}
+			var typeName:String=getQualifiedClassName(TagBodyClass).replace("zero.swf.tagBodys::","");
+			if(typeName){
+				var type:int=TagType[typeName];
+				if(typeName===TagType.typeNameArr[type]){
+					getSetValueTagBodyClasses[type]=TagBodyClass;
+					getSetValueMemberNames[type]=memberName;
+					getSetValueValueNames[type]=valueName;
+					getSetValueDefaultValues[type]=defaultValue;
+					return;
+				}
+			}
+			throw new Error("TagBodyClass="+TagBodyClass+", typeName="+typeName);
+		}
+		
+		//
 		public static const baseInfoNameV:Vector.<String>=SWF0.baseInfoNameV.concat(Vector.<String>([
-			"acceleration","isAS3","accessNetworkOnly","metadataStr","bgColor"
+			"acceleration","isAS3","accessNetworkOnly","metadataStr"
 		]));
+		
+		private var getSetValueValues:Object;
+		public function getValue(valueName:String):*{
+			return getSetValueValues[valueName];
+		}
+		public function setValue(valueName:String,value:*):void{
+			getSetValueValues[valueName]=value;
+		}
+		//private var getSetValueTags:Vector.<Tag>;
 		
 		public var tagV:Vector.<Tag>;
 		
@@ -32,13 +95,26 @@ package zero.swf{
 			_FrameRate:Number=30,
 			_isAS3:Boolean=true,
 			_accessNetworkOnly:Boolean=false,
-			_bgColor:int=0xffffff
+			_metadataStr:String=null
 		){
 			super(_type,_Version,_width,_height,_FrameRate);
 			
 			isAS3=_isAS3;
 			accessNetworkOnly=_accessNetworkOnly;
-			bgColor=_bgColor;
+			metadataStr=_metadataStr;
+			
+			tagV=new Vector.<Tag>();
+			
+			//写入默认值们到 getSetValueValues
+			getSetValueValues=new Object();
+			var getSetValueId:int=getSetValueValueNames.length;
+			while(--getSetValueId>=0){
+				var valueName:String=getSetValueValueNames[getSetValueId];
+				if(valueName){
+					getSetValueValues[valueName]=getSetValueDefaultValues[getSetValueId];
+					//trace(valueName+"="+getSetValueValues[valueName]);
+				}
+			}
 		}
 		public function clear():void{
 			if(dataAndTags){
@@ -47,9 +123,6 @@ package zero.swf{
 		}
 		
 		//
-		private var fileAttributesTag:Tag;
-		private var metadataTag:Tag;
-		private var setBackgroundColorTag:Tag;
 		
 		public var acceleration:String;//direct 和 gpu 在文档和实际情况中好像是倒过来的...
 		
@@ -60,7 +133,6 @@ package zero.swf{
 		public var isAS3:Boolean;
 		public var accessNetworkOnly:Boolean;
 		public var metadataStr:String;
-		public var bgColor:int;
 		
 		private var progress_finished:Function;
 		
@@ -78,10 +150,6 @@ package zero.swf{
 			isAS3=false;
 			accessNetworkOnly=false;
 			metadataStr="";
-			bgColor=0xffffff;
-			fileAttributesTag=null;
-			metadataTag=null;
-			setBackgroundColorTag=null;
 			for each(var tag:Tag in tagV){
 				switch(tag.type){
 					case TagType.FileAttributes:
@@ -103,8 +171,6 @@ package zero.swf{
 						
 						isAS3=(fileAttributes.ActionScript3==1);
 						accessNetworkOnly=(fileAttributes.UseNetwork==1);
-						fileAttributesTag=tag;
-						fileAttributesTag.tagBody=fileAttributes;
 					break;
 					case TagType.Metadata:
 						var metadata:Metadata;
@@ -116,21 +182,20 @@ package zero.swf{
 						}
 						
 						metadataStr=metadata.metadata;
-						metadataTag=tag;
-						metadataTag.tagBody=metadata;
 					break;
-					case TagType.SetBackgroundColor:
-						var setBackgroundColor:SetBackgroundColor=new SetBackgroundColor();
-						if(tag.tagBody){
-							setBackgroundColor=tag.tagBody as SetBackgroundColor;
-						}else{
-							setBackgroundColor=new SetBackgroundColor();
-							setBackgroundColor.initByData(tag.bodyData,tag.bodyOffset,tag.bodyOffset+tag.bodyLength);
+					default:
+						var TagBodyClass:Class=getSetValueTagBodyClasses[tag.type];
+						if(TagBodyClass){
+							var tagBody:Object=null;
+							if(tag.tagBody){
+								tagBody=tag.tagBody;
+							}else{
+								tagBody=new TagBodyClass();
+								tagBody.initByData(tag.bodyData,tag.bodyOffset,tag.bodyOffset+tag.bodyLength);
+								tag.tagBody=tagBody;
+							}
+							getSetValueValues[getSetValueValueNames[tag.type]]=tagBody[getSetValueMemberNames[tag.type]];
 						}
-						
-						bgColor=setBackgroundColor.BackgroundColor;
-						setBackgroundColorTag=tag;
-						setBackgroundColorTag.tagBody=setBackgroundColor;
 					break;
 				}
 			}
@@ -138,13 +203,18 @@ package zero.swf{
 		public function infos2Tags():void{
 			///*
 			var tagId:int=tagV.length;
+			var tag:Tag;
 			while(--tagId>=0){
-				var tag:Tag=tagV[tagId];
+				tag=tagV[tagId];
 				switch(tag.type){
 					case TagType.FileAttributes:
 					case TagType.Metadata:
-					case TagType.SetBackgroundColor:
 						tagV.splice(tagId,1);
+					break;
+					default:
+						if(getSetValueTagBodyClasses[tag.type]){
+							tagV.splice(tagId,1);
+						}
 					break;
 				}
 			}
@@ -177,33 +247,48 @@ package zero.swf{
 			}
 			fileAttributes.UseNetwork=(accessNetworkOnly?1:0);
 			
-			var setBackgroundColor:SetBackgroundColor=new SetBackgroundColor();
-			setBackgroundColor.BackgroundColor=bgColor;
-			if(!setBackgroundColorTag){
-				setBackgroundColorTag=new Tag();
+			var getSetValueTags:Vector.<Tag>=new Vector.<Tag>(TagTypeOrderV.length);
+			var getSetValueId:int=getSetValueValueNames.length;
+			while(--getSetValueId>=0){
+				var valueName:String=getSetValueValueNames[getSetValueId];
+				if(valueName){
+					var TagBodyClass:Class=getSetValueTagBodyClasses[getSetValueId];
+					var tagBody:Object=new TagBodyClass();
+					tagBody[getSetValueMemberNames[getSetValueId]]=getSetValueValues[valueName];
+					tag=new Tag();
+					tag.tagBody=tagBody;
+					var tagOrderId:int=TagTypeOrderV.indexOf(tag.type);
+					if(tagOrderId==-1){
+						getSetValueTags.push(tag);
+					}else{
+						getSetValueTags[tagOrderId]=tag;
+					}
+				}
 			}
-			setBackgroundColorTag.tagBody=setBackgroundColor;
-			tagV.unshift(setBackgroundColorTag);
+			
+			var i:int=getSetValueTags.length;
+			while(--i>=0){
+				tag=getSetValueTags[i];
+				if(tag){
+					tagV.unshift(tag);
+				}
+			}
 			
 			if(metadataStr){
 				fileAttributes.HasMetadata=1;
 				var metadata:Metadata=new Metadata();
 				metadata.metadata=metadataStr;
-				if(!metadataTag){
-					metadataTag=new Tag();
-				}
-				metadataTag.tagBody=metadata;
-				tagV.unshift(metadataTag);
+				tag=new Tag();
+				tag.tagBody=metadata;
+				tagV.unshift(tag);
 			}else{
 				fileAttributes.HasMetadata=0;
 			}
 			
 			if(Version>=8){
-				if(!fileAttributesTag){
-					fileAttributesTag=new Tag();
-				}
-				fileAttributesTag.tagBody=fileAttributes;
-				tagV.unshift(fileAttributesTag);
+				tag=new Tag();
+				tag.tagBody=fileAttributes;
+				tagV.unshift(tag);
 			}
 		}
 		

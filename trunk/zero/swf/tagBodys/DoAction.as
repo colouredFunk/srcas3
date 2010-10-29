@@ -19,17 +19,17 @@ DoAction 版本:v1.0
 package zero.swf.tagBodys{
 	import zero.swf.avm1.ACTIONRECORD;
 	import flash.utils.ByteArray;
-	public class DoAction extends TagBody{
+	public class DoAction{
 		public var Actions:ACTIONRECORD;
 		public var ActionEndFlag:int;					//UI8
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			Actions=new ACTIONRECORD();
 			offset=Actions.initByData(data,offset,endOffset-1);
 			ActionEndFlag=data[offset++];
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data.writeBytes(Actions.toData());
 			data[data.length]=ActionEndFlag;
@@ -38,7 +38,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<DoAction
 				ActionEndFlag={ActionEndFlag}
 			>
@@ -47,7 +47,7 @@ package zero.swf.tagBodys{
 			xml.Actions.appendChild(Actions.toXML());
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			Actions=new ACTIONRECORD();
 			Actions.initByXML(xml.Actions.children()[0]);
 			ActionEndFlag=int(xml.@ActionEndFlag.toString());

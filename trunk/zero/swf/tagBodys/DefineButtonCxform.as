@@ -19,11 +19,11 @@ DefineButtonCxform 版本:v1.0
 package zero.swf.tagBodys{
 	import zero.swf.records.CXFORM;
 	import flash.utils.ByteArray;
-	public class DefineButtonCxform extends TagBody{
+	public class DefineButtonCxform{
 		public var ButtonId:int;						//UI16
 		public var ButtonColorTransformV:Vector.<CXFORM>;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			ButtonId=data[offset]|(data[offset+1]<<8);
 			offset+=2;
 			var i:int=-1;
@@ -36,7 +36,7 @@ package zero.swf.tagBodys{
 			}
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=ButtonId;
 			data[1]=ButtonId>>8;
@@ -49,7 +49,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<DefineButtonCxform
 				ButtonId={ButtonId}
 			>
@@ -68,7 +68,7 @@ package zero.swf.tagBodys{
 			}
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			ButtonId=int(xml.@ButtonId.toString());
 			if(xml.ButtonColorTransformList.length()){
 				var listXML:XML=xml.ButtonColorTransformList[0];

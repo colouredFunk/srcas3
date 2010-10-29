@@ -17,14 +17,14 @@ SetBackgroundColor 版本:v1.0
 package zero.swf.tagBodys{
 	import zero.BytesAndStr16;
 	import flash.utils.ByteArray;
-	public class SetBackgroundColor extends TagBody{
+	public class SetBackgroundColor{
 		public var BackgroundColor:int;					//RGB
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			BackgroundColor=(data[offset]<<16)|(data[offset+1]<<8)|data[offset+2];
 			return offset+3;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=BackgroundColor>>16;
 			data[1]=BackgroundColor>>8;
@@ -34,12 +34,12 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			return <SetBackgroundColor
 				BackgroundColor={"0x"+BytesAndStr16._16V[(BackgroundColor>>16)&0xff]+BytesAndStr16._16V[(BackgroundColor>>8)&0xff]+BytesAndStr16._16V[BackgroundColor&0xff]}
 			/>;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			BackgroundColor=int(xml.@BackgroundColor.toString());
 		}
 		}//end of CONFIG::toXMLAndInitByXML

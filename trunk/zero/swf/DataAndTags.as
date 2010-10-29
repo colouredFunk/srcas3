@@ -12,14 +12,37 @@ package zero.swf{
 	
 	import zero.BytesAndStr16;
 	import zero.Outputer;
-	import zero.swf.funs.DataMark;
-	import zero.swf.tagBodys.DefineSprite;
 	import zero.swf.tagBodys.FileAttributes;
 	import zero.swf.tagBodys.Metadata;
-	import zero.swf.tagBodys.SetBackgroundColor;
-	import zero.swf.tagBodys.TagBody;
 
-	public class DataAndTags extends BaseDat{
+	public class DataAndTags{
+		
+		private static var getDataBySrcMark:Object;
+		public static var resourceV:Vector.<Object>;
+		
+		public static function reset():void{
+			getDataBySrcMark=new Object();
+			getDataBySrc=null;
+			resourceV=new Vector.<Object>();
+			initByXML_getResourceTag=null;
+		}
+		
+		public static function toXML_addResourceTag(tag:Tag,bodyXML:XML):void{
+			resourceV[resourceV.length]={tag:tag,bodyXML:bodyXML};
+		}
+		
+		public static var getDataBySrc:Function;
+		public static function getDataBySrcAndMark(src:String):ByteArray{
+			if(getDataBySrcMark[src]){
+			}else{
+				getDataBySrcMark[src]=getDataBySrc(src);
+			}
+			
+			return getDataBySrcMark[src];
+		}
+		public static var initByXML_getResourceTag:Function;
+		
+		
 		public static var ignoreUnknownTag:Boolean=true;
 		public static var currSrcName:String;
 		
@@ -29,14 +52,16 @@ package zero.swf{
 		public static const onlyLocationOption:String="仅位置";
 		public static const noOutputOption:String="不输出";
 		
-		public static const defaultOption:String=byteCodesOption;
+		//public static const defaultOption:String=byteCodesOption;
+		public static var defaultOption:String=byteCodesOption;
 		
 		public static var mustBeStructorTagBodyClasses:Vector.<Class>;
 		
 		public static var optionIndexs:Object;
 		
 		private static var optionV:Vector.<String>;
-		public static function setOption(optionXML:XML):void{
+		public static function setOption(optionXML:XML=null):void{
+			optionXML||(optionXML=<options/>);
 			var optionMark:Object=getOptionMarkByOptionXML(optionXML);
 			var typeNum:int=TagType.typeNameArr.length;
 			optionV=new Vector.<String>(typeNum);
@@ -66,7 +91,7 @@ package zero.swf{
 		public static function activateTagBodyClasses(...TagBodyClasses):void{
 			var optionXML:XML=<optin/>;
 			for each(var TagBodyClass:Class in TagBodyClasses){
-				var className:String=flash.utils.getQualifiedClassName(TagBodyClass).replace("zero.swf.tagBodys::","")
+				var className:String=getQualifiedClassName(TagBodyClass).replace("zero.swf.tagBodys::","")
 				if(className){
 					var type:int=TagType[className];
 					if(TagType.typeNameArr[type]===className){
@@ -85,7 +110,6 @@ package zero.swf{
 			
 			mustBeStructorTagBodyClasses[TagType.FileAttributes]=FileAttributes;
 			mustBeStructorTagBodyClasses[TagType.Metadata]=Metadata;
-			mustBeStructorTagBodyClasses[TagType.SetBackgroundColor]=SetBackgroundColor;
 			
 			optionIndexs=new Object();
 			optionIndexs[structorOption]=0;
@@ -146,7 +170,7 @@ package zero.swf{
 			//initByData(defaultData,0,defaultData.length);
 		}
 		
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			FrameCount=data[offset++]|(data[offset++]<<8);//帧数是一个int, 在SWF里以 UI16(Unsigned 16-bit integer value, 16位无符号整数) 的结构保存
 			curr_frameId=0;
 			tagV=getTagV(data,offset,endOffset);
@@ -259,7 +283,7 @@ package zero.swf{
 			toDataResult[0]=FrameCount;
 			toDataResult[1]=FrameCount>>8;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			run("toData");
 			var newData:ByteArray=toDataResult;
 			toDataResult=null;
@@ -357,7 +381,7 @@ package zero.swf{
 			toXMLResult.@FrameCount=FrameCount;
 			checkAddDataBlock();
 		}
-		override public function toXML():XML{
+		public function toXML():XML{
 			run("toXML");
 			var newXML:XML=toXMLResult;
 			toXMLResult=null;
@@ -401,49 +425,53 @@ package zero.swf{
 				}else{
 					option=defaultOption;
 				}
-				switch(option){
-					case structorOption:
-						if(tag.tagBody){
-							tagXML.appendChild(tag.tagBody.toXML());
-						}else{
-							throw new Error("暂不支持");
-						}
-					break;
-					case resourceOption:
-						if(tag.tagBody){
-							throw new Error("暂不支持");
-						}
-						
-						if(DefineObjs[typeName]){
-						}else{
-							throw new Error("暂不支持");
-						}
-						
-						var bodyXML:XML=<body defId={tag.getDefId()}/>;
-						DataMark.toXML_addResourceTag(tag,bodyXML);
-						tagXML.appendChild(bodyXML);
-					break;
-					case byteCodesOption:
-						if(tag.tagBody){
-							throw new Error("暂不支持");
-						}
-						if(tag.bodyData&&tag.bodyLength>0){
-							tagXML.appendChild(<body length={tag.bodyLength} value={BytesAndStr16.bytes2str16(tag.bodyData,tag.bodyOffset,tag.bodyLength)}/>);
-						}
-					break;
-					case onlyLocationOption:
-						if(tag.tagBody){
-							throw new Error("暂不支持");
-						}
-						if(tag.bodyData&&tag.bodyLength>0){
-							tagXML.appendChild(<body src={currSrcName} offset={tag.bodyOffset} length={tag.bodyLength}/>);
-						}
-					break;
-					//case noOutputOption:
-					//break;
-					default:
-						throw new Error("未知 option: "+optionV[tag.type]);
-					break;
+				if(tag.tagBody){
+					tagXML.appendChild(tag.tagBody.toXML());
+				}else{
+					switch(option){
+						case structorOption:
+							if(tag.tagBody){
+								tagXML.appendChild(tag.tagBody.toXML());
+							}else{
+								throw new Error("暂不支持");
+							}
+						break;
+						case resourceOption:
+							//if(tag.tagBody){
+							//	throw new Error("暂不支持");
+							//}
+							
+							if(DefineObjs[typeName]){
+							}else{
+								throw new Error("暂不支持");
+							}
+							
+							var bodyXML:XML=<body defId={tag.getDefId()}/>;
+							toXML_addResourceTag(tag,bodyXML);
+							tagXML.appendChild(bodyXML);
+						break;
+						case byteCodesOption:
+							//if(tag.tagBody){
+							//	throw new Error("暂不支持");
+							//}
+							if(tag.bodyData&&tag.bodyLength>0){
+								tagXML.appendChild(<body length={tag.bodyLength} value={BytesAndStr16.bytes2str16(tag.bodyData,tag.bodyOffset,tag.bodyLength)}/>);
+							}
+						break;
+						case onlyLocationOption:
+							//if(tag.tagBody){
+							//	throw new Error("暂不支持");
+							//}
+							if(tag.bodyData&&tag.bodyLength>0){
+								tagXML.appendChild(<body src={currSrcName} offset={tag.bodyOffset} length={tag.bodyLength}/>);
+							}
+						break;
+						//case noOutputOption:
+						//break;
+						default:
+							throw new Error("未知 option: "+optionV[tag.type]);
+						break;
+					}
 				}
 				
 				if(tag.type==TagType.ShowFrame){
@@ -479,7 +507,7 @@ package zero.swf{
 				FrameCount=curr_frameId;
 			}
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			initByXML_start(xml);
 			while(++curr_childId<totalChild){
 				initByXML_step();
@@ -532,7 +560,7 @@ package zero.swf{
 				if(offsetStr&&lengthStr&&srcStr){
 					var offset:int=int(offsetStr);
 					var endOffset:int=offset+int(lengthStr);
-					for each(tag in getTagV(DataMark.getDataBySrcAndMark(srcStr),offset,endOffset)){
+					for each(tag in getTagV(getDataBySrcAndMark(srcStr),offset,endOffset)){
 						//trace("tag="+tag);
 						tagV[tagV.length]=tag;
 					}
@@ -578,7 +606,7 @@ package zero.swf{
 							if(resourcePath){
 								var defIdStr:String=bodyXML.@defId.toString();
 								if(defIdStr){
-									tag=DataMark.initByXML_getResourceTag(bodyXML);
+									tag=initByXML_getResourceTag(bodyXML);
 									if(tag.type===type){
 									}else{
 										Outputer.output("一个 "+typeName+" 被替换成: "+TagType.typeNameArr[tag.type]+"(可能会引起问题?)","brown");
@@ -599,7 +627,7 @@ package zero.swf{
 											if(srcStr){
 												tag=new Tag();
 												tag.type=type;
-												tag.bodyData=DataMark.getDataBySrcAndMark(srcStr);
+												tag.bodyData=getDataBySrcAndMark(srcStr);
 												tag.bodyOffset=int(offsetStr);
 												tag.bodyLength=int(lengthStr);
 											}else{
@@ -622,7 +650,7 @@ package zero.swf{
 						}else{
 							throw new Error("TagBodyClass: "+typeName+" 未定义");
 						}
-						var tagBody:TagBody=new TagBodyClass();
+						var tagBody:Object=new TagBodyClass();
 						tagBody.initByXML(bodyXML);
 						tag=new Tag();
 						tag.tagBody=tagBody;
