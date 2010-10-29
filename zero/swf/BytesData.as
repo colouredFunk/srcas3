@@ -11,21 +11,20 @@ package zero.swf{
 	
 	import flash.utils.ByteArray;
 	import zero.BytesAndStr16;
-	import zero.swf.BaseDat;
 	
-	public class BytesData extends BaseDat{
+	public class BytesData{
 		public var ownData:ByteArray;
 		public var dataOffset:int;
 		public var dataLength:int;
 		public function BytesData(){
 		}
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			ownData=data;
 			dataOffset=offset;
 			dataLength=endOffset-offset;
 			return endOffset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			if(dataLength>0){
 				data.writeBytes(ownData,dataOffset,dataLength);
@@ -34,13 +33,13 @@ package zero.swf{
 		}
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			if(dataLength>0){
 				return <BytesData length={dataLength} value={BytesAndStr16.bytes2str16(ownData,dataOffset,dataLength)}/>;
 			}
 			return <BytesData/>;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			var data:ByteArray=BytesAndStr16.str162bytes(xml.@value.toString());
 			initByData(data,0,data.length);
 		}

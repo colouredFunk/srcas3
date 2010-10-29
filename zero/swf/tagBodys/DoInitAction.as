@@ -39,12 +39,12 @@ DoInitAction 版本:v1.0
 package zero.swf.tagBodys{
 	import zero.swf.avm1.ACTIONRECORD;
 	import flash.utils.ByteArray;
-	public class DoInitAction extends TagBody{
+	public class DoInitAction{
 		public var SpriteID:int;						//UI16
 		public var Actions:ACTIONRECORD;
 		public var ActionEndFlag:int;					//UI8
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			SpriteID=data[offset]|(data[offset+1]<<8);
 			offset+=2;
 			Actions=new ACTIONRECORD();
@@ -52,7 +52,7 @@ package zero.swf.tagBodys{
 			ActionEndFlag=data[offset++];
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=SpriteID;
 			data[1]=SpriteID>>8;
@@ -64,7 +64,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<DoInitAction
 				SpriteID={SpriteID}
 				ActionEndFlag={ActionEndFlag}
@@ -74,7 +74,7 @@ package zero.swf.tagBodys{
 			xml.Actions.appendChild(Actions.toXML());
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			SpriteID=int(xml.@SpriteID.toString());
 			Actions=new ACTIONRECORD();
 			Actions.initByXML(xml.Actions.children()[0]);

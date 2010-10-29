@@ -31,13 +31,13 @@ ImportAssets2 版本:v1.0
 //NameN 			STRING 			Identifier for last imported character
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class ImportAssets2 extends TagBody{
+	public class ImportAssets2{
 		public var URL:String;							//STRING
 		public var ReservedUI16:int;					//UI16
 		public var TagV:Vector.<int>;
 		public var NameV:Vector.<String>;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var get_str_size:int=0;
 			while(data[offset+(get_str_size++)]){}
 			data.position=offset;
@@ -59,7 +59,7 @@ package zero.swf.tagBodys{
 			}
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data.writeUTFBytes(URL+"\x00");
 			var offset:int=data.length;
@@ -83,7 +83,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<ImportAssets2
 				URL={URL}
 				ReservedUI16={ReservedUI16}
@@ -104,7 +104,7 @@ package zero.swf.tagBodys{
 			}
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			URL=xml.@URL.toString();
 			ReservedUI16=int(xml.@ReservedUI16.toString());
 			if(xml.TagAndNameList.length()){

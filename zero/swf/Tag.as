@@ -8,12 +8,9 @@ Tag 版本:v1.0
 */
 
 package zero.swf{
-	import flash.display.*;
-	import flash.events.*;
-	import flash.utils.*;
-	
-	import zero.swf.tagBodys.TagBody;
-
+	import flash.utils.ByteArray;
+	import flash.utils.getDefinitionByName;
+	import flash.utils.getQualifiedClassName;
 	public class Tag{
 		public var headOffset:int;
 		public var bodyOffset:int;
@@ -64,11 +61,11 @@ package zero.swf{
 			}
 		}
 		
-		private var __tagBody:TagBody;
-		public function get tagBody():TagBody{
+		private var __tagBody:Object;
+		public function get tagBody():Object{
 			return __tagBody;
 		}
-		public function set tagBody(_tagBody:TagBody):void{
+		public function set tagBody(_tagBody:Object):void{
 			if(_tagBody){
 				bodyData=null;
 				__tagBody=_tagBody;

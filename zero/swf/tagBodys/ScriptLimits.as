@@ -25,16 +25,16 @@ ScriptLimits 版本:v1.0
 //ScriptTimeoutSeconds 	UI16 			Maximum ActionScript processing time before script stuck dialog box displays
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class ScriptLimits extends TagBody{
+	public class ScriptLimits{
 		public var MaxRecursionDepth:int;				//UI16
 		public var ScriptTimeoutSeconds:int;			//UI16
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			MaxRecursionDepth=data[offset]|(data[offset+1]<<8);
 			ScriptTimeoutSeconds=data[offset+2]|(data[offset+3]<<8);
 			return offset+4;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=MaxRecursionDepth;
 			data[1]=MaxRecursionDepth>>8;
@@ -45,13 +45,13 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			return <ScriptLimits
 				MaxRecursionDepth={MaxRecursionDepth}
 				ScriptTimeoutSeconds={ScriptTimeoutSeconds}
 			/>;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			MaxRecursionDepth=int(xml.@MaxRecursionDepth.toString());
 			ScriptTimeoutSeconds=int(xml.@ScriptTimeoutSeconds.toString());
 		}

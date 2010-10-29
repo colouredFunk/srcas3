@@ -2,8 +2,10 @@
 <class>
   <instance_info infos="public class" name="Class12345" super_name="flash.display.BitmapData" protectedNs="Class12345">
     <iinit methodName="Class12345" methodId="1">
-      <method_info return_type="*"/>
-      <method_body max_stack="3" local_count="1" init_scope_depth="5" max_scope_depth="6">
+      <method_info return_type="*">
+        <flags>NEED_REST</flags>
+      </method_info>
+      <method_body max_stack="3" local_count="2" init_scope_depth="5" max_scope_depth="6">
         <codes><![CDATA[
 	getlocal0
 	pushscope

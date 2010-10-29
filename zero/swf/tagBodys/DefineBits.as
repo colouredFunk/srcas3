@@ -25,17 +25,17 @@ DefineBits 版本:v1.0
 package zero.swf.tagBodys{
 	import zero.swf.BytesData;
 	import flash.utils.ByteArray;
-	public class DefineBits extends TagBody{
+	public class DefineBits{
 		public var id:int;								//UI16
 		public var JPEGData:BytesData;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			id=data[offset]|(data[offset+1]<<8);
 			offset+=2;
 			JPEGData=new BytesData();
 			return JPEGData.initByData(data,offset,endOffset);
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=id;
 			data[1]=id>>8;
@@ -46,7 +46,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<DefineBits
 				id={id}
 			>
@@ -55,7 +55,7 @@ package zero.swf.tagBodys{
 			xml.JPEGData.appendChild(JPEGData.toXML());
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			id=int(xml.@id.toString());
 			JPEGData=new BytesData();
 			JPEGData.initByXML(xml.JPEGData.children()[0]);

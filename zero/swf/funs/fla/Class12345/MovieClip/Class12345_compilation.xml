@@ -3,19 +3,10 @@
     <tag type="FileAttributes" typeNum="69">
       <FileAttributes UseDirectBlit="0" UseGPU="0" HasMetadata="0" ActionScript3="1" UseNetwork="1"/>
     </tag>
-    <tag type="SetBackgroundColor" typeNum="9">
-      <SetBackgroundColor BackgroundColor="0xffffff"/>
-    </tag>
-    <tag type="DefineSceneAndFrameLabelData" typeNum="86">
-      <body length="12" value="01 00 e5 9c ba e6 99 af 20 31 00 00"/>
-    </tag>
+    <dataBlock src="Class12345_compilation.swf" offset="13" length="18"/>
     <tag type="DoABCWithoutFlagsAndName" typeNum="72">
-      <body length="281" value="10 00 2e 00 00 00 00 0c 00 0a 43 6c 61 73 73 31 32 33 34 35 0d 44 69 73 70 6c 61 79 4f 62 6a 65 63 74 16 44 69 73 70 6c 61 79 4f 62 6a 65 63 74 43 6f 6e 74 61 69 6e 65 72 0f 45 76 65 6e 74 44 69 73 70 61 74 63 68 65 72 11 49 6e 74 65 72 61 63 74 69 76 65 4f 62 6a 65 63 74 09 4d 6f 76 69 65 43 6c 69 70 06 4f 62 6a 65 63 74 06 53 70 72 69 74 65 0d 66 6c 61 73 68 2e 64 69 73 70 6c 61 79 0c 66 6c 61 73 68 2e 65 76 65 6e 74 73 05 18 02 16 01 16 0a 16 0b 00 09 07 02 02 07 03 07 07 02 08 07 04 05 07 03 03 07 03 06 07 03 04 07 03 09 03 00 00 00 00 00 00 00 00 00 00 00 00 00 01 01 02 09 01 00 00 00 01 00 01 02 01 01 04 01 00 03 00 01 01 0a 0b 06 d0 30 d0 49 00 47 00 00 01 01 01 09 0a 03 d0 30 47 00 00 02 02 01 01 09 27 d0 30 65 00 60 03 30 60 04 30 60 05 30 60 06 30 60 07 30 60 08 30 60 02 30 60 02 58 00 1d 1d 1d 1d 1d 1d 1d 68 01 47 00 00"/>
+      <body length="281" value="10 00 2e 00 00 00 00 0c 00 0a 43 6c 61 73 73 31 32 33 34 35 0d 44 69 73 70 6c 61 79 4f 62 6a 65 63 74 16 44 69 73 70 6c 61 79 4f 62 6a 65 63 74 43 6f 6e 74 61 69 6e 65 72 0f 45 76 65 6e 74 44 69 73 70 61 74 63 68 65 72 11 49 6e 74 65 72 61 63 74 69 76 65 4f 62 6a 65 63 74 09 4d 6f 76 69 65 43 6c 69 70 06 4f 62 6a 65 63 74 06 53 70 72 69 74 65 0d 66 6c 61 73 68 2e 64 69 73 70 6c 61 79 0c 66 6c 61 73 68 2e 65 76 65 6e 74 73 05 18 02 16 01 16 0a 16 0b 00 09 07 02 02 07 03 07 07 02 08 07 04 05 07 03 03 07 03 06 07 03 04 07 03 09 03 00 00 00 00 00 00 00 00 00 00 00 00 00 01 01 02 08 01 00 00 00 01 00 01 02 01 01 04 01 00 03 00 01 01 0a 0b 06 d0 30 d0 49 00 47 00 00 01 01 01 09 0a 03 d0 30 47 00 00 02 02 01 01 09 27 d0 30 65 00 60 03 30 60 04 30 60 05 30 60 06 30 60 07 30 60 08 30 60 02 30 60 02 58 00 1d 1d 1d 1d 1d 1d 1d 68 01 47 00 00"/>
     </tag>
-    <tag type="SymbolClass" typeNum="76">
-      <body length="15" value="01 00 00 00 43 6c 61 73 73 31 32 33 34 35 00"/>
-    </tag>
-    <tag type="ShowFrame" typeNum="1" frameId="0"/>
-    <tag type="End" typeNum="0"/>
+    <dataBlock src="Class12345_compilation.swf" offset="318" length="25"/>
   </tags>
 </SWF>

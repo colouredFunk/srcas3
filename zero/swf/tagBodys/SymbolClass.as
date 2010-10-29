@@ -17,11 +17,11 @@ SymbolClass 版本:v1.0
 //NameN 		STRING 			Fully-qualified class name for symbol N
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class SymbolClass extends TagBody{
+	public class SymbolClass{
 		public var TagV:Vector.<int>;
 		public var NameV:Vector.<String>;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var NumSymbols:int=data[offset++]|(data[offset++]<<8);
 			TagV=new Vector.<int>(NumSymbols);
 			NameV=new Vector.<String>(NumSymbols);
@@ -36,7 +36,7 @@ package zero.swf.tagBodys{
 			}
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var NumSymbols:int=TagV.length;
 			data[0]=NumSymbols;
@@ -56,7 +56,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<SymbolClass>
 				<TagAndNameList/>
 			</SymbolClass>;
@@ -74,7 +74,7 @@ package zero.swf.tagBodys{
 			}
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			if(xml.TagAndNameList.length()){
 				var listXML:XML=xml.TagAndNameList[0];
 				var TagXMLList:XMLList=listXML.Tag;

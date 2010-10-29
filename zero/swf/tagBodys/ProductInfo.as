@@ -29,7 +29,7 @@ ProductInfo 版本:v1.0
 package zero.swf.tagBodys{
 	import zero.swf.vmarks.ProductIDAndEditions;
 	import flash.utils.ByteArray;
-	public class ProductInfo extends TagBody{
+	public class ProductInfo{
 		public var ProductID:uint;						//UI32
 		public var Edition:uint;						//UI32
 		public var MajorVersion:int;					//UI8
@@ -38,7 +38,7 @@ package zero.swf.tagBodys{
 		public var BuildHigh:uint;						//UI32
 		public var CompilationDate:Number;				//UI64
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			ProductID=data[offset]|(data[offset+1]<<8)|(data[offset+2]<<16)|(data[offset+3]<<24);
 			Edition=data[offset+4]|(data[offset+5]<<8)|(data[offset+6]<<16)|(data[offset+7]<<24);
 			MajorVersion=data[offset+8];
@@ -58,7 +58,7 @@ package zero.swf.tagBodys{
 				+data[offset+25]*72057594037927940;
 			return offset+26;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=ProductID;
 			data[1]=ProductID>>8;
@@ -91,7 +91,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			return <ProductInfo
 				ProductID={ProductIDAndEditions.productIDV[ProductID]}
 				Edition={ProductIDAndEditions.editionV[Edition]}
@@ -102,7 +102,7 @@ package zero.swf.tagBodys{
 				CompilationDate={new Date(CompilationDate)}
 			/>;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			ProductID=ProductIDAndEditions[xml.@ProductID.toString()];
 			Edition=ProductIDAndEditions[xml.@Edition.toString()];
 			MajorVersion=int(xml.@MajorVersion.toString());

@@ -39,11 +39,11 @@ FrameLabel 版本:v1.0
 //Named Anchor flag UI8 								Always 1
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class FrameLabel extends TagBody{
+	public class FrameLabel{
 		public var Name:String;							//STRING
 		public var NamedAnchorflag:int;					//UI8
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var get_str_size:int=0;
 			while(data[offset+(get_str_size++)]){}
 			data.position=offset;
@@ -55,7 +55,7 @@ package zero.swf.tagBodys{
 			}
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data.writeUTFBytes(Name+"\x00");
 			
@@ -67,7 +67,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<FrameLabel
 				Name={Name}
 				NamedAnchorflag={NamedAnchorflag}
@@ -79,7 +79,7 @@ package zero.swf.tagBodys{
 			}
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			Name=xml.@Name.toString();
 			if(xml.@NamedAnchorflag){
 				NamedAnchorflag=int(xml.@NamedAnchorflag.toString());

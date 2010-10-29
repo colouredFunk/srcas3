@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <class>
-  <instance_info infos="public class" name="Class12345" super_name="flash.display.MovieClip" protectedNs="Class12345">
+  <instance_info infos="public dynamic class" name="Class12345" super_name="flash.display.MovieClip" protectedNs="Class12345">
     <iinit methodName="Class12345" methodId="1">
       <method_info return_type="*"/>
       <method_body max_stack="1" local_count="1" init_scope_depth="10" max_scope_depth="11">

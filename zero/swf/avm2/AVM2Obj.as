@@ -9,10 +9,9 @@ AVM2Obj 版本:v1.0
 
 package zero.swf.avm2{
 	import flash.utils.getQualifiedClassName;
+	import flash.utils.ByteArray;
 	
-	import zero.swf.BaseDat;
-
-	public class AVM2Obj extends BaseDat{
+	public class AVM2Obj{
 		private static const ABCClassNameV:Vector.<String>=Vector.<String>([
 			"ABCFileWithSimpleConstant_pool",
 			"ABCFile",
@@ -51,6 +50,22 @@ package zero.swf.avm2{
 		
 		public function AVM2Obj(){
 		}
+		
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+			return -1;
+		}
+		public function toData():ByteArray{
+			return null;
+		}
+		
+		////
+		CONFIG::toXMLAndInitByXML {
+		public function toXML():XML{
+			return null;
+		}
+		public function initByXML(xml:XML):void{
+		}
+		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
 

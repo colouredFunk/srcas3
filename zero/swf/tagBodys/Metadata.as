@@ -71,17 +71,17 @@ Metadata 版本:v1.0
 //Metadata 	STRING 			XML Metadata
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class Metadata extends TagBody{
+	public class Metadata{
 		public var metadata:String;						//STRING
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var get_str_size:int=0;
 			while(data[offset+(get_str_size++)]){}
 			data.position=offset;
 			metadata=data.readUTFBytes(get_str_size);
 			return offset+get_str_size;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data.writeUTFBytes(metadata+"\x00");
 			return data;
@@ -89,12 +89,12 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			return <Metadata
 				metadata={metadata}
 			/>;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			metadata=xml.@metadata.toString();
 		}
 		}//end of CONFIG::toXMLAndInitByXML

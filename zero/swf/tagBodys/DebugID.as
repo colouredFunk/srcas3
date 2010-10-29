@@ -11,10 +11,10 @@ DebugID 版本:v1.0
 package zero.swf.tagBodys{
 	import zero.BytesAndStr16;
 	import flash.utils.ByteArray;
-	public class DebugID extends TagBody{
+	public class DebugID{
 		public var id:String;							//DebugID
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			id=
 				BytesAndStr16._16V[data[offset]]+
 				BytesAndStr16._16V[data[offset+1]]+
@@ -38,7 +38,7 @@ package zero.swf.tagBodys{
 				BytesAndStr16._16V[data[offset+15]];
 			return offset+16;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var idStr:String=id.replace(/-/g,"");
 			data.writeUnsignedInt(uint("0x"+idStr.substr(0,8)));
@@ -50,12 +50,12 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			return <DebugID
 				id={id}
 			/>;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			id=xml.@id.toString();
 		}
 		}//end of CONFIG::toXMLAndInitByXML

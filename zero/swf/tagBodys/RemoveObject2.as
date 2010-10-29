@@ -16,14 +16,14 @@ RemoveObject2 版本:v1.0
 //Depth 			UI16 			Depth of character
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class RemoveObject2 extends TagBody{
+	public class RemoveObject2{
 		public var Depth:int;							//UI16
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			Depth=data[offset]|(data[offset+1]<<8);
 			return offset+2;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=Depth;
 			data[1]=Depth>>8;
@@ -32,12 +32,12 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			return <RemoveObject2
 				Depth={Depth}
 			/>;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			Depth=int(xml.@Depth.toString());
 		}
 		}//end of CONFIG::toXMLAndInitByXML

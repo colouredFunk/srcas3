@@ -39,7 +39,7 @@ package zero.swf.tagBodys{
 	import zero.swf.records.CXFORMWITHALPHA;
 	import zero.swf.records.CLIPACTIONS;
 	import flash.utils.ByteArray;
-	public class PlaceObject2 extends TagBody{
+	public class PlaceObject2{
 		public var PlaceFlagHasClipActions:int;
 		public var PlaceFlagHasClipDepth:int;
 		public var PlaceFlagHasName:int;
@@ -57,7 +57,7 @@ package zero.swf.tagBodys{
 		public var ClipDepth:int;						//UI16
 		public var ClipActions:CLIPACTIONS;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var flags:int=data[offset];
 			PlaceFlagHasClipActions=(flags<<24)>>>31;	//10000000
 			PlaceFlagHasClipDepth=(flags<<25)>>>31;		//01000000
@@ -109,7 +109,7 @@ package zero.swf.tagBodys{
 			}
 			return offset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			var flags:int=0;
 			flags|=PlaceFlagHasClipActions<<7;			//10000000
@@ -166,7 +166,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		public function toXML():XML{
 			var xml:XML=<PlaceObject2
 				PlaceFlagHasClipActions={PlaceFlagHasClipActions}
 				PlaceFlagHasClipDepth={PlaceFlagHasClipDepth}
@@ -223,7 +223,7 @@ package zero.swf.tagBodys{
 			}
 			return xml;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			PlaceFlagHasClipActions=int(xml.@PlaceFlagHasClipActions.toString());
 			PlaceFlagHasClipDepth=int(xml.@PlaceFlagHasClipDepth.toString());
 			PlaceFlagHasName=int(xml.@PlaceFlagHasName.toString());
