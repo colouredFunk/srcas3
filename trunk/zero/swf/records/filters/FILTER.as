@@ -23,7 +23,7 @@ package zero.swf.records.filters{
 		
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
+		public function toXML(xmlName:String):XML{
 			return null;
 		}
 		public function initByXML(xml:XML):void{
