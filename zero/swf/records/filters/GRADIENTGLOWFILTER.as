@@ -2,7 +2,7 @@
 GRADIENTGLOWFILTER 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月20日 15:26:09 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月1日 16:59:35 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -110,8 +110,8 @@ package zero.swf.records.filters{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
-			var xml:XML=<GRADIENTGLOWFILTER
+		override public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="GRADIENTGLOWFILTER"
 				BlurX={BlurX}
 				BlurY={BlurY}
 				Angle={Angle}
@@ -122,20 +122,16 @@ package zero.swf.records.filters{
 				CompositeSource={CompositeSource}
 				OnTop={OnTop}
 				Passes={Passes}
-			>
-				<GradientColorAndGradientRatioList/>
-			</GRADIENTGLOWFILTER>;
+			/>;
 			if(GradientColorV.length){
-				var listXML:XML=xml.GradientColorAndGradientRatioList[0];
-				listXML.@count=GradientColorV.length;
+				var listXML:XML=<GradientColorAndGradientRatioList count={GradientColorV.length}/>
 				var i:int=-1;
 				for each(var GradientColor:uint in GradientColorV){
 					i++;
 					listXML.appendChild(<GradientColor value={"0x"+BytesAndStr16._16V[(GradientColor>>24)&0xff]+BytesAndStr16._16V[(GradientColor>>16)&0xff]+BytesAndStr16._16V[(GradientColor>>8)&0xff]+BytesAndStr16._16V[GradientColor&0xff]}/>);
 					listXML.appendChild(<GradientRatio value={GradientRatioV[i]}/>);
 				}
-			}else{
-				delete xml.GradientColorAndGradientRatioList;
+				xml.appendChild(listXML);
 			}
 			return xml;
 		}
