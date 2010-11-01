@@ -2,7 +2,7 @@
 FILLSTYLE 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月20日 16:08:28 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月1日 20:49:59 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -26,41 +26,53 @@ FILLSTYLE 版本:v1.0
 //BitmapId 			If type = 0x40, 0x41, 0x42 or 0x43, UI16				ID of bitmap character for fill.
 //BitmapMatrix 		If type = 0x40, 0x41, 0x42 or 0x43, MATRIX				Matrix for bitmap fill.
 package zero.swf.records{
-	import zero.BytesAndStr16;
 	import flash.utils.ByteArray;
+	
+	import zero.BytesAndStr16;
+	import zero.swf.records.gardents.BaseGardent;
+
 	public class FILLSTYLE{
-		public var datas:Array;
+		public var FillStyleType:int;
+		
+		public var Color:int;
+		
+		public var GradientMatrix:MATRIX;
+		public var Gradient:BaseGardent;
+		public var FocalGradient:BaseGardent;
+		
+		public var BitmapId:int;
+		public var BitmapMatrix:MATRIX;
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			var FillStyleType:int=data[offset++];
+			FillStyleType=data[offset++];
 			switch(FillStyleType){
 				case 0x00:
-					var Color:int=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++];
-					datas=[FillStyleType,Color];
+					if(SHAPEWITHSTYLE.currSolidFillUseRGBA){
+						Color=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++]|(data[offset++]<<24);
+					}else{
+						Color=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++];
+					}
 				break;
 				case 0x10:
 				case 0x12:
 				case 0x13:
-					var GradientMatrix:MATRIX=new MATRIX();
+					GradientMatrix=new MATRIX();
 					offset=GradientMatrix.initByData(data,offset,endOffset);
 					if(FillStyleType==0x13){
-						var FocalGradient:FOCALGRADIENT=new FOCALGRADIENT();
+						FocalGradient=new SHAPEWITHSTYLE.currFocalGradientClass();
 						offset=FocalGradient.initByData(data,offset,endOffset);
-						datas=[FillStyleType,GradientMatrix,FocalGradient];
 					}else{
-						var Gradient:GRADIENT=new GRADIENT();
+						Gradient=new SHAPEWITHSTYLE.currGradientClass();
 						offset=Gradient.initByData(data,offset,endOffset);
-						datas=[FillStyleType,GradientMatrix,Gradient];
 					}
 				break;
 				case 0x40:
 				case 0x41:
 				case 0x42:
 				case 0x43:
-					var BitmapId:int=data[offset++]|(data[offset++]<<8);
-					var BitmapMatrix:MATRIX=new MATRIX();
+					BitmapId=data[offset++]|(data[offset++]<<8);
+					BitmapMatrix=new MATRIX();
 					offset=BitmapMatrix.initByData(data,offset,endOffset);
-					datas=[FillStyleType,BitmapId,BitmapMatrix];
 				break;
 				default:
 					throw new Error("未知 FillStyleType: "+FillStyleType);
@@ -70,31 +82,39 @@ package zero.swf.records{
 		}
 		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
-			var FillStyleType:int=datas[0];
 			data[0]=FillStyleType;
 			switch(FillStyleType){
 				case 0x00:
-					var Color:int=datas[1];
-					data[1]=Color>>16;
-					data[2]=Color>>8;
-					data[3]=Color;
+					if(SHAPEWITHSTYLE.currSolidFillUseRGBA){
+						data[1]=Color>>16;
+						data[2]=Color>>8;
+						data[3]=Color;
+						data[4]=Color>>24;
+					}else{
+						data[1]=Color>>16;
+						data[2]=Color>>8;
+						data[3]=Color;
+					}
 				break;
 				case 0x10:
 				case 0x12:
 				case 0x13:
 					data.position=1;
-					data.writeBytes(datas[1].toData());
-					data.writeBytes(datas[2].toData());
+					data.writeBytes(GradientMatrix.toData());
+					if(FillStyleType==0x13){
+						data.writeBytes(FocalGradient.toData());
+					}else{
+						data.writeBytes(Gradient.toData());
+					}
 				break;
 				case 0x40:
 				case 0x41:
 				case 0x42:
 				case 0x43:
-					var BitmapId:int=datas[1];
 					data[1]=BitmapId;
 					data[2]=BitmapId>>8;
 					data.position=3;
-					data.writeBytes(datas[2].toData());
+					data.writeBytes(BitmapMatrix.toData());
 				break;
 				default:
 					throw new Error("未知 FillStyleType: "+FillStyleType);
@@ -105,42 +125,33 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
-			var xml:XML=<FILLSTYLE>
-				
-			</FILLSTYLE>;
-			import zero.BytesAndStr16;
-			var FillStyleType:int=datas[0];
+		public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="FILLSTYLE"/>;
 			xml.@FillStyleType="0x"+BytesAndStr16._16V[FillStyleType];
 			switch(FillStyleType){
 				case 0x00:
-					var Color:int=datas[1];
-					xml.@Color="0x"+BytesAndStr16._16V[(Color>>16)&0xff]+BytesAndStr16._16V[(Color>>8)&0xff]+BytesAndStr16._16V[Color&0xff]
+					if(SHAPEWITHSTYLE.currSolidFillUseRGBA){
+						xml.@Color="0x"+BytesAndStr16._16V[(Color>>24)&0xff]+BytesAndStr16._16V[(Color>>16)&0xff]+BytesAndStr16._16V[(Color>>8)&0xff]+BytesAndStr16._16V[Color&0xff];
+					}else{
+						xml.@Color="0x"+BytesAndStr16._16V[(Color>>16)&0xff]+BytesAndStr16._16V[(Color>>8)&0xff]+BytesAndStr16._16V[Color&0xff];
+					}
 				break;
 				case 0x10:
 				case 0x12:
 				case 0x13:
-					var GradientMatrixXML:XML=<GradientMatrix/>;
-					GradientMatrixXML.appendChild(datas[1].toXML());
-					xml.appendChild(GradientMatrixXML);
+					xml.appendChild(GradientMatrix.toXML("GradientMatrix"));
 					if(FillStyleType==0x13){
-						var FocalGradientXML:XML=<FocalGradient/>;
-						FocalGradientXML.appendChild(datas[2].toXML());
-						xml.appendChild(FocalGradientXML);
+						xml.appendChild(FocalGradient.toXML("FocalGradient"));
 					}else{
-						var GradientXML:XML=<Gradient/>;
-						GradientXML.appendChild(datas[2].toXML());
-						xml.appendChild(GradientXML);
+						xml.appendChild(Gradient.toXML("Gradient"));
 					}
 				break;
 				case 0x40:
 				case 0x41:
 				case 0x42:
 				case 0x43:
-					xml.@BitmapId=datas[1];
-					var BitmapMatrixXML:XML=<BitmapMatrix/>;
-					BitmapMatrixXML.appendChild(datas[2].toXML());
-					xml.appendChild(BitmapMatrixXML);
+					xml.@BitmapId=BitmapId;
+					xml.appendChild(BitmapMatrix.toXML("BitmapMatrix"));
 				break;
 				default:
 					throw new Error("未知 FillStyleType: "+FillStyleType);
@@ -149,35 +160,31 @@ package zero.swf.records{
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
-			var FillStyleType:int=int(xml.@FillStyleType.toString());
+			FillStyleType=int(xml.@FillStyleType.toString());
 			switch(FillStyleType){
 				case 0x00:
-					var Color:int=int(xml.@Color.toString());
-					datas=[FillStyleType,Color];
+					Color=int(xml.@Color.toString());
 				break;
 				case 0x10:
 				case 0x12:
 				case 0x13:
-					var GradientMatrix:MATRIX=new MATRIX();
-					GradientMatrix.initByXML(xml.GradientMatrix.children()[0]);
+					GradientMatrix=new MATRIX();
+					GradientMatrix.initByXML(xml.GradientMatrix[0]);
 					if(FillStyleType==0x13){
-						var FocalGradient:FOCALGRADIENT=new FOCALGRADIENT();
-						FocalGradient.initByXML(xml.FocalGradient.children()[0]);
-						datas=[FillStyleType,GradientMatrix,FocalGradient];
+						FocalGradient=new SHAPEWITHSTYLE.currFocalGradientClass();
+						FocalGradient.initByXML(xml.FocalGradient[0]);
 					}else{
-						var Gradient:GRADIENT=new GRADIENT();
-						Gradient.initByXML(xml.Gradient.children()[0]);
-						datas=[FillStyleType,GradientMatrix,Gradient];
+						Gradient=new SHAPEWITHSTYLE.currGradientClass();
+						Gradient.initByXML(xml.Gradient[0]);
 					}
 				break;
 				case 0x40:
 				case 0x41:
 				case 0x42:
 				case 0x43:
-					var BitmapId:int=int(xml.@BitmapId.toString());
-					var BitmapMatrix:MATRIX=new MATRIX();
-					BitmapMatrix.initByXML(xml.BitmapMatrix.children()[0]);
-					datas=[FillStyleType,BitmapId,BitmapMatrix];
+					BitmapId=int(xml.@BitmapId.toString());
+					BitmapMatrix=new MATRIX();
+					BitmapMatrix.initByXML(xml.BitmapMatrix[0]);
 				break;
 				default:
 					throw new Error("未知 FillStyleType: "+FillStyleType);

@@ -2,7 +2,7 @@
 CLIPACTIONRECORD 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月20日 16:08:28 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月1日 18:38:20 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -19,14 +19,14 @@ package zero.swf.records{
 	import flash.utils.ByteArray;
 	public class CLIPACTIONRECORD{
 		public var EventFlags:CLIPEVENTFLAGS;
-		public var ActionRecordSize:uint;				//UI32
+		
 		public var KeyCode:int;							//UI8
 		public var Actions:ACTIONRECORD;
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			EventFlags=new CLIPEVENTFLAGS();
 			offset=EventFlags.initByData(data,offset,endOffset);
-			ActionRecordSize=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16)|(data[offset++]<<24);
+			var ActionRecordSize:int=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16)|(data[offset++]<<24);
 			endOffset=offset+ActionRecordSize;
 			
 			if(EventFlags.ClipEventKeyPress){
@@ -47,7 +47,7 @@ package zero.swf.records{
 			}
 			data.position=offset;
 			data.writeBytes(Actions.toData());
-			ActionRecordSize=data.length-ActionRecordSizeOffset;
+			var ActionRecordSize:int=data.length-ActionRecordSizeOffset;
 			data[ActionRecordSizeOffset-4]=ActionRecordSize;
 			data[ActionRecordSizeOffset-3]=ActionRecordSize>>8;
 			data[ActionRecordSizeOffset-2]=ActionRecordSize>>16;
@@ -57,32 +57,29 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
-			var xml:XML=<CLIPACTIONRECORD
-				ActionRecordSize={ActionRecordSize}
+		public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="CLIPACTIONRECORD"
 				KeyCode={KeyPressKeyCodes.keyCodeV[KeyCode]}
-			>
-				<EventFlags/>
-				<Actions/>
-			</CLIPACTIONRECORD>;
-			xml.EventFlags.appendChild(EventFlags.toXML());
+			/>;
+			xml.appendChild(EventFlags.toXML("EventFlags"));
+			
 			if(EventFlags.ClipEventKeyPress){
 				
 			}else{
 				delete xml.@KeyCode;
 			}
-			xml.Actions.appendChild(Actions.toXML());
+			xml.appendChild(Actions.toXML("Actions"));
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
 			EventFlags=new CLIPEVENTFLAGS();
-			EventFlags.initByXML(xml.EventFlags.children()[0]);
-			ActionRecordSize=uint(xml.@ActionRecordSize.toString());
+			EventFlags.initByXML(xml.EventFlags[0]);
+			
 			if(EventFlags.ClipEventKeyPress){
 				KeyCode=KeyPressKeyCodes[xml.@KeyCode.toString()];
 			}
 			Actions=new ACTIONRECORD();
-			Actions.initByXML(xml.Actions.children()[0]);
+			Actions.initByXML(xml.Actions[0]);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}
