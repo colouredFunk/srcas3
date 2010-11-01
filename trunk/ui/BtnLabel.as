@@ -13,34 +13,39 @@
 		protected var xOff:int;
 		protected var yOff:int;
 		
-		protected var __widthMax:int;
+		protected var __widthMax:uint;
 		[Inspectable(defaultValue=0,type="int",name="0_固定宽")]
-		public function set widthMax(_widthMax:int):void {
+		public function set widthMax(_widthMax:uint):void {
+			if (_widthMax==0) {
+				return;
+			}
 			__widthMax = _widthMax;
 			$setStyle(false);
 		}
+		/*
 		protected var __heightMax:int;
 		[Inspectable(defaultValue=0,type="int",name="0_固定高")]
 		public function set heightMax(_heightMax:int):void {
 			__heightMax = _heightMax;
 			$setStyle(false);
 		}
+		*/
+		[Inspectable(enumeration="left,right,center",defaultValue="left",type="String",name="1_对齐")]
+		public function set autoSize(_autoSize:String):void {
+			txt.autoSize = _autoSize;
+			$setStyle(false);
+		}
 		private var __label:String;
 		public function get label():String {
 			return __label;
 		}
-		[Inspectable(defaultValue="label",type="String",name="文本")]
+		[Inspectable(defaultValue="label",type="String",name="2_文本")]
 		public function set label(_label:String):void {
 			if (__label!=_label) {
 				__label=_label;
 				txt.text=__label;
 				$setStyle(false);
 			}
-		}
-		[Inspectable(enumeration="left,right,center",defaultValue="left",type="String",name="对齐")]
-		public function set autoSize(_autoSize:String):void {
-			txt.autoSize = _autoSize;
-			$setStyle(false);
 		}
 		override protected function init():void {
 			if (bar) {
@@ -68,7 +73,7 @@
 					}
 			}else {
 				if (bar) {
-					if (txt.width + widthAdd > __widthMax && txt.width + widthAdd * 0.25 < __widthMax) {
+					if (txt.width + widthAdd < __widthMax && txt.width + widthAdd * 0.25 < __widthMax) {
 						bar.width = __widthMax;
 					}else {
 						bar.width = int(txt.width + widthAdd);
