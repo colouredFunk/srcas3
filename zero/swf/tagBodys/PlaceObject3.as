@@ -2,7 +2,7 @@
 PlaceObject3 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月1日 16:01:29 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月1日 19:35:20 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -106,7 +106,8 @@ PlaceObject3 版本:v1.0
 package zero.swf.tagBodys{
 	import zero.swf.records.MATRIX;
 	import zero.swf.records.CXFORMWITHALPHA;
-	import zero.swf.records.FILTERLIST;
+	import zero.swf.vmarks.FilterTypes;
+	import zero.swf.records.filters.FILTER;
 	import zero.swf.vmarks.BlendModes;
 	import zero.swf.records.CLIPACTIONS;
 	import flash.utils.ByteArray;
@@ -132,7 +133,7 @@ package zero.swf.tagBodys{
 		public var Ratio:int;							//UI16
 		public var Name:String;							//STRING
 		public var ClipDepth:int;						//UI16
-		public var SurfaceFilterList:FILTERLIST;
+		public var SurfaceFilterV:Vector.<FILTER>;
 		public var BlendMode:int;						//UI8
 		public var BitmapCache:int;						//UI8
 		public var ClipActions:CLIPACTIONS;
@@ -200,8 +201,15 @@ package zero.swf.tagBodys{
 			
 			if(PlaceFlagHasFilterList){
 			
-				SurfaceFilterList=new FILTERLIST();
-				offset=SurfaceFilterList.initByData(data,offset,endOffset);
+				var NumberOfFilters:int=data[offset++];
+				SurfaceFilterV=new Vector.<FILTER>(NumberOfFilters);
+				for(var i:int=0;i<NumberOfFilters;i++){
+					var FilterID:int=data[offset++];
+			
+					SurfaceFilterV[i]=new FilterTypes.classV[FilterID]();
+					offset=SurfaceFilterV[i].initByData(data,offset,endOffset);
+					SurfaceFilterV[i].FilterID=FilterID;
+				}
 			}
 			
 			if(PlaceFlagHasBlendMode){
@@ -283,10 +291,16 @@ package zero.swf.tagBodys{
 				data[offset++]=ClipDepth>>8;
 			}
 			
-			if(PlaceFlagHasFilterList){
-				data.position=offset;
-				data.writeBytes(SurfaceFilterList.toData());
-				offset=data.length;
+			if(SurfaceFilterV){
+				var NumberOfFilters:int=SurfaceFilterV.length;
+				data[offset++]=NumberOfFilters;
+			
+				for each(var SurfaceFilter:FILTER in SurfaceFilterV){
+					data[offset++]=SurfaceFilter.FilterID;
+					data.position=offset;
+					data.writeBytes(SurfaceFilter.toData());
+					offset=data.length;
+				}
 			}
 			
 			if(PlaceFlagHasBlendMode){
@@ -341,13 +355,9 @@ package zero.swf.tagBodys{
 			}
 			if(PlaceFlagHasMatrix){
 				xml.appendChild(Matrix.toXML("Matrix"));
-			}else{
-				delete xml.Matrix;
 			}
 			if(PlaceFlagHasColorTransform){
 				xml.appendChild(ColorTransform.toXML("ColorTransform"));
-			}else{
-				delete xml.ColorTransform;
 			}
 			if(PlaceFlagHasRatio){
 				
@@ -364,10 +374,12 @@ package zero.swf.tagBodys{
 			}else{
 				delete xml.@ClipDepth;
 			}
-			if(PlaceFlagHasFilterList){
-				xml.appendChild(SurfaceFilterList.toXML("SurfaceFilterList"));
-			}else{
-				delete xml.SurfaceFilterList;
+			if(SurfaceFilterV&&SurfaceFilterV.length){
+				var listXML:XML=<SurfaceFilterList count={SurfaceFilterV.length}/>
+				for each(var SurfaceFilter:FILTER in SurfaceFilterV){
+					listXML.appendChild(SurfaceFilter.toXML("SurfaceFilter"));
+				}
+				xml.appendChild(listXML);
 			}
 			if(PlaceFlagHasBlendMode){
 				
@@ -381,8 +393,6 @@ package zero.swf.tagBodys{
 			}
 			if(PlaceFlagHasClipActions){
 				xml.appendChild(ClipActions.toXML("ClipActions"));
-			}else{
-				delete xml.ClipActions;
 			}
 			return xml;
 		}
@@ -424,9 +434,18 @@ package zero.swf.tagBodys{
 			if(PlaceFlagHasClipDepth){
 				ClipDepth=int(xml.@ClipDepth.toString());
 			}
-			if(PlaceFlagHasFilterList){
-				SurfaceFilterList=new FILTERLIST();
-				SurfaceFilterList.initByXML(xml.SurfaceFilterList[0]);
+			if(xml.SurfaceFilterList.length()){
+				var listXML:XML=xml.SurfaceFilterList[0];
+				var SurfaceFilterXMLList:XMLList=listXML.SurfaceFilter;
+				var i:int=-1;
+				SurfaceFilterV=new Vector.<FILTER>(SurfaceFilterXMLList.length());
+				for each(var SurfaceFilterXML:XML in SurfaceFilterXMLList){
+					i++;
+					var FilterID:int=FilterTypes[SurfaceFilterXML["@class"].toString()];
+					SurfaceFilterV[i]=new FilterTypes.classV[FilterID]();
+					SurfaceFilterV[i].initByXML(SurfaceFilterXML);
+					SurfaceFilterV[i].FilterID=FilterID;
+				}
 			}
 			if(PlaceFlagHasBlendMode){
 				BlendMode=BlendModes[xml.@BlendMode.toString()];
