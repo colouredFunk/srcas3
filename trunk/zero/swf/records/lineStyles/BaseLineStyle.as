@@ -1,16 +1,19 @@
 /***
-SHAPERECORD 版本:v1.0
+BaseLineStyle 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月9日 14:09:00
+创建时间:2010年11月1日 21:47:16
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.swf.records.shape_records{
-	import flash.utils.ByteArray;
-	public class SHAPERECORD{
-		public function SHAPERECORD(){//没什么实质功能，主要是为了方便 Vector.<SHAPERECORD>
+package zero.swf.records.lineStyles{
+	import flash.display.*;
+	import flash.events.*;
+	import flash.utils.*;
+	
+	public class BaseLineStyle{
+		public function BaseLineStyle(){
 		}
 		
 		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
@@ -22,7 +25,7 @@ package zero.swf.records.shape_records{
 		
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
+		public function toXML(xmlName:String):XML{
 			return null;
 		}
 		public function initByXML(xml:XML):void{

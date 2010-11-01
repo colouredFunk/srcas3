@@ -2,7 +2,7 @@
 CLIPACTIONS 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月20日 16:08:28 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月1日 19:09:02 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -67,25 +67,18 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
-			var xml:XML=<CLIPACTIONS
+		public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="CLIPACTIONS"
 				ClipActionEndFlag1={ClipActionEndFlag1}
 				ClipActionEndFlag2={ClipActionEndFlag2}
-			>
-				<AllEventFlags/>
-				<ClipActionRecordList/>
-			</CLIPACTIONS>;
-			xml.AllEventFlags.appendChild(AllEventFlags.toXML());
+			/>;
+			xml.appendChild(AllEventFlags.toXML("AllEventFlags"));
 			if(ClipActionRecordV.length){
-				var listXML:XML=xml.ClipActionRecordList[0];
-				listXML.@count=ClipActionRecordV.length;
+				var listXML:XML=<ClipActionRecordList count={ClipActionRecordV.length}/>
 				for each(var ClipActionRecord:CLIPACTIONRECORD in ClipActionRecordV){
-					var itemXML:XML=<ClipActionRecord/>;
-					itemXML.appendChild(ClipActionRecord.toXML());
-					listXML.appendChild(itemXML);
+					listXML.appendChild(ClipActionRecord.toXML("ClipActionRecord"));
 				}
-			}else{
-				delete xml.ClipActionRecordList;
+				xml.appendChild(listXML);
 			}
 			if(ClipActionEndFlag2>=0){
 				
@@ -97,7 +90,7 @@ package zero.swf.records{
 		public function initByXML(xml:XML):void{
 			ClipActionEndFlag2=-1;
 			AllEventFlags=new CLIPEVENTFLAGS();
-			AllEventFlags.initByXML(xml.AllEventFlags.children()[0]);
+			AllEventFlags.initByXML(xml.AllEventFlags[0]);
 			if(xml.ClipActionRecordList.length()){
 				var listXML:XML=xml.ClipActionRecordList[0];
 				var ClipActionRecordXMLList:XMLList=listXML.ClipActionRecord;
@@ -106,7 +99,7 @@ package zero.swf.records{
 				for each(var ClipActionRecordXML:XML in ClipActionRecordXMLList){
 					i++;
 					ClipActionRecordV[i]=new CLIPACTIONRECORD();
-					ClipActionRecordV[i].initByXML(ClipActionRecordXML.children()[0]);
+					ClipActionRecordV[i].initByXML(ClipActionRecordXML);
 				}
 			}else{
 				ClipActionRecordV=new Vector.<CLIPACTIONRECORD>();

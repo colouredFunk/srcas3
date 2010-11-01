@@ -2,7 +2,7 @@
 BUTTONRECORD_within_DefineButton 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月20日 16:08:28 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月1日 18:38:20 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -101,8 +101,8 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
-			var xml:XML=<BUTTONRECORD_within_DefineButton
+		public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="BUTTONRECORD_within_DefineButton"
 				ButtonHasBlendMode={ButtonHasBlendMode}
 				ButtonHasFilterList={ButtonHasFilterList}
 				ButtonStateHitTest={ButtonStateHitTest}
@@ -111,10 +111,8 @@ package zero.swf.records{
 				ButtonStateUp={ButtonStateUp}
 				CharacterID={CharacterID}
 				PlaceDepth={PlaceDepth}
-			>
-				<PlaceMatrix/>
-			</BUTTONRECORD_within_DefineButton>;
-			xml.PlaceMatrix.appendChild(PlaceMatrix.toXML());
+			/>;
+			xml.appendChild(PlaceMatrix.toXML("PlaceMatrix"));
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
@@ -127,7 +125,7 @@ package zero.swf.records{
 			CharacterID=int(xml.@CharacterID.toString());
 			PlaceDepth=int(xml.@PlaceDepth.toString());
 			PlaceMatrix=new MATRIX();
-			PlaceMatrix.initByXML(xml.PlaceMatrix.children()[0]);
+			PlaceMatrix.initByXML(xml.PlaceMatrix[0]);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

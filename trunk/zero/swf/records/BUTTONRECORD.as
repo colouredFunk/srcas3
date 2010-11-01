@@ -2,7 +2,7 @@
 BUTTONRECORD 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月24日 10:19:21 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月1日 19:11:34 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -52,7 +52,8 @@ BUTTONRECORD 版本:v1.0
 package zero.swf.records{
 	import zero.swf.records.MATRIX;
 	import zero.swf.records.CXFORMWITHALPHA;
-	import zero.swf.records.FILTERLIST;
+	import zero.swf.vmarks.FilterTypes;
+	import zero.swf.records.filters.FILTER;
 	import zero.swf.vmarks.BlendModes;
 	import flash.utils.ByteArray;
 	public class BUTTONRECORD{
@@ -66,7 +67,7 @@ package zero.swf.records{
 		public var PlaceDepth:int;						//UI16
 		public var PlaceMatrix:MATRIX;
 		public var ColorTransform:CXFORMWITHALPHA;
-		public var FilterList:FILTERLIST;
+		public var FilterV:Vector.<FILTER>;
 		public var BlendMode:int;						//UI8
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
@@ -89,8 +90,15 @@ package zero.swf.records{
 			
 			if(ButtonHasFilterList){
 			
-				FilterList=new FILTERLIST();
-				offset=FilterList.initByData(data,offset,endOffset);
+				var NumberOfFilters:int=data[offset++];
+				FilterV=new Vector.<FILTER>(NumberOfFilters);
+				for(var i:int=0;i<NumberOfFilters;i++){
+					var FilterID:int=data[offset++];
+			
+					FilterV[i]=new FilterTypes.classV[FilterID]();
+					offset=FilterV[i].initByData(data,offset,endOffset);
+					FilterV[i].FilterID=FilterID;
+				}
 			}
 			
 			if(ButtonHasBlendMode){
@@ -118,10 +126,16 @@ package zero.swf.records{
 			data.writeBytes(PlaceMatrix.toData());
 			data.writeBytes(ColorTransform.toData());
 			var offset:int=data.length;
-			if(ButtonHasFilterList){
-				data.position=offset;
-				data.writeBytes(FilterList.toData());
-				offset=data.length;
+			if(FilterV){
+				var NumberOfFilters:int=FilterV.length;
+				data[offset++]=NumberOfFilters;
+			
+				for each(var Filter:FILTER in FilterV){
+					data[offset++]=Filter.FilterID;
+					data.position=offset;
+					data.writeBytes(Filter.toData());
+					offset=data.length;
+				}
 			}
 			if(ButtonHasBlendMode){
 				data[offset++]=BlendMode;
@@ -131,8 +145,8 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
-			var xml:XML=<BUTTONRECORD
+		public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="BUTTONRECORD"
 				ButtonHasBlendMode={ButtonHasBlendMode}
 				ButtonHasFilterList={ButtonHasFilterList}
 				ButtonStateHitTest={ButtonStateHitTest}
@@ -142,17 +156,15 @@ package zero.swf.records{
 				CharacterID={CharacterID}
 				PlaceDepth={PlaceDepth}
 				BlendMode={BlendModes.blendModeV[BlendMode]}
-			>
-				<PlaceMatrix/>
-				<ColorTransform/>
-				<FilterList/>
-			</BUTTONRECORD>;
-			xml.PlaceMatrix.appendChild(PlaceMatrix.toXML());
-			xml.ColorTransform.appendChild(ColorTransform.toXML());
-			if(ButtonHasFilterList){
-				xml.FilterList.appendChild(FilterList.toXML());
-			}else{
-				delete xml.FilterList;
+			/>;
+			xml.appendChild(PlaceMatrix.toXML("PlaceMatrix"));
+			xml.appendChild(ColorTransform.toXML("ColorTransform"));
+			if(FilterV&&FilterV.length){
+				var listXML:XML=<FilterList count={FilterV.length}/>
+				for each(var Filter:FILTER in FilterV){
+					listXML.appendChild(Filter.toXML("Filter"));
+				}
+				xml.appendChild(listXML);
 			}
 			if(ButtonHasBlendMode){
 				
@@ -171,12 +183,21 @@ package zero.swf.records{
 			CharacterID=int(xml.@CharacterID.toString());
 			PlaceDepth=int(xml.@PlaceDepth.toString());
 			PlaceMatrix=new MATRIX();
-			PlaceMatrix.initByXML(xml.PlaceMatrix.children()[0]);
+			PlaceMatrix.initByXML(xml.PlaceMatrix[0]);
 			ColorTransform=new CXFORMWITHALPHA();
-			ColorTransform.initByXML(xml.ColorTransform.children()[0]);
-			if(ButtonHasFilterList){
-				FilterList=new FILTERLIST();
-				FilterList.initByXML(xml.FilterList.children()[0]);
+			ColorTransform.initByXML(xml.ColorTransform[0]);
+			if(xml.FilterList.length()){
+				var listXML:XML=xml.FilterList[0];
+				var FilterXMLList:XMLList=listXML.Filter;
+				var i:int=-1;
+				FilterV=new Vector.<FILTER>(FilterXMLList.length());
+				for each(var FilterXML:XML in FilterXMLList){
+					i++;
+					var FilterID:int=FilterTypes[FilterXML["@class"].toString()];
+					FilterV[i]=new FilterTypes.classV[FilterID]();
+					FilterV[i].initByXML(FilterXML);
+					FilterV[i].FilterID=FilterID;
+				}
 			}
 			if(ButtonHasBlendMode){
 				BlendMode=BlendModes[xml.@BlendMode.toString()];

@@ -2,7 +2,7 @@
 SHAPEWITHSTYLE 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月9日 15:53:44 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月9日 15:53:44
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -19,12 +19,18 @@ SHAPEWITHSTYLE 版本:v1.0
 package zero.swf.records{
 	import flash.utils.ByteArray;
 	
-	import zero.swf.records.shape_records.CURVEDEDGERECORD;
-	import zero.swf.records.shape_records.SHAPERECORD;
-	import zero.swf.records.shape_records.STRAIGHTEDGERECORD;
-	import zero.swf.records.shape_records.STYLECHANGERECORD;
+	import zero.swf.records.shapeRecords.CURVEDEDGERECORD;
+	import zero.swf.records.shapeRecords.SHAPERECORD;
+	import zero.swf.records.shapeRecords.STRAIGHTEDGERECORD;
+	import zero.swf.records.shapeRecords.STYLECHANGERECORD;
 
 	public class SHAPEWITHSTYLE{
+		public static var currSolidFillUseRGBA:Boolean;
+		public static var currGradientClass:Class;
+		public static var currFocalGradientClass:Class;
+		public static var currLineStyleClass:Class;
+		
+		
 		public var fillAndLineStyles:FillAndLineStyles;
 		
 		public var ShapeRecordV:Vector.<SHAPERECORD>;
@@ -463,28 +469,21 @@ package zero.swf.records{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
-			var xml:XML=<SHAPEWITHSTYLE>
-				<fillAndLineStyles/>
-				<ShapeRecordList/>
-			</SHAPEWITHSTYLE>;
-			xml.fillAndLineStyles.appendChild(fillAndLineStyles.toXML());
+		public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="SHAPEWITHSTYLE"/>;
+			xml.appendChild(fillAndLineStyles.toXML("fillAndLineStyles"));
 			if(ShapeRecordV.length){
-				var listXML:XML=xml.ShapeRecordList[0];
-				listXML.@count=ShapeRecordV.length;
+				var listXML:XML=<ShapeRecordList count={ShapeRecordV.length}/>;
 				for each(var ShapeRecord:SHAPERECORD in ShapeRecordV){
-					var itemXML:XML=<ShapeRecord/>;
-					itemXML.appendChild(ShapeRecord.toXML());
-					listXML.appendChild(itemXML);
+					listXML.appendChild(ShapeRecord.toXML("ShapeRecord"));
 				}
-			}else{
-				delete xml.ShapeRecordList;
+				xml.appendChild(listXML);
 			}
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
 			fillAndLineStyles=new FillAndLineStyles();
-			fillAndLineStyles.initByXML(xml.fillAndLineStyles.children()[0]);
+			fillAndLineStyles.initByXML(xml.fillAndLineStyles[0]);
 			
 			if(xml.ShapeRecordList.length()){
 				var listXML:XML=xml.ShapeRecordList[0];
@@ -493,8 +492,8 @@ package zero.swf.records{
 				ShapeRecordV=new Vector.<SHAPERECORD>(ShapeRecordXMLList.length());
 				for each(var ShapeRecordXML:XML in ShapeRecordXMLList){
 					i++;
-					var ShapeRecordXMLNode:XML=ShapeRecordXML.children()[0];
-					switch(ShapeRecordXMLNode.name().toString()){
+					var ShapeRecordXMLNode:XML=ShapeRecordXML[0];
+					switch(ShapeRecordXMLNode["@class"].toString()){
 						case "STYLECHANGERECORD":
 							ShapeRecordV[i]=new STYLECHANGERECORD();
 						break;
@@ -505,7 +504,7 @@ package zero.swf.records{
 							ShapeRecordV[i]=new CURVEDEDGERECORD();
 						break;
 						default:
-							throw new Error("奇怪的 ShapeRecordXMLNode.name(): "+ShapeRecordXMLNode.name().toString());
+							throw new Error("奇怪的 ShapeRecordXMLNode.@class: "+ShapeRecordXMLNode["@class"].toString());
 						break;
 					}
 					ShapeRecordV[i].initByXML(ShapeRecordXMLNode);
