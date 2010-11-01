@@ -2,7 +2,7 @@
 DoABC 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月21日 16:40:07 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月1日 16:35:21 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -47,21 +47,19 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
-			var xml:XML=<DoABC
+		public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="DoABC"
 				Flags={Flags}
 				Name={Name}
-			>
-				<ABCData/>
-			</DoABC>;
-			xml.ABCData.appendChild(ABCData.toXML());
+			/>;
+			xml.appendChild(ABCData.toXML("ABCData"));
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
 			Flags=uint(xml.@Flags.toString());
 			Name=xml.@Name.toString();
-			var ABCDataXML:XML=xml.ABCData.children()[0];
-			ABCData=new (AVM2Obj.getClassByClassName(ABCDataXML.name().toString()))();
+			var ABCDataXML:XML=xml.ABCData[0];
+			ABCData=new (AVM2Obj.getClassByClassName(ABCDataXML["@class"].toString()))();
 			ABCData.initByXML(ABCDataXML);
 		}
 		}//end of CONFIG::toXMLAndInitByXML

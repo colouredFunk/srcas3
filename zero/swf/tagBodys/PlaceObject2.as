@@ -2,7 +2,7 @@
 PlaceObject2 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月20日 15:10:44 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月1日 16:01:29 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -166,8 +166,8 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
-			var xml:XML=<PlaceObject2
+		public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="PlaceObject2"
 				PlaceFlagHasClipActions={PlaceFlagHasClipActions}
 				PlaceFlagHasClipDepth={PlaceFlagHasClipDepth}
 				PlaceFlagHasName={PlaceFlagHasName}
@@ -181,23 +181,19 @@ package zero.swf.tagBodys{
 				Ratio={Ratio}
 				Name={Name}
 				ClipDepth={ClipDepth}
-			>
-				<Matrix/>
-				<ColorTransform/>
-				<ClipActions/>
-			</PlaceObject2>;
+			/>;
 			if(PlaceFlagHasCharacter){
 				
 			}else{
 				delete xml.@CharacterId;
 			}
 			if(PlaceFlagHasMatrix){
-				xml.Matrix.appendChild(Matrix.toXML());
+				xml.appendChild(Matrix.toXML("Matrix"));
 			}else{
 				delete xml.Matrix;
 			}
 			if(PlaceFlagHasColorTransform){
-				xml.ColorTransform.appendChild(ColorTransform.toXML());
+				xml.appendChild(ColorTransform.toXML("ColorTransform"));
 			}else{
 				delete xml.ColorTransform;
 			}
@@ -217,7 +213,7 @@ package zero.swf.tagBodys{
 				delete xml.@ClipDepth;
 			}
 			if(PlaceFlagHasClipActions){
-				xml.ClipActions.appendChild(ClipActions.toXML());
+				xml.appendChild(ClipActions.toXML("ClipActions"));
 			}else{
 				delete xml.ClipActions;
 			}
@@ -238,11 +234,11 @@ package zero.swf.tagBodys{
 			}
 			if(PlaceFlagHasMatrix){
 				Matrix=new MATRIX();
-				Matrix.initByXML(xml.Matrix.children()[0]);
+				Matrix.initByXML(xml.Matrix[0]);
 			}
 			if(PlaceFlagHasColorTransform){
 				ColorTransform=new CXFORMWITHALPHA();
-				ColorTransform.initByXML(xml.ColorTransform.children()[0]);
+				ColorTransform.initByXML(xml.ColorTransform[0]);
 			}
 			if(PlaceFlagHasRatio){
 				Ratio=int(xml.@Ratio.toString());
@@ -255,7 +251,7 @@ package zero.swf.tagBodys{
 			}
 			if(PlaceFlagHasClipActions){
 				ClipActions=new CLIPACTIONS();
-				ClipActions.initByXML(xml.ClipActions.children()[0]);
+				ClipActions.initByXML(xml.ClipActions[0]);
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML

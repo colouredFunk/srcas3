@@ -2,7 +2,7 @@
 DefineButton2 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月20日 14:54:30 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月1日 16:45:36 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -91,12 +91,13 @@ package zero.swf.tagBodys{
 			for each(var Actions:BUTTONCONDACTION in ActionsV){
 				var ActionsData:ByteArray=Actions.toData();
 				if(--restActionsNum){
-					Actions.CondActionSize=ActionsData.length;
-					ActionsData[0]=Actions.CondActionSize;
-					ActionsData[1]=Actions.CondActionSize>>8;
-				}else{
-					Actions.CondActionSize=0;
-				}
+					var CondActionSize:int=ActionsData.length;
+					ActionsData[0]=CondActionSize;
+					ActionsData[1]=CondActionSize>>8;
+				}//else{
+				//	ActionsData[0]=0;
+				//	ActionsData[1]=0;
+				//}
 				data.writeBytes(ActionsData);
 			}
 			return data;
@@ -104,36 +105,29 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
-			var xml:XML=<DefineButton2
+		public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="DefineButton2"
 				id={id}
 				TrackAsMenu={TrackAsMenu}
 				CharacterEndFlag={CharacterEndFlag}
-			>
-				<CharacterList/>
-				<ActionsList/>
-			</DefineButton2>;
+			/>;
 			if(CharacterV.length){
-				var listXML:XML=xml.CharacterList[0];
-				listXML.@count=CharacterV.length;
+				var listXML:XML=<CharacterList count={CharacterV.length}/>
 				for each(var Character:BUTTONRECORD in CharacterV){
 					var itemXML:XML=<Character/>;
-					itemXML.appendChild(Character.toXML());
+					itemXML.appendChild(Character.toXML("Character"));
 					listXML.appendChild(itemXML);
 				}
-			}else{
-				delete xml.CharacterList;
+				xml.appendChild(listXML);
 			}
 			if(ActionsV.length){
-				listXML=xml.ActionsList[0];
-				listXML.@count=ActionsV.length;
+				listXML=<ActionsList count={ActionsV.length}/>
 				for each(var Actions:BUTTONCONDACTION in ActionsV){
 					itemXML=<Actions/>;
-					itemXML.appendChild(Actions.toXML());
+					itemXML.appendChild(Actions.toXML("Actions"));
 					listXML.appendChild(itemXML);
 				}
-			}else{
-				delete xml.ActionsList;
+				xml.appendChild(listXML);
 			}
 			return xml;
 		}
@@ -148,7 +142,7 @@ package zero.swf.tagBodys{
 				for each(var CharacterXML:XML in CharacterXMLList){
 					i++;
 					CharacterV[i]=new BUTTONRECORD();
-					CharacterV[i].initByXML(CharacterXML.children()[0]);
+					CharacterV[i].initByXML(CharacterXML.Character[0]);
 				}
 			}else{
 				CharacterV=new Vector.<BUTTONRECORD>();
@@ -162,7 +156,7 @@ package zero.swf.tagBodys{
 				for each(var ActionsXML:XML in ActionsXMLList){
 					i++;
 					ActionsV[i]=new BUTTONCONDACTION();
-					ActionsV[i].initByXML(ActionsXML.children()[0]);
+					ActionsV[i].initByXML(ActionsXML.Actions[0]);
 				}
 			}else{
 				ActionsV=new Vector.<BUTTONCONDACTION>();

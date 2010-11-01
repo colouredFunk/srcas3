@@ -2,7 +2,7 @@
 DefineButtonCxform 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月20日 14:54:30 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月1日 16:45:36 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -49,22 +49,18 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
-			var xml:XML=<DefineButtonCxform
+		public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="DefineButtonCxform"
 				ButtonId={ButtonId}
-			>
-				<ButtonColorTransformList/>
-			</DefineButtonCxform>;
+			/>;
 			if(ButtonColorTransformV.length){
-				var listXML:XML=xml.ButtonColorTransformList[0];
-				listXML.@count=ButtonColorTransformV.length;
+				var listXML:XML=<ButtonColorTransformList count={ButtonColorTransformV.length}/>
 				for each(var ButtonColorTransform:CXFORM in ButtonColorTransformV){
 					var itemXML:XML=<ButtonColorTransform/>;
-					itemXML.appendChild(ButtonColorTransform.toXML());
+					itemXML.appendChild(ButtonColorTransform.toXML("ButtonColorTransform"));
 					listXML.appendChild(itemXML);
 				}
-			}else{
-				delete xml.ButtonColorTransformList;
+				xml.appendChild(listXML);
 			}
 			return xml;
 		}
@@ -78,7 +74,7 @@ package zero.swf.tagBodys{
 				for each(var ButtonColorTransformXML:XML in ButtonColorTransformXMLList){
 					i++;
 					ButtonColorTransformV[i]=new CXFORM();
-					ButtonColorTransformV[i].initByXML(ButtonColorTransformXML.children()[0]);
+					ButtonColorTransformV[i].initByXML(ButtonColorTransformXML.ButtonColorTransform[0]);
 				}
 			}else{
 				ButtonColorTransformV=new Vector.<CXFORM>();
