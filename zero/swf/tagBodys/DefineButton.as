@@ -2,7 +2,7 @@
 DefineButton 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月1日 19:09:01 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月1日 19:58:02 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -36,7 +36,7 @@ package zero.swf.tagBodys{
 		public var id:int;								//UI16
 		public var CharacterV:Vector.<BUTTONRECORD_within_DefineButton>;
 		public var CharacterEndFlag:int;				//UI8
-		public var restData:BytesData;
+		public var restDatas:BytesData;
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			id=data[offset]|(data[offset+1]<<8);
@@ -51,8 +51,8 @@ package zero.swf.tagBodys{
 			}
 			CharacterEndFlag=data[offset++];
 			
-			restData=new BytesData();
-			return restData.initByData(data,offset,endOffset);
+			restDatas=new BytesData();
+			return restDatas.initByData(data,offset,endOffset);
 		}
 		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
@@ -65,7 +65,7 @@ package zero.swf.tagBodys{
 			var offset:int=data.length;
 			data[offset++]=CharacterEndFlag;
 			data.position=offset;
-			data.writeBytes(restData.toData());
+			data.writeBytes(restDatas.toData());
 			return data;
 		}
 
@@ -83,7 +83,7 @@ package zero.swf.tagBodys{
 				}
 				xml.appendChild(listXML);
 			}
-			xml.appendChild(restData.toXML("restData"));
+			xml.appendChild(restDatas.toXML("restDatas"));
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
@@ -102,8 +102,8 @@ package zero.swf.tagBodys{
 				CharacterV=new Vector.<BUTTONRECORD_within_DefineButton>();
 			}
 			CharacterEndFlag=int(xml.@CharacterEndFlag.toString());
-			restData=new BytesData();
-			restData.initByXML(xml.restData[0]);
+			restDatas=new BytesData();
+			restDatas.initByXML(xml.restDatas[0]);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}
