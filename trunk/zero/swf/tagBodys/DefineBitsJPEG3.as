@@ -2,7 +2,7 @@
 DefineBitsJPEG3 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月20日 19:46:58 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月1日 16:01:28 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -39,14 +39,12 @@ package zero.swf.tagBodys{
 	public class DefineBitsJPEG3{
 		public var id:int;								//UI16
 		
-		public var AlphaDataOffset:uint;				//UI32
 		public var ImageData:BytesData;
 		public var BitmapAlphaData:BytesData;
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			id=data[offset]|(data[offset+1]<<8);
-			
-			AlphaDataOffset=data[offset+2]|(data[offset+3]<<8)|(data[offset+4]<<16)|(data[offset+5]<<24);
+			var AlphaDataOffset:int=data[offset+2]|(data[offset+3]<<8)|(data[offset+4]<<16)|(data[offset+5]<<24);
 			offset+=6;
 			ImageData=new BytesData();
 			offset=ImageData.initByData(data,offset,offset+AlphaDataOffset);
@@ -58,7 +56,7 @@ package zero.swf.tagBodys{
 			var data:ByteArray=new ByteArray();
 			data[0]=id;
 			data[1]=id>>8;
-			AlphaDataOffset=ImageData.dataLength;
+			var AlphaDataOffset:int=ImageData.dataLength;
 			data[2]=AlphaDataOffset;
 			data[3]=AlphaDataOffset>>8;
 			data[4]=AlphaDataOffset>>16;
@@ -71,27 +69,22 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
-			var xml:XML=<DefineBitsJPEG3
+		public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="DefineBitsJPEG3"
 				id={id}
-				AlphaDataOffset={AlphaDataOffset}
-			>
-				<ImageData/>
-				<BitmapAlphaData/>
-			</DefineBitsJPEG3>;
+			/>;
 			
-			xml.ImageData.appendChild(ImageData.toXML());
-			xml.BitmapAlphaData.appendChild(BitmapAlphaData.toXML());
+			xml.appendChild(ImageData.toXML("ImageData"));
+			xml.appendChild(BitmapAlphaData.toXML("BitmapAlphaData"));
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
 			id=int(xml.@id.toString());
 			
-			AlphaDataOffset=uint(xml.@AlphaDataOffset.toString());
 			ImageData=new BytesData();
-			ImageData.initByXML(xml.ImageData.children()[0]);
+			ImageData.initByXML(xml.ImageData[0]);
 			BitmapAlphaData=new BytesData();
-			BitmapAlphaData.initByXML(xml.BitmapAlphaData.children()[0]);
+			BitmapAlphaData.initByXML(xml.BitmapAlphaData[0]);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

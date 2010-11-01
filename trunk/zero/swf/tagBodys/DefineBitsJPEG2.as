@@ -2,7 +2,7 @@
 DefineBitsJPEG2 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月20日 14:54:30 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月1日 16:01:28 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -51,19 +51,17 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
-			var xml:XML=<DefineBitsJPEG2
+		public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="DefineBitsJPEG2"
 				id={id}
-			>
-				<ImageData/>
-			</DefineBitsJPEG2>;
-			xml.ImageData.appendChild(ImageData.toXML());
+			/>;
+			xml.appendChild(ImageData.toXML("ImageData"));
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
 			id=int(xml.@id.toString());
 			ImageData=new BytesData();
-			ImageData.initByXML(xml.ImageData.children()[0]);
+			ImageData.initByXML(xml.ImageData[0]);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}
