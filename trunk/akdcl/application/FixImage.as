@@ -29,6 +29,9 @@ package akdcl.application{
 		public var background:*;
 		public var viewBackground:*;
 		
+		public var btnBrowse:*;
+		public var btnReset:*;
+		
 		protected var moveRect:UISprite;
 		protected var foregroundRect:UISprite;
 		protected var transformTool:TransformTool;
@@ -112,6 +115,12 @@ package akdcl.application{
 			urlRequest.contentType = formVariables.contentType;
 			urlLoader = new URLLoader();
 			bitmapTemp = new Bitmap();
+			if (btnBrowse) {
+				btnBrowse.release = browse;
+			}
+			if (btnReset) {
+				btnReset.release = reset;
+			}
 		}
 		override protected function onRemoveToStageHandler():void {
 			fileRef.remove();
@@ -130,6 +139,7 @@ package akdcl.application{
 			transformTool = null;
 			fileRef = null;
 			__bitmapData = null;
+			btnBrowse = null;
 		}
 		public function browse():void {
 			fileRef.browseFile();
@@ -149,7 +159,12 @@ package akdcl.application{
 			transformTool.selectedItem = moveRect;
 			updateBMD();
 		}
-		public function upload(_url:String, _quality:uint = 80, ...args):URLLoader {
+		public function addData(_data:Object):void {
+			for (var _i:String in _data) {
+				formVariables.add(_i, _data[_i]);
+			}
+		}
+		public function upload(_url:String, _quality:uint = 80, _isGBKData:Boolean = false, ...args):URLLoader {
 			if (!__bitmapData) {
 				return null;
 			}
@@ -173,7 +188,7 @@ package akdcl.application{
 					_bmd.dispose();
 				}
 			}
-			urlRequest.data = formVariables.data;
+			urlRequest.data = _isGBKData?formVariables.dataGBK:formVariables.data;
 			urlRequest.url = _url;
 			urlLoader.load(urlRequest);
 			return urlLoader;

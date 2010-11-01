@@ -264,14 +264,12 @@
 					break;
 				case PicPlayer.TWEENED:
 					mouseChildren = true;
-					mouseEnabled = true;
 					picPlayer.mouseChildren = true;
 					picPlayer.mouseEnabled = true;
 					break;
 				case PicPlayer.LOAD:
 				case PicPlayer.RELOAD:
 					mouseChildren = false;
-					mouseEnabled = false;
 					picPlayer.mouseChildren = false;
 					picPlayer.mouseEnabled = false;
 					if (btn_select) {
