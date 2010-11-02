@@ -201,14 +201,14 @@ package zero.swf.avm2.advances{
 		
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
+		public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
 			var xml:XML=toXML_fun(Method_info_memberV);
 			
 			if(codes){
 				toXML_fun(Method_body_info_memberV,xml);
 				
 				var infoXML:XML=<codes/>;
-				infoXML.appendChild(codes.toXML());
+				infoXML.appendChild(codes.toXML("codes"));
 				xml.appendChild(infoXML);
 			}
 			

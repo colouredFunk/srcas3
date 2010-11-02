@@ -73,7 +73,7 @@ package zero.swf.avm2.traits{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		override public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
 			var xml:XML=<Trait_slot
 				slot_id={slot_id}
 				type_name={type_name}
