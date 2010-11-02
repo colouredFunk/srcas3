@@ -26,15 +26,6 @@ package zero.swf.avm1{
 				actionRecordV[actionRecordV.length]=this;
 			}
 		}
-		////
-		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
-			//暂时用着
-			var xml:XML=super.toXML();
-			xml.setName("ACTIONRECORD");
-			return xml;
-		}
-		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
 
