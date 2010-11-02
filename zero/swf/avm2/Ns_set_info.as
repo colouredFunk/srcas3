@@ -2,7 +2,7 @@
 Ns_set_info 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月20日 16:25:31 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月2日 20:19:34 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -53,18 +53,14 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
-			var xml:XML=<Ns_set_info>
-				<nsList/>
-			</Ns_set_info>;
+		override public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="Ns_set_info"/>;
 			if(nsV.length){
-				var listXML:XML=xml.nsList[0];
-				listXML.@count=nsV.length;
+				var listXML:XML=<nsList count={nsV.length}/>
 				for each(var ns:int in nsV){
 					listXML.appendChild(<ns value={ns}/>);
 				}
-			}else{
-				delete xml.nsList;
+				xml.appendChild(listXML);
 			}
 			return xml;
 		}

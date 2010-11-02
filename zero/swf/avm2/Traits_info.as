@@ -2,7 +2,7 @@
 Traits_info 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月20日 16:47:02 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月2日 20:19:34 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -118,8 +118,8 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
-			var xml:XML=<Traits_info
+		override public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="Traits_info"
 				name={name}
 				kind_attributes={(
 					"|"+TraitAttributes.flagV[kind_attributes&TraitAttributes.Final]+
@@ -127,19 +127,14 @@ package zero.swf.avm2{
 					"|"+TraitAttributes.flagV[kind_attributes&TraitAttributes.Metadata]
 				).replace(/\|null/g,"").substr(1)}
 				kind_trait_type={TraitTypes.typeV[kind_trait_type]}
-			>
-				<trait/>
-				<metadataList/>
-			</Traits_info>;
-			xml.trait.appendChild(trait.toXML());
+			/>;
+			xml.appendChild(trait.toXML("trait"));
 			if(metadataV&&metadataV.length){
-				var listXML:XML=xml.metadataList[0];
-				listXML.@count=metadataV.length;
+				var listXML:XML=<metadataList count={metadataV.length}/>
 				for each(var metadata:int in metadataV){
 					listXML.appendChild(<metadata value={metadata}/>);
 				}
-			}else{
-				delete xml.metadataList;
+				xml.appendChild(listXML);
 			}
 			return xml;
 		}

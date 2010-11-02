@@ -2,7 +2,7 @@
 ABCFile 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月25日 10:15:36 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月2日 20:19:34 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -488,28 +488,13 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
-			var xml:XML=<ABCFile
+		override public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="ABCFile"
 				minor_version={minor_version}
 				major_version={major_version}
-			>
-				<integerList/>
-				<uintegerList/>
-				<doubleList/>
-				<stringList/>
-				<namespace_infoList/>
-				<ns_set_infoList/>
-				<multiname_infoList/>
-				<method_infoList/>
-				<metadata_infoList/>
-				<instance_infoList/>
-				<class_infoList/>
-				<script_infoList/>
-				<method_body_infoList/>
-			</ABCFile>;
+			/>;
 			if(integerV.length){
-				var listXML:XML=xml.integerList[0];
-				listXML.@count=integerV.length;
+				var listXML:XML=<integerList count={integerV.length}/>
 				var i:int=0;
 				for each(var integer:int in integerV){
 					if(i<1){
@@ -518,12 +503,10 @@ package zero.swf.avm2{
 					}
 					listXML.appendChild(<integer value={integer}/>);
 				}
-			}else{
-				delete xml.integerList;
+				xml.appendChild(listXML);
 			}
 			if(uintegerV.length){
-				listXML=xml.uintegerList[0];
-				listXML.@count=uintegerV.length;
+				listXML=<uintegerList count={uintegerV.length}/>
 				i=0;
 				for each(var uinteger:int in uintegerV){
 					if(i<1){
@@ -532,12 +515,10 @@ package zero.swf.avm2{
 					}
 					listXML.appendChild(<uinteger value={uinteger}/>);
 				}
-			}else{
-				delete xml.uintegerList;
+				xml.appendChild(listXML);
 			}
 			if(doubleV.length){
-				listXML=xml.doubleList[0];
-				listXML.@count=doubleV.length;
+				listXML=<doubleList count={doubleV.length}/>
 				i=0;
 				for each(var double:Number in doubleV){
 					if(i<1){
@@ -546,12 +527,10 @@ package zero.swf.avm2{
 					}
 					listXML.appendChild(<double value={double}/>);
 				}
-			}else{
-				delete xml.doubleList;
+				xml.appendChild(listXML);
 			}
 			if(stringV.length){
-				listXML=xml.stringList[0];
-				listXML.@count=stringV.length;
+				listXML=<stringList count={stringV.length}/>
 				i=0;
 				for each(var string:String in stringV){
 					if(i<1){
@@ -560,122 +539,85 @@ package zero.swf.avm2{
 					}
 					listXML.appendChild(<string value={string/*要求10.1.52.14或以上的播放器 或 2.0.2.12610 以上的 air 才能正确的处理 "\x00"*/}/>);
 				}
-			}else{
-				delete xml.stringList;
+				xml.appendChild(listXML);
 			}
 			if(namespace_infoV.length){
-				listXML=xml.namespace_infoList[0];
-				listXML.@count=namespace_infoV.length;
+				listXML=<namespace_infoList count={namespace_infoV.length}/>
 				i=0;
 				for each(var namespace_info:Namespace_info in namespace_infoV){
 					if(i<1){
 						i++;
 						continue;
 					}
-					var itemXML:XML=<namespace_info/>;
-					itemXML.appendChild(namespace_info.toXML());
-					listXML.appendChild(itemXML);
+					listXML.appendChild(namespace_info.toXML("namespace_info"));
 				}
-			}else{
-				delete xml.namespace_infoList;
+				xml.appendChild(listXML);
 			}
 			if(ns_set_infoV.length){
-				listXML=xml.ns_set_infoList[0];
-				listXML.@count=ns_set_infoV.length;
+				listXML=<ns_set_infoList count={ns_set_infoV.length}/>
 				i=0;
 				for each(var ns_set_info:Ns_set_info in ns_set_infoV){
 					if(i<1){
 						i++;
 						continue;
 					}
-					itemXML=<ns_set_info/>;
-					itemXML.appendChild(ns_set_info.toXML());
-					listXML.appendChild(itemXML);
+					listXML.appendChild(ns_set_info.toXML("ns_set_info"));
 				}
-			}else{
-				delete xml.ns_set_infoList;
+				xml.appendChild(listXML);
 			}
 			if(multiname_infoV.length){
-				listXML=xml.multiname_infoList[0];
-				listXML.@count=multiname_infoV.length;
+				listXML=<multiname_infoList count={multiname_infoV.length}/>
 				i=0;
 				for each(var multiname_info:Multiname_info in multiname_infoV){
 					if(i<1){
 						i++;
 						continue;
 					}
-					itemXML=<multiname_info/>;
-					itemXML.appendChild(multiname_info.toXML());
-					listXML.appendChild(itemXML);
+					listXML.appendChild(multiname_info.toXML("multiname_info"));
 				}
-			}else{
-				delete xml.multiname_infoList;
+				xml.appendChild(listXML);
 			}
 			if(method_infoV.length){
-				listXML=xml.method_infoList[0];
-				listXML.@count=method_infoV.length;
+				listXML=<method_infoList count={method_infoV.length}/>
 				for each(var method_info:Method_info in method_infoV){
-					itemXML=<method_info/>;
-					itemXML.appendChild(method_info.toXML());
-					listXML.appendChild(itemXML);
+					listXML.appendChild(method_info.toXML("method_info"));
 				}
-			}else{
-				delete xml.method_infoList;
+				xml.appendChild(listXML);
 			}
 			if(metadata_infoV.length){
-				listXML=xml.metadata_infoList[0];
-				listXML.@count=metadata_infoV.length;
+				listXML=<metadata_infoList count={metadata_infoV.length}/>
 				for each(var metadata_info:Metadata_info in metadata_infoV){
-					itemXML=<metadata_info/>;
-					itemXML.appendChild(metadata_info.toXML());
-					listXML.appendChild(itemXML);
+					listXML.appendChild(metadata_info.toXML("metadata_info"));
 				}
-			}else{
-				delete xml.metadata_infoList;
+				xml.appendChild(listXML);
 			}
 			if(instance_infoV.length){
-				listXML=xml.instance_infoList[0];
-				listXML.@count=instance_infoV.length;
+				listXML=<instance_infoList count={instance_infoV.length}/>
 				for each(var instance_info:Instance_info in instance_infoV){
-					itemXML=<instance_info/>;
-					itemXML.appendChild(instance_info.toXML());
-					listXML.appendChild(itemXML);
+					listXML.appendChild(instance_info.toXML("instance_info"));
 				}
-			}else{
-				delete xml.instance_infoList;
+				xml.appendChild(listXML);
 			}
 			if(class_infoV.length){
-				listXML=xml.class_infoList[0];
-				listXML.@count=class_infoV.length;
+				listXML=<class_infoList count={class_infoV.length}/>
 				for each(var class_info:Class_info in class_infoV){
-					itemXML=<class_info/>;
-					itemXML.appendChild(class_info.toXML());
-					listXML.appendChild(itemXML);
+					listXML.appendChild(class_info.toXML("class_info"));
 				}
-			}else{
-				delete xml.class_infoList;
+				xml.appendChild(listXML);
 			}
 			if(script_infoV.length){
-				listXML=xml.script_infoList[0];
-				listXML.@count=script_infoV.length;
+				listXML=<script_infoList count={script_infoV.length}/>
 				for each(var script_info:Script_info in script_infoV){
-					itemXML=<script_info/>;
-					itemXML.appendChild(script_info.toXML());
-					listXML.appendChild(itemXML);
+					listXML.appendChild(script_info.toXML("script_info"));
 				}
-			}else{
-				delete xml.script_infoList;
+				xml.appendChild(listXML);
 			}
 			if(method_body_infoV.length){
-				listXML=xml.method_body_infoList[0];
-				listXML.@count=method_body_infoV.length;
+				listXML=<method_body_infoList count={method_body_infoV.length}/>
 				for each(var method_body_info:Method_body_info in method_body_infoV){
-					itemXML=<method_body_info/>;
-					itemXML.appendChild(method_body_info.toXML());
-					listXML.appendChild(itemXML);
+					listXML.appendChild(method_body_info.toXML("method_body_info"));
 				}
-			}else{
-				delete xml.method_body_infoList;
+				xml.appendChild(listXML);
 			}
 			return xml;
 		}
@@ -760,7 +702,7 @@ package zero.swf.avm2{
 					for each(var namespace_infoXML:XML in namespace_infoXMLList){
 						i++;
 						namespace_infoV[i]=new Namespace_info();
-						namespace_infoV[i].initByXML(namespace_infoXML.children()[0]);
+						namespace_infoV[i].initByXML(namespace_infoXML);
 					}
 				}else{
 					namespace_infoV=new Vector.<Namespace_info>();
@@ -778,7 +720,7 @@ package zero.swf.avm2{
 					for each(var ns_set_infoXML:XML in ns_set_infoXMLList){
 						i++;
 						ns_set_infoV[i]=new Ns_set_info();
-						ns_set_infoV[i].initByXML(ns_set_infoXML.children()[0]);
+						ns_set_infoV[i].initByXML(ns_set_infoXML);
 					}
 				}else{
 					ns_set_infoV=new Vector.<Ns_set_info>();
@@ -796,7 +738,7 @@ package zero.swf.avm2{
 					for each(var multiname_infoXML:XML in multiname_infoXMLList){
 						i++;
 						multiname_infoV[i]=new Multiname_info();
-						multiname_infoV[i].initByXML(multiname_infoXML.children()[0]);
+						multiname_infoV[i].initByXML(multiname_infoXML);
 					}
 				}else{
 					multiname_infoV=new Vector.<Multiname_info>();
@@ -812,7 +754,7 @@ package zero.swf.avm2{
 				for each(var method_infoXML:XML in method_infoXMLList){
 					i++;
 					method_infoV[i]=new Method_info();
-					method_infoV[i].initByXML(method_infoXML.children()[0]);
+					method_infoV[i].initByXML(method_infoXML);
 				}
 			}else{
 				method_infoV=new Vector.<Method_info>();
@@ -825,7 +767,7 @@ package zero.swf.avm2{
 				for each(var metadata_infoXML:XML in metadata_infoXMLList){
 					i++;
 					metadata_infoV[i]=new Metadata_info();
-					metadata_infoV[i].initByXML(metadata_infoXML.children()[0]);
+					metadata_infoV[i].initByXML(metadata_infoXML);
 				}
 			}else{
 				metadata_infoV=new Vector.<Metadata_info>();
@@ -838,7 +780,7 @@ package zero.swf.avm2{
 				for each(var instance_infoXML:XML in instance_infoXMLList){
 					i++;
 					instance_infoV[i]=new Instance_info();
-					instance_infoV[i].initByXML(instance_infoXML.children()[0]);
+					instance_infoV[i].initByXML(instance_infoXML);
 				}
 			}else{
 				instance_infoV=new Vector.<Instance_info>();
@@ -851,7 +793,7 @@ package zero.swf.avm2{
 				for each(var class_infoXML:XML in class_infoXMLList){
 					i++;
 					class_infoV[i]=new Class_info();
-					class_infoV[i].initByXML(class_infoXML.children()[0]);
+					class_infoV[i].initByXML(class_infoXML);
 				}
 			}else{
 				class_infoV=new Vector.<Class_info>();
@@ -864,7 +806,7 @@ package zero.swf.avm2{
 				for each(var script_infoXML:XML in script_infoXMLList){
 					i++;
 					script_infoV[i]=new Script_info();
-					script_infoV[i].initByXML(script_infoXML.children()[0]);
+					script_infoV[i].initByXML(script_infoXML);
 				}
 			}else{
 				script_infoV=new Vector.<Script_info>();
@@ -877,7 +819,7 @@ package zero.swf.avm2{
 				for each(var method_body_infoXML:XML in method_body_infoXMLList){
 					i++;
 					method_body_infoV[i]=new Method_body_info();
-					method_body_infoV[i].initByXML(method_body_infoXML.children()[0]);
+					method_body_infoV[i].initByXML(method_body_infoXML);
 				}
 			}else{
 				method_body_infoV=new Vector.<Method_body_info>();

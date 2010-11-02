@@ -2,7 +2,7 @@
 Metadata_info 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月20日 16:25:31 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月2日 20:19:34 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -58,22 +58,16 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
-			var xml:XML=<Metadata_info
+		override public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="Metadata_info"
 				name={name}
-			>
-				<item_infoList/>
-			</Metadata_info>;
+			/>;
 			if(item_infoV.length){
-				var listXML:XML=xml.item_infoList[0];
-				listXML.@count=item_infoV.length;
+				var listXML:XML=<item_infoList count={item_infoV.length}/>
 				for each(var item_info:Item_info in item_infoV){
-					var itemXML:XML=<item_info/>;
-					itemXML.appendChild(item_info.toXML());
-					listXML.appendChild(itemXML);
+					listXML.appendChild(item_info.toXML("item_info"));
 				}
-			}else{
-				delete xml.item_infoList;
+				xml.appendChild(listXML);
 			}
 			return xml;
 		}
@@ -87,7 +81,7 @@ package zero.swf.avm2{
 				for each(var item_infoXML:XML in item_infoXMLList){
 					i++;
 					item_infoV[i]=new Item_info();
-					item_infoV[i].initByXML(item_infoXML.children()[0]);
+					item_infoV[i].initByXML(item_infoXML);
 				}
 			}else{
 				item_infoV=new Vector.<Item_info>();
