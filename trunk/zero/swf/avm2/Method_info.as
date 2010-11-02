@@ -2,7 +2,7 @@
 Method_info 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月26日 21:33:55 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月2日 20:19:34 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -164,8 +164,8 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
-			var xml:XML=<Method_info
+		override public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="Method_info"
 				return_type={return_type}
 				name={name}
 				flags={(
@@ -176,40 +176,28 @@ package zero.swf.avm2{
 					"|"+MethodFlags.flagV[flags&MethodFlags.SET_DXNS]+
 					"|"+MethodFlags.flagV[flags&MethodFlags.HAS_PARAM_NAMES]
 				).replace(/\|null/g,"").substr(1)}
-			>
-				<param_typeList/>
-				<option_detailList/>
-				<param_nameList/>
-			</Method_info>;
+			/>;
 			
 			if(param_typeV.length){
-				var listXML:XML=xml.param_typeList[0];
-				listXML.@count=param_typeV.length;
+				var listXML:XML=<param_typeList count={param_typeV.length}/>
 				for each(var param_type:int in param_typeV){
 					listXML.appendChild(<param_type value={param_type}/>);
 				}
-			}else{
-				delete xml.param_typeList;
+				xml.appendChild(listXML);
 			}
 			if(option_detailV&&option_detailV.length){
-				listXML=xml.option_detailList[0];
-				listXML.@count=option_detailV.length;
+				listXML=<option_detailList count={option_detailV.length}/>
 				for each(var option_detail:Option_detail in option_detailV){
-					var itemXML:XML=<option_detail/>;
-					itemXML.appendChild(option_detail.toXML());
-					listXML.appendChild(itemXML);
+					listXML.appendChild(option_detail.toXML("option_detail"));
 				}
-			}else{
-				delete xml.option_detailList;
+				xml.appendChild(listXML);
 			}
 			if(param_nameV&&param_nameV.length){
-				listXML=xml.param_nameList[0];
-				listXML.@count=param_nameV.length;
+				listXML=<param_nameList count={param_nameV.length}/>
 				for each(var param_name:int in param_nameV){
 					listXML.appendChild(<param_name value={param_name}/>);
 				}
-			}else{
-				delete xml.param_nameList;
+				xml.appendChild(listXML);
 			}
 			return xml;
 		}
@@ -242,7 +230,7 @@ package zero.swf.avm2{
 				for each(var option_detailXML:XML in option_detailXMLList){
 					i++;
 					option_detailV[i]=new Option_detail();
-					option_detailV[i].initByXML(option_detailXML.children()[0]);
+					option_detailV[i].initByXML(option_detailXML);
 				}
 			}
 			if(xml.param_nameList.length()){

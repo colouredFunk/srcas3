@@ -2,7 +2,7 @@
 Instance_info 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月27日 19:43:21 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月2日 20:19:34 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -141,8 +141,8 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
-			var xml:XML=<Instance_info
+		override public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="Instance_info"
 				name={name}
 				super_name={super_name}
 				flags={(
@@ -153,34 +153,25 @@ package zero.swf.avm2{
 				).replace(/\|null/g,"").substr(1)}
 				protectedNs={protectedNs}
 				iinit={iinit}
-			>
-				<intrfList/>
-				<itraits_infoList/>
-			</Instance_info>;
+			/>;
 			if(protectedNs){
 				
 			}else{
 				delete xml.@protectedNs;
 			}
 			if(intrfV.length){
-				var listXML:XML=xml.intrfList[0];
-				listXML.@count=intrfV.length;
+				var listXML:XML=<intrfList count={intrfV.length}/>
 				for each(var intrf:int in intrfV){
 					listXML.appendChild(<intrf value={intrf}/>);
 				}
-			}else{
-				delete xml.intrfList;
+				xml.appendChild(listXML);
 			}
 			if(itraits_infoV.length){
-				listXML=xml.itraits_infoList[0];
-				listXML.@count=itraits_infoV.length;
+				listXML=<itraits_infoList count={itraits_infoV.length}/>
 				for each(var itraits_info:Traits_info in itraits_infoV){
-					var itemXML:XML=<itraits_info/>;
-					itemXML.appendChild(itraits_info.toXML());
-					listXML.appendChild(itemXML);
+					listXML.appendChild(itraits_info.toXML("itraits_info"));
 				}
-			}else{
-				delete xml.itraits_infoList;
+				xml.appendChild(listXML);
 			}
 			return xml;
 		}
@@ -217,7 +208,7 @@ package zero.swf.avm2{
 				for each(var itraits_infoXML:XML in itraits_infoXMLList){
 					i++;
 					itraits_infoV[i]=new Traits_info();
-					itraits_infoV[i].initByXML(itraits_infoXML.children()[0]);
+					itraits_infoV[i].initByXML(itraits_infoXML);
 				}
 			}else{
 				itraits_infoV=new Vector.<Traits_info>();
