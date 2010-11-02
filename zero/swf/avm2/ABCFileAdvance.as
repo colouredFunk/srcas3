@@ -35,17 +35,17 @@ package zero.swf.avm2{
 		
 		
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
-			var xml:XML=<ABCFileAdvance/>;
+		override public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="ABCFileAdvance"/>;
 			
-			xml.appendChild(advanceABC.toXML());
+			xml.appendChild(advanceABC.toXML("advanceABC"));
 			
 			return xml;
 		}
 		override public function initByXML(xml:XML):void{
 			
 			advanceABC=new AdvanceABC();
-			advanceABC.initByXML(xml.children()[0]);
+			advanceABC.initByXML(xml.advanceABC[0]);
 			
 		}
 		}

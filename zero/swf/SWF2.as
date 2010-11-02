@@ -184,21 +184,35 @@ package zero.swf{
 						metadataStr=metadata.metadata;
 					break;
 					default:
-						var TagBodyClass:Class=getSetValueTagBodyClasses[tag.type];
-						if(TagBodyClass){
-							var tagBody:Object=null;
+						var valueName:String=getSetValueValueNames[tag.type];
+						if(valueName){
+							//trace("valueName="+valueName);
+							var tagBody:Object;
 							if(tag.tagBody){
 								tagBody=tag.tagBody;
 							}else{
-								tagBody=new TagBodyClass();
+								tagBody=new getSetValueTagBodyClasses[tag.type]();
 								tagBody.initByData(tag.bodyData,tag.bodyOffset,tag.bodyOffset+tag.bodyLength);
 								tag.tagBody=tagBody;
 							}
-							getSetValueValues[getSetValueValueNames[tag.type]]=tagBody[getSetValueMemberNames[tag.type]];
+							getSetValueValues[valueName]=tagBody[getSetValueMemberNames[tag.type]];
 						}
 					break;
 				}
 			}
+			
+			/*
+			trace("tags2Infos");
+			for each(tag in tagV){
+				//trace(TagType.typeNameArr[tag.type]);
+				if(tag.type==TagType.SetBackgroundColor){
+					trace("tag.tagBody="+tag.tagBody);
+					trace(tag.tagBody["BackgroundColor"].toString(16));
+					trace(getValue("bgColor"));
+					break;
+				}
+			}
+			//*/
 		}
 		public function infos2Tags():void{
 			///*
@@ -290,6 +304,19 @@ package zero.swf{
 				tag.tagBody=fileAttributes;
 				tagV.unshift(tag);
 			}
+			
+			/*
+			trace("infos2Tags");
+			for each(tag in tagV){
+				//trace(TagType.typeNameArr[tag.type]);
+				if(tag.type==TagType.SetBackgroundColor){
+					trace("tag.tagBody="+tag.tagBody);
+					trace(tag.tagBody["BackgroundColor"].toString(16));
+					trace(getValue("bgColor"));
+					break;
+				}
+			}
+			//*/
 		}
 		
 		override public function toData():ByteArray{
@@ -355,7 +382,7 @@ package zero.swf{
 			
 			var dataAndTags:DataAndTags=new DataAndTags();
 			dataAndTags.tagV=tagV;
-			xml.appendChild(dataAndTags.toXML());
+			xml.appendChild(dataAndTags.toXML("dataAndTags"));
 			return xml;
 		}
 		public function toXML2(progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
@@ -405,7 +432,7 @@ package zero.swf{
 			
 			FrameRate=Number(xml.@FrameRate.toString());
 			var dataAndTags:DataAndTags=new DataAndTags();
-			dataAndTags.initByXML(xml.tags[0]);
+			dataAndTags.initByXML(xml.dataAndTags[0]);
 			tagV=dataAndTags.tagV;
 			
 			tags2Infos();
@@ -421,13 +448,13 @@ package zero.swf{
 			
 			dataAndTags=new DataAndTags();
 			dataAndTags.initByXML2(
-				xml.tags[0],
+				xml.dataAndTags[0],
 				progress_start,
 				progress_progress,
-				initByXMLL2_finished
+				initByXML2_finished
 			);
 		}
-		private function initByXMLL2_finished():void{
+		private function initByXML2_finished():void{
 			var _progress_finished:Function=progress_finished;
 			progress_finished=null;
 			

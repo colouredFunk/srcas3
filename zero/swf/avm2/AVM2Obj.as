@@ -60,7 +60,7 @@ package zero.swf.avm2{
 		
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
+		public function toXML(xmlName:String):XML{
 			return null;
 		}
 		public function initByXML(xml:XML):void{

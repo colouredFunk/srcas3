@@ -458,7 +458,7 @@ package zero.swf.avm2.advances{
 		
 		////
 	CONFIG::toXMLAndInitByXML {
-		public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
+		public function toXML(xmlName:String):XML{
 			//trace("toXML========================================");
 			
 			//为各级 toXML 作准备
@@ -466,20 +466,18 @@ package zero.swf.avm2.advances{
 			currInstance=this;
 			//准备完毕
 			
-			var xml:XML=<AdvanceABC
+			var xml:XML=<{xmlName} class="AdvanceABC"
 				minor_version={minor_version}
 				major_version={major_version}
 			/>;
 			
-			var classListXML:XML=<classList/>;
-			classListXML.@count=classV.length;
+			var classListXML:XML=<classList count={classV.length}/>;
 			for each(var clazz:AdvanceClass in classV){
 				classListXML.appendChild(clazz.toXML());
 			}
 			xml.appendChild(classListXML);
 			
-			var script_infoListXML:XML=<script_infoList/>;
-			script_infoListXML.@count=script_infoV.length;
+			var script_infoListXML:XML=<script_infoList count={script_infoV.length}/>;
 			for each(var script_info:AdvanceScript_info in script_infoV){
 				script_infoListXML.appendChild(script_info.toXML());
 			}

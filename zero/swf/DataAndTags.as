@@ -369,7 +369,7 @@ package zero.swf{
 		private var toXML_startOffset:int;
 		private var toXML_endOffset:int;
 		private function toXML_start():void{
-			toXMLResult=<tags FrameCount={FrameCount}/>;
+			toXMLResult=<dataAndTags class="DataAndTags" FrameCount={FrameCount}/>;
 			curr_frameId=0;
 			curr_childId=-1;
 			
@@ -381,7 +381,7 @@ package zero.swf{
 			toXMLResult.@FrameCount=FrameCount;
 			checkAddDataBlock();
 		}
-		public function toXML():XML{
+		public function toXML(xmlName:String):XML{
 			run("toXML");
 			var newXML:XML=toXMLResult;
 			toXMLResult=null;
@@ -393,6 +393,7 @@ package zero.swf{
 		private function toXML_step():void{
 			var tag:Tag=tagV[curr_childId];
 			var typeName:String=TagType.typeNameArr[tag.type];
+			//trace("toXML_step typeName="+typeName);
 			if(typeName){
 				
 			}else{
@@ -401,7 +402,19 @@ package zero.swf{
 					return;
 				}
 			}
-			if(typeName&&(optionV[tag.type]===noOutputOption)){
+			
+			var option:String;
+			if(tag.tagBody){
+				option=structorOption;
+			}else{
+				if(typeName){
+					option=optionV[tag.type];
+				}else{
+					option=defaultOption;
+				}
+			}
+			
+			if(option===noOutputOption){
 				//如果不是用同一个swf的数据的则可能会出错
 				if(toXML_startOffset==-1){
 					toXML_startOffset=tag.headOffset;
@@ -419,59 +432,50 @@ package zero.swf{
 					tagXML=<tag type="未知" typeNum={tag.type}/>;
 				}
 				
-				var option:String;
-				if(typeName){
-					option=optionV[tag.type];
-				}else{
-					option=defaultOption;
-				}
-				if(tag.tagBody){
-					tagXML.appendChild(tag.tagBody.toXML());
-				}else{
-					switch(option){
-						case structorOption:
-							if(tag.tagBody){
-								tagXML.appendChild(tag.tagBody.toXML());
-							}else{
-								throw new Error("暂不支持");
-							}
-						break;
-						case resourceOption:
-							//if(tag.tagBody){
-							//	throw new Error("暂不支持");
-							//}
-							
-							if(DefineObjs[typeName]){
-							}else{
-								throw new Error("暂不支持");
-							}
-							
-							var bodyXML:XML=<body defId={tag.getDefId()}/>;
-							toXML_addResourceTag(tag,bodyXML);
-							tagXML.appendChild(bodyXML);
-						break;
-						case byteCodesOption:
-							//if(tag.tagBody){
-							//	throw new Error("暂不支持");
-							//}
-							if(tag.bodyData&&tag.bodyLength>0){
-								tagXML.appendChild(<body length={tag.bodyLength} value={BytesAndStr16.bytes2str16(tag.bodyData,tag.bodyOffset,tag.bodyLength)}/>);
-							}
-						break;
-						case onlyLocationOption:
-							//if(tag.tagBody){
-							//	throw new Error("暂不支持");
-							//}
-							if(tag.bodyData&&tag.bodyLength>0){
-								tagXML.appendChild(<body src={currSrcName} offset={tag.bodyOffset} length={tag.bodyLength}/>);
-							}
-						break;
-						//case noOutputOption:
-						//break;
-						default:
-							throw new Error("未知 option: "+optionV[tag.type]);
-						break;
-					}
+				
+				switch(option){
+					case structorOption:
+						if(tag.tagBody){
+							tagXML.appendChild(tag.tagBody.toXML("tagBody"));
+						}else{
+							throw new Error("暂不支持");
+						}
+					break;
+					case resourceOption:
+						//if(tag.tagBody){
+						//	throw new Error("暂不支持");
+						//}
+						
+						if(DefineObjs[typeName]){
+						}else{
+							throw new Error("暂不支持");
+						}
+						
+						var bodyXML:XML=<body defId={tag.getDefId()}/>;
+						toXML_addResourceTag(tag,bodyXML);
+						tagXML.appendChild(bodyXML);
+					break;
+					case byteCodesOption:
+						//if(tag.tagBody){
+						//	throw new Error("暂不支持");
+						//}
+						if(tag.bodyData&&tag.bodyLength>0){
+							tagXML.appendChild(<body length={tag.bodyLength} value={BytesAndStr16.bytes2str16(tag.bodyData,tag.bodyOffset,tag.bodyLength)}/>);
+						}
+					break;
+					case onlyLocationOption:
+						//if(tag.tagBody){
+						//	throw new Error("暂不支持");
+						//}
+						if(tag.bodyData&&tag.bodyLength>0){
+							tagXML.appendChild(<body src={currSrcName} offset={tag.bodyOffset} length={tag.bodyLength}/>);
+						}
+					break;
+					//case noOutputOption:
+					//break;
+					default:
+						throw new Error("未知 option: "+optionV[tag.type]);
+					break;
 				}
 				
 				if(tag.type==TagType.ShowFrame){
@@ -594,7 +598,7 @@ package zero.swf{
 					tag.bodyData=new ByteArray();
 				}else{
 					var bodyXML:XML=tagsChildXML.children()[0];
-					if(bodyXML.name()=="body"){
+					if(bodyXML.name().toString()=="body"){
 						var valueStr:String=bodyXML.@value.toString();
 						if(valueStr){
 							//字节码

@@ -55,7 +55,7 @@ package zero.swf{
 			width=(FrameSize.Xmax-FrameSize.Xmin)/20;
 			height=(FrameSize.Ymax-FrameSize.Ymin)/20;
 			
-			//trace(FrameSize.toXML().toXMLString());
+			//trace(FrameSize.toXML("FrameSize").toXMLString());
 			
 			FrameRate=_data[offset++]/256+_data[offset++];//帧频是一个Number, 在SWF里以 FIXED8(16-bit 8.8 fixed-point number, 16位8.8定点数) 的结构保存
 			var data:ByteArray=new ByteArray();
@@ -73,7 +73,7 @@ package zero.swf{
 			FrameSize.Ymin=y*20;
 			FrameSize.Xmax=(x+width)*20;
 			FrameSize.Ymax=(y+height)*20;
-			//trace(FrameSize.toXML().toXMLString());
+			//trace(FrameSize.toXML("FrameSize").toXMLString());
 			var data:ByteArray=FrameSize.toData();
 			data[data.length]=FrameRate*256;
 			data[data.length]=FrameRate;

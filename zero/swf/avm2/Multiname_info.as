@@ -227,11 +227,10 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
-			var xml:XML=<Multiname_info
+		override public function toXML(xmlName:String):XML{
+			var xml:XML=<{xmlName} class="Multiname_info"
 				kind={MultinameKind.kindV[kind]}
-			>
-			</Multiname_info>;
+			/>;
 			
 			switch(kind){
 				case MultinameKind.QName:
@@ -259,8 +258,7 @@ package zero.swf.avm2{
 				case MultinameKind.GenericName:
 					xml.@TypeDefinition=TypeDefinition;
 					if(ParamV.length){
-						var listXML:XML=<ParamList/>;
-						listXML.@count=ParamV.length;
+						var listXML:XML=<ParamList count={ParamV.length}/>
 						for each(var Param:int in ParamV){
 							listXML.appendChild(<Param value={Param}/>);
 						}
