@@ -36,7 +36,6 @@ package zero.swf.funs{
 		private static function _getAvalibleDefineObjIdV(tagV:Vector.<Tag>):void{
 			for each(var tag:Tag in tagV){
 				//if(tag is DefineSprite){//一般来说 DefineSprite 内不会有 DefineObj
-				//	_getAvalibleDefineObjIdV((tag.bodyData as DefineSprite).tags.tagV);
 				//}else{
 					var typeName:String=TagType.typeNameArr[tag.type];
 					if(typeName){
