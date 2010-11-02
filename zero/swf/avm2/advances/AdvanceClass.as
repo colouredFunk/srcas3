@@ -121,7 +121,7 @@ package zero.swf.avm2.advances{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
+		public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
 			var xml:XML=toXML_fun(Instance_info_memberV);
 			
 			toXML_fun(Class_info_memberV,xml);

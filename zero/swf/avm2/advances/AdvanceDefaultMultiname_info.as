@@ -28,7 +28,7 @@ package zero.swf.avm2.advances{
 		
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		override public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
 			return <AdvanceMultiname_info kind="*"/>;
 		}
 		override public function initByXML(xml:XML):void{

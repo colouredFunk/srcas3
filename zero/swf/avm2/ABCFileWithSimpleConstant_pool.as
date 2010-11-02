@@ -234,7 +234,7 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		override public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
 			var xml:XML=<ABCFileWithSimpleConstant_pool
 				minor_version={minor_version}
 				major_version={major_version}
@@ -301,7 +301,7 @@ package zero.swf.avm2{
 			}else{
 				delete xml.stringList;
 			}
-			xml.restDatas.appendChild(restDatas.toXML());
+			xml.restDatas.appendChild(restDatas.toXML("restDatas"));
 			return xml;
 		}
 		override public function initByXML(xml:XML):void{

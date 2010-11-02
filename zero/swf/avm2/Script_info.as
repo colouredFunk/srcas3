@@ -62,7 +62,7 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		override public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
 			var xml:XML=<Script_info
 				init={init}
 			>

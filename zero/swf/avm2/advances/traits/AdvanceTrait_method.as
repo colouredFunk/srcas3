@@ -51,7 +51,7 @@ package zero.swf.avm2.advances.traits{
 		
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
+		public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
 			return toXML_fun(memberV);
 		}
 		public function initByXML(xml:XML):void{

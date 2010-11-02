@@ -162,7 +162,7 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML():XML{
+		override public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
 			var xml:XML=<Method_body_info
 				method={method}
 				max_stack={max_stack}
@@ -175,7 +175,7 @@ package zero.swf.avm2{
 				<traits_infoList/>
 			</Method_body_info>;
 			
-			xml.codes.appendChild(codes.toXML());
+			xml.codes.appendChild(codes.toXML("codes"));
 			if(exception_infoV.length){
 				var listXML:XML=xml.exception_infoList[0];
 				listXML.@count=exception_infoV.length;
