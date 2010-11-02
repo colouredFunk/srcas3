@@ -33,11 +33,11 @@ package zero.swf{
 		}
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML():XML{
+		public function toXML(xmlName:String):XML{
 			if(dataLength>0){
-				return <BytesData length={dataLength} value={BytesAndStr16.bytes2str16(ownData,dataOffset,dataLength)}/>;
+				return <{xmlName} class="BytesData" length={dataLength} value={BytesAndStr16.bytes2str16(ownData,dataOffset,dataLength)}/>;
 			}
-			return <BytesData/>;
+			return <{xmlName} class="BytesData"/>;
 		}
 		public function initByXML(xml:XML):void{
 			var data:ByteArray=BytesAndStr16.str162bytes(xml.@value.toString());
