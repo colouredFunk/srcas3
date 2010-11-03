@@ -295,9 +295,10 @@
 			}
 			if(isPluginMode){
 				ExternalInterface.call("musicPause");
-			}else if(sound){
-				sound.stop();
+			}else if (sound) {
+				//
 				$pause();
+				sound.stop();
 			}
 		}
 		protected function $pause():void {
