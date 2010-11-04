@@ -9,8 +9,9 @@ Tag 版本:v1.0
 
 package zero.swf{
 	import flash.utils.ByteArray;
-	import flash.utils.getDefinitionByName;
-	import flash.utils.getQualifiedClassName;
+	
+	import zero.Outputer;
+	
 	public class Tag{
 		public var headOffset:int;
 		public var bodyOffset:int;
@@ -19,8 +20,8 @@ package zero.swf{
 		
 		//public var test_isShort:Boolean;//测试
 		
-		public function Tag(){
-			type=-1;
+		public function Tag(_type:int=-1){
+			type=_type;
 		}
 		
 		public function initByData(data:ByteArray,offset:int):void{
@@ -40,12 +41,17 @@ package zero.swf{
 		}
 		
 		private var __bodyData:ByteArray;
-		public function get bodyData():ByteArray{
-			return __bodyData;
+		public function getBodyData():ByteArray{
+			if(__bodyData){
+				return __bodyData;
+			}
+			throw new Error("__bodyData="+__bodyData);
+			return null;
 		}
-		public function set bodyData(_bodyData:ByteArray):void{
+		public function setBodyData(_bodyData:ByteArray):void{
 			if(_bodyData){
-				tagBody=null;
+				//body=null;
+				setBody(null);
 				if(type<0){
 					throw new Error("未设置 type");
 				}
@@ -61,23 +67,42 @@ package zero.swf{
 			}
 		}
 		
-		private var __tagBody:Object;
-		public function get tagBody():Object{
-			return __tagBody;
-		}
-		public function set tagBody(_tagBody:Object):void{
-			if(_tagBody){
-				bodyData=null;
-				__tagBody=_tagBody;
-				type=getTypeByQualifiedClassName(_tagBody);
+		private var __body:Object;
+		public function getBody():Object{
+			if(__body){
 			}else{
-				__tagBody=null;
+				if(__bodyData){
+					var TagBodyClass:Class=TagAndBodyClasses.getTagBodyClassByType(type);
+					if(TagBodyClass){
+						__body=new TagBodyClass();
+						var endOffset:int=bodyOffset+bodyLength;
+						var offset:int=__body.initByData(__bodyData,bodyOffset,endOffset);
+						if(offset===endOffset){
+						}else{
+							Outputer.outputError("type="+type+", typeName="+TagType.typeNameArr[type]+", offset="+offset+", endOffset="+endOffset);
+						}
+					}else{
+						throw new Error("type="+type+", typeName="+TagType.typeNameArr[type]+", TagBodyClass 未定义");
+					}
+				}
+			}
+			//trace("__body="+__body);
+			return __body;
+		}
+		public function setBody(_body:Object):void{
+			if(_body){
+				//data=null;
+				setBodyData(null);
+				__body=_body;
+				type=TagAndBodyClasses.getTypeByTagBodyOrBodyClass(_body);
+			}else{
+				__body=null;
 			}
 		}
 		
 		public function getDefId():int{
-			if(__tagBody){
-				return __tagBody["id"];
+			if(__body){
+				return __body["id"];
 			}
 			if(__bodyData){
 				if(bodyLength<2){
@@ -89,8 +114,8 @@ package zero.swf{
 			return -1;
 		}
 		public function setDefId(defId:int):void{
-			if(__tagBody){
-				__tagBody["id"]=defId;
+			if(__body){
+				__body["id"]=defId;
 			}else if(__bodyData){
 				if(bodyLength<2){
 					throw new Error("bodyLength="+bodyLength);
@@ -102,68 +127,20 @@ package zero.swf{
 			}
 		}
 		
-		public static function getTypeByQualifiedClassName(obj:*):int{
-			var typeName:String=getQualifiedClassName(obj).replace("zero.swf.tagBodys::","");
-			if(typeName){
-				var type:int=TagType[typeName];
-				if(TagType.typeNameArr[type]===typeName){
-					return type;
+		public function getData():ByteArray{
+			var bodyData:ByteArray;
+			if(__body){
+				bodyData=__body.toData();
+			}else{
+				bodyData=new ByteArray();
+				if(bodyLength>0){
+					bodyData.writeBytes(__bodyData,bodyOffset,bodyLength);
 				}
-				throw new Error("未知 typeName: "+typeName);
-			}else{
-				throw new Error("typeName="+typeName);
 			}
-			return -1;
-		}
-		public static function getTagBodyClassByType(type:int):Class{
-			try{
-				return getDefinitionByName("zero.swf.tagBodys."+TagType.typeNameArr[type]) as Class;
-			}catch(e:Error){
-				//throw new Error("TagBodyClass: "+TagType.typeNameArr[type]+" 未定义");
-			}
-			return null;
-		}
-		
-		//在结构文档里搜索 RECORDHEADER (long) 可搜索得到
-		private static const recordHeaderMustBeLongTypes:Object={
-			//DefineButton:true,//测试完去掉
-			//DefineButton2:true,//测试完去掉
-			//DefineButtonCxform:true,//测试完去掉
-			//DefineSceneAndFrameLabelData:true,//测试完去掉
-			//DefineShape:true,//测试完去掉 Flash Builder 4 会把这个编译成短tag，Flash CS5 则会编译成长tag
-			//DefineSprite:true,//测试完去掉
-			//DoAction:true,//测试完去掉
-			//ExportAssets:true,//测试完去掉
-			//ImportAssets:true,//测试完去掉
-			//JPEGTables:true,//测试完去掉
-			//ScriptLimits:true,//测试完去掉 Flash Builder 4 会把这个编译成短tag，Flash CS5 则会编译成长tag
-			//SymbolClass:true,//测试完去掉 Flash Builder 4 会把这个编译成短tag，Flash CS5 则会编译成长tag,
-			//FrameLabel:true,//测试完去掉
-			
-			DefineBits:true,
-			DefineBitsJPEG2:true,
-			DefineBitsJPEG3:true,
-			DefineBitsJPEG4:true,
-			DefineBitsLossless:true,
-			DefineBitsLossless2:true,
-			SoundStreamBlock:true
-			
-		}//某天偶然发现的一些小图片变成短tag后出错(不知道还会不会有其它tag有这种现像)
-		//public static function getHeaderData(type:int,bodyLength:int,test_isShort:Boolean):ByteArray{
-		public static function getHeaderData(type:int,bodyLength:int):ByteArray{
 			var data:ByteArray=new ByteArray();
-			data[0]=type<<6;
-			data[1]=type>>>2;
-			if(bodyLength>=0x3f||recordHeaderMustBeLongTypes[TagType.typeNameArr[type]]){//||!test_isShort
-				//长tag
-				data[0]|=0x3f;
-				data[2]=bodyLength;
-				data[3]=bodyLength>>8;
-				data[4]=bodyLength>>16;
-				data[5]=bodyLength>>24;
-			}else{
-				data[0]|=bodyLength;
-			}
+			//toDataResult.writeBytes(Tag.getHeaderData(type,bodyData.length,test_isShort));
+			data.writeBytes(TagAndHeader.getHeaderData(type,bodyData.length));
+			data.writeBytes(bodyData);
 			return data;
 		}
 	}

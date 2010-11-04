@@ -36,7 +36,7 @@ package zero.swf{
 		public static const DefineBitsJPEG3:String=IMG;
 		public static const DefineBitsLossless2:String=IMG;
 		public static const DefineEditText:String=SWF;//20101029
-		public static const DefineSprite:String=DAT;//20101029	SWF//貌似引起问题了
+		public static const DefineSprite:String=SWF;//20101029
 		public static const DefineMorphShape:String=DAT;
 		public static const DefineFont2:String=DAT;
 		public static const DefineVideoStream:String=DAT;

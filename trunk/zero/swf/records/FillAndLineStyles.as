@@ -30,8 +30,8 @@ package zero.swf.records{
 	import zero.swf.records.lineStyles.BaseLineStyle;
 	import flash.utils.ByteArray;
 	public class FillAndLineStyles{
-		public var FillStylesV:Vector.<FILLSTYLE>;
-		public var LineStylesV:Vector.<BaseLineStyle>;
+		public var FillStyleV:Vector.<FILLSTYLE>;
+		public var LineStyleV:Vector.<BaseLineStyle>;
 		public var NumFillBits:int;
 		public var NumLineBits:int;
 		//
@@ -42,11 +42,11 @@ package zero.swf.records{
 			if(FillStyleCount==0xff){
 				FillStyleCount=data[offset++]|(data[offset++]<<8);
 			}
-			FillStylesV=new Vector.<FILLSTYLE>(FillStyleCount);
+			FillStyleV=new Vector.<FILLSTYLE>(FillStyleCount);
 			for(var i:int=0;i<FillStyleCount;i++){
 			
-				FillStylesV[i]=new FILLSTYLE();
-				offset=FillStylesV[i].initByData(data,offset,endOffset);
+				FillStyleV[i]=new FILLSTYLE();
+				offset=FillStyleV[i].initByData(data,offset,endOffset);
 			}
 			
 			
@@ -54,11 +54,11 @@ package zero.swf.records{
 			if(LineStyleCount==0xff){
 				LineStyleCount=data[offset++]|(data[offset++]<<8);
 			}
-			LineStylesV=new Vector.<BaseLineStyle>(LineStyleCount);
+			LineStyleV=new Vector.<BaseLineStyle>(LineStyleCount);
 			for(i=0;i<LineStyleCount;i++){
 			
-				LineStylesV[i]=new SHAPEWITHSTYLE.currLineStyleClass();
-				offset=LineStylesV[i].initByData(data,offset,endOffset);
+				LineStyleV[i]=new SHAPEWITHSTYLE.currLineStyleClass();
+				offset=LineStyleV[i].initByData(data,offset,endOffset);
 			}
 			var flags:int=data[offset++];
 			NumFillBits=(flags<<24)>>>28;				//11110000
@@ -67,7 +67,7 @@ package zero.swf.records{
 		}
 		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
-			var FillStyleCount:int=FillStylesV.length;
+			var FillStyleCount:int=FillStyleV.length;
 			var offset:int=0;
 			if(FillStyleCount<0xff){
 				data[offset++]=FillStyleCount;
@@ -78,11 +78,11 @@ package zero.swf.records{
 			}
 			
 			data.position=offset;
-			for each(var FillStyles:FILLSTYLE in FillStylesV){
-				data.writeBytes(FillStyles.toData());
+			for each(var FillStyle:FILLSTYLE in FillStyleV){
+				data.writeBytes(FillStyle.toData());
 			}
 			offset=data.length;
-			var LineStyleCount:int=LineStylesV.length;
+			var LineStyleCount:int=LineStyleV.length;
 			
 			if(LineStyleCount<0xff){
 				data[offset++]=LineStyleCount;
@@ -93,8 +93,8 @@ package zero.swf.records{
 			}
 			
 			data.position=offset;
-			for each(var LineStyles:BaseLineStyle in LineStylesV){
-				data.writeBytes(LineStyles.toData());
+			for each(var LineStyle:BaseLineStyle in LineStyleV){
+				data.writeBytes(LineStyle.toData());
 			}
 			offset=data.length;
 			var flags:int=0;
@@ -111,48 +111,48 @@ package zero.swf.records{
 				NumFillBits={NumFillBits}
 				NumLineBits={NumLineBits}
 			/>;
-			if(FillStylesV.length){
-				var listXML:XML=<FillStylesList count={FillStylesV.length}/>
-				for each(var FillStyles:FILLSTYLE in FillStylesV){
-					listXML.appendChild(FillStyles.toXML("FillStyles"));
+			if(FillStyleV.length){
+				var listXML:XML=<FillStyleList count={FillStyleV.length}/>
+				for each(var FillStyle:FILLSTYLE in FillStyleV){
+					listXML.appendChild(FillStyle.toXML("FillStyle"));
 				}
 				xml.appendChild(listXML);
 			}
-			if(LineStylesV.length){
-				listXML=<LineStylesList count={LineStylesV.length}/>
-				for each(var LineStyles:BaseLineStyle in LineStylesV){
-					listXML.appendChild(LineStyles.toXML("LineStyles"));
+			if(LineStyleV.length){
+				listXML=<LineStyleList count={LineStyleV.length}/>
+				for each(var LineStyle:BaseLineStyle in LineStyleV){
+					listXML.appendChild(LineStyle.toXML("LineStyle"));
 				}
 				xml.appendChild(listXML);
 			}
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
-			if(xml.FillStylesList.length()){
-				var listXML:XML=xml.FillStylesList[0];
-				var FillStylesXMLList:XMLList=listXML.FillStyles;
+			if(xml.FillStyleList.length()){
+				var listXML:XML=xml.FillStyleList[0];
+				var FillStyleXMLList:XMLList=listXML.FillStyle;
 				var i:int=-1;
-				FillStylesV=new Vector.<FILLSTYLE>(FillStylesXMLList.length());
-				for each(var FillStylesXML:XML in FillStylesXMLList){
+				FillStyleV=new Vector.<FILLSTYLE>(FillStyleXMLList.length());
+				for each(var FillStyleXML:XML in FillStyleXMLList){
 					i++;
-					FillStylesV[i]=new FILLSTYLE();
-					FillStylesV[i].initByXML(FillStylesXML);
+					FillStyleV[i]=new FILLSTYLE();
+					FillStyleV[i].initByXML(FillStyleXML);
 				}
 			}else{
-				FillStylesV=new Vector.<FILLSTYLE>();
+				FillStyleV=new Vector.<FILLSTYLE>();
 			}
-			if(xml.LineStylesList.length()){
-				listXML=xml.LineStylesList[0];
-				var LineStylesXMLList:XMLList=listXML.LineStyles;
+			if(xml.LineStyleList.length()){
+				listXML=xml.LineStyleList[0];
+				var LineStyleXMLList:XMLList=listXML.LineStyle;
 				i=-1;
-				LineStylesV=new Vector.<BaseLineStyle>(LineStylesXMLList.length());
-				for each(var LineStylesXML:XML in LineStylesXMLList){
+				LineStyleV=new Vector.<BaseLineStyle>(LineStyleXMLList.length());
+				for each(var LineStyleXML:XML in LineStyleXMLList){
 					i++;
-					LineStylesV[i]=new SHAPEWITHSTYLE.currLineStyleClass();
-					LineStylesV[i].initByXML(LineStylesXML);
+					LineStyleV[i]=new SHAPEWITHSTYLE.currLineStyleClass();
+					LineStyleV[i].initByXML(LineStyleXML);
 				}
 			}else{
-				LineStylesV=new Vector.<BaseLineStyle>();
+				LineStyleV=new Vector.<BaseLineStyle>();
 			}
 			NumFillBits=int(xml.@NumFillBits.toString());
 			NumLineBits=int(xml.@NumLineBits.toString());

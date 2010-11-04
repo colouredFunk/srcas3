@@ -2,7 +2,7 @@
 BUTTONRECORD 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月1日 19:11:34 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月3日 11:45:50 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -126,7 +126,7 @@ package zero.swf.records{
 			data.writeBytes(PlaceMatrix.toData());
 			data.writeBytes(ColorTransform.toData());
 			var offset:int=data.length;
-			if(FilterV){
+			if(ButtonHasFilterList){
 				var NumberOfFilters:int=FilterV.length;
 				data[offset++]=NumberOfFilters;
 			
@@ -159,12 +159,14 @@ package zero.swf.records{
 			/>;
 			xml.appendChild(PlaceMatrix.toXML("PlaceMatrix"));
 			xml.appendChild(ColorTransform.toXML("ColorTransform"));
-			if(FilterV&&FilterV.length){
-				var listXML:XML=<FilterList count={FilterV.length}/>
-				for each(var Filter:FILTER in FilterV){
-					listXML.appendChild(Filter.toXML("Filter"));
+			if(ButtonHasFilterList){
+				if(FilterV.length){
+					var listXML:XML=<FilterList count={FilterV.length}/>
+					for each(var Filter:FILTER in FilterV){
+						listXML.appendChild(Filter.toXML("Filter"));
+					}
+					xml.appendChild(listXML);
 				}
-				xml.appendChild(listXML);
 			}
 			if(ButtonHasBlendMode){
 				
@@ -186,17 +188,21 @@ package zero.swf.records{
 			PlaceMatrix.initByXML(xml.PlaceMatrix[0]);
 			ColorTransform=new CXFORMWITHALPHA();
 			ColorTransform.initByXML(xml.ColorTransform[0]);
-			if(xml.FilterList.length()){
-				var listXML:XML=xml.FilterList[0];
-				var FilterXMLList:XMLList=listXML.Filter;
-				var i:int=-1;
-				FilterV=new Vector.<FILTER>(FilterXMLList.length());
-				for each(var FilterXML:XML in FilterXMLList){
-					i++;
-					var FilterID:int=FilterTypes[FilterXML["@class"].toString()];
-					FilterV[i]=new FilterTypes.classV[FilterID]();
-					FilterV[i].initByXML(FilterXML);
-					FilterV[i].FilterID=FilterID;
+			if(ButtonHasFilterList){
+				if(xml.FilterList.length()){
+					var listXML:XML=xml.FilterList[0];
+					var FilterXMLList:XMLList=listXML.Filter;
+					var i:int=-1;
+					FilterV=new Vector.<FILTER>(FilterXMLList.length());
+					for each(var FilterXML:XML in FilterXMLList){
+						i++;
+						var FilterID:int=FilterTypes[FilterXML["@class"].toString()];
+						FilterV[i]=new FilterTypes.classV[FilterID]();
+						FilterV[i].initByXML(FilterXML);
+						FilterV[i].FilterID=FilterID;
+					}
+				}else{
+					FilterV=new Vector.<FILTER>();
 				}
 			}
 			if(ButtonHasBlendMode){

@@ -94,7 +94,7 @@ public class StatusManager{
 			runStatus(true);
 		}
 	}
-	private static function runStatus(alertCallBackB:Boolean,noRemoveAlert:Boolean=false):void{
+	private static function runStatus(alertCallBackB:Boolean=true,noRemoveAlert:Boolean=false):void{
 		if(alertCallBackB){
 			GotoURL.goto(currXML,statusURLLoader.data);
 			switch(currXML.@status.toString()){

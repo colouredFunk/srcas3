@@ -81,9 +81,11 @@ package zero.ui{
 		private function normalizeFileURLByLastFSMFile(fileURL:String):String{
 			if(lastFSMFile){
 				if(fileFilterList){
-					var fileFilter:FileFilter=fileFilterList[0];
-					if(fileFilter.extension.toLowerCase().indexOf("*"+lastFSMFile.type.toLowerCase())==-1){
-						fileURL=lastFSMFile.parent.url;
+					if(lastFSMFile.type){
+						var fileFilter:FileFilter=fileFilterList[0];
+						if(fileFilter.extension.toLowerCase().indexOf("*"+lastFSMFile.type.toLowerCase())==-1){
+							fileURL=lastFSMFile.parent.url;
+						}
 					}
 				}else if(browseType==DIR){
 					fileURL=lastFSMFile.parent.url;

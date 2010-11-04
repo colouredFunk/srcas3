@@ -2,7 +2,7 @@
 PlaceObject3 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月2日 21:34:36 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月3日 11:17:01 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -374,12 +374,14 @@ package zero.swf.tagBodys{
 			}else{
 				delete xml.@ClipDepth;
 			}
-			if(SurfaceFilterV&&SurfaceFilterV.length){
-				var listXML:XML=<SurfaceFilterList count={SurfaceFilterV.length}/>
-				for each(var SurfaceFilter:FILTER in SurfaceFilterV){
-					listXML.appendChild(SurfaceFilter.toXML("SurfaceFilter"));
+			if(PlaceFlagHasFilterList){
+				if(SurfaceFilterV.length){
+					var listXML:XML=<SurfaceFilterList count={SurfaceFilterV.length}/>
+					for each(var SurfaceFilter:FILTER in SurfaceFilterV){
+						listXML.appendChild(SurfaceFilter.toXML("SurfaceFilter"));
+					}
+					xml.appendChild(listXML);
 				}
-				xml.appendChild(listXML);
 			}
 			if(PlaceFlagHasBlendMode){
 				
@@ -434,17 +436,21 @@ package zero.swf.tagBodys{
 			if(PlaceFlagHasClipDepth){
 				ClipDepth=int(xml.@ClipDepth.toString());
 			}
-			if(xml.SurfaceFilterList.length()){
-				var listXML:XML=xml.SurfaceFilterList[0];
-				var SurfaceFilterXMLList:XMLList=listXML.SurfaceFilter;
-				var i:int=-1;
-				SurfaceFilterV=new Vector.<FILTER>(SurfaceFilterXMLList.length());
-				for each(var SurfaceFilterXML:XML in SurfaceFilterXMLList){
-					i++;
-					var FilterID:int=FilterTypes[SurfaceFilterXML["@class"].toString()];
-					SurfaceFilterV[i]=new FilterTypes.classV[FilterID]();
-					SurfaceFilterV[i].initByXML(SurfaceFilterXML);
-					SurfaceFilterV[i].FilterID=FilterID;
+			if(PlaceFlagHasFilterList){
+				if(xml.SurfaceFilterList.length()){
+					var listXML:XML=xml.SurfaceFilterList[0];
+					var SurfaceFilterXMLList:XMLList=listXML.SurfaceFilter;
+					var i:int=-1;
+					SurfaceFilterV=new Vector.<FILTER>(SurfaceFilterXMLList.length());
+					for each(var SurfaceFilterXML:XML in SurfaceFilterXMLList){
+						i++;
+						var FilterID:int=FilterTypes[SurfaceFilterXML["@class"].toString()];
+						SurfaceFilterV[i]=new FilterTypes.classV[FilterID]();
+						SurfaceFilterV[i].initByXML(SurfaceFilterXML);
+						SurfaceFilterV[i].FilterID=FilterID;
+					}
+				}else{
+					SurfaceFilterV=new Vector.<FILTER>();
 				}
 			}
 			if(PlaceFlagHasBlendMode){
