@@ -62,7 +62,7 @@
 			bar = null;
 			endClip = null;
 		}
-		internal function $setStyle(_isActive:Boolean):void {
+		public function $setStyle(_isActive:Boolean):void {
 			if (totalFrames > 8) {
 					if (txt.autoSize == TextFieldAutoSize.RIGHT) {
 						txt.txt.x = -int(txt.width);

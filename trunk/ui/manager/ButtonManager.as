@@ -1,4 +1,4 @@
-package ui {
+package ui.manager {
 	import flash.display.Sprite;
 	import flash.display.Stage;
 	import flash.events.Event;

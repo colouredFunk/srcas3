@@ -3,6 +3,7 @@ package ui{
 	import flash.external.ExternalInterface;
 	
 	import ui.UIMovieClip;
+	import ui.manager.ButtonManager;
 	
 	/**
 	 * ...
@@ -71,7 +72,7 @@ package ui{
 			}
 			ButtonManager.setButtonStyle(this);
 		}
-		internal function $release():void {
+		public function $release():void {
 			if (href) {
 				Common.getURL(href, hrefTarget);
 			}else if(eEval) {

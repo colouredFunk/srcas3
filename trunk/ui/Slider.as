@@ -1,5 +1,6 @@
 ﻿package ui {
 	import flash.events.Event;
+	import ui.manager.ButtonManager;
 	
 	/**
 	 * ...
@@ -41,7 +42,7 @@
 			super.init();
 			enabled = true;
 		}
-		internal function $setStyle(_isActive:Boolean):void {
+		public function $setStyle(_isActive:Boolean):void {
 			if (_isActive) {
 				ButtonManager.setButtonClipPlay(thumb, true);
 				ButtonManager.setButtonClipPlay(bar, true);
@@ -52,16 +53,16 @@
 				ButtonManager.setButtonClipPlay(track, false);
 			}
 		}
-		internal function $press():void {
+		public function $press():void {
 			timeHolded = 0;
 			onHoldingHandler(null);
 			addEventListener(Event.ENTER_FRAME, onHoldingHandler);
 		}
-		internal function $release():void {
+		public function $release():void {
 			timeHolded = 0;
 			removeEventListener(Event.ENTER_FRAME, onHoldingHandler);
 		}
-		internal function $wheel(_delta:int):void {
+		public function $wheel(_delta:int):void {
 			if (timeHolded == 0) {
 				value += _delta > 0?snapInterval: -snapInterval;
 			}
