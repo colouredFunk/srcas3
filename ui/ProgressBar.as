@@ -14,11 +14,18 @@ package ui{
 		public var maskClip:*;
 		public var track:*;
 		
-		public var roundShow:Boolean = true;
-		protected var isReferenceFromThumb:Boolean;
 		protected var offXThumb:int;
 		protected var offWidthMaskClip:int;
 		protected var offWidthTrack:int;
+		
+		private var __roundShow:Boolean;
+		public function get roundShow():Boolean{
+			return __roundShow;
+		}
+		public function set roundShow(_roundShow:Boolean):void{
+			__roundShow = _roundShow;
+			setStyle();
+		}
 		private var __length:uint;
 		public function get length():uint {
 			return __length;
@@ -26,10 +33,10 @@ package ui{
 		public function set length(_length:uint):void {
 			__length = _length;
 			if (maskClip && bar) {
-				maskClip.width = offWidthMaskClip +length;
+				maskClip.width = offWidthMaskClip +__length;
 			}
 			if (track) {
-				track.width = offWidthTrack +length;
+				track.width = offWidthTrack +__length - offXThumb * 2;
 			}
 			setStyle();
 		}
@@ -50,8 +57,12 @@ package ui{
 		}
 		override protected function init():void {
 			super.init();
-			if (bar && thumb) {
-				offXThumb = thumb.x - bar.width - bar.x;
+			if (track) {
+				if (bar) {
+					offWidthTrack = track.width - bar.width;
+				}else {
+					offWidthTrack = track.width - thumb.x;
+				}
 			}
 			if (maskClip) {
 				if (bar) {
@@ -61,25 +72,17 @@ package ui{
 					maskClip.mask = bar;
 				}else {
 					maskClip.cacheAsBitmap = true;
-					bar.cacheAsBitmap = true;
+					thumb.cacheAsBitmap = true;
 					thumb.mask = maskClip;
 				}
 			}
-			if (track) {
-				if (bar) {
-					offWidthTrack = track.width - bar.width;
-				}else {
-					offWidthTrack = track.width - thumb.x;
-				}
-			}
-			if (isReferenceFromThumb?!thumb:bar) {
+			if (thumb && bar) {
+				offXThumb = thumb.x - bar.width - bar.x;
+				length = (thumb.x - bar.x + offXThumb)  * scaleX;
+			}else if (bar) {
 				length = bar.width * scaleX;
 			}else {
-				if (bar) {
-					length = (thumb.x - bar.x)  * scaleX;
-				}else {
-					length = thumb.x  * scaleX;
-				}
+				length = thumb.x  * scaleX;
 			}
 			scaleX = 1;
 			enabled = false;
@@ -105,31 +108,35 @@ package ui{
 			return _value;
 		}
 		protected function setStyle():void {
-			if (isReferenceFromThumb?!thumb:bar) {
-				bar.width = value * length;
-				if (roundShow) {
-					bar.width = Math.round(bar.width);
+			setClips(value * length);
+			setText();
+		}
+		protected function setClips(_value:Number):void {
+			if (thumb && bar) {
+				thumb.x = _value + bar.x - offXThumb;
+				var _width:int = Math.round(_value - 2 * offXThumb);
+				if (_width<0) {
+					_width = 0;
 				}
-				if (thumb) {
-					thumb.x = bar.width + bar.x + offXThumb;
-				}
+				bar.width = _width;
+			}else if(bar){
+				bar.width = _value;
 			}else {
-				thumb.x = value * length;
-				if (roundShow) {
+				thumb.x = _value;
+			}
+			if (roundShow) {
+				if (thumb) {
 					thumb.x = Math.round(thumb.x);
 				}
 				if (bar) {
-					var _width:int = Math.round(thumb.x - bar.x - offXThumb);
-					if (_width<0) {
-						_width = 0;
-					}
-					bar.width = _width;
+					bar.x = Math.round(bar.x);
 				}
 			}
+		}
+		protected function setText():void {
 			if (txt) {
 				txt.text = Math.round(value * 100) + " %";
 			}
 		}
 	}
-	
 }
