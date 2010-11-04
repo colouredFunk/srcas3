@@ -12,6 +12,8 @@
 	import flash.system.LoaderContext;
 	import flash.system.ApplicationDomain;
 	
+	import ui.manager.ButtonManager;
+	
 	public class Alert extends UISprite {
 		public static var alertLayer:*;
 		public static var ClassAlert:Class;

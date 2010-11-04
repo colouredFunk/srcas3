@@ -1,6 +1,8 @@
 ﻿package ui{
-	import ui.UISprite;
 	import flash.events.Event;
+	
+	import ui.UISprite;
+	import ui.manager.ButtonManager;
 	
 	/**
 	 * ...

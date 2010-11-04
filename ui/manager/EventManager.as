@@ -1,11 +1,11 @@
-package ui{
+package ui.manager{
 	import flash.utils.Dictionary;
 	
 	/**
 	 * ...
 	 * @author Akdcl
 	 */
-	public class EventManager {
+	final public class EventManager {
 		
 		private static var listenerDic:Object = { };
 		public static function addTargetEvent(_type:String, _listener:Function, _target:*):void {

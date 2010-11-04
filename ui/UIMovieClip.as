@@ -3,6 +3,8 @@ package ui{
 	import flash.events.Event;
 	import flash.utils.Dictionary;
 	
+	import ui.manager.EventManager;
+	
 	/**
 	 * ...
 	 * @author Akdcl
