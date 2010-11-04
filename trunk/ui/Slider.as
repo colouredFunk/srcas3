@@ -38,7 +38,6 @@
 			return timeHolded > 0;
 		}
 		override protected function init():void {
-			isReferenceFromThumb = true;
 			super.init();
 			enabled = true;
 		}
@@ -64,12 +63,12 @@
 		}
 		public function $wheel(_delta:int):void {
 			if (timeHolded == 0) {
-				value += _delta > 0?snapInterval: -snapInterval;
+				value += _delta * snapInterval;
 			}
 		}
 		protected function onHoldingHandler(_evt:Event):void {
 			if (bar) {
-				value = Math.round((mouseX - bar.x) / scale / snapInterval) * snapInterval + minimum;
+				value = Math.round((mouseX - bar.x + offXThumb) / scale / snapInterval) * snapInterval + minimum;
 			}else {
 				value = Math.round(mouseX / scale / snapInterval) * snapInterval + minimum;
 			}
@@ -85,30 +84,10 @@
 		}
 		override protected function setStyle():void {
 			scale = length/(maximum-minimum);
-			var _x:uint = Math.round((value-minimum) * scale);
-			
-			if (isReferenceFromThumb?!thumb:bar) {
-				bar.width = _x;
-				if (roundShow) {
-					bar.width = Math.round(bar.width);
-				}
-				if (thumb) {
-					thumb.x = bar.width + bar.x + offXThumb;
-				}
-			}else {
-				thumb.x = _x;
-				if (roundShow) {
-					thumb.x = Math.round(thumb.x);
-				}
-				if (bar) {
-					thumb.x+=bar.x;
-					var _width:int = Math.round(thumb.x - bar.x - offXThumb);
-					if (_width<0) {
-						_width = 0;
-					}
-					bar.width = _width;
-				}
-			}
+			setClips(Math.round((value-minimum) * scale));
+			setText();
+		}
+		override protected function setText():void {
 			if (txt) {
 				txt.text = value;
 			}
