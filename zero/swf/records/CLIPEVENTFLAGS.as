@@ -2,7 +2,7 @@
 CLIPEVENTFLAGS 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月1日 16:59:34 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月3日 13:28:45 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -57,11 +57,10 @@ package zero.swf.records{
 		public var ClipEventConstruct:int;
 		public var ClipEventKeyPress:int;
 		public var ClipEventDragOut:int;
-		public var ReservedFlags:int;					//UB[8]
+		public var HasEndReservedUI8:Boolean;			//HasEndReservedUI8
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			ClipEventConstruct=-1;
-			ReservedFlags=-1;
 			var flags:int=data[offset];
 			ClipEventKeyUp=(flags<<24)>>>31;			//10000000
 			ClipEventKeyDown=(flags<<25)>>>31;			//01000000
@@ -88,9 +87,9 @@ package zero.swf.records{
 				ClipEventKeyPress=(flags<<30)>>>31;			//00000010
 				ClipEventDragOut=flags&0x01;				//00000001
 			}
-			
 			if(offset<endOffset){
-				ReservedFlags=data[offset++];
+				offset++;
+				HasEndReservedUI8=true;
 			}
 			return offset;
 		}
@@ -127,8 +126,8 @@ package zero.swf.records{
 				flags|=ClipEventDragOut;					//00000001
 				data[offset++]=flags;
 			}
-			if(ReservedFlags>=0){
-				data[offset++]=ReservedFlags;
+			if(HasEndReservedUI8){
+				data[data.length]=0x00;
 			}
 			return data;
 		}
@@ -156,7 +155,7 @@ package zero.swf.records{
 				ClipEventConstruct={ClipEventConstruct}
 				ClipEventKeyPress={ClipEventKeyPress}
 				ClipEventDragOut={ClipEventDragOut}
-				ReservedFlags={ReservedFlags}
+				HasEndReservedUI8={HasEndReservedUI8}
 			/>;
 			if(ClipEventConstruct>=0){
 				
@@ -165,16 +164,10 @@ package zero.swf.records{
 				delete xml.@ClipEventKeyPress;
 				delete xml.@ClipEventDragOut;
 			}
-			if(ReservedFlags>=0){
-				
-			}else{
-				delete xml.@ReservedFlags;
-			}
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
 			ClipEventConstruct=-1;
-			ReservedFlags=-1;
 			ClipEventKeyUp=int(xml.@ClipEventKeyUp.toString());
 			ClipEventKeyDown=int(xml.@ClipEventKeyDown.toString());
 			ClipEventMouseUp=int(xml.@ClipEventMouseUp.toString());
@@ -196,9 +189,7 @@ package zero.swf.records{
 				ClipEventKeyPress=int(xml.@ClipEventKeyPress.toString());
 				ClipEventDragOut=int(xml.@ClipEventDragOut.toString());
 			}
-			if(xml.@ReservedFlags){
-				ReservedFlags=int(xml.@ReservedFlags.toString());
-			}
+			HasEndReservedUI8=(xml.@HasEndReservedUI8.toString()==="true");
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

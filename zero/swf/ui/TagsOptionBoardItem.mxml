@@ -44,7 +44,7 @@
 							];
 							
 							var hasTagBodyClass:Boolean=true;
-							if(Tag.getTagBodyClassByType(TagType[type])){
+							if(TagAndBodyClasses.getTagBodyClassByTypeName(type)){
 								hasTagBodyClass=true;
 							}else{
 								hasTagBodyClass=false;

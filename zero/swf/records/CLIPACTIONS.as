@@ -2,7 +2,7 @@
 CLIPACTIONS 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月1日 19:09:02 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月3日 13:23:54 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -21,11 +21,9 @@ package zero.swf.records{
 	public class CLIPACTIONS{
 		public var AllEventFlags:CLIPEVENTFLAGS;
 		public var ClipActionRecordV:Vector.<CLIPACTIONRECORD>;
-		public var ClipActionEndFlag1:int;				//UI16
-		public var ClipActionEndFlag2:int;				//UI16
+		public var ClipActionEndFlagIsUI32:Boolean;		//ClipActionEndFlagIsUI32
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			ClipActionEndFlag2=-1;
 			//Reserved=data[offset]|(data[offset+1]<<8);
 			offset+=2;
 			AllEventFlags=new CLIPEVENTFLAGS();
@@ -39,10 +37,13 @@ package zero.swf.records{
 				ClipActionRecordV[i]=new CLIPACTIONRECORD();
 				offset=ClipActionRecordV[i].initByData(data,offset,endOffset);
 			}
-			ClipActionEndFlag1=data[offset++]|(data[offset++]<<8);
 			
-			if(offset<endOffset){
-				ClipActionEndFlag2=data[offset++]|(data[offset++]<<8);
+			offset+=2;
+			if(offset===endOffset){
+				ClipActionEndFlagIsUI32=false;
+			}else{
+				offset+=2;
+				ClipActionEndFlagIsUI32=true;
 			}
 			return offset;
 		}
@@ -56,11 +57,11 @@ package zero.swf.records{
 				data.writeBytes(ClipActionRecord.toData());
 			}
 			var offset:int=data.length;
-			data[offset]=ClipActionEndFlag1;
-			data[offset+1]=ClipActionEndFlag1>>8;
-			if(ClipActionEndFlag2>=0){
-				data[offset+2]=ClipActionEndFlag2;
-				data[offset+3]=ClipActionEndFlag2>>8;
+			data[offset++]=0x00;
+			data[offset++]=0x00;
+			if(ClipActionEndFlagIsUI32){
+				data[offset++]=0x00;
+				data[offset++]=0x00;
 			}
 			return data;
 		}
@@ -69,8 +70,7 @@ package zero.swf.records{
 		CONFIG::toXMLAndInitByXML {
 		public function toXML(xmlName:String):XML{
 			var xml:XML=<{xmlName} class="CLIPACTIONS"
-				ClipActionEndFlag1={ClipActionEndFlag1}
-				ClipActionEndFlag2={ClipActionEndFlag2}
+				ClipActionEndFlagIsUI32={ClipActionEndFlagIsUI32}
 			/>;
 			xml.appendChild(AllEventFlags.toXML("AllEventFlags"));
 			if(ClipActionRecordV.length){
@@ -80,15 +80,9 @@ package zero.swf.records{
 				}
 				xml.appendChild(listXML);
 			}
-			if(ClipActionEndFlag2>=0){
-				
-			}else{
-				delete xml.@ClipActionEndFlag2;
-			}
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
-			ClipActionEndFlag2=-1;
 			AllEventFlags=new CLIPEVENTFLAGS();
 			AllEventFlags.initByXML(xml.AllEventFlags[0]);
 			if(xml.ClipActionRecordList.length()){
@@ -104,10 +98,7 @@ package zero.swf.records{
 			}else{
 				ClipActionRecordV=new Vector.<CLIPACTIONRECORD>();
 			}
-			ClipActionEndFlag1=int(xml.@ClipActionEndFlag1.toString());
-			if(xml.@ClipActionEndFlag2){
-				ClipActionEndFlag2=int(xml.@ClipActionEndFlag2.toString());
-			}
+			ClipActionEndFlagIsUI32=(xml.@ClipActionEndFlagIsUI32.toString()==="true");
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

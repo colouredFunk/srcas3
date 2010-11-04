@@ -76,9 +76,8 @@ package zero.swf.funs{
 					doABCData[classNameOffset]=strSize;
 					doABCData.writeBytes(classData,classNameOffset+11);
 					//trace(BytesAndStr16.bytes2str16(doABCData,0,doABCData.length));
-					var tag:Tag=new Tag();
-					tag.type=TagType.DoABC;
-					tag.bodyData=doABCData;
+					var tag:Tag=new Tag(TagType.DoABC);
+					tag.setBodyData(doABCData);
 					return tag;
 				}
 				throw new Error("classNameOffset="+classNameOffset);

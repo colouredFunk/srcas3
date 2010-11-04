@@ -2,7 +2,7 @@
 FrameLabel 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月1日 16:01:29 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月3日 13:23:54 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -41,7 +41,7 @@ package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
 	public class FrameLabel{
 		public var Name:String;							//STRING
-		public var NamedAnchorflag:int;					//UI8
+		public var NamedAnchorflag:Boolean;				//NamedAnchorflag
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var get_str_size:int=0;
@@ -49,18 +49,18 @@ package zero.swf.tagBodys{
 			data.position=offset;
 			Name=data.readUTFBytes(get_str_size);
 			offset+=get_str_size;
-			
 			if(offset<endOffset){
-				NamedAnchorflag=data[offset++];
+				offset++;
+				NamedAnchorflag=true;
 			}
 			return offset;
 		}
 		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data.writeUTFBytes(Name+"\x00");
-			
+			var offset:int=data.length;
 			if(NamedAnchorflag){
-				data[data.length]=NamedAnchorflag;
+				data[data.length]=0x01;
 			}
 			return data;
 		}
@@ -68,22 +68,14 @@ package zero.swf.tagBodys{
 		////
 		CONFIG::toXMLAndInitByXML {
 		public function toXML(xmlName:String):XML{
-			var xml:XML=<{xmlName} class="FrameLabel"
+			return <{xmlName} class="FrameLabel"
 				Name={Name}
 				NamedAnchorflag={NamedAnchorflag}
 			/>;
-			if(NamedAnchorflag){
-				
-			}else{
-				delete xml.@NamedAnchorflag;
-			}
-			return xml;
 		}
 		public function initByXML(xml:XML):void{
 			Name=xml.@Name.toString();
-			if(xml.@NamedAnchorflag){
-				NamedAnchorflag=int(xml.@NamedAnchorflag.toString());
-			}
+			NamedAnchorflag=(xml.@NamedAnchorflag.toString()==="true");
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

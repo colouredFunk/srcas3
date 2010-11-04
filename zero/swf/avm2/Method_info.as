@@ -2,7 +2,7 @@
 Method_info 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月2日 20:19:34 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月3日 11:48:48 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -138,7 +138,7 @@ package zero.swf.avm2{
 			//name
 			data[offset++]=flags;
 			
-			if(option_detailV){
+			if(flags&MethodFlags.HAS_OPTIONAL){
 				var option_detail_count:int=option_detailV.length;
 			
 				if(option_detail_count>>>7){if(option_detail_count>>>14){if(option_detail_count>>>21){if(option_detail_count>>>28){data[offset++]=(option_detail_count&0x7f)|0x80;data[offset++]=((option_detail_count>>>7)&0x7f)|0x80;data[offset++]=((option_detail_count>>>14)&0x7f)|0x80;data[offset++]=((option_detail_count>>>21)&0x7f)|0x80;data[offset++]=option_detail_count>>>28;}else{data[offset++]=(option_detail_count&0x7f)|0x80;data[offset++]=((option_detail_count>>>7)&0x7f)|0x80;data[offset++]=((option_detail_count>>>14)&0x7f)|0x80;data[offset++]=option_detail_count>>>21;}}else{data[offset++]=(option_detail_count&0x7f)|0x80;data[offset++]=((option_detail_count>>>7)&0x7f)|0x80;data[offset++]=option_detail_count>>>14;}}else{data[offset++]=(option_detail_count&0x7f)|0x80;data[offset++]=option_detail_count>>>7;}}else{data[offset++]=option_detail_count;}
@@ -151,7 +151,7 @@ package zero.swf.avm2{
 			offset=data.length;
 			}
 			
-			if(param_nameV){
+			if(flags&MethodFlags.HAS_PARAM_NAMES){
 			
 				for each(var param_name:int in param_nameV){
 			
@@ -185,19 +185,23 @@ package zero.swf.avm2{
 				}
 				xml.appendChild(listXML);
 			}
-			if(option_detailV&&option_detailV.length){
-				listXML=<option_detailList count={option_detailV.length}/>
-				for each(var option_detail:Option_detail in option_detailV){
-					listXML.appendChild(option_detail.toXML("option_detail"));
+			if(flags&MethodFlags.HAS_OPTIONAL){
+				if(option_detailV.length){
+					listXML=<option_detailList count={option_detailV.length}/>
+					for each(var option_detail:Option_detail in option_detailV){
+						listXML.appendChild(option_detail.toXML("option_detail"));
+					}
+					xml.appendChild(listXML);
 				}
-				xml.appendChild(listXML);
 			}
-			if(param_nameV&&param_nameV.length){
-				listXML=<param_nameList count={param_nameV.length}/>
-				for each(var param_name:int in param_nameV){
-					listXML.appendChild(<param_name value={param_name}/>);
+			if(flags&MethodFlags.HAS_PARAM_NAMES){
+				if(param_nameV.length){
+					listXML=<param_nameList count={param_nameV.length}/>
+					for each(var param_name:int in param_nameV){
+						listXML.appendChild(<param_name value={param_name}/>);
+					}
+					xml.appendChild(listXML);
 				}
-				xml.appendChild(listXML);
 			}
 			return xml;
 		}
@@ -222,25 +226,33 @@ package zero.swf.avm2{
 				flags|=MethodFlags[flagsStr];
 			}
 			
-			if(xml.option_detailList.length()){
-				listXML=xml.option_detailList[0];
-				var option_detailXMLList:XMLList=listXML.option_detail;
-				i=-1;
-				option_detailV=new Vector.<Option_detail>(option_detailXMLList.length());
-				for each(var option_detailXML:XML in option_detailXMLList){
-					i++;
-					option_detailV[i]=new Option_detail();
-					option_detailV[i].initByXML(option_detailXML);
+			if(flags&MethodFlags.HAS_OPTIONAL){
+				if(xml.option_detailList.length()){
+					listXML=xml.option_detailList[0];
+					var option_detailXMLList:XMLList=listXML.option_detail;
+					i=-1;
+					option_detailV=new Vector.<Option_detail>(option_detailXMLList.length());
+					for each(var option_detailXML:XML in option_detailXMLList){
+						i++;
+						option_detailV[i]=new Option_detail();
+						option_detailV[i].initByXML(option_detailXML);
+					}
+				}else{
+					option_detailV=new Vector.<Option_detail>();
 				}
 			}
-			if(xml.param_nameList.length()){
-				listXML=xml.param_nameList[0];
-				var param_nameXMLList:XMLList=listXML.param_name;
-				i=-1;
-				param_nameV=new Vector.<int>(param_nameXMLList.length());
-				for each(var param_nameXML:XML in param_nameXMLList){
-					i++;
-					param_nameV[i]=int(param_nameXML.@value.toString());
+			if(flags&MethodFlags.HAS_PARAM_NAMES){
+				if(xml.param_nameList.length()){
+					listXML=xml.param_nameList[0];
+					var param_nameXMLList:XMLList=listXML.param_name;
+					i=-1;
+					param_nameV=new Vector.<int>(param_nameXMLList.length());
+					for each(var param_nameXML:XML in param_nameXMLList){
+						i++;
+						param_nameV[i]=int(param_nameXML.@value.toString());
+					}
+				}else{
+					param_nameV=new Vector.<int>();
 				}
 			}
 		}

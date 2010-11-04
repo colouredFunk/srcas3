@@ -9,8 +9,6 @@ SWF2 版本:v1.0
 
 package zero.swf{
 	import flash.utils.ByteArray;
-	import flash.utils.getDefinitionByName;
-	import flash.utils.getQualifiedClassName;
 	
 	import zero.swf.tagBodys.FileAttributes;
 	import zero.swf.tagBodys.Metadata;
@@ -55,7 +53,7 @@ package zero.swf{
 			if(TagBodyClass==Metadata||TagBodyClass==FileAttributes){
 				throw new Error("TagBodyClass="+TagBodyClass+" 已经被征用");
 			}
-			var typeName:String=getQualifiedClassName(TagBodyClass).replace("zero.swf.tagBodys::","");
+			var typeName:String=TagAndBodyClasses.getTypeNameByTagBodyOrBodyClass(TagBodyClass);
 			if(typeName){
 				var type:int=TagType[typeName];
 				if(typeName===TagType.typeNameArr[type]){
@@ -153,13 +151,7 @@ package zero.swf{
 			for each(var tag:Tag in tagV){
 				switch(tag.type){
 					case TagType.FileAttributes:
-						var fileAttributes:FileAttributes;
-						if(tag.tagBody){
-							fileAttributes=tag.tagBody as FileAttributes;
-						}else{
-							fileAttributes=new FileAttributes();
-							fileAttributes.initByData(tag.bodyData,tag.bodyOffset,tag.bodyOffset+tag.bodyLength);
-						}
+						var fileAttributes:FileAttributes=tag.getBody() as FileAttributes;
 						
 						if(fileAttributes.UseDirectBlit){
 							acceleration=ACC_DIRECT;
@@ -173,46 +165,17 @@ package zero.swf{
 						accessNetworkOnly=(fileAttributes.UseNetwork==1);
 					break;
 					case TagType.Metadata:
-						var metadata:Metadata;
-						if(tag.tagBody){
-							metadata=tag.tagBody as Metadata;
-						}else{
-							metadata=new Metadata();
-							metadata.initByData(tag.bodyData,tag.bodyOffset,tag.bodyOffset+tag.bodyLength);
-						}
-						
-						metadataStr=metadata.metadata;
+						metadataStr=(tag.getBody() as Metadata).metadata;
 					break;
 					default:
 						var valueName:String=getSetValueValueNames[tag.type];
 						if(valueName){
 							//trace("valueName="+valueName);
-							var tagBody:Object;
-							if(tag.tagBody){
-								tagBody=tag.tagBody;
-							}else{
-								tagBody=new getSetValueTagBodyClasses[tag.type]();
-								tagBody.initByData(tag.bodyData,tag.bodyOffset,tag.bodyOffset+tag.bodyLength);
-								tag.tagBody=tagBody;
-							}
-							getSetValueValues[valueName]=tagBody[getSetValueMemberNames[tag.type]];
+							getSetValueValues[valueName]=tag.getBody()[getSetValueMemberNames[tag.type]];
 						}
 					break;
 				}
 			}
-			
-			/*
-			trace("tags2Infos");
-			for each(tag in tagV){
-				//trace(TagType.typeNameArr[tag.type]);
-				if(tag.type==TagType.SetBackgroundColor){
-					trace("tag.tagBody="+tag.tagBody);
-					trace(tag.tagBody["BackgroundColor"].toString(16));
-					trace(getValue("bgColor"));
-					break;
-				}
-			}
-			//*/
 		}
 		public function infos2Tags():void{
 			///*
@@ -266,11 +229,9 @@ package zero.swf{
 			while(--getSetValueId>=0){
 				var valueName:String=getSetValueValueNames[getSetValueId];
 				if(valueName){
-					var TagBodyClass:Class=getSetValueTagBodyClasses[getSetValueId];
-					var tagBody:Object=new TagBodyClass();
-					tagBody[getSetValueMemberNames[getSetValueId]]=getSetValueValues[valueName];
 					tag=new Tag();
-					tag.tagBody=tagBody;
+					tag.setBody(new getSetValueTagBodyClasses[getSetValueId]());
+					tag.getBody()[getSetValueMemberNames[getSetValueId]]=getSetValueValues[valueName];
 					var tagOrderId:int=TagTypeOrderV.indexOf(tag.type);
 					if(tagOrderId==-1){
 						getSetValueTags.push(tag);
@@ -290,10 +251,9 @@ package zero.swf{
 			
 			if(metadataStr){
 				fileAttributes.HasMetadata=1;
-				var metadata:Metadata=new Metadata();
-				metadata.metadata=metadataStr;
 				tag=new Tag();
-				tag.tagBody=metadata;
+				tag.setBody(new Metadata());
+				(tag.getBody() as Metadata).metadata=metadataStr;
 				tagV.unshift(tag);
 			}else{
 				fileAttributes.HasMetadata=0;
@@ -301,22 +261,9 @@ package zero.swf{
 			
 			if(Version>=8){
 				tag=new Tag();
-				tag.tagBody=fileAttributes;
+				tag.setBody(fileAttributes);
 				tagV.unshift(tag);
 			}
-			
-			/*
-			trace("infos2Tags");
-			for each(tag in tagV){
-				//trace(TagType.typeNameArr[tag.type]);
-				if(tag.type==TagType.SetBackgroundColor){
-					trace("tag.tagBody="+tag.tagBody);
-					trace(tag.tagBody["BackgroundColor"].toString(16));
-					trace(getValue("bgColor"));
-					break;
-				}
-			}
-			//*/
 		}
 		
 		override public function toData():ByteArray{
@@ -480,6 +427,7 @@ package zero.swf{
 			if(resInserter){
 			}else{
 				try{
+					import flash.utils.getDefinitionByName;
 					var ResInserterClass:Class=getDefinitionByName("zero.swf.funs.ResInserter") as Class;
 				}catch(e:Error){
 					throw new Error("未编译: zero.swf.funs.ResInserter");

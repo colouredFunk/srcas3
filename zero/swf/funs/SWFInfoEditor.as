@@ -17,7 +17,7 @@ package zero.swf{
 	import zero.swf.tagBodys.ScriptLimits;
 	//import zero.swf.tagBodys.ProductInfo;
 	
-	public class SWFInfoEditor{
+	public class SWFInfoEditor{暂未使用
 		
 		public var enableDebugger2_password:String;
 		public var debugIDStr:String;
