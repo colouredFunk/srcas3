@@ -17,7 +17,7 @@ package zero{
 		private static var __getVar:Function=null;
 		
 		private static const loader:Loader=initLoader();
-		private static function initLoader():Loader{
+		private static function initLoader():Loader{请暂时使用SWFMetadataGetter
 			//trace("initLoader");
 			var loader:Loader=new Loader();
 			var swfData:ByteArray=new ByteArray();
