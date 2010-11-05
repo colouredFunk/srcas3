@@ -103,14 +103,12 @@
 				
 				//获取修改时间:
 				SWFMetadataGetter.init(this.loaderInfo.bytes);
-				trace(SWFMetadataGetter.metadataXML.toXMLString());
 				
 				var modifyDate:String=SWFMetadataGetter.getModifyDate();
 				if(modifyDate){
 					Common.addContextMenu(this, "发布时间:"+modifyDate.split("+")[0].replace("T"," "));
 				}
 				//
-				
 				onLoaded();
 			}
 		}
