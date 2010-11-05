@@ -119,7 +119,7 @@
 			}
 			return _strOld.split(_str).join(_rep);
 		}
-		public static function booleanStr(_str:String):Boolean{
+		public static function stringIsTrue(_str:String):Boolean {
 			if(!_str||_str==""||_str=="0"||_str==" "||_str=="false"){
 				return false;
 			}
@@ -127,31 +127,12 @@
 		}
 		public static function isValidEmail(_email:String):Boolean {
 			var _emailExpression:RegExp =/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+(w+([.-]\w+))*/;
-			///^[a-z][\w.-]+@\w[\w.-]+\.[\w.-]*[a-z][a-z]$/i;
+			/////^[a-z][\w.-]+@\w[\w.-]+\.[\w.-]*[a-z][a-z]$/i;
 			return _emailExpression.test(_email);
-		}
-		public static function encodeStr(_str:String,_type:String="GBK"):String{
-			var _byte:ByteArray = new ByteArray();
-			_byte.writeMultiByte(_str,_type);
-			return String(_byte);
 		}
 		//
 		public static function playerVersion():int{
 			return int(flash.system.Capabilities.version.split(",")[0].split(" ")[1]);
-		}
-		public static function hasPara(_xmlList:XMLList,_key:String,_value:*):XML {
-			if (_xmlList.length()>0) {
-				var _xmlListTemp:XMLList=_xmlList.attribute(_key).contains(_value);
-				if (_xmlListTemp.length()>0) {
-					return _xmlListTemp[0];
-				}
-				return null;
-			}
-			return null;
-		}
-		//
-		public static function EventUp(f:Function,... arg):Function {
-			return function(e:Event):void{f.apply(null,[e].concat(arg))};
 		}
 		//
 		public static function clone(_source:Object):* {
@@ -273,7 +254,7 @@
 			}
 			return _href;
 		}
-		public static function isContainsHREFOrJS(_xml:XML, _hrefKey:String = "href", _jsKey:String = "js"):Boolean {
+		public static function isXMLNodeContainsHREFOrJS(_xml:XML, _hrefKey:String = "href", _jsKey:String = "js"):Boolean {
 			var _href:String = String(_xml.attribute(_hrefKey));
 			var _js:String = String(_xml.attribute(_jsKey));
 			return Boolean(_href || _js);
