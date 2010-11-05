@@ -14,9 +14,9 @@
 	import flash.system.Security;
 	import flash.system.System;
 	
-	import com.adobe.serialization.json.JSON;
+	import zero.SWFMetadataGetter;
 	
-	import zero.SWFVarsGetter;
+	import com.adobe.serialization.json.JSON;
 	
 	public class DocClass extends MovieClip {
 		protected static var instance:*;
@@ -100,18 +100,18 @@
 			}
 			if (loaded == 1 && onLoaded != null) {
 				removeEventListener(Event.ENTER_FRAME, onLoadingHandler);
-				//onLoad();
-				onLoadedAndAddVersionInfo();
-			}
-		}
-		private function onLoadedAndAddVersionInfo():void{
-			SWFVarsGetter.init(this.loaderInfo.bytes,onSWFVarsGetterInit);
-			onLoaded();
-		}
-		private function onSWFVarsGetterInit():void{
-			var modifyDate:String=SWFVarsGetter.getModifyDate();
-			if(modifyDate){
-				Common.addContextMenu(this, "发布时间:"+modifyDate.split("+")[0].replace("T"," "));
+				
+				//获取修改时间:
+				SWFMetadataGetter.init(this.loaderInfo.bytes);
+				trace(SWFMetadataGetter.metadataXML.toXMLString());
+				
+				var modifyDate:String=SWFMetadataGetter.getModifyDate();
+				if(modifyDate){
+					Common.addContextMenu(this, "发布时间:"+modifyDate.split("+")[0].replace("T"," "));
+				}
+				//
+				
+				onLoaded();
 			}
 		}
 		private var __bytesTotal:int;
