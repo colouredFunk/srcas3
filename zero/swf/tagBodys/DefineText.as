@@ -2,7 +2,7 @@
 DefineText 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月4日 20:57:26 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月5日 10:43:13 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -35,7 +35,7 @@ package zero.swf.tagBodys{
 		public var GlyphBits:int;						//UI8
 		public var AdvanceBits:int;						//UI8
 		
-		public var TextRecordsV:Vector.<TEXTRECORD>;
+		public var TextRecordV:Vector.<TEXTRECORD>;
 		public var EndOfRecordsFlag:int;				//UI8
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
@@ -52,12 +52,12 @@ package zero.swf.tagBodys{
 			TEXTRECORD.AdvanceBits=AdvanceBits;
 			
 			var i:int=-1;
-			TextRecordsV=new Vector.<TEXTRECORD>();
+			TextRecordV=new Vector.<TEXTRECORD>();
 			while(data[offset]){
 				i++;
 			
-				TextRecordsV[i]=new TEXTRECORD();
-				offset=TextRecordsV[i].initByData(data,offset,endOffset);
+				TextRecordV[i]=new TEXTRECORD();
+				offset=TextRecordV[i].initByData(data,offset,endOffset);
 			}
 			EndOfRecordsFlag=data[offset++];
 			return offset;
@@ -76,8 +76,8 @@ package zero.swf.tagBodys{
 			TEXTRECORD.AdvanceBits=AdvanceBits;
 			offset+=2;
 			data.position=offset;
-			for each(var TextRecords:TEXTRECORD in TextRecordsV){
-				data.writeBytes(TextRecords.toData());
+			for each(var TextRecord:TEXTRECORD in TextRecordV){
+				data.writeBytes(TextRecord.toData());
 			}
 			data[data.length]=EndOfRecordsFlag;
 			return data;
@@ -95,10 +95,10 @@ package zero.swf.tagBodys{
 			xml.appendChild(TextBounds.toXML("TextBounds"));
 			xml.appendChild(TextMatrix.toXML("TextMatrix"));
 			
-			if(TextRecordsV.length){
-				var listXML:XML=<TextRecordsList count={TextRecordsV.length}/>
-				for each(var TextRecords:TEXTRECORD in TextRecordsV){
-					listXML.appendChild(TextRecords.toXML("TextRecords"));
+			if(TextRecordV.length){
+				var listXML:XML=<TextRecordList count={TextRecordV.length}/>
+				for each(var TextRecord:TEXTRECORD in TextRecordV){
+					listXML.appendChild(TextRecord.toXML("TextRecord"));
 				}
 				xml.appendChild(listXML);
 			}
@@ -113,18 +113,18 @@ package zero.swf.tagBodys{
 			GlyphBits=int(xml.@GlyphBits.toString());
 			AdvanceBits=int(xml.@AdvanceBits.toString());
 			
-			if(xml.TextRecordsList.length()){
-				var listXML:XML=xml.TextRecordsList[0];
-				var TextRecordsXMLList:XMLList=listXML.TextRecords;
+			if(xml.TextRecordList.length()){
+				var listXML:XML=xml.TextRecordList[0];
+				var TextRecordXMLList:XMLList=listXML.TextRecord;
 				var i:int=-1;
-				TextRecordsV=new Vector.<TEXTRECORD>(TextRecordsXMLList.length());
-				for each(var TextRecordsXML:XML in TextRecordsXMLList){
+				TextRecordV=new Vector.<TEXTRECORD>(TextRecordXMLList.length());
+				for each(var TextRecordXML:XML in TextRecordXMLList){
 					i++;
-					TextRecordsV[i]=new TEXTRECORD();
-					TextRecordsV[i].initByXML(TextRecordsXML);
+					TextRecordV[i]=new TEXTRECORD();
+					TextRecordV[i].initByXML(TextRecordXML);
 				}
 			}else{
-				TextRecordsV=new Vector.<TEXTRECORD>();
+				TextRecordV=new Vector.<TEXTRECORD>();
 			}
 			EndOfRecordsFlag=int(xml.@EndOfRecordsFlag.toString());
 		}

@@ -68,7 +68,7 @@ package zero.swf{
 		}
 		
 		//
-		public static const baseInfoNameV:Vector.<String>=SWF0.baseInfoNameV.concat(Vector.<String>([
+		public static const baseInfoNameV:Vector.<String>=SWF1.baseInfoNameV.concat(Vector.<String>([
 			"acceleration","isAS3","accessNetworkOnly","metadataStr"
 		]));
 		
@@ -269,7 +269,7 @@ package zero.swf{
 		override public function toData():ByteArray{
 			infos2Tags();
 			
-			insertResTags();
+			resTags2Tags();
 			
 			var data:ByteArray=baseInfo2Data();
 			data.position=data.length;
@@ -282,7 +282,7 @@ package zero.swf{
 		public function toSWFData2(progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
 			infos2Tags();
 			
-			insertResTags();
+			resTags2Tags();
 			
 			data=baseInfo2Data();
 			data.position=data.length;
@@ -421,6 +421,7 @@ package zero.swf{
 			resData:ByteArray,
 			className:String,
 			type:String,
+			frameId:int=-1,
 			addDoABC:Boolean=false,
 			addSymbolClass:Boolean=false
 		):void{
@@ -443,13 +444,30 @@ package zero.swf{
 				addSymbolClass
 			)
 		}
-		private function insertResTags():void{
+		public function resTags2Tags():void{
+			//把插入的 resTag 们放到 tagV 后面
 			if(resInserter){
-				var endTag:Tag=tagV.pop();
-				var lastShowFrameTag:Tag=tagV.pop();
+				var endTag:Tag=null;
+				var lastShowFrameTag:Tag=null;
+				var lastTag:Tag;
+				
+				lastTag=tagV[tagV.length-1];
+				if(lastTag.type==TagType.End){
+					endTag=tagV.pop();
+				}
+				lastTag=tagV[tagV.length-1];
+				if(lastTag.type==TagType.ShowFrame){
+					lastShowFrameTag=tagV.pop();
+				}
+				
 				tagV=tagV.concat(resInserter.getTagVAndReset());
-				tagV.push(lastShowFrameTag);
-				tagV.push(endTag);
+				
+				if(lastShowFrameTag){
+					tagV.push(lastShowFrameTag);
+				}
+				if(endTag){
+					tagV.push(endTag);
+				}
 			}
 		}
 	}
