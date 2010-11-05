@@ -60,7 +60,7 @@ package zero.swf.funs{
 					defineBitsJPEG2.id=defId;
 					defineBitsJPEG2.ImageData=new BytesData();
 					defineBitsJPEG2.ImageData.initByData(resData,0,resData.length);
-					tag.tagBody=defineBitsJPEG2;
+					tag.setBody(defineBitsJPEG2);
 				break;
 				/*
 				case SOUND:
@@ -71,7 +71,7 @@ package zero.swf.funs{
 					defineBinaryData.id=defId;
 					defineBinaryData.Data=new BytesData();
 					defineBinaryData.Data.initByData(resData,0,resData.length);
-					tag.tagBody=defineBinaryData;
+					tag.setBody(defineBinaryData);
 				break;
 				default:
 					throw new Error("不支持的 type: "+type);
@@ -86,7 +86,7 @@ package zero.swf.funs{
 				symbolClass.TagV=new Vector.<int>();
 				symbolClass.TagV[0]=defId;
 				tag=new Tag();
-				tag.tagBody=symbolClass;
+				tag.setBody(symbolClass);
 				tagV[tagV.length]=tag;
 			}else{
 				classNameV[classNameV.length]=className;
@@ -94,17 +94,22 @@ package zero.swf.funs{
 			}
 		}
 		public function getTagVAndReset():Vector.<Tag>{
-			var symbolClass:SymbolClass=new SymbolClass();
-			for each(var className:String in classNameV){
-				symbolClass.NameV=classNameV;
-				symbolClass.TagV=defIdV;
+			if(tagV.length){
+				var symbolClass:SymbolClass=new SymbolClass();
+				for each(var className:String in classNameV){
+					symbolClass.NameV=classNameV;
+					symbolClass.TagV=defIdV;
+				}
+				var tag:Tag=new Tag();
+				tag.setBody(symbolClass);
+				tagV[tagV.length]=tag;
+				var _tagV:Vector.<Tag>=tagV;
+				clearTags();
+				return _tagV;
 			}
-			var tag:Tag=new Tag();
-			tag.tagBody=symbolClass;
-			tagV[tagV.length]=tag;
-			var _tagV:Vector.<Tag>=tagV;
-			clearTags();
-			return _tagV;
+			
+			//return null;
+			return new Vector.<Tag>();
 		}
 		private function clearTags():void{
 			classNameV=new Vector.<String>();

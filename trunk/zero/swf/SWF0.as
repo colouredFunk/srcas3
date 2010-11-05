@@ -38,11 +38,13 @@ package zero.swf{
 		public function copyBaseInfo(swf:SWF0):void{
 			var swfBaseInfoNameV:Vector.<String>=swf["constructor"].baseInfoNameV;
 			var baseInfoNameV:Vector.<String>=this["constructor"].baseInfoNameV;
+			//trace("copyBaseInfo: ");
 			for each(var baseInfoName:String in swfBaseInfoNameV){
 				if(baseInfoNameV.indexOf(baseInfoName)==-1){
 					
 				}else{
 					this[baseInfoName]=swf[baseInfoName];
+					//trace(baseInfoName,swf[baseInfoName]);
 				}
 			}
 		}

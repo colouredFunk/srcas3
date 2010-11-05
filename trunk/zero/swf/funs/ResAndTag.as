@@ -17,7 +17,6 @@ package zero.swf.funs{
 	
 	import zero.FileTypes;
 	import zero.Outputer;
-	
 	import zero.swf.DefineObjs;
 	import zero.swf.SWF2;
 	import zero.swf.Tag;
@@ -26,6 +25,7 @@ package zero.swf.funs{
 	import zero.swf.records.BUTTONRECORD_within_DefineButton;
 	import zero.swf.records.FILLSTYLE;
 	import zero.swf.records.SHAPEWITHSTYLE;
+	import zero.swf.records.TEXTRECORD;
 	import zero.swf.records.lineStyles.BaseLineStyle;
 	import zero.swf.records.lineStyles.LINESTYLE2;
 	import zero.swf.records.shapeRecords.SHAPERECORD;
@@ -41,6 +41,7 @@ package zero.swf.funs{
 	import zero.swf.tagBodys.DefineShape3;
 	import zero.swf.tagBodys.DefineShape4;
 	import zero.swf.tagBodys.DefineSprite;
+	import zero.swf.tagBodys.DefineText;
 	import zero.swf.tagBodys.PlaceObject;
 	import zero.swf.tagBodys.PlaceObject2;
 	import zero.swf.tagBodys.PlaceObject3;
@@ -139,6 +140,7 @@ package zero.swf.funs{
 					}
 				break;
 				case TagType.DefineSprite:
+					///*
 					for each(var childTag:Tag in (tag.getBody() as DefineSprite).dataAndTags.tagV){
 						switch(childTag.type){
 							case TagType.PlaceObject:
@@ -152,15 +154,19 @@ package zero.swf.funs{
 							break;
 						}
 					}
+					//*/
 				break;
 				case TagType.DefineText:
-					
+					//Outputer.outputError("暂不太支持 DefineText");
+					for each(var TextRecord:TEXTRECORD in (tag.getBody() as DefineText).TextRecordV){
+						getRelatedTag(TextRecord.FontID);
+					}
 				break;
 				case TagType.DefineText2:
-					
+					Outputer.outputError("暂不太支持 DefineText2");
 				break;
 				case TagType.DefineEditText:
-					
+					Outputer.outputError("暂不太支持 DefineEditText");
 				break;
 			}
 		}

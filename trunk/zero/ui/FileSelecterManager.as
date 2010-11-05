@@ -13,6 +13,8 @@ package zero.ui{
 	import flash.filesystem.File;
 	import flash.net.*;
 	import flash.utils.*;
+	
+	import mx.controls.ComboBox;
 
 	public class FileSelecterManager{
 		public static const OPEN:String="open";
@@ -100,27 +102,36 @@ package zero.ui{
 			_browseType:String=OPEN,
 			_browseTitle:String="选择一个文件: ",
 			so:SharedObject=null,
-			saveId:String=null
+			saveId:String=null,
+			defaultFileURL:String=null
 		):void{
 			//init("图片","jpg,png,gif,bmp");
 			if(btn){
 				btn.addEventListener(MouseEvent.CLICK,browse);
 			}
+			
+			var FileClass:Class;
+			try{
+				FileClass=getDefinitionByName("flash.filesystem.File") as Class;
+			}catch(e:Error){
+				FileClass=null;
+			}
+			
 			if(fileTypeName){
 				if(fileTypes){
 					fileFilterList=[new FileFilter(fileTypeName,"*."+fileTypes.replace(/\,/g,";*."))];
 				}
 				browseType=_browseType;
 				
-				var FileClass:Class;
-				try{
-					FileClass=getDefinitionByName("flash.filesystem.File") as Class;
-				}catch(e:Error){
-					FileClass=null;
-				}
-				
 				if(FileClass){
-					ComboBoxManager.addCb(cb,so,saveId);
+					if(defaultFileURL){
+						ComboBoxManager.addCb(cb,so,saveId,[decodeURI(defaultFileURL)]);
+					}else{
+						ComboBoxManager.addCb(cb,so,saveId);
+					}
+					
+					//trace("cb.text="+cb.text);
+					
 					var __fileURL:String=cb.text;
 					if(!__fileURL&&lastFSMFile){
 						__fileURL=lastFSMFile.url;
