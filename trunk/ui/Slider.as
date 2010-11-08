@@ -85,12 +85,12 @@
 		override protected function setStyle():void {
 			scale = length/(maximum-minimum);
 			setClips(Math.round((value-minimum) * scale));
-			setText();
-		}
-		override protected function setText():void {
 			if (txt) {
-				txt.text = value;
+				txt.text = (labelFunction!=null)?labelFunction(value):setLabel(value);
 			}
+		}
+		override protected function setLabel(_value:Number):String {
+			return String(value);
 		}
 	}
 }
