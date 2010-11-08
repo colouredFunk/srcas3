@@ -7,6 +7,7 @@ package ui{
 	 */
 	public class ProgressBar extends SimpleBtn {
 		public var change:Function;
+		public var labelFunction:Function;
 		
 		public var txt:*;
 		public var thumb:*;
@@ -86,6 +87,7 @@ package ui{
 			}
 			scaleX = 1;
 			enabled = false;
+			value = 0;
 		}
 		override protected function onRemoveToStageHandler():void {
 			super.onRemoveToStageHandler();
@@ -109,7 +111,9 @@ package ui{
 		}
 		protected function setStyle():void {
 			setClips(value * length);
-			setText();
+			if (txt) {
+				txt.text = (labelFunction!=null)?labelFunction(value):setLabel(value);
+			}
 		}
 		protected function setClips(_value:Number):void {
 			if (thumb && bar) {
@@ -133,10 +137,8 @@ package ui{
 				}
 			}
 		}
-		protected function setText():void {
-			if (txt) {
-				txt.text = Math.round(value * 100) + " %";
-			}
+		protected function setLabel(_value:Number):String {
+			return Math.round(value * 100) + " %";
 		}
 	}
 }
