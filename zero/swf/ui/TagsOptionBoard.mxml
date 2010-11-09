@@ -481,6 +481,9 @@ TagsOptionBoard 版本:v1.0
 					case ABCFile:
 						return 1;
 					break;
+					//default:
+					//	throw new Error("被我注掉了");
+					//break;
 					case ABCFileAdvance:
 						return 2;
 					break;

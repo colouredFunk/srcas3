@@ -2,7 +2,7 @@
 Method_body_info 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月2日 20:19:34 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月9日 10:14:36 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -56,7 +56,7 @@ Method_body_info 版本:v1.0
 //The value of trait_count is the number of elements in the trait array. The trait array contains all
 //the traits for this method body (see above for more information on traits).
 package zero.swf.avm2{
-	import zero.swf.BytesData;
+	import zero.swf.avm2.Codes;
 	import zero.swf.avm2.Exception_info;
 	import zero.swf.avm2.Traits_info;
 	import flash.utils.ByteArray;
@@ -67,7 +67,7 @@ package zero.swf.avm2{
 		public var init_scope_depth:int;				//u30
 		public var max_scope_depth:int;					//u30
 		
-		public var codes:BytesData;
+		public var codes:Codes;
 		public var exception_infoV:Vector.<Exception_info>;
 		public var traits_infoV:Vector.<Traits_info>;
 		//
@@ -90,7 +90,7 @@ package zero.swf.avm2{
 			if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var codes_length:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{codes_length=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{codes_length=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{codes_length=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{codes_length=data[offset++];}
 			//codes_length
 			
-			codes=new BytesData();
+			codes=new Codes();
 			offset=codes.initByData(data,offset,offset+codes_length);
 			
 			
@@ -132,11 +132,13 @@ package zero.swf.avm2{
 			if(max_scope_depth>>>7){if(max_scope_depth>>>14){if(max_scope_depth>>>21){if(max_scope_depth>>>28){data[offset++]=(max_scope_depth&0x7f)|0x80;data[offset++]=((max_scope_depth>>>7)&0x7f)|0x80;data[offset++]=((max_scope_depth>>>14)&0x7f)|0x80;data[offset++]=((max_scope_depth>>>21)&0x7f)|0x80;data[offset++]=max_scope_depth>>>28;}else{data[offset++]=(max_scope_depth&0x7f)|0x80;data[offset++]=((max_scope_depth>>>7)&0x7f)|0x80;data[offset++]=((max_scope_depth>>>14)&0x7f)|0x80;data[offset++]=max_scope_depth>>>21;}}else{data[offset++]=(max_scope_depth&0x7f)|0x80;data[offset++]=((max_scope_depth>>>7)&0x7f)|0x80;data[offset++]=max_scope_depth>>>14;}}else{data[offset++]=(max_scope_depth&0x7f)|0x80;data[offset++]=max_scope_depth>>>7;}}else{data[offset++]=max_scope_depth;}
 			//max_scope_depth
 			
-			var codes_length:int=codes.dataLength;
+			var codesData:ByteArray=codes.toData();
+			var codes_length:int=codesData.length;
 			if(codes_length>>>7){if(codes_length>>>14){if(codes_length>>>21){if(codes_length>>>28){data[offset++]=(codes_length&0x7f)|0x80;data[offset++]=((codes_length>>>7)&0x7f)|0x80;data[offset++]=((codes_length>>>14)&0x7f)|0x80;data[offset++]=((codes_length>>>21)&0x7f)|0x80;data[offset++]=codes_length>>>28;}else{data[offset++]=(codes_length&0x7f)|0x80;data[offset++]=((codes_length>>>7)&0x7f)|0x80;data[offset++]=((codes_length>>>14)&0x7f)|0x80;data[offset++]=codes_length>>>21;}}else{data[offset++]=(codes_length&0x7f)|0x80;data[offset++]=((codes_length>>>7)&0x7f)|0x80;data[offset++]=codes_length>>>14;}}else{data[offset++]=(codes_length&0x7f)|0x80;data[offset++]=codes_length>>>7;}}else{data[offset++]=codes_length;}
 			//codes_length
+			
 			data.position=offset;
-			data.writeBytes(codes.toData());
+			data.writeBytes(codesData);
 			offset=data.length;
 			var exception_info_count:int=exception_infoV.length;
 			
@@ -195,7 +197,7 @@ package zero.swf.avm2{
 			init_scope_depth=int(xml.@init_scope_depth.toString());
 			max_scope_depth=int(xml.@max_scope_depth.toString());
 			
-			codes=new BytesData();
+			codes=new Codes();
 			codes.initByXML(xml.codes[0]);
 			if(xml.exception_infoList.length()){
 				var listXML:XML=xml.exception_infoList[0];
