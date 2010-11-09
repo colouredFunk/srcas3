@@ -118,11 +118,15 @@ package zero.swf.avm2.advances{
 			AdvanceABC.currInstance.abcFile.class_infoV.push(class_info);
 			return AdvanceABC.currInstance.abcFile.instance_infoV.length-1;
 		}
+		
+		public function getMarkKey():String{
+			return name.toXML("name").toXMLString();
+		}
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
-			var xml:XML=toXML_fun(Instance_info_memberV);
+		public function toXML(xmlName:String):XML{
+			var xml:XML=toXML_fun(Instance_info_memberV,xmlName);
 			
 			toXML_fun(Class_info_memberV,xml);
 			
@@ -134,6 +138,8 @@ package zero.swf.avm2.advances{
 			
 			initByXML_fun(xml,Instance_info_memberV);
 			initByXML_fun(xml,Class_info_memberV);
+			
+			AdvanceABC.currInstance.marks[Member.CLASS][getMarkKey()]=this;
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

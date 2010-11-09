@@ -152,6 +152,13 @@ package zero.swf.avm2.advances{
 			return null;
 		}
 		
+		private static const memberV:Vector.<Member>=Vector.<Member>([
+			new Member("minor_version"),
+			new Member("major_version"),
+			new Member("class",Member.CLASS,{isList:true}),
+			new Member("script_info",Member.SCRIPT_INFO,{isList:true})
+		]);
+		
 		private function getDefaultInfo0s():void{
 			//- -
 			namespace_infoV[0]=null;
@@ -189,7 +196,7 @@ package zero.swf.avm2.advances{
 			
 			var i:int;
 			
-			//为各级 getInfoByIdAndVName 作准备
+			//为各级 getInfoByIdAndMemberType 作准备
 			//test_total_new=0;
 			currInstance=this;
 			
@@ -199,15 +206,7 @@ package zero.swf.avm2.advances{
 			for each(memberType in Member.typeV){
 				i++;
 				if(Member.fromABCFileMark[memberType]){
-					if(
-						memberType==Member.INTEGER
-						||
-						memberType==Member.UINTEGER
-						||
-						memberType==Member.DOUBLE
-						||
-						memberType==Member.STRING
-					){
+					if(Member.directMark[memberType]){
 						this[memberType+"V"]=abcFile[memberType+"V"];
 					}else if(memberType==Member.METHOD){
 						this[memberType+"V"]=new MemberClasses.vClassV[i](abcFile.method_infoV.length);
@@ -233,12 +232,12 @@ package zero.swf.avm2.advances{
 			i=-1;
 			for each(var instance_info:Instance_info in abcFile.instance_infoV){
 				i++;
-				getInfoByIdAndVName(i,Member.CLASS);
+				getInfoByIdAndMemberType(i,Member.CLASS);
 			}
 			i=-1;
 			for each(var script_info:Script_info in abcFile.script_infoV){
 				i++;
-				getInfoByIdAndVName(i,Member.SCRIPT_INFO);
+				getInfoByIdAndMemberType(i,Member.SCRIPT_INFO);
 			}
 			//
 			
@@ -255,7 +254,7 @@ package zero.swf.avm2.advances{
 				}
 			}
 		}
-		public function getInfoByIdAndVName(id:int,memberType:String):*{
+		public function getInfoByIdAndMemberType(id:int,memberType:String):*{
 			if(id==0){
 				if(
 					memberType==Member.INTEGER
@@ -264,7 +263,8 @@ package zero.swf.avm2.advances{
 					||
 					memberType==Member.DOUBLE
 				){
-					id=-1;
+					throw new Error("id="+id+" 超出范围, "+memberType);
+					return null;
 				}/*else{
 					if(memberType==STRING){
 						return "";
@@ -283,15 +283,7 @@ package zero.swf.avm2.advances{
 			if(id>=0){
 				var v:*=this[memberType+"V"];
 				if(id<v.length){
-					if(
-						memberType==Member.INTEGER
-						||
-						memberType==Member.UINTEGER
-						||
-						memberType==Member.DOUBLE
-						||
-						memberType==Member.STRING
-					){
+					if(Member.directMark[memberType]){
 						return v[id];
 					}
 					
@@ -317,13 +309,13 @@ package zero.swf.avm2.advances{
 			return null;
 		}
 		
-		public function getInfoVByIdsAndVName(advance:Advance,avm2Obj:AVM2Obj,infoVName:String,memberType:String):void{
+		public function getInfoVByIdsAndMemberType(advance:Advance,avm2Obj:AVM2Obj,infoVName:String,memberType:String):void{
 			var idV:Vector.<int>=avm2Obj[infoVName];
 			var infoV:*=advance[infoVName]=new MemberClasses[memberType+"VClass"](idV.length);
 			var i:int=-1;
 			for each(var id:int in idV){
 				i++;
-				infoV[i]=getInfoByIdAndVName(id,memberType);
+				infoV[i]=getInfoByIdAndMemberType(id,memberType);
 			}
 		}
 		//
@@ -337,7 +329,7 @@ package zero.swf.avm2.advances{
 			
 			var i:int;
 			
-			//为各级 getIdByInfoAndVName 作准备
+			//为各级 getIdByInfoAndMemberType 作准备
 			//test_total_new=0;
 			currInstance=this;
 			
@@ -368,10 +360,10 @@ package zero.swf.avm2.advances{
 			
 			//
 			for each(var clazz:AdvanceClass in classV){
-				getIdByInfoAndVName(clazz,Member.CLASS);
+				getIdByInfoAndMemberType(clazz,Member.CLASS);
 			}
 			for each(var script_info:AdvanceScript_info in script_infoV){
-				getIdByInfoAndVName(script_info,Member.SCRIPT_INFO);
+				getIdByInfoAndMemberType(script_info,Member.SCRIPT_INFO);
 			}
 			//
 			
@@ -409,18 +401,10 @@ package zero.swf.avm2.advances{
 			dicts=null;
 		}
 		
-		public function getIdByInfoAndVName(info:*,memberType:String):int{
+		public function getIdByInfoAndMemberType(info:*,memberType:String):int{
 			var dict:Dictionary=dicts[memberType];
 			
-			if(
-				memberType==Member.INTEGER
-				||
-				memberType==Member.UINTEGER
-				||
-				memberType==Member.DOUBLE
-				||
-				memberType==Member.STRING
-			){
+			if(Member.directMark[memberType]){
 				if(info===null||info===undefined){
 					throw new Error("info="+info);
 				}else{
@@ -446,13 +430,13 @@ package zero.swf.avm2.advances{
 		
 			return -1;
 		}
-		public function getIdsByInfoVAndVName(advance:Advance,avm2Obj:AVM2Obj,infoVName:String,memberType:String):void{
+		public function getIdsByInfoVAndMemberType(advance:Advance,avm2Obj:AVM2Obj,infoVName:String,memberType:String):void{
 			var infoV:*=advance[infoVName];
 			var idV:Vector.<int>=avm2Obj[infoVName]=new Vector.<int>(infoV.length);
 			var i:int=-1;
 			for each(var info:* in infoV){
 				i++;
-				idV[i]=getIdByInfoAndVName(info,memberType);
+				idV[i]=getIdByInfoAndMemberType(info,memberType);
 			}
 		}
 		
@@ -466,49 +450,26 @@ package zero.swf.avm2.advances{
 			currInstance=this;
 			//准备完毕
 			
-			var xml:XML=<{xmlName} class="AdvanceABC"
-				minor_version={minor_version}
-				major_version={major_version}
-			/>;
-			
-			var classListXML:XML=<classList count={classV.length}/>;
-			for each(var clazz:AdvanceClass in classV){
-				classListXML.appendChild(clazz.toXML());
-			}
-			xml.appendChild(classListXML);
-			
-			var script_infoListXML:XML=<script_infoList count={script_infoV.length}/>;
-			for each(var script_info:AdvanceScript_info in script_infoV){
-				script_infoListXML.appendChild(script_info.toXML());
-			}
-			xml.appendChild(script_infoListXML);
+			var xml:XML=toXML_fun(memberV,xmlName);
 			
 			currInstance=null;
 			
 			return xml;
 		}
 		
-		public function getInfoListXMLByInfoVAndVName(advance:Advance,name:String,memberType:String):XML{
+		public function getInfoListXMLByInfoVAndMemberType(advance:Advance,name:String,memberType:String):XML{
 			return advance.getInfoListXMLByInfoV(
-						name,!(
-							memberType==Member.INTEGER
-							||
-							memberType==Member.UINTEGER
-							||
-							memberType==Member.DOUBLE
-							||
-							memberType==Member.STRING
-					));
+						name,!Member.directMark[memberType]);
 		}
 		
-		private var marks:Object;
+		public var marks:Object;
 		public function initByXML(xml:XML):void{
 			//trace("initByXML========================================");
 			
-			minor_version=int(xml.@minor_version.toString());
-			major_version=int(xml.@major_version.toString());
+			//minor_version=int(xml.@minor_version.toString());
+			//major_version=int(xml.@major_version.toString());
 			
-			//为各级 getInfoByXMLAndVName 作准备
+			//为各级 getInfoByXMLAndMemberType 作准备
 			//test_total_new=0;
 			currInstance=this;
 			
@@ -521,41 +482,25 @@ package zero.swf.avm2.advances{
 				}
 			}
 			
+			///*
 			var i:int=-1;
 			for each(memberType in Member.typeV){
 				i++;
 				if(Member.fromABCFileMark[memberType]){
-					if(
-						memberType==Member.INTEGER
-						||
-						memberType==Member.UINTEGER
-						||
-						memberType==Member.DOUBLE
-						||
-						memberType==Member.STRING
-					){
-					}else if(
-						memberType==Member.NAMESPACE_INFO
-						||
-						memberType==Member.NS_SET_INFO
-						||
-						memberType==Member.MULTINAME_INFO
-					){
+					if(Member.directMark[memberType]){
+					}else if(Member.idStartFrom1Mark[memberType]){
 						this[memberType+"V"]=new MemberClasses.vClassV[i](1);
 					}else{
 						this[memberType+"V"]=new MemberClasses.vClassV[i]();
 					}
 				}
 			}
+			//*/
+			
 			getDefaultInfo0s();
 			//准备完毕
 			
-			for each(var AdvanceClassXML:XML in xml.classList[0].children()){
-				getInfoByXMLAndVName(AdvanceClassXML,Member.CLASS);
-			}
-			for each(var AdvanceScript_infoXML:XML in xml.script_infoList[0].children()){
-				getInfoByXMLAndVName(AdvanceScript_infoXML,Member.SCRIPT_INFO);
-			}
+			initByXML_fun(xml,memberV);
 			
 			//trace("methodV="+methodV);
 			
@@ -571,21 +516,23 @@ package zero.swf.avm2.advances{
 			}
 			marks=null;
 		}
-		public function getInfoByXMLAndVName(xml:XML,memberType:String):*{
-			var key:String=xml.toXMLString();
-			if(key==='<AdvanceMultiname_info kind="*"/>'){
-				return AdvanceDefaultMultiname_info.instance;
+		public function getInfoByXMLAndMemberType(xml:XML,memberType:String):*{
+			if(memberType==Member.MULTINAME_INFO){
+				if(xml.@kind.toString()=="*"){
+					return AdvanceDefaultMultiname_info.instance;
+				}
 			}
-			var info:*=marks[memberType][key];
+			var markKey:String=xml.toXMLString();
+			var info:*=marks[memberType][markKey];
 			if(info){
 			}else{
-				marks[memberType][key]=info=new MemberClasses[memberType]();
+				marks[memberType][markKey]=info=new MemberClasses[memberType]();
 				info.initByXML(xml);
 				this[memberType+"V"][this[memberType+"V"].length]=info;
 			}
 			return info;
 		}
-		public function getInfoVByInfoListXMLAndVName(advance:Advance,name:String,xml:XML,memberType:String):void{
+		public function getInfoVByInfoListXMLAndMemberType(advance:Advance,name:String,xml:XML,memberType:String):void{
 			var infoXMLList:XMLList=xml[name+"List"][0][name];
 			var i:int=-1;
 			var infoV:*=advance[name+"V"]=new MemberClasses[memberType+"VClass"](infoXMLList.length());
@@ -598,7 +545,7 @@ package zero.swf.avm2.advances{
 			}else{
 				for each(infoXML in infoXMLList){
 					i++;
-					infoV[i]=getInfoByXMLAndVName(infoXML.children()[0],memberType);
+					infoV[i]=getInfoByXMLAndMemberType(infoXML,memberType);
 				}
 			}
 		}
@@ -607,16 +554,16 @@ package zero.swf.avm2.advances{
 	public function getConstValueByIdAndKind(name:String,id:int,kind:int):*{
 		switch(kind){
 			case ConstantKind.Int:
-				return getInfoByIdAndVName(id,Member.INTEGER);
+				return getInfoByIdAndMemberType(id,Member.INTEGER);
 			break;
 			case ConstantKind.UInt:
-				return getInfoByIdAndVName(id,Member.UINTEGER);
+				return getInfoByIdAndMemberType(id,Member.UINTEGER);
 			break;
 			case ConstantKind.Double:
-				return getInfoByIdAndVName(id,Member.DOUBLE);
+				return getInfoByIdAndMemberType(id,Member.DOUBLE);
 			break;
 			case ConstantKind.Utf8:
-				return getInfoByIdAndVName(id,Member.STRING);
+				return getInfoByIdAndMemberType(id,Member.STRING);
 			break;
 			case ConstantKind.True:
 			case ConstantKind.False:
@@ -631,7 +578,7 @@ package zero.swf.avm2.advances{
 			case ConstantKind.ExplicitNamespace:
 			case ConstantKind.StaticProtectedNs:
 			case ConstantKind.PrivateNs:
-				return getInfoByIdAndVName(id,Member.NAMESPACE_INFO);
+				return getInfoByIdAndMemberType(id,Member.NAMESPACE_INFO);
 			break;
 			default:
 				throw new Error("未知 kind: "+kind);
@@ -644,16 +591,16 @@ package zero.swf.avm2.advances{
 		//trace("getIdByKindAndConstValue",ConstantKind.kindV[kind],value);
 		switch(kind){
 			case ConstantKind.Int:
-				return getIdByInfoAndVName(value,Member.INTEGER);
+				return getIdByInfoAndMemberType(value,Member.INTEGER);
 			break;
 			case ConstantKind.UInt:
-				return getIdByInfoAndVName(value,Member.UINTEGER);
+				return getIdByInfoAndMemberType(value,Member.UINTEGER);
 			break;
 			case ConstantKind.Double:
-				return getIdByInfoAndVName(value,Member.DOUBLE);
+				return getIdByInfoAndMemberType(value,Member.DOUBLE);
 			break;
 			case ConstantKind.Utf8:
-				return getIdByInfoAndVName(value,Member.STRING);
+				return getIdByInfoAndMemberType(value,Member.STRING);
 			break;
 			case ConstantKind.True:
 			case ConstantKind.False:
@@ -668,7 +615,7 @@ package zero.swf.avm2.advances{
 			case ConstantKind.ExplicitNamespace:
 			case ConstantKind.StaticProtectedNs:
 			case ConstantKind.PrivateNs:
-				return getIdByInfoAndVName(value,Member.NAMESPACE_INFO);
+				return getIdByInfoAndMemberType(value,Member.NAMESPACE_INFO);
 			break;
 			default:
 				throw new Error("未知 kind: "+kind);
@@ -698,9 +645,7 @@ package zero.swf.avm2.advances{
 			case ConstantKind.StaticProtectedNs:
 			case ConstantKind.PrivateNs:
 				if(value){
-					var infoXML:XML=new XML("<"+name+"/>");
-					infoXML.appendChild(value.toXML());
-					xml.appendChild(infoXML);
+					xml.appendChild(value.toXML(name));
 				}
 			break;
 			default:
@@ -735,7 +680,7 @@ package zero.swf.avm2.advances{
 			case ConstantKind.ExplicitNamespace:
 			case ConstantKind.StaticProtectedNs:
 			case ConstantKind.PrivateNs:
-				advance[name]=getInfoByXMLAndVName(xml,Member.NAMESPACE_INFO);
+				advance[name]=getInfoByXMLAndMemberType(xml,Member.NAMESPACE_INFO);
 			break;
 			default:
 				throw new Error("未知 kind: "+kind);

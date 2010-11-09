@@ -116,6 +116,8 @@ package zero.swf.avm2.advances{
 		
 		public var constKindName:String;
 		
+		public var xmlUseMarkKey:Boolean;
+		
 		public function Member(
 			_name:String,
 			_type:String=null,
@@ -144,6 +146,8 @@ package zero.swf.avm2.advances{
 				}else if(rest.constKindName){
 					constKindName=rest.constKindName;
 				}
+				
+				xmlUseMarkKey=rest.xmlUseMarkKey;
 			}
 		}
 	}

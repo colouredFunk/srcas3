@@ -269,7 +269,7 @@ package zero.swf{
 		override public function toData():ByteArray{
 			infos2Tags();
 			
-			resTags2Tags();
+			//updateInsertedRes();
 			
 			var data:ByteArray=baseInfo2Data();
 			data.position=data.length;
@@ -282,7 +282,7 @@ package zero.swf{
 		public function toSWFData2(progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
 			infos2Tags();
 			
-			resTags2Tags();
+			//updateInsertedRes();
 			
 			data=baseInfo2Data();
 			data.position=data.length;
@@ -323,7 +323,7 @@ package zero.swf{
 		public function toXML():XML{
 			infos2Tags();
 			
-			insertResTags();
+			//updateInsertedRes();
 			
 			getXML();
 			
@@ -335,7 +335,7 @@ package zero.swf{
 		public function toXML2(progress_start:Function,progress_progress:Function,_progress_finished:Function):void{
 			infos2Tags();
 			
-			insertResTags();
+			//updateInsertedRes();
 			
 			getXML();
 			
@@ -415,7 +415,7 @@ package zero.swf{
 		}//end of CONFIG::toXMLAndInitByXML
 		
 		
-		
+		/*
 		private var resInserter:*;
 		public function insertRes(
 			resData:ByteArray,
@@ -440,36 +440,19 @@ package zero.swf{
 				resData,
 				className,
 				type,
+				frameId,
 				addDoABC,
 				addSymbolClass
 			)
 		}
-		public function resTags2Tags():void{
-			//把插入的 resTag 们放到 tagV 后面
+		
+		public function updateInsertedRes():void{
+			//把插入的 resTag 们放到对应的帧里
 			if(resInserter){
-				var endTag:Tag=null;
-				var lastShowFrameTag:Tag=null;
-				var lastTag:Tag;
-				
-				lastTag=tagV[tagV.length-1];
-				if(lastTag.type==TagType.End){
-					endTag=tagV.pop();
-				}
-				lastTag=tagV[tagV.length-1];
-				if(lastTag.type==TagType.ShowFrame){
-					lastShowFrameTag=tagV.pop();
-				}
-				
-				tagV=tagV.concat(resInserter.getTagVAndReset());
-				
-				if(lastShowFrameTag){
-					tagV.push(lastShowFrameTag);
-				}
-				if(endTag){
-					tagV.push(endTag);
-				}
+				resInserter.getTagVAndReset(tagV);
 			}
 		}
+		*/
 	}
 }
 

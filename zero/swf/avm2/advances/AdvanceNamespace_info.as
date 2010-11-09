@@ -48,6 +48,7 @@ package zero.swf.avm2.advances{
 		//
 		public function AdvanceNamespace_info(){
 		}
+		
 		public function initByInfo(_infoId:int,namespace_info:Namespace_info):void{
 			infoId=_infoId;
 			
@@ -65,8 +66,8 @@ package zero.swf.avm2.advances{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
-			var xml:XML=toXML_fun(memberV);
+		public function toXML(xmlName:String):XML{
+			var xml:XML=toXML_fun(memberV,xmlName);
 			
 			xml.@infoId=infoId;
 			return xml;

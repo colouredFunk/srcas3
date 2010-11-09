@@ -100,6 +100,9 @@ TagsOptionBoard 版本:v1.0
 			import zero.swf.DataAndTags;
 			import zero.swf.TagType;
 			import zero.swf.avm2.AVM2Obj;
+			import zero.swf.avm2.ABCFileWithSimpleConstant_pool;
+			import zero.swf.avm2.ABCFile;
+			import zero.swf.avm2.ABCFileAdvance;
 			
 			private static const settingFolderPath:String=("file:///"+decodeURI(File.applicationDirectory.nativePath+"/setting")+"/").replace(/\\/g,"/");
 			private static const optionsFolderPath:String=settingFolderPath+"options/";
@@ -474,7 +477,18 @@ TagsOptionBoard 版本:v1.0
 				if(outputDoABCLevelStr){
 					return int(outputDoABCLevelStr);
 				}
-				return AVM2Obj.decodeLevel;
+				switch(AVM2Obj.ABCFileClass){
+					case ABCFile:
+						return 1;
+					break;
+					case ABCFileAdvance:
+						return 2;
+					break;
+					//default:
+					//	return 0;
+					//break;
+				}
+				return 0;
 			}
 			public static function set outputDoABCLevel(_outputDoABCLevel:int):void{
 				settingXML.@outputDoABCLevel=_outputDoABCLevel;
