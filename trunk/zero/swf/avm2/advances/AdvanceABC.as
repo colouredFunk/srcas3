@@ -532,6 +532,14 @@ package zero.swf.avm2.advances{
 			}
 			return info;
 		}
+		public function getInfoByMarkKeyAndMemberType(markKey:String,memberType:String):*{
+			var info:*=marks[memberType][markKey];
+			if(info){
+			}else{
+				
+			}
+			return info;
+		}
 		public function getInfoVByInfoListXMLAndMemberType(advance:Advance,name:String,xml:XML,memberType:String):void{
 			var infoXMLList:XMLList=xml[name+"List"][0][name];
 			var i:int=-1;

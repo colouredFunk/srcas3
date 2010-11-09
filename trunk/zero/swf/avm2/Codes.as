@@ -9,70 +9,80 @@ Codes 版本:v1.0
 
 package zero.swf.avm2{
 	import flash.utils.ByteArray;
-	public class Codes extends AVM2Obj{
-		public var codeV:Vector.<Array>;
+	public class Codes{
+		public var codeV:Vector.<Code>;
 		//
-		override public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			var codeId:int=-1;
-			codeV=new Vector.<Array>();
-			var op:int;
+			codeV=new Vector.<Code>();
+			var code:Code;
 			while(offset<endOffset){
 				codeId++;
 				
-				op=data[offset++];
-				codeV[codeId]=[op];
-				var opDataType:String=Op.opDataTypeV[op];
-				if(opDataType==Op.dataType_u8){
-				}else{
-					switch(opDataType){
-						case Op.dataType_u8_u8:
-							codeV[codeId][1]=data[offset++];
-						break;
-						case Op.dataType_u8_u30:
-							if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){codeV[codeId][1]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{codeV[codeId][1]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{codeV[codeId][1]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{codeV[codeId][1]=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{codeV[codeId][1]=data[offset++];}
-							//codeV[codeId][1]
-						break;
-						case Op.dataType_u8_u30_u30:
-							if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){codeV[codeId][1]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{codeV[codeId][1]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{codeV[codeId][1]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{codeV[codeId][1]=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{codeV[codeId][1]=data[offset++];}
-							//codeV[codeId][1]
-							
-							if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){codeV[codeId][2]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{codeV[codeId][2]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{codeV[codeId][2]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{codeV[codeId][2]=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{codeV[codeId][2]=data[offset++];}
-							//codeV[codeId][2]
-						break;
-						case Op.dataType_u8_s24:
-							codeV[codeId][1]=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16);
-							if(codeV[codeId][1]&0x00008000){codeV[codeId][1]|=0xffff0000}//最高位为1,表示负数
-						break;
-						case Op. dataType_u8_s24_u30_s24List:
-							codeV[codeId][1]=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16);
-							if(codeV[codeId][1]&0x00008000){codeV[codeId][1]|=0xffff0000}//最高位为1,表示负数
-							
-							if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var case_count:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{case_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{case_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{case_count=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{case_count=data[offset++];}
-							//case_count
-							
-							case_count++;
-							codeV[codeId][2]=new Vector.<int>(case_count);
-							for(var i:int=0;i<case_count;i++){
-								codeV[codeId][2][i]=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16);
-								if(codeV[codeId][2][i]&0x00008000){codeV[codeId][2][i]|=0xffff0000}//最高位为1,表示负数
-							}
-						break;
-						case Op.dataType_u8_u8_u30_u8_u30:
-							codeV[codeId][1]=data[offset++];
-							if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){codeV[codeId][2]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{codeV[codeId][2]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{codeV[codeId][2]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{codeV[codeId][2]=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{codeV[codeId][2]=data[offset++];}
-							//codeV[codeId][2]
-							
-							codeV[codeId][3]=data[offset++];
-							
-							if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){codeV[codeId][4]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{codeV[codeId][4]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{codeV[codeId][4]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{codeV[codeId][4]=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{codeV[codeId][4]=data[offset++];}
-							//codeV[codeId][4]
-						break;
-						default:
-							throw new Error("未知 opDataType: "+opDataType+", op="+op);
-							//trace("未知 opDataType: "+opDataType+", op="+op);
-							//return endOffset;
-						break;
+				codeV[codeId]=code=new Code();
+				code.offset=offset;
+				code.op=data[offset++];
+				
+				var opDataType:String=Op.opDataTypeV[code.op];
+				
+				if(opDataType){
+					if(opDataType==Op.dataType_u8){
+					}else{
+						switch(opDataType){
+							case Op.dataType_u8_u8:
+								code.value=data[offset++];
+							break;
+							case Op.dataType_u8_u30:
+								if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){code.value=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{code.value=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{code.value=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{code.value=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{code.value=data[offset++];}
+								//code.value
+							break;
+							case Op.dataType_u8_u30_u30:
+								code.value={}
+								if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){code.value.u30=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{code.value.u30=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{code.value.u30=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{code.value.u30=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{code.value.u30=data[offset++];}
+								//code.value.u30
+								
+								if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){code.value.u30_2=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{code.value.u30_2=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{code.value.u30_2=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{code.value.u30_2=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{code.value.u30_2=data[offset++];}
+								//code.value.u30_2
+							break;
+							case Op.dataType_u8_s24:
+								code.value=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16);
+								if(code.value&0x00008000){code.value|=0xffff0000}//最高位为1,表示负数
+							break;
+							case Op. dataType_u8_s24_u30_s24List:
+								code.value={}
+								code.value.default_offset=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16);
+								if(code.value.default_offset&0x00008000){code.value.default_offset|=0xffff0000}//最高位为1,表示负数
+								
+								if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var case_count:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{case_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{case_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{case_count=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{case_count=data[offset++];}
+								//case_count
+								
+								case_count++;
+								code.value.case_offsetV=new Vector.<int>(case_count);
+								for(var i:int=0;i<case_count;i++){
+									code.value.case_offsetV[i]=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16);
+									if(code.value.case_offsetV[i]&0x00008000){code.value.case_offsetV[i]|=0xffff0000}//最高位为1,表示负数
+								}
+							break;
+							case Op.dataType_u8_u8_u30_u8_u30:
+								code.value={}
+								code.value.debug_type=data[offset++];
+								if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){code.value.index=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{code.value.index=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{code.value.index=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{code.value.index=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{code.value.index=data[offset++];}
+								//code.value.index
+								
+								code.value.reg=data[offset++];
+								
+								if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){code.value.extra=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{code.value.extra=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{code.value.extra=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{code.value.extra=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{code.value.extra=data[offset++];}
+								//code.value.extra
+							break;
+							default:
+								throw new Error("未知 opDataType: "+opDataType+", op="+code.op);
+								//trace("未知 opDataType: "+opDataType+", op="+code.op);
+								//return endOffset;
+							break;
+						}
 					}
+				}else{
+					throw new Error("未知 op: "+code.op);
 				}
 			}
 			
@@ -84,66 +94,66 @@ package zero.swf.avm2{
 			}
 			return endOffset;
 		}
-		override public function toData():ByteArray{
+		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			
 			var offset:int=0;
-			var op:int;
-			for each(var code:Array in codeV){
-				op=code[0];
-				data[offset++]=op;
-				var opDataType:String=Op.opDataTypeV[op];
+			for each(var code:Code in codeV){
+				data[offset++]=code.op;
+				
+				var opDataType:String=Op.opDataTypeV[code.op];
+				
 				if(opDataType==Op.dataType_u8){
 				}else{
 					switch(opDataType){
 						case Op.dataType_u8_u8:
-							data[offset++]=code[1];
+							data[offset++]=code.value;
 						break;
 						case Op.dataType_u8_u30:
-							if(code[1]>>>7){if(code[1]>>>14){if(code[1]>>>21){if(code[1]>>>28){data[offset++]=(code[1]&0x7f)|0x80;data[offset++]=((code[1]>>>7)&0x7f)|0x80;data[offset++]=((code[1]>>>14)&0x7f)|0x80;data[offset++]=((code[1]>>>21)&0x7f)|0x80;data[offset++]=code[1]>>>28;}else{data[offset++]=(code[1]&0x7f)|0x80;data[offset++]=((code[1]>>>7)&0x7f)|0x80;data[offset++]=((code[1]>>>14)&0x7f)|0x80;data[offset++]=code[1]>>>21;}}else{data[offset++]=(code[1]&0x7f)|0x80;data[offset++]=((code[1]>>>7)&0x7f)|0x80;data[offset++]=code[1]>>>14;}}else{data[offset++]=(code[1]&0x7f)|0x80;data[offset++]=code[1]>>>7;}}else{data[offset++]=code[1];}
-							//code[1]
+							if(code.value>>>7){if(code.value>>>14){if(code.value>>>21){if(code.value>>>28){data[offset++]=(code.value&0x7f)|0x80;data[offset++]=((code.value>>>7)&0x7f)|0x80;data[offset++]=((code.value>>>14)&0x7f)|0x80;data[offset++]=((code.value>>>21)&0x7f)|0x80;data[offset++]=code.value>>>28;}else{data[offset++]=(code.value&0x7f)|0x80;data[offset++]=((code.value>>>7)&0x7f)|0x80;data[offset++]=((code.value>>>14)&0x7f)|0x80;data[offset++]=code.value>>>21;}}else{data[offset++]=(code.value&0x7f)|0x80;data[offset++]=((code.value>>>7)&0x7f)|0x80;data[offset++]=code.value>>>14;}}else{data[offset++]=(code.value&0x7f)|0x80;data[offset++]=code.value>>>7;}}else{data[offset++]=code.value;}
+							//code.value
 						break;
 						case Op.dataType_u8_u30_u30:
-							if(code[1]>>>7){if(code[1]>>>14){if(code[1]>>>21){if(code[1]>>>28){data[offset++]=(code[1]&0x7f)|0x80;data[offset++]=((code[1]>>>7)&0x7f)|0x80;data[offset++]=((code[1]>>>14)&0x7f)|0x80;data[offset++]=((code[1]>>>21)&0x7f)|0x80;data[offset++]=code[1]>>>28;}else{data[offset++]=(code[1]&0x7f)|0x80;data[offset++]=((code[1]>>>7)&0x7f)|0x80;data[offset++]=((code[1]>>>14)&0x7f)|0x80;data[offset++]=code[1]>>>21;}}else{data[offset++]=(code[1]&0x7f)|0x80;data[offset++]=((code[1]>>>7)&0x7f)|0x80;data[offset++]=code[1]>>>14;}}else{data[offset++]=(code[1]&0x7f)|0x80;data[offset++]=code[1]>>>7;}}else{data[offset++]=code[1];}
-							//code[1]
+							if(code.value.u30>>>7){if(code.value.u30>>>14){if(code.value.u30>>>21){if(code.value.u30>>>28){data[offset++]=(code.value.u30&0x7f)|0x80;data[offset++]=((code.value.u30>>>7)&0x7f)|0x80;data[offset++]=((code.value.u30>>>14)&0x7f)|0x80;data[offset++]=((code.value.u30>>>21)&0x7f)|0x80;data[offset++]=code.value.u30>>>28;}else{data[offset++]=(code.value.u30&0x7f)|0x80;data[offset++]=((code.value.u30>>>7)&0x7f)|0x80;data[offset++]=((code.value.u30>>>14)&0x7f)|0x80;data[offset++]=code.value.u30>>>21;}}else{data[offset++]=(code.value.u30&0x7f)|0x80;data[offset++]=((code.value.u30>>>7)&0x7f)|0x80;data[offset++]=code.value.u30>>>14;}}else{data[offset++]=(code.value.u30&0x7f)|0x80;data[offset++]=code.value.u30>>>7;}}else{data[offset++]=code.value.u30;}
+							//code.value.u30
 							
-							if(code[2]>>>7){if(code[2]>>>14){if(code[2]>>>21){if(code[2]>>>28){data[offset++]=(code[2]&0x7f)|0x80;data[offset++]=((code[2]>>>7)&0x7f)|0x80;data[offset++]=((code[2]>>>14)&0x7f)|0x80;data[offset++]=((code[2]>>>21)&0x7f)|0x80;data[offset++]=code[2]>>>28;}else{data[offset++]=(code[2]&0x7f)|0x80;data[offset++]=((code[2]>>>7)&0x7f)|0x80;data[offset++]=((code[2]>>>14)&0x7f)|0x80;data[offset++]=code[2]>>>21;}}else{data[offset++]=(code[2]&0x7f)|0x80;data[offset++]=((code[2]>>>7)&0x7f)|0x80;data[offset++]=code[2]>>>14;}}else{data[offset++]=(code[2]&0x7f)|0x80;data[offset++]=code[2]>>>7;}}else{data[offset++]=code[2];}
-							//code[2]
+							if(code.value.u30_2>>>7){if(code.value.u30_2>>>14){if(code.value.u30_2>>>21){if(code.value.u30_2>>>28){data[offset++]=(code.value.u30_2&0x7f)|0x80;data[offset++]=((code.value.u30_2>>>7)&0x7f)|0x80;data[offset++]=((code.value.u30_2>>>14)&0x7f)|0x80;data[offset++]=((code.value.u30_2>>>21)&0x7f)|0x80;data[offset++]=code.value.u30_2>>>28;}else{data[offset++]=(code.value.u30_2&0x7f)|0x80;data[offset++]=((code.value.u30_2>>>7)&0x7f)|0x80;data[offset++]=((code.value.u30_2>>>14)&0x7f)|0x80;data[offset++]=code.value.u30_2>>>21;}}else{data[offset++]=(code.value.u30_2&0x7f)|0x80;data[offset++]=((code.value.u30_2>>>7)&0x7f)|0x80;data[offset++]=code.value.u30_2>>>14;}}else{data[offset++]=(code.value.u30_2&0x7f)|0x80;data[offset++]=code.value.u30_2>>>7;}}else{data[offset++]=code.value.u30_2;}
+							//code.value.u30_2
 						break;
 						case Op.dataType_u8_s24:
-							data[offset++]=code[1];
-							data[offset++]=code[1]>>8;
-							data[offset++]=code[1]>>16;
+							data[offset++]=code.value;
+							data[offset++]=code.value>>8;
+							data[offset++]=code.value>>16;
 						break;
 						case Op. dataType_u8_s24_u30_s24List:
-							data[offset++]=code[1];
-							data[offset++]=code[1]>>8;
-							data[offset++]=code[1]>>16;
+							data[offset++]=code.value.default_offset;
+							data[offset++]=code.value.default_offset>>8;
+							data[offset++]=code.value.default_offset>>16;
 							
-							var case_count:int=code[2].length-1;
+							var case_count:int=code.value.case_offsetV.length-1;
 							if(case_count>>>7){if(case_count>>>14){if(case_count>>>21){if(case_count>>>28){data[offset++]=(case_count&0x7f)|0x80;data[offset++]=((case_count>>>7)&0x7f)|0x80;data[offset++]=((case_count>>>14)&0x7f)|0x80;data[offset++]=((case_count>>>21)&0x7f)|0x80;data[offset++]=case_count>>>28;}else{data[offset++]=(case_count&0x7f)|0x80;data[offset++]=((case_count>>>7)&0x7f)|0x80;data[offset++]=((case_count>>>14)&0x7f)|0x80;data[offset++]=case_count>>>21;}}else{data[offset++]=(case_count&0x7f)|0x80;data[offset++]=((case_count>>>7)&0x7f)|0x80;data[offset++]=case_count>>>14;}}else{data[offset++]=(case_count&0x7f)|0x80;data[offset++]=case_count>>>7;}}else{data[offset++]=case_count;}
 							//case_count
 							
-							for each(var case_offset:int in code[2]){
+							for each(var case_offset:int in code.value.case_offsetV){
 								data[offset++]=case_offset;
 								data[offset++]=case_offset>>8;
 								data[offset++]=case_offset>>16;
 							}
 						break;
 						case Op.dataType_u8_u8_u30_u8_u30:
-							data[offset++]=code[1];
+							data[offset++]=code.value.debug_type;
 							
-							if(code[2]>>>7){if(code[2]>>>14){if(code[2]>>>21){if(code[2]>>>28){data[offset++]=(code[2]&0x7f)|0x80;data[offset++]=((code[2]>>>7)&0x7f)|0x80;data[offset++]=((code[2]>>>14)&0x7f)|0x80;data[offset++]=((code[2]>>>21)&0x7f)|0x80;data[offset++]=code[2]>>>28;}else{data[offset++]=(code[2]&0x7f)|0x80;data[offset++]=((code[2]>>>7)&0x7f)|0x80;data[offset++]=((code[2]>>>14)&0x7f)|0x80;data[offset++]=code[2]>>>21;}}else{data[offset++]=(code[2]&0x7f)|0x80;data[offset++]=((code[2]>>>7)&0x7f)|0x80;data[offset++]=code[2]>>>14;}}else{data[offset++]=(code[2]&0x7f)|0x80;data[offset++]=code[2]>>>7;}}else{data[offset++]=code[2];}
-							//code[2]
+							if(code.value.index>>>7){if(code.value.index>>>14){if(code.value.index>>>21){if(code.value.index>>>28){data[offset++]=(code.value.index&0x7f)|0x80;data[offset++]=((code.value.index>>>7)&0x7f)|0x80;data[offset++]=((code.value.index>>>14)&0x7f)|0x80;data[offset++]=((code.value.index>>>21)&0x7f)|0x80;data[offset++]=code.value.index>>>28;}else{data[offset++]=(code.value.index&0x7f)|0x80;data[offset++]=((code.value.index>>>7)&0x7f)|0x80;data[offset++]=((code.value.index>>>14)&0x7f)|0x80;data[offset++]=code.value.index>>>21;}}else{data[offset++]=(code.value.index&0x7f)|0x80;data[offset++]=((code.value.index>>>7)&0x7f)|0x80;data[offset++]=code.value.index>>>14;}}else{data[offset++]=(code.value.index&0x7f)|0x80;data[offset++]=code.value.index>>>7;}}else{data[offset++]=code.value.index;}
+							//code.value.index
 							
-							data[offset++]=code[3];
+							data[offset++]=code.value.reg;
 							
-							if(code[4]>>>7){if(code[4]>>>14){if(code[4]>>>21){if(code[4]>>>28){data[offset++]=(code[4]&0x7f)|0x80;data[offset++]=((code[4]>>>7)&0x7f)|0x80;data[offset++]=((code[4]>>>14)&0x7f)|0x80;data[offset++]=((code[4]>>>21)&0x7f)|0x80;data[offset++]=code[4]>>>28;}else{data[offset++]=(code[4]&0x7f)|0x80;data[offset++]=((code[4]>>>7)&0x7f)|0x80;data[offset++]=((code[4]>>>14)&0x7f)|0x80;data[offset++]=code[4]>>>21;}}else{data[offset++]=(code[4]&0x7f)|0x80;data[offset++]=((code[4]>>>7)&0x7f)|0x80;data[offset++]=code[4]>>>14;}}else{data[offset++]=(code[4]&0x7f)|0x80;data[offset++]=code[4]>>>7;}}else{data[offset++]=code[4];}
-							//code[4]
+							if(code.value.extra>>>7){if(code.value.extra>>>14){if(code.value.extra>>>21){if(code.value.extra>>>28){data[offset++]=(code.value.extra&0x7f)|0x80;data[offset++]=((code.value.extra>>>7)&0x7f)|0x80;data[offset++]=((code.value.extra>>>14)&0x7f)|0x80;data[offset++]=((code.value.extra>>>21)&0x7f)|0x80;data[offset++]=code.value.extra>>>28;}else{data[offset++]=(code.value.extra&0x7f)|0x80;data[offset++]=((code.value.extra>>>7)&0x7f)|0x80;data[offset++]=((code.value.extra>>>14)&0x7f)|0x80;data[offset++]=code.value.extra>>>21;}}else{data[offset++]=(code.value.extra&0x7f)|0x80;data[offset++]=((code.value.extra>>>7)&0x7f)|0x80;data[offset++]=code.value.extra>>>14;}}else{data[offset++]=(code.value.extra&0x7f)|0x80;data[offset++]=code.value.extra>>>7;}}else{data[offset++]=code.value.extra;}
+							//code.value.extra
 						break;
 						default:
-							throw new Error("未知 opDataType: "+opDataType+", op="+op);
-							//trace("未知 opDataType: "+opDataType+", op="+op);
+							throw new Error("未知 opDataType: "+opDataType+", op="+code.op);
+							//trace("未知 opDataType: "+opDataType+", op="+code.op);
 						break;
 					}
 				}
@@ -153,13 +163,40 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML(xmlName:String):XML{
+		public function toXML(xmlName:String):XML{
 			if(codeV.length){
 				var codesStr:String="";
-				for each(var code:Array in codeV){
-					codesStr+="\t\t\t\t\t"+Op.opNameV[code[0]];
-					if(code.length>1){
-						codesStr+=" "+code.slice(1);
+				for each(var code:Code in codeV){
+					codesStr+="\t\t\t\t\t"+Op.opNameV[code.op];
+					
+					var opDataType:String=Op.opDataTypeV[code.op];
+					
+					if(opDataType==Op.dataType_u8){
+					}else{
+						switch(opDataType){
+							case Op.dataType_u8_u8:
+								codesStr+=" "+code.value;
+							break;
+							case Op.dataType_u8_u30:
+								codesStr+=" "+code.value;
+							break;
+							case Op.dataType_u8_u30_u30:
+								codesStr+=" "+code.value.u30+","+code.value.u30_2;
+							break;
+							case Op.dataType_u8_s24:
+								codesStr+=" "+code.value;
+							break;
+							case Op. dataType_u8_s24_u30_s24List:
+								codesStr+=" "+code.value.default_offset+","+code.value.case_offsetV;
+							break;
+							case Op.dataType_u8_u8_u30_u8_u30:
+								codesStr+=" "+code.value.debug_type+","+code.value.index+","+code.value.reg+","+code.value.extra;
+							break;
+							default:
+								throw new Error("未知 opDataType: "+opDataType+", op="+code.op);
+								//trace("未知 opDataType: "+opDataType+", op="+code.op);
+							break;
+						}
 					}
 					codesStr+="\n";
 				}
@@ -169,20 +206,26 @@ package zero.swf.avm2{
 			}
 			return <{xmlName}/>;
 		}
-		override public function initByXML(xml:XML):void{
+		public function initByXML(xml:XML):void{
 			var codeStrArr:Array=xml.toString().split("\n");
 			var codeId:int=-1;
-			codeV=new Vector.<Array>();
-			var op:int;
+			codeV=new Vector.<Code>();
+			var code:Code;
 			for each(var codeStr:String in codeStrArr){
 				var _codeStr:String=codeStr.replace(/^\s*|\s*$/g,"");
 				if(_codeStr){
+					if(_codeStr.indexOf("//")==0){
+						continue;
+					}
 					var codeArr:Array=_codeStr.split(/\s+/);
 					if(Op.ops[codeArr[0]]>=0){
 						codeId++;
-						op=Op.ops[codeArr[0]];
-						codeV[codeId]=[op];
-						var opDataType:String=Op.opDataTypeV[op];
+						
+						codeV[codeId]=code=new Code();
+						code.op=Op.ops[codeArr[0]];
+						
+						var opDataType:String=Op.opDataTypeV[code.op];
+						
 						if(opDataType==Op.dataType_u8){
 						}else{
 							codeArr=codeArr[1].split(/[,\s]+/);
@@ -190,33 +233,41 @@ package zero.swf.avm2{
 								case Op.dataType_u8_u8:
 								case Op.dataType_u8_u30:
 								case Op.dataType_u8_s24:
-									codeV[codeId][1]=int(codeArr[0]);
+									code.value=int(codeArr[0]);
 								break;
 								case Op.dataType_u8_u30_u30:
-									codeV[codeId][1]=int(codeArr[0]);
-									codeV[codeId][2]=int(codeArr[1]);
+									code.value={
+										u30:int(codeArr[0]),
+										u30_2:int(codeArr[1])
+									}
 								break;
 								case Op. dataType_u8_s24_u30_s24List:
-									codeV[codeId][1]=int(codeArr.shift());
-									codeV[codeId][2]=new Vector.<int>();
+									code.value={
+										default_offset:int(codeArr.shift()),
+										case_offsetV:new Vector.<int>()
+									}
 									var i:int=-1;
 									for each(var case_offset_str:String in codeArr){
 										i++;
-										codeV[codeId][2][i]=int(case_offset_str);
+										code.value.case_offsetV[i]=int(case_offset_str);
 									}
 								break;
 								case Op.dataType_u8_u8_u30_u8_u30:
-									codeV[codeId][1]=int(codeArr[0]);
-									codeV[codeId][2]=int(codeArr[1]);
-									codeV[codeId][3]=int(codeArr[2]);
-									codeV[codeId][4]=int(codeArr[3]);
+									code.value={
+										debug_type:int(codeArr[0]),
+										index:int(codeArr[1]),
+										reg:int(codeArr[2]),
+										extra:int(codeArr[3])
+									}
 								break;
 								default:
-									throw new Error("未知 opDataType: "+opDataType+", op="+op);
-									//trace("未知 opDataType: "+opDataType+", op="+op);
+									throw new Error("未知 opDataType: "+opDataType+", op="+code.op);
+									//trace("未知 opDataType: "+opDataType+", op="+code.op);
 								break;
 							}
 						}
+					}else{
+						throw new Error("未知 _codeStr: "+_codeStr);
 					}
 				}
 			}
