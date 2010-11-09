@@ -120,7 +120,12 @@ package zero.swf.avm2.advances{
 		}
 		
 		public function getMarkKey():String{
-			return name.toXML("name").toXMLString();
+			if(name.ns.name){
+				return name.ns.name+"."+name.name;
+			}
+			return name.name;
+			
+			//return name.toXML("name").toXMLString();
 		}
 
 		////
