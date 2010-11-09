@@ -117,12 +117,15 @@ AdvanceMethod 版本:v1.0
 //the traits for this method body (see above for more information on traits).
 
 package zero.swf.avm2.advances{
+	import flash.utils.ByteArray;
+	
 	import zero.swf.BytesData;
 	import zero.swf.avm2.Exception_info;
 	import zero.swf.avm2.Method_body_info;
 	import zero.swf.avm2.Method_info;
 	import zero.swf.avm2.Option_detail;
 	import zero.swf.avm2.Traits_info;
+	import zero.swf.avm2.advances.codes.Codes;
 	import zero.swf.vmarks.MethodFlags;
 	
 	public class AdvanceMethod extends Advance{
@@ -158,7 +161,7 @@ package zero.swf.avm2.advances{
 		public var local_count:int;
 		public var init_scope_depth:int;
 		public var max_scope_depth:int;
-		public var codes:BytesData;
+		public var codes:Codes;
 		public var exception_infoV:Vector.<AdvanceException_info>;
 		public var traits_infoV:Vector.<AdvanceTraits_info>;
 		
@@ -175,7 +178,9 @@ package zero.swf.avm2.advances{
 				
 				initByInfo_fun(method_body_info,Method_body_info_memberV);
 				
-				codes=method_body_info.codes;
+				//codes=method_body_info.codes;
+				codes=new Codes();
+				codes.initByData(method_body_info.codes.ownData,method_body_info.codes.dataOffset,method_body_info.codes.dataOffset+method_body_info.codes.dataLength);
 			}
 		}
 		
@@ -184,12 +189,17 @@ package zero.swf.avm2.advances{
 			
 			toInfo_fun(method_info,Method_info_memberV);
 			
+			//trace("codes="+codes);
 			if(codes){
 				var method_body_info:Method_body_info=new Method_body_info();
 				
 				toInfo_fun(method_body_info,Method_body_info_memberV);
 				
-				method_body_info.codes=codes;
+				method_body_info.method=AdvanceABC.currInstance.abcFile.method_infoV.length;
+				
+				var codesData:ByteArray=codes.toData();
+				method_body_info.codes=new BytesData();
+				method_body_info.codes.initByData(codesData,0,codesData.length);
 				
 				AdvanceABC.currInstance.abcFile.method_body_infoV.push(method_body_info);
 			}
@@ -201,15 +211,13 @@ package zero.swf.avm2.advances{
 		
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
-			var xml:XML=toXML_fun(Method_info_memberV);
+		public function toXML(xmlName:String):XML{
+			var xml:XML=toXML_fun(Method_info_memberV,xmlName);
 			
 			if(codes){
 				toXML_fun(Method_body_info_memberV,xml);
 				
-				var infoXML:XML=<codes/>;
-				infoXML.appendChild(codes.toXML("codes"));
-				xml.appendChild(infoXML);
+				xml.appendChild(codes.toXML("codes"));
 			}
 			
 			xml.@infoId=infoId;
@@ -221,37 +229,17 @@ package zero.swf.avm2.advances{
 			initByXML_fun(xml,Method_info_memberV);
 			
 			var codesXML:XML=xml.codes[0];
+			//trace("codesXML="+codesXML.toXMLString());
 			
 			if(codesXML){
 				
 				initByXML_fun(xml,Method_body_info_memberV);
 				
-				codes=new BytesData();
-				codes.initByXML(codesXML.children()[0]);
+				//codes=new BytesData();
+				codes=new Codes();
+				codes.initByXML(codesXML);
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
-
-//
-
-// 常忘正则表达式
-// /^\s*|\s*$/					//前后空白						"\nabc d  e 哈 哈\t \r".replace(/^\s*|\s*$/g,"") === "abc d  e 哈 哈"
-// /[\\\/:*?\"<>|]/				//不合法的windows文件名字符集		"\\\/:*?\"<>|\\\/:*哈 哈?\"<>|\\哈 \/:*?\"<>|".replace(/[\\\/:*?\"<>|]/g,"") === "哈 哈哈 "
-// /[a-zA-Z_][a-zA-Z0-9_]*/		//合法的变量名(不考虑中文)
-// value=value.replace(/[^a-zA-Z0-9_]/g,"").replace(/^[0-9]*/,"");//替换不合法的变量名
-// 先把除字母数字下划线的字符去掉,再把开头的数字去掉
-// 想不到怎样能用一个正则表达式搞定...
-
-//正则表达式30分钟入门教程		http://www.unibetter.com/deerchao/zhengzhe-biaodashi-jiaocheng-se.htm
-//正则表达式用法及实例			http://eskimo.blogbus.com/logs/29095458.html
-//常用正则表达式					http://www.williamlong.info/archives/433.html
-
-/*
-
-//常用值
-
-//常用语句块
-
-*/

@@ -25,7 +25,7 @@ package zero.swf.avm2.advances{
 	public class AdvanceNs_set_info extends Advance{
 		
 		private static const memberV:Vector.<Member>=Vector.<Member>([
-			new Member("ns",Member.NAMESPACE_INFO,{isList:true}),
+			new Member("ns",Member.NAMESPACE_INFO,{isList:true})
 		]);
 		
 		private var infoId:int;	//从 swf 或 xml 直接读取过来的 id
@@ -34,6 +34,7 @@ package zero.swf.avm2.advances{
 		//
 		public function AdvanceNs_set_info(){
 		}
+		
 		public function initByInfo(_infoId:int,ns_set_info:Ns_set_info):void{
 			infoId=_infoId;
 			
@@ -51,8 +52,8 @@ package zero.swf.avm2.advances{
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
-			var xml:XML=toXML_fun(memberV);
+		public function toXML(xmlName:String):XML{
+			var xml:XML=toXML_fun(memberV,xmlName);
 			
 			xml.@infoId=infoId;
 			return xml;

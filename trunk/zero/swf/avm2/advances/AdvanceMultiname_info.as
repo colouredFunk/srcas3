@@ -228,43 +228,43 @@ package zero.swf.avm2.advances{
 		
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML(xmlName:String=null):XML{//暂时带默认 null 值{
+		public function toXML(xmlName:String):XML{
 			var xml:XML;
 			
 			switch(kind){
 				case MultinameKind.QName:
 				case MultinameKind.QNameA:
 					
-					xml=toXML_fun(QName_memberV);
+					xml=toXML_fun(QName_memberV,xmlName);
 					
 				break;
 				case MultinameKind.Multiname:
 				case MultinameKind.MultinameA:
 					
-					xml=toXML_fun(Multiname_memberV);
+					xml=toXML_fun(Multiname_memberV,xmlName);
 					
 				break;
 				case MultinameKind.RTQName:
 				case MultinameKind.RTQNameA:
 					
-					xml=toXML_fun(RTQName_memberV);
+					xml=toXML_fun(RTQName_memberV,xmlName);
 					
 				break;
 				case MultinameKind.RTQNameL:
 				case MultinameKind.RTQNameLA:
 					
-					xml=toXML_fun(RTQNameL_memberV);
+					xml=toXML_fun(RTQNameL_memberV,xmlName);
 					
 				break;
 				case MultinameKind.MultinameL:
 				case MultinameKind.MultinameLA:
 					
-					xml=toXML_fun(MultinameL_memberV);
+					xml=toXML_fun(MultinameL_memberV,xmlName);
 					
 				break;
 				case MultinameKind.GenericName:
 					
-					xml=toXML_fun(GenericName_memberV);
+					xml=toXML_fun(GenericName_memberV,xmlName);
 					
 				break;
 				default:
@@ -322,25 +322,3 @@ package zero.swf.avm2.advances{
 		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
-
-//
-
-// 常忘正则表达式
-// /^\s*|\s*$/					//前后空白						"\nabc d  e 哈 哈\t \r".replace(/^\s*|\s*$/g,"") === "abc d  e 哈 哈"
-// /[\\\/:*?\"<>|]/				//不合法的windows文件名字符集		"\\\/:*?\"<>|\\\/:*哈 哈?\"<>|\\哈 \/:*?\"<>|".replace(/[\\\/:*?\"<>|]/g,"") === "哈 哈哈 "
-// /[a-zA-Z_][a-zA-Z0-9_]*/		//合法的变量名(不考虑中文)
-// value=value.replace(/[^a-zA-Z0-9_]/g,"").replace(/^[0-9]*/,"");//替换不合法的变量名
-// 先把除字母数字下划线的字符去掉,再把开头的数字去掉
-// 想不到怎样能用一个正则表达式搞定...
-
-//正则表达式30分钟入门教程		http://www.unibetter.com/deerchao/zhengzhe-biaodashi-jiaocheng-se.htm
-//正则表达式用法及实例			http://eskimo.blogbus.com/logs/29095458.html
-//常用正则表达式					http://www.williamlong.info/archives/433.html
-
-/*
-
-//常用值
-
-//常用语句块
-
-*/

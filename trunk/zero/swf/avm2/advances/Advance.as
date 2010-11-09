@@ -29,14 +29,14 @@ package zero.swf.avm2.advances{
 				
 				if(Member.fromABCFileMark[member.type]){
 					if(member.isList){
-						AdvanceABC.currInstance.getInfoVByIdsAndVName(this,avm2Obj,member.name+"V",member.type);
+						AdvanceABC.currInstance.getInfoVByIdsAndMemberType(this,avm2Obj,member.name+"V",member.type);
 					}else{
 						//if(Member.directMark[member.type]){
 							//
 						//}else{
 							//
 						//}
-						this[member.name]=AdvanceABC.currInstance.getInfoByIdAndVName(avm2Obj[member.name],member.type);
+						this[member.name]=AdvanceABC.currInstance.getInfoByIdAndMemberType(avm2Obj[member.name],member.type);
 					}
 				}else{
 					if(member.isList){
@@ -87,14 +87,14 @@ package zero.swf.avm2.advances{
 				
 				if(Member.fromABCFileMark[member.type]){
 					if(member.isList){
-						AdvanceABC.currInstance.getIdsByInfoVAndVName(this,avm2Obj,member.name+"V",member.type);
+						AdvanceABC.currInstance.getIdsByInfoVAndMemberType(this,avm2Obj,member.name+"V",member.type);
 					}else{
 						//if(Member.directMark[member.type]){
 							//
 						//}else{
 							//
 						//}
-						avm2Obj[member.name]=AdvanceABC.currInstance.getIdByInfoAndVName(this[member.name],member.type);
+						avm2Obj[member.name]=AdvanceABC.currInstance.getIdByInfoAndMemberType(this[member.name],member.type);
 					}
 				}else{
 					if(member.isList){
@@ -126,9 +126,14 @@ package zero.swf.avm2.advances{
 			}
 		}
 		
-		public function toXML_fun(memberV:Vector.<Member>,xml:XML=null):XML{
+		public function toXML_fun(memberV:Vector.<Member>,xmlOrXMLName:*):XML{
 			var className:String=getQualifiedClassName(this);
-			xml||(xml=new XML("<"+className.substr(className.lastIndexOf("::")+2)+"/>"));
+			var xml:XML;
+			if(xmlOrXMLName is String){
+				xml=<{xmlOrXMLName} class={className.substr(className.lastIndexOf("::")+2)}/>;
+			}else{
+				xml=xmlOrXMLName;
+			}
 			
 			for each(var member:Member in memberV){
 				if(member.curr==Member.CURR_CASE){
@@ -154,18 +159,19 @@ package zero.swf.avm2.advances{
 					}
 				}
 				
-				var infoXML:XML;
+				if(member.xmlUseMarkKey){
+					xml.appendChild(<{member.name} markKey={this[member.name].getMarkKey()}/>);
+					continue;
+				}
 				
 				if(Member.fromABCFileMark[member.type]){
 					if(member.isList){
-						xml.appendChild(AdvanceABC.currInstance.getInfoListXMLByInfoVAndVName(this,member.name,member.type));
+						xml.appendChild(AdvanceABC.currInstance.getInfoListXMLByInfoVAndMemberType(this,member.name,member.type));
 					}else{
 						if(Member.directMark[member.type]){
 							xml["@"+member.name]=this[member.name];
 						}else{
-							infoXML=new XML("<"+member.name+"/>");
-							infoXML.appendChild(this[member.name].toXML());
-							xml.appendChild(infoXML);
+							xml.appendChild(this[member.name].toXML(member.name));
 						}
 					}
 				}else{
@@ -175,9 +181,7 @@ package zero.swf.avm2.advances{
 						AdvanceABC.currInstance.getXMLByKindAndConstValue(member.name,xml,this[member.constKindName],this[member.name]);
 					}else{
 						if(member.classV){
-							infoXML=new XML("<"+member.name+"/>");
-							infoXML.appendChild(this[member.name].toXML());
-							xml.appendChild(infoXML);
+							xml.appendChild(this[member.name].toXML(member.name));
 						}else{
 							if(member.kindClass){
 								xml["@"+member.name]=member.kindClass[member.kindVName][this[member.name]];
@@ -196,9 +200,7 @@ package zero.swf.avm2.advances{
 									if(Member.directMark[member.type]){
 										xml["@"+member.name]=this[member.name];
 									}else{
-										infoXML=new XML("<"+member.name+"/>");
-										infoXML.appendChild(this[member.name].toXML());
-										xml.appendChild(infoXML);
+										xml.appendChild(this[member.name].toXML(member.name));
 									}
 								}
 							}
@@ -233,14 +235,21 @@ package zero.swf.avm2.advances{
 					}
 				}
 				
+				if(member.xmlUseMarkKey){
+					//trace("markKey="+xml[member.name][0].@markKey.toString());
+					this[member.name]=AdvanceABC.currInstance.marks[member.type][xml[member.name][0].@markKey.toString()];
+					//trace("markKey this[member.name]="+this[member.name]);
+					continue;
+				}
+				
 				if(Member.fromABCFileMark[member.type]){
 					if(member.isList){
-						AdvanceABC.currInstance.getInfoVByInfoListXMLAndVName(this,member.name,xml,member.type);
+						AdvanceABC.currInstance.getInfoVByInfoListXMLAndMemberType(this,member.name,xml,member.type);
 					}else{
 						if(Member.directMark[member.type]){
 							this[member.name]=getValueByStringAndType(xml["@"+member.name].toString(),member.type);
 						}else{
-							this[member.name]=AdvanceABC.currInstance.getInfoByXMLAndVName(xml[member.name].children()[0],member.type);
+							this[member.name]=AdvanceABC.currInstance.getInfoByXMLAndMemberType(xml[member.name][0],member.type);
 						}
 					}
 				}else{
@@ -251,7 +260,7 @@ package zero.swf.avm2.advances{
 					}else{
 						if(member.classV){
 							this[member.name]=new (member.classV[this[member.classVIdName]])();
-							this[member.name].initByXML(xml[member.name].children()[0]);
+							this[member.name].initByXML(xml[member.name][0]);
 						}else{
 							if(member.kindClass){
 								this[member.name]=member.kindClass[xml["@"+member.name].toString()];
@@ -268,7 +277,7 @@ package zero.swf.avm2.advances{
 										this[member.name]=getValueByStringAndType(xml["@"+member.name].toString(),member.type);
 									}else{
 										//this[member.name]=new (member.classV[this[member.classVIdName]])();
-										//this[member.name].initByXML(xml[member.name].children()[0]);
+										//this[member.name].initByXML(xml[member.name][0]);
 										throw new Error("未处理");
 									}
 								}
@@ -323,15 +332,13 @@ package zero.swf.avm2.advances{
 		CONFIG::toXMLAndInitByXML {
 		public function getInfoListXMLByInfoV(name:String,isAdvance:Boolean):XML{
 			var infoV:*=this[name+"V"];
-			var infoListXML:XML=new XML("<"+name+"List count=\""+infoV.length+"\"/>");
+			var infoListXML:XML=<{name+"List"} count={infoV.length}/>;
 			for each(var info:* in infoV){
-				var infoXML:XML=new XML("<"+name+"/>");
 				if(isAdvance){
-					infoXML.appendChild(info.toXML());
+					infoListXML.appendChild(info.toXML(name));
 				}else{
-					infoXML.@value=info;
+					infoListXML.appendChild(<{name} value={info}/>);
 				}
-				infoListXML.appendChild(infoXML);
 			}
 			return infoListXML;
 		}
@@ -343,7 +350,7 @@ package zero.swf.avm2.advances{
 			for each(var infoXML:XML in infoXMLList){
 				i++;
 				infoV[i]=new infoClass();
-				infoV[i].initByXML(infoXML.children()[0]);
+				infoV[i].initByXML(infoXML);
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML

@@ -7,7 +7,7 @@ RandomStrs 版本:v1.0
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.swf{
+package zero.swf.funs{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
@@ -17,6 +17,7 @@ package zero.swf{
 		private static var mark:Object;
 		private static var firstUseStrArr:Array;//优先使用的字符串, 不带空格或只带前后空格的, 或比较均匀好看的...
 		public static function initSeed(seed:String):void{
+			//设置种子，这样如果有人破解开则会看到大量的这个字符串
 			mark=new Object();
 			seedV=Vector.<String>(seed.split(""));
 			var seed2:String=seedV.join(" ");
@@ -50,6 +51,10 @@ package zero.swf{
 		}
 		//private static var testingId:int=0;
 		public static function getRan():String{
+			if(mark){
+			}else{
+				throw new Error("请先调用 initSeed 设置种子");
+			}
 			//if(testingId>=0){
 			//	return "简单混淆"+testingId++;
 			//}

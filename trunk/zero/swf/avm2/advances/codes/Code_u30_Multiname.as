@@ -1,40 +1,38 @@
-/***
-UGetterAndSetter 版本:v1.0
+﻿/***
+Code_u30_Multiname 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年6月13日 13:51:06
+创建时间:2010年7月12日 09:43:17
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.gettersetter{
-	import flash.utils.ByteArray;
-	public class UGetterAndSetter{
-		public static var offset:int;
-		public static function getU(data:ByteArray,_offset:int):uint{
-			var u:uint=0;
-			var step:int=0;
-			do{
-				var value:int=data[_offset++];
-				u|=((value&0x7f)<<step);// value & 0111 1111
-				step+=7;
-			}while(value>>>7);
-			offset=_offset;
-			return u;
+package zero.swf.avm2.advances.codes{
+	import zero.swf.avm2.advances.AdvanceMultiname_info;
+
+	public class Code_u30_Multiname extends Code{
+		public var multiname_info:AdvanceMultiname_info;
+		
+		public function Code_u30_Multiname(){
 		}
-		public static function setU(value:uint,newData:ByteArray,_offset:int):void{
-			while(true){
-				var byteValue:int=value&0x7f;
-				value>>>=7;
-				if(value){
-					newData[_offset++]=0x80|byteValue;
-				}else{
-					newData[_offset++]=byteValue;
-					break;
-				}
-			}
-			offset=_offset;
+		//
+		
+		public function initByInfo(_multiname_info:AdvanceMultiname_info):void{
+			multiname_info=_multiname_info;
 		}
+		
+		public function toInfo():void{
+			//var data:ByteArray=new ByteArray();
+			//return data;
+		}
+		////
+		CONFIG::toXMLAndInitByXML {
+		public function toXML(xmlName:String):XML{
+			return <{xmlName} class="Codes"/>;
+		}
+		public function initByXML(xml:XML):void{
+		}
+		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
 

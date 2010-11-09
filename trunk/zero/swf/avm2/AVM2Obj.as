@@ -12,6 +12,7 @@ package zero.swf.avm2{
 	import flash.utils.ByteArray;
 	
 	public class AVM2Obj{
+		/*
 		private static const ABCClassNameV:Vector.<String>=Vector.<String>([
 			"ABCFileWithSimpleConstant_pool",
 			"ABCFile",
@@ -46,6 +47,9 @@ package zero.swf.avm2{
 		public static function getClassByClassName(className:String):Class{
 			return abcClassV[getClassIdByClassName(className)];
 		}
+		*/
+		
+		public static var ABCFileClass:Class;
 		
 		
 		public function AVM2Obj(){
