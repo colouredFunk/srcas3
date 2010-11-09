@@ -19,8 +19,6 @@ package zero.swf.avm2.advances{
 	import zero.swf.avm2.Option_detail;
 	import zero.swf.avm2.Script_info;
 	import zero.swf.avm2.Traits_info;
-	import zero.swf.avm2.advances.traits.AdvanceTrait;
-	import zero.swf.avm2.traits.Trait;
 
 	public class MemberClasses{
 		public static const classV:Vector.<Class>=Vector.<Class>([
@@ -36,7 +34,6 @@ package zero.swf.avm2.advances{
 			AdvanceClass,
 			AdvanceScript_info,
 			AdvanceTraits_info,
-			AdvanceTrait,
 			AdvanceOption_detail,
 			AdvanceItem_info,
 			AdvanceException_info
@@ -54,7 +51,6 @@ package zero.swf.avm2.advances{
 			Vector.<AdvanceClass>,
 			Vector.<AdvanceScript_info>,
 			Vector.<AdvanceTraits_info>,
-			Vector.<AdvanceTrait>,
 			Vector.<AdvanceOption_detail>,
 			Vector.<AdvanceItem_info>,
 			Vector.<AdvanceException_info>
@@ -74,7 +70,6 @@ package zero.swf.avm2.advances{
 			null,//Instance_info,
 			Script_info,
 			Traits_info,
-			Trait,
 			Option_detail,
 			Item_info,
 			Exception_info
@@ -92,7 +87,6 @@ package zero.swf.avm2.advances{
 			null,//Vector.<Instance_info>,
 			Vector.<Script_info>,
 			Vector.<Traits_info>,
-			Vector.<Trait>,
 			Vector.<Option_detail>,
 			Vector.<Item_info>,
 			Vector.<Exception_info>

@@ -11,6 +11,9 @@ import flash.events.*;
 import flash.net.*;
 public class StatusManager{
 	public static var xml:XML;
+	public static var loginStatus:String;
+	//public static var normalStatus:String;
+	
 	public static var actionXML:XML;
 	public static var errorXML:XML;
 	public static var statusXMLs:Array;
@@ -37,8 +40,10 @@ public class StatusManager{
 		statusURLLoader=null;
 		init(xml);
 	}
-	public static function init(_xml:XML):void{
+	public static function init(_xml:XML,_loginStatus:String="1"/*,_normalStatus:String="2"*/):void{
 		xml=_xml;
+		loginStatus=_loginStatus;
+		//normalStatus=_normalStatus;
 		statusCount=0;
 		statusXMLs=new Array();
 		for each(var node:XML in xml.children()){
@@ -98,13 +103,13 @@ public class StatusManager{
 		if(alertCallBackB){
 			GotoURL.goto(currXML,statusURLLoader.data);
 			switch(currXML.@status.toString()){
-				case "1":
-					//默认是提示用户要登录
+				case loginStatus:
+					//提示用户要登录
 					GotoURL.goto(getValue("login"),statusURLLoader.data);
 				break;
-				case "2":
-					//默认是正常状态
-				break;
+				//case normalStatus:
+					//正常状态
+				//break;
 				default:
 				break;
 			}

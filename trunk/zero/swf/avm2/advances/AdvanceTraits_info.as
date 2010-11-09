@@ -52,40 +52,169 @@ AdvanceTraits_info 版本:v1.0
 //ATTR_Metadata 	0x4 	Is used to signal that the fields metadata_count and metadata follow the data field in the traits_info entry
 
 package zero.swf.avm2.advances{
+	import zero.swf.vmarks.ConstantKind;
 	import zero.swf.avm2.AVM2Obj;
 	import zero.swf.avm2.Metadata_info;
 	import zero.swf.avm2.Traits_info;
-	import zero.swf.avm2.advances.traits.AdvanceTrait;
-	import zero.swf.avm2.advances.traits.AdvanceTraitTypes;
 	import zero.swf.vmarks.TraitAttributes;
 	import zero.swf.vmarks.TraitTypes;
 
 	public class AdvanceTraits_info extends Advance{
 		
+		public var name:AdvanceMultiname_info;
+		public var kind_attributes:int;
+		public var kind_trait_type:int;
+		public var metadataV:Vector.<AdvanceMetadata_info>;
+		
 		private static const memberV:Vector.<Member>=Vector.<Member>([
 			new Member("name",Member.MULTINAME_INFO),
 			new Member("kind_attributes",null,{flagClass:TraitAttributes}),
 			new Member("kind_trait_type",null,{kindClass:TraitTypes,kindVName:"typeV"}),
-			new Member("trait",Member.TRAIT,{classV:AdvanceTraitTypes.classV,classVIdName:"kind_trait_type"}),
 			new Member("metadata",Member.METADATA_INFO,{isList:true,curr:Member.CURR_CASE}),
 		]);
 		
-		public var name:AdvanceMultiname_info;
-		public var kind_attributes:int;
-		public var kind_trait_type:int;
-		public var trait:AdvanceTrait;
-		public var metadataV:Vector.<AdvanceMetadata_info>;
+		private static const trait_slot_memberV:Vector.<Member>=Vector.<Member>([
+			new Member("slot_id"),
+			new Member("type_name",Member.MULTINAME_INFO),
+			new Member("vkind",null,{kindClass:ConstantKind}),
+			new Member("vindex",null,{constKindName:"vkind"})//这里把 vkind 放在了 vindex 前面
+		]);
+		
+		private static const trait_method_memberV:Vector.<Member>=Vector.<Member>([
+			new Member("disp_id"),
+			new Member("methodi",Member.METHOD)
+		]);
+		
+		private static const trait_function_memberV:Vector.<Member>=Vector.<Member>([
+			new Member("slot_id"),
+			new Member("functioni",Member.METHOD)
+		]);
+		
+		private static const trait_class_memberV:Vector.<Member>=Vector.<Member>([
+			new Member("slot_id"),
+			new Member("classi",Member.CLASS,{xmlUseMarkKey:true})
+		]);
+		
+		public var slot_id:int;
+		public var type_name:AdvanceMultiname_info;
+		public var vindex:*;
+		public var vkind:int;
+		
+		public var disp_id:int;
+		public var methodi:AdvanceMethod;
+		
+		//public var slot_id:int;
+		public var functioni:AdvanceMethod;
+		
+		//public var slot_id:int;
+		public var classi:AdvanceClass;
 		
 		public function AdvanceTraits_info(){
 		}
 		
 		public function initByInfo(traits_info:Traits_info):void{
 			initByInfo_fun(traits_info,memberV,traits_info.kind_attributes&TraitAttributes.Metadata);
+			//
+			switch(kind_trait_type){
+				case TraitTypes.Slot:
+				case TraitTypes.Const:
+					//trait_slot
+					//{
+					//	u30 slot_id
+					//	u30 type_name
+					//	u30 vindex
+					//	u8 vkind
+					//}
+					
+					//The slot_id field is an integer from 0 to N and is used to identify a position in which this trait resides. A
+					//value of 0 requests the AVM2 to assign a position.
+					
+					//This field is used to identify the type of the trait. It is an index into the multiname array of the
+					//constant_pool. A value of zero indicates that the type is the any type (*).
+					
+					//This field is an index that is used in conjunction with the vkind field in order to define a value for the
+					//trait. If it is 0, vkind is empty; otherwise it references one of the tables in the constant pool, depending on
+					//the value of vkind.
+					//0 表示没有默认值的属性，例如：public var a:int;，这时不需要 vkind
+					//否则表示有默认值的属性，例如：public var a:int=123;
+					
+					//This field exists only when vindex is non-zero. It is used to determine how vindex will be interpreted.
+					//See the "Constant Kind" table above for details.
+					
+					//vindex 和 vkind 合起来很像 Option_detail，Option_detail 是用作函数参数的默认值
+					
+					initByInfo_fun(traits_info,trait_slot_memberV);
+				break;
+				case TraitTypes.Method:
+				case TraitTypes.Getter:
+				case TraitTypes.Setter:
+					//trait_method
+					//{
+					//	u30 disp_id
+					//	u30 method
+					//}
+					
+					//The disp_id field is a compiler assigned integer that is used by the AVM2 to optimize the resolution of
+					//virtual function calls. An overridden method must have the same disp_id as that of the method in the
+					//base class. A value of zero disables this optimization.
+					
+					//The method field is an index that points into the method array of the abcFile entry.
+					
+					initByInfo_fun(traits_info,trait_method_memberV);
+				break;
+				case TraitTypes.Function:
+					//trait_function
+					//{
+					//	u30 slot_id
+					//	u30 function
+					//}
+					
+					//The slot_id field is an integer from 0 to N and is used to identify a position in which this trait resides.
+					//A value of 0 requests the AVM2 to assign a position.
+					
+					//The function field is an index that points into the method array of the abcFile entry.
+					
+					initByInfo_fun(traits_info,trait_function_memberV);
+				break;
+				case TraitTypes.Clazz:
+					//trait_class
+					//{
+					//	u30 slot_id
+					//	u30 classi
+					//}
+					
+					//The slot_id field is an integer from 0 to N and is used to identify a position in which this trait resides. A
+					//value of 0 requests the AVM2 to assign a position.
+					
+					//The classi field is an index that points into the class array of the abcFile entry.
+					
+					initByInfo_fun(traits_info,trait_class_memberV);
+				break;
+			}
+			//
 		}
 		public function toInfo():Traits_info{
 			var traits_info:Traits_info=new Traits_info();
 			
 			toInfo_fun(traits_info,memberV);
+			
+			switch(kind_trait_type){
+				case TraitTypes.Slot:
+				case TraitTypes.Const:
+					toInfo_fun(traits_info,trait_slot_memberV);
+				break;
+				case TraitTypes.Method:
+				case TraitTypes.Getter:
+				case TraitTypes.Setter:
+					toInfo_fun(traits_info,trait_method_memberV);
+				break;
+				case TraitTypes.Function:
+					toInfo_fun(traits_info,trait_function_memberV);
+				break;
+				case TraitTypes.Clazz:
+					toInfo_fun(traits_info,trait_class_memberV);
+				break;
+			}
 			
 			return traits_info;
 		}
@@ -93,10 +222,50 @@ package zero.swf.avm2.advances{
 		////
 		CONFIG::toXMLAndInitByXML {
 		public function toXML(xmlName:String):XML{
-			return toXML_fun(memberV,xmlName);
+			var xml:XML=toXML_fun(memberV,xmlName);
+			
+			switch(kind_trait_type){
+				case TraitTypes.Slot:
+				case TraitTypes.Const:
+					toXML_fun(trait_slot_memberV,xml);
+				break;
+				case TraitTypes.Method:
+				case TraitTypes.Getter:
+				case TraitTypes.Setter:
+					toXML_fun(trait_method_memberV,xml);
+				break;
+				case TraitTypes.Function:
+					toXML_fun(trait_function_memberV,xml);
+				break;
+				case TraitTypes.Clazz:
+					toXML_fun(trait_class_memberV,xml);
+				break;
+			}
+			
+			return xml;
 		}
 		public function initByXML(xml:XML):void{
 			initByXML_fun(xml,memberV);
+			
+			//
+			switch(kind_trait_type){
+				case TraitTypes.Slot:
+				case TraitTypes.Const:
+					initByXML_fun(xml,trait_slot_memberV);
+				break;
+				case TraitTypes.Method:
+				case TraitTypes.Getter:
+				case TraitTypes.Setter:
+					initByXML_fun(xml,trait_method_memberV);
+				break;
+				case TraitTypes.Function:
+					initByXML_fun(xml,trait_function_memberV);
+				break;
+				case TraitTypes.Clazz:
+					initByXML_fun(xml,trait_class_memberV);
+				break;
+			}
+			//
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

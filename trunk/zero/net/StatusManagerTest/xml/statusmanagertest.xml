@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<action url="action.txt"/>
+	<login js="alert('请把这个 alert(); 换成登录函数，例如：login();');"/>
+	
+	<status status="11" msg="请先登录！"/>
+	<status status="22" msg="请先提交个人信息！" url="提交个人信息页.htm" target="_blank"/>
+	<status status="0" msg="没中奖"/>
+	<status status="44" msg="今天的次数已经用完"/>
+	<status status="1" msg="140乾装套"/>
+	<status status="2" msg="十级金精铁玉"/>
+	<status status="3" msg="NOKIAX3-00手机"/>
+	<status status="4" msg="独角兽坐骑"/>
+	<status status="5" msg="诛仙主角手办"/>
+	<status status="6" msg="大灰狼宠物"/>
+	<status status="7" msg="完美一卡通"/>
+	<status status="8" msg="双倍经验卷"/>
+	
+	
+	<error js="alert('网络错误，请稍后再试！');"/>
+</root>

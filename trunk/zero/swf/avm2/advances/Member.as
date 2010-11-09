@@ -30,7 +30,6 @@ package zero.swf.avm2.advances{
 		//
 		
 		public static const TRAITS_INFO:String="traits_info";
-		public static const TRAIT:String="trait";
 		public static const OPTION_DETIAL:String="option_detial";
 		public static const ITEM_INFO:String="item_info";
 		public static const EXCEPTION_INFO:String="exception_info";
@@ -52,7 +51,6 @@ package zero.swf.avm2.advances{
 			CLASS,
 			SCRIPT_INFO,
 			TRAITS_INFO,
-			TRAIT,
 			OPTION_DETIAL,
 			ITEM_INFO,
 			EXCEPTION_INFO

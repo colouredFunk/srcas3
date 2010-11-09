@@ -1,61 +1,37 @@
 /***
-AdvanceTrait_method 版本:v1.0
+AdvanceCodes 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月27日 19:39:47
+创建时间:2010年11月8日 14:28:59
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
-//trait_method
-//{
-//	u30 disp_id
-//	u30 method
-//}
-
-//The disp_id field is a compiler assigned integer that is used by the AVM2 to optimize the resolution of
-//virtual function calls. An overridden method must have the same disp_id as that of the method in the
-//base class. A value of zero disables this optimization.
-
-//The method field is an index that points into the method array of the abcFile entry.
-
-package zero.swf.avm2.advances.traits{
-	import zero.swf.avm2.advances.Member;
+package zero.swf.avm2.advances{
+	import zero.swf.avm2.Codes;
+	import zero.swf.avm2.Op;
 	import zero.swf.avm2.advances.AdvanceABC;
-	import zero.swf.avm2.advances.AdvanceMethod;
-	import zero.swf.avm2.traits.Trait_method;
+	import zero.swf.avm2.advances.AdvanceMultiname_info;
+	import zero.swf.avm2.advances.Member;
+	
 
-	public class AdvanceTrait_method extends AdvanceTrait{
-		
-		private static const memberV:Vector.<Member>=Vector.<Member>([
-			new Member("disp_id"),
-			new Member("methodi",Member.METHOD)
-		]);
-		
-		public var disp_id:int;
-		public var methodi:AdvanceMethod;
-		
-		public function AdvanceTrait_method(){
+	public class AdvanceCodes{
+		public var codeV:Vector.<Array>;
+		public function AdvanceCodes(){
 		}
-		
-		public function initByInfo(trait_method:Trait_method):void{
-			initByInfo_fun(trait_method,memberV);
-		}
-		public function toInfo():Trait_method{
-			var trait_method:Trait_method=new Trait_method();
+		public function initByInfo(codes:Codes):void{
 			
-			toInfo_fun(trait_method,memberV);
-			
-			return trait_method;
 		}
-		
+		public function toInfo():Codes{
+			var codes:Codes=new Codes();
+			return codes;
+		}
 		////
 		CONFIG::toXMLAndInitByXML {
 		public function toXML(xmlName:String):XML{
-			return toXML_fun(memberV,xmlName);
+			return <{xmlName} class="AdvanceCodes"/>;
 		}
 		public function initByXML(xml:XML):void{
-			initByXML_fun(xml,memberV);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

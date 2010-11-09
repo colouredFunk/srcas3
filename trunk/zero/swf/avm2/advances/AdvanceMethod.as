@@ -125,7 +125,6 @@ package zero.swf.avm2.advances{
 	import zero.swf.avm2.Method_info;
 	import zero.swf.avm2.Option_detail;
 	import zero.swf.avm2.Traits_info;
-	import zero.swf.avm2.advances.codes.Codes;
 	import zero.swf.vmarks.MethodFlags;
 	
 	public class AdvanceMethod extends Advance{
@@ -161,7 +160,7 @@ package zero.swf.avm2.advances{
 		public var local_count:int;
 		public var init_scope_depth:int;
 		public var max_scope_depth:int;
-		public var codes:Codes;
+		public var codes:AdvanceCodes;
 		public var exception_infoV:Vector.<AdvanceException_info>;
 		public var traits_infoV:Vector.<AdvanceTraits_info>;
 		
@@ -178,9 +177,8 @@ package zero.swf.avm2.advances{
 				
 				initByInfo_fun(method_body_info,Method_body_info_memberV);
 				
-				//codes=method_body_info.codes;
-				codes=new Codes();
-				codes.initByData(method_body_info.codes.ownData,method_body_info.codes.dataOffset,method_body_info.codes.dataOffset+method_body_info.codes.dataLength);
+				codes=new AdvanceCodes();
+				codes.initByInfo(method_body_info.codes);
 			}
 		}
 		
@@ -189,7 +187,6 @@ package zero.swf.avm2.advances{
 			
 			toInfo_fun(method_info,Method_info_memberV);
 			
-			//trace("codes="+codes);
 			if(codes){
 				var method_body_info:Method_body_info=new Method_body_info();
 				
@@ -197,9 +194,7 @@ package zero.swf.avm2.advances{
 				
 				method_body_info.method=AdvanceABC.currInstance.abcFile.method_infoV.length;
 				
-				var codesData:ByteArray=codes.toData();
-				method_body_info.codes=new BytesData();
-				method_body_info.codes.initByData(codesData,0,codesData.length);
+				method_body_info.codes=codes.toInfo();
 				
 				AdvanceABC.currInstance.abcFile.method_body_infoV.push(method_body_info);
 			}
@@ -229,14 +224,12 @@ package zero.swf.avm2.advances{
 			initByXML_fun(xml,Method_info_memberV);
 			
 			var codesXML:XML=xml.codes[0];
-			//trace("codesXML="+codesXML.toXMLString());
 			
 			if(codesXML){
 				
 				initByXML_fun(xml,Method_body_info_memberV);
 				
-				//codes=new BytesData();
-				codes=new Codes();
+				codes=new AdvanceCodes();
 				codes.initByXML(codesXML);
 			}
 		}
