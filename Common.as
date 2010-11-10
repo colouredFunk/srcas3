@@ -254,11 +254,6 @@
 			}
 			return _href;
 		}
-		public static function isXMLNodeContainsHREFOrJS(_xml:XML, _hrefKey:String = "href", _jsKey:String = "js"):Boolean {
-			var _href:String = String(_xml.attribute(_hrefKey));
-			var _js:String = String(_xml.attribute(_jsKey));
-			return Boolean(_href || _js);
-		}
 		public static function getURLByXMLNode(_xml:*, _data:Object = null, _hrefKey:String = "href", _jsKey:String = "js", _targetKey:String = "target"):void {
 			if (_xml is XMLList) {
 				_xml = _xml[0];
