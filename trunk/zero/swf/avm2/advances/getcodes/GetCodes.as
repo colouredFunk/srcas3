@@ -381,7 +381,7 @@ package{
 			//20101108
 			var opName:String;
 			
-			codes="package zero.swf.avm2{\n";
+			codes="package zero.swf.avm2.advances{\n";
 			codes+="\tpublic class Op{\n";
 			
 			opStr_v[3]+="_";
@@ -405,27 +405,25 @@ package{
 				
 				["u8_u8__value_byte",["pushbyte"]],
 				
-				["u8_u30__multiname_info",["getsuper","setsuper","getdescendants","findpropstrict","findproperty","getlex","setproperty","getproperty","initproperty","deleteproperty","coerce","astype","istype"]],
-				["u8_u30__string",["dxns","pushstring","debugfile"]],
-				["u8_u30__register",["kill","getlocal","setlocal","inclocal","declocal","inclocal_i","declocal_i"]],
+				["u8_u30__value_int",["pushshort","debugline","bkptline"]],
+				["u8_u30__scope",["getscopeobject"]],
 				["u8_u30__slot",["getslot","setslot","getglobalslot","setglobalslot"]],
+				["u8_u30__register",["kill","getlocal","setlocal","inclocal","declocal","inclocal_i","declocal_i"]],
+				["u8_u30__args",["call","construct","constructsuper","applytype","newobject","newarray"]],
 				["u8_u30__int",["pushint"]],
 				["u8_u30__uint",["pushuint"]],
 				["u8_u30__double",["pushdouble"]],
+				["u8_u30__string",["dxns","pushstring","debugfile"]],
 				["u8_u30__namespace_info",["pushnamespace"]],
+				["u8_u30__multiname_info",["getsuper","setsuper","getdescendants","findpropstrict","findproperty","getlex","setproperty","getproperty","initproperty","deleteproperty","coerce","astype","istype"]],
 				["u8_u30__method",["newfunction"]],
 				["u8_u30__class",["newclass"]],
 				["u8_u30__exception_info",["newcatch"]],
-				["u8_u30__scope",["getscopeobject"]],
 				["u8_u30__finddef",["finddef"]],
 				
-				["u8_u30__args",["call","construct","constructsuper","applytype","newobject","newarray"]],
-				
-				["u8_u30__value_int",["pushshort","debugline","bkptline"]],
-				
+				["u8_u30_u30__register_register",["hasnext2"]],
 				["u8_u30_u30__multiname_info_args",["callsuper","callproperty","constructprop","callproplex","callsupervoid","callpropvoid"]],
 				["u8_u30_u30__method_args",["callmethod","callstatic"]],
-				["u8_u30_u30__register_register",["hasnext2"]],
 				
 				["u8_s24__branch",["ifnlt","ifnle","ifngt","ifnge","jump","iftrue","iffalse","ifeq","ifne","iflt","ifle","ifgt","ifge","ifstricteq","ifstrictne"]],
 				

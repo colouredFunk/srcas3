@@ -143,7 +143,7 @@ package zero.swf.avm2.advances{
 			new Member("local_count"),
 			new Member("init_scope_depth"),
 			new Member("max_scope_depth"),
-			new Member("exception_info",Member.EXCEPTION_INFO,{isList:true}),
+			//new Member("exception_info",Member.EXCEPTION_INFO,{isList:true}),
 			new Member("traits_info",Member.TRAITS_INFO,{isList:true})
 		]);
 		
@@ -161,7 +161,7 @@ package zero.swf.avm2.advances{
 		public var init_scope_depth:int;
 		public var max_scope_depth:int;
 		public var codes:AdvanceCodes;
-		public var exception_infoV:Vector.<AdvanceException_info>;
+		//public var exception_infoV:Vector.<AdvanceException_info>;
 		public var traits_infoV:Vector.<AdvanceTraits_info>;
 		
 		public function AdvanceMethod(){
@@ -177,8 +177,15 @@ package zero.swf.avm2.advances{
 				
 				initByInfo_fun(method_body_info,Method_body_info_memberV);
 				
+				var exception_infoV:Vector.<AdvanceException_info>=new Vector.<AdvanceException_info>();
+				var i:int=-1;
+				for each(var exception_info:Exception_info in method_body_info.exception_infoV){
+					i++;
+					exception_infoV[i]=new AdvanceException_info();
+					exception_infoV[i].initByInfo(exception_info);
+				}
 				codes=new AdvanceCodes();
-				codes.initByInfo(method_body_info.codes);
+				codes.initByInfo(method_body_info.codes.toData(),exception_infoV);
 			}
 		}
 		
@@ -194,7 +201,19 @@ package zero.swf.avm2.advances{
 				
 				method_body_info.method=AdvanceABC.currInstance.abcFile.method_infoV.length;
 				
-				method_body_info.codes=codes.toInfo();
+				var exception_infoV:Vector.<AdvanceException_info>=new Vector.<AdvanceException_info>();
+				
+				var codesData:ByteArray=codes.toData(exception_infoV);
+				
+				method_body_info.exception_infoV=new Vector.<Exception_info>();
+				var i:int=-1;
+				for each(var exception_info:AdvanceException_info in exception_infoV){
+					i++;
+					method_body_info.exception_infoV[i]=exception_info.toInfo();
+				}
+				
+				method_body_info.codes=new BytesData();
+				method_body_info.codes.initByData(codesData,0,codesData.length);
 				
 				AdvanceABC.currInstance.abcFile.method_body_infoV.push(method_body_info);
 			}

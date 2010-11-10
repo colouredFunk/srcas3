@@ -8,261 +8,379 @@ AdvanceCodes 版本:v1.0
 */
 
 package zero.swf.avm2.advances{
-	import zero.swf.avm2.Code;
-	import zero.swf.avm2.Codes;
-	import zero.swf.avm2.Op;
+	import flash.utils.ByteArray;
+	
 	import zero.swf.avm2.advances.AdvanceABC;
 	import zero.swf.avm2.advances.AdvanceMultiname_info;
 	import zero.swf.avm2.advances.Member;
 	
 
 	public class AdvanceCodes{
-		public var codeV:Vector.<AdvanceCode>;
+		public var codeV:Vector.<BaseCode>;
 		public function AdvanceCodes(){
 		}
-		public function initByInfo(codes:Codes):void{
-			if(codes.codeV.length){
-				var codesStartOffset:int=codes.codeV[0].offset;
-				var codesEndOffset:int=codes.codeV[codes.codeV.length-1].offset;
-				var codesLength:int=codesEndOffset-codesStartOffset+1;
-				LabelMark.reset();
-				var codeByOffsetArr:Array=new Array();
+		public function initByInfo(
+			data:ByteArray,
+			exception_infoV:Vector.<AdvanceException_info>
+		):void{
+			
+			var labelId:int=0;
+			var labelMarkArr:Array=new Array();
+			var codeByOffsetArr:Array=new Array();
+			
+			var offset:int=0;
+			var endOffset:int=data.length;
+			
+			var advanceCode:AdvanceCode,labelMark:LabelMark,exception_info:AdvanceException_info;
+			var u30_1:int,u30_2:int,jumpOffset:int,jumpPos:int;
+			
+			while(offset<endOffset){
+				advanceCode=new AdvanceCode();
+				codeByOffsetArr[offset]=advanceCode;
+				advanceCode.op=data[offset++];
 				
-				var advanceCode:AdvanceCode,labelMark:LabelMark;
-				for each(var code:Code in codes.codeV){
-					advanceCode=new AdvanceCode();
-					codeByOffsetArr[code.offset-codesStartOffset]=advanceCode;
-					advanceCode.op=code.op;
-					
-					var opType:String=Op.opTypeV[advanceCode.op];
-					
-					if(opType){
-						if(opType==Op.type_u8){
-						}else{
-							switch(opType){
-								case Op.type_u8_u8__value_byte:
-									advanceCode.value=code.value;
-								break;
-								
-								case Op.type_u8_u30__value_int:
-									advanceCode.value=code.value;
-								break;
-								case Op.type_u8_u30__scope:
-									advanceCode.scope=code.value;
-								break;
-								case Op.type_u8_u30__slot:
-									advanceCode.slot=code.value;
-								break;
-								case Op.type_u8_u30__register:
-									advanceCode.register=code.value;
-								break;
-								case Op.type_u8_u30__args:
-									advanceCode.args=code.value;
-								break;
-								case Op.type_u8_u30__int:
-									advanceCode.integer=AdvanceABC.currInstance.getInfoByIdAndMemberType(code.value,Member.INTEGER);
-								break;
-								case Op.type_u8_u30__uint:
-									advanceCode.uinteger=AdvanceABC.currInstance.getInfoByIdAndMemberType(code.value,Member.UINTEGER);
-								break;
-								case Op.type_u8_u30__double:
-									advanceCode.double=AdvanceABC.currInstance.getInfoByIdAndMemberType(code.value,Member.DOUBLE);
-								break;
-								case Op.type_u8_u30__string:
-									advanceCode.string=AdvanceABC.currInstance.getInfoByIdAndMemberType(code.value,Member.STRING);
-								break;
-								case Op.type_u8_u30__namespace_info:
-									advanceCode.namespace_info=AdvanceABC.currInstance.getInfoByIdAndMemberType(code.value,Member.NAMESPACE_INFO);
-								break;
-								case Op.type_u8_u30__multiname_info:
-									advanceCode.multiname_info=AdvanceABC.currInstance.getInfoByIdAndMemberType(code.value,Member.MULTINAME_INFO);
-								break;
-								case Op.type_u8_u30__method:
-									advanceCode.method=AdvanceABC.currInstance.getInfoByIdAndMemberType(code.value,Member.METHOD);
-								break;
-								case Op.type_u8_u30__class:
-									advanceCode.clazz=AdvanceABC.currInstance.getInfoByIdAndMemberType(code.value,Member.CLASS);
-								break;
-								case Op.type_u8_u30__exception_info:
-									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
-								break;
-								case Op.type_u8_u30__finddef:
-									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
-								break;
-								
-								case Op.type_u8_u30_u30__register_register:
-									advanceCode.register=code.value.u30;
-									advanceCode.register2=code.value.u30_2;
-								break;	
-								case Op.type_u8_u30_u30__multiname_info_args:
-									advanceCode.multiname_info=AdvanceABC.currInstance.getInfoByIdAndMemberType(code.value.u30,Member.MULTINAME_INFO);
-									advanceCode.args=code.value.u30_2;
-								break;
-								case Op.type_u8_u30_u30__method_args:
-									advanceCode.namespace_info=AdvanceABC.currInstance.getInfoByIdAndMemberType(code.value.u30,Member.NAMESPACE_INFO);
-									advanceCode.args=code.value.u30_2;
-								break;
-									
-								case Op.type_u8_s24__branch:
-									advanceCode.labelMark=LabelMark.getLabelByOffsetAndLength(code.offset-codesStartOffset+4+code.value,codesLength);
-								break;
-									
-								case Op.type_u8_s24_u30_s24List__lookupswitch:
-									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
-								break;
-									
-								case Op.type_u8_u8_u30_u8_u30__debug:
-									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
-								break;
-								
-								default:
-									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
-								break;
-							}
-						}
+				var opDataType:String=Op.opDataTypeV[advanceCode.op];
+				
+				if(opDataType){
+					if(opDataType==Op.dataType_u8){
 					}else{
-						throw new Error("未知 op: "+advanceCode.op);
+						switch(opDataType){
+							case Op.dataType_u8_u8:
+								
+								//Op.type_u8_u8__value_byte
+								advanceCode.value=data[offset++];
+							break;
+							case Op.dataType_u8_u30:
+								if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){u30_1=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{u30_1=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{u30_1=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{u30_1=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{u30_1=data[offset++];}
+								//u30_1
+								switch(Op.opTypeV[advanceCode.op]){
+									case Op.type_u8_u30__value_int:
+									case Op.type_u8_u30__scope:
+									case Op.type_u8_u30__slot:
+									case Op.type_u8_u30__register:
+									case Op.type_u8_u30__args:
+										advanceCode.value=u30_1;
+									break;
+									case Op.type_u8_u30__int:
+										advanceCode.value=AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.INTEGER);
+									break;
+									case Op.type_u8_u30__uint:
+										advanceCode.value=AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.UINTEGER);
+									break;
+									case Op.type_u8_u30__double:
+										advanceCode.value=AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.DOUBLE);
+									break;
+									case Op.type_u8_u30__string:
+										advanceCode.value=AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.STRING);
+									break;
+									case Op.type_u8_u30__namespace_info:
+										advanceCode.value=AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.NAMESPACE_INFO);
+									break;
+									case Op.type_u8_u30__multiname_info:
+										advanceCode.value=AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.MULTINAME_INFO);
+									break;
+									case Op.type_u8_u30__method:
+										advanceCode.value=AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.METHOD);
+									break;
+									case Op.type_u8_u30__class:
+										advanceCode.value=AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.CLASS);
+									break;
+									case Op.type_u8_u30__exception_info:
+										advanceCode.value={
+											exception_info:exception_infoV[u30_1]
+										};
+										
+										labelMark=labelMarkArr[advanceCode.value.exception_info.from];
+										if(labelMark){
+										}else{
+											labelMarkArr[advanceCode.value.exception_info.from]=labelMark=new LabelMark();
+											labelMark.labelId=labelId++;
+										}
+										advanceCode.value.from=labelMark;
+										
+										labelMark=labelMarkArr[advanceCode.value.exception_info.to];
+										if(labelMark){
+										}else{
+											labelMarkArr[advanceCode.value.exception_info.to]=labelMark=new LabelMark();
+											labelMark.labelId=labelId++;
+										}
+										advanceCode.value.to=labelMark;
+										
+										labelMark=labelMarkArr[advanceCode.value.exception_info.target];
+										if(labelMark){
+										}else{
+											labelMarkArr[advanceCode.value.exception_info.target]=labelMark=new LabelMark();
+											labelMark.labelId=labelId++;
+										}
+										advanceCode.value.target=labelMark;
+										
+									break;
+									case Op.type_u8_u30__finddef:
+										throw new Error("未处理, op="+advanceCode.op+", opType="+Op.opTypeV[advanceCode.op]);
+									break;
+								}
+							break;
+							case Op.dataType_u8_u30_u30:
+								if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){u30_1=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{u30_1=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{u30_1=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{u30_1=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{u30_1=data[offset++];}
+								//u30_1
+								
+								if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){u30_2=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{u30_2=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{u30_2=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{u30_2=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{u30_2=data[offset++];}
+								//u30_2
+								switch(Op.opTypeV[advanceCode.op]){
+									case Op.type_u8_u30_u30__register_register:
+										advanceCode.value={
+											register1:u30_1,
+											register2:u30_2
+										}
+									break;	
+									case Op.type_u8_u30_u30__multiname_info_args:
+										advanceCode.value={
+											multiname_info:AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.MULTINAME_INFO),
+											args:u30_2
+										}
+									break;
+									case Op.type_u8_u30_u30__method_args:
+										advanceCode.value={
+											method:AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.METHOD),
+											args:u30_2
+										}
+									break;
+								}
+							break;
+							case Op.dataType_u8_s24:
+								
+								//Op.type_u8_s24__branch
+								jumpOffset=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16);
+								if(jumpOffset&0x00008000){jumpOffset|=0xffff0000}//最高位为1,表示负数
+								
+								jumpPos=offset+jumpOffset;
+								if(jumpPos<0||jumpPos>endOffset){
+									throw new Error("可能是扰码: offset="+offset+", jumpPos="+jumpPos+", 跳转命令只允许跳至代码开头和代码末尾+1之间的位置");
+								}
+								labelMark=labelMarkArr[jumpPos];
+								if(labelMark){
+								}else{
+									labelMarkArr[jumpPos]=labelMark=new LabelMark();
+									labelMark.labelId=labelId++;
+								}
+								advanceCode.value=labelMark;
+							break;
+							case Op.dataType_u8_s24_u30_s24List:
+								
+								//Op.type_u8_s24_u30_s24List__lookupswitch
+								throw new Error("未处理, op="+advanceCode.op+", opDataType="+opDataType);
+								/*
+								advanceCode.value={default_offset:data[offset++]|(data[offset++]<<8)|(data[offset++]<<16)};
+								if(advanceCode.value.default_offset&0x00008000){advanceCode.value.default_offset|=0xffff0000}//最高位为1,表示负数
+								
+								if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var case_count:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{case_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{case_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{case_count=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{case_count=data[offset++];}
+								//case_count
+								
+								case_count++;
+								advanceCode.value.case_offsetV=new Vector.<int>(case_count);
+								for(var i:int=0;i<case_count;i++){
+									advanceCode.value.case_offsetV[i]=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16);
+									if(advanceCode.value.case_offsetV[i]&0x00008000){advanceCode.value.case_offsetV[i]|=0xffff0000}//最高位为1,表示负数
+								}
+								*/
+							break;
+							case Op.dataType_u8_u8_u30_u8_u30:
+								
+								//Op.type_u8_u8_u30_u8_u30__debug
+								advanceCode.value={debug_type:data[offset++]};
+								if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var debug_index:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{debug_index=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{debug_index=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{debug_index=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{debug_index=data[offset++];}
+								//debug_index
+								
+								advanceCode.value.index=AdvanceABC.currInstance.getInfoByIdAndMemberType(debug_index,Member.STRING);
+								
+								advanceCode.value.reg=data[offset++];
+								
+								if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){advanceCode.value.extra=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{advanceCode.value.extra=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{advanceCode.value.extra=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{advanceCode.value.extra=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{advanceCode.value.extra=data[offset++];}
+								//advanceCode.value.extra
+							break;
+							default:
+								throw new Error("未知 opDataType: "+opDataType+", op="+advanceCode.op);
+							break;
+						}
 					}
+				}else{
+					throw new Error("未知 op: "+advanceCode.op);
 				}
+			}
+			
+			//trace("offset="+offset+",endOffset="+endOffset);
+			if(offset===endOffset){
 				
-				
-				var L:int=codeByOffsetArr.length;
-				if(L<LabelMark.labelArr.length){
-					L=LabelMark.labelArr.length;
+			}else{
+				throw new Error("offset="+offset+",endOffset="+endOffset);
+			}
+			
+			codeV=new Vector.<BaseCode>();
+			var codeId:int=0;
+			for(offset=0;offset<=endOffset;offset++){
+				if(labelMarkArr[offset]){
+					codeV[codeId++]=labelMarkArr[offset];
 				}
-				//if(L<ExceptionPosMark.exceptionPosArr.length){
-				//	L=ExceptionPosMark.exceptionPosArr.length;
-				//}
-				
-				codeV=new Vector.<AdvanceCode>();
-				var codeId:int=0;
-				for(var codesOffset:int=0;codesOffset<L;codesOffset++){
-					if(LabelMark.labelArr[codesOffset]){
-						codeV[codeId++]=LabelMark.labelArr[codesOffset];
-					}
-					if(codeByOffsetArr[codesOffset]){
-						codeV[codeId++]=codeByOffsetArr[codesOffset];
-					}
+				if(codeByOffsetArr[offset]){
+					codeV[codeId++]=codeByOffsetArr[offset];
 				}
 			}
 		}
-		public function toInfo():Codes{
-			var codes:Codes=new Codes();
-			codes.codeV=new Vector.<Code>();
-			var codeId:int=-1;
-			var code:Code;
-			for each(var advanceCode:AdvanceCode in codeV){
-				if(advanceCode is LabelMark){
-					trace("未处理");
+		public function toData(exception_infoV:Vector.<AdvanceException_info>):ByteArray{
+			var data:ByteArray=new ByteArray();
+			
+			var labelMarkArr:Array=new Array();
+			
+			var offset:int=0;
+			
+			var u30_1:int,u30_2:int,jumpOffset:int;
+			
+			for each(var baseCode:BaseCode in codeV){
+				if(baseCode is LabelMark){
+					(baseCode as LabelMark).pos=offset;
 				}else{
-					codes.codeV[++codeId]=code=new Code();
-					code.op=advanceCode.op;
+					var advanceCode:AdvanceCode=baseCode as AdvanceCode;
+					data[offset++]=advanceCode.op;
 					
-					var opType:String=Op.opTypeV[advanceCode.op];
+					var opDataType:String=Op.opDataTypeV[advanceCode.op];
 					
-					if(opType==Op.type_u8){
+					if(opDataType==Op.dataType_u8){
 					}else{
-						switch(opType){
-							case Op.type_u8_u8__value_byte:
-								code.value=advanceCode.value;
+						switch(opDataType){
+							case Op.dataType_u8_u8:
+								
+								//Op.type_u8_u8__value_byte
+								data[offset++]=advanceCode.value;
 							break;
-							
-							case Op.type_u8_u30__value_int:
-								code.value=advanceCode.value;
-							break;
-							case Op.type_u8_u30__scope:
-								code.value=advanceCode.scope;
-							break;
-							case Op.type_u8_u30__slot:
-								code.value=advanceCode.slot;
-							break;
-							case Op.type_u8_u30__register:
-								code.value=advanceCode.register;
-							break;
-							case Op.type_u8_u30__args:
-								code.value=advanceCode.args;
-							break;
-							case Op.type_u8_u30__int:
-								code.value=advanceCode.integer;
-							break;
-							case Op.type_u8_u30__uint:
-								code.value=advanceCode.uinteger;
-							break;
-							case Op.type_u8_u30__double:
-								code.value=advanceCode.double;
-							break;
-							case Op.type_u8_u30__string:
-								code.value=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.string,Member.STRING);
-							break;
-							case Op.type_u8_u30__namespace_info:
-								code.value=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.namespace_info,Member.NAMESPACE_INFO);
-							break;
-							case Op.type_u8_u30__multiname_info:
-								code.value=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.multiname_info,Member.MULTINAME_INFO);
-							break;
-							case Op.type_u8_u30__method:
-								code.value=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.method,Member.METHOD);
-							break;
-							case Op.type_u8_u30__class:
-								code.value=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.clazz,Member.CLASS);
-							break;
-							case Op.type_u8_u30__exception_info:
-								throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
-							break;
-							case Op.type_u8_u30__finddef:
-								throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
-							break;
-							
-							case Op.type_u8_u30_u30__register_register:
-								code.value={
-									u30:advanceCode.register,
-									u30_2:advanceCode.register2
+							case Op.dataType_u8_u30:
+								switch(Op.opTypeV[advanceCode.op]){
+									case Op.type_u8_u30__value_int:
+									case Op.type_u8_u30__scope:
+									case Op.type_u8_u30__slot:
+									case Op.type_u8_u30__register:
+									case Op.type_u8_u30__args:
+										u30_1=advanceCode.value;
+									break;
+									case Op.type_u8_u30__int:
+										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value,Member.INTEGER);
+									break;
+									case Op.type_u8_u30__uint:
+										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value,Member.UINTEGER);
+									break;
+									case Op.type_u8_u30__double:
+										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value,Member.DOUBLE);
+									break;
+									case Op.type_u8_u30__string:
+										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value,Member.STRING);
+									break;
+									case Op.type_u8_u30__namespace_info:
+										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value,Member.NAMESPACE_INFO);
+									break;
+									case Op.type_u8_u30__multiname_info:
+										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value,Member.MULTINAME_INFO);
+									break;
+									case Op.type_u8_u30__method:
+										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value,Member.METHOD);
+									break;
+									case Op.type_u8_u30__class:
+										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value,Member.CLASS);
+									break;
+									case Op.type_u8_u30__exception_info:
+										u30_1=exception_infoV.length;
+										exception_infoV[u30_1]=advanceCode.value.exception_info;
+										throw new Error("计算位置");
+									break;
+									case Op.type_u8_u30__finddef:
+										throw new Error("未处理, op="+advanceCode.op+", opType="+Op.opTypeV[advanceCode.op]);
+									break;
 								}
+								
+								if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
+								//u30_1
 							break;
-							case Op.type_u8_u30_u30__multiname_info_args:
-								code.value={
-									u30:AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.multiname_info,Member.MULTINAME_INFO),
-									u30_2:advanceCode.args
+							case Op.dataType_u8_u30_u30:
+								switch(Op.opTypeV[advanceCode.op]){
+									case Op.type_u8_u30_u30__register_register:
+										u30_1=advanceCode.value.register1;
+										u30_2=advanceCode.value.register2;
+									break;
+									case Op.type_u8_u30_u30__multiname_info_args:
+										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value.multiname_info,Member.MULTINAME_INFO),
+										u30_2=advanceCode.value.args;
+									break;
+									case Op.type_u8_u30_u30__method_args:
+										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value.method,Member.METHOD),
+										u30_2=advanceCode.value.args;
+									break;
 								}
-							break;
-							case Op.type_u8_u30_u30__method_args:
-								code.value={
-									u30:AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.method,Member.METHOD),
-									u30_2:advanceCode.args
-								}
-							break;
-							
-							case Op.type_u8_s24__branch:
-								code.value=0;
-								trace("未处理");
+								if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
+								//u30_1
+								
+								if(u30_2>>>7){if(u30_2>>>14){if(u30_2>>>21){if(u30_2>>>28){data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=((u30_2>>>7)&0x7f)|0x80;data[offset++]=((u30_2>>>14)&0x7f)|0x80;data[offset++]=((u30_2>>>21)&0x7f)|0x80;data[offset++]=u30_2>>>28;}else{data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=((u30_2>>>7)&0x7f)|0x80;data[offset++]=((u30_2>>>14)&0x7f)|0x80;data[offset++]=u30_2>>>21;}}else{data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=((u30_2>>>7)&0x7f)|0x80;data[offset++]=u30_2>>>14;}}else{data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=u30_2>>>7;}}else{data[offset++]=u30_2;}
+								//u30_2
 							break;
 							
-							case Op.type_u8_s24_u30_s24List__lookupswitch:
-								throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
+							case Op.dataType_u8_s24:
+								
+								//Op.type_u8_s24__branch
+								//先用 0 占位，后面一次性写入
+								data[offset++]=0x00;
+								data[offset++]=0x00;
+								data[offset++]=0x00;
+								labelMarkArr[offset]=advanceCode.value;
 							break;
 							
-							case Op.type_u8_u8_u30_u8_u30__debug:
-								throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
+							case Op.dataType_u8_s24_u30_s24List:
+								//Op.type_u8_s24_u30_s24List__lookupswitch
+								throw new Error("未处理, op="+advanceCode.op+", opDataType="+opDataType);
+							break;
+							
+							case Op.dataType_u8_u8_u30_u8_u30:
+								
+								//Op.type_u8_u8_u30_u8_u30__debug
+								data[offset++]=advanceCode.value.debug_type;
+								
+								var debug_index:int=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value.index,Member.STRING);
+								
+								if(debug_index>>>7){if(debug_index>>>14){if(debug_index>>>21){if(debug_index>>>28){data[offset++]=(debug_index&0x7f)|0x80;data[offset++]=((debug_index>>>7)&0x7f)|0x80;data[offset++]=((debug_index>>>14)&0x7f)|0x80;data[offset++]=((debug_index>>>21)&0x7f)|0x80;data[offset++]=debug_index>>>28;}else{data[offset++]=(debug_index&0x7f)|0x80;data[offset++]=((debug_index>>>7)&0x7f)|0x80;data[offset++]=((debug_index>>>14)&0x7f)|0x80;data[offset++]=debug_index>>>21;}}else{data[offset++]=(debug_index&0x7f)|0x80;data[offset++]=((debug_index>>>7)&0x7f)|0x80;data[offset++]=debug_index>>>14;}}else{data[offset++]=(debug_index&0x7f)|0x80;data[offset++]=debug_index>>>7;}}else{data[offset++]=debug_index;}
+								//debug_index
+								
+								data[offset++]=advanceCode.value.reg;
+								
+								if(advanceCode.value.extra>>>7){if(advanceCode.value.extra>>>14){if(advanceCode.value.extra>>>21){if(advanceCode.value.extra>>>28){data[offset++]=(advanceCode.value.extra&0x7f)|0x80;data[offset++]=((advanceCode.value.extra>>>7)&0x7f)|0x80;data[offset++]=((advanceCode.value.extra>>>14)&0x7f)|0x80;data[offset++]=((advanceCode.value.extra>>>21)&0x7f)|0x80;data[offset++]=advanceCode.value.extra>>>28;}else{data[offset++]=(advanceCode.value.extra&0x7f)|0x80;data[offset++]=((advanceCode.value.extra>>>7)&0x7f)|0x80;data[offset++]=((advanceCode.value.extra>>>14)&0x7f)|0x80;data[offset++]=advanceCode.value.extra>>>21;}}else{data[offset++]=(advanceCode.value.extra&0x7f)|0x80;data[offset++]=((advanceCode.value.extra>>>7)&0x7f)|0x80;data[offset++]=advanceCode.value.extra>>>14;}}else{data[offset++]=(advanceCode.value.extra&0x7f)|0x80;data[offset++]=advanceCode.value.extra>>>7;}}else{data[offset++]=advanceCode.value.extra;}
+								//advanceCode.value.extra
 							break;
 							
 							default:
-								throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
+								throw new Error("未知 opDataType: "+opDataType+", op="+advanceCode.op);
 							break;
 						}
 					}
 				}
 			}
-			return codes;
+			
+			var endOffset:int=data.length;
+			for(offset=0;offset<=endOffset;offset++){
+				if(labelMarkArr[offset]){
+					jumpOffset=labelMarkArr[offset].pos-offset;
+					data[offset-3]=jumpOffset;
+					data[offset-2]=jumpOffset>>8;
+					data[offset-1]=jumpOffset>>16;
+				}
+			}
+			
+			return data;
 		}
 		////
 		CONFIG::toXMLAndInitByXML {
 		public function toXML(xmlName:String):XML{
 			if(codeV.length){
 				var codesStr:String="";
-				for each(var advanceCode:AdvanceCode in codeV){
-					if(advanceCode is LabelMark){
-						codesStr+="\t\t\t\tlabel"+(advanceCode as LabelMark).markId+":\n";
+				for each(var baseCode:BaseCode in codeV){
+					if(baseCode is LabelMark){
+						codesStr+="\t\t\t\tlabel"+(baseCode as LabelMark).labelId+":\n";
 					}else{
+						var advanceCode:AdvanceCode=baseCode as AdvanceCode;
 						codesStr+="\t\t\t\t\t"+Op.opNameV[advanceCode.op];
 						var opType:String=Op.opTypeV[advanceCode.op];
 						
@@ -270,67 +388,50 @@ package zero.swf.avm2.advances{
 						}else{
 							switch(opType){
 								case Op.type_u8_u8__value_byte:
-									codesStr+=" "+advanceCode.value;
-								break;
-								
 								case Op.type_u8_u30__value_int:
-									codesStr+=" "+advanceCode.value;
-									break;
 								case Op.type_u8_u30__scope:
-									codesStr+=" "+advanceCode.scope;
-									break;
 								case Op.type_u8_u30__slot:
-									codesStr+=" "+advanceCode.slot;
-									break;
 								case Op.type_u8_u30__register:
-									codesStr+=" "+advanceCode.register;
-									break;
 								case Op.type_u8_u30__args:
-									codesStr+=" (param count:"+advanceCode.args+")";
-									break;
 								case Op.type_u8_u30__int:
-									codesStr+=" "+advanceCode.integer;
-								break;
 								case Op.type_u8_u30__uint:
-									codesStr+=" "+advanceCode.uinteger;
-								break;
 								case Op.type_u8_u30__double:
-									codesStr+=" "+advanceCode.double;
+									codesStr+=" "+advanceCode.value;
 								break;
 								case Op.type_u8_u30__string:
-									codesStr+=" \""+(<xml value={advanceCode.string}/>).@value.toString()+"\"";
-									break;
+									codesStr+=" \""+(<xml value={advanceCode.value}/>).@value.toString()+"\"";//- -
+								break;
 								case Op.type_u8_u30__namespace_info:
-									codesStr+=" "+advanceCode.namespace_info.toXML("namespace_info").toXMLString().replace(/[\r\n]+/g,"");
+									codesStr+=" "+advanceCode.value.toXML("namespace_info").toXMLString().replace(/[\r\n]+/g,"");
 								break;
 								case Op.type_u8_u30__multiname_info:
-									codesStr+=" "+advanceCode.multiname_info.toXML("multiname_info").toXMLString().replace(/[\r\n]+/g,"");
-									break;
+									codesStr+=" "+advanceCode.value.toXML("multiname_info").toXMLString().replace(/[\r\n]+/g,"");
+								break;
 								case Op.type_u8_u30__method:
-									codesStr+=" "+advanceCode.method.toXML("method").toXMLString().replace(/[\r\n]+/g,"");
+									codesStr+=" "+advanceCode.value.toXML("method").toXMLString().replace(/[\r\n]+/g,"");
 								break;
 								case Op.type_u8_u30__class:
-									codesStr+=" "+advanceCode.clazz.getMarkKey();
+									codesStr+=" "+advanceCode.value.getMarkKey();
 								break;
 								case Op.type_u8_u30__exception_info:
-									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
+									codesStr+=" "+advanceCode.value.exception_info.toXML("exception_info").toXMLString().replace(/[\r\n]+/g,"")+" from:label"+advanceCode.value.from.labelId+" to:label"+advanceCode.value.to.labelId+" target:label"+advanceCode.value.target.labelId;
 								break;
 								case Op.type_u8_u30__finddef:
 									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
 								break;
 								
 								case Op.type_u8_u30_u30__register_register:
-									codesStr+=" "+advanceCode.register+" "+advanceCode.register2;
+									codesStr+=" "+advanceCode.value.register1+" "+advanceCode.value.register2;
 								break;
 								case Op.type_u8_u30_u30__multiname_info_args:
-									codesStr+=" "+advanceCode.multiname_info.toXML("multiname_info").toXMLString().replace(/[\r\n]+/g,"")+" (param count:"+advanceCode.args+")";
+									codesStr+=" "+advanceCode.value.multiname_info.toXML("multiname_info").toXMLString().replace(/[\r\n]+/g,"")+" "+advanceCode.value.args;
 								break;
 								case Op.type_u8_u30_u30__method_args:
-									codesStr+=" "+advanceCode.method.toXML("method").toXMLString().replace(/[\r\n]+/g,"")+" (param count:"+advanceCode.args+")";
+									codesStr+=" "+advanceCode.value.method.toXML("method").toXMLString().replace(/[\r\n]+/g,"")+" "+advanceCode.value.args;
 								break;
 								
 								case Op.type_u8_s24__branch:
-									codesStr+=" label"+advanceCode.labelMark.markId;
+									codesStr+=" label"+advanceCode.value.labelId;
 								break;
 								
 								case Op.type_u8_s24_u30_s24List__lookupswitch:
@@ -338,7 +439,7 @@ package zero.swf.avm2.advances{
 								break;
 								
 								case Op.type_u8_u8_u30_u8_u30__debug:
-									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
+									codesStr+=" "+advanceCode.value.debug_type+" \""+(<xml value={advanceCode.value.index}/>).@value.toString()+"\" "+advanceCode.value.reg+" "+advanceCode.value.extra;//- -
 								break;
 								
 								default:
@@ -358,13 +459,14 @@ package zero.swf.avm2.advances{
 		public function initByXML(xml:XML):void{
 			var codeStrArr:Array=xml.toString().split("\n");
 			var codeId:int=-1;
-			codeV=new Vector.<AdvanceCode>();
+			codeV=new Vector.<BaseCode>();
 			var advanceCode:AdvanceCode;
 			
 			var codeStr:String;
 			var i:int=codeStrArr.length;
 			var labelMarkMark:Object=new Object();
 			var labelMark:LabelMark;
+			var matchArr:Array,numStrArr:Array;
 			while(--i>=0){
 				codeStrArr[i]=codeStr=codeStrArr[i].replace(/^\s*|\s*$/g,"");
 				if(codeStr){
@@ -381,14 +483,14 @@ package zero.swf.avm2.advances{
 						throw new Error("重复的 labelMark: "+codeStr);
 					}
 					labelMarkMark[codeStr]=labelMark=new LabelMark();
-					labelMark.markId=int(codeStr.replace(/label(\d+):/,"$1"));
-				}/*else if(exceptionPosMarkReg.test(str)){
-					if(exceptionPosMarkMark[str]){
-						throw new Error("重复的 exceptionPosMark: "+str);
-					}
-					exceptionPosMarkMark[str]=exceptionPosMark=new ExceptionPosMark();
-					exceptionPosMark.markId=int(str.replace(exceptionPosMarkReg,"$1"));
-				}*/
+					labelMark.labelId=int(codeStr.replace(/label(\d+):/,"$1"));
+				}//else if(exceptionPosMarkReg.test(str)){
+				//	if(exceptionPosMarkMark[str]){
+				//		throw new Error("重复的 exceptionPosMark: "+str);
+				//	}
+				//	exceptionPosMarkMark[str]=exceptionPosMark=new ExceptionPosMark();
+				//	exceptionPosMark.markId=int(str.replace(exceptionPosMarkReg,"$1"));
+				//}
 			}
 			for each(codeStr in codeStrArr){
 				if(/label(\d+):/.test(codeStr)){
@@ -412,96 +514,113 @@ package zero.swf.avm2.advances{
 							codeStr=codeStr.substr(pos).replace(/^\s*|\s*$/g,"");
 							switch(opType){
 								case Op.type_u8_u8__value_byte:
-									advanceCode.value=int(codeStr.replace(/\s+/g,""));
-								break;
-								
 								case Op.type_u8_u30__value_int:
-									advanceCode.value=int(codeStr.replace(/\s+/g,""));
-								break;
 								case Op.type_u8_u30__scope:
-									advanceCode.scope=int(codeStr.replace(/\s+/g,""));
-								break;
 								case Op.type_u8_u30__slot:
-									advanceCode.slot=int(codeStr.replace(/\s+/g,""));
-								break;
 								case Op.type_u8_u30__register:
-									advanceCode.register=int(codeStr.replace(/\s+/g,""));
-								break;
 								case Op.type_u8_u30__args:
-									advanceCode.args=int(codeStr.replace(/\s*\(param count:(.*?)\)\s*/,"$1"));
-								break;
 								case Op.type_u8_u30__int:
-									advanceCode.integer=int(codeStr.replace(/\s+/g,""));
-								break;
 								case Op.type_u8_u30__uint:
-									advanceCode.uinteger=int(codeStr.replace(/\s+/g,""));
+									advanceCode.value=int(codeStr.replace(/\s+/g,""));//支持 16进制的整数表示
 								break;
 								case Op.type_u8_u30__double:
-									advanceCode.double=Number(codeStr.replace(/\s+/g,""));
+									advanceCode.value=Number(codeStr.replace(/\s+/g,""));
 								break;
 								case Op.type_u8_u30__string:
-									advanceCode.string=codeStr.replace(/\s*"(.*)"\s*/,"$1");
+									advanceCode.value=codeStr.replace(/"(.*)"/,"$1");
 								break;
 								case Op.type_u8_u30__namespace_info:
-									advanceCode.namespace_info=AdvanceABC.currInstance.getInfoByXMLAndMemberType(new XML(codeStr),Member.NAMESPACE_INFO);
+									advanceCode.value=AdvanceABC.currInstance.getInfoByXMLAndMemberType(new XML(codeStr),Member.NAMESPACE_INFO);
 								break;
 								case Op.type_u8_u30__multiname_info:
-									advanceCode.multiname_info=AdvanceABC.currInstance.getInfoByXMLAndMemberType(new XML(codeStr),Member.MULTINAME_INFO);
+									advanceCode.value=AdvanceABC.currInstance.getInfoByXMLAndMemberType(new XML(codeStr),Member.MULTINAME_INFO);
 								break;
 								case Op.type_u8_u30__method:
-									advanceCode.method=AdvanceABC.currInstance.getInfoByXMLAndMemberType(new XML(codeStr),Member.METHOD);
+									advanceCode.value=AdvanceABC.currInstance.getInfoByXMLAndMemberType(new XML(codeStr),Member.METHOD);
 								break;
 								case Op.type_u8_u30__class:
-									advanceCode.clazz=AdvanceABC.currInstance.getInfoByMarkKeyAndMemberType(codeStr,Member.CLASS);
+									advanceCode.value=AdvanceABC.currInstance.getInfoByMarkKeyAndMemberType(codeStr,Member.CLASS);
 								break;
 								case Op.type_u8_u30__exception_info:
-									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
+									advanceCode.value={exception_info:new AdvanceException_info()};
+									
+									matchArr=codeStr.match(/from:label\d+\s+to:label\d+\s+target:label\d+$/);
+									numStrArr=matchArr[0].replace(/from|to|target|label|:/g,"").split(/\s+/);
+									
+									advanceCode.value.from=labelMarkMark["label"+numStrArr[0]+":"];
+									if(advanceCode.value.from){
+									}else{
+										throw new Error("找不到对应的 advanceCode.value.from: "+codeStr);
+									}
+									
+									advanceCode.value.to=labelMarkMark["label"+numStrArr[1]+":"];
+									if(advanceCode.value.to){
+									}else{
+										throw new Error("找不到对应的 advanceCode.value.to: "+codeStr);
+									}
+									
+									advanceCode.value.target=labelMarkMark["label"+numStrArr[2]+":"];
+									if(advanceCode.value.target){
+									}else{
+										throw new Error("找不到对应的 advanceCode.value.target: "+codeStr);
+									}
+									
+									advanceCode.value.exception_info.initByXML(new XML(codeStr.replace(/from:label\d+\s+to:label\d+\s+target:label\d+$/,"")));
 								break;
 								case Op.type_u8_u30__finddef:
 									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
 								break;
 								
 								case Op.type_u8_u30_u30__register_register:
-									var matchArr:Array=codeStr.match(/\w+/g);
-									advanceCode.register=int(matchArr[0]);
-									advanceCode.register2=int(matchArr[1]);
+									matchArr=codeStr.match(/\w+/g);
+									advanceCode.value={
+										register1:int(matchArr[0]),
+										register2:int(matchArr[1])
+									}
 								break;
 								case Op.type_u8_u30_u30__multiname_info_args:
-									pos=codeStr.search(/\s*\(param count:(.*?)\)\s*/);
+									pos=codeStr.search(/\s+\d+$/);//不支持 16进制的整数表示
 									if(pos>0){
-										advanceCode.multiname_info=AdvanceABC.currInstance.getInfoByXMLAndMemberType(new XML(codeStr.substr(0,pos)),Member.MULTINAME_INFO);
-										advanceCode.args=int(codeStr.substr(pos).replace(/\s*\(param count:(.*?)\)\s*/,"$1"));
+										advanceCode.value={
+											multiname_info:AdvanceABC.currInstance.getInfoByXMLAndMemberType(new XML(codeStr.substr(0,pos)),Member.MULTINAME_INFO),
+											args:int(codeStr.substr(pos).replace(/\D+/g,""))//不支持 16进制的整数表示
+										}
 									}else{
-										throw new Error("pos="+pos);
+										throw new Error("找不到 args: "+codeStr);
 									}
 								break;
 								case Op.type_u8_u30_u30__method_args:
-									pos=codeStr.search(/\s*\(param count:(.*?)\)\s*/);
+									pos=codeStr.search(/\s+\d+$/);//不支持 16进制的整数表示
 									if(pos>0){
-										advanceCode.method=AdvanceABC.currInstance.getInfoByXMLAndMemberType(new XML(codeStr.substr(0,pos)),Member.METHOD);
-										advanceCode.args=int(codeStr.substr(pos).replace(/\s*\(param count:(.*?)\)\s*/,"$1"));
+										advanceCode.value={
+											method:AdvanceABC.currInstance.getInfoByXMLAndMemberType(new XML(codeStr.substr(0,pos)),Member.METHOD),
+											args:int(codeStr.substr(pos).replace(/\D+/g,""))//不支持 16进制的整数表示
+										}
 									}else{
-										throw new Error("pos="+pos);
+										throw new Error("找不到 args: "+codeStr);
 									}
 								break;
-								
 								case Op.type_u8_s24__branch:
 									labelMark=labelMarkMark[codeStr+":"];
 									if(labelMark){
-										advanceCode.labelMark=labelMark;
+										advanceCode.value=labelMark;
 									}else{
-										throw new Error("labelMark="+labelMark);
+										throw new Error("找不到对应的 labelMark: "+codeStr);
 									}
 								break;
-								
 								case Op.type_u8_s24_u30_s24List__lookupswitch:
 									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
 								break;
-								
 								case Op.type_u8_u8_u30_u8_u30__debug:
-									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
+									matchArr=codeStr.match(/".*"/);
+									numStrArr=codeStr.replace(matchArr[0],"").split(/\s+/);
+									advanceCode.value={
+										debug_type:int(numStrArr[0]),
+										index:matchArr[0].replace(/"(.*)"/,"$1"),
+										reg:int(numStrArr[1]),
+										extra:int(numStrArr[2])
+									}
 								break;
-								
 								default:
 									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
 								break;

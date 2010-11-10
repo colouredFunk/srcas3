@@ -26,6 +26,9 @@ public class StatusManager{
 	public static var msgPopUp:Function;
 	public static var statusCount:int;
 	public static var onStatus:Function;
+	public static var prevCheckStatus:Function=function():Boolean{
+		return true;
+	}
 	
 	private static var statusURLLoader:URLLoader;
 	
@@ -92,11 +95,13 @@ public class StatusManager{
 		checkStatus();
 	}
 	private static function checkStatus():void{
-		var msg:String=currXML.@msg.toString();
-		if(msg){
-			msgPopUp(ReplaceVars.replace(msg,statusURLLoader.data),currXML.@btnLabel.toString()).callBack=runStatus;
-		}else{
-			runStatus(true);
+		if(prevCheckStatus()){
+			var msg:String=currXML.@msg.toString();
+			if(msg){
+				msgPopUp(ReplaceVars.replace(msg,statusURLLoader.data),currXML.@btnLabel.toString()).callBack=runStatus;
+			}else{
+				runStatus(true);
+			}
 		}
 	}
 	private static function runStatus(alertCallBackB:Boolean=true,noRemoveAlert:Boolean=false):void{
