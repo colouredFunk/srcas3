@@ -63,7 +63,7 @@
 			endClip = null;
 		}
 		public function $setStyle(_isActive:Boolean):void {
-			if (totalFrames > 8) {
+			if (totalFrames > 8 || !bar) {
 					if (txt.autoSize == TextFieldAutoSize.RIGHT) {
 						txt.txt.x = -int(txt.width);
 					} else if (txt.autoSize == TextFieldAutoSize.CENTER) {
@@ -71,26 +71,24 @@
 					} else {
 						txt.txt.x = 0;
 					}
-			}else {
-				if (bar) {
-					if (txt.width + widthAdd < __widthMax && txt.width + widthAdd * 0.25 < __widthMax) {
-						bar.width = __widthMax;
-					}else {
-						bar.width = int(txt.width + widthAdd);
-					}
-					if (txt.autoSize == TextFieldAutoSize.RIGHT) {
-						bar.x = -bar.width;
-						txt.txt.x = int((txt.width - bar.width) * 0.5 - txt.width) - txt.x;
-					} else if (txt.autoSize == TextFieldAutoSize.CENTER) {
-						bar.x = -int(bar.width * 0.5);
-						txt.txt.x = -int(txt.width * 0.5) - txt.x;
-					} else {
-						bar.x = 0;
-						txt.txt.x = -int((txt.width - bar.width) * 0.5) - txt.x;
-					}
-					bar.y = 0;
-					txt.txt.y = bar.y - yOff - txt.y;
+			}else if (bar){
+				if (txt.width + widthAdd < __widthMax && txt.width + widthAdd * 0.25 < __widthMax) {
+					bar.width = __widthMax;
+				}else {
+					bar.width = int(txt.width + widthAdd);
 				}
+				if (txt.autoSize == TextFieldAutoSize.RIGHT) {
+					bar.x = -bar.width;
+					txt.txt.x = int((txt.width - bar.width) * 0.5 - txt.width) - txt.x;
+				} else if (txt.autoSize == TextFieldAutoSize.CENTER) {
+					bar.x = -int(bar.width * 0.5);
+					txt.txt.x = -int(txt.width * 0.5) - txt.x;
+				} else {
+					bar.x = 0;
+					txt.txt.x = -int((txt.width - bar.width) * 0.5) - txt.x;
+				}
+				bar.y = 0;
+				txt.txt.y = bar.y - yOff - txt.y;
 			}
 			if (endClip) {
 				endClip.x = txt.x + txt.txt.x + txt.width;
