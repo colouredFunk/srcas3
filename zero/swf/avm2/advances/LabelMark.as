@@ -2,31 +2,15 @@
 LabelMark 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年7月12日 22:01:32
+创建时间:2010年11月10日 14:14:47
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
 package zero.swf.avm2.advances{
-	public class LabelMark extends BaseMark{
-		public static var currMarkId:int;
-		public static var labelArr:Array;
-		public static function reset():void{
-			currMarkId=0;
-			labelArr=new Array();
-		}
-		public static function getLabelByOffsetAndLength(offset:int,length:int):LabelMark{
-			return getMarkByOffsetAndLength(offset,length,labelArr,LabelMark) as LabelMark;
-		}
-		//
-		public function LabelMark(){}
-		//
-		//public function toXML(xmlName:String):XML{
-		//	return new XML("<label"+markId+"/>");
-		//}
-		//public function toString():String{
-		//	return "label"+markId;
-		//}
+	public class LabelMark extends BaseCode{
+		public var labelId:int;
+		public var pos:int;
 	}
 }
 

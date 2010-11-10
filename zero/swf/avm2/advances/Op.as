@@ -1,4 +1,4 @@
-package zero.swf.avm2{
+package zero.swf.avm2.advances{
 	public class Op{
 		
 		public static const dataType_u8:String="u8";
@@ -8,26 +8,26 @@ package zero.swf.avm2{
 		public static const type_u8_u8__value_byte:String="u8_u8__value_byte";
 		
 		public static const dataType_u8_u30:String="u8_u30";
-		public static const type_u8_u30__multiname_info:String="u8_u30__multiname_info";
-		public static const type_u8_u30__string:String="u8_u30__string";
-		public static const type_u8_u30__register:String="u8_u30__register";
+		public static const type_u8_u30__value_int:String="u8_u30__value_int";
+		public static const type_u8_u30__scope:String="u8_u30__scope";
 		public static const type_u8_u30__slot:String="u8_u30__slot";
+		public static const type_u8_u30__register:String="u8_u30__register";
+		public static const type_u8_u30__args:String="u8_u30__args";
 		public static const type_u8_u30__int:String="u8_u30__int";
 		public static const type_u8_u30__uint:String="u8_u30__uint";
 		public static const type_u8_u30__double:String="u8_u30__double";
+		public static const type_u8_u30__string:String="u8_u30__string";
 		public static const type_u8_u30__namespace_info:String="u8_u30__namespace_info";
+		public static const type_u8_u30__multiname_info:String="u8_u30__multiname_info";
 		public static const type_u8_u30__method:String="u8_u30__method";
 		public static const type_u8_u30__class:String="u8_u30__class";
 		public static const type_u8_u30__exception_info:String="u8_u30__exception_info";
-		public static const type_u8_u30__scope:String="u8_u30__scope";
 		public static const type_u8_u30__finddef:String="u8_u30__finddef";
-		public static const type_u8_u30__args:String="u8_u30__args";
-		public static const type_u8_u30__value_int:String="u8_u30__value_int";
 		
 		public static const dataType_u8_u30_u30:String="u8_u30_u30";
+		public static const type_u8_u30_u30__register_register:String="u8_u30_u30__register_register";
 		public static const type_u8_u30_u30__multiname_info_args:String="u8_u30_u30__multiname_info_args";
 		public static const type_u8_u30_u30__method_args:String="u8_u30_u30__method_args";
-		public static const type_u8_u30_u30__register_register:String="u8_u30_u30__register_register";
 		
 		public static const dataType_u8_s24:String="u8_s24";
 		public static const type_u8_s24__branch:String="u8_s24__branch";

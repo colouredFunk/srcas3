@@ -8,29 +8,9 @@ AdvanceCode 版本:v1.0
 */
 
 package zero.swf.avm2.advances{
-	public class AdvanceCode{
+	public class AdvanceCode extends BaseCode{
 		public var op:int;
-		
-		public var args:int;
-		public var scope:int;
-		public var value:int;
-		public var slot:int;
-		public var register:int;
-		public var register2:int;
-		
-		public var integer:int;
-		public var uinteger:int;
-		public var double:Number;
-		public var string:String;
-		public var namespace_info:AdvanceNamespace_info;
-		public var multiname_info:AdvanceMultiname_info;
-		public var method:AdvanceMethod;
-		public var clazz:AdvanceClass;
-		
-		public var labelMark:LabelMark;
-		
-		public function AdvanceCode(){
-		}
+		public var value:*;
 	}
 }
 
