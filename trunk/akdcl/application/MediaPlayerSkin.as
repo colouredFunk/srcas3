@@ -17,38 +17,37 @@ package akdcl.application{
 		public var btnPlayStop:*;
 		public var btnNext:*;
 		public var btnPrev:*;
-		
 		public var btnVolume:*;
 		public var barVolume:*;
 		public var barPlayProgress:*;
 		public var barLoadProgress:*;
 		
 		protected var player:MediaPlayer;
-		public function MediaPlayerSkin() {
-			
+		override protected function onRemoveToStageHandler():void {
+			super.onRemoveToStageHandler();
 		}
 		public function setPlayer(_player:MediaPlayer):void {
 			player = _player;
 			if (btnPlay) {
-				btnPlay.release = player.play();
+				btnPlay.release = player.play;
 			}
 			if (btnPause) {
-				btnPause.release = player.pause();
+				btnPause.release = player.pause;
 			}
 			if (btnStop) {
-				btnStop.release = player.stop();
+				btnStop.release = player.stop;
 			}
 			if (btnPlayPause) {
-				btnPlayPause.release = player.playOrPause();
+				btnPlayPause.release = player.playOrPause;
 			}
 			if (btnPlayStop) {
-				btnPlayStop.release = player.playOrStop();
+				btnPlayStop.release = player.playOrStop;
 			}
 			if (btnNext) {
-				btnNext.release = player.next();
+				btnNext.release = player.next;
 			}
 			if (btnPrev) {
-				btnPrev.release = player.prev();
+				btnPrev.release = player.prev;
 			}
 			if (btnVolume) {
 				btnVolume.release = function():void {
@@ -58,14 +57,19 @@ package akdcl.application{
 			if (barVolume) {
 				barVolume.maximum = 1;
 				barVolume.snapInterval = MediaPlayer.VALUE_PERCENTAGE;
+				barVolume.value = player.volume;
 				barVolume.change = function(_value:Number):void {
 					player.volume = _value;
 				}
 			}
 			if (barPlayProgress) {
+				if (barPlayProgress.barLoadProgress) {
+					barLoadProgress = barPlayProgress.barLoadProgress;
+				}
 				barPlayProgress.maximum = 1;
 				barPlayProgress.snapInterval = MediaPlayer.VALUE_PERCENTAGE;
-				barPlayProgress.press = barPlayProgress.change = function(_value:Number):void {
+				//barPlayProgress.press = 
+				barPlayProgress.change = function(_value:Number):void {
 					if (barPlayProgress.isHold) {
 						
 					}
@@ -74,25 +78,31 @@ package akdcl.application{
 					player.playProgress = barPlayProgress.value * 0.99;
 				}
 			}
+			if (barLoadProgress) {
+				barLoadProgress.maximum = 1;
+				barLoadProgress.snapInterval = MediaPlayer.VALUE_PERCENTAGE;
+				barLoadProgress.enabled = false;
+			}
 			player.addEventListener(MediaEvent.STATE_CHANGE, onStateChangeHandler);
 			player.addEventListener(MediaEvent.VOLUME_CHANGE, onVolumeChangeHandler);
 			player.addEventListener(MediaEvent.PLAY_PROGRESS, onPlayProgressHandler);
+			player.addEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
 		}
 		protected function onStateChangeHandler(_evt:MediaEvent):void {
 			if (btnPlay) {
 				btnPlay.select = player.playState == MediaPlayer.STATE_PLAY;
+			}
+			if (btnPlayPause) {
+				btnPlayPause.select = player.playState == MediaPlayer.STATE_PLAY;
+			}
+			if (btnPlayStop) {
+				btnPlayStop.select = player.playState == MediaPlayer.STATE_PLAY;
 			}
 			if (btnPause) {
 				btnPause.select = player.playState == MediaPlayer.STATE_PAUSE;
 			}
 			if (btnStop) {
 				btnStop.select = player.playState == MediaPlayer.STATE_STOP;
-			}
-			if (btnPlayPause) {
-				btnPlayPause.select = player.playState == MediaPlayer.STATE_PAUSE;
-			}
-			if (btnPlayStop) {
-				btnPlayStop.select = player.playState == MediaPlayer.STATE_STOP;
 			}
 			switch(player.playState) {
 				case MediaPlayer.STATE_PLAY:
@@ -114,6 +124,11 @@ package akdcl.application{
 		protected function onPlayProgressHandler(_evt:MediaEvent):void {
 			if (barPlayProgress && !barPlayProgress.isHold) {
 				barPlayProgress.value = player.playProgress;
+			}
+		}
+		protected function onLoadProgressHandler(_evt:MediaEvent):void {
+			if (barLoadProgress) {
+				barLoadProgress.value = player.loadProgress;
 			}
 		}
 	}

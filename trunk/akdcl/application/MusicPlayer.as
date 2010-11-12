@@ -70,7 +70,7 @@
 					return 1;
 				}
 			}else if (sound) {
-				return sound.loaded;
+				return sound.loadProgress;
 			}else{
 				return 0;
 			}
@@ -85,7 +85,7 @@
 					return 0;
 				}
 			}else if (sound) {
-				return sound.played;
+				return sound.playProgress;
 			}else{
 				return 0;
 			}
