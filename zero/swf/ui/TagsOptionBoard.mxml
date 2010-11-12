@@ -102,7 +102,7 @@ TagsOptionBoard 版本:v1.0
 			import zero.swf.avm2.AVM2Obj;
 			import zero.swf.avm2.ABCFileWithSimpleConstant_pool;
 			import zero.swf.avm2.ABCFile;
-			import zero.swf.avm2.ABCFileAdvance;
+			import zero.swf.tagBodys.DoABCWithoutFlagsAndName;
 			
 			private static const settingFolderPath:String=("file:///"+decodeURI(File.applicationDirectory.nativePath+"/setting")+"/").replace(/\\/g,"/");
 			private static const optionsFolderPath:String=settingFolderPath+"options/";
@@ -130,7 +130,8 @@ TagsOptionBoard 版本:v1.0
 				if(settingFile.exists){
 					settingXML=new XML(FileAndStr.readStrFromFile(settingFile));
 				}else{
-					settingXML=<setting selectedOptionName="输出位图为资源"/>;
+					//settingXML=<setting selectedOptionName="输出位图为资源"/>;
+					settingXML=<setting selectedOptionName="AS3代码"/>;
 				}
 				
 				var optionsFolder:File=new File(optionsFolderPath);
@@ -477,23 +478,12 @@ TagsOptionBoard 版本:v1.0
 				if(outputDoABCLevelStr){
 					return int(outputDoABCLevelStr);
 				}
-				switch(AVM2Obj.ABCFileClass){
-					case ABCFile:
-						return 1;
-					break;
-					//default:
-					//	throw new Error("被我注掉了");
-					//break;
-					case ABCFileAdvance:
-						return 2;
-					break;
-					//default:
-					//	return 0;
-					//break;
-				}
-				return 0;
+				return DoABCWithoutFlagsAndName.getDecodeABCLevel();
 			}
 			public static function set outputDoABCLevel(_outputDoABCLevel:int):void{
+				if(_outputDoABCLevel<0){
+					_outputDoABCLevel=0;
+				}
 				settingXML.@outputDoABCLevel=_outputDoABCLevel;
 				if(instance){
 					instance["rbOutputDoABCLevel"+_outputDoABCLevel].selected=true;

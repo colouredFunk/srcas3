@@ -13,10 +13,13 @@ package zero.swf.avm2.advances{
 	import zero.swf.avm2.AVM2Obj;
 	
 	public class Advance{
+		public static var test_tempArr:Array;
 		//public static var test_total_new:int;
 		public function Advance(){
 			//trace(this+", test_total_new="+(++test_total_new));
 		}
+		
+		
 		public function initByInfo_fun(avm2Obj:AVM2Obj,memberV:Vector.<Member>,...rests):void{
 			var restId:int=0;
 			for each(var member:Member in memberV){

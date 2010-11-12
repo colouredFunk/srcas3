@@ -60,6 +60,7 @@ package zero.ui{
 				btn=null;
 			}
 			ComboBoxManager.clearCb(cb);
+			cb.removeEventListener(Event.CHANGE,change);//20101112
 			if(__file){
 				__file.removeEventListener(Event.SELECT,select);
 				__file.removeEventListener((getDefinitionByName("flash.events.FileListEvent") as Object).SELECT_MULTIPLE,selectMultiple);
@@ -129,6 +130,7 @@ package zero.ui{
 					}else{
 						ComboBoxManager.addCb(cb,so,saveId);
 					}
+					cb.addEventListener(Event.CHANGE,change);//20101112
 					
 					//trace("cb.text="+cb.text);
 					
@@ -302,7 +304,7 @@ package zero.ui{
 			dataV[currId]=fr.data;
 			loadNextData();
 		}
-		private function change():void{
+		private function change(...args):void{
 			try{
 				__file.url=cb.text;
 			}catch(e:Error){

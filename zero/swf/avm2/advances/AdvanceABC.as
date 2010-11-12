@@ -179,7 +179,7 @@ package zero.swf.avm2.advances{
 		private var stringV:Vector.<String>;
 		private var namespace_infoV:Vector.<AdvanceNamespace_info>;
 		private var ns_set_infoV:Vector.<AdvanceNs_set_info>;
-		private var multiname_infoV:Vector.<AdvanceMultiname_info>;
+		public var multiname_infoV:Vector.<AdvanceMultiname_info>;
 		private var metadata_infoV:Vector.<AdvanceMetadata_info>;
 		private var methodV:Vector.<AdvanceMethod>;
 		public var classV:Vector.<AdvanceClass>;
@@ -243,6 +243,7 @@ package zero.swf.avm2.advances{
 			
 			method_body_info_arr=null;
 			
+			/*
 			currInstance=null;
 			
 			for each(memberType in Member.typeV){
@@ -253,6 +254,7 @@ package zero.swf.avm2.advances{
 					}
 				}
 			}
+			*/
 		}
 		public function getInfoByIdAndMemberType(id:int,memberType:String):*{
 			if(id==0){
@@ -442,20 +444,61 @@ package zero.swf.avm2.advances{
 		
 		////
 	CONFIG::toXMLAndInitByXML {
+		private var specialTempId:int;
 		public function toXML(xmlName:String):XML{
 			//trace("toXML========================================");
 			
 			//为各级 toXML 作准备
 			//test_total_new=0;
+			
+			marks=new Object();
+			//for each(memberType in Member.typeV){
+			//	if(Member.fromABCFileMark[memberType]){
+			//		marks[memberType]=new Object();
+			//	}
+			//}
+			marks["specials"]=new Object();
+			specialTempId=0;
+			
 			currInstance=this;
 			//准备完毕
 			
+			
 			var xml:XML=toXML_fun(memberV,xmlName);
+			
+			var specialsXML:XML=<specials/>;
+			var specialsCount:int=0;
+			for(var specialName:String in marks["specials"]){
+				specialsCount++;
+				var specialXML:XML=<special name={specialName.substr(1)}/>;
+				specialXML.appendChild(marks["specials"][specialName]);
+				specialsXML.appendChild(specialXML);
+			}
+			if(specialsCount){
+				specialsXML.@count=specialsCount;
+				xml.appendChild(specialsXML);
+			}
 			
 			currInstance=null;
 			
 			return xml;
 		}
+		
+		/*
+		public function addSpecial(specialName:String,specialXML:XML):String{
+			if(specialName){
+			}else{
+				do{
+					specialName="temp"+(specialTempId++);
+				}while(marks["specials"]["~"+specialName]);
+			}
+			if(marks["specials"]["~"+specialName]){
+				throw new Error("重复的 specialName: "+specialName);
+			}
+			marks["specials"]["~"+specialName]=specialXML;
+			return specialName;
+		}
+		*/
 		
 		public function getInfoListXMLByInfoVAndMemberType(advance:Advance,name:String,memberType:String):XML{
 			return advance.getInfoListXMLByInfoV(
@@ -522,16 +565,40 @@ package zero.swf.avm2.advances{
 					return AdvanceDefaultMultiname_info.instance;
 				}
 			}
+			
+			//- -
+			var oldXMLName:String=xml.name().toString();
+			xml.setName(memberType);
 			var markKey:String=xml.toXMLString();
+			xml.setName(oldXMLName);
+			
 			var info:*=marks[memberType][markKey];
+			
+			/*
+			if(memberType==Member.MULTINAME_INFO){
+				trace("markKey="+markKey);
+				trace("info="+info);
+			}
+			//*/
+			
 			if(info){
 			}else{
 				marks[memberType][markKey]=info=new MemberClasses[memberType]();
 				info.initByXML(xml);
 				this[memberType+"V"][this[memberType+"V"].length]=info;
 			}
+			
+			/*
+			if(memberType==Member.MULTINAME_INFO){
+				trace("info.infoId="+info.infoId);
+				trace("--------------------------------------------------------------");
+			}
+			//*/
+			
 			return info;
 		}
+		
+		///*
 		public function getInfoByMarkKeyAndMemberType(markKey:String,memberType:String):*{
 			var info:*=marks[memberType][markKey];
 			if(info){
@@ -540,6 +607,8 @@ package zero.swf.avm2.advances{
 			}
 			return info;
 		}
+		//*/
+		
 		public function getInfoVByInfoListXMLAndMemberType(advance:Advance,name:String,xml:XML,memberType:String):void{
 			var infoXMLList:XMLList=xml[name+"List"][0][name];
 			var i:int=-1;

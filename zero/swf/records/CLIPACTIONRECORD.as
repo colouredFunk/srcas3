@@ -32,7 +32,6 @@ package zero.swf.records{
 			if(EventFlags.ClipEventKeyPress){
 				KeyCode=data[offset++];
 			}
-			
 			Actions=new ACTIONRECORD();
 			return Actions.initByData(data,offset,endOffset);
 		}

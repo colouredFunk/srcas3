@@ -35,6 +35,7 @@ AdvanceMultiname_info 版本:v1.0
 package zero.swf.avm2.advances{
 	import zero.swf.avm2.Multiname_info;
 	import zero.swf.vmarks.MultinameKind;
+	import zero.swf.vmarks.NamespaceKind;
 	
 	public class AdvanceMultiname_info extends Advance{
 		
@@ -71,6 +72,7 @@ package zero.swf.avm2.advances{
 		]);
 		
 		private var infoId:int;	//从 swf 或 xml 直接读取过来的 id
+		//public var infoId:int;	//测试
 		
 		public var kind:int;
 		
@@ -277,6 +279,19 @@ package zero.swf.avm2.advances{
 		}
 		public function initByXML(xml:XML):void{
 			infoId=int(xml.@infoId.toString());
+			
+			/*
+			if(test_tempArr){
+			}else{
+				test_tempArr=new Array();
+			}
+			if(test_tempArr[infoId]){
+				throw new Error("重复 initByXML, infoId="+infoId);
+			}
+			test_tempArr[infoId]=true;
+			//*/
+			
+			//trace("initByXML infoId="+infoId);
 			
 			switch(MultinameKind[xml.@kind.toString()]){
 				case MultinameKind.QName:

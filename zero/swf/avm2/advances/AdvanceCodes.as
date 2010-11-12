@@ -168,21 +168,49 @@ package zero.swf.avm2.advances{
 							case Op.dataType_u8_s24_u30_s24List:
 								
 								//Op.type_u8_s24_u30_s24List__lookupswitch
-								throw new Error("未处理, op="+advanceCode.op+", opDataType="+opDataType);
-								/*
-								advanceCode.value={default_offset:data[offset++]|(data[offset++]<<8)|(data[offset++]<<16)};
-								if(advanceCode.value.default_offset&0x00008000){advanceCode.value.default_offset|=0xffff0000}//最高位为1,表示负数
+								
+								//The base location is the address of the lookupswitch instruction itself.
+								var lookupswitch_startOffset:int=offset-1;
+								
+								jumpOffset=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16);
+								if(jumpOffset&0x00008000){jumpOffset|=0xffff0000}//最高位为1,表示负数
+								
+								jumpPos=lookupswitch_startOffset+jumpOffset;
+								
+								if(jumpPos<0||jumpPos>endOffset){
+									throw new Error("可能是扰码: offset="+offset+", jumpPos="+jumpPos+", 跳转命令只允许跳至代码开头和代码末尾+1之间的位置");
+								}
+								labelMark=labelMarkArr[jumpPos];
+								if(labelMark){
+								}else{
+									labelMarkArr[jumpPos]=labelMark=new LabelMark();
+									labelMark.labelId=labelId++;
+								}
+								advanceCode.value={default_offset:labelMark};
 								
 								if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var case_count:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{case_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{case_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{case_count=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{case_count=data[offset++];}
 								//case_count
 								
 								case_count++;
-								advanceCode.value.case_offsetV=new Vector.<int>(case_count);
+								advanceCode.value.case_offsetV=new Vector.<LabelMark>(case_count);
 								for(var i:int=0;i<case_count;i++){
-									advanceCode.value.case_offsetV[i]=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16);
-									if(advanceCode.value.case_offsetV[i]&0x00008000){advanceCode.value.case_offsetV[i]|=0xffff0000}//最高位为1,表示负数
+									//Op.type_u8_s24_u30_s24List__lookupswitch
+									jumpOffset=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16);
+									if(jumpOffset&0x00008000){jumpOffset|=0xffff0000}//最高位为1,表示负数
+									
+									jumpPos=lookupswitch_startOffset+jumpOffset;
+									
+									if(jumpPos<0||jumpPos>endOffset){
+										throw new Error("可能是扰码: offset="+offset+", jumpPos="+jumpPos+", 跳转命令只允许跳至代码开头和代码末尾+1之间的位置");
+									}
+									labelMark=labelMarkArr[jumpPos];
+									if(labelMark){
+									}else{
+										labelMarkArr[jumpPos]=labelMark=new LabelMark();
+										labelMark.labelId=labelId++;
+									}
+									advanceCode.value.case_offsetV[i]=labelMark;
 								}
-								*/
 							break;
 							case Op.dataType_u8_u8_u30_u8_u30:
 								
@@ -229,17 +257,19 @@ package zero.swf.avm2.advances{
 		public function toData(exception_infoV:Vector.<AdvanceException_info>):ByteArray{
 			var data:ByteArray=new ByteArray();
 			
-			var labelMarkArr:Array=new Array();
+			var posMarkArr:Array=new Array();//记录 branch, newcatch, lookupswitch 的位置及相关的 label 位置
 			
 			var offset:int=0;
 			
 			var u30_1:int,u30_2:int,jumpOffset:int;
 			
+			var advanceCode:AdvanceCode,labelMark:LabelMark;
+			
 			for each(var baseCode:BaseCode in codeV){
 				if(baseCode is LabelMark){
 					(baseCode as LabelMark).pos=offset;
 				}else{
-					var advanceCode:AdvanceCode=baseCode as AdvanceCode;
+					advanceCode=baseCode as AdvanceCode;
 					data[offset++]=advanceCode.op;
 					
 					var opDataType:String=Op.opDataTypeV[advanceCode.op];
@@ -288,7 +318,7 @@ package zero.swf.avm2.advances{
 									case Op.type_u8_u30__exception_info:
 										u30_1=exception_infoV.length;
 										exception_infoV[u30_1]=advanceCode.value.exception_info;
-										throw new Error("计算位置");
+										posMarkArr[offset]=advanceCode;
 									break;
 									case Op.type_u8_u30__finddef:
 										throw new Error("未处理, op="+advanceCode.op+", opType="+Op.opTypeV[advanceCode.op]);
@@ -327,12 +357,33 @@ package zero.swf.avm2.advances{
 								data[offset++]=0x00;
 								data[offset++]=0x00;
 								data[offset++]=0x00;
-								labelMarkArr[offset]=advanceCode.value;
+								posMarkArr[offset]=advanceCode.value;
 							break;
 							
 							case Op.dataType_u8_s24_u30_s24List:
 								//Op.type_u8_s24_u30_s24List__lookupswitch
-								throw new Error("未处理, op="+advanceCode.op+", opDataType="+opDataType);
+								
+								//The base location is the address of the lookupswitch instruction itself.
+								posMarkArr[offset-1]=advanceCode;
+								
+								advanceCode.value.default_offset_startPos=offset;
+								
+								//先用 0 占位，后面一次性写入
+								data[offset++]=0x00;
+								data[offset++]=0x00;
+								data[offset++]=0x00;
+								
+								var case_count:int=advanceCode.value.case_offsetV.length-1;
+								if(case_count>>>7){if(case_count>>>14){if(case_count>>>21){if(case_count>>>28){data[offset++]=(case_count&0x7f)|0x80;data[offset++]=((case_count>>>7)&0x7f)|0x80;data[offset++]=((case_count>>>14)&0x7f)|0x80;data[offset++]=((case_count>>>21)&0x7f)|0x80;data[offset++]=case_count>>>28;}else{data[offset++]=(case_count&0x7f)|0x80;data[offset++]=((case_count>>>7)&0x7f)|0x80;data[offset++]=((case_count>>>14)&0x7f)|0x80;data[offset++]=case_count>>>21;}}else{data[offset++]=(case_count&0x7f)|0x80;data[offset++]=((case_count>>>7)&0x7f)|0x80;data[offset++]=case_count>>>14;}}else{data[offset++]=(case_count&0x7f)|0x80;data[offset++]=case_count>>>7;}}else{data[offset++]=case_count;}
+								//case_count
+								
+								advanceCode.value.case_offset_startPos=offset;
+								for each(labelMark in advanceCode.value.case_offsetV){
+									//先用 0 占位，后面一次性写入
+									data[offset++]=0x00;
+									data[offset++]=0x00;
+									data[offset++]=0x00;
+								}
 							break;
 							
 							case Op.dataType_u8_u8_u30_u8_u30:
@@ -361,11 +412,39 @@ package zero.swf.avm2.advances{
 			
 			var endOffset:int=data.length;
 			for(offset=0;offset<=endOffset;offset++){
-				if(labelMarkArr[offset]){
-					jumpOffset=labelMarkArr[offset].pos-offset;
-					data[offset-3]=jumpOffset;
-					data[offset-2]=jumpOffset>>8;
-					data[offset-1]=jumpOffset>>16;
+				if(posMarkArr[offset]){
+					if(posMarkArr[offset] is LabelMark){
+						labelMark=posMarkArr[offset];
+						jumpOffset=labelMark.pos-offset;
+						data[offset-3]=jumpOffset;
+						data[offset-2]=jumpOffset>>8;
+						data[offset-1]=jumpOffset>>16;
+					}else{
+						advanceCode=posMarkArr[offset];
+						if(advanceCode.op==Op.newcatch){
+							advanceCode.value.exception_info.from=advanceCode.value.from.pos;
+							advanceCode.value.exception_info.to=advanceCode.value.to.pos;
+							advanceCode.value.exception_info.target=advanceCode.value.target.pos;
+						}else if(advanceCode.op==Op.lookupswitch){
+							var case_offset:int;
+							
+							labelMark=advanceCode.value.default_offset;
+							jumpOffset=labelMark.pos-offset;
+							case_offset=advanceCode.value.default_offset_startPos;
+							data[case_offset++]=jumpOffset;
+							data[case_offset++]=jumpOffset>>8;
+							data[case_offset++]=jumpOffset>>16;
+							case_offset=advanceCode.value.case_offset_startPos;
+							for each(labelMark in advanceCode.value.case_offsetV){
+								jumpOffset=labelMark.pos-offset;
+								data[case_offset++]=jumpOffset;
+								data[case_offset++]=jumpOffset>>8;
+								data[case_offset++]=jumpOffset>>16;
+							}
+						}else{
+							throw new Error("发现 posMarkArr 里的奇怪的 advanceCode, advanceCode.op="+advanceCode.op);
+						}
+					}
 				}
 			}
 			
@@ -374,13 +453,16 @@ package zero.swf.avm2.advances{
 		////
 		CONFIG::toXMLAndInitByXML {
 		public function toXML(xmlName:String):XML{
+			var advanceCode:AdvanceCode,labelMark:LabelMark;
+			var stringXML:XML=<string/>;//用来转换字符串的
+			//var specialXMLMark:Object=new Object();//用来记录一些实在不适合在汇编码里显示的东西，例如匿名函数
 			if(codeV.length){
 				var codesStr:String="";
 				for each(var baseCode:BaseCode in codeV){
 					if(baseCode is LabelMark){
 						codesStr+="\t\t\t\tlabel"+(baseCode as LabelMark).labelId+":\n";
 					}else{
-						var advanceCode:AdvanceCode=baseCode as AdvanceCode;
+						advanceCode=baseCode as AdvanceCode;
 						codesStr+="\t\t\t\t\t"+Op.opNameV[advanceCode.op];
 						var opType:String=Op.opTypeV[advanceCode.op];
 						
@@ -399,7 +481,8 @@ package zero.swf.avm2.advances{
 									codesStr+=" "+advanceCode.value;
 								break;
 								case Op.type_u8_u30__string:
-									codesStr+=" \""+(<xml value={advanceCode.value}/>).@value.toString()+"\"";//- -
+									stringXML.@value=advanceCode.value;
+									codesStr+=" "+stringXML.toXMLString().replace(/<string value=(".*")\/>/,"$1").replace(/>/g,"&gt;");//- -
 								break;
 								case Op.type_u8_u30__namespace_info:
 									codesStr+=" "+advanceCode.value.toXML("namespace_info").toXMLString().replace(/[\r\n]+/g,"");
@@ -409,6 +492,7 @@ package zero.swf.avm2.advances{
 								break;
 								case Op.type_u8_u30__method:
 									codesStr+=" "+advanceCode.value.toXML("method").toXMLString().replace(/[\r\n]+/g,"");
+									//codesStr+=" "+AdvanceABC.currInstance.addSpecial(null,advanceCode.value.toXML("method"));
 								break;
 								case Op.type_u8_u30__class:
 									codesStr+=" "+advanceCode.value.getMarkKey();
@@ -435,11 +519,14 @@ package zero.swf.avm2.advances{
 								break;
 								
 								case Op.type_u8_s24_u30_s24List__lookupswitch:
-									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
+									codesStr+=" label"+advanceCode.value.default_offset.labelId;
+									for each(labelMark in advanceCode.value.case_offsetV){
+										codesStr+=" label"+labelMark.labelId;
+									}
 								break;
 								
 								case Op.type_u8_u8_u30_u8_u30__debug:
-									codesStr+=" "+advanceCode.value.debug_type+" \""+(<xml value={advanceCode.value.index}/>).@value.toString()+"\" "+advanceCode.value.reg+" "+advanceCode.value.extra;//- -
+									codesStr+=" "+advanceCode.value.debug_type+" "+stringXML.toXMLString().replace(/<string value=(".*")\/>/,"$1").replace(/>/g,"&gt;")+" "+advanceCode.value.reg+" "+advanceCode.value.extra;//- -
 								break;
 								
 								default:
@@ -450,6 +537,7 @@ package zero.swf.avm2.advances{
 						codesStr+="\n";
 					}
 				}
+				
 				return new XML("<"+xmlName+"><![CDATA[\n"+
 					codesStr
 					+"\t\t\t\t]]></"+xmlName+">");
@@ -466,7 +554,8 @@ package zero.swf.avm2.advances{
 			var i:int=codeStrArr.length;
 			var labelMarkMark:Object=new Object();
 			var labelMark:LabelMark;
-			var matchArr:Array,numStrArr:Array;
+			var matchArr:Array,matchStr:String,numStrArr:Array;
+			
 			while(--i>=0){
 				codeStrArr[i]=codeStr=codeStrArr[i].replace(/^\s*|\s*$/g,"");
 				if(codeStr){
@@ -527,7 +616,7 @@ package zero.swf.avm2.advances{
 									advanceCode.value=Number(codeStr.replace(/\s+/g,""));
 								break;
 								case Op.type_u8_u30__string:
-									advanceCode.value=codeStr.replace(/"(.*)"/,"$1");
+									advanceCode.value=new XML("<string value="+codeStr+"/>").@value.toString();//- -
 								break;
 								case Op.type_u8_u30__namespace_info:
 									advanceCode.value=AdvanceABC.currInstance.getInfoByXMLAndMemberType(new XML(codeStr),Member.NAMESPACE_INFO);
@@ -609,14 +698,31 @@ package zero.swf.avm2.advances{
 									}
 								break;
 								case Op.type_u8_s24_u30_s24List__lookupswitch:
-									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
+									matchArr=codeStr.match(/label\d+/g);
+									matchStr=matchArr.shift();
+									labelMark=labelMarkMark[matchStr+":"];
+									if(labelMark){
+										advanceCode.value={default_offset:labelMark};
+									}else{
+										throw new Error("找不到对应的 labelMark: "+matchStr);
+									}
+									advanceCode.value.case_offsetV=new Vector.<LabelMark>();
+									i=0;
+									for each(matchStr in matchArr){
+										labelMark=labelMarkMark[matchStr+":"];
+										if(labelMark){
+											advanceCode.value.case_offsetV[i++]=labelMark;
+										}else{
+											throw new Error("找不到对应的 labelMark: "+matchStr);
+										}
+									}
 								break;
 								case Op.type_u8_u8_u30_u8_u30__debug:
 									matchArr=codeStr.match(/".*"/);
 									numStrArr=codeStr.replace(matchArr[0],"").split(/\s+/);
 									advanceCode.value={
 										debug_type:int(numStrArr[0]),
-										index:matchArr[0].replace(/"(.*)"/,"$1"),
+										index:new XML("<string value="+matchArr[0]+"/>").@value.toString(),//- -
 										reg:int(numStrArr[1]),
 										extra:int(numStrArr[2])
 									}

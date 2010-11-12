@@ -12,8 +12,6 @@ package zero.swf.funs{
 	import zero.swf.SWF2;
 	import zero.swf.Tag;
 	import zero.swf.TagType;
-	import zero.swf.avm2.AVM2Obj;
-	import zero.swf.avm2.ABCFile;
 	import zero.swf.tagBodys.DoABC;
 	import zero.swf.tagBodys.DoABCWithoutFlagsAndName;
 	import zero.swf.tagBodys.SymbolClass;
@@ -28,11 +26,6 @@ package zero.swf.funs{
 			//把 DoABC 或 DoABCWithoutFlagsAndName 的 abcData 里的 stringV 里的特定的字符串替换成特定的字符串
 			DoABC;
 			DoABCWithoutFlagsAndName;
-			
-			//AVM2Obj.activateClass(ABCFileWithSimpleConstant_pool);
-			//AVM2Obj.decodeLevel=0;
-			
-			AVM2Obj.ABCFileClass=ABCFile;
 			
 			var str0:String;
 			var i:int;
@@ -61,11 +54,11 @@ package zero.swf.funs{
 				switch(tag.type){
 					case TagType.DoABC:
 					case TagType.DoABCWithoutFlagsAndName:
-						var abcData:ABCFile=tag.getBody().ABCData as ABCFile;
+						var abcData:*=tag.getBody().ABCData;
 						i=abcData.stringV.length;
 						while(--i>=0){
 							strt=mark["~"+abcData.stringV[i]];
-							if(strt){
+							if(strt is String){
 								abcData.stringV[i]=strt;
 							}
 						}
@@ -87,7 +80,7 @@ package zero.swf.funs{
 						i=NameV.length;
 						while(--i>=0){
 							strt=mark["~"+NameV[i]];
-							if(strt){
+							if(strt is String){
 								NameV[i]=strt;
 							}
 						}
