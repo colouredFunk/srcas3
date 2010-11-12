@@ -21,33 +21,32 @@ package akdcl.media
 			}
 			return _sound;
 		}
-		public static function playSound(_source:String, _position:uint = 0, _soundTransform:SoundTransform = null):void {
-			var _sound:akdcl.media.Sound = loadSound(_source);
-			_sound.play(_position, 0, _soundTransform);
-		}
-		public var userData:Object;
+		
 		protected var soundChannel:SoundChannel;
 		public function Sound(_source:String = null) {
 			if (_source) {
 				this.loadSound(_source);
 			}
 		}
-		public function get loaded():Number {
-			var _loaded:Number = bytesLoaded / bytesTotal;
-			if (isNaN(_loaded)) {
-				_loaded = 0;
+		public function get loadProgress():Number {
+			var _loadProgress:Number = bytesLoaded / bytesTotal;
+			if (isNaN(_loadProgress)) {
+				_loadProgress = 0;
 			}
-			return _loaded;
+			return _loadProgress;
 		}
-		public function get played():Number {
-			var _played:Number = position / totalTime;
-			if (isNaN(_played)) {
-				_played = 0;
+		public function get playProgress():Number {
+			var _playProgress:Number = position / totalTime;
+			if (isNaN(_playProgress)) {
+				_playProgress = 0;
 			}
-			return _played;
+			return _playProgress;
+		}
+		public function set playProgress(_playProgress:Number):void {
+			position = _playProgress * totalTime;
 		}
 		public function get totalTime():uint {
-			return length / loaded;
+			return length / loadProgress;
 		}
 		public function get position():uint {
 			if (soundChannel) {
@@ -56,7 +55,13 @@ package akdcl.media
 				return 0;
 			}
 		}
-		private var __volume:Number;
+		public function set position(_position:uint):void {
+			if (soundChannel) {
+				stop();
+			}
+			play(_position);
+		}
+		private var __volume:Number = 0.8;
 		public function get volume():Number{
 			return __volume;
 		}
@@ -65,21 +70,40 @@ package akdcl.media
 				_volume = 0;
 			}else if (_volume>1) {
 				_volume=1
-			}else if (_volume==__volume) {
-				return;
 			}
 			__volume = _volume;
-			setVolume(__volume);
-		}
-		protected function setVolume(_volume:Number):void  {
 			if(soundChannel) {
 				var _trans:SoundTransform = soundChannel.soundTransform;
 				_trans.volume = _volume;
 				soundChannel.soundTransform = _trans;
 			}
 		}
-		public function stop(_isClose:Boolean = true):void {
-			removeChannel();
+		public function loadSound(_source:String):akdcl.media.Sound {
+			soundDic[_source] = this;
+			load(new URLRequest(_source), new SoundLoaderContext(1000, true));
+			return this;
+		}
+		override public function play(startTime:Number = 0, loops:int = 0, sndTransform:SoundTransform = null):SoundChannel {
+			if (startTime > totalTime * loadProgress) {
+				startTime = totalTime * loadProgress * 0.99;
+			}
+			if (positionPause > 0 && startTime != 0) {
+				startTime = positionPause;
+			}
+			positionPause = 0;
+			var _soundChannel:SoundChannel = super.play(startTime, loops, sndTransform);
+			addChannel(_soundChannel);
+			return _soundChannel;
+		}
+		protected var positionPause:uint;
+		public function pause():void {
+			positionPause = positionPause?positionPause:position;
+			removeChannel(soundChannel);
+		}
+		public function stop(_isClose:Boolean = false):void {
+			positionPause = 0;
+			removeChannel(soundChannel);
+			soundChannel = null;
 			if (_isClose) {
 				try {
 					close();
@@ -89,26 +113,16 @@ package akdcl.media
 				//removeFrom?
 			}
 		}
-		public function loadSound(_source:String):akdcl.media.Sound {
-			soundDic[_source] = this;
-			load(new URLRequest(_source), new SoundLoaderContext(1000, true));
-			return this;
-		}
-		override public function play(startTime:Number = 0, loops:int = 0, sndTransform:SoundTransform = null):SoundChannel 
-		{
-			var _soundChannel:SoundChannel = super.play(startTime, loops, sndTransform);
-			addChannel(_soundChannel);
-			return _soundChannel;
-		}
 		protected function addChannel(_soundChannel:SoundChannel):void {
-			removeChannel();
+			removeChannel(soundChannel);
 			soundChannel = _soundChannel;
+			volume = volume;
 			soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundPlayCompleteHandle);
 		}
-		protected function removeChannel():void {
-			if (soundChannel) {
-				soundChannel.stop();
-				soundChannel.removeEventListener(Event.SOUND_COMPLETE, onSoundPlayCompleteHandle);
+		protected function removeChannel(_soundChannel:SoundChannel):void {
+			if (_soundChannel) {
+				_soundChannel.stop();
+				_soundChannel.removeEventListener(Event.SOUND_COMPLETE, onSoundPlayCompleteHandle);
 			}
 		}
 		protected function onSoundPlayCompleteHandle(_evt:Event):void {
