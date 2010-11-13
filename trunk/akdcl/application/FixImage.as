@@ -164,6 +164,7 @@ package akdcl.application{
 				formVariables.add(_i, _data[_i]);
 			}
 		}
+		protected var matrixTemp:Matrix = new Matrix();
 		public function upload(_url:String, _quality:uint = 80, _isGBKData:Boolean = false, ...args):URLLoader {
 			if (!__bitmapData) {
 				return null;
@@ -180,10 +181,10 @@ package akdcl.application{
 					bitmapTemp.bitmapData = __bitmapData;
 					bitmapTemp.smoothing = true;
 					bitmapTemp.width = int(args[_i + 1]) || bitmapTemp.width;
-					bitmapTemp.scaleY = bitmapTemp.scaleX;
+					matrixTemp.a = matrixTemp.d = bitmapTemp.scaleY = bitmapTemp.scaleX;
 					bitmapTemp.height = Math.round(bitmapTemp.height);
 					_bmd = new BitmapData(bitmapTemp.width, bitmapTemp.height, true, 0x000000);
-					_bmd.draw(bitmapTemp);
+					_bmd.draw(bitmapTemp, matrixTemp);
 					formVariables.addFile(args[_i], _jpgEncoder.encode(_bmd));
 					_bmd.dispose();
 				}
