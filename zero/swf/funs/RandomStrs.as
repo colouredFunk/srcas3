@@ -51,13 +51,13 @@ package zero.swf.funs{
 		}
 		//private static var testingId:int=0;
 		public static function getRan():String{
+			//if(testingId>=0){
+			//	return "随机"+testingId++;
+			//}
 			if(mark){
 			}else{
 				throw new Error("请先调用 initSeed 设置种子");
 			}
-			//if(testingId>=0){
-			//	return "简单混淆"+testingId++;
-			//}
 			var ran:String;
 			if(firstUseStrArr.length>0){
 				ran=firstUseStrArr.shift();

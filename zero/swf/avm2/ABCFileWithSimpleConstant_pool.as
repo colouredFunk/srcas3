@@ -69,6 +69,7 @@ ABCFileWithSimpleConstant_pool 版本:v1.0
 //multiname array describes names used by the bytecode. The "0" entry of the multiname array is not
 //present in the abcFile.
 package zero.swf.avm2{
+	import zero.Outputer;
 	import zero.swf.BytesData;
 	import flash.utils.Endian;
 	import flash.utils.ByteArray;
@@ -125,29 +126,33 @@ package zero.swf.avm2{
 				if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var get_str_size:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{get_str_size=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{get_str_size=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{get_str_size=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{get_str_size=data[offset++];}
 				//get_str_size
 				
-				//处理 "\x00"
-				var get_str_end_offset:int=offset+get_str_size;
-				var get_str_str:String="";
-				do{
-					if(data[offset]){
-						data.position=offset;
-						var get_str_sub_str:String=data.readUTFBytes(get_str_end_offset-offset);
-						var get_str_data:ByteArray=new ByteArray();
-						get_str_data.writeUTFBytes(get_str_sub_str);
-						get_str_str+=get_str_sub_str;
-						offset+=get_str_data.length;
+				if(get_str_size){
+					//处理 "\x00"
+					var get_str_end_offset:int=offset+get_str_size;
+					var get_str_str:String="";
+					do{
+						if(data[offset]){
+							data.position=offset;
+							var get_str_sub_str:String=data.readUTFBytes(get_str_end_offset-offset);
+							var get_str_data:ByteArray=new ByteArray();
+							get_str_data.writeUTFBytes(get_str_sub_str);
+							get_str_str+=get_str_sub_str;
+							offset+=get_str_data.length;
+						}else{
+							get_str_str+="\x00";
+							offset++;
+						}
+					}while(offset<get_str_end_offset);
+					if(offset==get_str_end_offset){
 					}else{
-						get_str_str+="\x00";
-						offset++;
+						offset=get_str_end_offset;
+						//throw new Error("get_str_data.length="+get_str_data.length+",get_str_size="+get_str_size+",get_str_str=\""+get_str_str+"\"");
+						Outputer.output("get_str_data.length="+get_str_data.length+",get_str_size="+get_str_size+",get_str_str=\""+get_str_str+"\"","brown");
 					}
-				}while(offset<get_str_end_offset);
-				if(offset==get_str_end_offset){
+					stringV[i]=get_str_str;
 				}else{
-					offset=get_str_end_offset;
-					throw new Error("get_str_data.length="+get_str_data.length+",get_str_size="+get_str_size+",get_str_str=\""+get_str_str+"\"");
-					//trace("get_str_data.length="+get_str_data.length+",get_str_size="+get_str_size+",get_str_str=\""+get_str_str+"\"");
+					stringV[i]="";
 				}
-				stringV[i]=get_str_str;
 				//
 			}
 			

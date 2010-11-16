@@ -14,21 +14,6 @@ package zero.swf.funs{
 	import zero.swf.TagType;
 	
 	public class Za7Za8{
-		/*
-		public static function mix(swf:SWF2,str0Arr:Array,strtArr:Array=null):void{
-			if(strtArr){
-				strtArr=strtArr.concat(RandomStrs.getRanArr(str0Arr.length-strtArr.length));
-			}else{
-				strtArr=RandomStrs.getRanArr(str0Arr.length);
-			}
-			ReplaceStrs.replace(
-				swf,
-				str0Arr,
-				strtArr
-			);
-		}
-		*/
-		
 		public static function getUsefulTags(tagV:Vector.<Tag>):Vector.<Tag>{
 			//把 FileAttributes，DebugId 等不想要的去掉
 			var usefulTagV:Vector.<Tag>=new Vector.<Tag>();

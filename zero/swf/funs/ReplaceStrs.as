@@ -9,21 +9,29 @@ ReplaceStrs 版本:v1.0
 
 package zero.swf.funs{
 	
+	import flash.utils.ByteArray;
+	
 	import zero.swf.SWF2;
 	import zero.swf.Tag;
 	import zero.swf.TagType;
 	import zero.swf.tagBodys.DoABC;
 	import zero.swf.tagBodys.DoABCWithoutFlagsAndName;
 	import zero.swf.tagBodys.SymbolClass;
+	import zero.swf.avm2.ABCFileWithSimpleConstant_pool;
 	
 	public class ReplaceStrs{
 		public static function replace(
-			swf:SWF2,
+			swfData:ByteArray,
 			str0Arr:Array,
 			strtArr:Array//,
 			//symbolClassNameIdArr:Array=null
-		):void{
+		):ByteArray{
 			//把 DoABC 或 DoABCWithoutFlagsAndName 的 abcData 里的 stringV 里的特定的字符串替换成特定的字符串
+			DoABCWithoutFlagsAndName.setDecodeABC(ABCFileWithSimpleConstant_pool);
+			
+			var swf:SWF2=new SWF2();
+			swf.initBySWFData(swfData);
+			
 			DoABC;
 			DoABCWithoutFlagsAndName;
 			
@@ -54,11 +62,12 @@ package zero.swf.funs{
 				switch(tag.type){
 					case TagType.DoABC:
 					case TagType.DoABCWithoutFlagsAndName:
-						var abcData:*=tag.getBody().ABCData;
+						var abcData:ABCFileWithSimpleConstant_pool=tag.getBody().abc;
 						i=abcData.stringV.length;
-						while(--i>=0){
+						while(--i>0){
 							strt=mark["~"+abcData.stringV[i]];
 							if(strt is String){
+								//trace("strt=\""+strt+"\",strt.length="+strt.length);
 								abcData.stringV[i]=strt;
 							}
 						}
@@ -87,6 +96,10 @@ package zero.swf.funs{
 					break;
 				}
 			}
+			
+			DoABCWithoutFlagsAndName.setDecodeABC(null);
+			
+			return swf.toSWFData();
 		}
 	}
 }

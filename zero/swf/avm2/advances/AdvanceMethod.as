@@ -167,6 +167,26 @@ package zero.swf.avm2.advances{
 		public function AdvanceMethod(){
 		}
 		
+		public function clone():AdvanceMethod{
+			var method:AdvanceMethod=new AdvanceMethod();
+			
+			method.infoId=infoId;
+			method.return_type=return_type;
+			method.param_typeV=param_typeV;
+			method.name=name;
+			method.flags=flags;
+			method.option_detailV=option_detailV;
+			method.param_nameV=param_nameV;
+			method.max_stack=max_stack;
+			method.local_count=local_count;
+			method.init_scope_depth=init_scope_depth;
+			method.max_scope_depth=max_scope_depth;
+			method.codes=codes;
+			method.traits_infoV=traits_infoV;
+			
+			return method;
+		}
+		
 		public function initByInfos(_infoId:int,method_info:Method_info,method_body_info:Method_body_info):void{
 			infoId=_infoId;
 			
@@ -194,12 +214,16 @@ package zero.swf.avm2.advances{
 			
 			toInfo_fun(method_info,Method_info_memberV);
 			
+			var methodId:int=AdvanceABC.currInstance.abcFile.method_infoV.length;
+			AdvanceABC.currInstance.abcFile.method_infoV[methodId]=method_info;
+			
 			if(codes){
 				var method_body_info:Method_body_info=new Method_body_info();
 				
 				toInfo_fun(method_body_info,Method_body_info_memberV);
 				
-				method_body_info.method=AdvanceABC.currInstance.abcFile.method_infoV.length;
+				method_body_info.method=methodId;
+				//trace("methodId="+methodId);
 				
 				var exception_infoV:Vector.<AdvanceException_info>=new Vector.<AdvanceException_info>();
 				
@@ -218,9 +242,7 @@ package zero.swf.avm2.advances{
 				AdvanceABC.currInstance.abcFile.method_body_infoV.push(method_body_info);
 			}
 			
-			//--
-			AdvanceABC.currInstance.abcFile.method_infoV.push(method_info);
-			return AdvanceABC.currInstance.abcFile.method_infoV.length-1;
+			return methodId;
 		}
 		
 		////

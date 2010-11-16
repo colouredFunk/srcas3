@@ -63,6 +63,7 @@ OutputPane 版本:v1.0
 			timeoutId=setTimeout(updateDelay,100);
 		}
 		private function msg2strArr(msg:String,style:String=null):void{
+			msg=msg.replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\x00/g,"\\x00");
 			if(style){
 				strArr[strArr.length]="<span class=\""+style+"\">"+msg+"</span><br>";
 			}else{

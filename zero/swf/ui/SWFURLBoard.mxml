@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 width="640" height="290"
+		 title="SWF地址配置"
+		 close="close()"
+		 showCloseButton="true"
+ xmlns:ui="zero.swf.ui.*">
+	<s:Group id="itemArea" width="630" height="240">
+		<ui:SWFURLItem y="0" width="100%"/>
+		<ui:SWFURLItem y="30" width="100%"/>
+		<ui:SWFURLItem y="60" width="100%"/>
+		<ui:SWFURLItem y="90" width="100%"/>
+		<ui:SWFURLItem y="120" width="100%"/>
+		<ui:SWFURLItem y="150" width="100%"/>
+		<ui:SWFURLItem y="180" width="100%"/>
+		<ui:SWFURLItem y="210" width="100%"/>
+	</s:Group>
+	<fx:Script>
+		<![CDATA[
+			import mx.managers.PopUpManager;
+			public static var so:SharedObject;
+			public static function show(
+				container:Sprite
+			):void{
+				var swfURLBoard:SWFURLBoard=PopUpManager.createPopUp(
+					container,
+					SWFURLBoard,
+					true
+				) as SWFURLBoard;
+				swfURLBoard.init();
+			}
+			private function init():void{
+				var i:int=itemArea.numElements;
+				var item:SWFURLItem;
+				item=itemArea.getElementAt(0) as SWFURLItem;
+				item.txt.text="${当前此SWF的地址}";
+				item.cb.selected=true;
+				while(--i>=0){
+					item=itemArea.getElementAt(i) as SWFURLItem;
+					item.init(so,"SWFURLItem_"+i);
+				}
+				
+				this.x=(stage.stageWidth-this.width)/2;
+				this.y=(stage.stageHeight-this.height)/2;
+			}
+			
+			private function close():void{
+				var i:int=itemArea.numElements;
+				while(--i>=0){
+					var item:SWFURLItem=itemArea.getElementAt(i) as SWFURLItem;
+					item.clear();
+				}
+				PopUpManager.removePopUp(this);
+			}
+			
+			public static function get xml():XML{
+				var itemId:int=0;
+				var xml:XML=<swfURLs/>;
+				while(true){
+					var txt_saveId:String="SWFURLItem_"+itemId+"_txt";
+					if(so.data[txt_saveId]===undefined){
+						break;
+					}
+					var swfURL:String=so.data[txt_saveId].replace(/^\s*|\s*$/g,"");
+					if(swfURL){
+						var cb_saveId:String="SWFURLItem_"+itemId+"_cb";
+						var swfURLXML:XML=<swfURL url={swfURL}/>;
+						if(so.data["SWFURLItem_"+itemId+"_cb"]){
+							swfURLXML.@strictMatch=true;
+						}
+						xml.appendChild(swfURLXML);
+					}
+					itemId++;
+				}
+				if(xml.swfURL.length()==0){
+					xml.appendChild(<swfURL url="${默认可访问地址}" strictMatch="true"/>);
+				}
+				return xml;
+			}
+		]]>
+	</fx:Script>
+</mx:TitleWindow>

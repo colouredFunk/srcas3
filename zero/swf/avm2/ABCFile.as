@@ -127,6 +127,7 @@ ABCFile 版本:v1.0
 //entry consists of a variable length method_body_info structure which contains the instructions for an
 //individual method or function.
 package zero.swf.avm2{
+	import zero.Outputer;
 	import zero.swf.avm2.Namespace_info;
 	import zero.swf.avm2.Ns_set_info;
 	import zero.swf.avm2.Multiname_info;
@@ -199,29 +200,33 @@ package zero.swf.avm2{
 				if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var get_str_size:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{get_str_size=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{get_str_size=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{get_str_size=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{get_str_size=data[offset++];}
 				//get_str_size
 				
-				//处理 "\x00"
-				var get_str_end_offset:int=offset+get_str_size;
-				var get_str_str:String="";
-				do{
-					if(data[offset]){
-						data.position=offset;
-						var get_str_sub_str:String=data.readUTFBytes(get_str_end_offset-offset);
-						var get_str_data:ByteArray=new ByteArray();
-						get_str_data.writeUTFBytes(get_str_sub_str);
-						get_str_str+=get_str_sub_str;
-						offset+=get_str_data.length;
+				if(get_str_size){
+					//处理 "\x00"
+					var get_str_end_offset:int=offset+get_str_size;
+					var get_str_str:String="";
+					do{
+						if(data[offset]){
+							data.position=offset;
+							var get_str_sub_str:String=data.readUTFBytes(get_str_end_offset-offset);
+							var get_str_data:ByteArray=new ByteArray();
+							get_str_data.writeUTFBytes(get_str_sub_str);
+							get_str_str+=get_str_sub_str;
+							offset+=get_str_data.length;
+						}else{
+							get_str_str+="\x00";
+							offset++;
+						}
+					}while(offset<get_str_end_offset);
+					if(offset==get_str_end_offset){
 					}else{
-						get_str_str+="\x00";
-						offset++;
+						offset=get_str_end_offset;
+						//throw new Error("get_str_data.length="+get_str_data.length+",get_str_size="+get_str_size+",get_str_str=\""+get_str_str+"\"");
+						Outputer.output("get_str_data.length="+get_str_data.length+",get_str_size="+get_str_size+",get_str_str=\""+get_str_str+"\"","brown");
 					}
-				}while(offset<get_str_end_offset);
-				if(offset==get_str_end_offset){
+					stringV[i]=get_str_str;
 				}else{
-					offset=get_str_end_offset;
-					throw new Error("get_str_data.length="+get_str_data.length+",get_str_size="+get_str_size+",get_str_str=\""+get_str_str+"\"");
-					//trace("get_str_data.length="+get_str_data.length+",get_str_size="+get_str_size+",get_str_str=\""+get_str_str+"\"");
+					stringV[i]="";
 				}
-				stringV[i]=get_str_str;
 				//
 			}
 			
@@ -376,6 +381,7 @@ package zero.swf.avm2{
 					i++;
 					continue;
 				}
+				//trace("string=\""+string+"\",string.length="+string.length);
 				var set_str_data:ByteArray=new ByteArray();
 				set_str_data.writeUTFBytes(string);
 				var set_str_size:int=set_str_data.length;
