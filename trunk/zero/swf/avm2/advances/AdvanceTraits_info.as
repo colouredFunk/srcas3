@@ -52,10 +52,10 @@ AdvanceTraits_info 版本:v1.0
 //ATTR_Metadata 	0x4 	Is used to signal that the fields metadata_count and metadata follow the data field in the traits_info entry
 
 package zero.swf.avm2.advances{
-	import zero.swf.vmarks.ConstantKind;
 	import zero.swf.avm2.AVM2Obj;
 	import zero.swf.avm2.Metadata_info;
 	import zero.swf.avm2.Traits_info;
+	import zero.swf.vmarks.ConstantKind;
 	import zero.swf.vmarks.TraitAttributes;
 	import zero.swf.vmarks.TraitTypes;
 
@@ -110,6 +110,20 @@ package zero.swf.avm2.advances{
 		public var classi:AdvanceClass;
 		
 		public function AdvanceTraits_info(){
+		}
+		
+		public function cloneAsMethodTrait():AdvanceTraits_info{
+			var traits_info:AdvanceTraits_info=new AdvanceTraits_info();
+			
+			traits_info.name=name;
+			traits_info.kind_attributes=kind_attributes;
+			traits_info.kind_trait_type=kind_trait_type;
+			traits_info.metadataV=metadataV;
+			
+			traits_info.disp_id=disp_id;
+			traits_info.methodi=methodi.clone();
+			
+			return traits_info;
 		}
 		
 		public function initByInfo(traits_info:Traits_info):void{

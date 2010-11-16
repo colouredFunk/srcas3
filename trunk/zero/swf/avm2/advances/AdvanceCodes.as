@@ -10,6 +10,7 @@ AdvanceCodes 版本:v1.0
 package zero.swf.avm2.advances{
 	import flash.utils.ByteArray;
 	
+	import zero.Outputer;
 	import zero.swf.avm2.advances.AdvanceABC;
 	import zero.swf.avm2.advances.AdvanceMultiname_info;
 	import zero.swf.avm2.advances.Member;
@@ -155,7 +156,20 @@ package zero.swf.avm2.advances{
 								
 								jumpPos=offset+jumpOffset;
 								if(jumpPos<0||jumpPos>endOffset){
-									throw new Error("可能是扰码: offset="+offset+", jumpPos="+jumpPos+", 跳转命令只允许跳至代码开头和代码末尾+1之间的位置");
+									if(lastCodeIsReturn(codeByOffsetArr)){
+										codeByOffsetArr.pop();
+										Outputer.output("return 后面的异常跳转，已忽略 offset="+offset+", jumpPos="+jumpPos+", endOffset="+endOffset,"green");
+										continue;
+									}
+									Outputer.output("dataType_u8_s24 可能是扰码: offset="+offset+", jumpPos="+jumpPos+", endOffset="+endOffset+", 跳转命令只允许跳至代码开头和代码末尾之间的位置","brown");
+									//if(jumpPos<0){
+									//	jumpPos=0;
+									//}else{
+										jumpPos=endOffset;
+									//}
+									Outputer.output("jumpPos 已修正为: "+jumpPos,"brown");
+									
+									//throw new Error("哈哈");
 								}
 								labelMark=labelMarkArr[jumpPos];
 								if(labelMark){
@@ -178,7 +192,15 @@ package zero.swf.avm2.advances{
 								jumpPos=lookupswitch_startOffset+jumpOffset;
 								
 								if(jumpPos<0||jumpPos>endOffset){
-									throw new Error("可能是扰码: offset="+offset+", jumpPos="+jumpPos+", 跳转命令只允许跳至代码开头和代码末尾+1之间的位置");
+									Outputer.output("dataType_u8_s24_u30_s24List default_offset 可能是扰码: offset="+offset+", jumpPos="+jumpPos+", endOffset="+endOffset+", 跳转命令只允许跳至代码开头和代码末尾之间的位置","brown");
+									//if(jumpPos<0){
+									//	jumpPos=0;
+									//}else{
+										jumpPos=endOffset;
+									//}
+									Outputer.output("jumpPos 已修正为: "+jumpPos,"brown");
+									
+									//throw new Error("哈哈");
 								}
 								labelMark=labelMarkArr[jumpPos];
 								if(labelMark){
@@ -201,7 +223,15 @@ package zero.swf.avm2.advances{
 									jumpPos=lookupswitch_startOffset+jumpOffset;
 									
 									if(jumpPos<0||jumpPos>endOffset){
-										throw new Error("可能是扰码: offset="+offset+", jumpPos="+jumpPos+", 跳转命令只允许跳至代码开头和代码末尾+1之间的位置");
+										Outputer.output("dataType_u8_s24_u30_s24List case_offset 可能是扰码: offset="+offset+", jumpPos="+jumpPos+", endOffset="+endOffset+", 跳转命令只允许跳至代码开头和代码末尾之间的位置","brown");
+										//if(jumpPos<0){
+										//	jumpPos=0;
+										//}else{
+											jumpPos=endOffset;
+										//}
+										Outputer.output("jumpPos 已修正为: "+jumpPos,"brown");
+										
+										//throw new Error("哈哈");
 									}
 									labelMark=labelMarkArr[jumpPos];
 									if(labelMark){
@@ -245,6 +275,7 @@ package zero.swf.avm2.advances{
 			
 			codeV=new Vector.<BaseCode>();
 			var codeId:int=0;
+			//endOffset++;
 			for(offset=0;offset<=endOffset;offset++){
 				if(labelMarkArr[offset]){
 					codeV[codeId++]=labelMarkArr[offset];
@@ -253,6 +284,22 @@ package zero.swf.avm2.advances{
 					codeV[codeId++]=codeByOffsetArr[offset];
 				}
 			}
+		}
+		private function lastCodeIsReturn(codeByOffsetArr:Array):Boolean{
+			var prevCodeOffset:int=codeByOffsetArr.length-1;
+			while(--prevCodeOffset>=0){
+				if(codeByOffsetArr[prevCodeOffset]){
+					switch(codeByOffsetArr[prevCodeOffset].op){
+						case Op.throw_:
+						case Op.returnvoid:
+						case Op.returnvalue:
+							return true;
+						break;
+					}
+					return false;
+				}
+			}
+			return false;
 		}
 		public function toData(exception_infoV:Vector.<AdvanceException_info>):ByteArray{
 			var data:ByteArray=new ByteArray();

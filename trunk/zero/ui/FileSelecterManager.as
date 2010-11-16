@@ -104,7 +104,7 @@ package zero.ui{
 			_browseTitle:String="选择一个文件: ",
 			so:SharedObject=null,
 			saveId:String=null,
-			defaultFileURL:String=null
+			defaultFileURLOrFileURLArr:*=null
 		):void{
 			//init("图片","jpg,png,gif,bmp");
 			if(btn){
@@ -125,8 +125,10 @@ package zero.ui{
 				browseType=_browseType;
 				
 				if(FileClass){
-					if(defaultFileURL){
-						ComboBoxManager.addCb(cb,so,saveId,[decodeURI(defaultFileURL)]);
+					if(defaultFileURLOrFileURLArr is Array){
+						ComboBoxManager.addCb(cb,so,saveId,defaultFileURLOrFileURLArr);
+					}else if(defaultFileURLOrFileURLArr){
+						ComboBoxManager.addCb(cb,so,saveId,[decodeURI(defaultFileURLOrFileURLArr)]);
 					}else{
 						ComboBoxManager.addCb(cb,so,saveId);
 					}

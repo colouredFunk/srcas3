@@ -1,55 +1,35 @@
 /***
-SimpleMixer 版本:v1.0
+FileSizeCheckerAdder 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月8日 09:34:03
+创建时间:2010年11月16日 16:15:58
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
 package zero.swf.funs{
+	import zero.swf.*;
+	import zero.swf.avm2.*;
+	import zero.swf.avm2.advances.*;
+	import zero.swf.tagBodys.*;
+	import zero.swf.vmarks.*;
 	
-	import zero.swf.SWF2;
-	import zero.swf.Tag;
-	import zero.swf.TagType;
-	import zero.swf.avm2.ABCFile;
-	import zero.swf.avm2.AVM2Obj;
-	import zero.swf.avm2.Instance_info;
-	import zero.swf.tagBodys.DoABC;
-	import zero.swf.tagBodys.DoABCWithoutFlagsAndName;
-	import zero.swf.tagBodys.SymbolClass;
-	
-	public class SimpleMixer{
-		public static function mix(swfOrSWFArr:*):void{
-			//支持关联混合（对多个swf进行混合，相同的字符串混淆后仍然相同）
-			var swf:SWF2,abcFile:ABCFile;
-			var abcFileV:Vector.<ABCFile>=new Vector.<ABCFile>();
-			if(swfOrSWFArr is Array){
-				for each(swf in swfOrSWFArr){
-					getABCFiles(swf,abcFileV);
-				}
-			}else{
-				getABCFiles(swfOrSWFArr,abcFileV);
-			}
+	public class FileSizeCheckerAdder extends MethodCodesInserter{
+		public static function addFileSizeCheckerToSWF(swf:SWF2,checkFileSizeMethod:AdvanceMethod):void{
+			var codeV:Vector.<BaseCode>=normalizeCodeV(checkFileSizeMethod.codes.codeV);
 			
-			//var strMark:Object=new Object();
-			for each(abcFile in abcFileV){
-				for each(var instance_info:Instance_info in abcFile.instance_infoV){
-					
-				}
-				
-			}
-		}
-		private static function getTraitNames():void{
-			
-		}
-		private static function getABCFiles(swf:SWF2,abcFileV:Vector.<ABCFile>):void{
-			var i:int;
-			for each(var tag:Tag in swf.tagV){
+			var tag:Tag;
+			for each(tag in swf.tagV){
 				switch(tag.type){
 					case TagType.DoABC:
 					case TagType.DoABCWithoutFlagsAndName:
-						abcFileV.push(tag.getBody().ABCData);
+						var advanceABC:AdvanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc as AdvanceABC
+						for each(var clazz:AdvanceClass in advanceABC.classV){
+							insertCodesInMethod(codeV,checkFileSizeMethod.max_stack,clazz.cinit);
+						}
+						for each(var script_info:AdvanceScript_info in advanceABC.script_infoV){
+							insertCodesInMethod(codeV,checkFileSizeMethod.max_stack,script_info.init);
+						}
 					break;
 				}
 			}

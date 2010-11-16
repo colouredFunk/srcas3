@@ -173,20 +173,26 @@ package zero.swf.avm2.advances{
 		
 		private var dicts:Object;
 		
-		private var integerV:Vector.<int>;
-		private var uintegerV:Vector.<int>;
-		private var doubleV:Vector.<Number>;
-		private var stringV:Vector.<String>;
-		private var namespace_infoV:Vector.<AdvanceNamespace_info>;
-		private var ns_set_infoV:Vector.<AdvanceNs_set_info>;
+		public var integerV:Vector.<int>;
+		public var uintegerV:Vector.<int>;
+		public var doubleV:Vector.<Number>;
+		public var stringV:Vector.<String>;
+		public var namespace_infoV:Vector.<AdvanceNamespace_info>;
+		public var ns_set_infoV:Vector.<AdvanceNs_set_info>;
 		public var multiname_infoV:Vector.<AdvanceMultiname_info>;
-		private var metadata_infoV:Vector.<AdvanceMetadata_info>;
-		private var methodV:Vector.<AdvanceMethod>;
+		public var metadata_infoV:Vector.<AdvanceMetadata_info>;
+		public var methodV:Vector.<AdvanceMethod>;
 		public var classV:Vector.<AdvanceClass>;
 		public var script_infoV:Vector.<AdvanceScript_info>;
 		
 		private var method_body_info_arr:Array;
 		
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+			var abcFile:ABCFile=new ABCFile();
+			offset=abcFile.initByData(data,offset,endOffset);
+			initByABCFile(abcFile);
+			return offset;
+		}
 		public function initByABCFile(_abcFile:ABCFile):void{
 			//trace("initByABCFile========================================");
 			abcFile=_abcFile;
@@ -322,6 +328,13 @@ package zero.swf.avm2.advances{
 		}
 		//
 		
+		public function toData():ByteArray{
+			var abcFile:ABCFile=new ABCFile();
+			getABCFile(abcFile);
+			var data:ByteArray=new ByteArray();
+			data.writeBytes(abcFile.toData());
+			return data;
+		}
 		public function getABCFile(_abcFile:ABCFile):void{
 			//trace("getABCFile========================================");
 			abcFile=_abcFile;

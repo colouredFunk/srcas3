@@ -17,71 +17,54 @@ package zero.swf.tagBodys{
 	
 	import zero.swf.avm2.AVM2Obj;
 	public class DoABCWithoutFlagsAndName{
-		public static function setDecodeABC(_ABCFileClass:Class,_AdvanceABCClass:Class=null):void{
+		public static function setDecodeABC(_ABCClass:Class):void{
 			//DoABCWithoutFlagsAndName.setDecodeABC(ABCFileWithSimpleConstant_pool)
 			//DoABCWithoutFlagsAndName.setDecodeABC(ABCFile)
-			//DoABCWithoutFlagsAndName.setDecodeABC(ABCFile,AdvanceABC)
+			//DoABCWithoutFlagsAndName.setDecodeABC(AdvanceABC)
 			
-			ABCFileClass=_ABCFileClass;
-			if(ABCFileClass){
-				switch(getQualifiedClassName(ABCFileClass)){
+			if(_ABCClass){
+				switch(getQualifiedClassName(_ABCClass)){
 					case "zero.swf.avm2::ABCFileWithSimpleConstant_pool":
-						AdvanceABCClass=null;
-					break;
 					case "zero.swf.avm2::ABCFile":
-						AdvanceABCClass=_AdvanceABCClass;
-						if(AdvanceABCClass){
-							if(getQualifiedClassName(AdvanceABCClass)=="zero.swf.avm2.advances::AdvanceABC"){
-							}else{
-								throw new Error("AdvanceABCClass 只允许是 zero.swf.avm2.advances::AdvanceABC，而不能是: "+ABCFileClass);
-							}
-						}
+					case "zero.swf.avm2.advances::AdvanceABC":
+						ABCClass=_ABCClass;
 					break;
 					default:
-						throw new Error("未知 ABCFileClass: "+ABCFileClass);
+						throw new Error("未知 ABCClass: "+ABCClass);
 					break;
 				}
 			}else{
-				ABCFileClass=null;
-				AdvanceABCClass=null;
+				ABCClass=null;
 			}
 		}
+		
+		private static var ABCClass:Class;
+		
 		public static function getDecodeABCLevel():int{
-			switch(getQualifiedClassName(ABCFileClass)){
+			switch(getQualifiedClassName(ABCClass)){
 				case "zero.swf.avm2::ABCFileWithSimpleConstant_pool":
 					return 0;
 				break;
 				case "zero.swf.avm2::ABCFile":
-					if(AdvanceABCClass){
-						return 2;
-					}
 					return 1;
+				break;
+				case "zero.swf.avm2.advances::AdvanceABC":
+					return 2;
 				break;
 			}
 			return -1;
 		}
-		private static var ABCFileClass:Class;
-		private static var AdvanceABCClass:Class;
+		//
 		
-		public var ABCData:*;
-		public var advanceABC:*;
+		public var abc:*;
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
-			ABCData=new ABCFileClass();
-			var offset:int=ABCData.initByData(data,offset,endOffset);
-			if(AdvanceABCClass){
-				advanceABC=new AdvanceABCClass();
-				advanceABC.initByABCFile(ABCData);
-			}
-			return offset;
+			abc=new ABCClass();
+			return abc.initByData(data,offset,endOffset);
 		}
 		public function toData():ByteArray{
-			if(advanceABC){
-				ABCData=new (getDefinitionByName("zero.swf.avm2.ABCFile"))();
-				advanceABC.getABCFile(ABCData);
-			}
 			var data:ByteArray=new ByteArray();
-			data.writeBytes(ABCData.toData());
+			data.writeBytes(abc.toData());
 			return data;
 		}
 
@@ -89,22 +72,25 @@ package zero.swf.tagBodys{
 		CONFIG::toXMLAndInitByXML {
 		public function toXML(xmlName:String):XML{
 			var xml:XML=<{xmlName} class="DoABCWithoutFlagsAndName"/>;
-			if(advanceABC){
-				xml.appendChild(advanceABC.toXML("advanceABC"));
-			}else{
-				xml.appendChild(ABCData.toXML("ABCData"));
-			}
+			xml.appendChild(abc.toXML("abc"));
 			return xml;
 		}
 		public function initByXML(xml:XML):void{
-			if(xml.advanceABC[0]){
-				advanceABC=new (getDefinitionByName("zero.swf.avm2.advances.AdvanceABC"))();
-				advanceABC.initByXML(xml.advanceABC[0]);
-			}else{
-				var ABCDataXML:XML=xml.ABCData[0];
-				ABCData=new (getDefinitionByName("zero.swf.avm2."+ABCDataXML["@class"].toString()))();
-				ABCData.initByXML(ABCDataXML);
+			var abcXML:XML=xml.abc[0];
+			var className:String=abcXML["@class"].toString();
+			switch(className){
+				case "ABCFileWithSimpleConstant_pool":
+				case "ABCFile":
+					abc=new (getDefinitionByName("zero.swf.avm2."+className))();
+				break;
+				case "AdvanceABC":
+					abc=new (getDefinitionByName("zero.swf.avm2.advances."+className))();
+				break;
+				default:
+					throw new Error("未知 className: "+className);
+				break;
 			}
+			abc.initByXML(abcXML);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}
