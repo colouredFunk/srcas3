@@ -50,6 +50,7 @@
 			_source = _source + ":" + _imageLoader.areaWidth + " x " + _imageLoader.areaHeight;
 			contextMenuItemImageLoader.caption = _source;
 		}
+		
 		public var progressClip:*;
 		public var container:*;
 		public var foreground:*;
@@ -58,6 +59,10 @@
 		protected var autoFitArea:AutoFitArea;
 		protected var bmp:Bitmap;
 		protected var bmdNow:BitmapData;
+		protected var __loadProgress:Number = 0;
+		public function get loadProgress():Number {
+			return __loadProgress;
+		}
 		private var __imageGroup:String;
 		public function get imageGroup():String{
 			return __imageGroup;
@@ -131,7 +136,6 @@
 			container = null;
 			foreground = null;
 			background = null;
-			contextMenu = null;
 			autoFitArea.destroy();
 		}
 		public function load(_source:*, _index:uint = 0, _changeImmediately:Boolean = false ):void {
@@ -203,7 +207,7 @@
 			updateArea(bmp);
 		}
 		private const LIMITWH_MAX:uint = 999999;
-		protected function updateArea(_content:*):void {
+		public function updateArea(_content:*):void {
 			if (areaWidth + areaHeight <= 2) {
 				//原始大小显示
 			}else {
@@ -231,6 +235,7 @@
 			}
 		}
 		protected function onImageLoadingHandler(_evt:LoaderEvent):void {
+			__loadProgress = _evt.target.progress;
 			setProgressClip(_evt.target.progress);
 		}
 		protected function onImageLoadedHandler(_evt:LoaderEvent):void {
@@ -346,7 +351,8 @@
 				deregister(_evt.target.url,_imageLoader);
 			}
 		}
-		private static function onErrorHandler(_evt:LoaderEvent):void{
+		private static function onErrorHandler(_evt:LoaderEvent):void {
+			//removeLoaderFormDic
 			trace(_evt.toString());
 		}
 		private static function onProgressHandler(_evt:LoaderEvent):void{
