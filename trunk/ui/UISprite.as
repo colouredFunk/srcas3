@@ -56,6 +56,7 @@
 			scrollRect = null;
 			mask = null;
 			hitArea = null;
+			contextMenu = null;
 			EventManager.removeTargetAllEvent(this);
 			removeChildren(this);
 			for each (var _i:* in userData) {

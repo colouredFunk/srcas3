@@ -40,6 +40,13 @@
 		override protected function init():void {
 			super.init();
 			enabled = true;
+			if (txt) {
+				txt.mouseEnabled = false;
+				if (txt.hasOwnProperty("mouseChildren")) {
+					txt.mouseChildren = false;
+				}
+				mouseEnabled = false;
+			}
 		}
 		public function $setStyle(_isActive:Boolean):void {
 			if (_isActive) {
@@ -82,15 +89,9 @@
 			}
 			return _value;
 		}
-		override protected function setStyle():void {
-			scale = length/(maximum-minimum);
-			setClips(Math.round((value-minimum) * scale));
-			if (txt) {
-				txt.text = (labelFunction!=null)?labelFunction(value):setLabel(value);
-			}
-		}
-		override protected function setLabel(_value:Number):String {
-			return String(value);
+		override protected function getClipsValue():Number {
+			scale = length / (maximum - minimum);
+			return Math.round((value-minimum) * scale);
 		}
 	}
 }

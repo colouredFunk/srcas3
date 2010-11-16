@@ -109,8 +109,11 @@ package ui{
 			}
 			return _value;
 		}
-		protected function setStyle():void {
-			setClips(value * length);
+		protected function getClipsValue():Number {
+			return value * length;
+		}
+		public function setStyle():void {
+			setClips(getClipsValue());
 			if (txt) {
 				txt.text = (labelFunction!=null)?labelFunction(value):setLabel(value);
 			}
