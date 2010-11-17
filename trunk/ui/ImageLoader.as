@@ -216,12 +216,12 @@
 				var _scaleMode:String
 				var _alignX:String = AlignMode.CENTER;
 				var _alignY:String = AlignMode.CENTER;
-				if(areaWidth<=1){
+				if (areaWidth <= 1) {
 					_scaleMode = ScaleMode.PROPORTIONAL_OUTSIDE;
 					_alignX = AlignMode.LEFT;
 					_widthMax = limitSize?_content.width:LIMITWH_MAX;
 					_heightMax = limitSize?Math.min(_content.height, areaHeight):LIMITWH_MAX;
-				}else if (areaHeight<=1) {
+				}else if (areaHeight <= 1) {
 					_scaleMode = ScaleMode.PROPORTIONAL_OUTSIDE;
 					_alignY = AlignMode.TOP;
 					_widthMax = limitSize?Math.min(_content.width, areaWidth):LIMITWH_MAX;
