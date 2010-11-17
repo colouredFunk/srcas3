@@ -220,6 +220,7 @@ package zero.swf.avm2{
 					if(vindex){
 						data[offset++]=vkind;
 					}
+					//trace(name,"vkind="+vkind,"vindex="+vindex);
 				break;
 				case TraitTypes.Method:
 				case TraitTypes.Getter:

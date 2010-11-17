@@ -36,9 +36,9 @@ package zero.swf.avm2.advances{
 			var u30_1:int,u30_2:int,jumpOffset:int,jumpPos:int;
 			
 			while(offset<endOffset){
-				advanceCode=new AdvanceCode();
+				advanceCode=new AdvanceCode(data[offset]);
 				codeByOffsetArr[offset]=advanceCode;
-				advanceCode.op=data[offset++];
+				offset++;
 				
 				var opDataType:String=Op.opDataTypeV[advanceCode.op];
 				
@@ -538,8 +538,8 @@ package zero.swf.avm2.advances{
 									codesStr+=" "+advanceCode.value.toXML("multiname_info").toXMLString().replace(/[\r\n]+/g,"");
 								break;
 								case Op.type_u8_u30__method:
-									codesStr+=" "+advanceCode.value.toXML("method").toXMLString().replace(/[\r\n]+/g,"");
-									//codesStr+=" "+AdvanceABC.currInstance.addSpecial(null,advanceCode.value.toXML("method"));
+									stringXML.@value=advanceCode.value.toXML("method").toXMLString();
+									codesStr+=" "+stringXML.toXMLString().replace(/<string value=(".*")\/>/,"$1").replace(/>/g,"&gt;");//- -
 								break;
 								case Op.type_u8_u30__class:
 									codesStr+=" "+advanceCode.value.getMarkKey();
@@ -558,7 +558,8 @@ package zero.swf.avm2.advances{
 									codesStr+=" "+advanceCode.value.multiname_info.toXML("multiname_info").toXMLString().replace(/[\r\n]+/g,"")+" "+advanceCode.value.args;
 								break;
 								case Op.type_u8_u30_u30__method_args:
-									codesStr+=" "+advanceCode.value.method.toXML("method").toXMLString().replace(/[\r\n]+/g,"")+" "+advanceCode.value.args;
+									stringXML.@value=advanceCode.value.method.toXML("method").toXMLString();
+									codesStr+=" "+stringXML.toXMLString().replace(/<string value=(".*")\/>/,"$1").replace(/>/g,"&gt;")+" "+advanceCode.value.args;//- -
 								break;
 								
 								case Op.type_u8_s24__branch:
@@ -640,8 +641,7 @@ package zero.swf.avm2.advances{
 						opStr=codeStr.substr(0,pos);
 					}
 					if(Op.ops[opStr]>=0){
-						codeV[++codeId]=advanceCode=new AdvanceCode();
-						advanceCode.op=Op.ops[opStr];
+						codeV[++codeId]=advanceCode=new AdvanceCode(Op.ops[opStr]);
 						
 						var opType:String=Op.opTypeV[advanceCode.op];
 						
@@ -672,7 +672,11 @@ package zero.swf.avm2.advances{
 									advanceCode.value=AdvanceABC.currInstance.getInfoByXMLAndMemberType(new XML(codeStr),Member.MULTINAME_INFO);
 								break;
 								case Op.type_u8_u30__method:
-									advanceCode.value=AdvanceABC.currInstance.getInfoByXMLAndMemberType(new XML(codeStr),Member.METHOD);
+									advanceCode.value=AdvanceABC.currInstance.getInfoByXMLAndMemberType(
+										new XML(
+											new XML("<string value="+codeStr+"/>").@value.toString()
+										),Member.METHOD
+									);
 								break;
 								case Op.type_u8_u30__class:
 									advanceCode.value=AdvanceABC.currInstance.getInfoByMarkKeyAndMemberType(codeStr,Member.CLASS);

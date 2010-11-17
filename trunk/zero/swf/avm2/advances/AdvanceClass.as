@@ -119,12 +119,14 @@ package zero.swf.avm2.advances{
 			return AdvanceABC.currInstance.abcFile.instance_infoV.length-1;
 		}
 		
-		public function getMarkKey():String{
+		public function getClassName():String{
 			if(name.ns.name){
 				return name.ns.name+"."+name.name;
 			}
 			return name.name;
-			
+		}
+		public function getMarkKey():String{
+			return getClassName();
 			//return name.toXML("name").toXMLString();
 		}
 

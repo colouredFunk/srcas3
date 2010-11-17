@@ -11,6 +11,11 @@ package zero.swf.avm2.advances{
 	public class AdvanceCode extends BaseCode{
 		public var op:int;
 		public var value:*;
+		
+		public function AdvanceCode(_op:int,_value:*=undefined){
+			op=_op;
+			value=_value;
+		}
 	}
 }
 
