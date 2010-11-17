@@ -12,7 +12,7 @@
 
 		public static var FILETYPES_IMAGES:String = "jpg,jpeg,gif,png,bmp";
 		protected var fileInfos:String;
-		protected var fileTypes:String;
+		public var fileTypes:String;
 		public var maxSize:int = 10000;
 		public var autoLoad:Boolean = true;
 		public var autoImage:Boolean = true;
@@ -129,7 +129,7 @@
 				_loader.unload();
 			}
 		}
-		public function uploadFile(_url:String,_id:String):Boolean {
+		public function uploadFile(_url:String, _id:String):Boolean {
 			if(!isSet){
 				if(onFailed!=null){
 					onFailed("选择要打开的"+fileInfos+"!");
