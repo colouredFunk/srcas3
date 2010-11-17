@@ -6,7 +6,6 @@
 	<s:CheckBox y="3" label="精确匹配" right="0" id="cb"/>
 	<fx:Script>
 		<![CDATA[
-			import zero.ui.*;
 			public function init(so:SharedObject,saveId:String):void{
 				TxtManager.addTxt(txt,so,saveId+"_txt");
 				CheckBoxManager.addCb(cb,so,saveId+"_cb");

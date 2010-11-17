@@ -28,6 +28,7 @@ OutputPane 版本:v1.0
 			.blue 	{color: #0000cc;}
 			.brown	{color: #ff6600;}
 			.grey	{color: #bbbbbb;}
+			.pink	{color: #ff00ff;}
 			]]>
 		</fx:String>
 	</fx:Declarations>
@@ -53,22 +54,30 @@ OutputPane 版本:v1.0
 			strArr=new Array();
 			clearTimeout(timeoutId);
 		}
-		public function output(msg:String,style:String=null):void{
-			msg2strArr(msg,style);
+		public function output(msg:String,styleOrXML:*=undefined):void{
+			msg2strArr(msg,styleOrXML);
 			updateDelay();
 		}
-		public function outputDelay(msg:String,style:String=null):void{
-			msg2strArr(msg,style);
+		public function outputDelay(msg:String,styleOrXML:*=undefined):void{
+			msg2strArr(msg,styleOrXML);
 			clearTimeout(timeoutId);
 			timeoutId=setTimeout(updateDelay,100);
 		}
-		private function msg2strArr(msg:String,style:String=null):void{
+		private function msg2strArr(msg:String,styleOrXML:*=undefined):void{
 			msg=msg.replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\x00/g,"\\x00");
-			if(style){
-				strArr[strArr.length]="<span class=\""+style+"\">"+msg+"</span><br>";
+			if(styleOrXML){
+				var html:XML;
+				if(styleOrXML is XML){
+					html=styleOrXML.copy();
+				}else{
+					html=<span class={styleOrXML}/>
+				}
+				html.appendChild(msg);
+				strArr[strArr.length]=html.toXMLString()+"<br>";
 			}else{
 				strArr[strArr.length]=msg+"<br>";
 			}
+			//trace(strArr[strArr.length-1]);
 		}
 		private function updateDelay():void{
 			txt.htmlText=strArr.join("");
