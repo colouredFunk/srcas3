@@ -87,6 +87,12 @@ package zero.swf.avm2.advances{
 		//
 		public function AdvanceMultiname_info(){
 		}
+		public function getMultiname():String{
+			if(ns.name){
+				return ns.name+"."+name;
+			}
+			return name;
+		}
 		public function initByInfo(_infoId:int,multiname_info:Multiname_info):void{
 			infoId=_infoId;
 			

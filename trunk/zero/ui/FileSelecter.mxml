@@ -5,6 +5,7 @@
 		 creationComplete="creationComplete()"
 		 removedFromStage="removed()"
 		 width="300" height="25"
+		 nativeDragEnter="nativeDragEnter(event)" nativeDragDrop="nativeDragDrop(event)"
 >
 	<mx:TextInput id="txt" editable="false" left="0" right="75" textAlign="right"/>
 	<mx:ComboBox id="cb" left="0" right="75" minWidth="0"/>
@@ -21,6 +22,16 @@
 			}
 			private function removed():void{
 				fsm.clear();
+			}
+
+			private function nativeDragEnter(event:NativeDragEvent):void{
+				if(fsm.checkIsMatchType(event.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT) as Array)){
+					NativeDragManager.acceptDragDrop(this);
+				}
+			}
+
+			private function nativeDragDrop(event:NativeDragEvent):void{
+				fsm.nativeDragDrop(event.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT) as Array);
 			}
 
 		]]>
