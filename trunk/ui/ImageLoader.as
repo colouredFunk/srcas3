@@ -5,6 +5,7 @@
 	import com.greensock.loading.ImageLoader;
 	import com.greensock.loading.display.ContentDisplay;
 	import flash.display.MovieClip;
+	import flash.events.ProgressEvent;
 	import flash.text.TextField;
 	
 	import com.greensock.TweenMax;
@@ -82,22 +83,18 @@
 		public function set noCache(_noCache:Boolean):void{
 			createManager(imageGroup).vars.noCache = _noCache;
 		}
-		private var __areaWidth:uint = 1;
 		public function get areaWidth():uint {
-			return __areaWidth;
-		};
+			return autoFitArea.width;
+		}
 		public function set areaWidth(_areaWidth:uint):void {
-			__areaWidth = _areaWidth;
-			autoFitArea.width = __areaWidth;
-		};
-		private var __areaHeight:uint = 1;
+			autoFitArea.width = _areaWidth;
+		}
 		public function get areaHeight():uint {
-			return __areaHeight;
-		};
+			return autoFitArea.height;
+		}
 		public function set areaHeight(_areaHeight:uint):void {
-			__areaHeight = _areaHeight;
-			autoFitArea.height = __areaHeight;
-		};
+			autoFitArea.height = _areaHeight;
+		}
 		protected var __source:String;
 		public function get source():String {
 			return __source;
@@ -108,17 +105,19 @@
 			if (!container) {
 				container = this;
 			}
+			var _areaWidth:uint = 1;
+			var _areaHeight:uint = 1;
 			if (background) {
-				__areaWidth = background.width;
-				__areaHeight = background.height;
+				_areaWidth = background.width;
+				_areaHeight = background.height;
 			}else if (container.width * container.height > 0) {
-				__areaWidth = container.width;
-				__areaHeight = container.height;
+				_areaWidth = container.width;
+				_areaHeight = container.height;
 			}
 			setProgressClip(false);
 			bmp = new Bitmap();
 			bmp.alpha = 0;
-			autoFitArea = new AutoFitArea(container, 0, 0, areaWidth, areaHeight);
+			autoFitArea = new AutoFitArea(container, 0, 0, _areaWidth, _areaHeight);
 			createMenu(this);
 			contextMenu = contextMenuImageLoader;
 		}
@@ -138,44 +137,34 @@
 			background = null;
 			autoFitArea.destroy();
 		}
+		public var changeImmediately:Boolean;
 		public function load(_source:*, _index:uint = 0, _changeImmediately:Boolean = false ):void {
 			if (_source && __source == _source) {
 				return;
 			}
 			__source = _source;
+			changeImmediately = _changeImmediately;
 			if (_source is BitmapData) {
 				bmdNow = _source;
 				__source = null;
+				//
+				setBMP(bmdNow);
 			}else {
-				var _isReady:Boolean = !Boolean(bmdNow);
-				bmdNow = loadBMD(_source, this, _index);
-			}
-			if (_changeImmediately) {
-				if (bmdNow) {
-					setBMP(bmdNow, _changeImmediately);
-				}else {
-					hideBMP(bmp, _changeImmediately, onHideEndHandler);
-				}
-			}else {
-				if (bmdNow && _isReady) {
-					setBMP(bmdNow, _changeImmediately);
-				}else {
-					hideBMP(bmp, _changeImmediately, onHideEndHandler);
-				}
+				loadBMD(_source, this, _index);
 			}
 		}
-		public function unload(_changeImmediately:Boolean = false):void {
-			hideBMP(bmp, _changeImmediately, onUnloadedHandler);
+		public function unload():void {
+			hideBMP(bmp, onUnloadedHandler);
 		}
 		protected var isHideTweening:Boolean;
-		protected function hideBMP(_content:*, _changeImmediately:Boolean = false , onHideComplete:Function = null):void {
+		protected function hideBMP(_content:*, onHideComplete:Function = null):void {
 			if (isHideTweening) {
 				return;
 			}
 			isHideTweening = true;
 			autoFitArea.release(_content);
 			TweenMax.killTweensOf(bmp);
-			TweenMax.to(bmp, _changeImmediately?0:12, { alpha:0, useFrames:true, ease:Sine.easeInOut, onComplete:onHideComplete } );
+			TweenMax.to(bmp, changeImmediately?0:12, { alpha:0, useFrames:true, ease:Sine.easeInOut, onComplete:onHideComplete } );
 		}
 		private function onUnloadedHandler():void {
 			isHideTweening = false;
@@ -187,7 +176,7 @@
 			isHideTweening = false;
 			setBMP(bmdNow);
 		}
-		protected function setBMP(_content:*, _changeImmediately:Boolean = false ):void {
+		protected function setBMP(_content:*):void {
 			if (!_content || isHideTweening) {
 				return;
 			}
@@ -203,11 +192,11 @@
 				container.addChild(bmp);
 			}
 			TweenMax.killTweensOf(bmp);
-			TweenMax.to(bmp, _changeImmediately?0:15, { alpha:1, useFrames:true, ease:Sine.easeInOut } );
+			TweenMax.to(bmp, changeImmediately?0:15, { alpha:1, useFrames:true, ease:Sine.easeInOut } );
 			updateArea(bmp);
 		}
 		private const LIMITWH_MAX:uint = 999999;
-		public function updateArea(_content:*):void {
+		protected function updateArea(_content:*):void {
 			if (areaWidth + areaHeight <= 2) {
 				//原始大小显示
 			}else {
@@ -234,14 +223,27 @@
 				autoFitArea.attach(_content, _scaleMode, _alignX, _alignY, false, 0, _widthMax, 0, _heightMax);
 			}
 		}
-		protected function onImageLoadingHandler(_evt:LoaderEvent):void {
-			__loadProgress = _evt.target.progress;
-			setProgressClip(_evt.target.progress);
+		protected function onImageLoadingHandler(_evt:*):void {
+			__loadProgress = _evt?_evt.target.progress:1;
+			setProgressClip(__loadProgress);
+			if (_evt) {
+				dispatchEvent(new ProgressEvent(ProgressEvent.PROGRESS, false, false, _evt?_evt.target.bytesLoaded:100, _evt?_evt.target.bytesTotal:100));
+			}
 		}
-		protected function onImageLoadedHandler(_evt:LoaderEvent):void {
-			bmdNow = _evt.target.rawContent.bitmapData;
-			setBMP(bmdNow);
+		protected function onImageLoadedHandler(_evt:*):void {
+			var _isReady:Boolean = !Boolean(bmdNow);
+			if (_evt is LoaderEvent) {
+				bmdNow = _evt.target.rawContent.bitmapData;
+			}else {
+				bmdNow = _evt as BitmapData;
+			}
+			if (bmdNow && _isReady) {
+				setBMP(bmdNow);
+			}else {
+				hideBMP(bmp, onHideEndHandler);
+			}
 			setProgressClip(false);
+			dispatchEvent(new Event(Event.COMPLETE));
 		}
 		protected function setProgressClip(_progress:*):void {
 			if (!progressClip) {
@@ -288,12 +290,14 @@
 		}
 		public static var onGroupLoading:Function;
 		public static var onGroupLoaded:Function;
-		protected static function loadBMD(_source:String, _imageLoader:ui.ImageLoader, _index:uint = 0):BitmapData {
+		protected static function loadBMD(_source:String, _imageLoader:ui.ImageLoader, _index:uint = 0):void {
 			imageLoader = imageLoaderDic[_source];
 			if (imageLoader) {
 				if (imageLoader.progress == 1 && imageLoader.rawContent && imageLoader.rawContent.bitmapData) {
 					//已经加载完图片
-					return imageLoader.rawContent.bitmapData;
+					_imageLoader.onImageLoadingHandler(null);
+					_imageLoader.onImageLoadedHandler(imageLoader.rawContent.bitmapData);
+					return;
 				}else {
 					register(_source, _imageLoader);
 					//将正在加载的图片加载优先级提前或退后
@@ -304,7 +308,7 @@
 					}else {
 						//异组请求图片的情况,要找到imageLoader属于哪个loaderMax
 					}
-					return null;
+					return;
 				}
 			}
 			//添加新的加载
@@ -318,7 +322,7 @@
 			
 			loaderMax.insert(imageLoader, _index);
 			loaderMax.load();
-			return null;
+			return;
 		}
 		private static function register(_source:String, _imageLoader:ui.ImageLoader):void {
 			deregister(_imageLoader.__source, _imageLoader);
