@@ -25,7 +25,7 @@ package zero.ui{
 		}
 		public function gotoURL():void{
 			GotoURL.gotoURL(
-				(getDefinitionByName("ui_2.BaseLoadURLPoj") as Object).xml[xmlName][0]
+				(getDefinitionByName("zero.ui.BaseLoadURLPoj") as Object).xml[xmlName][0]
 			);
 		}
 	}
