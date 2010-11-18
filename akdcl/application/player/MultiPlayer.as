@@ -1,4 +1,4 @@
-package akdcl.application{
+package akdcl.application.player{
 	import akdcl.events.MediaEvent;
 	
 	/**

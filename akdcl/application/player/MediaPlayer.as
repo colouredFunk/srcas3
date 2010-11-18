@@ -1,4 +1,4 @@
-package akdcl.application{
+package akdcl.application.player{
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
 	import flash.events.TimerEvent;

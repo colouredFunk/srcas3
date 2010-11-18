@@ -1,11 +1,11 @@
-package akdcl.application{
+package akdcl.application.player{
 	import flash.events.Event;
+	import com.greensock.TweenLite;
+	
 	import akdcl.events.MediaEvent;
-	import akdcl.application.MediaPlayer;
 	
 	import ui.ImageLoader;
 	import ui.UISprite;
-	import com.greensock.TweenLite;
 	/**
 	 * ...
 	 * @author Akdcl
