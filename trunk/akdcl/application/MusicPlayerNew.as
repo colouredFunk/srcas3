@@ -1,5 +1,6 @@
 package akdcl.application{
 	import flash.events.Event;
+	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
 	
 	import akdcl.media.Sound;
@@ -27,46 +28,42 @@ package akdcl.application{
 			}
 		}
 		protected var sound:Sound;
-		override protected function onRemoveToStageHandler():void {
-			super.onRemoveToStageHandler();
+		override public function remove():void {
+			super.remove();
 			if (sound) {
 				sound.stop(true);
 				sound = null;
 			}
 		}
 		override public function play():Boolean {
-			if (!isPlaying && sound) {
+			var _isPlay:Boolean = super.play();
+			if (_isPlay && sound) {
 				sound.play();
 			}
-			return super.play();
+			return _isPlay;
 		}
-		override public function pause():Boolean {
-			if (sound) {
-				sound.pause();
-			}
-			return super.pause();
+		override public function pause():void {
+			super.pause();
+			sound&&sound.pause();
 		}
-		override public function stop():Boolean {
-			if (sound) {
-				sound.stop();
-			}
-			return super.stop();
+		override public function stop():void {
+			sound && sound.stop();
+			super.stop();
 		}
 		override protected function onPlayIDChangeHandler(_playID:int):void {
-			super.onPlayIDChangeHandler(_playID);
 			stop();
 			if (sound) {
-				//sound.removeEventListener(Event.ID3, onID3Loaded);
+				sound.removeEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);
 				sound.removeEventListener(ProgressEvent.PROGRESS, onLoadProgressHander);
-				//sound.removeEventListener(Event.COMPLETE, onSoundLoadCompleteHandle);
+				sound.removeEventListener(Event.COMPLETE, onLoadCompleteHandler);
 				sound.removeEventListener(Event.SOUND_COMPLETE, onPlayCompleteHandler);
 				sound.stop(true);
 			}
 			var _musicSource:String = getMediaByID(_playID);
 			sound = Sound.loadSound(_musicSource);
-			//sound.addEventListener(Event.ID3, onID3Loaded);
+			sound.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);
 			sound.addEventListener(ProgressEvent.PROGRESS, onLoadProgressHander);
-			//sound.addEventListener(Event.COMPLETE, onSoundLoadCompleteHandle);
+			sound.addEventListener(Event.COMPLETE, onLoadCompleteHandler);
 			sound.addEventListener(Event.SOUND_COMPLETE, onPlayCompleteHandler);
 			if (autoPlay) {
 				play();
@@ -74,6 +71,7 @@ package akdcl.application{
 				stop();
 			}
 			autoPlay = true;
+			super.onPlayIDChangeHandler(_playID);
 		}
 	}
 }

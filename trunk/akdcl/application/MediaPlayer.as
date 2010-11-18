@@ -1,8 +1,10 @@
 package akdcl.application{
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
+	import flash.events.TimerEvent;
+	import flash.utils.Timer;
 	
-	import ui.UISprite;
+	import ui.UIEventDispatcher;
 	
 	import akdcl.events.MediaEvent;
 	import akdcl.application.IDPart;
@@ -21,11 +23,21 @@ package akdcl.application{
 
 	/// @eventType	akdcl.events.MediaEvent.LOAD_PROGRESS
 	[Event(name = "loadProgress", type = "akdcl.events.MediaEvent")]
+	
+	/// @eventType	akdcl.events.MediaEvent.LOAD_ERROR
+	[Event(name = "loadError", type = "akdcl.events.MediaEvent")]
+	
+	/// @eventType	akdcl.events.MediaEvent.LOAD_COMPLETE
+	[Event(name = "loadComplete", type = "akdcl.events.MediaEvent")]
+	
+	/// @eventType	akdcl.events.MediaEvent.PLAY_ID_CHANGE
+	[Event(name = "playIDChange", type = "akdcl.events.MediaEvent")]
+	
 	/**
 	 * ...
 	 * @author Akdcl
 	 */
-	public class MediaPlayer extends UISprite {
+	public class MediaPlayer extends UIEventDispatcher {
 		public static const STATE_PLAY:String = "play";
 		public static const STATE_PAUSE:String = "pause";
 		public static const STATE_STOP:String = "stop";
@@ -35,7 +47,6 @@ package akdcl.application{
 		public static const STATE_CONNECT:String = "connect";
 		public static const STATE_READY:String = "ready";
 		public static const STATE_RECONNECT:String = "reconnect";
-		public static const STATE_CONNECT_TIMEOUT:String = "connectTimeout";
 		
 		
 		public static const VALUE_PERCENTAGE:Number = 0.004;
@@ -72,6 +83,10 @@ package akdcl.application{
 		//毫秒为单位
 		public function get totalTime():uint {
 			return 0;
+		}
+		//
+		public function get isPlaying():Boolean {
+			return playState == STATE_PLAY;
 		}
 		//毫秒为单位
 		public function get position():uint {
@@ -140,14 +155,12 @@ package akdcl.application{
 			idPart.id = _playID;
 		}
 		//0:不循环，1:单首循环，2:顺序循环(全部播放完毕后停止)，3:顺序循环，4:随机播放
+		private var __repeat:uint = 3;
 		public function get repeat():uint {
-			return 3;
+			return __repeat;
 		}
 		public function set repeat(_repeat:uint):void {
-		}
-		//
-		public function get isPlaying():Boolean {
-			return playState == STATE_PLAY;
+			__repeat = _repeat;
 		}
 		//
 		private var __playState:String = STATE_STOP;
@@ -158,41 +171,92 @@ package akdcl.application{
 			if (__playState == _playState) {
 				return;
 			}
-			__playState = _playState;
-			switch(__playState) {
+			switch(_playState) {
 				case STATE_PLAY:
-					addEventListener(Event.ENTER_FRAME, onPlayProgressHander);
-				break;
+					timer.start();
+					break;
+				case STATE_PAUSE:
+					if (__playState == STATE_STOP) {
+						return;
+					}
+					timer.stop();
+					break;
 				case STATE_STOP:
+					timer.reset();
+					timer.stop();
 					onPlayProgressHander();
+					break;
 				default:
-					removeEventListener(Event.ENTER_FRAME, onPlayProgressHander);
+					timer.stop();
 			}
+			__playState = _playState;
 			dispatchEvent(new MediaEvent(MediaEvent.STATE_CHANGE));
 		}
 		//
+		private var __contentWidth:uint;
+		public function get contentWidth():uint {
+			return __contentWidth;
+		}
+		public function set contentWidth(value:uint):void {
+			__contentWidth = value;
+		}
+		private var __contentHeight:uint;
+		public function get contentHeight():uint {
+			return __contentHeight;
+		}
+		public function set contentHeight(value:uint):void {
+			__contentHeight = value;
+		}
+		private var __content:*;
+		public function get content():* {
+			return __content;
+		}
+		public function set content(_content:*):* {
+			__content = _content;
+		}
+		private var __container:*;
+		public function get container():*{
+			return __container;
+		}
+		public function set container(_cotainer:*):void {
+			if (_cotainer == __container || !_cotainer) {
+				return;
+			}
+			__container = _cotainer;
+		}
+		//
+		public var updateInterval:uint = 20;
+		protected var timer:Timer;
 		protected var idPart:IDPart;
-		protected var playList:XMLList;
+		protected var __playList:XMLList;
+		public function get playList():XMLList{
+			return __playList;
+		}
 		//
 		override protected function init():void {
 			super.init();
+			timer = new Timer(updateInterval);
+			timer.addEventListener(TimerEvent.TIMER, onPlayProgressHander);
 			idPart = new IDPart();
 			idPart.onIDChange = onPlayIDChangeHandler;
 		}
-		override protected function onRemoveToStageHandler():void {
+		override public function remove():void {
+			super.remove();
+			stop();
+			timer.removeEventListener(TimerEvent.TIMER, onPlayProgressHander);
+			timer = null;
 			idPart.remove();
 			idPart = null;
-			playList = null;
-			stop();
-			super.onRemoveToStageHandler();
+			__playList = null;
 		}
 		//
-		public function open(_list:*, _autoPlay:Boolean = false):void {
-			playList = createList(_list);
-			if (!playList) {
+		public function openList(_list:*, _autoPlay:Boolean = false):void {
+			_list = createList(_list);
+			if (!_list) {
 				return;
 			}
-			idPart.length = playList.length();
+			__playList = _list;
+			idPart.length = __playList.length();
 			idPart.setID( -1);
 			autoPlay = _autoPlay;
 			playID = 0;
@@ -203,25 +267,17 @@ package akdcl.application{
 		}
 		//
 		public function play():Boolean {
-			if (playState== STATE_PLAY) {
+			if (isPlaying) {
 				return false;
 			}
 			setPlayState(STATE_PLAY);
 			return true;
 		}
-		public function pause():Boolean {
-			if (playState== STATE_PAUSE) {
-				return false;
-			}
+		public function pause():void {
 			setPlayState(STATE_PAUSE);
-			return true;
 		}
-		public function stop():Boolean {
-			if (playState== STATE_STOP) {
-				return false;
-			}
+		public function stop():void {
 			setPlayState(STATE_STOP);
-			return true;
 		}
 		public function playOrPause():Boolean {
 			if (playState== STATE_PLAY) {
@@ -248,7 +304,22 @@ package akdcl.application{
 			playID--;
 		}
 		//
+		public function hideContent():void {
+		}
+		//
 		protected function onPlayIDChangeHandler(_playID:int):void {
+			dispatchEvent(new MediaEvent(MediaEvent.PLAY_ID_CHANGE));
+		}
+		//
+		protected function onLoadErrorHandler(_evt:*= null):void {
+			onPlayCompleteHandler();
+			dispatchEvent(new MediaEvent(MediaEvent.LOAD_ERROR));
+		}
+		protected function onLoadProgressHander(_evt:*= null):void {
+			dispatchEvent(new MediaEvent(MediaEvent.LOAD_PROGRESS));
+		}
+		protected function onLoadCompleteHandler(_evt:*= null):void {
+			dispatchEvent(new MediaEvent(MediaEvent.LOAD_COMPLETE));
 		}
 		//
 		protected function onPlayCompleteHandler(_evt:*= null):void {
@@ -261,9 +332,11 @@ package akdcl.application{
 					play();
 					break;
 				case 2:
-					idPart.autoID = false;
-					next();
-					idPart.autoID = true;
+					if (playID == idPart.length - 1) {
+						stop();
+					}else {
+						next();
+					}
 					break;
 				case 3:
 					next();
@@ -277,9 +350,6 @@ package akdcl.application{
 		}
 		protected function onPlayProgressHander(_evt:*= null):void {
 			dispatchEvent(new MediaEvent(MediaEvent.PLAY_PROGRESS));
-		}
-		protected function onLoadProgressHander(_evt:*= null):void {
-			dispatchEvent(new MediaEvent(MediaEvent.LOAD_PROGRESS));
 		}
 	}
 	
