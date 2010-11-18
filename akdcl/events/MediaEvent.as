@@ -4,6 +4,9 @@ package akdcl.events {
 	 * ...
 	 * @author Akdcl
 	 */
+	/// @eventType	akdcl.events.MediaEvent.LIST_CHANGE
+	[Event(name = "listChange", type = "akdcl.events.MediaEvent")]
+	
 	/// @eventType	akdcl.events.MediaEvent.VOLUME_CHANGE
 	[Event(name = "volumeChange", type = "akdcl.events.MediaEvent")]
 
@@ -29,6 +32,7 @@ package akdcl.events {
 	[Event(name = "loadComplete", type = "akdcl.events.MediaEvent")]
 	
 	public class MediaEvent extends Event {
+		public static const LIST_CHANGE : String = "listChange";
 		public static const VOLUME_CHANGE : String = "volumeChange";
 		public static const STATE_CHANGE : String = "stateChange";
 		public static const PLAY_ID_CHANGE : String = "playIDChange";

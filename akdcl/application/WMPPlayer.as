@@ -304,17 +304,12 @@ package akdcl.application{
 		override protected function onPlayIDChangeHandler(_playID:int):void {
 			stop();
 			wmpInfo = null;
+			super.onPlayIDChangeHandler(_playID);
 			var _mediaSource:String = getMediaByID(_playID);
 			if (isPlugin) {
 				ExternalInterface.call("pwrd.wmpPlayer.openList", ExternalInterface.objectID, _mediaSource);
 			}
-			if (autoPlay) {
-				play();
-			}else {
-				stop();
-			}
-			autoPlay = true;
-			super.onPlayIDChangeHandler(_playID);
+			play();
 		}
 	}
 }

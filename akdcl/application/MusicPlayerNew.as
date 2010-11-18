@@ -59,19 +59,16 @@ package akdcl.application{
 				sound.removeEventListener(Event.SOUND_COMPLETE, onPlayCompleteHandler);
 				sound.stop(true);
 			}
+			
+			super.onPlayIDChangeHandler(_playID);
+			
 			var _musicSource:String = getMediaByID(_playID);
 			sound = Sound.loadSound(_musicSource);
 			sound.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);
 			sound.addEventListener(ProgressEvent.PROGRESS, onLoadProgressHander);
 			sound.addEventListener(Event.COMPLETE, onLoadCompleteHandler);
 			sound.addEventListener(Event.SOUND_COMPLETE, onPlayCompleteHandler);
-			if (autoPlay) {
-				play();
-			}else {
-				stop();
-			}
-			autoPlay = true;
-			super.onPlayIDChangeHandler(_playID);
+			play();
 		}
 	}
 }
