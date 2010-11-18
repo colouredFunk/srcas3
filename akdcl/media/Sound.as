@@ -99,7 +99,7 @@ package akdcl.media
 			if (startTime > totalTime * loadProgress) {
 				startTime = totalTime * loadProgress * 0.99;
 			}
-			if (positionPause > 0 && startTime != 0) {
+			if (positionPause > 0 && startTime == 0) {
 				startTime = positionPause;
 			}
 			positionPause = 0;
