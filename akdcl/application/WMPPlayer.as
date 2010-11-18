@@ -1,8 +1,9 @@
 package akdcl.application{
 	import flash.events.Event;
+	import flash.events.TimerEvent;
 	import flash.external.ExternalInterface;
 	import flash.utils.setTimeout;
-	import akdcl.application.MediaPlayer;
+	import flash.utils.Timer;
 	
 	/**
 	 * ...
@@ -113,7 +114,7 @@ package akdcl.application{
 					_player.settings.volume=_volume;
 				}
 			}
-			pwrd.wmpPlayer.open=function(_swfID,_mediaSource){
+			pwrd.wmpPlayer.openList=function(_swfID,_mediaSource){
 				var _player=pwrd.wmpPlayer.getPlayer(_swfID);
 				if(pwrd.wmpPlayer.isWMPNow){
 					_player.URL=_mediaSource;
@@ -156,15 +157,22 @@ package akdcl.application{
 		public static var isPlugin:Boolean;
 		
 		override public function get loadProgress():Number {
+			var _loadedProgress:Number;
 			if (isPlugin) {
 				var _playingInfo:Object = getWMPPlayingInfo();
 				if (_playingInfo) {
-					return int(_playingInfo.loadProgress) * 0.01;
+					_loadedProgress = int(_playingInfo.loadProgress) * 0.01;
 				}else {
-					return 1;
+					_loadedProgress = 1;
 				}
+			}else {
+				_loadedProgress = 0;
 			}
-			return 0;
+			if (_loadedProgress==1) {
+				timerLoad.stop();
+				onLoadCompleteHandler();
+			}
+			return _loadedProgress;
 		}
 		override public function get totalTime():uint {
 			if (isPlugin && wmpInfo) {
@@ -185,58 +193,56 @@ package akdcl.application{
 		}
 		override public function set position(value:uint):void {
 			if (isPlugin) {
-				ExternalInterface.call("pwrd.wmpPlayer.play",swfID, value * 0.001);
+				ExternalInterface.call("pwrd.wmpPlayer.play",ExternalInterface.objectID, value * 0.001);
 			}
 		}
 		override public function set volume(value:Number):void {
 			super.volume = value;
 			if (isPlugin) {
-				ExternalInterface.call("pwrd.wmpPlayer.setVolume", swfID, volume * 100);
+				ExternalInterface.call("pwrd.wmpPlayer.setVolume", ExternalInterface.objectID, volume * 100);
 			}
 		}
-		public var swfID:String;
 		protected var wmpInfo:Object;
-		public function setJS(_swfID:String):void {
-			swfID = _swfID;
-			if (swfID && ExternalInterface.available) {
+		protected var timerLoad:Timer;
+		override protected function init():void {
+			timerLoad = new Timer(updateInterval);
+			timerLoad.addEventListener(TimerEvent.TIMER, onLoadProgressHander);
+			if (ExternalInterface.available) {
 				ExternalInterface.call("eval", PWRDJS.INIT.toString());
 				ExternalInterface.call("eval", WMPPLAYER_JS.toString());
 				ExternalInterface.call("pwrd.wmpPlayer.createWMPContainer");
 				ExternalInterface.addCallback("playStateChange", playStateChange);
-				isPlugin = ExternalInterface.call("pwrd.wmpPlayer.createWMPPlayer", swfID, "playStateChange");
+				isPlugin = ExternalInterface.call("pwrd.wmpPlayer.createWMPPlayer", ExternalInterface.objectID, "playStateChange");
 			}
+		}
+		override public function remove():void {
+			super.remove();
+			wmpInfo = null;
+			timerLoad.removeEventListener(TimerEvent.TIMER, onLoadProgressHander);
+			timerLoad = null;
 		}
 		override public function play():Boolean {
-			if (playState== STATE_PLAY) {
-				return false;
-			}
 			if (isPlugin) {
-				ExternalInterface.call("pwrd.wmpPlayer.play",swfID);
+				ExternalInterface.call("pwrd.wmpPlayer.play",ExternalInterface.objectID);
+				volume = volume;
 			}
-			volume = volume;
-			return true;
+			return super.play();
 		}
-		override public function pause():Boolean {
-			if (playState== STATE_PAUSE) {
-				return false;
-			}
+		override public function pause():void {
 			if (isPlugin) {
-				ExternalInterface.call("pwrd.wmpPlayer.pause",swfID);
+				ExternalInterface.call("pwrd.wmpPlayer.pause",ExternalInterface.objectID);
 			}
-			return true;
+			super.pause();
 		}
-		override public function stop():Boolean {
-			if (playState== STATE_STOP) {
-				return false;
-			}
+		override public function stop():void {
 			if (isPlugin) {
-				ExternalInterface.call("pwrd.wmpPlayer.stop",swfID);
+				ExternalInterface.call("pwrd.wmpPlayer.stop",ExternalInterface.objectID);
 			}
-			return true;
+			super.stop();
 		}
 		protected function getWMPPlayingInfo():Object {
 			if (isPlugin) {
-				return ExternalInterface.call("pwrd.wmpPlayer.getWMPPlayingInfo",swfID);
+				return ExternalInterface.call("pwrd.wmpPlayer.getWMPPlayingInfo",ExternalInterface.objectID);
 			}
 			return null;
 		}
@@ -244,9 +250,7 @@ package akdcl.application{
 			switch (_id) {
 				case 0 :
 					//连接超时
-					setPlayState(MediaPlayer.STATE_CONNECT_TIMEOUT);
-					stop();
-					setTimeout(play, 300);
+					onLoadErrorHandler();
 					break;
 				case 1 :
 					//停止
@@ -258,8 +262,9 @@ package akdcl.application{
 					break;
 				case 3 :
 					//播放
-					wmpInfo = ExternalInterface.call("pwrd.wmpPlayer.getWMPInfo", swfID);
-					addEventListener(Event.ENTER_FRAME, onLoadProgressHander);
+					wmpInfo = ExternalInterface.call("pwrd.wmpPlayer.getWMPInfo", ExternalInterface.objectID);
+					timerLoad.reset();
+					timerLoad.start();
 					setPlayState(MediaPlayer.STATE_PLAY);
 					break;
 				case 4 :
@@ -288,8 +293,6 @@ package akdcl.application{
 				case 10 :
 					//就绪
 					setPlayState(MediaPlayer.STATE_READY);
-					stop();
-					setTimeout(play, 300);
 					break;
 				case 11 :
 					//重新连接
@@ -298,17 +301,12 @@ package akdcl.application{
 			}
 			return _id;
 		}
-		override protected function onRemoveToStageHandler():void {
-			super.onRemoveToStageHandler();
-			wmpInfo = null;
-		}
 		override protected function onPlayIDChangeHandler(_playID:int):void {
-			super.onPlayIDChangeHandler(_playID);
 			stop();
 			wmpInfo = null;
 			var _mediaSource:String = getMediaByID(_playID);
 			if (isPlugin) {
-				ExternalInterface.call("pwrd.wmpPlayer.open", swfID, _mediaSource);
+				ExternalInterface.call("pwrd.wmpPlayer.openList", ExternalInterface.objectID, _mediaSource);
 			}
 			if (autoPlay) {
 				play();
@@ -316,6 +314,7 @@ package akdcl.application{
 				stop();
 			}
 			autoPlay = true;
+			super.onPlayIDChangeHandler(_playID);
 		}
 	}
 }
