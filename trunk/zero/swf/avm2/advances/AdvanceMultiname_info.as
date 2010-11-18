@@ -93,7 +93,7 @@ package zero.swf.avm2.advances{
 			}
 			return name;
 		}
-		public function initByInfo(_infoId:int,multiname_info:Multiname_info):void{
+		public function initByInfo(advanceABC:AdvanceABC,_infoId:int,multiname_info:Multiname_info):void{
 			infoId=_infoId;
 			
 			switch(multiname_info.kind){
@@ -112,7 +112,7 @@ package zero.swf.avm2.advances{
 					//name是在 constant_pool.string_v 中的id
 					//ns或name如果是 0 则表示 "*"
 					
-					initByInfo_fun(multiname_info,QName_memberV);
+					initByInfo_fun(advanceABC,multiname_info,QName_memberV);
 				break;
 				case MultinameKind.Multiname:
 				case MultinameKind.MultinameA:
@@ -129,7 +129,7 @@ package zero.swf.avm2.advances{
 					//name如果是 0 则表示 "*"
 					//ns_set不能是 0
 					
-					initByInfo_fun(multiname_info,Multiname_memberV);
+					initByInfo_fun(advanceABC,multiname_info,Multiname_memberV);
 				break;
 				case MultinameKind.RTQName:
 				case MultinameKind.RTQNameA:
@@ -142,7 +142,7 @@ package zero.swf.avm2.advances{
 					//name是在 constant_pool.string_v 中的id
 					//name如果是 0 则表示 "*"
 					
-					initByInfo_fun(multiname_info,RTQName_memberV);
+					initByInfo_fun(advanceABC,multiname_info,RTQName_memberV);
 				break;
 				case MultinameKind.RTQNameL:
 				case MultinameKind.RTQNameLA:
@@ -153,7 +153,7 @@ package zero.swf.avm2.advances{
 					//This kind has no associated data.
 					//什么都没有...
 					
-					initByInfo_fun(multiname_info,RTQNameL_memberV);
+					initByInfo_fun(advanceABC,multiname_info,RTQNameL_memberV);
 				break;
 				case MultinameKind.MultinameL:
 				case MultinameKind.MultinameLA:
@@ -166,7 +166,7 @@ package zero.swf.avm2.advances{
 					//ns_set是在 constant_pool.ns_set_info_v 中的id
 					//ns_set不能是 0
 					
-					initByInfo_fun(multiname_info,MultinameL_memberV);
+					initByInfo_fun(advanceABC,multiname_info,MultinameL_memberV);
 				break;
 				case MultinameKind.GenericName:
 					//0x1D can be considered a GenericName multiname, and is declared as such: 
@@ -178,50 +178,50 @@ package zero.swf.avm2.advances{
 					//[ParamCount] is a U8 (U30?) of how many parameters there are 
 					//[ParamX] is a U30 into the multiname table. 
 					
-					initByInfo_fun(multiname_info,GenericName_memberV);
+					initByInfo_fun(advanceABC,multiname_info,GenericName_memberV);
 				break;
 				default:
 					throw new Error("未知 kind: "+multiname_info.kind);
 				break;
 			}
 		}
-		public function toInfoId():int{
+		public function toInfoId(advanceABC:AdvanceABC):int{
 			var multiname_info:Multiname_info=new Multiname_info();
 			
 			switch(kind){
 				case MultinameKind.QName:
 				case MultinameKind.QNameA:
 					
-					toInfo_fun(multiname_info,QName_memberV);
+					toInfo_fun(advanceABC,multiname_info,QName_memberV);
 					
 				break;
 				case MultinameKind.Multiname:
 				case MultinameKind.MultinameA:
 					
-					toInfo_fun(multiname_info,Multiname_memberV);
+					toInfo_fun(advanceABC,multiname_info,Multiname_memberV);
 					
 				break;
 				case MultinameKind.RTQName:
 				case MultinameKind.RTQNameA:
 					
-					toInfo_fun(multiname_info,RTQName_memberV);
+					toInfo_fun(advanceABC,multiname_info,RTQName_memberV);
 					
 				break;
 				case MultinameKind.RTQNameL:
 				case MultinameKind.RTQNameLA:
 					
-					toInfo_fun(multiname_info,RTQNameL_memberV);
+					toInfo_fun(advanceABC,multiname_info,RTQNameL_memberV);
 					
 				break;
 				case MultinameKind.MultinameL:
 				case MultinameKind.MultinameLA:
 					
-					toInfo_fun(multiname_info,MultinameL_memberV);
+					toInfo_fun(advanceABC,multiname_info,MultinameL_memberV);
 					
 				break;
 				case MultinameKind.GenericName:
 					
-					toInfo_fun(multiname_info,GenericName_memberV);
+					toInfo_fun(advanceABC,multiname_info,GenericName_memberV);
 					
 				break;
 				default:
@@ -230,8 +230,8 @@ package zero.swf.avm2.advances{
 			}
 			
 			//--
-			AdvanceABC.currInstance.abcFile.multiname_infoV.push(multiname_info);
-			return AdvanceABC.currInstance.abcFile.multiname_infoV.length-1;
+			advanceABC.abcFile.multiname_infoV.push(multiname_info);
+			return advanceABC.abcFile.multiname_infoV.length-1;
 		}
 		
 		////
@@ -283,7 +283,7 @@ package zero.swf.avm2.advances{
 			xml.@infoId=infoId;
 			return xml;
 		}
-		public function initByXML(xml:XML):void{
+		public function initByXML(marks:Object,xml:XML):void{
 			infoId=int(xml.@infoId.toString());
 			
 			/*
@@ -303,36 +303,36 @@ package zero.swf.avm2.advances{
 				case MultinameKind.QName:
 				case MultinameKind.QNameA:
 					
-					initByXML_fun(xml,QName_memberV);
+					initByXML_fun(marks,xml,QName_memberV);
 					
 				break;
 				case MultinameKind.Multiname:
 				case MultinameKind.MultinameA:
 					
-					initByXML_fun(xml,Multiname_memberV);
+					initByXML_fun(marks,xml,Multiname_memberV);
 					
 				break;
 				case MultinameKind.RTQName:
 				case MultinameKind.RTQNameA:
 					
-					initByXML_fun(xml,RTQName_memberV);
+					initByXML_fun(marks,xml,RTQName_memberV);
 					
 				break;
 				case MultinameKind.RTQNameL:
 				case MultinameKind.RTQNameLA:
 					
-					initByXML_fun(xml,RTQNameL_memberV);
+					initByXML_fun(marks,xml,RTQNameL_memberV);
 					
 				break;
 				case MultinameKind.MultinameL:
 				case MultinameKind.MultinameLA:
 					
-					initByXML_fun(xml,MultinameL_memberV);
+					initByXML_fun(marks,xml,MultinameL_memberV);
 					
 				break;
 				case MultinameKind.GenericName:
 					
-					initByXML_fun(xml,GenericName_memberV);
+					initByXML_fun(marks,xml,GenericName_memberV);
 					
 				break;
 				default:

@@ -126,8 +126,8 @@ package zero.swf.avm2.advances{
 			return traits_info;
 		}
 		
-		public function initByInfo(traits_info:Traits_info):void{
-			initByInfo_fun(traits_info,memberV,traits_info.kind_attributes&TraitAttributes.Metadata);
+		public function initByInfo(advanceABC:AdvanceABC,traits_info:Traits_info):void{
+			initByInfo_fun(advanceABC,traits_info,memberV,traits_info.kind_attributes&TraitAttributes.Metadata);
 			//
 			switch(kind_trait_type){
 				case TraitTypes.Slot:
@@ -157,7 +157,7 @@ package zero.swf.avm2.advances{
 					
 					//vindex 和 vkind 合起来很像 Option_detail，Option_detail 是用作函数参数的默认值
 					
-					initByInfo_fun(traits_info,trait_slot_memberV);
+					initByInfo_fun(advanceABC,traits_info,trait_slot_memberV);
 				break;
 				case TraitTypes.Method:
 				case TraitTypes.Getter:
@@ -174,7 +174,7 @@ package zero.swf.avm2.advances{
 					
 					//The method field is an index that points into the method array of the abcFile entry.
 					
-					initByInfo_fun(traits_info,trait_method_memberV);
+					initByInfo_fun(advanceABC,traits_info,trait_method_memberV);
 				break;
 				case TraitTypes.Function:
 					//trait_function
@@ -188,7 +188,7 @@ package zero.swf.avm2.advances{
 					
 					//The function field is an index that points into the method array of the abcFile entry.
 					
-					initByInfo_fun(traits_info,trait_function_memberV);
+					initByInfo_fun(advanceABC,traits_info,trait_function_memberV);
 				break;
 				case TraitTypes.Clazz:
 					//trait_class
@@ -202,31 +202,31 @@ package zero.swf.avm2.advances{
 					
 					//The classi field is an index that points into the class array of the abcFile entry.
 					
-					initByInfo_fun(traits_info,trait_class_memberV);
+					initByInfo_fun(advanceABC,traits_info,trait_class_memberV);
 				break;
 			}
 			//
 		}
-		public function toInfo():Traits_info{
+		public function toInfo(advanceABC:AdvanceABC):Traits_info{
 			var traits_info:Traits_info=new Traits_info();
 			
-			toInfo_fun(traits_info,memberV);
+			toInfo_fun(advanceABC,traits_info,memberV);
 			
 			switch(kind_trait_type){
 				case TraitTypes.Slot:
 				case TraitTypes.Const:
-					toInfo_fun(traits_info,trait_slot_memberV);
+					toInfo_fun(advanceABC,traits_info,trait_slot_memberV);
 				break;
 				case TraitTypes.Method:
 				case TraitTypes.Getter:
 				case TraitTypes.Setter:
-					toInfo_fun(traits_info,trait_method_memberV);
+					toInfo_fun(advanceABC,traits_info,trait_method_memberV);
 				break;
 				case TraitTypes.Function:
-					toInfo_fun(traits_info,trait_function_memberV);
+					toInfo_fun(advanceABC,traits_info,trait_function_memberV);
 				break;
 				case TraitTypes.Clazz:
-					toInfo_fun(traits_info,trait_class_memberV);
+					toInfo_fun(advanceABC,traits_info,trait_class_memberV);
 				break;
 			}
 			
@@ -258,25 +258,27 @@ package zero.swf.avm2.advances{
 			
 			return xml;
 		}
-		public function initByXML(xml:XML):void{
-			initByXML_fun(xml,memberV);
+		public function initByXML(marks:Object,xml:XML):void{
+			initByXML_fun(marks,xml,memberV);
 			
 			//
 			switch(kind_trait_type){
 				case TraitTypes.Slot:
 				case TraitTypes.Const:
-					initByXML_fun(xml,trait_slot_memberV);
+					//trace("kind="+xml.vindex[0].@kind.toString());
+					initByXML_fun(marks,xml,trait_slot_memberV);
+					//trace("vindex.kind="+vindex.kind);
 				break;
 				case TraitTypes.Method:
 				case TraitTypes.Getter:
 				case TraitTypes.Setter:
-					initByXML_fun(xml,trait_method_memberV);
+					initByXML_fun(marks,xml,trait_method_memberV);
 				break;
 				case TraitTypes.Function:
-					initByXML_fun(xml,trait_function_memberV);
+					initByXML_fun(marks,xml,trait_function_memberV);
 				break;
 				case TraitTypes.Clazz:
-					initByXML_fun(xml,trait_class_memberV);
+					initByXML_fun(marks,xml,trait_class_memberV);
 				break;
 			}
 			//

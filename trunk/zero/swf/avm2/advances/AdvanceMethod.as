@@ -187,59 +187,59 @@ package zero.swf.avm2.advances{
 			return method;
 		}
 		
-		public function initByInfos(_infoId:int,method_info:Method_info,method_body_info:Method_body_info):void{
+		public function initByInfos(advanceABC:AdvanceABC,_infoId:int,method_info:Method_info,method_body_info:Method_body_info):void{
 			infoId=_infoId;
 			
-			initByInfo_fun(method_info,Method_info_memberV,method_info.flags&MethodFlags.HAS_OPTIONAL,method_info.flags&MethodFlags.HAS_PARAM_NAMES);
+			initByInfo_fun(advanceABC,method_info,Method_info_memberV,method_info.flags&MethodFlags.HAS_OPTIONAL,method_info.flags&MethodFlags.HAS_PARAM_NAMES);
 			
 			if(method_body_info){
 				//如果是接口则 method_body_info==null
 				
-				initByInfo_fun(method_body_info,Method_body_info_memberV);
+				initByInfo_fun(advanceABC,method_body_info,Method_body_info_memberV);
 				
 				var exception_infoV:Vector.<AdvanceException_info>=new Vector.<AdvanceException_info>();
 				var i:int=-1;
 				for each(var exception_info:Exception_info in method_body_info.exception_infoV){
 					i++;
 					exception_infoV[i]=new AdvanceException_info();
-					exception_infoV[i].initByInfo(exception_info);
+					exception_infoV[i].initByInfo(advanceABC,exception_info);
 				}
 				codes=new AdvanceCodes();
-				codes.initByInfo(method_body_info.codes.toData(),exception_infoV);
+				codes.initByInfo(advanceABC,method_body_info.codes.toData(),exception_infoV);
 			}
 		}
 		
-		public function toInfoId():int{
+		public function toInfoId(advanceABC:AdvanceABC):int{
 			var method_info:Method_info=new Method_info();
 			
-			toInfo_fun(method_info,Method_info_memberV);
+			toInfo_fun(advanceABC,method_info,Method_info_memberV);
 			
-			var methodId:int=AdvanceABC.currInstance.abcFile.method_infoV.length;
-			AdvanceABC.currInstance.abcFile.method_infoV[methodId]=method_info;
+			var methodId:int=advanceABC.abcFile.method_infoV.length;
+			advanceABC.abcFile.method_infoV[methodId]=method_info;
 			
 			if(codes){
 				var method_body_info:Method_body_info=new Method_body_info();
 				
-				toInfo_fun(method_body_info,Method_body_info_memberV);
+				toInfo_fun(advanceABC,method_body_info,Method_body_info_memberV);
 				
 				method_body_info.method=methodId;
 				//trace("methodId="+methodId);
 				
 				var exception_infoV:Vector.<AdvanceException_info>=new Vector.<AdvanceException_info>();
 				
-				var codesData:ByteArray=codes.toData(exception_infoV);
+				var codesData:ByteArray=codes.toData(advanceABC,exception_infoV);
 				
 				method_body_info.exception_infoV=new Vector.<Exception_info>();
 				var i:int=-1;
 				for each(var exception_info:AdvanceException_info in exception_infoV){
 					i++;
-					method_body_info.exception_infoV[i]=exception_info.toInfo();
+					method_body_info.exception_infoV[i]=exception_info.toInfo(advanceABC);
 				}
 				
 				method_body_info.codes=new BytesData();
 				method_body_info.codes.initByData(codesData,0,codesData.length);
 				
-				AdvanceABC.currInstance.abcFile.method_body_infoV.push(method_body_info);
+				advanceABC.abcFile.method_body_infoV.push(method_body_info);
 			}
 			
 			return methodId;
@@ -259,19 +259,19 @@ package zero.swf.avm2.advances{
 			xml.@infoId=infoId;
 			return xml;
 		}
-		public function initByXML(xml:XML):void{
+		public function initByXML(marks:Object,xml:XML):void{
 			infoId=int(xml.@infoId.toString());
 			
-			initByXML_fun(xml,Method_info_memberV);
+			initByXML_fun(marks,xml,Method_info_memberV);
 			
 			var codesXML:XML=xml.codes[0];
 			
 			if(codesXML){
 				
-				initByXML_fun(xml,Method_body_info_memberV);
+				initByXML_fun(marks,xml,Method_body_info_memberV);
 				
 				codes=new AdvanceCodes();
-				codes.initByXML(codesXML);
+				codes.initByXML(marks,codesXML);
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML

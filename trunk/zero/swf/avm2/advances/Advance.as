@@ -11,17 +11,18 @@ package zero.swf.avm2.advances{
 	import flash.utils.getQualifiedClassName;
 	
 	import zero.swf.avm2.AVM2Obj;
+	import zero.swf.vmarks.ConstantKind;
 	
 	public class Advance{
-		public static var test_tempArr:Array;
+		//public static var test_tempArr:Array;
 		//public static var test_total_new:int;
 		public function Advance(){
 			//trace(this+", test_total_new="+(++test_total_new));
 		}
 		
 		
-		public function initByInfo_fun(avm2Obj:AVM2Obj,memberV:Vector.<Member>,...rests):void{
-			var restId:int=0;
+		public function initByInfo_fun(advanceABC:AdvanceABC,mainAVM2Obj:AVM2Obj,memberV:Vector.<Member>,...rests):void{
+			var restId:int=0,infoV:*,i:int;
 			for each(var member:Member in memberV){
 				if(member.curr==Member.CURR_CASE){
 					if(rests[restId++]){
@@ -32,24 +33,37 @@ package zero.swf.avm2.advances{
 				
 				if(Member.fromABCFileMark[member.type]){
 					if(member.isList){
-						AdvanceABC.currInstance.getInfoVByIdsAndMemberType(this,avm2Obj,member.name+"V",member.type);
+						var idV:Vector.<int>=mainAVM2Obj[member.name+"V"];
+						infoV=this[member.name+"V"]=new MemberClasses[member.type+"VClass"](idV.length);
+						i=-1;
+						for each(var id:int in idV){
+							i++;
+							infoV[i]=advanceABC.getInfoByIdAndMemberType(id,member.type);
+						}
 					}else{
 						//if(Member.directMark[member.type]){
 							//
 						//}else{
 							//
 						//}
-						this[member.name]=AdvanceABC.currInstance.getInfoByIdAndMemberType(avm2Obj[member.name],member.type);
+						this[member.name]=advanceABC.getInfoByIdAndMemberType(mainAVM2Obj[member.name],member.type);
 					}
 				}else{
 					if(member.isList){
-						getInfoVByAVM2Objs(avm2Obj,member.name+"V",MemberClasses[member.type],MemberClasses[member.type+"VClass"]);
+						var avm2ObjV:*=mainAVM2Obj[member.name+"V"];
+						infoV=this[member.name+"V"]=new MemberClasses[member.type+"VClass"](avm2ObjV.length);
+						i=-1;
+						for each(var avm2Obj:AVM2Obj in avm2ObjV){
+							i++;
+							infoV[i]=new MemberClasses[member.type]();
+							infoV[i].initByInfo(advanceABC,avm2Obj);
+						}
 					}else if(member.constKindName){
-						this[member.name]=AdvanceABC.currInstance.getConstValueByIdAndKind(member.name,avm2Obj[member.name],this[member.constKindName])
+						this[member.name]=advanceABC.getConstValueByIdAndKind(member.name,mainAVM2Obj[member.name],this[member.constKindName])
 					}else{
 						if(member.classV){
 							this[member.name]=new (member.classV[this[member.classVIdName]])();
-							this[member.name].initByInfo(avm2Obj[member.name]);
+							this[member.name].initByInfo(advanceABC,mainAVM2Obj[member.name]);
 						}else{
 							//if(member.kindClass){
 							//	只在 toXML 或 initByXML 时有用
@@ -57,7 +71,7 @@ package zero.swf.avm2.advances{
 							//	只在 toXML 或 initByXML 时有用
 							//}eles{
 								if(member.type==Member.DIRECT_INT){
-									this[member.name]=avm2Obj[member.name];
+									this[member.name]=mainAVM2Obj[member.name];
 								}else{
 									if(Member.directMark[member.type]){
 										throw new Error("未处理");
@@ -71,8 +85,8 @@ package zero.swf.avm2.advances{
 				}
 			}
 		}
-		
-		public function toInfo_fun(avm2Obj:AVM2Obj,memberV:Vector.<Member>):void{
+		public function toInfo_fun(advanceABC:AdvanceABC,mainAVM2Obj:AVM2Obj,memberV:Vector.<Member>):void{
+			var infoV:*,i:int,info:*;
 			for each(var member:Member in memberV){
 				if(member.curr==Member.CURR_CASE){
 					if(member.isList){
@@ -90,26 +104,38 @@ package zero.swf.avm2.advances{
 				
 				if(Member.fromABCFileMark[member.type]){
 					if(member.isList){
-						AdvanceABC.currInstance.getIdsByInfoVAndMemberType(this,avm2Obj,member.name+"V",member.type);
+						infoV=this[member.name+"V"];
+						var idV:Vector.<int>=mainAVM2Obj[member.name+"V"]=new Vector.<int>(infoV.length);
+						i=-1;
+						for each(info in infoV){
+							i++;
+							idV[i]=advanceABC.getIdByInfoAndMemberType(info,member.type);
+						}
 					}else{
 						//if(Member.directMark[member.type]){
 							//
 						//}else{
 							//
 						//}
-						avm2Obj[member.name]=AdvanceABC.currInstance.getIdByInfoAndMemberType(this[member.name],member.type);
+						mainAVM2Obj[member.name]=advanceABC.getIdByInfoAndMemberType(this[member.name],member.type);
 					}
 				}else{
 					if(member.isList){
-						getAVM2ObjsByInfoV(avm2Obj,member.name+"V",MemberClasses[member.type+"AVM2ObjClass"],MemberClasses[member.type+"AVM2ObjVClass"]);
+						infoV=this[member.name+"V"];
+						var avm2ObjV:*=mainAVM2Obj[member.name+"V"]=new MemberClasses[member.type+"AVM2ObjVClass"](infoV.length);
+						i=-1;
+						for each(info in infoV){
+							i++;
+							avm2ObjV[i]=info.toInfo(advanceABC);
+						}
 					}else if(member.constKindName){
-						avm2Obj[member.name]=AdvanceABC.currInstance.getIdByKindAndConstValue(this[member.constKindName],this[member.name]);
+						mainAVM2Obj[member.name]=advanceABC.getIdByKindAndConstValue(this[member.constKindName],this[member.name]);
 					}else{
 						if(member.classV){
-							avm2Obj[member.name]=this[member.name].toInfo();
+							mainAVM2Obj[member.name]=this[member.name].toInfo(advanceABC);
 						}else{
 							if(member.type==Member.DIRECT_INT){
-								avm2Obj[member.name]=this[member.name];
+								mainAVM2Obj[member.name]=this[member.name];
 							}else{
 								//if(member.kindClass){
 								//	只在 toXML 或 initByXML 时有用
@@ -129,7 +155,12 @@ package zero.swf.avm2.advances{
 			}
 		}
 		
-		public function toXML_fun(memberV:Vector.<Member>,xmlOrXMLName:*):XML{
+		////
+		CONFIG::toXMLAndInitByXML {
+		public function toXML_fun(
+			memberV:Vector.<Member>,
+			xmlOrXMLName:*
+		):XML{
 			var className:String=getQualifiedClassName(this);
 			var xml:XML;
 			if(xmlOrXMLName is String){
@@ -167,43 +198,79 @@ package zero.swf.avm2.advances{
 					continue;
 				}
 				
-				if(Member.fromABCFileMark[member.type]){
-					if(member.isList){
-						xml.appendChild(AdvanceABC.currInstance.getInfoListXMLByInfoVAndMemberType(this,member.name,member.type));
+				if(member.isList){
+					var infoV:*=this[member.name+"V"];
+					var info:*;
+					var infoListXML:XML=<{member.name+"List"} count={infoV.length}/>;
+					if(Member.directMark[member.type]){
+						for each(info in infoV){
+							infoListXML.appendChild(<{member.name} value={info}/>);
+						}
 					}else{
+						for each(info in infoV){
+							infoListXML.appendChild(info.toXML(member.name));
+						}
+					}
+					xml.appendChild(infoListXML);
+				}else{
+					if(Member.fromABCFileMark[member.type]){
 						if(Member.directMark[member.type]){
 							xml["@"+member.name]=this[member.name];
 						}else{
 							xml.appendChild(this[member.name].toXML(member.name));
 						}
-					}
-				}else{
-					if(member.isList){
-						xml.appendChild(getInfoListXMLByInfoV(member.name,true));
-					}else if(member.constKindName){
-						AdvanceABC.currInstance.getXMLByKindAndConstValue(member.name,xml,this[member.constKindName],this[member.name]);
 					}else{
-						if(member.classV){
-							xml.appendChild(this[member.name].toXML(member.name));
-						}else{
-							if(member.kindClass){
-								xml["@"+member.name]=member.kindClass[member.kindVName][this[member.name]];
-							}else if(member.flagClass){
-								var flagsStr:String="";
-								for each(var flagStr:String in member.flagClass["flagV"]){
-									if(this[member.name]&member.flagClass[flagStr]){
-										flagsStr+="|"+flagStr;
-									}
-								}
-								xml["@"+member.name]=flagsStr.substr(1);
-							}else{
-								if(member.type==Member.DIRECT_INT){
+						if(member.constKindName){
+							switch(this[member.constKindName]){
+								case ConstantKind.Int:
+								case ConstantKind.UInt:
+								case ConstantKind.Double:
+								case ConstantKind.Utf8:
 									xml["@"+member.name]=this[member.name];
+								break;
+								case ConstantKind.True:
+								case ConstantKind.False:
+								case ConstantKind.Null:
+								case ConstantKind.Undefined:
+								break;
+								case ConstantKind.Namespace:
+								case ConstantKind.PackageNamespace:
+								case ConstantKind.PackageInternalNs:
+								case ConstantKind.ProtectedNamespace:
+								case ConstantKind.ExplicitNamespace:
+								case ConstantKind.StaticProtectedNs:
+								case ConstantKind.PrivateNs:
+									if(this[member.name]){
+										xml.appendChild(this[member.name].toXML(member.name));
+									}
+								break;
+								default:
+									throw new Error("未知 kind: "+this[member.constKindName]);
+								break;
+							}
+						}else{
+							if(member.classV){
+								xml.appendChild(this[member.name].toXML(member.name));
+							}else{
+								if(member.kindClass){
+									xml["@"+member.name]=member.kindClass[member.kindVName][this[member.name]];
+								}else if(member.flagClass){
+									var flagsStr:String="";
+									for each(var flagStr:String in member.flagClass["flagV"]){
+										if(this[member.name]&member.flagClass[flagStr]){
+											flagsStr+="|"+flagStr;
+										}
+									}
+									xml["@"+member.name]=flagsStr.substr(1);
 								}else{
-									if(Member.directMark[member.type]){
+									if(member.type==Member.DIRECT_INT){
 										xml["@"+member.name]=this[member.name];
 									}else{
-										xml.appendChild(this[member.name].toXML(member.name));
+										if(Member.directMark[member.type]){
+											xml["@"+member.name]=this[member.name];
+										}else{
+											xml.appendChild(this[member.name].toXML(member.name));
+										}
 									}
 								}
 							}
@@ -213,8 +280,8 @@ package zero.swf.avm2.advances{
 			}
 			return xml;
 		}
-		
-		public function initByXML_fun(xml:XML,memberV:Vector.<Member>):void{
+		public function initByXML_fun(marks:Object,xml:XML,memberV:Vector.<Member>):void{
+			var infoXMLList:XMLList,i:int,infoV:*,infoXML:XML;
 			for each(var member:Member in memberV){
 				if(member.curr==Member.CURR_CASE){
 					if(member.isList){
@@ -240,26 +307,77 @@ package zero.swf.avm2.advances{
 				
 				if(member.xmlUseMarkKey){
 					//trace("markKey="+xml[member.name][0].@markKey.toString());
-					this[member.name]=AdvanceABC.currInstance.marks[member.type][xml[member.name][0].@markKey.toString()];
+					this[member.name]=marks[member.type][xml[member.name][0].@markKey.toString()];
 					//trace("markKey this[member.name]="+this[member.name]);
 					continue;
 				}
 				
 				if(Member.fromABCFileMark[member.type]){
 					if(member.isList){
-						AdvanceABC.currInstance.getInfoVByInfoListXMLAndMemberType(this,member.name,xml,member.type);
+						infoXMLList=xml[member.name+"List"][0][member.name];
+						i=-1;
+						infoV=this[member.name+"V"]=new MemberClasses[member.type+"VClass"](infoXMLList.length());
+						if(Member.directMark[member.type]){
+							for each(infoXML in infoXMLList){
+								i++;
+								infoV[i]=getValueByStringAndType(infoXML.@value.toString(),member.type);
+							}
+						}else{
+							for each(infoXML in infoXMLList){
+								i++;
+								infoV[i]=getInfoByXMLAndMemberType(marks,infoXML,member.type);
+							}
+						}
 					}else{
 						if(Member.directMark[member.type]){
 							this[member.name]=getValueByStringAndType(xml["@"+member.name].toString(),member.type);
 						}else{
-							this[member.name]=AdvanceABC.currInstance.getInfoByXMLAndMemberType(xml[member.name][0],member.type);
+							this[member.name]=getInfoByXMLAndMemberType(marks,xml[member.name][0],member.type);
 						}
 					}
 				}else{
 					if(member.isList){
-						getInfoVByInfoListXML(member.name,xml,MemberClasses[member.type],MemberClasses[member.type+"VClass"]);
+						infoXMLList=xml[member.name+"List"][0][member.name];
+						i=-1;
+						infoV=this[member.name+"V"]=new MemberClasses[member.type+"VClass"](infoXMLList.length());
+						for each(infoXML in infoXMLList){
+							i++;
+							infoV[i]=new MemberClasses[member.type]();
+							infoV[i].initByXML(marks,infoXML);
+						}
 					}else if(member.constKindName){
-						AdvanceABC.currInstance.getConstValueByXMLAndKind(this,member.name,xml,this[member.constKindName]);
+						switch(this[member.constKindName]){
+							case ConstantKind.Int:
+								this[member.name]=getValueByStringAndType(xml["@"+member.name].toString(),Member.INTEGER);
+							break;
+							case ConstantKind.UInt:
+								this[member.name]=getValueByStringAndType(xml["@"+member.name].toString(),Member.UINTEGER);
+							break;
+							case ConstantKind.Double:
+								this[member.name]=getValueByStringAndType(xml["@"+member.name].toString(),Member.DOUBLE);
+							break;
+							case ConstantKind.Utf8:
+								this[member.name]=getValueByStringAndType(xml["@"+member.name].toString(),Member.STRING);
+							break;
+							case ConstantKind.True:
+							case ConstantKind.False:
+							case ConstantKind.Null:
+							case ConstantKind.Undefined:
+								this[member.name]=this[member.constKindName];//看了几个 swf, id 都是 和 kind 相等
+							break;
+							case ConstantKind.Namespace:
+							case ConstantKind.PackageNamespace:
+							case ConstantKind.PackageInternalNs:
+							case ConstantKind.ProtectedNamespace:
+							case ConstantKind.ExplicitNamespace:
+							case ConstantKind.StaticProtectedNs:
+							case ConstantKind.PrivateNs:
+								this[member.name]=getInfoByXMLAndMemberType(marks,xml[member.name][0],Member.NAMESPACE_INFO);
+							break;
+							default:
+								throw new Error("未知 kind: "+this[member.constKindName]);
+							break;
+						}
 					}else{
 						if(member.classV){
 							this[member.name]=new (member.classV[this[member.classVIdName]])();
@@ -291,7 +409,7 @@ package zero.swf.avm2.advances{
 			}
 		}
 		
-		public static function getValueByStringAndType(str:String,type:String):*{
+		private static function getValueByStringAndType(str:String,type:String):*{
 			switch(type){
 				case Member.INTEGER:
 					return int(str);
@@ -309,52 +427,32 @@ package zero.swf.avm2.advances{
 			throw new Error("getValueByStringAndType 不支持的 type: "+type);
 			return undefined;
 		}
-		
-		public function getInfoVByAVM2Objs(avm2Obj:AVM2Obj,infoVName:String,infoClass:Class,infoVClass:*):void{
-			var avm2ObjV:*=avm2Obj[infoVName];
-			var infoV:*=this[infoVName]=new infoVClass(avm2ObjV.length);
-			var i:int=-1;
-			for each(avm2Obj in avm2ObjV){
-				i++;
-				infoV[i]=new infoClass();
-				infoV[i].initByInfo(avm2Obj);
-			}
-		}
-		
-		public function getAVM2ObjsByInfoV(avm2Obj:AVM2Obj,infoVName:String,avm2ObjClass:Class,avm2ObjVClass:*):void{
-			var infoV:*=this[infoVName];
-			var avm2ObjV:*=avm2Obj[infoVName]=new avm2ObjVClass(infoV.length);
-			var i:int=-1;
-			for each(var info:* in infoV){
-				i++;
-				avm2ObjV[i]=info.toInfo();
-			}
-		}
-		
-		////
-		CONFIG::toXMLAndInitByXML {
-		public function getInfoListXMLByInfoV(name:String,isAdvance:Boolean):XML{
-			var infoV:*=this[name+"V"];
-			var infoListXML:XML=<{name+"List"} count={infoV.length}/>;
-			for each(var info:* in infoV){
-				if(isAdvance){
-					infoListXML.appendChild(info.toXML(name));
-				}else{
-					infoListXML.appendChild(<{name} value={info}/>);
+		public function getInfoByXMLAndMemberType(marks:Object,xml:XML,memberType:String):*{
+			if(memberType==Member.MULTINAME_INFO){
+				if(xml.@kind.toString()=="*"){
+					return AdvanceDefaultMultiname_info.instance;
 				}
 			}
-			return infoListXML;
-		}
-		
-		public function getInfoVByInfoListXML(name:String,xml:XML,infoClass:Class,infoVClass:*):void{
-			var infoXMLList:XMLList=xml[name+"List"][0][name];
-			var i:int=-1;
-			var infoV:*=this[name+"V"]=new infoVClass(infoXMLList.length());
-			for each(var infoXML:XML in infoXMLList){
-				i++;
-				infoV[i]=new infoClass();
-				infoV[i].initByXML(infoXML);
+			
+			var oldXMLName:String=xml.name().toString();
+			xml.setName(memberType);
+			var markKey:String=xml.toXMLString();
+			xml.setName(oldXMLName);
+			
+			var info:*=marks[memberType][markKey];
+			
+			if(info){
+			}else{
+				marks[memberType][markKey]=info=new MemberClasses[memberType]();
+				info.initByXML(marks,xml);
+				//advanceABC[memberType+"V"][advanceABC[memberType+"V"].length]=info;
 			}
+			
+			//if(info is AdvanceNamespace_info){
+			//	trace(xml.toXMLString());
+			//	trace("info="+info);
+			//}
+			return info;
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

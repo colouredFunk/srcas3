@@ -19,10 +19,10 @@ package zero.swf.avm2.advances{
 			}
 		}
 		
-		override public function initByInfo(_infoId:int,multiname_info:Multiname_info):void{
+		override public function initByInfo(advanceABC:AdvanceABC,_infoId:int,multiname_info:Multiname_info):void{
 			
 		}
-		override public function toInfoId():int{
+		override public function toInfoId(advanceABC:AdvanceABC):int{
 			return 0;
 		}
 		
@@ -31,7 +31,7 @@ package zero.swf.avm2.advances{
 		override public function toXML(xmlName:String):XML{
 			return <{xmlName} class="AdvanceMultiname_info" kind="*"/>;
 		}
-		override public function initByXML(xml:XML):void{
+		override public function initByXML(marks:Object,xml:XML):void{
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

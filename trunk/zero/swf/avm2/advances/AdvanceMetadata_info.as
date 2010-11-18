@@ -20,8 +20,8 @@ AdvanceMetadata_info 版本:v1.0
 //name 是在 constant_pool.string_v 中的id
 
 package zero.swf.avm2.advances{
-	import zero.swf.avm2.Metadata_info;
 	import zero.swf.avm2.Item_info;
+	import zero.swf.avm2.Metadata_info;
 	
 	public class AdvanceMetadata_info extends Advance{
 		
@@ -38,19 +38,19 @@ package zero.swf.avm2.advances{
 		public function AdvanceMetadata_info(){
 		}
 		
-		public function initByInfo(_infoId:int,metadata_info:Metadata_info):void{
+		public function initByInfo(advanceABC:AdvanceABC,_infoId:int,metadata_info:Metadata_info):void{
 			infoId=_infoId;
 			
-			initByInfo_fun(metadata_info,memberV);
+			initByInfo_fun(advanceABC,metadata_info,memberV);
 		}
-		public function toInfoId():int{
+		public function toInfoId(advanceABC:AdvanceABC):int{
 			var metadata_info:Metadata_info=new Metadata_info();
 			
-			toInfo_fun(metadata_info,memberV);
+			toInfo_fun(advanceABC,metadata_info,memberV);
 			
 			//--
-			AdvanceABC.currInstance.abcFile.metadata_infoV.push(metadata_info);
-			return AdvanceABC.currInstance.abcFile.metadata_infoV.length-1;
+			advanceABC.abcFile.metadata_infoV.push(metadata_info);
+			return advanceABC.abcFile.metadata_infoV.length-1;
 		}
 		
 		////
@@ -61,10 +61,10 @@ package zero.swf.avm2.advances{
 			xml.@infoId=infoId;
 			return xml;
 		}
-		public function initByXML(xml:XML):void{
+		public function initByXML(marks:Object,xml:XML):void{
 			infoId=int(xml.@infoId.toString());
 			
-			initByXML_fun(xml,memberV);
+			initByXML_fun(marks,xml,memberV);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

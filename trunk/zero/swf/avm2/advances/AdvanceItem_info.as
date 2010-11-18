@@ -33,13 +33,13 @@ package zero.swf.avm2.advances{
 			
 		}
 		
-		public function initByInfo(item_info:Item_info):void{
-			initByInfo_fun(item_info,memberV);
+		public function initByInfo(advanceABC:AdvanceABC,item_info:Item_info):void{
+			initByInfo_fun(advanceABC,item_info,memberV);
 		}
-		public function toInfo():Item_info{
+		public function toInfo(advanceABC:AdvanceABC):Item_info{
 			var item_info:Item_info=new Item_info();
 			
-			toInfo_fun(item_info,memberV);
+			toInfo_fun(advanceABC,item_info,memberV);
 			
 			return item_info;
 		}
@@ -49,8 +49,8 @@ package zero.swf.avm2.advances{
 		public function toXML(xmlName:String):XML{
 			return toXML_fun(memberV,xmlName);
 		}
-		public function initByXML(xml:XML):void{
-			initByXML_fun(xml,memberV);
+		public function initByXML(marks:Object,xml:XML):void{
+			initByXML_fun(marks,xml,memberV);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

@@ -16,11 +16,12 @@ package zero.swf.avm2.advances{
 	import zero.swf.avm2.advances.Member;
 	
 
-	public class AdvanceCodes{
+	public class AdvanceCodes extends Advance{
 		public var codeV:Vector.<BaseCode>;
 		public function AdvanceCodes(){
 		}
 		public function initByInfo(
+			advanceABC:AdvanceABC,
 			data:ByteArray,
 			exception_infoV:Vector.<AdvanceException_info>
 		):void{
@@ -63,28 +64,28 @@ package zero.swf.avm2.advances{
 										advanceCode.value=u30_1;
 									break;
 									case Op.type_u8_u30__int:
-										advanceCode.value=AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.INTEGER);
+										advanceCode.value=advanceABC.getInfoByIdAndMemberType(u30_1,Member.INTEGER);
 									break;
 									case Op.type_u8_u30__uint:
-										advanceCode.value=AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.UINTEGER);
+										advanceCode.value=advanceABC.getInfoByIdAndMemberType(u30_1,Member.UINTEGER);
 									break;
 									case Op.type_u8_u30__double:
-										advanceCode.value=AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.DOUBLE);
+										advanceCode.value=advanceABC.getInfoByIdAndMemberType(u30_1,Member.DOUBLE);
 									break;
 									case Op.type_u8_u30__string:
-										advanceCode.value=AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.STRING);
+										advanceCode.value=advanceABC.getInfoByIdAndMemberType(u30_1,Member.STRING);
 									break;
 									case Op.type_u8_u30__namespace_info:
-										advanceCode.value=AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.NAMESPACE_INFO);
+										advanceCode.value=advanceABC.getInfoByIdAndMemberType(u30_1,Member.NAMESPACE_INFO);
 									break;
 									case Op.type_u8_u30__multiname_info:
-										advanceCode.value=AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.MULTINAME_INFO);
+										advanceCode.value=advanceABC.getInfoByIdAndMemberType(u30_1,Member.MULTINAME_INFO);
 									break;
 									case Op.type_u8_u30__method:
-										advanceCode.value=AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.METHOD);
+										advanceCode.value=advanceABC.getInfoByIdAndMemberType(u30_1,Member.METHOD);
 									break;
 									case Op.type_u8_u30__class:
-										advanceCode.value=AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.CLASS);
+										advanceCode.value=advanceABC.getInfoByIdAndMemberType(u30_1,Member.CLASS);
 									break;
 									case Op.type_u8_u30__exception_info:
 										advanceCode.value={
@@ -136,13 +137,13 @@ package zero.swf.avm2.advances{
 									break;	
 									case Op.type_u8_u30_u30__multiname_info_args:
 										advanceCode.value={
-											multiname_info:AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.MULTINAME_INFO),
+											multiname_info:advanceABC.getInfoByIdAndMemberType(u30_1,Member.MULTINAME_INFO),
 											args:u30_2
 										}
 									break;
 									case Op.type_u8_u30_u30__method_args:
 										advanceCode.value={
-											method:AdvanceABC.currInstance.getInfoByIdAndMemberType(u30_1,Member.METHOD),
+											method:advanceABC.getInfoByIdAndMemberType(u30_1,Member.METHOD),
 											args:u30_2
 										}
 									break;
@@ -264,7 +265,7 @@ package zero.swf.avm2.advances{
 								if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var debug_index:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{debug_index=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{debug_index=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{debug_index=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{debug_index=data[offset++];}
 								//debug_index
 								
-								advanceCode.value.index=AdvanceABC.currInstance.getInfoByIdAndMemberType(debug_index,Member.STRING);
+								advanceCode.value.index=advanceABC.getInfoByIdAndMemberType(debug_index,Member.STRING);
 								
 								advanceCode.value.reg=data[offset++];
 								
@@ -316,7 +317,7 @@ package zero.swf.avm2.advances{
 			}
 			return false;
 		}
-		public function toData(exception_infoV:Vector.<AdvanceException_info>):ByteArray{
+		public function toData(advanceABC:AdvanceABC,exception_infoV:Vector.<AdvanceException_info>):ByteArray{
 			var data:ByteArray=new ByteArray();
 			
 			var posMarkArr:Array=new Array();//记录 branch, newcatch, lookupswitch 的位置及相关的 label 位置
@@ -354,28 +355,28 @@ package zero.swf.avm2.advances{
 										u30_1=advanceCode.value;
 									break;
 									case Op.type_u8_u30__int:
-										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value,Member.INTEGER);
+										u30_1=advanceABC.getIdByInfoAndMemberType(advanceCode.value,Member.INTEGER);
 									break;
 									case Op.type_u8_u30__uint:
-										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value,Member.UINTEGER);
+										u30_1=advanceABC.getIdByInfoAndMemberType(advanceCode.value,Member.UINTEGER);
 									break;
 									case Op.type_u8_u30__double:
-										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value,Member.DOUBLE);
+										u30_1=advanceABC.getIdByInfoAndMemberType(advanceCode.value,Member.DOUBLE);
 									break;
 									case Op.type_u8_u30__string:
-										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value,Member.STRING);
+										u30_1=advanceABC.getIdByInfoAndMemberType(advanceCode.value,Member.STRING);
 									break;
 									case Op.type_u8_u30__namespace_info:
-										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value,Member.NAMESPACE_INFO);
+										u30_1=advanceABC.getIdByInfoAndMemberType(advanceCode.value,Member.NAMESPACE_INFO);
 									break;
 									case Op.type_u8_u30__multiname_info:
-										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value,Member.MULTINAME_INFO);
+										u30_1=advanceABC.getIdByInfoAndMemberType(advanceCode.value,Member.MULTINAME_INFO);
 									break;
 									case Op.type_u8_u30__method:
-										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value,Member.METHOD);
+										u30_1=advanceABC.getIdByInfoAndMemberType(advanceCode.value,Member.METHOD);
 									break;
 									case Op.type_u8_u30__class:
-										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value,Member.CLASS);
+										u30_1=advanceABC.getIdByInfoAndMemberType(advanceCode.value,Member.CLASS);
 									break;
 									case Op.type_u8_u30__exception_info:
 										u30_1=exception_infoV.length;
@@ -397,11 +398,11 @@ package zero.swf.avm2.advances{
 										u30_2=advanceCode.value.register2;
 									break;
 									case Op.type_u8_u30_u30__multiname_info_args:
-										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value.multiname_info,Member.MULTINAME_INFO),
+										u30_1=advanceABC.getIdByInfoAndMemberType(advanceCode.value.multiname_info,Member.MULTINAME_INFO),
 										u30_2=advanceCode.value.args;
 									break;
 									case Op.type_u8_u30_u30__method_args:
-										u30_1=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value.method,Member.METHOD),
+										u30_1=advanceABC.getIdByInfoAndMemberType(advanceCode.value.method,Member.METHOD),
 										u30_2=advanceCode.value.args;
 									break;
 								}
@@ -453,7 +454,7 @@ package zero.swf.avm2.advances{
 								//Op.type_u8_u8_u30_u8_u30__debug
 								data[offset++]=advanceCode.value.debug_type;
 								
-								var debug_index:int=AdvanceABC.currInstance.getIdByInfoAndMemberType(advanceCode.value.index,Member.STRING);
+								var debug_index:int=advanceABC.getIdByInfoAndMemberType(advanceCode.value.index,Member.STRING);
 								
 								if(debug_index>>>7){if(debug_index>>>14){if(debug_index>>>21){if(debug_index>>>28){data[offset++]=(debug_index&0x7f)|0x80;data[offset++]=((debug_index>>>7)&0x7f)|0x80;data[offset++]=((debug_index>>>14)&0x7f)|0x80;data[offset++]=((debug_index>>>21)&0x7f)|0x80;data[offset++]=debug_index>>>28;}else{data[offset++]=(debug_index&0x7f)|0x80;data[offset++]=((debug_index>>>7)&0x7f)|0x80;data[offset++]=((debug_index>>>14)&0x7f)|0x80;data[offset++]=debug_index>>>21;}}else{data[offset++]=(debug_index&0x7f)|0x80;data[offset++]=((debug_index>>>7)&0x7f)|0x80;data[offset++]=debug_index>>>14;}}else{data[offset++]=(debug_index&0x7f)|0x80;data[offset++]=debug_index>>>7;}}else{data[offset++]=debug_index;}
 								//debug_index
@@ -555,6 +556,7 @@ package zero.swf.avm2.advances{
 								case Op.type_u8_u30__method:
 									stringXML.@value=advanceCode.value.toXML("method").toXMLString();
 									codesStr+=" "+stringXML.toXMLString().replace(/<string value=(".*")\/>/,"$1").replace(/>/g,"&gt;");//- -
+									//trace("advanceCode.value="+advanceCode.value);
 								break;
 								case Op.type_u8_u30__class:
 									codesStr+=" "+advanceCode.value.getMarkKey();
@@ -589,7 +591,9 @@ package zero.swf.avm2.advances{
 								break;
 								
 								case Op.type_u8_u8_u30_u8_u30__debug:
+									stringXML.@value=advanceCode.value.index;
 									codesStr+=" "+advanceCode.value.debug_type+" "+stringXML.toXMLString().replace(/<string value=(".*")\/>/,"$1").replace(/>/g,"&gt;")+" "+advanceCode.value.reg+" "+advanceCode.value.extra;//- -
+									//trace(stringXML.toXMLString().replace(/<string value=(".*")\/>/,"$1").replace(/>/g,"&gt;"));
 								break;
 								
 								default:
@@ -607,7 +611,7 @@ package zero.swf.avm2.advances{
 			}
 			return <{xmlName}/>;
 		}
-		public function initByXML(xml:XML):void{
+		public function initByXML(marks:Object,xml:XML):void{
 			var codeStrArr:Array=xml.toString().split("\n");
 			var codeId:int=-1;
 			codeV=new Vector.<BaseCode>();
@@ -630,7 +634,7 @@ package zero.swf.avm2.advances{
 					//空白
 					codeStrArr.splice(i,1);
 				}
-				if(/label(\d+):/.test(codeStr)){
+				if(/^label(\d+):$/.test(codeStr)){
 					if(labelMarkMark[codeStr]){
 						throw new Error("重复的 labelMark: "+codeStr);
 					}
@@ -645,7 +649,7 @@ package zero.swf.avm2.advances{
 				//}
 			}
 			for each(codeStr in codeStrArr){
-				if(/label(\d+):/.test(codeStr)){
+				if(/^label(\d+):$/.test(codeStr)){
 					codeV[++codeId]=labelMarkMark[codeStr];
 				}else{
 					var pos:int=codeStr.search(/\s+/);
@@ -657,7 +661,6 @@ package zero.swf.avm2.advances{
 					}
 					if(Op.ops[opStr]>=0){
 						codeV[++codeId]=advanceCode=new AdvanceCode(Op.ops[opStr]);
-						
 						var opType:String=Op.opTypeV[advanceCode.op];
 						
 						if(opType==Op.type_u8){
@@ -681,20 +684,22 @@ package zero.swf.avm2.advances{
 									advanceCode.value=new XML("<string value="+codeStr+"/>").@value.toString();//- -
 								break;
 								case Op.type_u8_u30__namespace_info:
-									advanceCode.value=AdvanceABC.currInstance.getInfoByXMLAndMemberType(new XML(codeStr),Member.NAMESPACE_INFO);
+									advanceCode.value=getInfoByXMLAndMemberType(marks,new XML(codeStr),Member.NAMESPACE_INFO);
 								break;
 								case Op.type_u8_u30__multiname_info:
-									advanceCode.value=AdvanceABC.currInstance.getInfoByXMLAndMemberType(new XML(codeStr),Member.MULTINAME_INFO);
+									advanceCode.value=getInfoByXMLAndMemberType(marks,new XML(codeStr),Member.MULTINAME_INFO);
 								break;
 								case Op.type_u8_u30__method:
-									advanceCode.value=AdvanceABC.currInstance.getInfoByXMLAndMemberType(
+									advanceCode.value=getInfoByXMLAndMemberType(
+										marks,
 										new XML(
 											new XML("<string value="+codeStr+"/>").@value.toString()
 										),Member.METHOD
 									);
+									//trace("advanceCode.value="+advanceCode.value);
 								break;
 								case Op.type_u8_u30__class:
-									advanceCode.value=AdvanceABC.currInstance.getInfoByMarkKeyAndMemberType(codeStr,Member.CLASS);
+									advanceCode.value=marks[Member.CLASS][codeStr];
 								break;
 								case Op.type_u8_u30__exception_info:
 									advanceCode.value={exception_info:new AdvanceException_info()};
@@ -720,7 +725,7 @@ package zero.swf.avm2.advances{
 										throw new Error("找不到对应的 advanceCode.value.target: "+codeStr);
 									}
 									
-									advanceCode.value.exception_info.initByXML(new XML(codeStr.replace(/from:label\d+\s+to:label\d+\s+target:label\d+$/,"")));
+									advanceCode.value.exception_info.initByXML(marks,new XML(codeStr.replace(/from:label\d+\s+to:label\d+\s+target:label\d+$/,"")));
 								break;
 								case Op.type_u8_u30__finddef:
 									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
@@ -737,7 +742,7 @@ package zero.swf.avm2.advances{
 									pos=codeStr.search(/\s+\d+$/);//不支持 16进制的整数表示
 									if(pos>0){
 										advanceCode.value={
-											multiname_info:AdvanceABC.currInstance.getInfoByXMLAndMemberType(new XML(codeStr.substr(0,pos)),Member.MULTINAME_INFO),
+											multiname_info:getInfoByXMLAndMemberType(marks,new XML(codeStr.substr(0,pos)),Member.MULTINAME_INFO),
 											args:int(codeStr.substr(pos).replace(/\D+/g,""))//不支持 16进制的整数表示
 										}
 									}else{
@@ -748,7 +753,7 @@ package zero.swf.avm2.advances{
 									pos=codeStr.search(/\s+\d+$/);//不支持 16进制的整数表示
 									if(pos>0){
 										advanceCode.value={
-											method:AdvanceABC.currInstance.getInfoByXMLAndMemberType(new XML(codeStr.substr(0,pos)),Member.METHOD),
+											method:getInfoByXMLAndMemberType(marks,new XML(codeStr.substr(0,pos)),Member.METHOD),
 											args:int(codeStr.substr(pos).replace(/\D+/g,""))//不支持 16进制的整数表示
 										}
 									}else{
