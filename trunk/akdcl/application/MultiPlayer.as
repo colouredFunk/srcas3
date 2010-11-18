@@ -41,10 +41,10 @@ package akdcl.application{
 			videoPlayer.volume = volume;
 			wmpPlayer.volume = volume;
 		}
-		protected var imagePlayer:ImagePlayer;
-		protected var musicPlayer:MusicPlayerNew;
-		protected var videoPlayer:VideoPlayer;
-		protected var wmpPlayer:WMPPlayer;
+		public var imagePlayer:ImagePlayer;
+		public var musicPlayer:MusicPlayerNew;
+		public var videoPlayer:VideoPlayer;
+		public var wmpPlayer:WMPPlayer;
 		protected var currentPlayer:MediaPlayer;
 		override protected function init():void {
 			super.init();
@@ -99,6 +99,9 @@ package akdcl.application{
 				currentPlayer.removeEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);	
 			}
 			hideContent();
+			
+			super.onPlayIDChangeHandler(_playID);
+			
 			var _mediaSource:String = getMediaByID(_playID);
 			var _mediaType:String = String(_mediaSource.split(".").pop()).toLowerCase();
 			switch(_mediaType) {
@@ -129,12 +132,8 @@ package akdcl.application{
 			currentPlayer.addEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
 			currentPlayer.addEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);
 			currentPlayer.container = container;
-			currentPlayer.openList(_mediaSource, false);
-			if (autoPlay) {
-				play();
-			}
-			autoPlay = true;
-			super.onPlayIDChangeHandler(_playID);
+			currentPlayer.playlist = _mediaSource;
+			play();
 		}
 	}
 }

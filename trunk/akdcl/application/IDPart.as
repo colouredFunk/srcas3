@@ -26,7 +26,7 @@ package akdcl.application
 			}
 			if (_id < 0) {
 				if (autoID) {
-					_id = length - _id;
+					_id = length + _id;
 				}else {
 					return;
 				}

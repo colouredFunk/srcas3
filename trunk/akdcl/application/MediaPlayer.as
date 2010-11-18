@@ -9,6 +9,9 @@ package akdcl.application{
 	import akdcl.events.MediaEvent;
 	import akdcl.application.IDPart;
 	
+	/// @eventType	akdcl.events.MediaEvent.LIST_CHANGE
+	[Event(name = "listChange", type = "akdcl.events.MediaEvent")]
+	
 	/// @eventType	akdcl.events.MediaEvent.VOLUME_CHANGE
 	[Event(name = "volumeChange", type = "akdcl.events.MediaEvent")]
 
@@ -135,20 +138,12 @@ package akdcl.application{
 			}
 		}
 		//
-		private var __autoPlay:Boolean = true;
-		public function get autoPlay():Boolean{
-			return __autoPlay;
-		}
-		public function set autoPlay(_autoPlay:Boolean):void {
-			__autoPlay = _autoPlay;
-		}
-		//
 		public function get playID():int {
 			return idPart.id;
 		}
 		public function set playID(_playID:int):void {
-			if (playList) {
-				if (playList.length() == 1) {
+			if (playlist) {
+				if (playlist.length() == 1) {
 					idPart.setID( -1);
 				}
 			}
@@ -225,13 +220,30 @@ package akdcl.application{
 			__container = _cotainer;
 		}
 		//
+		private var __playlist:XMLList;
+		public function get playlist():XMLList{
+			return __playlist;
+		}
+		public function set playlist(_playlist:*):void{
+			_playlist = createList(_playlist);
+			if (!_playlist) {
+				return;
+			}
+			stop();
+			__playlist = _playlist;
+			idPart.length = __playlist.length();
+			idPart.setID( -1);
+			dispatchEvent(new MediaEvent(MediaEvent.LIST_CHANGE));
+			if (autoPlay) {
+				play();
+			}
+			autoPlay = true;
+		}
+		//
+		public var autoPlay:Boolean = true;
 		public var updateInterval:uint = 20;
 		protected var timer:Timer;
 		protected var idPart:IDPart;
-		protected var __playList:XMLList;
-		public function get playList():XMLList{
-			return __playList;
-		}
 		//
 		override protected function init():void {
 			super.init();
@@ -247,29 +259,21 @@ package akdcl.application{
 			timer = null;
 			idPart.remove();
 			idPart = null;
-			__playList = null;
-		}
-		//
-		public function openList(_list:*, _autoPlay:Boolean = false):void {
-			_list = createList(_list);
-			if (!_list) {
-				return;
-			}
-			__playList = _list;
-			idPart.length = __playList.length();
-			idPart.setID( -1);
-			autoPlay = _autoPlay;
-			playID = 0;
+			playlist = null;
 		}
 		//
 		public function getMediaByID(_playID:int):String {
-			return playList?String(playList[_playID].@source):null
+			return playlist?String(playlist[_playID].@source):null
 		}
 		//
 		public function play():Boolean {
+			if (playID<0) {
+				playID = 0;
+			}
 			if (isPlaying) {
 				return false;
 			}
+			onLoadProgressHander();
 			setPlayState(STATE_PLAY);
 			return true;
 		}

@@ -44,8 +44,10 @@ package akdcl.application{
 			content.visible = false;
 		}
 		override protected function onPlayIDChangeHandler(_playID:int):void {
-			super.onPlayIDChangeHandler(_playID);
 			stop();
+			
+			super.onPlayIDChangeHandler(_playID);
+			
 			var _imageSource:String = getMediaByID(_playID);
 			content.load(_imageSource);
 			if (container) {
@@ -55,21 +57,11 @@ package akdcl.application{
 			//content.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);
 			content.addEventListener(ProgressEvent.PROGRESS, onLoadProgressHander);
 			content.addEventListener(Event.COMPLETE, onLoadCompleteHandler);
-			if (autoPlay) {
-				play();
-			}else {
-				stop();
-			}
-			autoPlay = true;
+			play();
 		}
-		override protected function onLoadProgressHander(_evt:* = null):void {
-			super.onLoadProgressHander(_evt);
-			var _play:uint = timer.currentCount * timer.delay;
-			if ( _play >= totalTime) {
-				
-			}else if (_play < totalTime * loadProgress) {
-				timer.start();
-			}
+		override protected function onLoadCompleteHandler(_evt:* = null):void {
+			super.onLoadCompleteHandler(_evt);
+			timer.start();
 		}
 		override protected function onPlayProgressHander(_evt:* = null):void {
 			super.onPlayProgressHander(_evt);

@@ -113,6 +113,9 @@ package akdcl.application{
 				video.removeEventListener(VideoLoader.VIDEO_COMPLETE, onPlayCompleteHandler);
 			}
 			hideContent();
+			
+			super.onPlayIDChangeHandler(_playID);
+			
 			var _videoSource:String = getMediaByID(_playID);
 			video = loadVideo(_videoSource, videoParams);
 			video.addEventListener(LoaderEvent.ERROR, onLoadErrorHandler);
@@ -125,20 +128,11 @@ package akdcl.application{
 				content.fitWidth = contentWidth;
 				content.fitHeight = contentHeight;
 			}
-			if (autoPlay) {
-				play();
-			}else {
-				
-			}
-			autoPlay = true;
-			super.onPlayIDChangeHandler(_playID);
+			play();
 		}
 		override protected function onLoadErrorHandler(_evt:* = null):void {
 			super.onLoadErrorHandler(_evt);
 			removeVideo(video);
-		}
-		override protected function onPlayProgressHander(_evt:* = null):void {
-			super.onPlayProgressHander(_evt);
 		}
 	}
 }
