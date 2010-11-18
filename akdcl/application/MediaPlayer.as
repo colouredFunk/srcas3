@@ -316,7 +316,11 @@ package akdcl.application{
 		}
 		//
 		protected function onLoadErrorHandler(_evt:*= null):void {
-			onPlayCompleteHandler();
+			if (playlist.length()==1) {
+				stop();
+			}else {
+				onPlayCompleteHandler();
+			}
 			dispatchEvent(new MediaEvent(MediaEvent.LOAD_ERROR));
 		}
 		protected function onLoadProgressHander(_evt:*= null):void {
