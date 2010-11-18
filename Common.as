@@ -54,7 +54,7 @@
 					_ary[_i] = _instanceCopy;
 				}
 				if (_eachFun != null) {
-					_eachFun.apply(Common, [_instanceCopy, _i, _instanceCopy != _instance, _length].concat(args));
+					_eachFun.apply(Common, [_instanceCopy, _i, _ary, _length].concat(args));
 				}
 			}
 			return _ary;
