@@ -35,19 +35,19 @@ package zero.swf.avm2.advances{
 		public function AdvanceNs_set_info(){
 		}
 		
-		public function initByInfo(_infoId:int,ns_set_info:Ns_set_info):void{
+		public function initByInfo(advanceABC:AdvanceABC,_infoId:int,ns_set_info:Ns_set_info):void{
 			infoId=_infoId;
 			
-			initByInfo_fun(ns_set_info,memberV);
+			initByInfo_fun(advanceABC,ns_set_info,memberV);
 		}
-		public function toInfoId():int{
+		public function toInfoId(advanceABC:AdvanceABC):int{
 			var ns_set_info:Ns_set_info=new Ns_set_info();
 			
-			toInfo_fun(ns_set_info,memberV);
+			toInfo_fun(advanceABC,ns_set_info,memberV);
 			
 			//--
-			AdvanceABC.currInstance.abcFile.ns_set_infoV.push(ns_set_info);
-			return AdvanceABC.currInstance.abcFile.ns_set_infoV.length-1;
+			advanceABC.abcFile.ns_set_infoV.push(ns_set_info);
+			return advanceABC.abcFile.ns_set_infoV.length-1;
 		}
 
 		////
@@ -58,10 +58,10 @@ package zero.swf.avm2.advances{
 			xml.@infoId=infoId;
 			return xml;
 		}
-		public function initByXML(xml:XML):void{
+		public function initByXML(marks:Object,xml:XML):void{
 			infoId=int(xml.@infoId.toString());
 			
-			initByXML_fun(xml,memberV);
+			initByXML_fun(marks,xml,memberV);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

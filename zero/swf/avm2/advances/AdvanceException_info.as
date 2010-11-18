@@ -56,13 +56,13 @@ package zero.swf.avm2.advances{
 		public function AdvanceException_info(){
 		}
 		
-		public function initByInfo(exception_info:Exception_info):void{
-			initByInfo_fun(exception_info,memberV);
+		public function initByInfo(advanceABC:AdvanceABC,exception_info:Exception_info):void{
+			initByInfo_fun(advanceABC,exception_info,memberV);
 		}
-		public function toInfo():Exception_info{
+		public function toInfo(advanceABC:AdvanceABC):Exception_info{
 			var exception_info:Exception_info=new Exception_info();
 			
-			toInfo_fun(exception_info,memberV);
+			toInfo_fun(advanceABC,exception_info,memberV);
 		
 			return exception_info;
 		}
@@ -72,8 +72,8 @@ package zero.swf.avm2.advances{
 		public function toXML(xmlName:String):XML{
 			return toXML_fun(memberV,xmlName);
 		}
-		public function initByXML(xml:XML):void{
-			initByXML_fun(xml,memberV);
+		public function initByXML(marks:Object,xml:XML):void{
+			initByXML_fun(marks,xml,memberV);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

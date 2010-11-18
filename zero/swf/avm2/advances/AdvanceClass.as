@@ -99,24 +99,24 @@ package zero.swf.avm2.advances{
 		public var ctraits_infoV:Vector.<AdvanceTraits_info>;					//traits_info
 		
 		//
-		public function initByInfos(_infoId:int,instance_info:Instance_info,class_info:Class_info):void{
+		public function initByInfos(advanceABC:AdvanceABC,_infoId:int,instance_info:Instance_info,class_info:Class_info):void{
 			infoId=_infoId;
 			
-			initByInfo_fun(instance_info,Instance_info_memberV,instance_info.flags&InstanceFlags.ClassProtectedNs);
+			initByInfo_fun(advanceABC,instance_info,Instance_info_memberV,instance_info.flags&InstanceFlags.ClassProtectedNs);
 			
-			initByInfo_fun(class_info,Class_info_memberV);
+			initByInfo_fun(advanceABC,class_info,Class_info_memberV);
 		}
-		public function toInfoId():int{
+		public function toInfoId(advanceABC:AdvanceABC):int{
 			var instance_info:Instance_info=new Instance_info();
 			var class_info:Class_info=new Class_info();
 			
-			toInfo_fun(instance_info,Instance_info_memberV);
-			toInfo_fun(class_info,Class_info_memberV);
+			toInfo_fun(advanceABC,instance_info,Instance_info_memberV);
+			toInfo_fun(advanceABC,class_info,Class_info_memberV);
 			
 			//--
-			AdvanceABC.currInstance.abcFile.instance_infoV.push(instance_info);
-			AdvanceABC.currInstance.abcFile.class_infoV.push(class_info);
-			return AdvanceABC.currInstance.abcFile.instance_infoV.length-1;
+			advanceABC.abcFile.instance_infoV.push(instance_info);
+			advanceABC.abcFile.class_infoV.push(class_info);
+			return advanceABC.abcFile.instance_infoV.length-1;
 		}
 		
 		public function getClassName():String{
@@ -140,13 +140,13 @@ package zero.swf.avm2.advances{
 			xml.@infoId=infoId;
 			return xml;
 		}
-		public function initByXML(xml:XML):void{
+		public function initByXML(marks:Object,xml:XML):void{
 			infoId=int(xml.@infoId.toString());
 			
-			initByXML_fun(xml,Instance_info_memberV);
-			initByXML_fun(xml,Class_info_memberV);
+			initByXML_fun(marks,xml,Instance_info_memberV);
+			initByXML_fun(marks,xml,Class_info_memberV);
 			
-			AdvanceABC.currInstance.marks[Member.CLASS][getMarkKey()]=this;
+			marks[Member.CLASS][getMarkKey()]=this;
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

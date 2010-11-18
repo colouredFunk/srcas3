@@ -51,13 +51,13 @@ package zero.swf.avm2.advances{
 		public function AdvanceOption_detail(){
 		}
 		
-		public function initByInfo(option_detail:Option_detail):void{
-			initByInfo_fun(option_detail,memberV);
+		public function initByInfo(advanceABC:AdvanceABC,option_detail:Option_detail):void{
+			initByInfo_fun(advanceABC,option_detail,memberV);
 		}
-		public function toInfo():Option_detail{
+		public function toInfo(advanceABC:AdvanceABC):Option_detail{
 			var option_detail:Option_detail=new Option_detail();
 			
-			toInfo_fun(option_detail,memberV);
+			toInfo_fun(advanceABC,option_detail,memberV);
 			
 			return option_detail;
 		}
@@ -67,8 +67,8 @@ package zero.swf.avm2.advances{
 		public function toXML(xmlName:String):XML{
 			return toXML_fun(memberV,xmlName);
 		}
-		public function initByXML(xml:XML):void{
-			initByXML_fun(xml,memberV);
+		public function initByXML(marks:Object,xml:XML):void{
+			initByXML_fun(marks,xml,memberV);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

@@ -12,15 +12,15 @@ package zero.swf.avm2.advances{
 		public var labelId:int;
 		public var pos:int;
 		
-		private static var test_labelId0:int=0;
-		private var test_labelId:int;
-		public function LabelMark(){
-			test_labelId=test_labelId0++;
-		}
-		public function toString():String{
+		//private static var test_labelId0:int=0;
+		//private var test_labelId:int;
+		//public function LabelMark(){
+		//	test_labelId=test_labelId0++;
+		//}
+		//public function toString():String{
 			//return "LabelMark_"+labelId;
-			return "LabelMark_"+test_labelId;
-		}
+		//	return "LabelMark_"+test_labelId;
+		//}
 	}
 }
 
