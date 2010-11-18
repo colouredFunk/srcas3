@@ -1,4 +1,4 @@
-package akdcl.application{
+package akdcl.application.player{
 	import com.greensock.events.LoaderEvent;
 	import com.greensock.loading.VideoLoader;
 	import com.greensock.layout.ScaleMode;
