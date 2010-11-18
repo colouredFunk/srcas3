@@ -137,6 +137,7 @@ package zero.swf{
 		//
 		override public function initByData(_data:ByteArray):void{
 			var data:ByteArray=initBaseInfoByData(_data);
+			CurrSWFVersion.Version=Version;
 			var dataAndTags:DataAndTags=new DataAndTags();
 			dataAndTags.initByData(data,0,data.length);
 			tagV=dataAndTags.tagV;
@@ -273,6 +274,7 @@ package zero.swf{
 			
 			var data:ByteArray=baseInfo2Data();
 			data.position=data.length;
+			CurrSWFVersion.Version=Version;
 			var dataAndTags:DataAndTags=new DataAndTags();
 			dataAndTags.tagV=tagV;
 			
@@ -286,6 +288,7 @@ package zero.swf{
 			
 			data=baseInfo2Data();
 			data.position=data.length;
+			CurrSWFVersion.Version=Version;
 			dataAndTags=new DataAndTags();
 			dataAndTags.tagV=tagV;
 			
@@ -327,6 +330,7 @@ package zero.swf{
 			
 			getXML();
 			
+			CurrSWFVersion.Version=Version;
 			var dataAndTags:DataAndTags=new DataAndTags();
 			dataAndTags.tagV=tagV;
 			xml.appendChild(dataAndTags.toXML("dataAndTags"));
@@ -340,6 +344,7 @@ package zero.swf{
 			getXML();
 			
 			progress_finished=_progress_finished;
+			CurrSWFVersion.Version=Version;
 			dataAndTags=new DataAndTags();
 			dataAndTags.tagV=tagV;
 			dataAndTags.toXML2(
@@ -378,6 +383,7 @@ package zero.swf{
 			initFrameSizeByXML(xml);
 			
 			FrameRate=Number(xml.@FrameRate.toString());
+			CurrSWFVersion.Version=Version;
 			var dataAndTags:DataAndTags=new DataAndTags();
 			dataAndTags.initByXML(xml.dataAndTags[0]);
 			tagV=dataAndTags.tagV;
@@ -393,6 +399,7 @@ package zero.swf{
 			
 			progress_finished=_progress_finished;
 			
+			CurrSWFVersion.Version=Version;
 			dataAndTags=new DataAndTags();
 			dataAndTags.initByXML2(
 				xml.dataAndTags[0],

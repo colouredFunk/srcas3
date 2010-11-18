@@ -2,7 +2,7 @@
 ABCFileWithSimpleConstant_pool 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月2日 20:19:34 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年11月18日 15:38:50 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -69,7 +69,6 @@ ABCFileWithSimpleConstant_pool 版本:v1.0
 //multiname array describes names used by the bytecode. The "0" entry of the multiname array is not
 //present in the abcFile.
 package zero.swf.avm2{
-	import zero.Outputer;
 	import zero.swf.BytesData;
 	import flash.utils.Endian;
 	import flash.utils.ByteArray;
@@ -147,6 +146,7 @@ package zero.swf.avm2{
 					}else{
 						offset=get_str_end_offset;
 						//throw new Error("get_str_data.length="+get_str_data.length+",get_str_size="+get_str_size+",get_str_str=\""+get_str_str+"\"");
+						import zero.Outputer;
 						Outputer.output("get_str_data.length="+get_str_data.length+",get_str_size="+get_str_size+",get_str_str=\""+get_str_str+"\"","brown");
 					}
 					stringV[i]=get_str_str;

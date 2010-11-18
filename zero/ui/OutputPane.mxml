@@ -56,10 +56,6 @@ OutputPane 版本:v1.0
 		}
 		public function output(msg:String,styleOrXML:*=undefined):void{
 			msg2strArr(msg,styleOrXML);
-			updateDelay();
-		}
-		public function outputDelay(msg:String,styleOrXML:*=undefined):void{
-			msg2strArr(msg,styleOrXML);
 			clearTimeout(timeoutId);
 			timeoutId=setTimeout(updateDelay,100);
 		}

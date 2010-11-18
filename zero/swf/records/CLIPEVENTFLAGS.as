@@ -37,6 +37,7 @@ CLIPEVENTFLAGS 版本:v1.0
 //Reserved 					If SWF version >= 6, UB[8] 	Always 0
 package zero.swf.records{
 	import flash.utils.ByteArray;
+	import zero.swf.CurrSWFVersion;
 	public class CLIPEVENTFLAGS{
 		public var ClipEventKeyUp:int;
 		public var ClipEventKeyDown:int;
@@ -57,7 +58,6 @@ package zero.swf.records{
 		public var ClipEventConstruct:int;
 		public var ClipEventKeyPress:int;
 		public var ClipEventDragOut:int;
-		public var HasEndReservedUI8:Boolean;			//HasEndReservedUI8
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			ClipEventConstruct=-1;
@@ -79,19 +79,18 @@ package zero.swf.records{
 			ClipEventPress=(flags<<29)>>>31;			//00000100
 			ClipEventInitialize=(flags<<30)>>>31;		//00000010
 			ClipEventData=flags&0x01;					//00000001
-			offset+=2;
-			if(offset<endOffset){
-				flags=data[offset++];
-				//Reserved=(flags<<24)>>>27;				//11111000
-				ClipEventConstruct=(flags<<29)>>>31;		//00000100
-				ClipEventKeyPress=(flags<<30)>>>31;			//00000010
-				ClipEventDragOut=flags&0x01;				//00000001
+			
+			if(CurrSWFVersion.Version<6){
+				return offset+2;
 			}
-			if(offset<endOffset){
-				offset++;
-				HasEndReservedUI8=true;
-			}
-			return offset;
+			
+			flags=data[offset+2];
+			//Reserved=(flags<<24)>>>27;				//11111000
+			ClipEventConstruct=(flags<<29)>>>31;		//00000100
+			ClipEventKeyPress=(flags<<30)>>>31;			//00000010
+			ClipEventDragOut=flags&0x01;				//00000001
+			
+			return offset+4;
 		}
 		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
@@ -117,18 +116,19 @@ package zero.swf.records{
 			flags|=ClipEventData;						//00000001
 			data[1]=flags;
 			
-			var offset:int=2;
-			if(ClipEventConstruct>=0){
-				flags=0;
-				//flags|=Reserved<<3;						//11111000
-				flags|=ClipEventConstruct<<2;				//00000100
-				flags|=ClipEventKeyPress<<1;				//00000010
-				flags|=ClipEventDragOut;					//00000001
-				data[offset++]=flags;
+			if(CurrSWFVersion.Version<6){
+				return data;
 			}
-			if(HasEndReservedUI8){
-				data[data.length]=0x00;
-			}
+			
+			flags=0;
+			//flags|=Reserved<<3;						//11111000
+			flags|=ClipEventConstruct<<2;				//00000100
+			flags|=ClipEventKeyPress<<1;				//00000010
+			flags|=ClipEventDragOut;					//00000001
+			data[2]=flags;
+			
+			data[3]=0x00;
+			
 			return data;
 		}
 
@@ -155,11 +155,8 @@ package zero.swf.records{
 				ClipEventConstruct={ClipEventConstruct}
 				ClipEventKeyPress={ClipEventKeyPress}
 				ClipEventDragOut={ClipEventDragOut}
-				HasEndReservedUI8={HasEndReservedUI8}
 			/>;
-			if(ClipEventConstruct>=0){
-				
-			}else{
+			if(CurrSWFVersion.Version<6){
 				delete xml.@ClipEventConstruct;
 				delete xml.@ClipEventKeyPress;
 				delete xml.@ClipEventDragOut;
@@ -184,12 +181,12 @@ package zero.swf.records{
 			ClipEventPress=int(xml.@ClipEventPress.toString());
 			ClipEventInitialize=int(xml.@ClipEventInitialize.toString());
 			ClipEventData=int(xml.@ClipEventData.toString());
-			if(xml.@ClipEventConstruct){
+			if(CurrSWFVersion.Version<6){
+			}else{
 				ClipEventConstruct=int(xml.@ClipEventConstruct.toString());
 				ClipEventKeyPress=int(xml.@ClipEventKeyPress.toString());
 				ClipEventDragOut=int(xml.@ClipEventDragOut.toString());
 			}
-			HasEndReservedUI8=(xml.@HasEndReservedUI8.toString()==="true");
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}

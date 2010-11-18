@@ -18,10 +18,11 @@ package zero.swf.records{
 	import zero.swf.records.CLIPEVENTFLAGS;
 	import zero.swf.records.CLIPACTIONRECORD;
 	import flash.utils.ByteArray;
+	import zero.swf.CurrSWFVersion;
+	import zero.Outputer;
 	public class CLIPACTIONS{
 		public var AllEventFlags:CLIPEVENTFLAGS;
 		public var ClipActionRecordV:Vector.<CLIPACTIONRECORD>;
-		public var ClipActionEndFlagIsUI32:Boolean;		//ClipActionEndFlagIsUI32
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
 			//Reserved=data[offset]|(data[offset+1]<<8);
@@ -32,20 +33,30 @@ package zero.swf.records{
 			var i:int=-1;
 			ClipActionRecordV=new Vector.<CLIPACTIONRECORD>();
 			while(offset<endOffset-6){
+				if(CurrSWFVersion.Version<6){
+					if(data[offset]||data[offset+1]){
+					}else{
+						Outputer.output("可能是扰码: CLIPEVENTFLAGS 所有属性为0","brown");
+						offset+=2;
+						continue;
+					}
+				}else{
+					if(data[offset]||data[offset+1]||data[offset+2]||data[offset+3]){
+					}else{
+						Outputer.output("可能是扰码: CLIPEVENTFLAGS 所有属性为0","brown");
+						offset+=4;
+						continue;
+					}
+				}
 				i++;
-			
 				ClipActionRecordV[i]=new CLIPACTIONRECORD();
 				offset=ClipActionRecordV[i].initByData(data,offset,endOffset);
 			}
 			
-			offset+=2;
-			if(offset===endOffset){
-				ClipActionEndFlagIsUI32=false;
-			}else{
-				offset+=2;
-				ClipActionEndFlagIsUI32=true;
+			if(CurrSWFVersion.Version<6){
+				return offset+2;
 			}
-			return offset;
+			return offset+4;
 		}
 		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
@@ -59,19 +70,18 @@ package zero.swf.records{
 			var offset:int=data.length;
 			data[offset++]=0x00;
 			data[offset++]=0x00;
-			if(ClipActionEndFlagIsUI32){
-				data[offset++]=0x00;
-				data[offset++]=0x00;
+			if(CurrSWFVersion.Version<6){
+				return data;
 			}
+			data[offset++]=0x00;
+			data[offset++]=0x00;
 			return data;
 		}
 
 		////
 		CONFIG::toXMLAndInitByXML {
 		public function toXML(xmlName:String):XML{
-			var xml:XML=<{xmlName} class="CLIPACTIONS"
-				ClipActionEndFlagIsUI32={ClipActionEndFlagIsUI32}
-			/>;
+			var xml:XML=<{xmlName} class="CLIPACTIONS"/>;
 			xml.appendChild(AllEventFlags.toXML("AllEventFlags"));
 			if(ClipActionRecordV.length){
 				var listXML:XML=<ClipActionRecordList count={ClipActionRecordV.length}/>
@@ -98,7 +108,6 @@ package zero.swf.records{
 			}else{
 				ClipActionRecordV=new Vector.<CLIPACTIONRECORD>();
 			}
-			ClipActionEndFlagIsUI32=(xml.@ClipActionEndFlagIsUI32.toString()==="true");
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 	}
