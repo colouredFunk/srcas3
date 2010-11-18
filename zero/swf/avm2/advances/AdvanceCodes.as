@@ -152,7 +152,7 @@ package zero.swf.avm2.advances{
 								
 								//Op.type_u8_s24__branch
 								jumpOffset=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16);
-								if(jumpOffset&0x00008000){jumpOffset|=0xffff0000}//最高位为1,表示负数
+								if(jumpOffset&0x00800000){jumpOffset|=0xff000000}//最高位为1,表示负数
 								
 								jumpPos=offset+jumpOffset;
 								if(jumpPos<0||jumpPos>endOffset){
@@ -162,6 +162,11 @@ package zero.swf.avm2.advances{
 										continue;
 									}
 									Outputer.output("dataType_u8_s24 可能是扰码: offset="+offset+", jumpPos="+jumpPos+", endOffset="+endOffset+", 跳转命令只允许跳至代码开头和代码末尾之间的位置","brown");
+									
+									//if(jumpPos<0){
+									//	throw new Error("哈哈");
+									//}
+									
 									//if(jumpPos<0){
 									//	jumpPos=0;
 									//}else{
@@ -187,12 +192,17 @@ package zero.swf.avm2.advances{
 								var lookupswitch_startOffset:int=offset-1;
 								
 								jumpOffset=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16);
-								if(jumpOffset&0x00008000){jumpOffset|=0xffff0000}//最高位为1,表示负数
+								if(jumpOffset&0x00800000){jumpOffset|=0xff000000}//最高位为1,表示负数
 								
 								jumpPos=lookupswitch_startOffset+jumpOffset;
 								
 								if(jumpPos<0||jumpPos>endOffset){
 									Outputer.output("dataType_u8_s24_u30_s24List default_offset 可能是扰码: offset="+offset+", jumpPos="+jumpPos+", endOffset="+endOffset+", 跳转命令只允许跳至代码开头和代码末尾之间的位置","brown");
+									
+									//if(jumpPos<0){
+									//	throw new Error("哈哈");
+									//}
+									
 									//if(jumpPos<0){
 									//	jumpPos=0;
 									//}else{
@@ -218,12 +228,17 @@ package zero.swf.avm2.advances{
 								for(var i:int=0;i<case_count;i++){
 									//Op.type_u8_s24_u30_s24List__lookupswitch
 									jumpOffset=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16);
-									if(jumpOffset&0x00008000){jumpOffset|=0xffff0000}//最高位为1,表示负数
+									if(jumpOffset&0x00800000){jumpOffset|=0xff000000}//最高位为1,表示负数
 									
 									jumpPos=lookupswitch_startOffset+jumpOffset;
 									
 									if(jumpPos<0||jumpPos>endOffset){
 										Outputer.output("dataType_u8_s24_u30_s24List case_offset 可能是扰码: offset="+offset+", jumpPos="+jumpPos+", endOffset="+endOffset+", 跳转命令只允许跳至代码开头和代码末尾之间的位置","brown");
+										
+										//if(jumpPos<0){
+										//	throw new Error("哈哈");
+										//}
+										
 										//if(jumpPos<0){
 										//	jumpPos=0;
 										//}else{
@@ -270,7 +285,7 @@ package zero.swf.avm2.advances{
 			if(offset===endOffset){
 				
 			}else{
-				throw new Error("offset="+offset+",endOffset="+endOffset);
+				trace("offset="+offset+",endOffset="+endOffset);
 			}
 			
 			codeV=new Vector.<BaseCode>();

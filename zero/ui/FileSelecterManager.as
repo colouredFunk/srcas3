@@ -308,9 +308,14 @@ package zero.ui{
 		}
 		private function change(...args):void{
 			try{
-				__file.url=cb.text;
+				__file.url=cb.text=cb.text.replace(/\\/g,"/");
 			}catch(e:Error){
-				return;
+				try{
+					__file.url=cb.text="file:///"+cb.text;
+				}catch(e:Error){
+					trace("e="+e);
+					return;
+				}
 			}
 			if(__file.exists){
 				if(browseType==OPEN_MULTIPLE){
@@ -328,7 +333,54 @@ package zero.ui{
 				lastFSMFile=new File(__file.url);
 				addURL(__file.url);
 				select(null);
+				//trace("__file.url="+__file.url);
 			}
+		}
+		
+		public function checkIsMatchType(fileArr:Array):Boolean{
+			switch(browseType){
+				case OPEN:
+					if(fileArr.length==1){
+						return checkFileIsMatchType(fileArr[0]);
+					}
+				break;
+				case OPEN_MULTIPLE:
+					trace("暂不支持拖入");
+					return false;
+					/*
+					for each(var file:File in fileArr){
+						if(checkFileIsMatchType(fileArr[0])){
+						}else{
+							return false
+						}
+					}
+					return true;
+					*/
+				break;
+				case DIR:
+					if(fileArr.length==1&&(fileArr[0] as File).isDirectory){
+						return true;
+					}
+				break;
+			}
+			return false;
+		}
+		private function checkFileIsMatchType(file:File):Boolean{
+			for each(var fileFilter:FileFilter in fileFilterList){
+				if(fileFilter.extension.indexOf("*.*")==-1){
+					return new RegExp("^("+fileFilter.extension.replace(/;/g,"|").replace(/\./g,"\\.").replace(/\*/g,".*")+")$","i").test(decodeURI(file.url));
+				}
+				return true;
+			}
+			return false;
+		}
+		
+		public function nativeDragDrop(fileArr:Array):Boolean{
+			if(checkIsMatchType(fileArr)){
+				addFile(fileArr[0]);
+				return true;
+			}
+			return false;
 		}
 	}
 }

@@ -34,15 +34,22 @@ package zero.swf.funs{
 			codes_max_stack:int,
 			method:AdvanceMethod
 		):void{
-			var code0:AdvanceCode=method.codes.codeV.shift() as AdvanceCode;
-			var code1:AdvanceCode=method.codes.codeV.shift() as AdvanceCode;
-			if(
-				code0.op==Op.getlocal0
-				&&
-				code1.op==Op.pushscope
-			){
-			}else{
-				throw new Error("method_codeV 不太正常");
+			var code0:AdvanceCode,code1:AdvanceCode;
+			if(method.codes.codeV.length>1){
+				code0=method.codes.codeV[0] as AdvanceCode;
+				code1=method.codes.codeV[1] as AdvanceCode;
+				if(
+					code0.op==Op.getlocal0
+					&&
+					code1.op==Op.pushscope
+				){
+					method.codes.codeV.shift();
+					method.codes.codeV.shift();
+				}else{
+					code0=null;
+					code1=null;
+					//throw new Error("method_codeV 不太正常, code0.op="+Op.opNameV[code0.op]+", code1.op="+Op.opNameV[code1.op]);
+				}
 			}
 			
 			if(method.max_stack<codes_max_stack){
@@ -50,8 +57,11 @@ package zero.swf.funs{
 			}
 			
 			method.codes.codeV=codeV.concat(method.codes.codeV);
-			method.codes.codeV.unshift(code1);
-			method.codes.codeV.unshift(code0);
+			
+			if(code0&&code1){
+				method.codes.codeV.unshift(code1);
+				method.codes.codeV.unshift(code0);
+			}
 		}
 	}
 }
