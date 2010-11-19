@@ -1,8 +1,8 @@
 /**
- * VERSION: 1.391
- * DATE: 2010-09-28
- * ACTIONSCRIPT VERSION: 3.0 (AS2 version is also available)
- * UPDATES AND DOCUMENTATION AT: http://www.TweenLite.com
+ * VERSION: 1.4
+ * DATE: 2010-11-12
+ * AS3 (AS2 version is also available)
+ * UPDATES AND DOCS AT: http://www.greensock.com
  **/
 
 package com.greensock.core {
@@ -17,7 +17,7 @@ package com.greensock.core {
  */
 	public class TweenCore {
 		/** @private **/
-		public static const version:Number = 1.391;
+		public static const version:Number = 1.4;
 		
 		/** @private **/
 		protected static var _classInitted:Boolean;
@@ -70,6 +70,9 @@ package com.greensock.core {
 		
 		public function TweenCore(duration:Number=0, vars:Object=null) {
 			this.vars = (vars != null) ? vars : {};
+			if (this.vars.isGSVars) {
+				this.vars = this.vars.vars;
+			}
 			this.cachedDuration = this.cachedTotalDuration = duration;
 			_delay = (this.vars.delay) ? Number(this.vars.delay) : 0;
 			this.cachedTimeScale = (this.vars.timeScale) ? Number(this.vars.timeScale) : 1;
@@ -173,7 +176,7 @@ package com.greensock.core {
 				this.active = false;
 			}
 			if (!suppressEvents) {
-				if (this.vars.onComplete && this.cachedTotalTime == this.cachedTotalDuration && !this.cachedReversed) { //note: remember that tweens can have a duration of zero in which case their cachedTime and cachedDuration would always match.
+				if (this.vars.onComplete && this.cachedTotalTime >= this.cachedTotalDuration && !this.cachedReversed) { //note: remember that tweens can have a duration of zero in which case their cachedTime and cachedDuration would always match. Also, TimelineLite/Max instances with autoRemoveChildren may have a cachedTotalTime that exceeds cachedTotalDuration because the children were removed after the last render.
 					this.vars.onComplete.apply(null, this.vars.onCompleteParams);
 				} else if (this.cachedReversed && this.cachedTotalTime == 0 && this.vars.onReverseComplete) {
 					this.vars.onReverseComplete.apply(null, this.vars.onReverseCompleteParams);

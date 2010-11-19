@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 1.391
- * DATE: 2010-09-28
+ * VERSION: 1.392
+ * DATE: 2010-10-13
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCUMENTATION AT: http://www.greensock.com/timelinelite/
  **/
@@ -113,7 +113,7 @@ package com.greensock {
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:Number = 1.391;
+		public static const version:Number = 1.392;
 		/** @private **/
 		private static var _overwriteMode:int = (OverwriteManager.enabled) ? OverwriteManager.mode : OverwriteManager.init(2); //Ensures that TweenLite instances don't overwrite each other before being put into the timeline/sequence.
 		/** @private **/
