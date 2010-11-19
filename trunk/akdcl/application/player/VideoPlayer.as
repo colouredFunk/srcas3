@@ -2,6 +2,7 @@ package akdcl.application.player{
 	import com.greensock.events.LoaderEvent;
 	import com.greensock.loading.VideoLoader;
 	import com.greensock.layout.ScaleMode;
+	import flash.events.Event;
 	
 	/**
 	 * ...
@@ -35,6 +36,9 @@ package akdcl.application.player{
 		
 		override public function get loadProgress():Number {
 			return video?video.progress:0; 
+		}
+		override public function get bufferProgress():Number {
+			return video?video.bufferProgress:1;
 		}
 		override public function get totalTime():uint { 
 			return video?(video.duration * 1000):0;

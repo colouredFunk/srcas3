@@ -25,6 +25,7 @@
 	import flash.events.ContextMenuEvent;
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
+	import flash.system.ApplicationDomain;
 	
 	/**
 	 * ...
@@ -33,12 +34,16 @@
 	public class  ImageLoader extends Btn {
 		private static var contextMenuImageLoader:ContextMenu;
 		private static var contextMenuItemImageLoader:ContextMenuItem;
-		private static function createMenu(_target:*):void {
+		private static function createMenu(_target:*):ContextMenu {
+			if (!ApplicationDomain.currentDomain.hasDefinition("Common")) {
+				return null;
+			}
 			if (!contextMenuImageLoader) {
-				contextMenuItemImageLoader = Common.addContextMenu(_target, "");
+				contextMenuItemImageLoader = ApplicationDomain.currentDomain.getDefinition("Common").addContextMenu(_target, "");
 				contextMenuImageLoader = _target.contextMenu;
 				contextMenuImageLoader.addEventListener(ContextMenuEvent.MENU_SELECT, onImageMenuShowHandler);
 			}
+			return contextMenuImageLoader;
 		}
 		private static function onImageMenuShowHandler(_evt:ContextMenuEvent):void {
 			var _imageLoader:*=_evt.contextMenuOwner as ImageLoader;
@@ -118,8 +123,7 @@
 			bmp = new Bitmap();
 			bmp.alpha = 0;
 			autoFitArea = new AutoFitArea(container, 0, 0, _areaWidth, _areaHeight);
-			createMenu(this);
-			contextMenu = contextMenuImageLoader;
+			contextMenu = createMenu(this);
 		}
 		override protected function onRemoveToStageHandler():void {
 			TweenMax.killChildTweensOf(this);
@@ -140,6 +144,8 @@
 		public var changeImmediately:Boolean;
 		public function load(_source:*, _index:uint = 0, _changeImmediately:Boolean = false ):void {
 			if (_source && __source == _source) {
+				onImageLoadingHandler(null);
+				onImageLoadedHandler(null);
 				return;
 			}
 			__source = _source;
@@ -147,7 +153,6 @@
 			if (_source is BitmapData) {
 				bmdNow = _source;
 				__source = null;
-				//
 				setBMP(bmdNow);
 			}else {
 				loadBMD(_source, this, _index);
@@ -226,21 +231,21 @@
 		protected function onImageLoadingHandler(_evt:*):void {
 			__loadProgress = _evt?_evt.target.progress:1;
 			setProgressClip(__loadProgress);
-			if (_evt) {
-				dispatchEvent(new ProgressEvent(ProgressEvent.PROGRESS, false, false, _evt?_evt.target.bytesLoaded:100, _evt?_evt.target.bytesTotal:100));
-			}
+			dispatchEvent(new ProgressEvent(ProgressEvent.PROGRESS, false, false, _evt?_evt.target.bytesLoaded:100, _evt?_evt.target.bytesTotal:100));
 		}
 		protected function onImageLoadedHandler(_evt:*):void {
 			var _isReady:Boolean = !Boolean(bmdNow);
 			if (_evt is LoaderEvent) {
 				bmdNow = _evt.target.rawContent.bitmapData;
-			}else {
+			}else if (_evt is BitmapData) {
 				bmdNow = _evt as BitmapData;
 			}
-			if (bmdNow && _isReady) {
-				setBMP(bmdNow);
-			}else {
-				hideBMP(bmp, onHideEndHandler);
+			if (_evt && bmdNow) {
+				if (_isReady) {
+					setBMP(bmdNow);
+				}else {
+					hideBMP(bmp, onHideEndHandler);
+				}
 			}
 			setProgressClip(false);
 			dispatchEvent(new Event(Event.COMPLETE));

@@ -183,7 +183,18 @@
 			if (labelList[0] == "") {
 				labelList.pop();
 			}
-			Common.copyInstanceToArray(btnY, Math.max(labelList.length, btnList.length), btnList, setBtn);
+			
+			var _length:uint = Math.max(labelList.length, btnList.length);
+			var _instanceCopy:*;
+			var _instanceClass:Class = btnY.constructor as Class;
+			for (_i=0; _i < _length;_i++ ) {
+				_instanceCopy = btnList[_i];
+				if (!_instanceCopy) {
+					_instanceCopy = new _instanceClass();
+					btnList[_i] = _instanceCopy;
+				}
+				setBtn(_instanceCopy,_i,btnList,_length);
+			}
 		}
 		//
 		private var __labelsAutoSize:String = TextFieldAutoSize.CENTER;
@@ -300,9 +311,8 @@
 			//isWinking = false;
 		}
 		protected function setBtn(_btn:*, _id:uint, ...args):void {
-			if (args[1]) {
-				addChildAt(_btn, getChildIndex(btnY));
-			}
+			
+			addChildAt(_btn, getChildIndex(btnY));
 			if (_id >= labelList.length) {
 				_btn.visible = false;
 			}else {
