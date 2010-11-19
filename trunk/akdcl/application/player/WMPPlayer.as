@@ -206,7 +206,7 @@ package akdcl.application.player{
 		protected var timerLoad:Timer;
 		override protected function init():void {
 			timerLoad = new Timer(updateInterval);
-			timerLoad.addEventListener(TimerEvent.TIMER, onLoadProgressHander);
+			timerLoad.addEventListener(TimerEvent.TIMER, onLoadProgressHandler);
 			if (ExternalInterface.available) {
 				ExternalInterface.call("eval", PWRDJS.INIT.toString());
 				ExternalInterface.call("eval", WMPPLAYER_JS.toString());
@@ -216,17 +216,17 @@ package akdcl.application.player{
 			}
 		}
 		override public function remove():void {
-			super.remove();
 			wmpInfo = null;
-			timerLoad.removeEventListener(TimerEvent.TIMER, onLoadProgressHander);
+			timerLoad.removeEventListener(TimerEvent.TIMER, onLoadProgressHandler);
 			timerLoad = null;
+			super.remove();
 		}
-		override public function play():Boolean {
+		override public function play():void {
 			if (isPlugin) {
 				ExternalInterface.call("pwrd.wmpPlayer.play",ExternalInterface.objectID);
 				volume = volume;
 			}
-			return super.play();
+			super.play();
 		}
 		override public function pause():void {
 			if (isPlugin) {

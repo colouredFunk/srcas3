@@ -19,8 +19,9 @@ package akdcl.application.player{
 		public function set totalTime(_totalTime:uint):void {
 			__totalTime = _totalTime;
 		}
+		protected var timeOff:uint;
 		override public function get position():uint {
-			return timer.currentCount * timer.delay;
+			return (timer.currentCount-timeOff) * timer.delay;
 		}
 		override public function set contentWidth(value:uint):void {
 			super.contentWidth = value;
@@ -33,11 +34,18 @@ package akdcl.application.player{
 		override protected function init():void {
 			super.init();
 			content = new ImageLoader();
+			//content.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);
+			content.addEventListener(ProgressEvent.PROGRESS, onLoadProgressHandler);
+			content.addEventListener(Event.COMPLETE, onLoadCompleteHandler);
 		}
 		override public function remove():void {
-			super.remove();
 			content.remove();
 			content = null;
+			super.remove();
+		}
+		override public function play():void {
+			super.play();
+			timeOff = timer.currentCount;
 		}
 		override public function hideContent():void {
 			super.hideContent();
@@ -49,14 +57,11 @@ package akdcl.application.player{
 			super.onPlayIDChangeHandler(_playID);
 			
 			var _imageSource:String = getMediaByID(_playID);
-			content.load(_imageSource);
 			if (container) {
 				content.visible = true;
 				container.addChild(content);
 			}
-			//content.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);
-			content.addEventListener(ProgressEvent.PROGRESS, onLoadProgressHander);
-			content.addEventListener(Event.COMPLETE, onLoadCompleteHandler);
+			content.load(_imageSource);
 			play();
 		}
 		override protected function onLoadCompleteHandler(_evt:* = null):void {
@@ -65,11 +70,10 @@ package akdcl.application.player{
 		}
 		override protected function onPlayProgressHander(_evt:* = null):void {
 			super.onPlayProgressHander(_evt);
-			var _play:uint = timer.currentCount * timer.delay;
-			if (_play > totalTime * loadProgress) {
+			if (position > totalTime * loadProgress) {
 				timer.stop();
 			}
-			if ( _play >= totalTime) {
+			if (position>=totalTime) {
 				onPlayCompleteHandler();
 			}
 		}

@@ -6,48 +6,45 @@ package akdcl.application.player{
 	
 	import ui.UIEventDispatcher;
 	
-	import akdcl.events.MediaEvent;
 	import akdcl.application.IDPart;
-	
-	/// @eventType	akdcl.events.MediaEvent.LIST_CHANGE
-	[Event(name = "listChange", type = "akdcl.events.MediaEvent")]
-	
-	/// @eventType	akdcl.events.MediaEvent.VOLUME_CHANGE
-	[Event(name = "volumeChange", type = "akdcl.events.MediaEvent")]
-
-	/// @eventType	akdcl.events.MediaEvent.STATE_CHANGE
-	[Event(name = "stateChange", type = "akdcl.events.MediaEvent")]
-
-	/// @eventType	akdcl.events.MediaEvent.PLAY_PROGRESS
-	[Event(name = "playProgress", type = "akdcl.events.MediaEvent")]
-
-	/// @eventType	akdcl.events.MediaEvent.PLAY_COMPLETE
-	[Event(name = "playComplete", type = "akdcl.events.MediaEvent")]
-
-	/// @eventType	akdcl.events.MediaEvent.LOAD_PROGRESS
-	[Event(name = "loadProgress", type = "akdcl.events.MediaEvent")]
-	
-	/// @eventType	akdcl.events.MediaEvent.LOAD_ERROR
-	[Event(name = "loadError", type = "akdcl.events.MediaEvent")]
-	
-	/// @eventType	akdcl.events.MediaEvent.LOAD_COMPLETE
-	[Event(name = "loadComplete", type = "akdcl.events.MediaEvent")]
-	
-	/// @eventType	akdcl.events.MediaEvent.PLAY_ID_CHANGE
-	[Event(name = "playIDChange", type = "akdcl.events.MediaEvent")]
-	
 	/**
 	 * ...
 	 * @author Akdcl
 	 */
+	/// @eventType	akdcl.application.player.MediaEvent.LIST_CHANGE
+	[Event(name = "listChange", type = "akdcl.application.player.MediaEvent")]
+	
+	/// @eventType	akdcl.application.player.MediaEvent.VOLUME_CHANGE
+	[Event(name = "volumeChange", type = "akdcl.application.player.MediaEvent")]
+
+	/// @eventType	akdcl.application.player.MediaEvent.STATE_CHANGE
+	[Event(name = "stateChange", type = "akdcl.application.player.MediaEvent")]
+
+	/// @eventType	akdcl.application.player.MediaEvent.PLAY_PROGRESS
+	[Event(name = "playProgress", type = "akdcl.application.player.MediaEvent")]
+
+	/// @eventType	akdcl.application.player.MediaEvent.PLAY_COMPLETE
+	[Event(name = "playComplete", type = "akdcl.application.player.MediaEvent")]
+
+	/// @eventType	akdcl.application.player.MediaEvent.LOAD_PROGRESS
+	[Event(name = "loadProgress", type = "akdcl.application.player.MediaEvent")]
+	
+	/// @eventType	akdcl.application.player.MediaEvent.LOAD_ERROR
+	[Event(name = "loadError", type = "akdcl.application.player.MediaEvent")]
+	
+	/// @eventType	akdcl.application.player.MediaEvent.LOAD_COMPLETE
+	[Event(name = "loadComplete", type = "akdcl.application.player.MediaEvent")]
+	
+	/// @eventType	akdcl.application.player.MediaEvent.PLAY_ID_CHANGE
+	[Event(name = "playIDChange", type = "akdcl.application.player.MediaEvent")]
+	
 	public class MediaPlayer extends UIEventDispatcher {
 		public static const STATE_PLAY:String = "play";
 		public static const STATE_PAUSE:String = "pause";
 		public static const STATE_STOP:String = "stop";
-		public static const STATE_BUFFER:String = "buffer";
-		public static const STATE_WAIT:String = "wait";
-		public static const STATE_COMPLETE:String = "complete";
 		public static const STATE_CONNECT:String = "connect";
+		public static const STATE_WAIT:String = "wait";
+		public static const STATE_BUFFER:String = "buffer";
 		public static const STATE_READY:String = "ready";
 		public static const STATE_RECONNECT:String = "reconnect";
 		
@@ -142,11 +139,6 @@ package akdcl.application.player{
 			return idPart.id;
 		}
 		public function set playID(_playID:int):void {
-			if (playlist) {
-				if (playlist.length() == 1) {
-					idPart.setID( -1);
-				}
-			}
 			idPart.id = _playID;
 		}
 		//0:不循环，1:单首循环，2:顺序循环(全部播放完毕后停止)，3:顺序循环，4:随机播放
@@ -162,30 +154,32 @@ package akdcl.application.player{
 		public function get playState():String{
 			return __playState;
 		}
-		protected function setPlayState(_playState:String):void {
+		protected function setPlayState(_playState:String):Boolean {
 			if (__playState == _playState) {
-				return;
+				return false;
 			}
 			switch(_playState) {
 				case STATE_PLAY:
-					timer.start();
+					timer.addEventListener(TimerEvent.TIMER, onPlayProgressHander);
 					break;
 				case STATE_PAUSE:
 					if (__playState == STATE_STOP) {
-						return;
+						return false;
 					}
-					timer.stop();
+					timer.removeEventListener(TimerEvent.TIMER, onPlayProgressHander);
 					break;
 				case STATE_STOP:
-					timer.reset();
-					timer.stop();
-					onPlayProgressHander();
+					timer.removeEventListener(TimerEvent.TIMER, onPlayProgressHander);
+					break;
+				case STATE_BUFFER:
+					timer.removeEventListener(TimerEvent.TIMER, onPlayProgressHander);
 					break;
 				default:
-					timer.stop();
+					timer.removeEventListener(TimerEvent.TIMER, onPlayProgressHander);
 			}
 			__playState = _playState;
 			dispatchEvent(new MediaEvent(MediaEvent.STATE_CHANGE));
+			return true;
 		}
 		//
 		private var __contentWidth:uint;
@@ -214,7 +208,7 @@ package akdcl.application.player{
 			return __container;
 		}
 		public function set container(_cotainer:*):void {
-			if (_cotainer == __container || !_cotainer) {
+			if (_cotainer == __container) {
 				return;
 			}
 			__container = _cotainer;
@@ -235,7 +229,7 @@ package akdcl.application.player{
 			idPart.setID( -1);
 			dispatchEvent(new MediaEvent(MediaEvent.LIST_CHANGE));
 			if (autoPlay) {
-				play();
+				playID = 0;
 			}
 			autoPlay = true;
 		}
@@ -248,34 +242,30 @@ package akdcl.application.player{
 		override protected function init():void {
 			super.init();
 			timer = new Timer(updateInterval);
-			timer.addEventListener(TimerEvent.TIMER, onPlayProgressHander);
 			idPart = new IDPart();
 			idPart.onIDChange = onPlayIDChangeHandler;
 		}
 		override public function remove():void {
-			super.remove();
 			stop();
-			timer.removeEventListener(TimerEvent.TIMER, onPlayProgressHander);
 			timer = null;
 			idPart.remove();
 			idPart = null;
 			playlist = null;
+			container = null;
+			content = null;
+			super.remove();
 		}
 		//
 		public function getMediaByID(_playID:int):String {
 			return playlist?String(playlist[_playID].@source):null
 		}
 		//
-		public function play():Boolean {
+		public function play():void {
 			if (playID<0) {
 				playID = 0;
+				return;
 			}
-			if (isPlaying) {
-				return false;
-			}
-			onLoadProgressHander();
 			setPlayState(STATE_PLAY);
-			return true;
 		}
 		public function pause():void {
 			setPlayState(STATE_PAUSE);
@@ -312,6 +302,7 @@ package akdcl.application.player{
 		}
 		//
 		protected function onPlayIDChangeHandler(_playID:int):void {
+			timer.start();
 			dispatchEvent(new MediaEvent(MediaEvent.PLAY_ID_CHANGE));
 		}
 		//
@@ -323,7 +314,7 @@ package akdcl.application.player{
 			}
 			dispatchEvent(new MediaEvent(MediaEvent.LOAD_ERROR));
 		}
-		protected function onLoadProgressHander(_evt:*= null):void {
+		protected function onLoadProgressHandler(_evt:*= null):void {
 			dispatchEvent(new MediaEvent(MediaEvent.LOAD_PROGRESS));
 		}
 		protected function onLoadCompleteHandler(_evt:*= null):void {
@@ -331,6 +322,8 @@ package akdcl.application.player{
 		}
 		//
 		protected function onPlayCompleteHandler(_evt:*= null):void {
+			timer.reset();
+			timer.stop();
 			switch(repeat) {
 				case 0:
 					stop();

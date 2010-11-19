@@ -45,7 +45,6 @@ package akdcl.application.player{
 		override public function set position(value:uint):void {
 			if (video) {
 				video.videoTime = Math.min(value, totalTime * video.progress * 0.99) * 0.001;
-				play();
 			}
 		}
 		override public function set volume(value:Number):void {
@@ -71,29 +70,27 @@ package akdcl.application.player{
 		}
 		protected var video:VideoLoader;
 		protected var videoParams:Object;
-		override protected function init():void {
-			super.init();
-		}
 		override public function remove():void {
-			super.remove();
 			hideContent();
 			video = null;
 			videoParams = null;
+			super.remove();
 		}
-		override public function play():Boolean {
-			var _isPlay:Boolean = super.play();
-			if (_isPlay && video) {
-				video.playVideo();
+		override public function play():void {
+			if (video&&!video.paused) {
+				 video.playVideo();
 			}
-			return _isPlay;
+			super.play();
 		}
 		override public function pause():void {
+			video && video.pauseVideo();
 			super.pause();
-			video&&video.pauseVideo();
 		}
 		override public function stop():void {
 			if (video) {
-				video.videoTime = 0;
+				if (video.videoTime!=0) {
+					video.videoTime = 0;
+				}
 				video.pauseVideo();
 			}
 			super.stop();
@@ -108,7 +105,7 @@ package akdcl.application.player{
 			stop();
 			if (video) {
 				video.removeEventListener(LoaderEvent.ERROR, onLoadErrorHandler);
-				video.removeEventListener(LoaderEvent.PROGRESS, onLoadProgressHander);
+				video.removeEventListener(LoaderEvent.PROGRESS, onLoadProgressHandler);
 				video.removeEventListener(LoaderEvent.COMPLETE, onLoadCompleteHandler);
 				video.removeEventListener(VideoLoader.VIDEO_COMPLETE, onPlayCompleteHandler);
 			}
@@ -119,7 +116,7 @@ package akdcl.application.player{
 			var _videoSource:String = getMediaByID(_playID);
 			video = loadVideo(_videoSource, videoParams);
 			video.addEventListener(LoaderEvent.ERROR, onLoadErrorHandler);
-			video.addEventListener(LoaderEvent.PROGRESS, onLoadProgressHander);
+			video.addEventListener(LoaderEvent.PROGRESS, onLoadProgressHandler);
 			video.addEventListener(LoaderEvent.COMPLETE, onLoadCompleteHandler);
 			video.addEventListener(VideoLoader.VIDEO_COMPLETE, onPlayCompleteHandler);
 			video.load();

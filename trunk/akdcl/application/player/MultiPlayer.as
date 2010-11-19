@@ -1,5 +1,4 @@
 package akdcl.application.player{
-	import akdcl.events.MediaEvent;
 	
 	/**
 	 * ...
@@ -42,19 +41,22 @@ package akdcl.application.player{
 			wmpPlayer.volume = volume;
 		}
 		public var imagePlayer:ImagePlayer;
-		public var musicPlayer:MusicPlayerNew;
+		public var musicPlayer:MusicPlayer;
 		public var videoPlayer:VideoPlayer;
 		public var wmpPlayer:WMPPlayer;
 		protected var currentPlayer:MediaPlayer;
 		override protected function init():void {
 			super.init();
-			musicPlayer = new MusicPlayerNew();
+			musicPlayer = new MusicPlayer();
 			imagePlayer = new ImagePlayer();
 			videoPlayer = new VideoPlayer();
 			wmpPlayer = new WMPPlayer();
+			imagePlayer.repeat = 0;
+			musicPlayer.repeat = 0;
+			videoPlayer.repeat = 0;
+			wmpPlayer.repeat = 0;
 		}
 		override public function remove():void {
-			super.remove();
 			imagePlayer.remove();
 			musicPlayer.remove();
 			videoPlayer.remove();
@@ -64,19 +66,19 @@ package akdcl.application.player{
 			videoPlayer = null;
 			wmpPlayer = null;
 			currentPlayer = null;
+			super.remove();
 		}
-		override public function play():Boolean {
-			var _isPlay:Boolean = super.play();
-			if (_isPlay&&currentPlayer) {
+		override public function play():void {
+			if (currentPlayer) {
 				currentPlayer.play();
 			}
-			return _isPlay;
+			super.play();
 		}
 		override public function pause():void {
-			super.pause();
 			if (currentPlayer) {
 				currentPlayer.pause();
 			}
+			super.pause();
 		}
 		override public function stop():void {
 			if (currentPlayer) {
@@ -94,7 +96,7 @@ package akdcl.application.player{
 			stop();
 			if (currentPlayer) {
 				currentPlayer.removeEventListener(MediaEvent.LOAD_ERROR, onLoadErrorHandler);
-				currentPlayer.removeEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHander);
+				currentPlayer.removeEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
 				currentPlayer.removeEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
 				currentPlayer.removeEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);	
 			}
@@ -128,7 +130,7 @@ package akdcl.application.player{
 					break;
 			}
 			currentPlayer.addEventListener(MediaEvent.LOAD_ERROR, onLoadErrorHandler);
-			currentPlayer.addEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHander);
+			currentPlayer.addEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
 			currentPlayer.addEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
 			currentPlayer.addEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);
 			currentPlayer.container = container;

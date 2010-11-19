@@ -3,9 +3,9 @@ package akdcl.application.player{
 	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
 	
-	import akdcl.media.Sound;
+	import akdcl.application.player.Sound;
 	
-	public class MusicPlayerNew extends MediaPlayer {
+	public class MusicPlayer extends MediaPlayer {
 		override public function get loadProgress():Number {
 			return sound?sound.loadProgress:0; 
 		}
@@ -18,7 +18,6 @@ package akdcl.application.player{
 		override public function set position(value:uint):void {
 			if (sound) {
 				sound.position = value;
-				setPlayState(MediaPlayer.STATE_PLAY);
 			}
 		}
 		override public function set volume(value:Number):void {
@@ -29,22 +28,19 @@ package akdcl.application.player{
 		}
 		protected var sound:Sound;
 		override public function remove():void {
-			super.remove();
 			if (sound) {
 				sound.stop(true);
 				sound = null;
 			}
+			super.remove();
 		}
-		override public function play():Boolean {
-			var _isPlay:Boolean = super.play();
-			if (_isPlay && sound) {
-				sound.play();
-			}
-			return _isPlay;
+		override public function play():void {
+			sound && sound.play();
+			super.play();
 		}
 		override public function pause():void {
+			sound && sound.pause();
 			super.pause();
-			sound&&sound.pause();
 		}
 		override public function stop():void {
 			sound && sound.stop();
@@ -54,7 +50,7 @@ package akdcl.application.player{
 			stop();
 			if (sound) {
 				sound.removeEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);
-				sound.removeEventListener(ProgressEvent.PROGRESS, onLoadProgressHander);
+				sound.removeEventListener(ProgressEvent.PROGRESS, onLoadProgressHandler);
 				sound.removeEventListener(Event.COMPLETE, onLoadCompleteHandler);
 				sound.removeEventListener(Event.SOUND_COMPLETE, onPlayCompleteHandler);
 				sound.stop(true);
@@ -64,9 +60,14 @@ package akdcl.application.player{
 			
 			var _musicSource:String = getMediaByID(_playID);
 			sound = Sound.loadSound(_musicSource);
-			sound.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);
-			sound.addEventListener(ProgressEvent.PROGRESS, onLoadProgressHander);
-			sound.addEventListener(Event.COMPLETE, onLoadCompleteHandler);
+			if (sound.loadProgress==1) {
+				onLoadProgressHandler();
+				onLoadCompleteHandler();
+			}else {
+				sound.addEventListener(ProgressEvent.PROGRESS, onLoadProgressHandler);
+				sound.addEventListener(Event.COMPLETE, onLoadCompleteHandler);
+				sound.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);
+			}
 			sound.addEventListener(Event.SOUND_COMPLETE, onPlayCompleteHandler);
 			play();
 		}
