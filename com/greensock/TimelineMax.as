@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.39
- * DATE: 2010-09-27
+ * VERSION: 1.392
+ * DATE: 2010-10-13
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCUMENTATION AT: http://www.greensock.com/timelinemax/
  **/
@@ -145,7 +145,7 @@ package com.greensock {
  **/
 	public class TimelineMax extends TimelineLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:Number = 1.39;
+		public static const version:Number = 1.392;
 		
 		/** @private **/
 		protected var _repeat:int;

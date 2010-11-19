@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.6
- * DATE: 2010-10-02
+ * VERSION: 1.7
+ * DATE: 2010-11-13
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -453,8 +453,8 @@ package com.greensock.loading {
 		
 		/** @private **/
 		protected function _checkRequiredLoaders():void {
-			if (_queue == null && this.vars.integrateProgress != false && !_scriptAccessDenied) {
-				_queue = _rootLookup[_loader.content];
+			if (_queue == null && this.vars.integrateProgress != false && !_scriptAccessDenied && _content != null) {
+				_queue = _rootLookup[_content];
 				if (_queue != null) {
 					_changeQueueListeners(true);
 					_queue.load(false);

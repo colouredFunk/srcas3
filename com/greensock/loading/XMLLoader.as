@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.63
- * DATE: 2010-10-08
+ * VERSION: 1.7
+ * DATE: 2010-11-13
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -17,6 +17,8 @@ package com.greensock.loading {
 	import flash.system.LoaderContext;
 	import flash.system.SecurityDomain;
 	
+	/** Dispatched when the XML finishes loading and its contents are parsed (creating any dynamic XML-driven loader instances necessary). If any dynamic loaders are created and have a <code>load="true"</code> attribute, they will begin loading at this point and the XMLLoader's <code>COMPLETE</code> will not be dispatched until the loaders have completed as well. **/
+	[Event(name="init", 				type="com.greensock.events.LoaderEvent")]
 	/** Dispatched when any loader that the XMLLoader discovered in the XML dispatches an OPEN event. **/
 	[Event(name="childOpen", 			type="com.greensock.events.LoaderEvent")]
 	/** Dispatched when any loader that the XMLLoader discovered in the XML dispatches a PROGRESS event. **/
@@ -391,7 +393,7 @@ function completeHandler(event:LoaderEvent):void {
 				} else if (s == "context") {
 					v.context = new LoaderContext(true, 
 												  (value == "own") ? ApplicationDomain.currentDomain : (value == "separate") ? new ApplicationDomain() : new ApplicationDomain(ApplicationDomain.currentDomain),
-												  SecurityDomain.currentDomain);
+												  (!_isLocal) ? SecurityDomain.currentDomain : null);
 					continue;
 				}
 				type = typeof(_varTypes[s]);

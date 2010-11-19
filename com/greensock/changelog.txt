@@ -1,6 +1,27 @@
 CHANGE LOG : GREENSOCK TWEENING PLATFORM
 ----------------------------------------
 
+2010-11-13
+---------------------------------------------
+TweenLite			11.4
+TweenMax			11.4
+TweenCore			11.4
+TweenLiteVars		5.0
+TweenMaxVars		5.0
+	- Rewrote TweenLiteVars and TweenMaxVars to facilitate method chaining like new TweenLiteVars().prop("x", 100).onComplete(myFunction).delay(1).autoAlpha(0). This makes it possible to do things inline, greatly reducing the code necessary to accomplish the same task. 
+	- Made TweenLite and TweenMax compatible with the new TweenLiteVars and TweenMaxVars classes. 
+	- Updated ASDocs
+
+2010-10-13
+---------------------------------------------
+TimelineLite		1.392
+TimelineMax			1.392
+TweenCore			1.392
+RoughEase			0.61
+	- Fixed issue that caused a TimelineLite/Max not to fire its onComplete when its autoRemoveChildren property was true
+	- Changed RoughEase so that when a name isn't defined, the instance isn't stored in the lookup table that's used for byName(), making the instance eligible for gc
+	- Added a dispose() method to RoughEase to manually release an instance for gc.
+
 2010-09-27
 ----------------------------------------------
 TweenLite			1.39

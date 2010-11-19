@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.62
- * DATE: 2010-10-02
+ * VERSION: 1.73
+ * DATE: 2010-11-18
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -209,7 +209,7 @@ function errorHandler(event:LoaderEvent):void {
 		/** @private **/
 		protected var _duration:Number;
 		/** @private **/
-		protected var _pauseOnBufferFull:Boolean;
+		protected var _pausePending:Boolean;
 		/** @private **/
 		protected var _volume:Number;
 		/** @private **/
@@ -228,8 +228,8 @@ function errorHandler(event:LoaderEvent):void {
 		protected var _prevTime:Number;
 		/** @private **/
 		protected var _firstCuePoint:CuePoint;
-		/** @private we must wait until the NetStream buffers once (the first time) before we can pause() it, otherwise it may not load at all and/or the metaData won't be received. **/
-		protected var _bufferedOnce:Boolean;
+		/** @private due to a bug in the NetStream class, we cannot seek() or pause() before the NetStream has dispatched a RENDER Event. **/
+		protected var _renderedOnce:Boolean;
 		
 		/** The metaData that was received from the video (contains information about its width, height, frame rate, etc.). See Adobe's docs for information about a NetStream's onMetaData callback. **/
 		public var metaData:Object;
@@ -318,7 +318,7 @@ function errorHandler(event:LoaderEvent):void {
 			_nc.addEventListener("asyncError", _failHandler, false, 0, true);
 			_nc.addEventListener("securityError", _failHandler, false, 0, true);
 			
-			_video = _content = new Video(320, 160);
+			_video = _content = new Video(this.vars.width || 320, this.vars.height || 240);
 			_video.smoothing = Boolean(this.vars.smoothing != false);
 			_video.deblocking = uint(this.vars.deblocking);
 			
@@ -326,7 +326,7 @@ function errorHandler(event:LoaderEvent):void {
 			
 			_duration = isNaN(this.vars.estimatedDuration) ? 200 : Number(this.vars.estimatedDuration); //just set it to a high number so that the progress starts out low.
 			_bufferMode = _preferEstimatedBytesInAudit = Boolean(this.vars.bufferMode == true);
-			_videoPaused = _pauseOnBufferFull = Boolean(this.vars.autoPlay == false);
+			_videoPaused = _pausePending = Boolean(this.vars.autoPlay == false);
 			this.autoAdjustBuffer = !(this.vars.autoAdjustBuffer == false);
 			
 			this.volume = ("volume" in this.vars) ? Number(this.vars.volume) : 1;
@@ -339,6 +339,7 @@ function errorHandler(event:LoaderEvent):void {
 			} else {
 				_sprite = new ContentDisplay(this);
 			}
+			Object(_sprite).rawContent = null; //so that the video doesn't initially show at the wrong size before the metaData is received at which point we can accurately determine the aspect ratio.
 		}
 		
 		/** @private **/
@@ -357,7 +358,6 @@ function errorHandler(event:LoaderEvent):void {
 				_ns.removeEventListener("asyncError", _failHandler);
 			}
 			_prevTime = 0;
-			_bufferedOnce = false;
 			
 			_ns = (this.vars.netStream is NetStream) ? this.vars.netStream : new NetStream(_nc);
 			_ns.checkPolicyFile = Boolean(this.vars.checkPolicyFile == true);
@@ -366,6 +366,7 @@ function errorHandler(event:LoaderEvent):void {
 			_ns.addEventListener(NetStatusEvent.NET_STATUS, _statusHandler, false, 0, true);
 			_ns.addEventListener("ioError", _failHandler, false, 0, true);
 			_ns.addEventListener("asyncError", _failHandler, false, 0, true);
+			_ns.addEventListener(Event.RENDER, _renderHandler, false, 0, true);
 			
 			_ns.bufferTime = isNaN(this.vars.bufferTime) ? 5 : Number(this.vars.bufferTime);
 			
@@ -379,9 +380,9 @@ function errorHandler(event:LoaderEvent):void {
 			_repeatCount = 0;
 			_prevTime = 0;
 			_bufferFull = false;
-			_bufferedOnce = false;
+			_renderedOnce = false;
 			this.metaData = null;
-			_pauseOnBufferFull = _videoPaused;
+			_pausePending = _videoPaused;
 			if (_videoPaused) {
 				_setForceTime(0);
 				_sound.volume = 0;
@@ -401,7 +402,7 @@ function errorHandler(event:LoaderEvent):void {
 			_forceTime = NaN;
 			_prevTime = 0;
 			_initted = false;
-			_bufferedOnce = false;
+			_renderedOnce = false;
 			this.metaData = null;
 			if (scrubLevel != 2) {
 				_refreshNetStream();
@@ -460,7 +461,7 @@ function errorHandler(event:LoaderEvent):void {
 						_cachedBytesLoaded = (_ns.bufferLength / _ns.bufferTime) * _cachedBytesTotal;
 					}
 					if (_cachedBytesTotal <= _cachedBytesLoaded) {
-						_cachedBytesTotal = (this.metaData == null) ? int(1.01 * _cachedBytesLoaded) + 1 : _cachedBytesLoaded;
+						_cachedBytesTotal = (this.metaData == null || !_renderedOnce) ? int(1.01 * _cachedBytesLoaded) + 1 : _cachedBytesLoaded;
 					}
 					
 				} else {
@@ -484,7 +485,7 @@ function errorHandler(event:LoaderEvent):void {
 		 * myVideoLoader.addASCuePoint(5, "coolPart", {message:"This is a cool part.", id:5}); <br />
 		 * myVideoLoader.addEventListener(VideoLoader.VIDEO_CUE_POINT, cuePointHandler); <br />
 		 * function cuePointHandler(event:LoaderEvent):void { <br />
-		 *     trace("hit cue point " + event.data.name + ", message: " + event.data.paramaters.message); <br />
+		 *     trace("hit cue point " + event.data.name + ", message: " + event.data.parameters.message); <br />
 		 * }</code>
 		 * 
 		 * @param time The time (in seconds) at which the cue point should be placed in the video. 
@@ -592,7 +593,7 @@ function errorHandler(event:LoaderEvent):void {
 				time = _duration;
 			}
 			var changed:Boolean = (time != this.videoTime);
-			if (_initted && _bufferedOnce && changed) { //don't seek() until metaData has been received, otherwise it can prevent it from ever being received. 
+			if (_initted && _renderedOnce && changed) { //don't seek() until metaData has been received otherwise it can prevent it from ever being received. Also, if the NetStream hasn't rendered once and we seek(), it often completely loses its audio!
 				_ns.seek(time);
 				_bufferFull = false;
 			}
@@ -601,42 +602,49 @@ function errorHandler(event:LoaderEvent):void {
 			if (changed) {
 				if (!skipCuePoints) {
 					_playProgressHandler(null);
-				} else if (_dispatchPlayProgress) {
-					dispatchEvent(new LoaderEvent(PLAY_PROGRESS, this));
+				} else {
+					_prevTime = time;
 				}
 			}
 			if (forcePlay) {
 				playVideo();
+			}
+			if (changed && skipCuePoints && _dispatchPlayProgress) {
+				dispatchEvent(new LoaderEvent(PLAY_PROGRESS, this));
 			}
 		}
 		
 		/** @private **/
 		protected function _setForceTime(time:Number):void {
 			if (!(_forceTime || _forceTime == 0)) { //if _forceTime is already set, the listener was already added (we remove it after 1 frame or after the buffer fills for the first time and metaData is received (whichever takes longer)
-				_sprite.addEventListener(Event.ENTER_FRAME, _forceTimeHandler, false, 0, true); //if, for example, after a video has finished playing, we seek(0) the video and immediately check the playProgress, it returns 1 instead of 0 because it takes a short time to render the first frame and accurately reflect the _ns.time variable. So we use a single ENTER_FRAME to help us override the _ns.time value briefly.
+				_ns.addEventListener(Event.RENDER, _forceTimeHandler, false, 0, true); //if, for example, after a video has finished playing, we seek(0) the video and immediately check the playProgress, it returns 1 instead of 0 because it takes a short time to render the first frame and accurately reflect the _ns.time variable. So we use a single ENTER_FRAME to help us override the _ns.time value briefly.
 			}
 			_forceTime = time;
 		}
 		
 		/** @private **/
 		protected function _onBufferFull():void {
-			_bufferedOnce = true;
-			if (_pauseOnBufferFull) {
+			if (_pausePending) {
 				if (!_initted && getTimer() - _time < 10000) {
-					_video.attachNetStream(null); //in some rare circumstances, the NetStream will finish buffering even before the metaData has been received. If we pause() the NetStream before the metaData arrives, it will prevent the metaData from ever arriving (bug in Flash) even after you resume(). So in this case, we allow the NetStream to continue playing so that metaData can be received, but we detach it from the Video object so that the user doesn't see the video playing. The volume is also muted, so to the user things look paused even though the NetStream is continuing to play/load. We'll re-attach the NetStream to the Video after either the metaData arrives or 10 seconds elapse.
+					_video.attachNetStream(null); //in some rare circumstances, the NetStream will finish buffering even before the metaData has been received. If we pause() the NetStream before the metaData arrives, it can prevent the metaData from ever arriving (bug in Flash) even after you resume(). So in this case, we allow the NetStream to continue playing so that metaData can be received, but we detach it from the Video object so that the user doesn't see the video playing. The volume is also muted, so to the user things look paused even though the NetStream is continuing to play/load. We'll re-attach the NetStream to the Video after either the metaData arrives or 10 seconds elapse.
 					return;
-				} else {
-					_pauseOnBufferFull = false;
-					this.volume = _volume; //Just resets the volume to where it should be because we temporarily made it silent during the buffer.
-					_ns.seek(_forceTime || 0);
-					_video.attachNetStream(_ns); //in case it was removed
-					_ns.pause(); //don't just do this.videoPaused = true because sometimes Flash fires NetStream.Play.Start BEFORE the buffer is full, and we must check inside the videoPaused setter to see if if the buffer is full and wait to pause until it is.
+				} else if (_renderedOnce) {
+					_applyPendingPause();
 				}
 			}
 			if (!_bufferFull) {
 				_bufferFull = true;
 				dispatchEvent(new LoaderEvent(VIDEO_BUFFER_FULL, this));
 			}
+		}
+		
+		/** @private **/
+		protected function _applyPendingPause():void {
+			_pausePending = false;
+			this.volume = _volume; //Just resets the volume to where it should be because we temporarily made it silent during the buffer.
+			_ns.seek(_forceTime || 0);
+			_video.attachNetStream(_ns); //in case it was removed
+			_ns.pause(); //don't just do this.videoPaused = true because sometimes Flash fires NetStream.Play.Start BEFORE the buffer is full, and we must check inside the videoPaused setter to see if if the buffer is full and wait to pause until it is.
 		}
 		
 		/** @private **/
@@ -648,13 +656,7 @@ function errorHandler(event:LoaderEvent):void {
 			if (!_bufferFull && _ns.bufferLength >= _ns.bufferTime) { 
 				_onBufferFull();
 			}
-			if (_pauseOnBufferFull) {
-				_video.attachNetStream(_ns); //if the NetStream isn't attached, then the Video object doesn't get resized properly in the ContentDisplay object.
-				(_sprite as Object).rawContent = _video; //resizes it appropriately
-				_video.attachNetStream(null);
-			} else {
-				(_sprite as Object).rawContent = _video; //resizes it appropriately
-			}
+			(_sprite as Object).rawContent = _video; //resizes it appropriately
 		}
 		
 		
@@ -665,8 +667,8 @@ function errorHandler(event:LoaderEvent):void {
 			this.metaData = info;
 			_duration = info.duration;
 			if ("width" in info) {
-				_video.scaleX = info.width / 320; 
-				_video.scaleY = info.height / 160; //MUST use 160 as the base width and adjust the scale because of the way Flash reports width/height/scaleX/scaleY on Video objects (it can cause problems when using the scrollRect otherwise)
+				_video.width = Number(info.width); 
+				_video.height = Number(info.height);
 			}
 			_forceInit();
 			dispatchEvent(new LoaderEvent(LoaderEvent.INIT, this, "", info));
@@ -682,7 +684,7 @@ function errorHandler(event:LoaderEvent):void {
 			if (!_bufferFull && _ns.bufferLength >= _ns.bufferTime) {
 				_onBufferFull();
 			}
-			if (_firstCuePoint) {
+			if (_firstCuePoint || _dispatchPlayProgress) {
 				var prevTime:Number = _prevTime;
 				_prevTime = this.videoTime;
 				var next:CuePoint;
@@ -694,9 +696,9 @@ function errorHandler(event:LoaderEvent):void {
 					}
 					cp = next;
 				}
-			}
-			if (_dispatchPlayProgress) {
-				dispatchEvent(new LoaderEvent(PLAY_PROGRESS, this));
+				if (_dispatchPlayProgress && prevTime != _prevTime) {
+					dispatchEvent(new LoaderEvent(PLAY_PROGRESS, this));
+				}
 			}
 		}
 		
@@ -704,7 +706,7 @@ function errorHandler(event:LoaderEvent):void {
 		protected function _statusHandler(event:NetStatusEvent):void {
 			var code:String = event.info.code;
 			if (code == "NetStream.Play.Start") { //remember, NetStream.Play.Start can be received BEFORE the buffer is full.
-				if (!_pauseOnBufferFull) {
+				if (!_pausePending) {
 					_sprite.addEventListener(Event.ENTER_FRAME, _playProgressHandler);
 					dispatchEvent(new LoaderEvent(VIDEO_PLAY, this));
 				}
@@ -752,9 +754,9 @@ function errorHandler(event:LoaderEvent):void {
 			if (!_bufferFull && _ns.bufferLength >= _ns.bufferTime) {
 				_onBufferFull();
 			}
-			if (_cachedBytesLoaded == _cachedBytesTotal && _ns.bytesTotal > 5 && (_initted || getTimer() - _time >= 10000)) { //make sure the metaData has been received because if the NetStream file is cached locally sometimes the bytesLoaded == bytesTotal BEFORE the metaData arrives. Or timeout after 10 seconds.
+			if (_cachedBytesLoaded == _cachedBytesTotal && _renderedOnce && _ns.bytesTotal > 5 && (_initted || getTimer() - _time >= 10000)) { //make sure the metaData has been received because if the NetStream file is cached locally sometimes the bytesLoaded == bytesTotal BEFORE the metaData arrives. Or timeout after 10 seconds.
 				_sprite.removeEventListener(Event.ENTER_FRAME, _enterFrameHandler);
-				if (!_bufferedOnce) {
+				if (!_bufferFull) {
 					_onBufferFull();
 				}
 				if (!_initted) {
@@ -776,10 +778,33 @@ function errorHandler(event:LoaderEvent):void {
 		}
 		
 		/** @private **/
+		protected function _renderHandler(event:Event):void {
+			_renderedOnce = true;
+			_ns.removeEventListener(Event.RENDER, _renderHandler);
+			if (_pausePending) {
+				if (_bufferFull) {
+					_applyPendingPause();
+				} else {
+					//if the NetStream is still buffering, there's a good chance that the video will appear to play briefly right before we pause it, so we detach the NetStream from the Video briefly to avoid that funky visual behavior (we attach it again as soon as it buffers).
+					//we cannot do _video.attachNetStream(null) here (within this RENDER handler) because it causes Flash Pro to crash! We must wait for an ENTER_FRAME event.
+					_sprite.addEventListener(Event.ENTER_FRAME, _detachNS, false, 100, true);
+				}
+			}
+		}
+		
+		/** @private see notes in _renderHandler() **/
+		private function _detachNS(event:Event):void {
+			_sprite.removeEventListener(Event.ENTER_FRAME, _detachNS);
+			if (!_bufferFull) {
+				_video.attachNetStream(null); //if the NetStream is still buffering, there's a good chance that the video will appear to play briefly right before we pause it, so we detach the NetStream from the Video briefly to avoid that funky visual behavior (we attach it again as soon as it buffers).
+			}
+		}
+		
+		/** @private **/
 		protected function _forceTimeHandler(event:Event):void {
-			if (!_videoPaused || (_initted && _bufferedOnce)) {
+			if (!_videoPaused || (_initted && _renderedOnce)) {
 				_forceTime = NaN;
-				event.target.removeEventListener(Event.ENTER_FRAME, _forceTimeHandler);
+				event.target.removeEventListener(Event.RENDER, _forceTimeHandler);
 			}
 		}
 		
@@ -809,14 +834,14 @@ function errorHandler(event:LoaderEvent):void {
 			var changed:Boolean = Boolean(value != _videoPaused);
 			_videoPaused = value;
 			if (_videoPaused) {
-				//If we're trying to pause a NetStream that hasn't even been buffered yet, we run into problems where it won't load. So we need to set the _pauseOnBufferFull to true and then when it's buffered, it'll pause it at the beginning.
-				if (!_bufferedOnce) {
+				//If we're trying to pause a NetStream that hasn't even been buffered yet, we run into problems where it won't load. So we need to set the _pausePending to true and then when it's buffered, it'll pause it at the beginning.
+				if (!_renderedOnce) {
 					_setForceTime(0);
-					_pauseOnBufferFull = true;
+					_pausePending = true;
 					_sound.volume = 0; //temporarily make it silent while buffering.
 					_ns.soundTransform = _sound;
 				} else {
-					_pauseOnBufferFull = false;
+					_pausePending = false;
 					this.volume = _volume; //Just resets the volume to where it should be in case we temporarily made it silent during the buffer.
 					_ns.pause();
 				}
@@ -825,16 +850,17 @@ function errorHandler(event:LoaderEvent):void {
 					dispatchEvent(new LoaderEvent(VIDEO_PAUSE, this));
 				}
 			} else {
-				if (_pauseOnBufferFull || !_bufferFull) {
+				if (_pausePending || !_bufferFull) {
 					//if we don't seek() first, sometimes the NetStream doesn't attach to the video properly!
 					//if we don't seek() first and the NetStream was previously rendered between its last keyframe and the end of the file, the "NetStream.Play.Stop" will have been called and it will refuse to continue playing even after resume() is called!
-					// if we seek() before the metaData has been received (_initted==true), it typically prevents it from being received at all!
-					if (_initted) {
+					//if we seek() before the metaData has been received (_initted==true), it typically prevents it from being received at all!
+					//if we seek() before the NetStream has rendered once, it can lose audio completely!
+					if (_initted && _renderedOnce) {
 						_ns.seek(this.videoTime); 
 						_bufferFull = false;
 					}
 					_video.attachNetStream(_ns); //in case we had to detach it while buffering and waiting for the metaData
-					_pauseOnBufferFull = false;
+					_pausePending = false;
 				}
 				this.volume = _volume; //Just resets the volume to where it should be in case we temporarily made it silent during the buffer.
 				_ns.resume();
@@ -919,7 +945,7 @@ function errorHandler(event:LoaderEvent):void {
 	}
 }
 
-/** @private **/
+/** @private for the linked list of cue points - makes processing very fast. **/
 internal class CuePoint {
 	public var next:CuePoint;
 	public var prev:CuePoint;
