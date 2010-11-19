@@ -235,39 +235,45 @@ package zero.swf.avm2.advances{
 		
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML(xmlName:String):XML{
-			var xml:XML=toXML_fun(memberV,xmlName);
+		public function toXML(marks:Object,xmlName:String):XML{
+			var xml:XML=<{xmlName} name={getMultiname_infoMarkKey(marks,name)}/>
+			
+			//----
+			toXML_fun(marks,memberV,xml);
 			
 			switch(kind_trait_type){
 				case TraitTypes.Slot:
 				case TraitTypes.Const:
-					toXML_fun(trait_slot_memberV,xml);
+					xml.@type_name=getMultiname_infoMarkKey(marks,type_name);
+					toXML_fun(marks,trait_slot_memberV,xml);
 				break;
 				case TraitTypes.Method:
 				case TraitTypes.Getter:
 				case TraitTypes.Setter:
-					toXML_fun(trait_method_memberV,xml);
+					toXML_fun(marks,trait_method_memberV,xml);
 				break;
 				case TraitTypes.Function:
-					toXML_fun(trait_function_memberV,xml);
+					toXML_fun(marks,trait_function_memberV,xml);
 				break;
 				case TraitTypes.Clazz:
-					toXML_fun(trait_class_memberV,xml);
+					toXML_fun(marks,trait_class_memberV,xml);
 				break;
 			}
 			
 			return xml;
 		}
 		public function initByXML(marks:Object,xml:XML):void{
+			name=getMultiname_infoByMarkKey(marks,xml.@name.toString());
+			
+			//----
 			initByXML_fun(marks,xml,memberV);
 			
 			//
 			switch(kind_trait_type){
 				case TraitTypes.Slot:
 				case TraitTypes.Const:
-					//trace("kind="+xml.vindex[0].@kind.toString());
+					type_name=getMultiname_infoByMarkKey(marks,xml.@type_name.toString());
 					initByXML_fun(marks,xml,trait_slot_memberV);
-					//trace("vindex.kind="+vindex.kind);
 				break;
 				case TraitTypes.Method:
 				case TraitTypes.Getter:

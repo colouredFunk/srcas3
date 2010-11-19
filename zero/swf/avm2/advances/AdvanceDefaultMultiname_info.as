@@ -27,13 +27,15 @@ package zero.swf.avm2.advances{
 		}
 		
 		////
+		///*
 		CONFIG::toXMLAndInitByXML {
-		override public function toXML(xmlName:String):XML{
+		override public function toXML(marks:Object,xmlName:String):XML{
 			return <{xmlName} class="AdvanceMultiname_info" kind="*"/>;
 		}
 		override public function initByXML(marks:Object,xml:XML):void{
 		}
 		}//end of CONFIG::toXMLAndInitByXML
+		//*/
 	}
 }
 

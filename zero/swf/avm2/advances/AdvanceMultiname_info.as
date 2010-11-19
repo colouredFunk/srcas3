@@ -87,12 +87,7 @@ package zero.swf.avm2.advances{
 		//
 		public function AdvanceMultiname_info(){
 		}
-		public function getMultiname():String{
-			if(ns.name){
-				return ns.name+"."+name;
-			}
-			return name;
-		}
+		
 		public function initByInfo(advanceABC:AdvanceABC,_infoId:int,multiname_info:Multiname_info):void{
 			infoId=_infoId;
 			
@@ -234,45 +229,107 @@ package zero.swf.avm2.advances{
 			return advanceABC.abcFile.multiname_infoV.length-1;
 		}
 		
+		public function getMarkKey(marks:Object):String{
+			switch(kind){
+				case MultinameKind.QName:
+				case MultinameKind.QNameA:
+					var markKey:String;
+					var ns_markKey:String=getNamespace_infoMarkKey(marks,ns);
+					if(ns_markKey){
+						if(ns.name){
+							markKey=ns_markKey+"."+name;
+						}else{
+							markKey=ns_markKey+name;
+						}
+					}else{
+						markKey=name;
+					}
+					if(kind==MultinameKind.QName){
+						return markKey;
+					}
+					return "["+MultinameKind.kindV[kind]+"]"+markKey;
+				break;
+				case MultinameKind.Multiname:
+				case MultinameKind.MultinameA:
+					
+					return "["+MultinameKind.kindV[kind]+"]["+ns_set.getMarkKey(marks)+"]"+name;
+					
+				break;
+				case MultinameKind.RTQName:
+				case MultinameKind.RTQNameA:
+					
+					return "["+MultinameKind.kindV[kind]+"]"+name;
+					
+				break;
+				case MultinameKind.RTQNameL:
+				case MultinameKind.RTQNameLA:
+					
+					return "["+MultinameKind.kindV[kind]+"]";
+					
+				break;
+				case MultinameKind.MultinameL:
+				case MultinameKind.MultinameLA:
+					
+					return "["+MultinameKind.kindV[kind]+"]["+ns_set.getMarkKey(marks)+"]";
+					
+				break;
+				case MultinameKind.GenericName:
+					
+					var ParamMarkKey:String="";
+					for each(var Param:AdvanceMultiname_info in ParamV){
+						ParamMarkKey+=","+Param.getMarkKey(marks);
+					}
+					return "["+MultinameKind.kindV[kind]+"]["+TypeDefinition.getMarkKey(marks)+"["+ParamMarkKey.substr(1)+"]]";
+					
+				break;
+				default:
+					throw new Error("未知 kind: "+kind);
+				break;
+			}
+			
+			return null;
+		}
+		
 		////
+		///*
 		CONFIG::toXMLAndInitByXML {
-		public function toXML(xmlName:String):XML{
+		public function toXML(marks:Object,xmlName:String):XML{
 			var xml:XML;
 			
 			switch(kind){
 				case MultinameKind.QName:
 				case MultinameKind.QNameA:
 					
-					xml=toXML_fun(QName_memberV,xmlName);
+					xml=toXML_fun(marks,QName_memberV,xmlName);
 					
 				break;
 				case MultinameKind.Multiname:
 				case MultinameKind.MultinameA:
 					
-					xml=toXML_fun(Multiname_memberV,xmlName);
+					xml=toXML_fun(marks,Multiname_memberV,xmlName);
 					
 				break;
 				case MultinameKind.RTQName:
 				case MultinameKind.RTQNameA:
 					
-					xml=toXML_fun(RTQName_memberV,xmlName);
+					xml=toXML_fun(marks,RTQName_memberV,xmlName);
 					
 				break;
 				case MultinameKind.RTQNameL:
 				case MultinameKind.RTQNameLA:
 					
-					xml=toXML_fun(RTQNameL_memberV,xmlName);
+					xml=toXML_fun(marks,RTQNameL_memberV,xmlName);
 					
 				break;
 				case MultinameKind.MultinameL:
 				case MultinameKind.MultinameLA:
 					
-					xml=toXML_fun(MultinameL_memberV,xmlName);
+					xml=toXML_fun(marks,MultinameL_memberV,xmlName);
 					
 				break;
 				case MultinameKind.GenericName:
 					
-					xml=toXML_fun(GenericName_memberV,xmlName);
+					xml=toXML_fun(marks,GenericName_memberV,xmlName);
 					
 				break;
 				default:
@@ -285,17 +342,6 @@ package zero.swf.avm2.advances{
 		}
 		public function initByXML(marks:Object,xml:XML):void{
 			infoId=int(xml.@infoId.toString());
-			
-			/*
-			if(test_tempArr){
-			}else{
-				test_tempArr=new Array();
-			}
-			if(test_tempArr[infoId]){
-				throw new Error("重复 initByXML, infoId="+infoId);
-			}
-			test_tempArr[infoId]=true;
-			//*/
 			
 			//trace("initByXML infoId="+infoId);
 			
@@ -341,5 +387,6 @@ package zero.swf.avm2.advances{
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML
+		//*/
 	}
 }
