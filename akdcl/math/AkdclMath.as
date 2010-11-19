@@ -16,7 +16,6 @@
 		}
 		//操作数组
 		public static function disorder(arr:Array):void {
-			//trace("Common.disorder 未测试");
 			var L:uint = arr.length;
 			var ran:uint;
 			var temp:*;

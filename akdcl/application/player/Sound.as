@@ -1,4 +1,4 @@
-package akdcl.media
+package akdcl.application.player
 {
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -18,14 +18,14 @@ package akdcl.media
 	public class Sound extends flash.media.Sound 
 	{
 		protected static var soundDic:Object = { };
-		public static function loadSound(_source:String):akdcl.media.Sound {
-			var _sound:akdcl.media.Sound = soundDic[_source];
+		public static function loadSound(_source:String):akdcl.application.player.Sound {
+			var _sound:akdcl.application.player.Sound = soundDic[_source];
 			if (!_sound) {
-				_sound = new akdcl.media.Sound(_source);
+				_sound = new akdcl.application.player.Sound(_source);
 			}
 			return _sound;
 		}
-		protected static function removeSound(_sound:akdcl.media.Sound):void {
+		protected static function removeSound(_sound:akdcl.application.player.Sound):void {
 			for (var _source:String in soundDic) {
 				if (soundDic[_source]==_sound) {
 					delete soundDic[_source];
@@ -63,14 +63,16 @@ package akdcl.media
 			if (soundChannel) {
 				return soundChannel.position;
 			}else {
-				return 0;
+				return positionLast;
 			}
 		}
 		public function set position(_position:uint):void {
 			if (soundChannel) {
 				stop();
+				play(_position);
+			}else {
+				positionLast = _position;
 			}
-			play(_position);
 		}
 		private var __volume:Number = 0.8;
 		public function get volume():Number{
@@ -80,29 +82,32 @@ package akdcl.media
 			if (_volume<0) {
 				_volume = 0;
 			}else if (_volume>1) {
-				_volume=1
+				_volume = 1;
 			}
 			__volume = _volume;
-			if(soundChannel) {
+			if (soundChannel) {
 				var _trans:SoundTransform = soundChannel.soundTransform;
 				_trans.volume = _volume;
 				soundChannel.soundTransform = _trans;
 			}
 		}
-		public function loadSound(_source:String):akdcl.media.Sound {
+		public function loadSound(_source:String):akdcl.application.player.Sound {
 			soundDic[_source] = this;
 			addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);
 			load(new URLRequest(_source), new SoundLoaderContext(1000, true));
 			return this;
 		}
-		override public function play(startTime:Number = 0, loops:int = 0, sndTransform:SoundTransform = null):SoundChannel {
+		override public function play(startTime:Number = -1, loops:int = 0, sndTransform:SoundTransform = null):SoundChannel {
+			if (startTime < 0 && soundChannel) {
+				return soundChannel;
+			}
 			if (startTime > totalTime * loadProgress) {
 				startTime = totalTime * loadProgress * 0.99;
 			}
-			if (positionPause > 0 && startTime == 0) {
-				startTime = positionPause;
+			if (positionLast > 0) {
+				startTime = positionLast;
 			}
-			positionPause = 0;
+			positionLast = 0;
 			try {
 				var _soundChannel:SoundChannel = super.play(startTime, loops, sndTransform);
 			}catch (_error:*) {
@@ -112,13 +117,14 @@ package akdcl.media
 			addChannel(_soundChannel);
 			return _soundChannel;
 		}
-		protected var positionPause:uint;
+		protected var positionLast:uint;
 		public function pause():void {
-			positionPause = positionPause?positionPause:position;
+			positionLast = position;
 			removeChannel(soundChannel);
+			soundChannel = null;
 		}
 		public function stop(_isClose:Boolean = false):void {
-			positionPause = 0;
+			positionLast = 0;
 			removeChannel(soundChannel);
 			soundChannel = null;
 			if (_isClose) {

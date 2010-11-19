@@ -2,8 +2,6 @@ package akdcl.application.player{
 	import flash.events.Event;
 	import com.greensock.TweenLite;
 	
-	import akdcl.events.MediaEvent;
-	
 	import ui.ImageLoader;
 	import ui.UISprite;
 	/**
@@ -196,7 +194,19 @@ package akdcl.application.player{
 				default:
 					formatBtnXY = false;
 			}
-			Common.copyInstanceToArray(btnList[0], Math.max(player.playlist.length(), btnList.length), btnList, setBtn);
+			
+			
+			var _length:uint = Math.max(player.playlist.length(), btnList.length);
+			var _instanceCopy:*;
+			var _instanceClass:Class = btnList[0].constructor as Class;
+			for (_i = 0; _i < _length;_i++ ) {
+				_instanceCopy = btnList[_i];
+				if (!_instanceCopy) {
+					_instanceCopy = new _instanceClass();
+					btnList[_i] = _instanceCopy;
+				}
+				setBtn(_instanceCopy,_i,btnList,_length);
+			}
 		}
 		protected function setBtn(_btn:*, _id:uint, ...args):void {
 			if (formatBtnXY) {
