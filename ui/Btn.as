@@ -1,6 +1,7 @@
 package ui{
 	import flash.events.Event;
 	import flash.external.ExternalInterface;
+	import flash.system.ApplicationDomain;
 	
 	import ui.UIMovieClip;
 	import ui.manager.ButtonManager;
@@ -74,7 +75,9 @@ package ui{
 		}
 		public function $release():void {
 			if (href) {
-				Common.getURL(href, hrefTarget);
+				if (ApplicationDomain.currentDomain.hasDefinition("Common")) {
+					ApplicationDomain.currentDomain.getDefinition("Common").getURL(href, hrefTarget);
+				}
 			}else if(eEval) {
 				ExternalInterface.call("eval", eEval);
 			}

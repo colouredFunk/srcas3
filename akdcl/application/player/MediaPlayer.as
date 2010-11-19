@@ -25,12 +25,15 @@ package akdcl.application.player{
 
 	/// @eventType	akdcl.application.player.MediaEvent.PLAY_COMPLETE
 	[Event(name = "playComplete", type = "akdcl.application.player.MediaEvent")]
+	
+	/// @eventType	akdcl.application.player.MediaEvent.LOAD_ERROR
+	[Event(name = "loadError", type = "akdcl.application.player.MediaEvent")]
 
 	/// @eventType	akdcl.application.player.MediaEvent.LOAD_PROGRESS
 	[Event(name = "loadProgress", type = "akdcl.application.player.MediaEvent")]
 	
-	/// @eventType	akdcl.application.player.MediaEvent.LOAD_ERROR
-	[Event(name = "loadError", type = "akdcl.application.player.MediaEvent")]
+	/// @eventType	akdcl.application.player.MediaEvent.BUFFER_PROGRESS
+	[Event(name = "bufferProgress", type = "akdcl.application.player.MediaEvent")]
 	
 	/// @eventType	akdcl.application.player.MediaEvent.LOAD_COMPLETE
 	[Event(name = "loadComplete", type = "akdcl.application.player.MediaEvent")]
@@ -78,6 +81,10 @@ package akdcl.application.player{
 		
 		//0~1
 		public function get loadProgress():Number {
+			return 0;
+		}
+		//0~1
+		public function get bufferProgress():Number {
 			return 0;
 		}
 		//毫秒为单位
@@ -166,16 +173,9 @@ package akdcl.application.player{
 					if (__playState == STATE_STOP) {
 						return false;
 					}
-					timer.removeEventListener(TimerEvent.TIMER, onPlayProgressHander);
-					break;
 				case STATE_STOP:
 					timer.removeEventListener(TimerEvent.TIMER, onPlayProgressHander);
 					break;
-				case STATE_BUFFER:
-					timer.removeEventListener(TimerEvent.TIMER, onPlayProgressHander);
-					break;
-				default:
-					timer.removeEventListener(TimerEvent.TIMER, onPlayProgressHander);
 			}
 			__playState = _playState;
 			dispatchEvent(new MediaEvent(MediaEvent.STATE_CHANGE));
@@ -313,6 +313,9 @@ package akdcl.application.player{
 				onPlayCompleteHandler();
 			}
 			dispatchEvent(new MediaEvent(MediaEvent.LOAD_ERROR));
+		}
+		protected function onBufferProgressHandler(_evt:*= null):void {
+			dispatchEvent(new MediaEvent(MediaEvent.BUFFER_PROGRESS));
 		}
 		protected function onLoadProgressHandler(_evt:*= null):void {
 			dispatchEvent(new MediaEvent(MediaEvent.LOAD_PROGRESS));

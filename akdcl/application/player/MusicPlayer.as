@@ -3,8 +3,6 @@ package akdcl.application.player{
 	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
 	
-	import akdcl.application.player.Sound;
-	
 	public class MusicPlayer extends MediaPlayer {
 		override public function get loadProgress():Number {
 			return sound?sound.loadProgress:0; 

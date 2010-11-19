@@ -212,8 +212,14 @@ package ui.manager {
 			groupItemDic[_groupName].push(_item);
 		}
 		public static function removeFromGroup(_groupName:String, _item:*):void {
-			Common.removeFromArray(groupItemDic[_groupName], _item);
-			Common.removeFromArray(groupSelectDic[_groupName], _item);
+			removeFromArray(groupItemDic[_groupName], _item);
+			removeFromArray(groupSelectDic[_groupName], _item);
+		}
+		public static function removeFromArray(_a:Array,_ai:*):* {
+			var _i:int=_a.indexOf(_ai);
+			if (_i>=0) {
+				return _a.splice(_i,1);
+			}
 		}
 		public static function selectItem(_groupName:String, _item:*):Boolean {
 			var _limit:uint = getLimit(_groupName);
@@ -233,7 +239,7 @@ package ui.manager {
 			}
 		}
 		public static function unselectItem(_groupName:String, _item:*):void {
-			Common.removeFromArray(groupSelectDic[_groupName], _item);
+			removeFromArray(groupSelectDic[_groupName], _item);
 		}
 		public static function getRadioUnselectFun(_groupName:String):Function {
 			return groupParamsDic[_groupName + KEY_RADIO_UNSELECT_FUN];

@@ -128,7 +128,6 @@ package {
 			XML.prettyPrinting = true;
 			var _xml:XML = XML(_str);
 			var _obj:Object = formatXML(_xml);
-			//trace(Common.objToString(_obj));
 			var _form:FormVariables = new FormVariables();
 			for (var _i:String in _obj) {
 				_form.add(_i,_obj[_i]);
