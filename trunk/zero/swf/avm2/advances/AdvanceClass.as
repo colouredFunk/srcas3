@@ -90,7 +90,7 @@ package zero.swf.avm2.advances{
 		public var super_name:AdvanceMultiname_info;							//multiname_info
 		public var flags:int;													//direct
 		public var protectedNs:AdvanceNamespace_info;							//namespace_info
-		public var intrfV:Vector.<AdvanceMultiname_info>;						//namespace_info
+		public var intrfV:Vector.<AdvanceMultiname_info>;						//multiname_info
 		
 		public var iinit:AdvanceMethod;										//method
 		public var itraits_infoV:Vector.<AdvanceTraits_info>;					//traits_info
@@ -119,23 +119,18 @@ package zero.swf.avm2.advances{
 			return advanceABC.abcFile.instance_infoV.length-1;
 		}
 		
-		public function getClassName():String{
-			if(name.ns.name){
-				return name.ns.name+"."+name.name;
-			}
-			return name.name;
-		}
-		public function getMarkKey():String{
-			return getClassName();
-			//return name.toXML("name").toXMLString();
+		public function getMarkKey(marks:Object):String{
+			return name.getMarkKey(marks);
+			//return name.toXML(marks,"name").toXMLString();
 		}
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML(xmlName:String):XML{
-			var xml:XML=toXML_fun(Instance_info_memberV,xmlName);
+		/*
+		public function toXML(marks:Object,xmlName:String):XML{
+			var xml:XML=toXML_fun(marks,Instance_info_memberV,xmlName);
 			
-			toXML_fun(Class_info_memberV,xml);
+			toXML_fun(marks,Class_info_memberV,xml);
 			
 			xml.@infoId=infoId;
 			return xml;
@@ -146,8 +141,95 @@ package zero.swf.avm2.advances{
 			initByXML_fun(marks,xml,Instance_info_memberV);
 			initByXML_fun(marks,xml,Class_info_memberV);
 			
-			marks[Member.CLASS][getMarkKey()]=this;
+			marks[Member.CLASS][getMarkKey(marks)]=this;
 		}
+		//*/
+		
+		///*
+		
+		public function toXML(marks:Object,xmlName:String):XML{
+			var xml:XML=<{xmlName}/>
+			
+			////
+			var description:String="";
+			
+			description+="class "+getMultiname_infoMarkKey(marks,name);
+			if(super_name===AdvanceDefaultMultiname_info.instance){
+			}else{
+				description+=" extends "+getMultiname_infoMarkKey(marks,super_name);
+			}
+			if(intrfV.length){
+				var intrfsStr:String="";
+				for each(var intrf:AdvanceMultiname_info in intrfV){
+					intrfsStr+=","+getMultiname_infoMarkKey(marks,intrf);
+				}
+				description+=" implements "+(intrfsStr.substr(1));
+			}
+			
+			xml.@description=description;
+			////
+			
+			if(protectedNs){
+				xml.@protectedNs=getNamespace_infoMarkKey(marks,protectedNs);
+			}
+			
+			//----
+			toXML_fun(marks,Instance_info_memberV,xml);
+			
+			toXML_fun(marks,Class_info_memberV,xml);
+			
+			xml.@infoId=infoId;
+			return xml;
+		}
+		public function initByXML(marks:Object,xml:XML):void{
+			var matchArr:Array,strArr:Array;
+			var description:String=xml.@description.toString();
+			matchArr=description.match(/class\s+[\w\.\[\]]+\s+extends\s+[\w\.\[\]]+/);
+			var classStr:String;
+			if(matchArr){
+				classStr=matchArr[0];
+				strArr=classStr.split(/\s+/);
+				//trace("strArr[3]="+strArr[3]);
+				super_name=getMultiname_infoByMarkKey(marks,strArr[3]);
+			}else{
+				matchArr=description.match(/class\s+[\w\.\[\]]+/);
+				if(matchArr){
+					classStr=matchArr[0];
+					strArr=classStr.split(/\s+/);
+					super_name=AdvanceDefaultMultiname_info.instance;
+				}else{
+					throw new Error("错误的 description: "+description);
+				}
+			}
+			name=getMultiname_infoByMarkKey(marks,strArr[1]);
+			
+			description=description.replace(classStr,"");
+			
+			matchArr=description.match(/implements\s+[\w\.\[\],]+/);
+			intrfV=new Vector.<AdvanceMultiname_info>();
+			if(matchArr){
+				for each(var intrfStr:String in matchArr[0].replace(/implements\s+/,"").split(",")){//这里假定了 intrfsStr 里只含有 QName 和 Multiname
+					intrfV.push(getMultiname_infoByMarkKey(marks,intrfStr));
+				}
+				//trace("intrfV="+intrfV);
+			}
+			
+			var protectedNsStr:String=xml.@protectedNs.toString();
+			if(protectedNsStr){
+				protectedNs=getNamespace_infoByMarkKey(marks,protectedNsStr);
+			}
+			
+			//----
+			infoId=int(xml.@infoId.toString());
+			
+			initByXML_fun(marks,xml,Instance_info_memberV);
+			initByXML_fun(marks,xml,Class_info_memberV);
+			
+			//trace("getMarkKey(marks)="+getMarkKey(marks));
+			marks[Member.CLASS][getMarkKey(marks)]=this;
+		}
+		//*/
+		
 		}//end of CONFIG::toXMLAndInitByXML
 	}
 }

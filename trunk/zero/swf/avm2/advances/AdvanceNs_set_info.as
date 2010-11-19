@@ -19,6 +19,7 @@ AdvanceNs_set_info 版本:v1.0
 //ns是在 constant_pool.namespace_info_v 中的id
 //No entry in the ns array may be zero.
 package zero.swf.avm2.advances{
+	import zero.swf.avm2.Namespace_info;
 	import zero.swf.avm2.Ns_set_info;
 	import zero.swf.avm2.advances.AdvanceABC;
 
@@ -49,11 +50,19 @@ package zero.swf.avm2.advances{
 			advanceABC.abcFile.ns_set_infoV.push(ns_set_info);
 			return advanceABC.abcFile.ns_set_infoV.length-1;
 		}
-
+		
+		public function getMarkKey(marks:Object):String{
+			var markKey:String="";
+			for each(var ns:AdvanceNamespace_info in nsV){
+				markKey+=","+getNamespace_infoMarkKey(marks,ns);
+			}
+			return markKey.substr(1);
+		}
 		////
+		///*
 		CONFIG::toXMLAndInitByXML {
-		public function toXML(xmlName:String):XML{
-			var xml:XML=toXML_fun(memberV,xmlName);
+		public function toXML(marks:Object,xmlName:String):XML{
+			var xml:XML=toXML_fun(marks,memberV,xmlName);
 			
 			xml.@infoId=infoId;
 			return xml;
@@ -64,5 +73,6 @@ package zero.swf.avm2.advances{
 			initByXML_fun(marks,xml,memberV);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
+		//*/
 	}
 }

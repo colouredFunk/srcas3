@@ -8,10 +8,12 @@ Advance 版本:v1.0
 */
 
 package zero.swf.avm2.advances{
+	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;
 	
 	import zero.swf.avm2.AVM2Obj;
-	import zero.swf.vmarks.ConstantKind;
+	import zero.swf.avm2.Multiname_info;
+	import zero.swf.vmarks.*;
 	
 	public class Advance{
 		//public static var test_tempArr:Array;
@@ -158,6 +160,7 @@ package zero.swf.avm2.advances{
 		////
 		CONFIG::toXMLAndInitByXML {
 		public function toXML_fun(
+			marks:Object,
 			memberV:Vector.<Member>,
 			xmlOrXMLName:*
 		):XML{
@@ -170,6 +173,18 @@ package zero.swf.avm2.advances{
 			}
 			
 			for each(var member:Member in memberV){
+				switch(member.type){
+					case Member.NAMESPACE_INFO:
+					case Member.NS_SET_INFO:
+					case Member.MULTINAME_INFO:
+						
+						//使用 markKey
+						//continue;
+						
+						trace("暂时输出 xml 以查看");
+						
+					break;
+				}
 				if(member.curr==Member.CURR_CASE){
 					//未考虑 int, uint, string 之类 为 0 或 "" 的情况
 					if(member.isList){
@@ -194,7 +209,7 @@ package zero.swf.avm2.advances{
 				}
 				
 				if(member.xmlUseMarkKey){
-					xml.appendChild(<{member.name} markKey={this[member.name].getMarkKey()}/>);
+					xml.appendChild(<{member.name} markKey={this[member.name].getMarkKey(marks)}/>);
 					continue;
 				}
 				
@@ -208,7 +223,7 @@ package zero.swf.avm2.advances{
 						}
 					}else{
 						for each(info in infoV){
-							infoListXML.appendChild(info.toXML(member.name));
+							infoListXML.appendChild(info.toXML(marks,member.name));
 						}
 					}
 					xml.appendChild(infoListXML);
@@ -217,7 +232,7 @@ package zero.swf.avm2.advances{
 						if(Member.directMark[member.type]){
 							xml["@"+member.name]=this[member.name];
 						}else{
-							xml.appendChild(this[member.name].toXML(member.name));
+							xml.appendChild(this[member.name].toXML(marks,member.name));
 						}
 					}else{
 						if(member.constKindName){
@@ -241,7 +256,7 @@ package zero.swf.avm2.advances{
 								case ConstantKind.StaticProtectedNs:
 								case ConstantKind.PrivateNs:
 									if(this[member.name]){
-										xml.appendChild(this[member.name].toXML(member.name));
+										xml.appendChild(this[member.name].toXML(marks,member.name));
 									}
 								break;
 								default:
@@ -250,7 +265,7 @@ package zero.swf.avm2.advances{
 							}
 						}else{
 							if(member.classV){
-								xml.appendChild(this[member.name].toXML(member.name));
+								xml.appendChild(this[member.name].toXML(marks,member.name));
 							}else{
 								if(member.kindClass){
 									xml["@"+member.name]=member.kindClass[member.kindVName][this[member.name]];
@@ -269,7 +284,7 @@ package zero.swf.avm2.advances{
 										if(Member.directMark[member.type]){
 											xml["@"+member.name]=this[member.name];
 										}else{
-											xml.appendChild(this[member.name].toXML(member.name));
+											xml.appendChild(this[member.name].toXML(marks,member.name));
 										}
 									}
 								}
@@ -283,6 +298,14 @@ package zero.swf.avm2.advances{
 		public function initByXML_fun(marks:Object,xml:XML,memberV:Vector.<Member>):void{
 			var infoXMLList:XMLList,i:int,infoV:*,infoXML:XML;
 			for each(var member:Member in memberV){
+				switch(member.type){
+					case Member.NAMESPACE_INFO:
+					case Member.NS_SET_INFO:
+					case Member.MULTINAME_INFO:
+						//使用 markKey
+						continue;
+					break;
+				}
 				if(member.curr==Member.CURR_CASE){
 					if(member.isList){
 						if(xml[member.name+"List"].length()){
@@ -454,7 +477,294 @@ package zero.swf.avm2.advances{
 			//}
 			return info;
 		}
+		
+		public function getNamespace_infoMarkKey(marks:Object,namespace_info:AdvanceNamespace_info):String{
+			var markKey:String=namespace_info.getMarkKey();
+			
+			var dict:Dictionary=marks[Member.NAMESPACE_INFO][markKey];
+			if(dict){
+			}else{
+				marks[Member.NAMESPACE_INFO][markKey]=dict=new Dictionary();
+				dict["id"]=0;
+			}
+			if(dict[namespace_info]>=0){
+			}else{
+				dict[namespace_info]=dict["id"]++;
+			}
+			
+			if(dict[namespace_info]==0){
+				return markKey;
+			}
+			
+			return markKey+"("+dict[namespace_info]+")";//同 key 但不同的 namespace_info
+		}
+		//public function getNs_set_infoMarkKey():String{
+		//	这里假定同 key 的 ns_set_info 是同一个，所以不需要 getNs_set_infoMarkKey，直接调用 ns_set_info.getMarkKey() 即可
+		//}
+		public function getMultiname_infoMarkKey(marks:Object,multiname_info:AdvanceMultiname_info):String{
+			if(multiname_info===AdvanceDefaultMultiname_info.instance){
+				return "*";
+			}
+			var markKey:String=multiname_info.getMarkKey(marks);
+			
+			var dict:Dictionary=marks[Member.MULTINAME_INFO][markKey];
+			if(dict){
+			}else{
+				marks[Member.MULTINAME_INFO][markKey]=dict=new Dictionary();
+				dict["id"]=0;
+			}
+			if(dict[multiname_info]>=0){
+			}else{
+				dict[multiname_info]=dict["id"]++;
+			}
+			
+			if(dict[multiname_info]==0){
+				return markKey;
+			}
+			
+			return markKey+"("+dict[multiname_info]+")";//同 key 但不同的 multiname_info
+		}
+		
+		////
+		
+		private function getNs_set_infoByMarkKey(marks:Object,markKey:String):AdvanceNs_set_info{
+			var ns_set_info:AdvanceNs_set_info=marks[Member.NS_SET_INFO][markKey];
+			if(ns_set_info){
+				return ns_set_info;
+			}
+			
+			marks[Member.NS_SET_INFO][markKey]=ns_set_info=new AdvanceNs_set_info();
+			ns_set_info.nsV=new Vector.<AdvanceNamespace_info>();
+			for each(var nsMarkKey:String in markKey.split(/,/)){
+				ns_set_info.nsV.push(getNamespace_infoByMarkKey(marks,nsMarkKey));
+			}
+			
+			return ns_set_info;
+		}
+		
+		public function getNamespace_infoByMarkKey(marks:Object,markKey:String):AdvanceNamespace_info{
+			var namespace_info:AdvanceNamespace_info=marks[Member.NAMESPACE_INFO][markKey];
+			if(namespace_info){
+				return namespace_info;
+			}
+			
+			marks[Member.NAMESPACE_INFO][markKey]=namespace_info=new AdvanceNamespace_info();
+			
+			var id:int;
+			if(markKey.indexOf("[")==0){
+				//第一个字符是 "[" 的
+				id=markKey.indexOf("]");
+				if(id>0){
+					namespace_info.kind=NamespaceKind[markKey.substr(1,id-1)];
+					if(namespace_info.kind>0){
+						markKey=markKey.substr(id+1);
+					}else{
+						throw new Error("不合法的 markKey: "+markKey);
+					}
+				}else{
+					throw new Error("不合法的 markKey: "+markKey);
+				}
+			}else{
+				namespace_info.kind=NamespaceKind.PackageNamespace;
+			}
+			namespace_info.name=markKey;
+			
+			return namespace_info;
+		}
+		public function getMultiname_infoByMarkKey(marks:Object,markKey:String):AdvanceMultiname_info{
+			if(markKey=="*"){
+				return AdvanceDefaultMultiname_info.instance;
+			}
+			
+			var multiname_info:AdvanceMultiname_info=marks[Member.MULTINAME_INFO][markKey];
+			if(multiname_info){
+				return multiname_info;
+			}
+			
+			marks[Member.MULTINAME_INFO][markKey]=multiname_info=new AdvanceMultiname_info();
+			
+			//trace("markKey="+markKey);
+			
+			if(markKey.lastIndexOf(")")==markKey.length-1){
+				markKey=markKey.replace(/^(.*)\(\d+\)$/,"$1");
+			}
+			
+			var id:int;
+			if(markKey.indexOf("[")==0){
+				//第一个字符是 "[" 的
+				id=markKey.indexOf("]");
+				if(id>0){
+					multiname_info.kind=MultinameKind[markKey.substr(1,id-1)];
+					if(multiname_info.kind>0){
+						markKey=markKey.substr(id+1);
+					}else{
+						multiname_info.kind=MultinameKind.QName;
+					}
+				}else{
+					throw new Error("不合法的 markKey: "+markKey);
+				}
+			}else{
+				multiname_info.kind=MultinameKind.QName;
+			}
+			
+			var matchArr:Array;
+			
+			switch(multiname_info.kind){
+				case MultinameKind.QName:
+				case MultinameKind.QNameA:
+					id=markKey.lastIndexOf(".");
+					if(markKey.indexOf("[")==0){
+						//第一个字符是 "[" 的
+						if(id==-1){
+							id=markKey.indexOf("]");
+							multiname_info.ns=getNamespace_infoByMarkKey(marks,markKey.substr(0,id+1));
+						}else{
+							multiname_info.ns=getNamespace_infoByMarkKey(marks,markKey.substr(0,id));
+						}
+						if(id>0){
+							multiname_info.name=markKey.substr(id+1);
+						}else{
+							throw new Error("不合法的 markKey: "+markKey);
+						}
+					}else{
+						if(id>0){
+							multiname_info.ns=getNamespace_infoByMarkKey(marks,markKey.substr(0,id));
+							multiname_info.name=markKey.substr(id+1);
+						}else{
+							multiname_info.ns=getNamespace_infoByMarkKey(marks,"");
+							multiname_info.name=markKey;
+						}
+					}
+					if(/^\w+$/.test(multiname_info.name)){
+					}else{
+						throw new Error("不合法的 multiname_info.name: "+multiname_info.name);
+					}
+					
+				break;
+				case MultinameKind.Multiname:
+				case MultinameKind.MultinameA:
+					
+					matchArr=markKey.match(/^\[.*\]/);
+					if(matchArr){
+						multiname_info.ns_set=getNs_set_infoByMarkKey(marks,matchArr[0].replace(/^\[(.*)\]$/,"$1"));
+						multiname_info.name=markKey.replace(/^\[.*\](.*?)$/,"$1");
+						if(/^\w+$/.test(multiname_info.name)){
+						}else{
+							throw new Error("不合法的 multiname_info.name: "+multiname_info.name);
+						}
+					}else{
+						throw new Error("不合法的 markKey: "+markKey);
+					}
+					
+				break;
+				case MultinameKind.RTQName:
+				case MultinameKind.RTQNameA:
+					
+					throw new Error("未处理");
+					//return "["+MultinameKind.kindV[kind]+"]"+name;
+					
+				break;
+				case MultinameKind.RTQNameL:
+				case MultinameKind.RTQNameLA:
+					
+					throw new Error("未处理");
+					//return "["+MultinameKind.kindV[kind]+"]";
+					
+				break;
+				case MultinameKind.MultinameL:
+				case MultinameKind.MultinameLA:
+					
+					if(/^\[.*\]$/.test(markKey)){
+						multiname_info.ns_set=getNs_set_infoByMarkKey(marks,markKey.replace(/^\[(.*)\]$/,"$1"));
+					}else{
+						throw new Error("不合法的 markKey: "+markKey);
+					}
+					
+				break;
+				case MultinameKind.GenericName:
+					/*
+					var arr:Array;
+					try{
+						arr=getArrFromXMLList(new XMLList(markKey.replace(/\[/g,"<node>").replace(/\]/g,"</node>")));
+					}catch(e:Error){
+						throw new Error("不合法的 markKey: "+markKey+"\n e="+e);
+					}
+					
+					getGenericNameByArr(marks,multiname_info,arr[0]);
+					//*/
+					///*
+					if(/^\[.*\]$/.test(markKey)){
+						markKey=markKey.replace(/^\[(.*)\]$/,"$1");
+						//trace("markKey="+markKey);
+						id=markKey.indexOf("[");
+						if(id>0){
+							multiname_info.TypeDefinition=getMultiname_infoByMarkKey(marks,markKey.substr(0,id));
+							multiname_info.ParamV=new Vector.<AdvanceMultiname_info>();
+							
+							markKey=markKey.substr(id+1);
+							multiname_info.ParamV[0]=getMultiname_infoByMarkKey(marks,markKey.substr(0,markKey.length-1));
+						}else{
+							throw new Error("不合法的 markKey: "+markKey);
+						}
+					}else{
+						throw new Error("不合法的 markKey: "+markKey);
+					}
+					//*/
+				break;
+				default:
+					throw new Error("未知 kind: "+multiname_info.kind);
+				break;
+			}
+			return multiname_info;
+		}
 		}//end of CONFIG::toXMLAndInitByXML
+		
+		/*
+		private function getGenericNameByArr(marks:Object,multiname_info:AdvanceMultiname_info,arr:Array):void{
+			multiname_info.TypeDefinition=getMultiname_infoByMarkKey(marks,arr[0]);
+			multiname_info.ParamV=new Vector.<AdvanceMultiname_info>();
+			arr=arr[1];
+			var i:int=0;
+			var L:int=arr.length;
+			while(i<L){
+				var Param:*=arr[i++];
+				if(Param is Array){
+					if(Param.length==1&&Param[0]==="GenericName"){
+						multiname_info.ParamV.push(getMultiname_infoByMarkKey(marks,"[GenericName]"+arr2str(arr[i++])));
+					}else{
+						throw new Error("不合法的 Param: "+Param);
+					}
+				}
+			}
+		}
+		private static function getArrFromXMLList(xmlList:XMLList):Array{
+			//从包含嵌套中括号的字符串中整理出数组来
+			//getArrFromStr_getArrFromXMLList(
+			//	new XMLList(str.replace(/\[/g,"<node>").replace(/\]/g,"</node>"))
+			//);
+			var arr:Array=new Array();
+			var i:int=0;
+			for each(var xml:XML in xmlList){
+				if(String(xml.name())==="node"){
+					arr[i++]=getArrFromXMLList(xml.children());
+				}else{
+					arr[i++]=xml.toString();
+				}
+			}
+			return arr;
+		}
+		private static function arr2str(arr:Array):String{
+			var str:String="";
+			for each(var element:* in arr){
+				if(element is Array){
+					str+=","+arr2str(element);
+				}else{
+					str+=","+element;
+				}
+			}
+			return "["+str.substr(1)+"]";
+		}
+		//*/
 	}
 }
 

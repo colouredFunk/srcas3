@@ -55,8 +55,8 @@ package zero.swf.avm2.advances{
 		
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML(xmlName:String):XML{
-			var xml:XML=toXML_fun(memberV,xmlName);
+		public function toXML(marks:Object,xmlName:String):XML{
+			var xml:XML=toXML_fun(marks,memberV,xmlName);
 			
 			xml.@infoId=infoId;
 			return xml;

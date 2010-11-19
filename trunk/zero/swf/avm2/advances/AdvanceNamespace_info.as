@@ -63,11 +63,21 @@ package zero.swf.avm2.advances{
 			advanceABC.abcFile.namespace_infoV.push(namespace_info);
 			return advanceABC.abcFile.namespace_infoV.length-1;
 		}
-
+		
+		///*
+		public function getMarkKey():String{
+			if(kind==NamespaceKind.PackageNamespace){
+				return name;
+			}
+			return "["+NamespaceKind.kindV[kind]+"]"+name;
+		}
+		//*/
+		
 		////
+		///*
 		CONFIG::toXMLAndInitByXML {
-		public function toXML(xmlName:String):XML{
-			var xml:XML=toXML_fun(memberV,xmlName);
+		public function toXML(marks:Object,xmlName:String):XML{
+			var xml:XML=toXML_fun(marks,memberV,xmlName);
 			
 			xml.@infoId=infoId;
 			return xml;
@@ -78,5 +88,6 @@ package zero.swf.avm2.advances{
 			initByXML_fun(marks,xml,memberV);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
+		//*/
 	}
 }

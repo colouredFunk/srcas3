@@ -247,19 +247,44 @@ package zero.swf.avm2.advances{
 		
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML(xmlName:String):XML{
-			var xml:XML=toXML_fun(Method_info_memberV,xmlName);
+		public function toXML(marks:Object,xmlName:String):XML{
+			var xml:XML=<{xmlName} return_type={getMultiname_infoMarkKey(marks,return_type)}/>
+			
+			////
+			if(param_typeV.length){
+				var param_typeListXML:XML=<param_typeList count={param_typeV.length}/>;
+				for each(var param_type:AdvanceMultiname_info in param_typeV){
+					var param_typeXML:XML=<param_type value={getMultiname_infoMarkKey(marks,param_type)}/>
+					param_typeListXML.appendChild(param_typeXML);
+				}
+				xml.appendChild(param_typeListXML);
+			}
+			
+			//----
+			toXML_fun(marks,Method_info_memberV,xml);
 			
 			if(codes){
-				toXML_fun(Method_body_info_memberV,xml);
+				toXML_fun(marks,Method_body_info_memberV,xml);
 				
-				xml.appendChild(codes.toXML("codes"));
+				xml.appendChild(codes.toXML(marks,"codes"));
 			}
 			
 			xml.@infoId=infoId;
 			return xml;
 		}
 		public function initByXML(marks:Object,xml:XML):void{
+			return_type=getMultiname_infoByMarkKey(marks,xml.@return_type.toString());
+			param_typeV=new Vector.<AdvanceMultiname_info>();
+			if(xml.param_typeList.length()){
+				var i:int=-1;
+				for each(var param_typeXML:XML in xml.param_typeList[0].param_type){
+					i++;
+					param_typeV[i]=getMultiname_infoByMarkKey(marks,param_typeXML.@value.toString());
+				}
+			}
+			
+			
+			//----
 			infoId=int(xml.@infoId.toString());
 			
 			initByXML_fun(marks,xml,Method_info_memberV);

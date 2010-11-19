@@ -456,7 +456,7 @@ package zero.swf.avm2.advances{
 			//准备完毕
 			
 			/*
-			var xml:XML=toXML_fun(memberV,xmlName);
+			var xml:XML=toXML_fun(marks,memberV,xmlName);
 			
 			var specialsXML:XML=<specials/>;
 			var specialsCount:int=0;
@@ -476,7 +476,16 @@ package zero.swf.avm2.advances{
 			return xml;
 			*/
 			
-			return toXML_fun(memberV,xmlName);
+			var memberType:String;
+			
+			var marks:Object=new Object();
+			for each(memberType in Member.typeV){
+				if(Member.fromABCFileMark[memberType]){
+					marks[memberType]=new Object();
+				}
+			}
+			
+			return toXML_fun(marks,memberV,xmlName);
 		}
 		
 		/*

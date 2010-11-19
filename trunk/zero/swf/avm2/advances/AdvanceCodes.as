@@ -515,7 +515,10 @@ package zero.swf.avm2.advances{
 		}
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML(xmlName:String):XML{
+			
+		public static var outputInfoXML:Boolean=true;
+		
+		public function toXML(marks:Object,xmlName:String):XML{
 			var advanceCode:AdvanceCode,labelMark:LabelMark;
 			var stringXML:XML=<string/>;//用来转换字符串的
 			//var specialXMLMark:Object=new Object();//用来记录一些实在不适合在汇编码里显示的东西，例如匿名函数
@@ -548,21 +551,26 @@ package zero.swf.avm2.advances{
 									codesStr+=" "+stringXML.toXMLString().replace(/<string value=(".*")\/>/,"$1").replace(/>/g,"&gt;");//- -
 								break;
 								case Op.type_u8_u30__namespace_info:
-									codesStr+=" "+advanceCode.value.toXML("namespace_info").toXMLString().replace(/[\r\n]+/g,"");
+									codesStr+=" "+getNamespace_infoMarkKey(marks,advanceCode.value);
+									if(outputInfoXML){
+										codesStr+="\n\t\t\t\t\t//"+advanceCode.value.toXML(marks,"namespace_info").toXMLString().replace(/[\r\n]+/g,"");
+									}
 								break;
 								case Op.type_u8_u30__multiname_info:
-									codesStr+=" "+advanceCode.value.toXML("multiname_info").toXMLString().replace(/[\r\n]+/g,"");
+									codesStr+=" "+getMultiname_infoMarkKey(marks,advanceCode.value);
+									if(outputInfoXML){
+										codesStr+="\n\t\t\t\t\t//"+advanceCode.value.toXML(marks,"multiname_info").toXMLString().replace(/[\r\n]+/g,"");
+									}
 								break;
 								case Op.type_u8_u30__method:
-									stringXML.@value=advanceCode.value.toXML("method").toXMLString();
+									stringXML.@value=advanceCode.value.toXML(marks,"method").toXMLString();
 									codesStr+=" "+stringXML.toXMLString().replace(/<string value=(".*")\/>/,"$1").replace(/>/g,"&gt;");//- -
-									//trace("advanceCode.value="+advanceCode.value);
 								break;
 								case Op.type_u8_u30__class:
-									codesStr+=" "+advanceCode.value.getMarkKey();
+									codesStr+=" "+advanceCode.value.getMarkKey(marks);
 								break;
 								case Op.type_u8_u30__exception_info:
-									codesStr+=" "+advanceCode.value.exception_info.toXML("exception_info").toXMLString().replace(/[\r\n]+/g,"")+" from:label"+advanceCode.value.from.labelId+" to:label"+advanceCode.value.to.labelId+" target:label"+advanceCode.value.target.labelId;
+									codesStr+=" "+advanceCode.value.exception_info.toXML(marks,"exception_info").toXMLString().replace(/[\r\n]+/g,"")+" from:label"+advanceCode.value.from.labelId+" to:label"+advanceCode.value.to.labelId+" target:label"+advanceCode.value.target.labelId;
 								break;
 								case Op.type_u8_u30__finddef:
 									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
@@ -572,10 +580,13 @@ package zero.swf.avm2.advances{
 									codesStr+=" "+advanceCode.value.register1+" "+advanceCode.value.register2;
 								break;
 								case Op.type_u8_u30_u30__multiname_info_args:
-									codesStr+=" "+advanceCode.value.multiname_info.toXML("multiname_info").toXMLString().replace(/[\r\n]+/g,"")+" "+advanceCode.value.args;
+									codesStr+=" "+getMultiname_infoMarkKey(marks,advanceCode.value.multiname_info)+" "+advanceCode.value.args;
+									if(outputInfoXML){
+										codesStr+="\n\t\t\t\t\t//"+advanceCode.value.multiname_info.toXML(marks,"multiname_info").toXMLString().replace(/[\r\n]+/g,"")+" "+advanceCode.value.args;
+									}
 								break;
 								case Op.type_u8_u30_u30__method_args:
-									stringXML.@value=advanceCode.value.method.toXML("method").toXMLString();
+									stringXML.@value=advanceCode.value.method.toXML(marks,"method").toXMLString();
 									codesStr+=" "+stringXML.toXMLString().replace(/<string value=(".*")\/>/,"$1").replace(/>/g,"&gt;")+" "+advanceCode.value.args;//- -
 								break;
 								
@@ -593,7 +604,6 @@ package zero.swf.avm2.advances{
 								case Op.type_u8_u8_u30_u8_u30__debug:
 									stringXML.@value=advanceCode.value.index;
 									codesStr+=" "+advanceCode.value.debug_type+" "+stringXML.toXMLString().replace(/<string value=(".*")\/>/,"$1").replace(/>/g,"&gt;")+" "+advanceCode.value.reg+" "+advanceCode.value.extra;//- -
-									//trace(stringXML.toXMLString().replace(/<string value=(".*")\/>/,"$1").replace(/>/g,"&gt;"));
 								break;
 								
 								default:
@@ -687,7 +697,8 @@ package zero.swf.avm2.advances{
 									advanceCode.value=getInfoByXMLAndMemberType(marks,new XML(codeStr),Member.NAMESPACE_INFO);
 								break;
 								case Op.type_u8_u30__multiname_info:
-									advanceCode.value=getInfoByXMLAndMemberType(marks,new XML(codeStr),Member.MULTINAME_INFO);
+									//advanceCode.value=getInfoByXMLAndMemberType(marks,new XML(codeStr),Member.MULTINAME_INFO);
+									advanceCode.value=getMultiname_infoByMarkKey(marks,codeStr);
 								break;
 								case Op.type_u8_u30__method:
 									advanceCode.value=getInfoByXMLAndMemberType(
@@ -700,6 +711,10 @@ package zero.swf.avm2.advances{
 								break;
 								case Op.type_u8_u30__class:
 									advanceCode.value=marks[Member.CLASS][codeStr];
+									if(advanceCode.value){
+									}else{
+										throw new Error("advanceCode.value="+advanceCode.value);
+									}
 								break;
 								case Op.type_u8_u30__exception_info:
 									advanceCode.value={exception_info:new AdvanceException_info()};
@@ -742,7 +757,8 @@ package zero.swf.avm2.advances{
 									pos=codeStr.search(/\s+\d+$/);//不支持 16进制的整数表示
 									if(pos>0){
 										advanceCode.value={
-											multiname_info:getInfoByXMLAndMemberType(marks,new XML(codeStr.substr(0,pos)),Member.MULTINAME_INFO),
+											//multiname_info:getInfoByXMLAndMemberType(marks,new XML(codeStr.substr(0,pos)),Member.MULTINAME_INFO),
+											multiname_info:getMultiname_infoByMarkKey(marks,codeStr.substr(0,pos)),
 											args:int(codeStr.substr(pos).replace(/\D+/g,""))//不支持 16进制的整数表示
 										}
 									}else{
