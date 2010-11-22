@@ -30,7 +30,7 @@ package ui{
 		}
 		override public function addEventListener(_type:String, _listener:Function, _useCapture:Boolean = false, _priority:int = 0, _useWeakReference:Boolean = false):void {
 			super.addEventListener(_type, _listener, _useCapture, _priority, _useWeakReference);
-			EventManager.removeTargetAllEvent(this);
+			EventManager.addTargetEvent(_type, _listener, this);
 		}
 		override public function removeEventListener(_type:String, _listener:Function, _useCapture:Boolean = false):void {
 			super.removeEventListener(_type, _listener, _useCapture);
