@@ -27,12 +27,12 @@ package ui.manager{
 				return;
 			}
 			for (var _listener:* in listenerDic[_target][_type]) {
-				delete listenerDic[_target][_type][_listener];
+				_target.removeEventListener(_type, _listener);
 			}
 			delete listenerDic[_target][_type];
 		}
 		public static function removeTargetAllEvent(_target:*):void {
-			for (var _type:String in listenerDic) {
+			for (var _type:String in listenerDic[_target]) {
 				removeTargetEventByType(_type, _target);
 			}
 			delete listenerDic[_target];
