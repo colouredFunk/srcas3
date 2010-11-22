@@ -54,11 +54,13 @@ package akdcl.application.player{
 		
 		public static const VALUE_PERCENTAGE:Number = 0.004;
 		public static const VOLUME_DEFAULT:Number = 0.8;
-		//
+		public static var SOURCE_ID:String = "source";
+		//根据提供的数据源获取播放列表
 		public static function createList(_list:*):XMLList {
 			var _xml:XML;
 			if ((_list is String) || (_list is Array)) {
 				if (_list is String) {
+					//将字符串按"|"格式成数组
 					_list = _list.split("|");
 				}
 				_xml =<root/>;
@@ -68,9 +70,10 @@ package akdcl.application.player{
 				_list = _xml.list;
 			}else if (_list is XMLList || _list is XML) {
 				if (_list is XML) {
+					//取XML中的"list"列表
 					_list = _list.list;
 				}
-				if (_list.@source.length()==0) {
+				if (_list.attribute(SOURCE_ID).length()==0) {
 					return null;
 				}
 			}else {
@@ -79,36 +82,32 @@ package akdcl.application.player{
 			return _list;
 		}
 		
-		//0~1
+		//加载进度0~1
 		public function get loadProgress():Number {
 			return 0;
 		}
-		//0~1
+		//缓冲进度0~1
 		public function get bufferProgress():Number {
 			return 0;
 		}
-		//毫秒为单位
+		//媒体长度(时间:毫秒为单位)
 		public function get totalTime():uint {
 			return 0;
 		}
-		//
-		public function get isPlaying():Boolean {
-			return playState == STATE_PLAY;
-		}
-		//毫秒为单位
+		//播放长度(时间:毫秒为单位)
 		public function get position():uint {
 			return 0;
 		}
 		public function set position(_position:uint):void {
 		}
-		//0~1
+		//播放进度0~1
 		public function get playProgress():Number {
 			return position / totalTime;
 		}
 		public function set playProgress(value:Number):void {
 			position = totalTime * value;
 		}
-		//0~1
+		//音量0~1
 		private var __volume:Number = VOLUME_DEFAULT;
 		public function get volume():Number {
 			return __volume;
@@ -122,7 +121,7 @@ package akdcl.application.player{
 			__volume = _volume;
 			dispatchEvent(new MediaEvent(MediaEvent.VOLUME_CHANGE));
 		}
-		//
+		//静音
 		private var volumeLast:Number = 0;
 		public function get mute():Boolean {
 			return volume == 0;
@@ -141,7 +140,7 @@ package akdcl.application.player{
 				volume = volumeLast;
 			}
 		}
-		//
+		//当前播放列表位置
 		public function get playID():int {
 			return idPart.id;
 		}
@@ -156,7 +155,11 @@ package akdcl.application.player{
 		public function set repeat(_repeat:uint):void {
 			__repeat = _repeat;
 		}
-		//
+		//是否处于播放状态
+		public function get isPlaying():Boolean {
+			return playState == STATE_PLAY;
+		}
+		//当前播放状态
 		private var __playState:String = STATE_STOP;
 		public function get playState():String{
 			return __playState;
@@ -213,9 +216,9 @@ package akdcl.application.player{
 			}
 			__container = _cotainer;
 		}
-		//
+		//播放列表
 		private var __playlist:XMLList;
-		public function get playlist():XMLList{
+		public function get playlist():XMLList {
 			return __playlist;
 		}
 		public function set playlist(_playlist:*):void{
@@ -257,7 +260,7 @@ package akdcl.application.player{
 		}
 		//
 		public function getMediaByID(_playID:int):String {
-			return playlist?String(playlist[_playID].@source):null
+			return playlist?String(playlist[_playID].attribute(SOURCE_ID)):null
 		}
 		//
 		public function play():void {
@@ -307,9 +310,11 @@ package akdcl.application.player{
 		}
 		//
 		protected function onLoadErrorHandler(_evt:*= null):void {
-			if (playlist.length()==1) {
+			if (playlist.length() == 1) {
+				//如果播放列表只有一个源，则停止播放
 				stop();
 			}else {
+				//根据repeat的值执行下一步
 				onPlayCompleteHandler();
 			}
 			dispatchEvent(new MediaEvent(MediaEvent.LOAD_ERROR));

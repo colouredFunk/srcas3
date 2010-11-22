@@ -168,10 +168,6 @@ package akdcl.application.player{
 			}else {
 				_loadedProgress = 0;
 			}
-			if (_loadedProgress==1) {
-				timerLoad.stop();
-				onLoadCompleteHandler();
-			}
 			return _loadedProgress;
 		}
 		override public function get totalTime():uint {
@@ -203,10 +199,8 @@ package akdcl.application.player{
 			}
 		}
 		protected var wmpInfo:Object;
-		protected var timerLoad:Timer;
 		override protected function init():void {
-			timerLoad = new Timer(updateInterval);
-			timerLoad.addEventListener(TimerEvent.TIMER, onLoadProgressHandler);
+			super.init();
 			if (ExternalInterface.available) {
 				ExternalInterface.call("eval", PWRDJS.INIT.toString());
 				ExternalInterface.call("eval", WMPPLAYER_JS.toString());
@@ -216,9 +210,8 @@ package akdcl.application.player{
 			}
 		}
 		override public function remove():void {
+			timer.removeEventListener(TimerEvent.TIMER, onLoadProgressHandler);
 			wmpInfo = null;
-			timerLoad.removeEventListener(TimerEvent.TIMER, onLoadProgressHandler);
-			timerLoad = null;
 			super.remove();
 		}
 		override public function play():void {
@@ -263,8 +256,7 @@ package akdcl.application.player{
 				case 3 :
 					//播放
 					wmpInfo = ExternalInterface.call("pwrd.wmpPlayer.getWMPInfo", ExternalInterface.objectID);
-					timerLoad.reset();
-					timerLoad.start();
+					timer.addEventListener(TimerEvent.TIMER, onLoadProgressHandler);
 					setPlayState(MediaPlayer.STATE_PLAY);
 					break;
 				case 4 :
@@ -299,6 +291,11 @@ package akdcl.application.player{
 					setPlayState(MediaPlayer.STATE_RECONNECT);
 					break;
 			}
+			if (_id==6) {
+				timer.addEventListener(TimerEvent.TIMER, onBufferProgressHandler);
+			}else {
+				timer.removeEventListener(TimerEvent.TIMER, onBufferProgressHandler);
+			}
 			return _id;
 		}
 		override protected function onPlayIDChangeHandler(_playID:int):void {
@@ -310,6 +307,13 @@ package akdcl.application.player{
 				ExternalInterface.call("pwrd.wmpPlayer.openList", ExternalInterface.objectID, _mediaSource);
 			}
 			play();
+		}
+		override protected function onLoadProgressHandler(_evt:* = null):void {
+			super.onLoadProgressHandler(_evt);
+			if (loadProgress >= 1) {
+				timer.removeEventListener(TimerEvent.TIMER, onLoadProgressHandler);
+				onLoadCompleteHandler();
+			}
 		}
 	}
 }

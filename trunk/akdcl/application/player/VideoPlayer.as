@@ -3,6 +3,7 @@ package akdcl.application.player{
 	import com.greensock.loading.VideoLoader;
 	import com.greensock.layout.ScaleMode;
 	import flash.events.Event;
+	import flash.events.TimerEvent;
 	
 	/**
 	 * ...
@@ -38,7 +39,7 @@ package akdcl.application.player{
 			return video?video.progress:0; 
 		}
 		override public function get bufferProgress():Number {
-			return video?video.bufferProgress:1;
+			return video?video.bufferProgress:0;
 		}
 		override public function get totalTime():uint { 
 			return video?(video.duration * 1000):0;
@@ -130,10 +131,27 @@ package akdcl.application.player{
 				content.fitHeight = contentHeight;
 			}
 			play();
+			timer.addEventListener(TimerEvent.TIMER, onBufferProgressHandler);
 		}
 		override protected function onLoadErrorHandler(_evt:* = null):void {
 			super.onLoadErrorHandler(_evt);
 			removeVideo(video);
+		}
+		protected var isBuffering:Boolean;
+		override protected function onBufferProgressHandler(_evt:* = null):void {
+			if (bufferProgress < 1 && video && video.videoPaused) {
+				if (!isBuffering) {
+					//
+				}
+				super.onBufferProgressHandler(_evt);
+				isBuffering = true;
+			}else {
+				if (isBuffering) {
+					super.onBufferProgressHandler(_evt);
+					//
+				}
+				isBuffering = false;
+			}
 		}
 	}
 }
