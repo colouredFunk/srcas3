@@ -133,6 +133,10 @@ package akdcl.application.player{
 			play();
 			timer.addEventListener(TimerEvent.TIMER, onBufferProgressHandler);
 		}
+		override protected function onPlayCompleteHandler(_evt:* = null):void {
+			super.onPlayCompleteHandler(_evt);
+			timer.removeEventListener(TimerEvent.TIMER, onBufferProgressHandler);
+		}
 		override protected function onLoadErrorHandler(_evt:* = null):void {
 			super.onLoadErrorHandler(_evt);
 			removeVideo(video);
