@@ -17,6 +17,8 @@
 		public var delay:uint = 0;
 		public var onUpdate:Function;
 		public var onComplete:Function;
+		public var autoRemove:Boolean = true;
+		public var playBack:Boolean;
 		private var isTempAsBmp:Boolean;
 		private var masked:DisplayObject;
 		
@@ -29,6 +31,12 @@
 		}
 		override protected function onRemoveToStageHandler():void {
 			super.onRemoveToStageHandler();
+			if (masked) {
+				masked.mask = null;
+				if (isTempAsBmp) {
+					masked.cacheAsBitmap = false;
+				}
+			}
 			masked = null;
 			onComplete = null;
 			onUpdate = null;
@@ -52,12 +60,14 @@
 			if (_isCacheAsBitmap&&!masked.cacheAsBitmap) {
 				isTempAsBmp = true;
 			}
-			this.cacheAsBitmap = _isCacheAsBitmap;
+			cacheAsBitmap = _isCacheAsBitmap;
 			masked.cacheAsBitmap = _isCacheAsBitmap;
 			if (_isMask) {
 				_masked.mask = this;
 			}
-			
+			if (playBack) {
+				gotoAndStop(totalFrames);
+			}
 			maskAniLayer = maskAniLayer?maskAniLayer:_masked.parent;
 			maskAniLayer.addChild(this);
 			
@@ -66,7 +76,7 @@
 			y = _rect.y;
 			width = _rect.width;
 			height = _rect.height;
-			this.addEventListener(Event.ENTER_FRAME, runStep);
+			addEventListener(Event.ENTER_FRAME, runStep);
 		}
 		private function runStep(_evt:Event):void {
 			if (delay>0) {
@@ -74,20 +84,24 @@
 				return;
 			}
 			for (var _i:uint; _i<speed; _i++) {
-				nextFrame();
+				if (playBack) {
+					prevFrame();
+				}else {
+					nextFrame();
+				}
 			}
 			if (onUpdate!=null) {
 				onUpdate();
 			}
-		}
-		override public function remove():void {
-			super.remove();
-			masked.mask = null;
-			if (isTempAsBmp) {
-				masked.cacheAsBitmap = false;
-			}
-			if (onComplete != null) {
-				onComplete(masked);
+			if (playBack?(currentFrame == 1):(currentFrame == totalFrames)) {
+				if (autoRemove) {
+					remove();
+				}else {
+					removeEventListener(Event.ENTER_FRAME, runStep);
+				}
+				if (onComplete != null) {
+					onComplete(masked);
+				}
 			}
 		}
 	}
