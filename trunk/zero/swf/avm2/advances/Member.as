@@ -25,7 +25,7 @@ package zero.swf.avm2.advances{
 			//
 		public static const METHOD:String="method";
 		public static const METADATA_INFO:String="metadata_info";
-		public static const CLASS:String="class";
+		public static const CLAZZ:String="clazz";
 		public static const SCRIPT_INFO:String="script_info";
 		//
 		
@@ -48,7 +48,7 @@ package zero.swf.avm2.advances{
 			MULTINAME_INFO,
 			METHOD,
 			METADATA_INFO,
-			CLASS,
+			CLAZZ,
 			SCRIPT_INFO,
 			TRAITS_INFO,
 			OPTION_DETIAL,
@@ -62,6 +62,7 @@ package zero.swf.avm2.advances{
 		
 		public static var directMark:Object;
 		public static var idStartFrom1Mark:Object;
+		public static var useMarkKeyMark:Object;
 		public static var fromABCFileMark:Object=firstInit();
 		private static function firstInit():Object{
 			directMark=new Object();
@@ -80,6 +81,12 @@ package zero.swf.avm2.advances{
 			idStartFrom1Mark[NS_SET_INFO]=true;
 			idStartFrom1Mark[MULTINAME_INFO]=true;
 			
+			useMarkKeyMark=new Object();
+			
+			useMarkKeyMark[NAMESPACE_INFO]=true;
+			useMarkKeyMark[NS_SET_INFO]=true;
+			useMarkKeyMark[MULTINAME_INFO]=true;
+			
 			//
 			var fromABCFileMark:Object=new Object();
 			
@@ -93,7 +100,7 @@ package zero.swf.avm2.advances{
 			
 			fromABCFileMark[METHOD]=true;
 			fromABCFileMark[METADATA_INFO]=true;
-			fromABCFileMark[CLASS]=true;
+			fromABCFileMark[CLAZZ]=true;
 			fromABCFileMark[SCRIPT_INFO]=true;
 			
 			return fromABCFileMark;
@@ -104,17 +111,12 @@ package zero.swf.avm2.advances{
 		public var isList:Boolean;
 		public var curr:String;
 		
-		public var classV:Vector.<Class>;
-		public var classVIdName:String;
-		
 		public var kindClass:Class;
 		public var kindVName:String;
 		
 		public var flagClass:Class;
 		
 		public var constKindName:String;
-		
-		public var xmlUseMarkKey:Boolean;
 		
 		public function Member(
 			_name:String,
@@ -134,18 +136,9 @@ package zero.swf.avm2.advances{
 					kindVName=rest.kindVName||"kindV";
 				}else if(rest.flagClass){
 					flagClass=rest.flagClass;
-				}else if(rest.classV){
-					if(rest.classVIdName){
-						classV=rest.classV;
-						classVIdName=rest.classVIdName;
-					}else{
-						throw new Error("rest.classVIdName="+rest.classVIdName);
-					}
 				}else if(rest.constKindName){
 					constKindName=rest.constKindName;
 				}
-				
-				xmlUseMarkKey=rest.xmlUseMarkKey;
 			}
 		}
 	}

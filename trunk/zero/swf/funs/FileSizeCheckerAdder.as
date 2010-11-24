@@ -24,7 +24,7 @@ package zero.swf.funs{
 					case TagType.DoABC:
 					case TagType.DoABCWithoutFlagsAndName:
 						var advanceABC:AdvanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc as AdvanceABC
-						for each(var clazz:AdvanceClass in advanceABC.classV){
+						for each(var clazz:AdvanceClass in advanceABC.clazzV){
 							insertCodesInMethod(codeV,checkFileSizeMethod.max_stack,clazz.cinit);
 						}
 						for each(var script_info:AdvanceScript_info in advanceABC.script_infoV){

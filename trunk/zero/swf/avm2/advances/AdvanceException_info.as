@@ -39,7 +39,7 @@ package zero.swf.avm2.advances{
 	import zero.swf.avm2.Exception_info;
 	public class AdvanceException_info extends Advance{
 		
-		private static const memberV:Vector.<Member>=Vector.<Member>([
+		public static const memberV:Vector.<Member>=Vector.<Member>([
 			new Member("from"),
 			new Member("to"),
 			new Member("target"),
@@ -66,23 +66,6 @@ package zero.swf.avm2.advances{
 		
 			return exception_info;
 		}
-		
-		////
-		CONFIG::toXMLAndInitByXML {
-		public function toXML(marks:Object,xmlName:String):XML{
-			var xml:XML=<{xmlName} exc_type={getMultiname_infoMarkKey(marks,exc_type)} var_name={getMultiname_infoMarkKey(marks,var_name)}/>
-			
-			//----
-			toXML_fun(marks,memberV,xml);
-			return xml;
-		}
-		public function initByXML(marks:Object,xml:XML):void{
-			exc_type=getMultiname_infoByMarkKey(marks,xml.@exc_type.toString());
-			var_name=getMultiname_infoByMarkKey(marks,xml.@var_name.toString());
-			
-			initByXML_fun(marks,xml,memberV);
-		}
-		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
 

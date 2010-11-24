@@ -66,33 +66,32 @@ package zero.swf.avm2.advances{
 		public var kind_trait_type:int;
 		public var metadataV:Vector.<AdvanceMetadata_info>;
 		
-		private static const memberV:Vector.<Member>=Vector.<Member>([
+		public static const memberV:Vector.<Member>=Vector.<Member>([
 			new Member("name",Member.MULTINAME_INFO),
 			new Member("kind_attributes",null,{flagClass:TraitAttributes}),
 			new Member("kind_trait_type",null,{kindClass:TraitTypes,kindVName:"typeV"}),
 			new Member("metadata",Member.METADATA_INFO,{isList:true,curr:Member.CURR_CASE}),
 		]);
 		
-		private static const trait_slot_memberV:Vector.<Member>=Vector.<Member>([
+		public static const trait_slot_memberV:Vector.<Member>=Vector.<Member>([
 			new Member("slot_id"),
 			new Member("type_name",Member.MULTINAME_INFO),
 			new Member("vkind",null,{kindClass:ConstantKind}),
 			new Member("vindex",null,{constKindName:"vkind"})//这里把 vkind 放在了 vindex 前面
 		]);
 		
-		private static const trait_method_memberV:Vector.<Member>=Vector.<Member>([
+		public static const trait_method_memberV:Vector.<Member>=Vector.<Member>([
 			new Member("disp_id"),
 			new Member("methodi",Member.METHOD)
 		]);
 		
-		private static const trait_function_memberV:Vector.<Member>=Vector.<Member>([
+		public static const trait_function_memberV:Vector.<Member>=Vector.<Member>([
 			new Member("slot_id"),
 			new Member("functioni",Member.METHOD)
 		]);
 		
-		private static const trait_class_memberV:Vector.<Member>=Vector.<Member>([
-			new Member("slot_id"),
-			new Member("classi",Member.CLASS,{xmlUseMarkKey:true})
+		public static const trait_class_memberV:Vector.<Member>=Vector.<Member>([
+			new Member("slot_id")
 		]);
 		
 		public var slot_id:int;
@@ -203,6 +202,11 @@ package zero.swf.avm2.advances{
 					//The classi field is an index that points into the class array of the abcFile entry.
 					
 					initByInfo_fun(advanceABC,traits_info,trait_class_memberV);
+					classi=advanceABC.getInfoByIdAndMemberType(traits_info.classi,Member.CLAZZ);
+					if(classi){
+					}else{
+						throw new Error("classi="+classi);
+					}
 				break;
 			}
 			//
@@ -227,6 +231,7 @@ package zero.swf.avm2.advances{
 				break;
 				case TraitTypes.Clazz:
 					toInfo_fun(advanceABC,traits_info,trait_class_memberV);
+					traits_info.classi=advanceABC.getIdByInfoAndMemberType(classi,Member.CLAZZ);
 				break;
 			}
 			
@@ -235,56 +240,56 @@ package zero.swf.avm2.advances{
 		
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML(marks:Object,xmlName:String):XML{
-			var xml:XML=<{xmlName} name={getMultiname_infoMarkKey(marks,name)}/>
-			
-			//----
-			toXML_fun(marks,memberV,xml);
+		override public function toXMLAndMark(infoMark:InfoMark):XML{
+			var xml:XML=toXML_fun(infoMark,memberV);
 			
 			switch(kind_trait_type){
 				case TraitTypes.Slot:
 				case TraitTypes.Const:
-					xml.@type_name=getMultiname_infoMarkKey(marks,type_name);
-					toXML_fun(marks,trait_slot_memberV,xml);
+					toXML_fun(infoMark,trait_slot_memberV,xml);
 				break;
 				case TraitTypes.Method:
 				case TraitTypes.Getter:
 				case TraitTypes.Setter:
-					toXML_fun(marks,trait_method_memberV,xml);
+					toXML_fun(infoMark,trait_method_memberV,xml);
 				break;
 				case TraitTypes.Function:
-					toXML_fun(marks,trait_function_memberV,xml);
+					toXML_fun(infoMark,trait_function_memberV,xml);
 				break;
 				case TraitTypes.Clazz:
-					toXML_fun(marks,trait_class_memberV,xml);
+					toXML_fun(infoMark,trait_class_memberV,xml);
+					xml.@classi=MarkStrs.multiname_info2markStr(infoMark,classi.name);
 				break;
 			}
 			
 			return xml;
 		}
-		public function initByXML(marks:Object,xml:XML):void{
-			name=getMultiname_infoByMarkKey(marks,xml.@name.toString());
-			
-			//----
-			initByXML_fun(marks,xml,memberV);
+		override public function initByXMLAndMark(infoMark:InfoMark,xml:XML):void{
+			initByXML_fun(infoMark,xml,memberV);
 			
 			//
 			switch(kind_trait_type){
 				case TraitTypes.Slot:
 				case TraitTypes.Const:
-					type_name=getMultiname_infoByMarkKey(marks,xml.@type_name.toString());
-					initByXML_fun(marks,xml,trait_slot_memberV);
+					initByXML_fun(infoMark,xml,trait_slot_memberV);
 				break;
 				case TraitTypes.Method:
 				case TraitTypes.Getter:
 				case TraitTypes.Setter:
-					initByXML_fun(marks,xml,trait_method_memberV);
+					initByXML_fun(infoMark,xml,trait_method_memberV);
 				break;
 				case TraitTypes.Function:
-					initByXML_fun(marks,xml,trait_function_memberV);
+					initByXML_fun(infoMark,xml,trait_function_memberV);
 				break;
 				case TraitTypes.Clazz:
-					initByXML_fun(marks,xml,trait_class_memberV);
+					initByXML_fun(infoMark,xml,trait_class_memberV);
+					
+					//这里假定了之前在 AdvanceClass 里已经标记过：
+					classi=infoMark.clazz["~"+xml.@classi.toString()];
+					if(classi){
+					}else{
+						throw new Error("classi="+classi);
+					}
 				break;
 			}
 			//

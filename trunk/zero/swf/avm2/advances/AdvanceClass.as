@@ -69,7 +69,7 @@ package zero.swf.avm2.advances{
 	import zero.swf.vmarks.InstanceFlags;
 	public class AdvanceClass extends Advance{
 		
-		private static const Instance_info_memberV:Vector.<Member>=Vector.<Member>([
+		public static const Instance_info_memberV:Vector.<Member>=Vector.<Member>([
 			new Member("name",Member.MULTINAME_INFO),
 			new Member("super_name",Member.MULTINAME_INFO),
 			new Member("flags",null,{flagClass:InstanceFlags}),
@@ -79,12 +79,10 @@ package zero.swf.avm2.advances{
 			new Member("itraits_info",Member.TRAITS_INFO,{isList:true})
 		]);
 		
-		private static const Class_info_memberV:Vector.<Member>=Vector.<Member>([
+		public static const Class_info_memberV:Vector.<Member>=Vector.<Member>([
 			new Member("cinit",Member.METHOD),
 			new Member("ctraits_info",Member.TRAITS_INFO,{isList:true})
 		]);
-		
-		private var infoId:int;	//从 swf 或 xml 直接读取过来的 id
 		
 		public var name:AdvanceMultiname_info;									//multiname_info
 		public var super_name:AdvanceMultiname_info;							//multiname_info
@@ -99,9 +97,7 @@ package zero.swf.avm2.advances{
 		public var ctraits_infoV:Vector.<AdvanceTraits_info>;					//traits_info
 		
 		//
-		public function initByInfos(advanceABC:AdvanceABC,_infoId:int,instance_info:Instance_info,class_info:Class_info):void{
-			infoId=_infoId;
-			
+		public function initByInfos(advanceABC:AdvanceABC,instance_info:Instance_info,class_info:Class_info):void{
 			initByInfo_fun(advanceABC,instance_info,Instance_info_memberV,instance_info.flags&InstanceFlags.ClassProtectedNs);
 			
 			initByInfo_fun(advanceABC,class_info,Class_info_memberV);
@@ -118,115 +114,98 @@ package zero.swf.avm2.advances{
 			advanceABC.abcFile.class_infoV.push(class_info);
 			return advanceABC.abcFile.instance_infoV.length-1;
 		}
-		
-		public function getMarkKey(marks:Object):String{
-			return name.getMarkKey(marks);
-			//return name.toXML(marks,"name").toXMLString();
-		}
 
 		////
 		CONFIG::toXMLAndInitByXML {
-		/*
-		public function toXML(marks:Object,xmlName:String):XML{
-			var xml:XML=toXML_fun(marks,Instance_info_memberV,xmlName);
-			
-			toXML_fun(marks,Class_info_memberV,xml);
-			
-			xml.@infoId=infoId;
-			return xml;
-		}
-		public function initByXML(marks:Object,xml:XML):void{
-			infoId=int(xml.@infoId.toString());
-			
-			initByXML_fun(marks,xml,Instance_info_memberV);
-			initByXML_fun(marks,xml,Class_info_memberV);
-			
-			marks[Member.CLASS][getMarkKey(marks)]=this;
-		}
-		//*/
 		
 		///*
 		
-		public function toXML(marks:Object,xmlName:String):XML{
-			var xml:XML=<{xmlName}/>
+		override public function toXMLAndMark(infoMark:InfoMark):XML{
+			var xml:XML=<AdvanceClass/>
 			
-			////
-			var description:String="";
-			
-			description+="class "+getMultiname_infoMarkKey(marks,name);
-			if(super_name===AdvanceDefaultMultiname_info.instance){
-			}else{
-				description+=" extends "+getMultiname_infoMarkKey(marks,super_name);
-			}
-			if(intrfV.length){
-				var intrfsStr:String="";
-				for each(var intrf:AdvanceMultiname_info in intrfV){
-					intrfsStr+=","+getMultiname_infoMarkKey(marks,intrf);
+			/*
+			if(useMarkKey){
+				var description:String="";
+				
+				description+="class "+name.getMarkStrByInfoAndMemberType(infoMark,Member.MULTINAME_INFO);
+				if(super_name===AdvanceDefaultMultiname_info.instance){
+				}else{
+					description+=" extends "+super_name.getMarkStrByInfoAndMemberType(infoMark,Member.MULTINAME_INFO);
 				}
-				description+=" implements "+(intrfsStr.substr(1));
-			}
-			
-			xml.@description=description;
-			////
-			
-			if(protectedNs){
-				xml.@protectedNs=getNamespace_infoMarkKey(marks,protectedNs);
+				if(intrfV.length){
+					var intrfsStr:String="";
+					for each(var intrf:AdvanceMultiname_info in intrfV){
+						intrfsStr+=","+intrf.getMarkStrByInfoAndMemberType(infoMark,Member.MULTINAME_INFO);
+					}
+					description+=" implements "+(intrfsStr.substr(1));
+				}
+				
+				xml.@description=description;
+				////
+				
+				if(protectedNs){
+					xml.@protectedNs=protectedNs.getMarkStrByInfoAndMemberType(infoMark,Member.NAMESPACE_INFO);
+				}
 			}
 			
 			//----
-			toXML_fun(marks,Instance_info_memberV,xml);
+			*/
+			toXML_fun(infoMark,Instance_info_memberV,xml);
 			
-			toXML_fun(marks,Class_info_memberV,xml);
+			toXML_fun(infoMark,Class_info_memberV,xml);
 			
-			xml.@infoId=infoId;
 			return xml;
 		}
-		public function initByXML(marks:Object,xml:XML):void{
-			var matchArr:Array,strArr:Array;
+		override public function initByXMLAndMark(infoMark:InfoMark,xml:XML):void{
+			/*
 			var description:String=xml.@description.toString();
-			matchArr=description.match(/class\s+[\w\.\[\]]+\s+extends\s+[\w\.\[\]]+/);
-			var classStr:String;
-			if(matchArr){
-				classStr=matchArr[0];
-				strArr=classStr.split(/\s+/);
-				//trace("strArr[3]="+strArr[3]);
-				super_name=getMultiname_infoByMarkKey(marks,strArr[3]);
-			}else{
-				matchArr=description.match(/class\s+[\w\.\[\]]+/);
+			if(description){
+				var matchArr:Array,strArr:Array;
+				matchArr=description.match(/class\s+[\w\.\[\]\(\)]+\s+extends\s+[\w\.\[\]\(\)]+/);
+				var classStr:String;
 				if(matchArr){
 					classStr=matchArr[0];
 					strArr=classStr.split(/\s+/);
-					super_name=AdvanceDefaultMultiname_info.instance;
+					//trace("strArr[3]="+strArr[3]);
+					super_name=getInfoByXMLOrMarkStr(infoMark,strArr[3],Member.MULTINAME_INFO) as AdvanceMultiname_info;
 				}else{
-					throw new Error("错误的 description: "+description);
+					matchArr=description.match(/class\s+[\w\.\[\]\(\)]+/);
+					if(matchArr){
+						classStr=matchArr[0];
+						strArr=classStr.split(/\s+/);
+						super_name=AdvanceDefaultMultiname_info.instance;
+					}else{
+						throw new Error("错误的 description: "+description);
+					}
 				}
-			}
-			name=getMultiname_infoByMarkKey(marks,strArr[1]);
-			
-			description=description.replace(classStr,"");
-			
-			matchArr=description.match(/implements\s+[\w\.\[\],]+/);
-			intrfV=new Vector.<AdvanceMultiname_info>();
-			if(matchArr){
-				for each(var intrfStr:String in matchArr[0].replace(/implements\s+/,"").split(",")){//这里假定了 intrfsStr 里只含有 QName 和 Multiname
-					intrfV.push(getMultiname_infoByMarkKey(marks,intrfStr));
+				
+				name=getInfoByXMLOrMarkStr(infoMark,strArr[1],Member.MULTINAME_INFO) as AdvanceMultiname_info;
+				
+				description=description.replace(classStr,"");
+				
+				matchArr=description.match(/implements\s+[\w\.\[\]\(\),]+/);
+				intrfV=new Vector.<AdvanceMultiname_info>();
+				if(matchArr){
+					for each(var intrfStr:String in matchArr[0].replace(/implements\s+/,"").split(",")){//这里假定了 intrfsStr 里只含有 QName 和 Multiname
+						intrfV.push(getInfoByXMLOrMarkStr(infoMark,intrfStr,Member.MULTINAME_INFO) as AdvanceMultiname_info);
+					}
+					//trace("intrfV="+intrfV);
 				}
-				//trace("intrfV="+intrfV);
-			}
-			
-			var protectedNsStr:String=xml.@protectedNs.toString();
-			if(protectedNsStr){
-				protectedNs=getNamespace_infoByMarkKey(marks,protectedNsStr);
+				
+				var protectedNsStr:String=xml.@protectedNs.toString();
+				if(protectedNsStr){
+					protectedNs=getInfoByXMLOrMarkStr(infoMark,protectedNsStr,Member.NAMESPACE_INFO) as AdvanceNamespace_info;
+				}
 			}
 			
 			//----
-			infoId=int(xml.@infoId.toString());
+			*/
+			initByXML_fun(infoMark,xml,Instance_info_memberV);
+			initByXML_fun(infoMark,xml,Class_info_memberV);
 			
-			initByXML_fun(marks,xml,Instance_info_memberV);
-			initByXML_fun(marks,xml,Class_info_memberV);
-			
-			//trace("getMarkKey(marks)="+getMarkKey(marks));
-			marks[Member.CLASS][getMarkKey(marks)]=this;
+			//保证 AdvanceTraits_info 和 AdvanceCodes 的 newclass 里能正确的通过 name 的 markStr 获取到 this：
+			//trace("className="+MarkStrs.multiname_info2markStr(infoMark,name));
+			infoMark.clazz["~"+MarkStrs.multiname_info2markStr(infoMark,name)]=this;
 		}
 		//*/
 		

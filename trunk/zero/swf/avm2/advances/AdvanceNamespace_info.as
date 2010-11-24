@@ -36,12 +36,10 @@ package zero.swf.avm2.advances{
 	import zero.swf.vmarks.NamespaceKind;
 	public class AdvanceNamespace_info extends Advance{
 		
-		private static const memberV:Vector.<Member>=Vector.<Member>([
+		public static const memberV:Vector.<Member>=Vector.<Member>([
 			new Member("kind",null,{kindClass:NamespaceKind}),
 			new Member("name",Member.STRING)
 		]);
-		
-		private var infoId:int;	//从 swf 或 xml 直接读取过来的 id
 		
 		public var kind:int;
 		public var name:String;
@@ -49,9 +47,7 @@ package zero.swf.avm2.advances{
 		public function AdvanceNamespace_info(){
 		}
 		
-		public function initByInfo(advanceABC:AdvanceABC,_infoId:int,namespace_info:Namespace_info):void{
-			infoId=_infoId;
-			
+		public function initByInfo(advanceABC:AdvanceABC,namespace_info:Namespace_info):void{
 			initByInfo_fun(advanceABC,namespace_info,memberV);
 		}
 		public function toInfoId(advanceABC:AdvanceABC):int{
@@ -63,31 +59,5 @@ package zero.swf.avm2.advances{
 			advanceABC.abcFile.namespace_infoV.push(namespace_info);
 			return advanceABC.abcFile.namespace_infoV.length-1;
 		}
-		
-		///*
-		public function getMarkKey():String{
-			if(kind==NamespaceKind.PackageNamespace){
-				return name;
-			}
-			return "["+NamespaceKind.kindV[kind]+"]"+name;
-		}
-		//*/
-		
-		////
-		///*
-		CONFIG::toXMLAndInitByXML {
-		public function toXML(marks:Object,xmlName:String):XML{
-			var xml:XML=toXML_fun(marks,memberV,xmlName);
-			
-			xml.@infoId=infoId;
-			return xml;
-		}
-		public function initByXML(marks:Object,xml:XML):void{
-			infoId=int(xml.@infoId.toString());
-			
-			initByXML_fun(marks,xml,memberV);
-		}
-		}//end of CONFIG::toXMLAndInitByXML
-		//*/
 	}
 }

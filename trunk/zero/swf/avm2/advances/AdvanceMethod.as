@@ -129,7 +129,7 @@ package zero.swf.avm2.advances{
 	
 	public class AdvanceMethod extends Advance{
 		
-		private static const Method_info_memberV:Vector.<Member>=Vector.<Member>([
+		public static const Method_info_memberV:Vector.<Member>=Vector.<Member>([
 			new Member("return_type",Member.MULTINAME_INFO),
 			new Member("param_type",Member.MULTINAME_INFO,{isList:true}),
 			new Member("name",Member.STRING),
@@ -138,7 +138,7 @@ package zero.swf.avm2.advances{
 			new Member("param_name",Member.STRING,{isList:true,curr:Member.CURR_CASE})
 		]);
 		
-		private static const Method_body_info_memberV:Vector.<Member>=Vector.<Member>([
+		public static const Method_body_info_memberV:Vector.<Member>=Vector.<Member>([
 			new Member("max_stack"),
 			new Member("local_count"),
 			new Member("init_scope_depth"),
@@ -146,8 +146,6 @@ package zero.swf.avm2.advances{
 			//new Member("exception_info",Member.EXCEPTION_INFO,{isList:true}),
 			new Member("traits_info",Member.TRAITS_INFO,{isList:true})
 		]);
-		
-		private var infoId:int;	//从 swf 或 xml 直接读取过来的 id
 		
 		public var return_type:AdvanceMultiname_info;
 		public var param_typeV:Vector.<AdvanceMultiname_info>;
@@ -170,7 +168,6 @@ package zero.swf.avm2.advances{
 		public function clone():AdvanceMethod{
 			var method:AdvanceMethod=new AdvanceMethod();
 			
-			method.infoId=infoId;
 			method.return_type=return_type;
 			method.param_typeV=param_typeV;
 			method.name=name;
@@ -187,9 +184,7 @@ package zero.swf.avm2.advances{
 			return method;
 		}
 		
-		public function initByInfos(advanceABC:AdvanceABC,_infoId:int,method_info:Method_info,method_body_info:Method_body_info):void{
-			infoId=_infoId;
-			
+		public function initByInfos(advanceABC:AdvanceABC,method_info:Method_info,method_body_info:Method_body_info):void{
 			initByInfo_fun(advanceABC,method_info,Method_info_memberV,method_info.flags&MethodFlags.HAS_OPTIONAL,method_info.flags&MethodFlags.HAS_PARAM_NAMES);
 			
 			if(method_body_info){
@@ -247,56 +242,30 @@ package zero.swf.avm2.advances{
 		
 		////
 		CONFIG::toXMLAndInitByXML {
-		public function toXML(marks:Object,xmlName:String):XML{
-			var xml:XML=<{xmlName} return_type={getMultiname_infoMarkKey(marks,return_type)}/>
-			
-			////
-			if(param_typeV.length){
-				var param_typeListXML:XML=<param_typeList count={param_typeV.length}/>;
-				for each(var param_type:AdvanceMultiname_info in param_typeV){
-					var param_typeXML:XML=<param_type value={getMultiname_infoMarkKey(marks,param_type)}/>
-					param_typeListXML.appendChild(param_typeXML);
-				}
-				xml.appendChild(param_typeListXML);
-			}
-			
-			//----
-			toXML_fun(marks,Method_info_memberV,xml);
+		override public function toXMLAndMark(infoMark:InfoMark):XML{
+			var xml:XML=toXML_fun(infoMark,Method_info_memberV);
 			
 			if(codes){
-				toXML_fun(marks,Method_body_info_memberV,xml);
+				toXML_fun(infoMark,Method_body_info_memberV,xml);
 				
-				xml.appendChild(codes.toXML(marks,"codes"));
+				var codesXML:XML=codes.toXMLAndMark(infoMark);
+				codesXML.setName("codes");
+				xml.appendChild(codesXML);
 			}
 			
-			xml.@infoId=infoId;
 			return xml;
 		}
-		public function initByXML(marks:Object,xml:XML):void{
-			return_type=getMultiname_infoByMarkKey(marks,xml.@return_type.toString());
-			param_typeV=new Vector.<AdvanceMultiname_info>();
-			if(xml.param_typeList.length()){
-				var i:int=-1;
-				for each(var param_typeXML:XML in xml.param_typeList[0].param_type){
-					i++;
-					param_typeV[i]=getMultiname_infoByMarkKey(marks,param_typeXML.@value.toString());
-				}
-			}
-			
-			
-			//----
-			infoId=int(xml.@infoId.toString());
-			
-			initByXML_fun(marks,xml,Method_info_memberV);
+		override public function initByXMLAndMark(infoMark:InfoMark,xml:XML):void{
+			initByXML_fun(infoMark,xml,Method_info_memberV);
 			
 			var codesXML:XML=xml.codes[0];
 			
 			if(codesXML){
 				
-				initByXML_fun(marks,xml,Method_body_info_memberV);
+				initByXML_fun(infoMark,xml,Method_body_info_memberV);
 				
 				codes=new AdvanceCodes();
-				codes.initByXML(marks,codesXML);
+				codes.initByXMLAndMark(infoMark,codesXML);
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML
