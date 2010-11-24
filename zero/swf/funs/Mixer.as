@@ -148,7 +148,7 @@ package zero.swf.funs{
 					case TagType.DoABC:
 					case TagType.DoABCWithoutFlagsAndName:
 						var advanceABC:AdvanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc;
-						for each(var clazz:AdvanceClass in advanceABC.classV){
+						for each(var clazz:AdvanceClass in advanceABC.clazzV){
 							var className:AdvanceMultiname_info=clazz.name;
 							var subMark:Object=classNameMark["~"+className.ns.name];
 							if(subMark){
@@ -233,7 +233,7 @@ package zero.swf.funs{
 			return false;
 		}
 		private static function getObjAndValIdByAdvanceABC(advanceABC:AdvanceABC):void{
-			for each(var clazz:AdvanceClass in advanceABC.classV){
+			for each(var clazz:AdvanceClass in advanceABC.clazzV){
 				if(checkQNameIsNoMixClass(clazz.name)){
 					continue;
 				}

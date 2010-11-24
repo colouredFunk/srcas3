@@ -40,7 +40,7 @@ package zero.swf.avm2.advances{
 	
 	public class AdvanceOption_detail extends Advance{
 		
-		private static const memberV:Vector.<Member>=Vector.<Member>([
+		public static const memberV:Vector.<Member>=Vector.<Member>([
 			new Member("kind",null,{kindClass:ConstantKind}),
 			new Member("val",null,{constKindName:"kind"})//这里把 kind 放在了 val 前面
 		]);
@@ -61,16 +61,6 @@ package zero.swf.avm2.advances{
 			
 			return option_detail;
 		}
-		
-		////
-		CONFIG::toXMLAndInitByXML {
-		public function toXML(marks:Object,xmlName:String):XML{
-			return toXML_fun(marks,memberV,xmlName);
-		}
-		public function initByXML(marks:Object,xml:XML):void{
-			initByXML_fun(marks,xml,memberV);
-		}
-		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
 

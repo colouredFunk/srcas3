@@ -148,7 +148,7 @@ package zero.swf.funs{
 					case TagType.DoABC:
 					case TagType.DoABCWithoutFlagsAndName:
 						var advanceABC:AdvanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc;
-						for each(var clazz:AdvanceClass in advanceABC.classV){
+						for each(var clazz:AdvanceClass in advanceABC.clazzV){
 							getConstFromTraits(clazz.ctraits_infoV,arrV,multiname_name_infoDict);
 							var codeV:Vector.<BaseCode>=clazz.cinit.codes.codeV;
 							var i:int=codeV.length;

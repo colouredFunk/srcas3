@@ -21,7 +21,7 @@ package zero.swf.avm2.advances{
 	
 	public class AdvanceItem_info extends Advance{
 		
-		private static const memberV:Vector.<Member>=Vector.<Member>([
+		public static const memberV:Vector.<Member>=Vector.<Member>([
 			new Member("key",Member.STRING),
 			new Member("value",Member.STRING)
 		]);
@@ -43,16 +43,6 @@ package zero.swf.avm2.advances{
 			
 			return item_info;
 		}
-		
-		////
-		CONFIG::toXMLAndInitByXML {
-		public function toXML(marks:Object,xmlName:String):XML{
-			return toXML_fun(marks,memberV,xmlName);
-		}
-		public function initByXML(marks:Object,xml:XML):void{
-			initByXML_fun(marks,xml,memberV);
-		}
-		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
 

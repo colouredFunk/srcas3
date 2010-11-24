@@ -8,6 +8,7 @@ Advance 版本:v1.0
 */
 
 package zero.swf.avm2.advances{
+	import flash.display.Sprite;
 	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;
 	
@@ -18,6 +19,7 @@ package zero.swf.avm2.advances{
 	public class Advance{
 		//public static var test_tempArr:Array;
 		//public static var test_total_new:int;
+		
 		public function Advance(){
 			//trace(this+", test_total_new="+(++test_total_new));
 		}
@@ -61,28 +63,54 @@ package zero.swf.avm2.advances{
 							infoV[i].initByInfo(advanceABC,avm2Obj);
 						}
 					}else if(member.constKindName){
-						this[member.name]=advanceABC.getConstValueByIdAndKind(member.name,mainAVM2Obj[member.name],this[member.constKindName])
-					}else{
-						if(member.classV){
-							this[member.name]=new (member.classV[this[member.classVIdName]])();
-							this[member.name].initByInfo(advanceABC,mainAVM2Obj[member.name]);
-						}else{
-							//if(member.kindClass){
-							//	只在 toXML 或 initByXML 时有用
-							//}eles if(member.flagClass){
-							//	只在 toXML 或 initByXML 时有用
-							//}eles{
-								if(member.type==Member.DIRECT_INT){
-									this[member.name]=mainAVM2Obj[member.name];
-								}else{
-									if(Member.directMark[member.type]){
-										throw new Error("未处理");
-									}else{
-										throw new Error("未处理");
-									}
-								}
-							//}
+						switch(this[member.constKindName]){
+							case ConstantKind.Int:
+								this[member.name]=advanceABC.getInfoByIdAndMemberType(mainAVM2Obj[member.name],Member.INTEGER);
+							break;
+							case ConstantKind.UInt:
+								this[member.name]=advanceABC.getInfoByIdAndMemberType(mainAVM2Obj[member.name],Member.UINTEGER);
+							break;
+							case ConstantKind.Double:
+								this[member.name]=advanceABC.getInfoByIdAndMemberType(mainAVM2Obj[member.name],Member.DOUBLE);
+							break;
+							case ConstantKind.Utf8:
+								this[member.name]=advanceABC.getInfoByIdAndMemberType(mainAVM2Obj[member.name],Member.STRING);
+							break;
+							case ConstantKind.True:
+							case ConstantKind.False:
+							case ConstantKind.Null:
+							case ConstantKind.Undefined:
+								this[member.name]=this[member.constKindName];//看了几个 swf, id 都是 和 kind 相等
+							break;
+							case ConstantKind.Namespace:
+							case ConstantKind.PackageNamespace:
+							case ConstantKind.PackageInternalNs:
+							case ConstantKind.ProtectedNamespace:
+							case ConstantKind.ExplicitNamespace:
+							case ConstantKind.StaticProtectedNs:
+							case ConstantKind.PrivateNs:
+								this[member.name]=advanceABC.getInfoByIdAndMemberType(mainAVM2Obj[member.name],Member.NAMESPACE_INFO);
+							break;
+							default:
+								throw new Error("未知 kind: "+this[member.constKindName]);
+							break;
 						}
+					}else{
+						//if(member.kindClass){
+						//	只在 toXML 或 initByXML 时有用
+						//}eles if(member.flagClass){
+						//	只在 toXML 或 initByXML 时有用
+						//}eles{
+							if(member.type==Member.DIRECT_INT){
+								this[member.name]=mainAVM2Obj[member.name];
+							}else{
+								if(Member.directMark[member.type]){
+									throw new Error("未处理");
+								}else{
+									throw new Error("未处理");
+								}
+							}
+						//}
 					}
 				}
 			}
@@ -131,26 +159,53 @@ package zero.swf.avm2.advances{
 							avm2ObjV[i]=info.toInfo(advanceABC);
 						}
 					}else if(member.constKindName){
-						mainAVM2Obj[member.name]=advanceABC.getIdByKindAndConstValue(this[member.constKindName],this[member.name]);
+						switch(this[member.constKindName]){
+							case ConstantKind.Int:
+								mainAVM2Obj[member.name]=advanceABC.getIdByInfoAndMemberType(this[member.name],Member.INTEGER);
+							break;
+							case ConstantKind.UInt:
+								mainAVM2Obj[member.name]=advanceABC.getIdByInfoAndMemberType(this[member.name],Member.UINTEGER);
+							break;
+							case ConstantKind.Double:
+								mainAVM2Obj[member.name]=advanceABC.getIdByInfoAndMemberType(this[member.name],Member.DOUBLE);
+							break;
+							case ConstantKind.Utf8:
+								mainAVM2Obj[member.name]=advanceABC.getIdByInfoAndMemberType(this[member.name],Member.STRING);
+							break;
+							case ConstantKind.True:
+							case ConstantKind.False:
+							case ConstantKind.Null:
+							case ConstantKind.Undefined:
+								mainAVM2Obj[member.name]=this[member.constKindName];//看了几个 swf, id 都是 和 kind 相等
+							break;
+							case ConstantKind.Namespace:
+							case ConstantKind.PackageNamespace:
+							case ConstantKind.PackageInternalNs:
+							case ConstantKind.ProtectedNamespace:
+							case ConstantKind.ExplicitNamespace:
+							case ConstantKind.StaticProtectedNs:
+							case ConstantKind.PrivateNs:
+								mainAVM2Obj[member.name]=advanceABC.getIdByInfoAndMemberType(this[member.name],Member.NAMESPACE_INFO);
+							break;
+							default:
+								throw new Error("未知 kind: "+this[member.constKindName]);
+							break;
+						}
 					}else{
-						if(member.classV){
-							mainAVM2Obj[member.name]=this[member.name].toInfo(advanceABC);
+						if(member.type==Member.DIRECT_INT){
+							mainAVM2Obj[member.name]=this[member.name];
 						}else{
-							if(member.type==Member.DIRECT_INT){
-								mainAVM2Obj[member.name]=this[member.name];
-							}else{
-								//if(member.kindClass){
-								//	只在 toXML 或 initByXML 时有用
-								//}eles if(member.flagClass){
-								//	只在 toXML 或 initByXML 时有用
-								//}eles{
-									if(Member.directMark[member.type]){
-										throw new Error("未处理");
-									}else{
-										throw new Error("未处理");
-									}
-								//}
-							}
+							//if(member.kindClass){
+							//	只在 toXML 或 initByXML 时有用
+							//}eles if(member.flagClass){
+							//	只在 toXML 或 initByXML 时有用
+							//}eles{
+								if(Member.directMark[member.type]){
+									throw new Error("未处理");
+								}else{
+									throw new Error("未处理");
+								}
+							//}
 						}
 					}
 				}
@@ -159,32 +214,30 @@ package zero.swf.avm2.advances{
 		
 		////
 		CONFIG::toXMLAndInitByXML {
+		protected static const useMarkKey:Boolean=function():Boolean{
+			
+			///*
+			return true;
+			//*/
+			
+			/*
+			trace("测试模式: useMarkKey==false");
+			return false;
+			//*/
+			
+		}();
 		public function toXML_fun(
-			marks:Object,
+			infoMark:InfoMark,
 			memberV:Vector.<Member>,
-			xmlOrXMLName:*
+			xml:XML=null
 		):XML{
-			var className:String=getQualifiedClassName(this);
-			var xml:XML;
-			if(xmlOrXMLName is String){
-				xml=<{xmlOrXMLName} class={className.substr(className.lastIndexOf("::")+2)}/>;
+			if(xml){
 			}else{
-				xml=xmlOrXMLName;
+				var className:String=getQualifiedClassName(this);
+				xml=<{className.substr(className.lastIndexOf("::")+2)}/>;
 			}
 			
 			for each(var member:Member in memberV){
-				switch(member.type){
-					case Member.NAMESPACE_INFO:
-					case Member.NS_SET_INFO:
-					case Member.MULTINAME_INFO:
-						
-						//使用 markKey
-						//continue;
-						
-						trace("暂时输出 xml 以查看");
-						
-					break;
-				}
 				if(member.curr==Member.CURR_CASE){
 					//未考虑 int, uint, string 之类 为 0 或 "" 的情况
 					if(member.isList){
@@ -208,14 +261,9 @@ package zero.swf.avm2.advances{
 					}
 				}
 				
-				if(member.xmlUseMarkKey){
-					xml.appendChild(<{member.name} markKey={this[member.name].getMarkKey(marks)}/>);
-					continue;
-				}
-				
 				if(member.isList){
 					var infoV:*=this[member.name+"V"];
-					var info:*;
+					var info:*,infoXML:XML;
 					var infoListXML:XML=<{member.name+"List"} count={infoV.length}/>;
 					if(Member.directMark[member.type]){
 						for each(info in infoV){
@@ -223,7 +271,19 @@ package zero.swf.avm2.advances{
 						}
 					}else{
 						for each(info in infoV){
-							infoListXML.appendChild(info.toXML(marks,member.name));
+							if(Member.useMarkKeyMark[member.type]){
+								if(useMarkKey){
+									infoListXML.appendChild(<{member.name} value={MarkStrs[member.type+"2markStr"](infoMark,info)}/>);
+								}else{
+									infoXML=MarkStrs[member.type+"2xml"](infoMark,info);
+									infoXML.setName(member.name);
+									infoListXML.appendChild(infoXML);
+								}
+							}else{
+								infoXML=info.toXMLAndMark(infoMark);
+								infoXML.setName(member.name);
+								infoListXML.appendChild(infoXML);
+							}
 						}
 					}
 					xml.appendChild(infoListXML);
@@ -232,7 +292,19 @@ package zero.swf.avm2.advances{
 						if(Member.directMark[member.type]){
 							xml["@"+member.name]=this[member.name];
 						}else{
-							xml.appendChild(this[member.name].toXML(marks,member.name));
+							if(Member.useMarkKeyMark[member.type]){
+								if(useMarkKey){
+									xml["@"+member.name]=MarkStrs[member.type+"2markStr"](infoMark,this[member.name]);
+								}else{
+									infoXML=MarkStrs[member.type+"2xml"](infoMark,this[member.name]);
+									infoXML.setName(member.name);
+									xml.appendChild(infoXML);
+								}
+							}else{
+								infoXML=this[member.name].toXMLAndMark(infoMark);
+								infoXML.setName(member.name);
+								xml.appendChild(infoXML);
+							}
 						}
 					}else{
 						if(member.constKindName){
@@ -256,7 +328,13 @@ package zero.swf.avm2.advances{
 								case ConstantKind.StaticProtectedNs:
 								case ConstantKind.PrivateNs:
 									if(this[member.name]){
-										xml.appendChild(this[member.name].toXML(marks,member.name));
+										if(useMarkKey){
+											xml["@"+member.name]=MarkStrs.namespace_info2markStr(infoMark,this[member.name]);
+										}else{
+											infoXML=MarkStrs.namespace_info2xml(infoMark,this[member.name]);
+											infoXML.setName(member.name);
+											xml.appendChild(infoXML);
+										}
 									}
 								break;
 								default:
@@ -264,27 +342,35 @@ package zero.swf.avm2.advances{
 								break;
 							}
 						}else{
-							if(member.classV){
-								xml.appendChild(this[member.name].toXML(marks,member.name));
-							}else{
-								if(member.kindClass){
-									xml["@"+member.name]=member.kindClass[member.kindVName][this[member.name]];
-								}else if(member.flagClass){
-									var flagsStr:String="";
-									for each(var flagStr:String in member.flagClass["flagV"]){
-										if(this[member.name]&member.flagClass[flagStr]){
-											flagsStr+="|"+flagStr;
-										}
+							if(member.kindClass){
+								xml["@"+member.name]=member.kindClass[member.kindVName][this[member.name]];
+							}else if(member.flagClass){
+								var flagsStr:String="";
+								for each(var flagStr:String in member.flagClass["flagV"]){
+									if(this[member.name]&member.flagClass[flagStr]){
+										flagsStr+="|"+flagStr;
 									}
-									xml["@"+member.name]=flagsStr.substr(1);
+								}
+								xml["@"+member.name]=flagsStr.substr(1);
+							}else{
+								if(member.type==Member.DIRECT_INT){
+									xml["@"+member.name]=this[member.name];
 								}else{
-									if(member.type==Member.DIRECT_INT){
+									if(Member.directMark[member.type]){
 										xml["@"+member.name]=this[member.name];
 									}else{
-										if(Member.directMark[member.type]){
-											xml["@"+member.name]=this[member.name];
+										if(Member.useMarkKeyMark[member.type]){
+											if(useMarkKey){
+												xml["@"+member.name]=MarkStrs[member.type+"2markStr"](infoMark,this[member.name]);
+											}else{
+												infoXML=MarkStrs[member.type+"2xml"](infoMark,this[member.name]);
+												infoXML.setName(member.name);
+												xml.appendChild(infoXML);
+											}
 										}else{
-											xml.appendChild(this[member.name].toXML(marks,member.name));
+											infoXML=this[member.name].toXMLAndMark(infoMark);
+											infoXML.setName(member.name);
+											xml.appendChild(infoXML);
 										}
 									}
 								}
@@ -295,17 +381,16 @@ package zero.swf.avm2.advances{
 			}
 			return xml;
 		}
-		public function initByXML_fun(marks:Object,xml:XML,memberV:Vector.<Member>):void{
+		public function initByXML_fun(
+			infoMark:InfoMark,
+			xml:XML,
+			memberV:Vector.<Member>
+		):void{
 			var infoXMLList:XMLList,i:int,infoV:*,infoXML:XML;
 			for each(var member:Member in memberV){
-				switch(member.type){
-					case Member.NAMESPACE_INFO:
-					case Member.NS_SET_INFO:
-					case Member.MULTINAME_INFO:
-						//使用 markKey
-						continue;
-					break;
-				}
+				//if(member.name=="protectedNs"){
+				//	trace("member.name="+member.name);
+				//}
 				if(member.curr==Member.CURR_CASE){
 					if(member.isList){
 						if(xml[member.name+"List"].length()){
@@ -313,7 +398,10 @@ package zero.swf.avm2.advances{
 							continue;
 						}
 					}else{
-						if(xml[member.name].length()){
+						if(
+							Member.useMarkKeyMark[member.type]&&xml["@"+member.name].length()
+							||
+							xml[member.name].length()){
 						}else{
 							continue;
 						}
@@ -327,13 +415,10 @@ package zero.swf.avm2.advances{
 						}
 					}
 				}
+				//if(member.name=="protectedNs"){
+				//	trace("member.name="+member.name+"--------------");
+				//}
 				
-				if(member.xmlUseMarkKey){
-					//trace("markKey="+xml[member.name][0].@markKey.toString());
-					this[member.name]=marks[member.type][xml[member.name][0].@markKey.toString()];
-					//trace("markKey this[member.name]="+this[member.name]);
-					continue;
-				}
 				
 				if(Member.fromABCFileMark[member.type]){
 					if(member.isList){
@@ -343,19 +428,66 @@ package zero.swf.avm2.advances{
 						if(Member.directMark[member.type]){
 							for each(infoXML in infoXMLList){
 								i++;
-								infoV[i]=getValueByStringAndType(infoXML.@value.toString(),member.type);
+								switch(member.type){
+									case Member.INTEGER:
+										infoV[i]=int(infoXML.@value.toString());
+									break;
+									case Member.UINTEGER:
+										infoV[i]=int(infoXML.@value.toString());
+									break;
+									case Member.DOUBLE:
+										infoV[i]=Number(infoXML.@value.toString());
+									break;
+									case Member.STRING:
+										infoV[i]=infoXML.@value.toString();
+									break;
+								}
 							}
 						}else{
 							for each(infoXML in infoXMLList){
 								i++;
-								infoV[i]=getInfoByXMLAndMemberType(marks,infoXML,member.type);
+								if(Member.useMarkKeyMark[member.type]){
+									if(/<\w+ value=".*?"\/>/.test(infoXML.toXMLString())){
+										infoV[i]=MarkStrs["markStr2"+member.type](infoMark,infoXML.@value.toString());
+									}else{
+										infoV[i]=MarkStrs["xml2"+member.type](infoMark,infoXML);
+									}
+								}else{
+									infoV[i]=new MemberClasses[member.type]();
+									infoV[i].initByXMLAndMark(infoMark,infoXML);
+								}
 							}
 						}
 					}else{
 						if(Member.directMark[member.type]){
-							this[member.name]=getValueByStringAndType(xml["@"+member.name].toString(),member.type);
+							switch(member.type){
+								case Member.INTEGER:
+									this[member.name]=int(xml["@"+member.name].toString());
+								break;
+								case Member.UINTEGER:
+									this[member.name]=int(xml["@"+member.name].toString());
+								break;
+								case Member.DOUBLE:
+									this[member.name]=Number(xml["@"+member.name].toString());
+								break;
+								case Member.STRING:
+									this[member.name]=xml["@"+member.name].toString();
+								break;
+							}
 						}else{
-							this[member.name]=getInfoByXMLAndMemberType(marks,xml[member.name][0],member.type);
+							if(Member.useMarkKeyMark[member.type]){
+								if(xml["@"+member.name].length()){
+									this[member.name]=MarkStrs["markStr2"+member.type](infoMark,xml["@"+member.name].toString());
+								}else{
+									this[member.name]=MarkStrs["xml2"+member.type](infoMark,xml[member.name][0]);
+								}
+							}else{
+								this[member.name]=new MemberClasses[member.type]();
+								this[member.name].initByXMLAndMark(infoMark,xml[member.name][0]);
+							}
+							//if(member.name=="protectedNs"){
+							//	trace("this[member.name]="+this[member.name]);
+							//}
 						}
 					}
 				}else{
@@ -365,22 +497,30 @@ package zero.swf.avm2.advances{
 						infoV=this[member.name+"V"]=new MemberClasses[member.type+"VClass"](infoXMLList.length());
 						for each(infoXML in infoXMLList){
 							i++;
-							infoV[i]=new MemberClasses[member.type]();
-							infoV[i].initByXML(marks,infoXML);
+							if(Member.useMarkKeyMark[member.type]){
+								if(/<\w+ value=".*?"\/>/.test(infoXML.toXMLString())){
+									infoV[i]=MarkStrs["markStr2"+member.type](infoMark,infoXML.@value.toString());
+								}else{
+									infoV[i]=MarkStrs["xml2"+member.type](infoMark,infoXML);
+								}
+							}else{
+								infoV[i]=new MemberClasses[member.type]();
+								infoV[i].initByXMLAndMark(infoMark,infoXML);
+							}
 						}
 					}else if(member.constKindName){
 						switch(this[member.constKindName]){
 							case ConstantKind.Int:
-								this[member.name]=getValueByStringAndType(xml["@"+member.name].toString(),Member.INTEGER);
+								this[member.name]=int(xml["@"+member.name].toString());
 							break;
 							case ConstantKind.UInt:
-								this[member.name]=getValueByStringAndType(xml["@"+member.name].toString(),Member.UINTEGER);
+								this[member.name]=int(xml["@"+member.name].toString());
 							break;
 							case ConstantKind.Double:
-								this[member.name]=getValueByStringAndType(xml["@"+member.name].toString(),Member.DOUBLE);
+								this[member.name]=Number(xml["@"+member.name].toString());
 							break;
 							case ConstantKind.Utf8:
-								this[member.name]=getValueByStringAndType(xml["@"+member.name].toString(),Member.STRING);
+								this[member.name]=xml["@"+member.name].toString();
 							break;
 							case ConstantKind.True:
 							case ConstantKind.False:
@@ -395,35 +535,45 @@ package zero.swf.avm2.advances{
 							case ConstantKind.ExplicitNamespace:
 							case ConstantKind.StaticProtectedNs:
 							case ConstantKind.PrivateNs:
-								this[member.name]=getInfoByXMLAndMemberType(marks,xml[member.name][0],Member.NAMESPACE_INFO);
+								if(xml["@"+member.name].length()){
+									this[member.name]=MarkStrs.markStr2namespace_info(infoMark,xml["@"+member.name].toString());
+								}else{
+									this[member.name]=MarkStrs.xml2namespace_info(infoMark,xml[member.name][0]);
+								}
 							break;
 							default:
 								throw new Error("未知 kind: "+this[member.constKindName]);
 							break;
 						}
 					}else{
-						if(member.classV){
-							this[member.name]=new (member.classV[this[member.classVIdName]])();
-							this[member.name].initByXML(xml[member.name][0]);
+						if(member.kindClass){
+							this[member.name]=member.kindClass[xml["@"+member.name].toString()];
+						}else if(member.flagClass){
+							this[member.name]=0;
+							for each(var flagStr:String in xml["@"+member.name].toString().split("|")){
+								this[member.name]|=member.flagClass[flagStr];
+							}
 						}else{
-							if(member.kindClass){
-								this[member.name]=member.kindClass[xml["@"+member.name].toString()];
-							}else if(member.flagClass){
-								this[member.name]=0;
-								for each(var flagStr:String in xml["@"+member.name].toString().split("|")){
-									this[member.name]|=member.flagClass[flagStr];
-								}
+							if(member.type==Member.DIRECT_INT){
+								this[member.name]=int(xml["@"+member.name].toString());
 							}else{
-								if(member.type==Member.DIRECT_INT){
-									this[member.name]=int(xml["@"+member.name].toString());
-								}else{
-									if(Member.directMark[member.type]){
-										this[member.name]=getValueByStringAndType(xml["@"+member.name].toString(),member.type);
-									}else{
-										//this[member.name]=new (member.classV[this[member.classVIdName]])();
-										//this[member.name].initByXML(xml[member.name][0]);
-										throw new Error("未处理");
+								if(Member.directMark[member.type]){
+									switch(member.type){
+										case Member.INTEGER:
+											this[member.name]=int(xml["@"+member.name].toString());
+										break;
+										case Member.UINTEGER:
+											this[member.name]=int(xml["@"+member.name].toString());
+										break;
+										case Member.DOUBLE:
+											this[member.name]=Number(xml["@"+member.name].toString());
+										break;
+										case Member.STRING:
+											this[member.name]=xml["@"+member.name].toString();
+										break;
 									}
+								}else{
+									throw new Error("未处理");
 								}
 							}
 						}
@@ -432,296 +582,19 @@ package zero.swf.avm2.advances{
 			}
 		}
 		
-		private static function getValueByStringAndType(str:String,type:String):*{
-			switch(type){
-				case Member.INTEGER:
-					return int(str);
-				break;
-				case Member.UINTEGER:
-					return uint(str);
-				break;
-				case Member.DOUBLE:
-					return Number(str);
-				break;
-				case Member.STRING:
-					return str;
-				break;
-			}
-			throw new Error("getValueByStringAndType 不支持的 type: "+type);
-			return undefined;
-		}
-		public function getInfoByXMLAndMemberType(marks:Object,xml:XML,memberType:String):*{
-			if(memberType==Member.MULTINAME_INFO){
-				if(xml.@kind.toString()=="*"){
-					return AdvanceDefaultMultiname_info.instance;
-				}
-			}
-			
-			var oldXMLName:String=xml.name().toString();
-			xml.setName(memberType);
-			var markKey:String=xml.toXMLString();
-			xml.setName(oldXMLName);
-			
-			var info:*=marks[memberType][markKey];
-			
-			if(info){
-			}else{
-				marks[memberType][markKey]=info=new MemberClasses[memberType]();
-				info.initByXML(marks,xml);
-				//advanceABC[memberType+"V"][advanceABC[memberType+"V"].length]=info;
-			}
-			
-			//if(info is AdvanceNamespace_info){
-			//	trace(xml.toXMLString());
-			//	trace("info="+info);
-			//}
-			return info;
-		}
-		
-		public function getNamespace_infoMarkKey(marks:Object,namespace_info:AdvanceNamespace_info):String{
-			var markKey:String=namespace_info.getMarkKey();
-			
-			var dict:Dictionary=marks[Member.NAMESPACE_INFO][markKey];
-			if(dict){
-			}else{
-				marks[Member.NAMESPACE_INFO][markKey]=dict=new Dictionary();
-				dict["id"]=0;
-			}
-			if(dict[namespace_info]>=0){
-			}else{
-				dict[namespace_info]=dict["id"]++;
-			}
-			
-			if(dict[namespace_info]==0){
-				return markKey;
-			}
-			
-			return markKey+"("+dict[namespace_info]+")";//同 key 但不同的 namespace_info
-		}
-		//public function getNs_set_infoMarkKey():String{
-		//	这里假定同 key 的 ns_set_info 是同一个，所以不需要 getNs_set_infoMarkKey，直接调用 ns_set_info.getMarkKey() 即可
-		//}
-		public function getMultiname_infoMarkKey(marks:Object,multiname_info:AdvanceMultiname_info):String{
-			if(multiname_info===AdvanceDefaultMultiname_info.instance){
-				return "*";
-			}
-			var markKey:String=multiname_info.getMarkKey(marks);
-			
-			var dict:Dictionary=marks[Member.MULTINAME_INFO][markKey];
-			if(dict){
-			}else{
-				marks[Member.MULTINAME_INFO][markKey]=dict=new Dictionary();
-				dict["id"]=0;
-			}
-			if(dict[multiname_info]>=0){
-			}else{
-				dict[multiname_info]=dict["id"]++;
-			}
-			
-			if(dict[multiname_info]==0){
-				return markKey;
-			}
-			
-			return markKey+"("+dict[multiname_info]+")";//同 key 但不同的 multiname_info
-		}
-		
 		////
 		
-		private function getNs_set_infoByMarkKey(marks:Object,markKey:String):AdvanceNs_set_info{
-			var ns_set_info:AdvanceNs_set_info=marks[Member.NS_SET_INFO][markKey];
-			if(ns_set_info){
-				return ns_set_info;
-			}
-			
-			marks[Member.NS_SET_INFO][markKey]=ns_set_info=new AdvanceNs_set_info();
-			ns_set_info.nsV=new Vector.<AdvanceNamespace_info>();
-			for each(var nsMarkKey:String in markKey.split(/,/)){
-				ns_set_info.nsV.push(getNamespace_infoByMarkKey(marks,nsMarkKey));
-			}
-			
-			return ns_set_info;
+		public function toXMLAndMark(infoMark:InfoMark):XML{
+			return toXML_fun(infoMark,this["constructor"].memberV);
 		}
-		
-		public function getNamespace_infoByMarkKey(marks:Object,markKey:String):AdvanceNamespace_info{
-			var namespace_info:AdvanceNamespace_info=marks[Member.NAMESPACE_INFO][markKey];
-			if(namespace_info){
-				return namespace_info;
-			}
-			
-			marks[Member.NAMESPACE_INFO][markKey]=namespace_info=new AdvanceNamespace_info();
-			
-			var id:int;
-			if(markKey.indexOf("[")==0){
-				//第一个字符是 "[" 的
-				id=markKey.indexOf("]");
-				if(id>0){
-					namespace_info.kind=NamespaceKind[markKey.substr(1,id-1)];
-					if(namespace_info.kind>0){
-						markKey=markKey.substr(id+1);
-					}else{
-						throw new Error("不合法的 markKey: "+markKey);
-					}
-				}else{
-					throw new Error("不合法的 markKey: "+markKey);
-				}
-			}else{
-				namespace_info.kind=NamespaceKind.PackageNamespace;
-			}
-			namespace_info.name=markKey;
-			
-			return namespace_info;
-		}
-		public function getMultiname_infoByMarkKey(marks:Object,markKey:String):AdvanceMultiname_info{
-			if(markKey=="*"){
-				return AdvanceDefaultMultiname_info.instance;
-			}
-			
-			var multiname_info:AdvanceMultiname_info=marks[Member.MULTINAME_INFO][markKey];
-			if(multiname_info){
-				return multiname_info;
-			}
-			
-			marks[Member.MULTINAME_INFO][markKey]=multiname_info=new AdvanceMultiname_info();
-			
-			//trace("markKey="+markKey);
-			
-			if(markKey.lastIndexOf(")")==markKey.length-1){
-				markKey=markKey.replace(/^(.*)\(\d+\)$/,"$1");
-			}
-			
-			var id:int;
-			if(markKey.indexOf("[")==0){
-				//第一个字符是 "[" 的
-				id=markKey.indexOf("]");
-				if(id>0){
-					multiname_info.kind=MultinameKind[markKey.substr(1,id-1)];
-					if(multiname_info.kind>0){
-						markKey=markKey.substr(id+1);
-					}else{
-						multiname_info.kind=MultinameKind.QName;
-					}
-				}else{
-					throw new Error("不合法的 markKey: "+markKey);
-				}
-			}else{
-				multiname_info.kind=MultinameKind.QName;
-			}
-			
-			var matchArr:Array;
-			
-			switch(multiname_info.kind){
-				case MultinameKind.QName:
-				case MultinameKind.QNameA:
-					id=markKey.lastIndexOf(".");
-					if(markKey.indexOf("[")==0){
-						//第一个字符是 "[" 的
-						if(id==-1){
-							id=markKey.indexOf("]");
-							multiname_info.ns=getNamespace_infoByMarkKey(marks,markKey.substr(0,id+1));
-						}else{
-							multiname_info.ns=getNamespace_infoByMarkKey(marks,markKey.substr(0,id));
-						}
-						if(id>0){
-							multiname_info.name=markKey.substr(id+1);
-						}else{
-							throw new Error("不合法的 markKey: "+markKey);
-						}
-					}else{
-						if(id>0){
-							multiname_info.ns=getNamespace_infoByMarkKey(marks,markKey.substr(0,id));
-							multiname_info.name=markKey.substr(id+1);
-						}else{
-							multiname_info.ns=getNamespace_infoByMarkKey(marks,"");
-							multiname_info.name=markKey;
-						}
-					}
-					if(/^\w+$/.test(multiname_info.name)){
-					}else{
-						throw new Error("不合法的 multiname_info.name: "+multiname_info.name);
-					}
-					
-				break;
-				case MultinameKind.Multiname:
-				case MultinameKind.MultinameA:
-					
-					matchArr=markKey.match(/^\[.*\]/);
-					if(matchArr){
-						multiname_info.ns_set=getNs_set_infoByMarkKey(marks,matchArr[0].replace(/^\[(.*)\]$/,"$1"));
-						multiname_info.name=markKey.replace(/^\[.*\](.*?)$/,"$1");
-						if(/^\w+$/.test(multiname_info.name)){
-						}else{
-							throw new Error("不合法的 multiname_info.name: "+multiname_info.name);
-						}
-					}else{
-						throw new Error("不合法的 markKey: "+markKey);
-					}
-					
-				break;
-				case MultinameKind.RTQName:
-				case MultinameKind.RTQNameA:
-					
-					throw new Error("未处理");
-					//return "["+MultinameKind.kindV[kind]+"]"+name;
-					
-				break;
-				case MultinameKind.RTQNameL:
-				case MultinameKind.RTQNameLA:
-					
-					throw new Error("未处理");
-					//return "["+MultinameKind.kindV[kind]+"]";
-					
-				break;
-				case MultinameKind.MultinameL:
-				case MultinameKind.MultinameLA:
-					
-					if(/^\[.*\]$/.test(markKey)){
-						multiname_info.ns_set=getNs_set_infoByMarkKey(marks,markKey.replace(/^\[(.*)\]$/,"$1"));
-					}else{
-						throw new Error("不合法的 markKey: "+markKey);
-					}
-					
-				break;
-				case MultinameKind.GenericName:
-					/*
-					var arr:Array;
-					try{
-						arr=getArrFromXMLList(new XMLList(markKey.replace(/\[/g,"<node>").replace(/\]/g,"</node>")));
-					}catch(e:Error){
-						throw new Error("不合法的 markKey: "+markKey+"\n e="+e);
-					}
-					
-					getGenericNameByArr(marks,multiname_info,arr[0]);
-					//*/
-					///*
-					if(/^\[.*\]$/.test(markKey)){
-						markKey=markKey.replace(/^\[(.*)\]$/,"$1");
-						//trace("markKey="+markKey);
-						id=markKey.indexOf("[");
-						if(id>0){
-							multiname_info.TypeDefinition=getMultiname_infoByMarkKey(marks,markKey.substr(0,id));
-							multiname_info.ParamV=new Vector.<AdvanceMultiname_info>();
-							
-							markKey=markKey.substr(id+1);
-							multiname_info.ParamV[0]=getMultiname_infoByMarkKey(marks,markKey.substr(0,markKey.length-1));
-						}else{
-							throw new Error("不合法的 markKey: "+markKey);
-						}
-					}else{
-						throw new Error("不合法的 markKey: "+markKey);
-					}
-					//*/
-				break;
-				default:
-					throw new Error("未知 kind: "+multiname_info.kind);
-				break;
-			}
-			return multiname_info;
+		public function initByXMLAndMark(infoMark:InfoMark,xml:XML):void{
+			initByXML_fun(infoMark,xml,this["constructor"].memberV);
 		}
 		}//end of CONFIG::toXMLAndInitByXML
 		
 		/*
-		private function getGenericNameByArr(marks:Object,multiname_info:AdvanceMultiname_info,arr:Array):void{
-			multiname_info.TypeDefinition=getMultiname_infoByMarkKey(marks,arr[0]);
+		private function getGenericNameByArr(infoMark:InfoMark,multiname_info:AdvanceMultiname_info,arr:Array):void{
+			multiname_info.TypeDefinition=getInfoByXMLOrMarkStr(infoMark,arr[0]);
 			multiname_info.ParamV=new Vector.<AdvanceMultiname_info>();
 			arr=arr[1];
 			var i:int=0;
@@ -730,7 +603,7 @@ package zero.swf.avm2.advances{
 				var Param:*=arr[i++];
 				if(Param is Array){
 					if(Param.length==1&&Param[0]==="GenericName"){
-						multiname_info.ParamV.push(getMultiname_infoByMarkKey(marks,"[GenericName]"+arr2str(arr[i++])));
+						multiname_info.ParamV.push(getInfoByXMLOrMarkStr(infoMark,"[GenericName]"+arr2str(arr[i++])));
 					}else{
 						throw new Error("不合法的 Param: "+Param);
 					}

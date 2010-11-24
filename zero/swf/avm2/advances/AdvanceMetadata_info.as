@@ -25,12 +25,10 @@ package zero.swf.avm2.advances{
 	
 	public class AdvanceMetadata_info extends Advance{
 		
-		private static const memberV:Vector.<Member>=Vector.<Member>([
+		public static const memberV:Vector.<Member>=Vector.<Member>([
 			new Member("name",Member.STRING),
 			new Member("item_info",Member.ITEM_INFO,{isList:true})
 		]);
-		
-		private var infoId:int;	//从 swf 或 xml 直接读取过来的 id
 		
 		public var name:String;
 		public var item_infoV:Vector.<AdvanceItem_info>;
@@ -38,9 +36,7 @@ package zero.swf.avm2.advances{
 		public function AdvanceMetadata_info(){
 		}
 		
-		public function initByInfo(advanceABC:AdvanceABC,_infoId:int,metadata_info:Metadata_info):void{
-			infoId=_infoId;
-			
+		public function initByInfo(advanceABC:AdvanceABC,metadata_info:Metadata_info):void{
 			initByInfo_fun(advanceABC,metadata_info,memberV);
 		}
 		public function toInfoId(advanceABC:AdvanceABC):int{
@@ -52,20 +48,5 @@ package zero.swf.avm2.advances{
 			advanceABC.abcFile.metadata_infoV.push(metadata_info);
 			return advanceABC.abcFile.metadata_infoV.length-1;
 		}
-		
-		////
-		CONFIG::toXMLAndInitByXML {
-		public function toXML(marks:Object,xmlName:String):XML{
-			var xml:XML=toXML_fun(marks,memberV,xmlName);
-			
-			xml.@infoId=infoId;
-			return xml;
-		}
-		public function initByXML(marks:Object,xml:XML):void{
-			infoId=int(xml.@infoId.toString());
-			
-			initByXML_fun(marks,xml,memberV);
-		}
-		}//end of CONFIG::toXMLAndInitByXML
 	}
 }

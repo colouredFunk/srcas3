@@ -25,7 +25,7 @@ package zero.swf.funs{
 					case TagType.DoABC:
 					case TagType.DoABCWithoutFlagsAndName:
 						var advanceABC:AdvanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc;
-						for each(var clazz:AdvanceClass in advanceABC.classV){
+						for each(var clazz:AdvanceClass in advanceABC.clazzV){
 							var firstInitResultMultinameName:AdvanceMultiname_info=null;
 							var methodTraits_info:AdvanceTraits_info;
 							for each(var traits_info:AdvanceTraits_info in clazz.ctraits_infoV){
@@ -131,7 +131,7 @@ package zero.swf.funs{
 						case TagType.DoABC:
 						case TagType.DoABCWithoutFlagsAndName:
 							advanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc;
-							for each(clazz in advanceABC.classV){
+							for each(clazz in advanceABC.clazzV){
 								insertFirstInitInTraits(clazz.itraits_infoV,firstInitV,markName);
 								if(firstInitV.length){
 								}else{
@@ -160,7 +160,7 @@ package zero.swf.funs{
 					case TagType.DoABC:
 					case TagType.DoABCWithoutFlagsAndName:
 						advanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc;
-						for each(clazz in advanceABC.classV){
+						for each(clazz in advanceABC.clazzV){
 							clearTraceMarkName(clazz.itraits_infoV,markName);
 							clearTraceMarkName(clazz.ctraits_infoV,markName);
 						}

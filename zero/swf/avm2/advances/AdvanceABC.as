@@ -146,10 +146,10 @@ package zero.swf.avm2.advances{
 	public class AdvanceABC extends Advance{
 		private static var firstInitResult:*=MemberClasses.firstInit();//- -
 		
-		private static const memberV:Vector.<Member>=Vector.<Member>([
+		public static const memberV:Vector.<Member>=Vector.<Member>([
 			new Member("minor_version"),
 			new Member("major_version"),
-			new Member("class",Member.CLASS,{isList:true}),
+			new Member("clazz",Member.CLAZZ,{isList:true}),
 			new Member("script_info",Member.SCRIPT_INFO,{isList:true})
 		]);
 		
@@ -176,7 +176,7 @@ package zero.swf.avm2.advances{
 		public var multiname_infoV:Vector.<AdvanceMultiname_info>;
 		public var metadata_infoV:Vector.<AdvanceMetadata_info>;
 		public var methodV:Vector.<AdvanceMethod>;
-		public var classV:Vector.<AdvanceClass>;
+		public var clazzV:Vector.<AdvanceClass>;
 		public var script_infoV:Vector.<AdvanceScript_info>;
 		
 		private var method_body_info_arr:Array;
@@ -209,7 +209,7 @@ package zero.swf.avm2.advances{
 						this[memberType+"V"]=abcFile[memberType+"V"];
 					}else if(memberType==Member.METHOD){
 						this[memberType+"V"]=new MemberClasses.vClassV[i](abcFile.method_infoV.length);
-					}else if(memberType==Member.CLASS||memberType==Member.SCRIPT_INFO){
+					}else if(memberType==Member.CLAZZ||memberType==Member.SCRIPT_INFO){
 					}else{
 						this[memberType+"V"]=new MemberClasses.vClassV[i](abcFile[memberType+"V"].length);
 					}
@@ -223,7 +223,7 @@ package zero.swf.avm2.advances{
 			for each(var method_body_info:Method_body_info in abcFile.method_body_infoV){
 				method_body_info_arr[method_body_info.method]=method_body_info;
 			}
-			classV=new Vector.<AdvanceClass>(abcFile.instance_infoV.length);
+			clazzV=new Vector.<AdvanceClass>(abcFile.instance_infoV.length);
 			script_infoV=new Vector.<AdvanceScript_info>(abcFile.script_infoV.length);
 			//准备完毕
 			
@@ -231,7 +231,7 @@ package zero.swf.avm2.advances{
 			i=-1;
 			for each(var instance_info:Instance_info in abcFile.instance_infoV){
 				i++;
-				getInfoByIdAndMemberType(i,Member.CLASS);
+				getInfoByIdAndMemberType(i,Member.CLAZZ);
 			}
 			i=-1;
 			for each(var script_info:Script_info in abcFile.script_infoV){
@@ -243,11 +243,9 @@ package zero.swf.avm2.advances{
 			method_body_info_arr=null;
 			
 			/*
-			currInstance=null;
-			
 			for each(memberType in Member.typeV){
 				if(Member.fromABCFileMark[memberType]){
-					if(memberType==Member.CLASS||memberType==Member.SCRIPT_INFO){
+					if(memberType==Member.CLAZZ||memberType==Member.SCRIPT_INFO){
 					}else{
 						this[memberType+"V"]=null;
 					}
@@ -296,11 +294,11 @@ package zero.swf.avm2.advances{
 						//"先里后外"，所以先 initByInfo() 或 initByInfos() 然后 v[id]=info
 						info=new MemberClasses[memberType]();
 						if(memberType==Member.METHOD){
-							info.initByInfos(this,id,abcFile.method_infoV[id],method_body_info_arr[id]);
-						}else if(memberType==Member.CLASS){
-							info.initByInfos(this,id,abcFile.instance_infoV[id],abcFile.class_infoV[id]);
+							info.initByInfos(this,abcFile.method_infoV[id],method_body_info_arr[id]);
+						}else if(memberType==Member.CLAZZ){
+							info.initByInfos(this,abcFile.instance_infoV[id],abcFile.class_infoV[id]);
 						}else{
-							info.initByInfo(this,id,abcFile[memberType+"V"][id]);
+							info.initByInfo(this,abcFile[memberType+"V"][id]);
 						}
 						v[id]=info;
 					}
@@ -367,8 +365,8 @@ package zero.swf.avm2.advances{
 			//准备完毕
 			
 			//
-			for each(var clazz:AdvanceClass in classV){
-				getIdByInfoAndMemberType(clazz,Member.CLASS);
+			for each(var clazz:AdvanceClass in clazzV){
+				getIdByInfoAndMemberType(clazz,Member.CLAZZ);
 			}
 			for each(var script_info:AdvanceScript_info in script_infoV){
 				getIdByInfoAndMemberType(script_info,Member.SCRIPT_INFO);
@@ -440,90 +438,50 @@ package zero.swf.avm2.advances{
 		}
 		
 		////
-	CONFIG::toXMLAndInitByXML {
+		CONFIG::toXMLAndInitByXML {
 		public function toXML(xmlName:String):XML{
 			//trace("toXML========================================");
 			
-			//为各级 toXML 作准备
-			//test_total_new=0;
-			
-			//for each(memberType in Member.typeV){
-			//	if(Member.fromABCFileMark[memberType]){
-			//		marks[memberType]=new Object();
-			//	}
-			//}
-			
-			//准备完毕
-			
-			/*
-			var xml:XML=toXML_fun(marks,memberV,xmlName);
-			
-			var specialsXML:XML=<specials/>;
-			var specialsCount:int=0;
-			for(var specialName:String in marks["specials"]){
-				specialsCount++;
-				var specialXML:XML=<special name={specialName.substr(1)}/>;
-				specialXML.appendChild(marks["specials"][specialName]);
-				specialsXML.appendChild(specialXML);
-			}
-			if(specialsCount){
-				specialsXML.@count=specialsCount;
+			var infoMark:InfoMark=new InfoMark();
+			var xml:XML=toXMLAndMark(infoMark);
+			xml.setName(xmlName);
+			xml["@class"]="AdvanceABC";
+			if(infoMark.specialMarkStrV.length){
+				var specialsXML:XML=<specials count={infoMark.specialMarkStrV.length}/>;
+				for each(var specialMarkStr:String in infoMark.specialMarkStrV){
+					var specialXML:XML=<special markStr={specialMarkStr}/>;
+					specialXML.appendChild(infoMark.specialXMLs["~"+specialMarkStr]);
+					specialsXML.appendChild(specialXML);
+				}
 				xml.appendChild(specialsXML);
 			}
-			
-			currInstance=null;
-			
 			return xml;
-			*/
-			
-			var memberType:String;
-			
-			var marks:Object=new Object();
-			for each(memberType in Member.typeV){
-				if(Member.fromABCFileMark[memberType]){
-					marks[memberType]=new Object();
-				}
-			}
-			
-			return toXML_fun(marks,memberV,xmlName);
 		}
 		
 		/*
-		public function addSpecial(specialName:String,specialXML:XML):String{
-			if(specialName){
-			}else{
-				do{
-					specialName="temp"+(specialTempId++);
-				}while(marks["specials"]["~"+specialName]);
-			}
-			if(marks["specials"]["~"+specialName]){
-				throw new Error("重复的 specialName: "+specialName);
-			}
-			marks["specials"]["~"+specialName]=specialXML;
-			return specialName;
+		override public function toXMLAndMark(infoMark:InfoMark):XML{
+			var xml:XML=super.toXMLAndMark(infoMark);
+			throw new Error("查看 infoMark 是否正常");
+			return xml;
 		}
-		*/
+		//*/
+		
+		/*
+		override public function initByXMLAndMark(infoMark:InfoMark,xml:XML):void{
+			super.initByXMLAndMark(infoMark,xml);
+			throw new Error("查看 infoMark 是否正常");
+		}
+		//*/
+		
 		
 		public function initByXML(xml:XML):void{
 			//trace("initByXML========================================");
 			
-			//minor_version=int(xml.@minor_version.toString());
-			//major_version=int(xml.@major_version.toString());
-			
 			//为各级 getInfoByXMLAndMemberType 作准备
-			//test_total_new=0;
-			
-			var memberType:String;
-			
-			var marks:Object=new Object();
-			for each(memberType in Member.typeV){
-				if(Member.fromABCFileMark[memberType]){
-					marks[memberType]=new Object();
-				}
-			}
 			
 			///*
 			var i:int=-1;
+			var memberType:String;
 			for each(memberType in Member.typeV){
 				i++;
 				if(Member.fromABCFileMark[memberType]){
@@ -538,95 +496,33 @@ package zero.swf.avm2.advances{
 			//*/
 			
 			getDefaultInfo0s();
+			
+			var infoMark:InfoMark=new InfoMark();
+			var specialsXML:XML=xml.specials[0];
+			if(specialsXML){
+				for each(var specialXML:XML in specialsXML.special){
+					infoMark.addSpecialXML(specialXML.@markStr.toString(),specialXML.children()[0]);
+				}
+			}
+			
 			//准备完毕
 			
-			initByXML_fun(marks,xml,memberV);
+			//initByXML_fun(new InfoMark(),xml,memberV);
+			initByXMLAndMark(infoMark,xml);
 			
 			//trace("methodV="+methodV);
 			
+			/*
 			for each(memberType in Member.typeV){
 				if(Member.fromABCFileMark[memberType]){
-					if(memberType==Member.CLASS||memberType==Member.SCRIPT_INFO){
+					if(memberType==Member.CLAZZ||memberType==Member.SCRIPT_INFO){
 					}else{
 						this[memberType+"V"]=null;
 					}
 				}
 			}
-			marks=null;
+			*/
 		}
-	}//end of CONFIG::toXMLAndInitByXML
-	
-	public function getConstValueByIdAndKind(name:String,id:int,kind:int):*{
-		switch(kind){
-			case ConstantKind.Int:
-				return getInfoByIdAndMemberType(id,Member.INTEGER);
-			break;
-			case ConstantKind.UInt:
-				return getInfoByIdAndMemberType(id,Member.UINTEGER);
-			break;
-			case ConstantKind.Double:
-				return getInfoByIdAndMemberType(id,Member.DOUBLE);
-			break;
-			case ConstantKind.Utf8:
-				return getInfoByIdAndMemberType(id,Member.STRING);
-			break;
-			case ConstantKind.True:
-			case ConstantKind.False:
-			case ConstantKind.Null:
-			case ConstantKind.Undefined:
-				return kind;//看了几个 swf, id 都是 和 kind 相等
-			break;
-			case ConstantKind.Namespace:
-			case ConstantKind.PackageNamespace:
-			case ConstantKind.PackageInternalNs:
-			case ConstantKind.ProtectedNamespace:
-			case ConstantKind.ExplicitNamespace:
-			case ConstantKind.StaticProtectedNs:
-			case ConstantKind.PrivateNs:
-				return getInfoByIdAndMemberType(id,Member.NAMESPACE_INFO);
-			break;
-			default:
-				throw new Error("未知 kind: "+kind);
-			break;
-		}
-		return null;
-		//trace("getConstValueByIdAndKind",ConstantKind.kindV[kind],advance[name]);
-	}
-	public function getIdByKindAndConstValue(kind:int,value:*):int{
-		//trace("getIdByKindAndConstValue",ConstantKind.kindV[kind],value);
-		switch(kind){
-			case ConstantKind.Int:
-				return getIdByInfoAndMemberType(value,Member.INTEGER);
-			break;
-			case ConstantKind.UInt:
-				return getIdByInfoAndMemberType(value,Member.UINTEGER);
-			break;
-			case ConstantKind.Double:
-				return getIdByInfoAndMemberType(value,Member.DOUBLE);
-			break;
-			case ConstantKind.Utf8:
-				return getIdByInfoAndMemberType(value,Member.STRING);
-			break;
-			case ConstantKind.True:
-			case ConstantKind.False:
-			case ConstantKind.Null:
-			case ConstantKind.Undefined:
-				return kind;//看了几个 swf, id 都是 和 kind 相等
-			break;
-			case ConstantKind.Namespace:
-			case ConstantKind.PackageNamespace:
-			case ConstantKind.PackageInternalNs:
-			case ConstantKind.ProtectedNamespace:
-			case ConstantKind.ExplicitNamespace:
-			case ConstantKind.StaticProtectedNs:
-			case ConstantKind.PrivateNs:
-				return getIdByInfoAndMemberType(value,Member.NAMESPACE_INFO);
-			break;
-			default:
-				throw new Error("未知 kind: "+kind);
-			break;
-		}
-		return -1;
-	}
+		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
