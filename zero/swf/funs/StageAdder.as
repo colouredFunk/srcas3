@@ -73,8 +73,14 @@ package zero.swf.funs{
 				switch(tag.type){
 					case TagType.DoABC:
 					case TagType.DoABCWithoutFlagsAndName:
-						for each(var clazz:AdvanceClass in ((tag.getBody() as DoABCWithoutFlagsAndName).abc as AdvanceABC).classV){
-							if(classNameMark["~"+clazz.getClassName()]){
+						for each(var clazz:AdvanceClass in ((tag.getBody() as DoABCWithoutFlagsAndName).abc as AdvanceABC).clazzV){
+							if(classNameMark["~"+(
+								clazz.name.ns.name
+								?
+								clazz.name.ns.name+"."+clazz.name.name
+								:
+								clazz.name.name
+							)]){
 								//trace("className="+className);
 								clazz.itraits_infoV.push(getStageMethod_traits_info.cloneAsMethodTrait());
 							}

@@ -208,7 +208,13 @@ package zero.swf.funs{
 		}
 		private static function checkQNameIsNoMixClass(multiname_info:AdvanceMultiname_info):Boolean{
 			if(multiname_info.kind==MultinameKind.QName){
-				var className:String=multiname_info.getMultiname();
+				var className:String=(
+					multiname_info.ns.name
+					?
+					multiname_info.ns.name+"."+multiname_info.name
+					:
+					multiname_info.name
+				);
 				//trace("className="+className);
 				for each(var str:String in className.split(/[.:]+/)){
 					if(noMixClassMark["~"+str]){

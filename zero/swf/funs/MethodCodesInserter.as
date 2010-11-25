@@ -15,6 +15,25 @@ package zero.swf.funs{
 	import zero.swf.vmarks.*;
 	
 	public class MethodCodesInserter{
+		public static function addCodeSegToSWF(swf:SWF2,codeSegMethod:AdvanceMethod):void{
+			var codeV:Vector.<BaseCode>=normalizeCodeV(codeSegMethod.codes.codeV);
+			
+			var tag:Tag;
+			for each(tag in swf.tagV){
+				switch(tag.type){
+					case TagType.DoABC:
+					case TagType.DoABCWithoutFlagsAndName:
+						var advanceABC:AdvanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc as AdvanceABC
+						for each(var clazz:AdvanceClass in advanceABC.clazzV){
+							insertCodesInMethod(codeV,codeSegMethod.max_stack,clazz.cinit);
+						}
+						for each(var script_info:AdvanceScript_info in advanceABC.script_infoV){
+							insertCodesInMethod(codeV,codeSegMethod.max_stack,script_info.init);
+						}
+					break;
+				}
+			}
+		}
 		public static function normalizeCodeV(codeV:Vector.<BaseCode>):Vector.<BaseCode>{
 			codeV=codeV.slice();
 			if(
