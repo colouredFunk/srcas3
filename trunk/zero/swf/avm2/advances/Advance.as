@@ -17,6 +17,7 @@ package zero.swf.avm2.advances{
 	import zero.swf.vmarks.*;
 	
 	public class Advance{
+		
 		//public static var test_tempArr:Array;
 		//public static var test_total_new:int;
 		

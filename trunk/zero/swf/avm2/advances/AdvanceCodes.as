@@ -148,6 +148,7 @@ package zero.swf.avm2.advances{
 											method:advanceABC.getInfoByIdAndMemberType(u30_1,Member.METHOD),
 											args:u30_2
 										}
+										throw new Error("恭喜你，你发现了一个 "+Op.opNameV[advanceCode.op]+" 的例子！");
 									break;
 								}
 							break;
@@ -407,6 +408,7 @@ package zero.swf.avm2.advances{
 									case Op.type_u8_u30_u30__method_args:
 										u30_1=advanceABC.getIdByInfoAndMemberType(advanceCode.value.method,Member.METHOD),
 										u30_2=advanceCode.value.args;
+										throw new Error("恭喜你，你发现了一个 "+Op.opNameV[advanceCode.op]+" 的例子！");
 									break;
 								}
 								if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
@@ -586,7 +588,7 @@ package zero.swf.avm2.advances{
 									codesStr+=" "+infoXML.toXMLString().replace(/[\r\n]+/g,"");
 								break;
 								case Op.type_u8_u30__finddef:
-									throw new Error("未处理, op="+advanceCode.op+", opType="+opType);
+									throw new Error("恭喜你，你发现了一个 "+Op.opNameV[advanceCode.op]+" 的例子！");
 								break;
 								
 								case Op.type_u8_u30_u30__register_register:
@@ -600,10 +602,10 @@ package zero.swf.avm2.advances{
 									}
 								break;
 								case Op.type_u8_u30_u30__method_args:
-									trace("可能复用: method");
-									infoXML=(advanceCode.value.method as AdvanceMethod).toXMLAndMark(infoMark);
-									infoXML.setName(Member.METHOD);
-									codesStr+=" "+Xattr.esc_xattr(infoXML.toXMLString())+" "+advanceCode.value.args;//- -
+									//infoXML=(advanceCode.value.method as AdvanceMethod).toXMLAndMark(infoMark);
+									//infoXML.setName(Member.METHOD);
+									//codesStr+=" "+Xattr.esc_xattr(infoXML.toXMLString())+" "+advanceCode.value.args;//- -
+									throw new Error("恭喜你，你发现了一个 "+Op.opNameV[advanceCode.op]+" 的例子！");
 								break;
 								
 								case Op.type_u8_s24__branch:
@@ -793,6 +795,8 @@ package zero.swf.avm2.advances{
 									}
 								break;
 								case Op.type_u8_u30_u30__method_args:
+									//callmethod,callstatic
+									/*
 									callmethod,callstatic
 									trace("可能复用: method");
 									execResult=/^(.*)\s+(\w+)$/.exec(codeStr);
@@ -806,6 +810,8 @@ package zero.swf.avm2.advances{
 									}else{
 										throw new Error("不合法的 codeStr: "+codeStr);
 									}
+									*/
+									throw new Error("恭喜你，你发现了一个 "+opStr+" 的例子！");
 								break;
 								case Op.type_u8_s24__branch:
 									labelMark=labelMarkMark[codeStr+":"];

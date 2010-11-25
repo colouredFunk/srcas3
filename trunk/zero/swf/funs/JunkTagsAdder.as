@@ -12,19 +12,7 @@ package zero.swf.funs{
 	
 	import zero.swf.*;
 	
-	public class JunkTagsAdder{
-		private static function getIdArr(total:int,tagVLen:int):Array{
-			var idArr:Array=new Array();
-			var i:int=total;
-			var id:int;
-			while(--i>=0){
-				do{
-					id=int(Math.random()*tagVLen);
-				}while(idArr[id]);
-				idArr[id]=true;
-			}
-			return idArr;
-		}
+	public class JunkTagsAdder extends JunksAdder{
 		public static function addJunkTags(swf:SWF2,total:int=10):void{
 			if(total>swf.tagV.length){
 				total=swf.tagV.length;

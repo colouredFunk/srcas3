@@ -23,6 +23,7 @@ package zero.swf.funs{
 			checkURLMethod2:AdvanceMethod,
 			urlsXML:XML
 		):void{
+			不用了直接汇编
 			//trace(urlsXML.toXMLString());
 			var codeV1:Vector.<BaseCode>=normalizeCodeV(checkURLMethod1.codes.codeV);
 			var codeV2:Vector.<BaseCode>=normalizeCodeV(checkURLMethod2.codes.codeV);

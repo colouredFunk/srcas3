@@ -1,39 +1,20 @@
 /***
-FileSizeCheckerAdder 版本:v1.0
+DirectCode 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月16日 16:15:58
+创建时间:2010年11月25日 21:06:47
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.swf.funs{
-	import zero.swf.*;
-	import zero.swf.avm2.*;
-	import zero.swf.avm2.advances.*;
-	import zero.swf.tagBodys.*;
-	import zero.swf.vmarks.*;
-	
-	public class FileSizeCheckerAdder extends MethodCodesInserter{
-		不用了直接汇编
-		public static function addFileSizeCheckerToSWF(swf:SWF2,checkFileSizeMethod:AdvanceMethod):void{
-			var codeV:Vector.<BaseCode>=normalizeCodeV(checkFileSizeMethod.codes.codeV);
-			
-			var tag:Tag;
-			for each(tag in swf.tagV){
-				switch(tag.type){
-					case TagType.DoABC:
-					case TagType.DoABCWithoutFlagsAndName:
-						var advanceABC:AdvanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc as AdvanceABC
-						for each(var clazz:AdvanceClass in advanceABC.clazzV){
-							insertCodesInMethod(codeV,checkFileSizeMethod.max_stack,clazz.cinit);
-						}
-						for each(var script_info:AdvanceScript_info in advanceABC.script_infoV){
-							insertCodesInMethod(codeV,checkFileSizeMethod.max_stack,script_info.init);
-						}
-					break;
-				}
-			}
+package zero.swf.avm2.advances{
+	public class DirectCode extends BaseCode{
+		public var op:int;
+		public var value:*;
+		
+		public function DirectCode(_op:int,_value:*=undefined){
+			op=_op;
+			value=_value;
 		}
 	}
 }
