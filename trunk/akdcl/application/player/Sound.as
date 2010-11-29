@@ -1,4 +1,4 @@
-package akdcl.application.player
+﻿package akdcl.application.player
 {
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -109,7 +109,7 @@ package akdcl.application.player
 			}
 			positionLast = 0;
 			try {
-				var _soundChannel:SoundChannel = super.play(startTime, loops, sndTransform);
+				var _soundChannel:SoundChannel = super.play(startTime<0?0:startTime, loops, sndTransform);
 			}catch (_error:*) {
 				dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR));
 				return null;
