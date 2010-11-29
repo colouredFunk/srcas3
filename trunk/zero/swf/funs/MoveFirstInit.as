@@ -150,59 +150,8 @@ package zero.swf.funs{
 					}
 				}
 			}
-			
-			for each(tag in swf.tagV){
-				switch(tag.type){
-					case TagType.DoABC:
-					case TagType.DoABCWithoutFlagsAndName:
-						advanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc;
-						for each(clazz in advanceABC.clazzV){
-							clearTraceMarkName(clazz.itraits_infoV,markName);
-							clearTraceMarkName(clazz.ctraits_infoV,markName);
-						}
-						for each(script_info in advanceABC.script_infoV){
-							clearTraceMarkName(script_info.traits_infoV,markName);
-						}
-					break;
-				}
-			}
 		}
 		
-		private static function checkIsTraceMarkName(
-			codeArr:Array,
-			i:int,
-			markName:String
-		):Boolean{
-			var code:*=codeArr[i];
-			if(
-				code is Code
-				&&
-				code.op==Op.findpropstrict
-				&&
-				code.value.name=="trace"
-			){
-				code=codeArr[i+1];
-				if(
-					code is Code
-					&&
-					code.op==Op.pushstring
-					&&
-					code.value==markName
-				){
-					code=codeArr[i+2];
-					if(
-						code is Code
-						&&
-						code.op==Op.callpropvoid
-						&&
-						code.value.multiname_info.name=="trace"
-					){
-						return true;
-					}
-				}
-			}
-			return false;
-		}
 		private static function insertFirstInitInTraits(
 			traits_infoV:Vector.<AdvanceTraits_info>,
 			firstInitV:Vector.<Array>,
@@ -217,7 +166,7 @@ package zero.swf.funs{
 						var codeArr:Array=traits_info.methodi.codes.codeArr;
 						var i:int=codeArr.length;
 						while(--i>=0){
-							if(checkIsTraceMarkName(codeArr,i,markName)){
+							if(TraceMarkName.checkIsTraceMarkName(codeArr,i,markName)){
 								if(firstInitV.length){
 									var firstInitArr:Array=firstInitV.pop();
 									var multiname_info:AdvanceMultiname_info=firstInitArr[0];
@@ -238,6 +187,24 @@ package zero.swf.funs{
 				}
 			}
 		}
+		public static function clearTraceMarkNames(swf:SWF2,markName:String="###runFirstInit()###"):void{
+			var tag:Tag,advanceABC:AdvanceABC,clazz:AdvanceClass,script_info:AdvanceScript_info;
+			for each(tag in swf.tagV){
+				switch(tag.type){
+					case TagType.DoABC:
+					case TagType.DoABCWithoutFlagsAndName:
+						advanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc;
+						for each(clazz in advanceABC.clazzV){
+							clearTraceMarkName(clazz.itraits_infoV,markName);
+							clearTraceMarkName(clazz.ctraits_infoV,markName);
+						}
+						for each(script_info in advanceABC.script_infoV){
+							clearTraceMarkName(script_info.traits_infoV,markName);
+						}
+					break;
+				}
+			}
+		}
 		private static function clearTraceMarkName(
 			traits_infoV:Vector.<AdvanceTraits_info>,
 			markName:String
@@ -248,13 +215,7 @@ package zero.swf.funs{
 					case TraitTypes.Method:
 					//case TraitTypes.Getter:
 					//case TraitTypes.Setter:
-						var codeArr:Array=traits_info.methodi.codes.codeArr;
-						var i:int=codeArr.length;
-						while(--i>=0){
-							if(checkIsTraceMarkName(codeArr,i,markName)){
-								codeArr.splice(i,3);
-							}
-						}
+						TraceMarkName.clearTraceMarkName(traits_info.methodi.codes.codeArr,markName)
 					break;
 					//case TraitTypes.Function:
 					//	traits_info.functioni.codes.codeArr
