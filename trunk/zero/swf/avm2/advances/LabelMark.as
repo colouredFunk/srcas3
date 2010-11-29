@@ -8,7 +8,7 @@ LabelMark 版本:v1.0
 */
 
 package zero.swf.avm2.advances{
-	public class LabelMark extends BaseCode{
+	public class LabelMark{
 		public var labelId:int;
 		public var pos:int;
 		

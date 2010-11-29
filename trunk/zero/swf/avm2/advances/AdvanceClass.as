@@ -203,7 +203,7 @@ package zero.swf.avm2.advances{
 			initByXML_fun(infoMark,xml,Instance_info_memberV);
 			initByXML_fun(infoMark,xml,Class_info_memberV);
 			
-			//保证 AdvanceTraits_info 和 AdvanceCodes 的 newclass 里能正确的通过 name 的 markStr 获取到 this：
+			//保证 AdvanceTraits_info 和 Codes 的 newclass 里能正确的通过 name 的 markStr 获取到 this：
 			//trace("className="+MarkStrs.multiname_info2markStr(infoMark,name));
 			infoMark.clazz["~"+MarkStrs.multiname_info2markStr(infoMark,name)]=this;
 		}

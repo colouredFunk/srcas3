@@ -77,11 +77,11 @@ package zero.swf.funs{
 			//简单的 codeV.clone()，不支持 lookupswitch
 			var L:int=checkURLMethodCodeV.length;
 			var labelMarkDict:Dictionary=new Dictionary();
-			var code:BaseCode,advanceCode:AdvanceCode,labelMark:LabelMark;
+			var code:BaseCode,advanceCode:Code,labelMark:LabelMark;
 			for(var i:int=0;i<L;i++){
 				code=checkURLMethodCodeV[i];
-				if(code is AdvanceCode){
-					advanceCode=new AdvanceCode(code["op"]);
+				if(code is Code){
+					advanceCode=new Code(code["op"]);
 					advanceCode.value=code["value"];
 					if(advanceCode.op==Op.pushstring&&advanceCode.value=="${url}"){
 						advanceCode.value=url;
@@ -94,8 +94,8 @@ package zero.swf.funs{
 				}
 			}
 			for each(code in codeV){
-				if(code is AdvanceCode){
-					advanceCode=code as AdvanceCode;
+				if(code is Code){
+					advanceCode=code as Code;
 					if(labelMarkDict[advanceCode.value]){
 						advanceCode.value=labelMarkDict[advanceCode.value];
 					}
@@ -108,7 +108,7 @@ package zero.swf.funs{
 			
 			/*
 			for each(code in codeV){
-				if(code is AdvanceCode){
+				if(code is Code){
 					trace(Op.opNameV[code["op"]],code["value"]);
 				}else{
 					trace(code);

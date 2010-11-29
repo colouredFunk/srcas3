@@ -16,7 +16,7 @@ package zero.swf.funs{
 	
 	public class MethodCodesInserter{
 		public static function addCodeSegToSWF(swf:SWF2,codeSegMethod:AdvanceMethod):void{
-			var codeV:Vector.<BaseCode>=normalizeCodeV(codeSegMethod.codes.codeV);
+			var codeArr:Array=normalizeCodeV(codeSegMethod.codes.codeArr);
 			
 			var tag:Tag;
 			for each(tag in swf.tagV){
@@ -25,49 +25,48 @@ package zero.swf.funs{
 					case TagType.DoABCWithoutFlagsAndName:
 						var advanceABC:AdvanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc as AdvanceABC
 						for each(var clazz:AdvanceClass in advanceABC.clazzV){
-							insertCodesInMethod(codeV,codeSegMethod.max_stack,clazz.cinit);
+							insertCodesInMethod(codeArr,codeSegMethod.max_stack,clazz.cinit);
 						}
 						for each(var script_info:AdvanceScript_info in advanceABC.script_infoV){
-							insertCodesInMethod(codeV,codeSegMethod.max_stack,script_info.init);
+							insertCodesInMethod(codeArr,codeSegMethod.max_stack,script_info.init);
 						}
 					break;
 				}
 			}
 		}
-		public static function normalizeCodeV(codeV:Vector.<BaseCode>):Vector.<BaseCode>{
-			codeV=codeV.slice();
+		public static function normalizeCodeV(codeArr:Array):Array{
+			codeArr=codeArr.slice();
 			if(
-				codeV.shift()["op"]==Op.getlocal0
+				codeArr.shift()===Op.getlocal0
 				&&
-				codeV.shift()["op"]==Op.pushscope
+				codeArr.shift()===Op.pushscope
 				&&
-				codeV.pop()["op"]==Op.returnvoid
+				codeArr.pop()===Op.returnvoid
 			){
 			}else{
-				throw new Error("codeV 不太正常");
+				throw new Error("codeArr 不太正常");
 			}
-			return codeV;
+			return codeArr;
 		}
 		public static function insertCodesInMethod(
-			codeV:Vector.<BaseCode>,
+			codeArr:Array,
 			codes_max_stack:int,
 			method:AdvanceMethod
 		):void{
-			var code0:AdvanceCode,code1:AdvanceCode;
-			if(method.codes.codeV.length>1){
-				code0=method.codes.codeV[0] as AdvanceCode;
-				code1=method.codes.codeV[1] as AdvanceCode;
+			var code0:*,code1:*;
+			if(method.codes.codeArr.length>1){
+				code0=method.codes.codeArr[0];
+				code1=method.codes.codeArr[1];
 				if(
-					code0.op==Op.getlocal0
+					code0===Op.getlocal0
 					&&
-					code1.op==Op.pushscope
+					code1===Op.pushscope
 				){
-					method.codes.codeV.shift();
-					method.codes.codeV.shift();
+					method.codes.codeArr.shift();
+					method.codes.codeArr.shift();
 				}else{
 					code0=null;
 					code1=null;
-					//throw new Error("method_codeV 不太正常, code0.op="+Op.opNameV[code0.op]+", code1.op="+Op.opNameV[code1.op]);
 				}
 			}
 			
@@ -75,11 +74,11 @@ package zero.swf.funs{
 				method.max_stack=codes_max_stack;
 			}
 			
-			method.codes.codeV=codeV.concat(method.codes.codeV);
+			method.codes.codeArr=codeArr.concat(method.codes.codeArr);
 			
 			if(code0&&code1){
-				method.codes.codeV.unshift(code1);
-				method.codes.codeV.unshift(code0);
+				method.codes.codeArr.unshift(code1);
+				method.codes.codeArr.unshift(code0);
 			}
 		}
 	}

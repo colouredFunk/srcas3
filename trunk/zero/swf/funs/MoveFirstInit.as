@@ -49,49 +49,45 @@ package zero.swf.funs{
 								}
 							}
 							if(firstInitResultMultinameName){
-								var codeV:Vector.<BaseCode>=clazz.cinit.codes.codeV;
-								var i:int=codeV.length;
+								var codeArr:Array=clazz.cinit.codes.codeArr;
+								var i:int=codeArr.length;
 								while(--i>=0){
-									var advanceCode:AdvanceCode=codeV[i] as AdvanceCode;
+									var findpropertyCode:*=codeArr[i];
 									if(
-										advanceCode
+										findpropertyCode is Code
 										&&
-										advanceCode.op==Op.findproperty
+										findpropertyCode.op==Op.findproperty
 										&&
-										advanceCode.value==firstInitResultMultinameName
+										findpropertyCode.value==firstInitResultMultinameName
 									){
-										var newfunctionCode:AdvanceCode=codeV[i+1] as AdvanceCode;
+										var newfunctionCode:*=codeArr[i+1];
 										if(
-											newfunctionCode
+											newfunctionCode is Code
 											&&
 											newfunctionCode.op==Op.newfunction
 										){
-											var getglobalscopeCode:AdvanceCode=codeV[i+2] as AdvanceCode;
-											if(
-												getglobalscopeCode
-												&&
-												getglobalscopeCode.op==Op.getglobalscope
-											){
-												var callCode:AdvanceCode=codeV[i+3] as AdvanceCode;
+											var getglobalscopeCode:*=codeArr[i+2];
+											if(getglobalscopeCode===Op.getglobalscope){
+												var callCode:*=codeArr[i+3];
 												if(
-													callCode
+													callCode is Code
 													&&
 													callCode.op==Op.call
 													&&
 													callCode.value==0
 												){
-													var initpropertyCode:AdvanceCode=codeV[i+4] as AdvanceCode;
+													var initpropertyCode:*=codeArr[i+4];
 													if(
-														initpropertyCode
+														initpropertyCode is Code
 														&&
 														initpropertyCode.op==Op.initproperty
 														&&
 														initpropertyCode.value===firstInitResultMultinameName
 													){
-														codeV.splice(i,5);
+														codeArr.splice(i,5);
 														methodTraits_info.methodi=newfunctionCode.value;
 														methodTraits_info.methodi.max_scope_depth++;
-														methodTraits_info.methodi.codes.codeV.splice(0,0,new AdvanceCode(Op.getlocal0),new AdvanceCode(Op.pushscope));
+														methodTraits_info.methodi.codes.codeArr.splice(0,0,Op.getlocal0,Op.pushscope);
 														firstInitV.push([
 															clazz.name,
 															methodTraits_info.name
@@ -132,20 +128,20 @@ package zero.swf.funs{
 						case TagType.DoABCWithoutFlagsAndName:
 							advanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc;
 							for each(clazz in advanceABC.clazzV){
-								insertFirstInitInTraits(clazz.itraits_infoV,firstInitV,markName);
 								if(firstInitV.length){
+									insertFirstInitInTraits(clazz.itraits_infoV,firstInitV,markName);
 								}else{
 									break loop;
 								}
-								insertFirstInitInTraits(clazz.ctraits_infoV,firstInitV,markName);
 								if(firstInitV.length){
+									insertFirstInitInTraits(clazz.ctraits_infoV,firstInitV,markName);
 								}else{
 									break loop;
 								}
 							}
 							for each(script_info in advanceABC.script_infoV){
-								insertFirstInitInTraits(script_info.traits_infoV,firstInitV,markName);
 								if(firstInitV.length){
+									insertFirstInitInTraits(script_info.traits_infoV,firstInitV,markName);
 								}else{
 									break loop;
 								}
@@ -173,33 +169,33 @@ package zero.swf.funs{
 		}
 		
 		private static function checkIsTraceMarkName(
-			codeV:Vector.<BaseCode>,
+			codeArr:Array,
 			i:int,
 			markName:String
 		):Boolean{
-			var advanceCode:AdvanceCode=codeV[i] as AdvanceCode;
+			var code:*=codeArr[i];
 			if(
-				advanceCode
+				code is Code
 				&&
-				advanceCode.op==Op.findpropstrict
+				code.op==Op.findpropstrict
 				&&
-				advanceCode.value.name=="trace"
+				code.value.name=="trace"
 			){
-				advanceCode=codeV[i+1] as AdvanceCode;
+				code=codeArr[i+1];
 				if(
-					advanceCode
+					code is Code
 					&&
-					advanceCode.op==Op.pushstring
+					code.op==Op.pushstring
 					&&
-					advanceCode.value==markName
+					code.value==markName
 				){
-					advanceCode=codeV[i+2] as AdvanceCode;
+					code=codeArr[i+2];
 					if(
-						advanceCode
+						code is Code
 						&&
-						advanceCode.op==Op.callpropvoid
+						code.op==Op.callpropvoid
 						&&
-						advanceCode.value.multiname_info.name=="trace"
+						code.value.multiname_info.name=="trace"
 					){
 						return true;
 					}
@@ -218,21 +214,26 @@ package zero.swf.funs{
 					case TraitTypes.Method:
 					//case TraitTypes.Getter:
 					//case TraitTypes.Setter:
-						var codeV:Vector.<BaseCode>=traits_info.methodi.codes.codeV;
-						var i:int=codeV.length;
+						var codeArr:Array=traits_info.methodi.codes.codeArr;
+						var i:int=codeArr.length;
 						while(--i>=0){
-							if(checkIsTraceMarkName(codeV,i,markName)){
-								var firstInitArr:Array=firstInitV.pop();
-								codeV.splice(i,0,new AdvanceCode(Op.getlex,firstInitArr[0]),new AdvanceCode(Op.callpropvoid,{
-									multiname_info:firstInitArr[1],
-									args:0
-								}));
-								Outputer.output("　分离"+firstInitArr[0].getMultiname()+".firstInitResult","green");
+							if(checkIsTraceMarkName(codeArr,i,markName)){
+								if(firstInitV.length){
+									var firstInitArr:Array=firstInitV.pop();
+									var multiname_info:AdvanceMultiname_info=firstInitArr[0];
+									codeArr.splice(i,0,new Code(Op.getlex,multiname_info),new Code(Op.callpropvoid,{
+										multiname_info:firstInitArr[1],
+										args:0
+									}));
+									Outputer.output("　分离"+(multiname_info.ns.name?multiname_info.ns.name+"."+multiname_info.name:multiname_info.name)+".firstInitResult","green");
+								}else{
+									break;
+								}
 							}
 						}
 					break;
 					//case TraitTypes.Function:
-					//	traits_info.functioni.codes.codeV
+					//	traits_info.functioni.codes.codeArr
 					//break;
 				}
 			}
@@ -247,16 +248,16 @@ package zero.swf.funs{
 					case TraitTypes.Method:
 					//case TraitTypes.Getter:
 					//case TraitTypes.Setter:
-						var codeV:Vector.<BaseCode>=traits_info.methodi.codes.codeV;
-						var i:int=codeV.length;
+						var codeArr:Array=traits_info.methodi.codes.codeArr;
+						var i:int=codeArr.length;
 						while(--i>=0){
-							if(checkIsTraceMarkName(codeV,i,markName)){
-								codeV.splice(i,3);
+							if(checkIsTraceMarkName(codeArr,i,markName)){
+								codeArr.splice(i,3);
 							}
 						}
 					break;
 					//case TraitTypes.Function:
-					//	traits_info.functioni.codes.codeV
+					//	traits_info.functioni.codes.codeArr
 					//break;
 				}
 			}
