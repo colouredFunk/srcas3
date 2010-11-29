@@ -8,7 +8,10 @@ CodesAddJunks 版本:v1.0
 */
 
 package zero.swf.funs{
+	import flash.utils.Dictionary;
+	
 	import zero.BytesAndStr16;
+	import zero.Xattr;
 	import zero.swf.*;
 	import zero.swf.avm2.advances.*;
 	import zero.swf.tagBodys.*;
@@ -93,6 +96,10 @@ package zero.swf.funs{
 				]
 			]
 		];
+		private static var dict:Dictionary;
+		public static function reset():void{
+			dict=new Dictionary();
+		}
 		public static function addJunkCodes(swf:SWF2):void{
 			DoABCWithoutFlagsAndName.setDecodeABC(AdvanceABC);
 			
@@ -135,6 +142,7 @@ package zero.swf.funs{
 				}
 			}
 		}
+		
 		private static function addJunkCodesToCodeV(method:AdvanceMethod):void{
 			if(method.codes){
 				
@@ -145,15 +153,23 @@ package zero.swf.funs{
 			var codeArr:Array=method.codes.codeArr;
 			
 			var L:int=codeArr.length;
-			if(L<4){
+			if(L<7){
 				return;
 			}
 			
+			if(dict[method.codes]){
+				trace("重复添加垃圾代码");
+				return;
+			}
+			dict[method.codes]=true;
+			
 			var i:int=L-1;//不能 jump 到句子后面，否则播放器报错：VerifyError: Error #1020: 代码不能超出方法结尾。
 			
-			var idArr:Array=getIdArr(20,i);
+			var idArr:Array=getIdArr(5,i);
 			
 			//trace("codes.codeArr.length="+codes.codeArr.length);
+			
+			var ran:int;
 			
 			while(--i>0){
 				if(idArr[i]){
@@ -164,40 +180,77 @@ package zero.swf.funs{
 					
 					var jumpCode:Code;
 					
-					switch(1){
+					switch(int(Math.random()*4)){
 						case 0:
-							//codes.codeArr.splice(j++,0,Op.getlocal0);
-							codeArr.splice(j++,0,Op.pushtrue);
-							jumpCode=new Code(Op.iftrue);
+						case 1:
+						case 2:
+							//pushtrue
+							codeArr.splice(j++,0,getPushTrue());
+							
+							//执行一个操作，但维持为true
+							switch(int(Math.random()*4)){
+								case 0:
+								break;
+								case 1:
+									//typeof(任何值)==一个有效的字符串
+									codeArr.splice(j++,0,Op.typeof_);
+								break;
+								case 2:
+									codeArr.splice(j++,0,Op.convert_b);
+								break;
+								case 3:
+									codeArr.splice(j++,0,Op.coerce_b);
+								break;
+							}
+							
+							//iftrue
+							switch(int(Math.random()*2)){
+								case 0:
+									jumpCode=new Code(Op.iftrue);
+								break;
+								case 1:
+									codeArr.splice(j++,0,Op.not);
+									jumpCode=new Code(Op.iffalse);
+								break;
+								
+							}
 							codeArr.splice(j++,0,jumpCode);
 							
-							/*
-							codeArr.splice(j++,0,[
-								Op.pushtrue,
-								Op.throw_
-							]);
-							//*/
-							
-							/*
-							var jumpBackLabel:LabelMark=new LabelMark();
-							codeArr.splice(j++,0,jumpBackLabel);
-							codeArr.splice(j++,0,Op.label);
-							codeArr.splice(j++,0,new Code(Op.jump,jumpBackLabel));
-							//*/
-							
-							///*
-							codeArr.splice(j++,0,[
-								Op.newclass,0
-							]);
-							//*/
+							//扰码
+							ran=(Math.random()*3)+1;
+							while(--ran>=0){
+								switch(int(Math.random()*4)){
+								//switch(2){
+									case 0:
+										codeArr.splice(j++,0,getPushTrue());
+										codeArr.splice(j++,0,getPop());
+									break;
+									case 1:
+										codeArr.splice(
+											j++,
+											0,
+											getLookUpSwitch()
+										);
+									break;
+									case 2:
+										codeArr.splice(j++,0,[Op.pushnamespace,int(Math.random()*5)+1]);//这里假定了 constant_pool 里至少有 5 个 pushnamespace
+										codeArr.splice(j++,0,getPop());
+									break;
+									case 3:
+										codeArr.splice(j++,0,[Op.pushstring,int(Math.random()*5)+1]);//这里假定了 constant_pool 里至少有 5 个 string
+										codeArr.splice(j++,0,getPop());
+									break;
+								}
+							}
 							
 							jumpCode.value=new LabelMark();
 							codeArr.splice(j++,0,jumpCode.value);
+
 						break;
-						case 1:
+						case 3:
 							jumpCode=new Code(Op.jump);
 							codeArr.splice(j++,0,jumpCode);
-							var ran:int=(Math.random()*3)+1;
+							ran=(Math.random()*3)+1;
 							while(--ran>=0){
 								var option:Array=options[int(Math.random()*options.length)];
 								switch(option[0]){
@@ -371,9 +424,87 @@ package zero.swf.funs{
 			
 			//trace("codes.codeArr.length="+codes.codeArr.length+"---------");
 			
-			method.max_stack++;
+			method.max_stack+=2;
 			
 			DoABCWithoutFlagsAndName.setDecodeABC(null);
+		}
+		private static function getPushTrue():Array{
+			var num1:int,num2:int;
+			switch(int(Math.random()*10)){
+				case 0:
+					return [Op.pushtrue];
+				break;
+				case 1:
+					return [Op.pushfalse,Op.not];
+				break;
+				case 2:
+					return [Op.getlocal0];
+				break;
+				case 3:
+					while(true){num1=int(Math.random()*0x100);num2=int(Math.random()*0x100);if(num1^num2){break;}}
+					return [Op.pushbyte,num1,Op.pushbyte,num2,Op.bitxor];
+				break;
+				case 4:
+					while(true){num1=int(Math.random()*0x100);num2=int(Math.random()*0x100);if(num1&num2){break;}}
+					return [Op.pushbyte,num1,Op.pushbyte,num2,Op.bitand];
+				break;
+				case 5:
+					while(true){num1=int(Math.random()*0x100);num2=int(Math.random()*0x100);if(num1|num2){break;}}
+					return [Op.pushbyte,num1,Op.pushbyte,num2,Op.bitor];
+				break;
+				case 6:
+					while(true){num1=int(Math.random()*0x100);num2=int(Math.random()*0x100);if(num1+num2){break;}}
+					return [Op.pushbyte,num1,Op.pushbyte,num2,Op.add_i];
+				break;
+				case 7:
+					while(true){num1=int(Math.random()*0x100);num2=int(Math.random()*0x100);if(num1-num2){break;}}
+					return [Op.pushbyte,num1,Op.pushbyte,num2,Op.subtract_i];
+				break;
+				case 8:
+					while(true){num1=int(Math.random()*0x100);num2=int(Math.random()*4);if(num1<<num2){break;}}
+					return [Op.pushbyte,num1,Op.pushbyte,num2,Op.lshift];
+				break;
+				case 9:
+					while(true){num1=int(Math.random()*0x100);num2=int(Math.random()*4);if(num1>>num2){break;}}
+					return [Op.pushbyte,num1,Op.pushbyte,num2,Op.rshift];
+				break;
+			}
+			return null;
+		}
+		private static function getPop():Array{
+			switch(int(Math.random()*5)){
+				case 0:
+					return [Op.pop];
+				break;
+				case 1:
+					return [Op.throw_];
+				break;
+				case 2:
+					return [Op.iftrue,0x00,0x00,0x00];
+				break;
+				case 3:
+					return [Op.iffalse,0x00,0x00,0x00];
+				break;
+				case 4:
+					return [Op.returnvalue];
+				break;
+			}
+			return null;
+		}
+		private static function getLookUpSwitch():Array{
+			var arr:Array=[
+				Op.pushbyte,int(Math.random()*0x100),
+				Op.lookupswitch
+			]
+			var case_count:int=int(Math.random()*2)+1;
+			var offset:int=1+3+1+3*(case_count+1);
+			arr.push(offset,0x00,0x00);
+			arr.push(case_count);
+			while(--case_count>=0){
+				arr.push(offset,0x00,0x00);
+			}
+			arr.push(offset,0x00,0x00);
+			return arr;
 		}
 	}
 }
