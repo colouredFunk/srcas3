@@ -215,12 +215,6 @@ package ui.manager {
 			removeFromArray(groupItemDic[_groupName], _item);
 			removeFromArray(groupSelectDic[_groupName], _item);
 		}
-		public static function removeFromArray(_a:Array,_ai:*):* {
-			var _i:int=_a.indexOf(_ai);
-			if (_i>=0) {
-				return _a.splice(_i,1);
-			}
-		}
 		public static function selectItem(_groupName:String, _item:*):Boolean {
 			var _limit:uint = getLimit(_groupName);
 			var _groupSelect:Array = groupSelectDic[_groupName];
@@ -240,6 +234,13 @@ package ui.manager {
 		}
 		public static function unselectItem(_groupName:String, _item:*):void {
 			removeFromArray(groupSelectDic[_groupName], _item);
+		}
+		public static function unselectGroup(_groupName:String):void {
+			var _groupSelect:Array = groupSelectDic[_groupName];
+			for each(var _select:* in _groupSelect) {
+				getRadioUnselectFun(_groupName)(_select);
+				unselectItem(_groupName, _select);
+			}
 		}
 		public static function getRadioUnselectFun(_groupName:String):Function {
 			return groupParamsDic[_groupName + KEY_RADIO_UNSELECT_FUN];
@@ -262,6 +263,13 @@ package ui.manager {
 		}
 		private static function unSelectItemFun(_item:*):void {
 			_item.select = false;
+		}
+		//
+		public static function removeFromArray(_a:Array,_ai:*):* {
+			var _i:int=_a.indexOf(_ai);
+			if (_i>=0) {
+				return _a.splice(_i,1);
+			}
 		}
 	}
 }
