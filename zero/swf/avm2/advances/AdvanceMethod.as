@@ -158,7 +158,7 @@ package zero.swf.avm2.advances{
 		public var local_count:int;
 		public var init_scope_depth:int;
 		public var max_scope_depth:int;
-		public var codes:AdvanceCodes;
+		public var codes:Codes;
 		//public var exception_infoV:Vector.<AdvanceException_info>;
 		public var traits_infoV:Vector.<AdvanceTraits_info>;
 		
@@ -199,7 +199,7 @@ package zero.swf.avm2.advances{
 					exception_infoV[i]=new AdvanceException_info();
 					exception_infoV[i].initByInfo(advanceABC,exception_info);
 				}
-				codes=new AdvanceCodes();
+				codes=new Codes();
 				codes.initByInfo(advanceABC,method_body_info.codes.toData(),exception_infoV);
 			}
 		}
@@ -264,7 +264,7 @@ package zero.swf.avm2.advances{
 				
 				initByXML_fun(infoMark,xml,Method_body_info_memberV);
 				
-				codes=new AdvanceCodes();
+				codes=new Codes();
 				codes.initByXMLAndMark(infoMark,codesXML);
 			}
 		}

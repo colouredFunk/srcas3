@@ -15,7 +15,7 @@ package zero.swf.funs{
 	public class JunksAdder{
 		public static function getIdArr(total:int,L:int):Array{
 			var idArr:Array=new Array();
-			var i:int=total;
+			var i:int=total>L?L:total;
 			var id:int;
 			while(--i>=0){
 				do{

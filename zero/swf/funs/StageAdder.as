@@ -82,7 +82,19 @@ package zero.swf.funs{
 								clazz.name.name
 							)]){
 								//trace("className="+className);
-								clazz.itraits_infoV.push(getStageMethod_traits_info.cloneAsMethodTrait());
+								var hasStage:Boolean=false;
+								for each(var traits_info:AdvanceTraits_info in clazz.itraits_infoV){
+									if(traits_info.name.name=="stage"){
+										hasStage=true;
+										break;
+									}
+								}
+								if(hasStage){
+									//import zero.Outputer;
+									//Outputer.output("hasStage="+hasStage);
+								}else{
+									clazz.itraits_infoV.push(getStageMethod_traits_info.cloneAsMethodTrait());
+								}
 							}
 						}
 					break;

@@ -263,7 +263,7 @@ package zero.swf.avm2.advances{
 					||
 					memberType==Member.DOUBLE
 				){
-					throw new Error("id="+id+" 超出范围, "+memberType);
+					throw new RangeError("id="+id+" 超出范围, "+memberType);
 					return null;
 				}/*else{
 					if(memberType==STRING){
@@ -305,7 +305,7 @@ package zero.swf.avm2.advances{
 					return info;
 				}
 			}
-			throw new Error("id="+id+" 超出范围, "+memberType+"V.length="+v.length);
+			throw new RangeError("id="+id+" 超出范围, "+memberType+"V.length="+v.length);
 			return null;
 		}
 		

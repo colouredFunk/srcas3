@@ -153,7 +153,7 @@ package zero.swf.funs{
 							var codeV:Vector.<BaseCode>=clazz.cinit.codes.codeV;
 							var i:int=codeV.length;
 							while(--i>=0){
-								var advanceCode:AdvanceCode=codeV[i] as AdvanceCode;
+								var advanceCode:Code=codeV[i] as Code;
 								if(
 									advanceCode
 									&&
@@ -161,7 +161,7 @@ package zero.swf.funs{
 									&&
 									multiname_name_infoDict[advanceCode.value]
 								){
-									var initpropertyCode:AdvanceCode=codeV[i+2] as AdvanceCode;
+									var initpropertyCode:Code=codeV[i+2] as Code;
 									if(
 										initpropertyCode
 										&&
