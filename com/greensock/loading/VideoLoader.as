@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.73
- * DATE: 2010-11-18
+ * VERSION: 1.741
+ * DATE: 2010-11-21
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -94,7 +94,7 @@ package com.greensock.loading {
  * 		<li><strong> bufferMode : Boolean </strong> - When <code>true</code>, the loader will report its progress only in terms of the video's buffer which can be very convenient if, for example, you want to display loading progress for the video's buffer or tuck it into a LoaderMax with other loaders and allow the LoaderMax to dispatch its <code>COMPLETE</code> event when the buffer is full instead of waiting for the whole file to download. When <code>bufferMode</code> is <code>true</code>, the VideoLoader will dispatch its <code>COMPLETE</code> event when the buffer is full as opposed to waiting for the entire video to load. You can toggle the <code>bufferMode</code> anytime. Please read the full <code>bufferMode</code> property ASDoc description below for details about how it affects things like <code>bytesTotal</code>.</li>
  * 		<li><strong> autoAdjustBuffer : Boolean </strong> If the buffer becomes empty during playback and <code>autoAdjustBuffer</code> is <code>true</code> (the default), it will automatically attempt to adjust the NetStream's <code>bufferTime</code> based on the rate at which the video has been loading, estimating what it needs to be in order to play the rest of the video without emptying the buffer again. This can prevent the annoying problem of video playback start/stopping/starting/stopping on a system tht doesn't have enough bandwidth to adequately buffer the video. You may also set the <code>bufferTime</code> in the constructor's <code>vars</code> parameter to set the initial value.</li>
  * 		<li><strong> alternateURL : String</strong> - If you define an <code>alternateURL</code>, the loader will initially try to load from its original <code>url</code> and if it fails, it will automatically (and permanently) change the loader's <code>url</code> to the <code>alternateURL</code> and try again. Think of it as a fallback or backup <code>url</code>. It is perfectly acceptable to use the same <code>alternateURL</code> for multiple loaders (maybe a default image for various ImageLoaders for example).</li>
- * 		<li><strong> noCache : Boolean</strong> - If <code>noCache</code> is <code>true</code>, a "cacheBusterID" parameter will be appended to the url with a random set of numbers to prevent caching (don't worry, this info is ignored when you <code>getLoader()</code> or <code>getContent()</code> by url and when you're running locally)</li>
+ * 		<li><strong> noCache : Boolean</strong> - If <code>noCache</code> is <code>true</code>, a "gsCacheBusterID" parameter will be appended to the url with a random set of numbers to prevent caching (don't worry, this info is ignored when you <code>getLoader()</code> or <code>getContent()</code> by url and when you're running locally)</li>
  * 		<li><strong> estimatedBytes : uint</strong> - Initially, the loader's <code>bytesTotal</code> is set to the <code>estimatedBytes</code> value (or <code>LoaderMax.defaultEstimatedBytes</code> if one isn't defined). Then, when the loader begins loading and it can accurately determine the bytesTotal, it will do so. Setting <code>estimatedBytes</code> is optional, but the more accurate the value, the more accurate your loaders' overall progress will be initially. If the loader will be inserted into a LoaderMax instance (for queue management), its <code>auditSize</code> feature can attempt to automatically determine the <code>bytesTotal</code> at runtime (there is a slight performance penalty for this, however - see LoaderMax's documentation for details).</li>
  * 		<li><strong> requireWithRoot : DisplayObject</strong> - LoaderMax supports <i>subloading</i>, where an object can be factored into a parent's loading progress. If you want LoaderMax to require this VideoLoader as part of its parent SWFLoader's progress, you must set the <code>requireWithRoot</code> property to your swf's <code>root</code>. For example, <code>var loader:VideoLoader = new VideoLoader("myScript.php", {name:"textData", requireWithRoot:this.root});</code></li>
  * 		<li><strong> autoDispose : Boolean</strong> - When <code>autoDispose</code> is <code>true</code>, the loader will be disposed immediately after it completes (it calls the <code>dispose()</code> method internally after dispatching its <code>COMPLETE</code> event). This will remove any listeners that were defined in the vars object (like onComplete, onProgress, onError, onInit). Once a loader is disposed, it can no longer be found with <code>LoaderMax.getLoader()</code> or <code>LoaderMax.getContent()</code> - it is essentially destroyed but its content is not unloaded (you must call <code>unload()</code> or <code>dispose(true)</code> to unload its content). The default <code>autoDispose</code> value is <code>false</code>.
@@ -228,7 +228,7 @@ function errorHandler(event:LoaderEvent):void {
 		protected var _prevTime:Number;
 		/** @private **/
 		protected var _firstCuePoint:CuePoint;
-		/** @private due to a bug in the NetStream class, we cannot seek() or pause() before the NetStream has dispatched a RENDER Event. **/
+		/** @private due to a bug in the NetStream class, we cannot seek() or pause() before the NetStream has dispatched a RENDER Event (or the NetStream.Buffer.Full status event is received for Flash Player 9). **/
 		protected var _renderedOnce:Boolean;
 		
 		/** The metaData that was received from the video (contains information about its width, height, frame rate, etc.). See Adobe's docs for information about a NetStream's onMetaData callback. **/
@@ -293,7 +293,7 @@ function errorHandler(event:LoaderEvent):void {
 		 * 		<li><strong> bufferMode : Boolean </strong> - When <code>true</code>, the loader will report its progress only in terms of the video's buffer which can be very convenient if, for example, you want to display loading progress for the video's buffer or tuck it into a LoaderMax with other loaders and allow the LoaderMax to dispatch its <code>COMPLETE</code> event when the buffer is full instead of waiting for the whole file to download. When <code>bufferMode</code> is <code>true</code>, the VideoLoader will dispatch its <code>COMPLETE</code> event when the buffer is full as opposed to waiting for the entire video to load. You can toggle the <code>bufferMode</code> anytime. Please read the full <code>bufferMode</code> property ASDoc description below for details about how it affects things like <code>bytesTotal</code>.</li>
 		 * 		<li><strong> autoAdjustBuffer : Boolean </strong> If the buffer becomes empty during playback and <code>autoAdjustBuffer</code> is <code>true</code> (the default), it will automatically attempt to adjust the NetStream's <code>bufferTime</code> based on the rate at which the video has been loading, estimating what it needs to be in order to play the rest of the video without emptying the buffer again. This can prevent the annoying problem of video playback start/stopping/starting/stopping on a system tht doesn't have enough bandwidth to adequately buffer the video. You may also set the <code>bufferTime</code> in the constructor's <code>vars</code> parameter to set the initial value.</li>
 		 * 		<li><strong> alternateURL : String</strong> - If you define an <code>alternateURL</code>, the loader will initially try to load from its original <code>url</code> and if it fails, it will automatically (and permanently) change the loader's <code>url</code> to the <code>alternateURL</code> and try again. Think of it as a fallback or backup <code>url</code>. It is perfectly acceptable to use the same <code>alternateURL</code> for multiple loaders (maybe a default image for various ImageLoaders for example).</li>
-		 * 		<li><strong> noCache : Boolean</strong> - If <code>noCache</code> is <code>true</code>, a "cacheBusterID" parameter will be appended to the url with a random set of numbers to prevent caching (don't worry, this info is ignored when you <code>getLoader()</code> or <code>getContent()</code> by url and when you're running locally)</li>
+		 * 		<li><strong> noCache : Boolean</strong> - If <code>noCache</code> is <code>true</code>, a "gsCacheBusterID" parameter will be appended to the url with a random set of numbers to prevent caching (don't worry, this info is ignored when you <code>getLoader()</code> or <code>getContent()</code> by url and when you're running locally)</li>
 		 * 		<li><strong> estimatedBytes : uint</strong> - Initially, the loader's <code>bytesTotal</code> is set to the <code>estimatedBytes</code> value (or <code>LoaderMax.defaultEstimatedBytes</code> if one isn't defined). Then, when the loader begins loading and it can accurately determine the bytesTotal, it will do so. Setting <code>estimatedBytes</code> is optional, but the more accurate the value, the more accurate your loaders' overall progress will be initially. If the loader will be inserted into a LoaderMax instance (for queue management), its <code>auditSize</code> feature can attempt to automatically determine the <code>bytesTotal</code> at runtime (there is a slight performance penalty for this, however - see LoaderMax's documentation for details).</li>
 		 * 		<li><strong> requireWithRoot : DisplayObject</strong> - LoaderMax supports <i>subloading</i>, where an object can be factored into a parent's loading progress. If you want LoaderMax to require this VideoLoader as part of its parent SWFLoader's progress, you must set the <code>requireWithRoot</code> property to your swf's <code>root</code>. For example, <code>var loader:VideoLoader = new VideoLoader("myScript.php", {name:"textData", requireWithRoot:this.root});</code></li>
 		 * 		<li><strong> autoDispose : Boolean</strong> - When <code>autoDispose</code> is <code>true</code>, the loader will be disposed immediately after it completes (it calls the <code>dispose()</code> method internally after dispatching its <code>COMPLETE</code> event). This will remove any listeners that were defined in the vars object (like onComplete, onProgress, onError, onInit). Once a loader is disposed, it can no longer be found with <code>LoaderMax.getLoader()</code> or <code>LoaderMax.getContent()</code> - it is essentially destroyed but its content is not unloaded (you must call <code>unload()</code> or <code>dispose(true)</code> to unload its content). The default <code>autoDispose</code> value is <code>false</code>.
@@ -352,10 +352,12 @@ function errorHandler(event:LoaderEvent):void {
 					
 				}
 				_sprite.removeEventListener(Event.ENTER_FRAME, _playProgressHandler);
+				_sprite.removeEventListener(Event.ENTER_FRAME, _forceTimeHandler);
 				_ns.client = {};
 				_ns.removeEventListener(NetStatusEvent.NET_STATUS, _statusHandler);
 				_ns.removeEventListener("ioError", _failHandler);
 				_ns.removeEventListener("asyncError", _failHandler);
+				_ns.removeEventListener(Event.RENDER, _renderHandler);
 			}
 			_prevTime = 0;
 			
@@ -366,7 +368,6 @@ function errorHandler(event:LoaderEvent):void {
 			_ns.addEventListener(NetStatusEvent.NET_STATUS, _statusHandler, false, 0, true);
 			_ns.addEventListener("ioError", _failHandler, false, 0, true);
 			_ns.addEventListener("asyncError", _failHandler, false, 0, true);
-			_ns.addEventListener(Event.RENDER, _renderHandler, false, 0, true);
 			
 			_ns.bufferTime = isNaN(this.vars.bufferTime) ? 5 : Number(this.vars.bufferTime);
 			
@@ -391,6 +392,7 @@ function errorHandler(event:LoaderEvent):void {
 				this.volume = _volume; //ensures the volume is back to normal in case it had been temporarily silenced while buffering
 			}
 			_sprite.addEventListener(Event.ENTER_FRAME, _enterFrameHandler);
+			_ns.addEventListener(Event.RENDER, _renderHandler, false, 0, true);
 			_videoComplete = _initted = false;
 			_ns.play(_request.url);
 		}
@@ -398,6 +400,7 @@ function errorHandler(event:LoaderEvent):void {
 		/** @private scrubLevel: 0 = cancel, 1 = unload, 2 = dispose, 3 = flush **/
 		override protected function _dump(scrubLevel:int=0, newStatus:int=0, suppressEvents:Boolean=false):void {
 			_sprite.removeEventListener(Event.ENTER_FRAME, _enterFrameHandler);
+			_ns.removeEventListener(Event.RENDER, _renderHandler);
 			_sprite.removeEventListener(Event.ENTER_FRAME, _forceTimeHandler);
 			_forceTime = NaN;
 			_prevTime = 0;
@@ -617,7 +620,7 @@ function errorHandler(event:LoaderEvent):void {
 		/** @private **/
 		protected function _setForceTime(time:Number):void {
 			if (!(_forceTime || _forceTime == 0)) { //if _forceTime is already set, the listener was already added (we remove it after 1 frame or after the buffer fills for the first time and metaData is received (whichever takes longer)
-				_ns.addEventListener(Event.RENDER, _forceTimeHandler, false, 0, true); //if, for example, after a video has finished playing, we seek(0) the video and immediately check the playProgress, it returns 1 instead of 0 because it takes a short time to render the first frame and accurately reflect the _ns.time variable. So we use a single ENTER_FRAME to help us override the _ns.time value briefly.
+				_sprite.addEventListener(Event.ENTER_FRAME, _forceTimeHandler, false, 0, true); //if, for example, after a video has finished playing, we seek(0) the video and immediately check the playProgress, it returns 1 instead of 0 because it takes a short time to render the first frame and accurately reflect the _ns.time variable. So we use a single ENTER_FRAME to help us override the _ns.time value briefly.
 			}
 			_forceTime = time;
 		}
@@ -657,6 +660,9 @@ function errorHandler(event:LoaderEvent):void {
 				_onBufferFull();
 			}
 			(_sprite as Object).rawContent = _video; //resizes it appropriately
+			if (!_bufferFull && _pausePending) {
+				_video.attachNetStream(null); //if the NetStream is still buffering, there's a good chance that the video will appear to play briefly right before we pause it, so we detach the NetStream from the Video briefly to avoid that funky visual behavior (we attach it again as soon as it buffers).
+			}
 		}
 		
 		
@@ -728,6 +734,9 @@ function errorHandler(event:LoaderEvent):void {
 					dispatchEvent(new LoaderEvent(VIDEO_COMPLETE, this));
 				}
 			} else if (code == "NetStream.Buffer.Full") {
+				if (!_renderedOnce) { //in Flash Player 9, NetStream doesn't dispatch the RENDER event and the only reliable way I could find to sense when a render truly must have occured is to wait for the NetStream.Buffer.Full status. We don't just put this code in the _onBufferFull() method because there's a chance it can be called from elsewhere before the NetStream.Buffer.Full status event occurs.
+					_renderHandler(null);
+				}
 				_onBufferFull();
 			} else if (code == "NetStream.Buffer.Empty") {
 				_bufferFull = false;
@@ -795,7 +804,7 @@ function errorHandler(event:LoaderEvent):void {
 		/** @private see notes in _renderHandler() **/
 		private function _detachNS(event:Event):void {
 			_sprite.removeEventListener(Event.ENTER_FRAME, _detachNS);
-			if (!_bufferFull) {
+			if (!_bufferFull && _pausePending) {
 				_video.attachNetStream(null); //if the NetStream is still buffering, there's a good chance that the video will appear to play briefly right before we pause it, so we detach the NetStream from the Video briefly to avoid that funky visual behavior (we attach it again as soon as it buffers).
 			}
 		}
@@ -804,7 +813,7 @@ function errorHandler(event:LoaderEvent):void {
 		protected function _forceTimeHandler(event:Event):void {
 			if (!_videoPaused || (_initted && _renderedOnce)) {
 				_forceTime = NaN;
-				event.target.removeEventListener(Event.RENDER, _forceTimeHandler);
+				event.target.removeEventListener(Event.ENTER_FRAME, _forceTimeHandler);
 			}
 		}
 		

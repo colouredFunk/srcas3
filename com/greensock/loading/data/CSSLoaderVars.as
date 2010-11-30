@@ -152,7 +152,7 @@ package com.greensock.loading.data {
 			return _set("estimatedBytes", value);
 		}
 		
-		/** If <code>true</code>, a "cacheBusterID" parameter will be appended to the url with a random set of numbers to prevent caching (don't worry, this info is ignored when you <code>LoaderMax.getLoader()</code> or <code>LoaderMax.getContent()</code> by <code>url</code> or when you're running locally). **/
+		/** If <code>true</code>, a "gsCacheBusterID" parameter will be appended to the url with a random set of numbers to prevent caching (don't worry, this info is ignored when you <code>LoaderMax.getLoader()</code> or <code>LoaderMax.getContent()</code> by <code>url</code> or when you're running locally). **/
 		public function noCache(value:Boolean):CSSLoaderVars {
 			return _set("noCache", value);
 		}

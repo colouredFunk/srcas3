@@ -1,6 +1,25 @@
 CHANGE LOG : GREENSOCK LOADERMAX SYSTEM
 ----------------------------------------
 
+2010-11-22
+---------------------------------------------
+VideoLoader			1.741
+LoaderMax			1.741
+	- Fixed issue that was introduced in version 1.73 that could cause a VideoLoader to not properly dispatch PLAY_PROGRESS events after gotoVideoTime() was called or the videoTime was set to a particular value.
+
+2010-11-21
+---------------------------------------------
+VideoLoader			1.74
+LoaderMax			1.74
+	- Fixed issue with VideoLoader not dispatching its COMPLETE event in a file that was published for Flash Player 9. This issue was introduced in version 1.73.
+	- Changed "cacheBusterID" URL variable to "gsCacheBusterID" in order to make it more unique and avoid a potential conflict with a particular CDN.
+
+2010-11-19
+---------------------------------------------
+VideoLoader			1.731
+LoaderMax			1.731
+	- Fixed a minor cleanup issue in VideoLoader related to removing an event listener internally
+
 2010-11-18
 ---------------------------------------------
 VideoLoader			1.73
