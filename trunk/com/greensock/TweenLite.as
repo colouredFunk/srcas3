@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 11.4
- * DATE: 2010-11-12
+ * VERSION: 11.411
+ * DATE: 2010-11-28
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCUMENTATION AT: http://www.TweenLite.com
  **/
@@ -235,7 +235,7 @@ package com.greensock {
 		}
 		
 		/** @private **/
-		public static const version:Number = 11.4;
+		public static const version:Number = 11.411;
 		/** @private When plugins are activated, the class is added (named based on the special property) to this object so that we can quickly look it up in the initTweenVals() method.**/
 		public static var plugins:Object = {}; 
 		/** @private **/
@@ -470,7 +470,7 @@ package com.greensock {
 			if (_hasUpdate && !suppressEvents) {
 				this.vars.onUpdate.apply(null, this.vars.onUpdateParams);
 			}
-			if (isComplete) {
+			if (isComplete && !this.gc) { //check gc because there's a chance that kill() could be called in an onUpdate
 				if (_hasPlugins && this.cachedPT1) {
 					onPluginEvent("onComplete", this);
 				}
