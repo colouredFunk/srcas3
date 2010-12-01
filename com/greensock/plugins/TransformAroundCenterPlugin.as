@@ -1,13 +1,14 @@
 /**
- * VERSION: 1.04
- * DATE: 10/2/2009
+ * VERSION: 1.3
+ * DATE: 12/1/2009
  * ACTIONSCRIPT VERSION: 3.0 
  * UPDATES AND DOCUMENTATION AT: http://www.TweenMax.com
  **/
 package com.greensock.plugins {
+	import com.greensock.*;
+	
 	import flash.display.*;
 	import flash.geom.*;
-	import com.greensock.*;
 /**
  * Normally, all transformations (scale, rotation, and position) are based on the DisplayObject's registration
  * point (most often its upper left corner), but TransformAroundCenter allows you to make the transformations
@@ -51,17 +52,23 @@ package com.greensock.plugins {
 		/** @private **/
 		override public function onInitTween(target:Object, value:*, tween:TweenLite):Boolean {
 			var remove:Boolean = false;
-			if (target.parent == null) {
+			var t:DisplayObject = target as DisplayObject;
+			if (t.parent == null) {
 				remove = true;
 				var s:Sprite = new Sprite();
-				s.addChild(target as DisplayObject);
+				s.addChild(t);
 			}
-			var b:Rectangle = target.getBounds(target.parent);
+			var b:Rectangle = t.getBounds(t.parent);
 			value.point = new Point(b.x + (b.width * 0.5), b.y + (b.height * 0.5));
 			if (remove) {
-				target.parent.removeChild(target);
+				t.parent.removeChild(t);
 			}
-			return super.onInitTween(target, value, tween);
+			var isValid:Boolean = super.onInitTween(t, value, tween);
+			if (t.scaleX == 0 || t.scaleY == 0) {
+				b = t.getBounds(t);
+				_local = new Point(b.x + (b.width * 0.5), b.y + (b.height * 0.5));
+			}
+			return isValid;
 		}
 		
 	}

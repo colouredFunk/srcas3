@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.53
- * DATE: 10/2/2009
+ * VERSION: 1.61
+ * DATE: 12/2/2009
  * ACTIONSCRIPT VERSION: 3.0 
  * UPDATES AND DOCUMENTATION AT: http://www.TweenMax.com
  **/
@@ -57,7 +57,7 @@ package com.greensock.plugins {
 		public function TransformAroundPointPlugin() {
 			super();
 			this.propName = "transformAroundPoint";
-			this.overwriteProps = [];
+			this.overwriteProps = ["x","y"];
 			this.priority = -1; //so that the x/y tweens occur BEFORE the transformAroundPoint is applied
 		}
 		
@@ -95,7 +95,7 @@ package com.greensock.plugins {
 			}
 			
 			if (tween != null) {
-				var enumerables:Object = (tween.vars.isTV == true) ? tween.vars.exposedVars : tween.vars; //for TweenLiteVars and TweenMaxVars (we need an object with enumerable properties);
+				var enumerables:Object = tween.vars; 
 				if ("x" in enumerables || "y" in enumerables) { //if the tween is supposed to affect x and y based on the original registration point, we need to make special adjustments here...
 					var endX:Number, endY:Number;
 					if ("x" in enumerables) {
@@ -104,15 +104,13 @@ package com.greensock.plugins {
 					if ("y" in enumerables) {
 						endY = (typeof(enumerables.y) == "number") ? enumerables.y : _target.y + Number(enumerables.y);
 					}
-					tween.killVars({x:true, y:true}); //we're taking over.
+					tween.killVars({x:true, y:true}, false); //we're taking over.
 					this.changeFactor = 1;
 					if (!isNaN(endX)) {
 						addTween(_point, "x", _point.x, _point.x + (endX - _target.x), "x");
-						this.overwriteProps[this.overwriteProps.length] = "x";
 					}
 					if (!isNaN(endY)) {
 						addTween(_point, "y", _point.y, _point.y + (endY - _target.y), "y");
-						this.overwriteProps[this.overwriteProps.length] = "y";
 					}
 					this.changeFactor = 0;
 				}
@@ -137,20 +135,17 @@ package com.greensock.plugins {
 			if (_target.parent) {
 				var p:Point, pt:PropTween, i:int = _tweens.length;
 				if (this.round) {
-					var val:Number, neg:int, x:Number, y:Number, negX:int, negY:int;
+					var val:Number, x:Number, y:Number;
 					while (i--) {
 						pt = _tweens[i];
 						val = pt.start + (pt.change * n);
-						neg = (val < 0) ? -1 : 1;
-						pt.target[pt.property] = ((val % 1) * neg > 0.5) ? int(val) + neg : int(val); //twice as fast as Math.round()
+						pt.target[pt.property] = (val > 0) ? int(val + 0.5) : int(val - 0.5); //4 times as fast as Math.round()
 					}
 					p = _target.parent.globalToLocal(_target.localToGlobal(_local));
 					x = _target.x + _point.x - p.x;
 					y = _target.y + _point.y - p.y;
-					negX = (x < 0) ? -1 : 1;
-					negY = (y < 0) ? -1 : 1;
-					_target.x = ((x % 1) * negX > 0.5) ? int(x) + negX : int(x); //twice as fast as Math.round()
-					_target.y = ((y % 1) * negY > 0.5) ? int(y) + negY : int(y); //twice as fast as Math.round()
+					_target.x = (x > 0) ? int(x + 0.5) : int(x - 0.5); //4 times as fast as Math.round()
+					_target.y = (y > 0) ? int(y + 0.5) : int(y - 0.5); //4 times as fast as Math.round()
 				} else {
 					while (i--) {
 						pt = _tweens[i];

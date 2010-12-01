@@ -21,14 +21,6 @@
 		public var playBack:Boolean;
 		private var isTempAsBmp:Boolean;
 		private var masked:DisplayObject;
-		
-		
-		
-		
-		override protected function init():void {
-			super.init();
-			stop();
-		}
 		override protected function onRemoveToStageHandler():void {
 			super.onRemoveToStageHandler();
 			if (masked) {
@@ -56,14 +48,15 @@
 			}
 		}
 		public function toMask(_masked:DisplayObject, _isMask:Boolean = true, _isCacheAsBitmap:Boolean = true ,_rect:Rectangle=null):void {
-			masked = _masked;
-			if (_isCacheAsBitmap&&!masked.cacheAsBitmap) {
-				isTempAsBmp = true;
-			}
-			cacheAsBitmap = _isCacheAsBitmap;
-			masked.cacheAsBitmap = _isCacheAsBitmap;
 			if (_isMask) {
+				if (_isCacheAsBitmap&&!_masked.cacheAsBitmap) {
+					isTempAsBmp = true;
+				}
+				cacheAsBitmap = _isCacheAsBitmap;
+				_masked.cacheAsBitmap = _isCacheAsBitmap;
 				_masked.mask = this;
+			}else {
+				enabledMask = false;
 			}
 			if (playBack) {
 				gotoAndStop(totalFrames);
@@ -71,12 +64,13 @@
 			maskAniLayer = maskAniLayer?maskAniLayer:_masked.parent;
 			maskAniLayer.addChild(this);
 			
-			_rect = _rect?_rect:masked.getRect(maskAniLayer);
+			_rect = _rect?_rect:_masked.getRect(maskAniLayer);
 			x = _rect.x;
 			y = _rect.y;
 			width = _rect.width;
 			height = _rect.height;
 			addEventListener(Event.ENTER_FRAME, runStep);
+			masked = _masked;
 		}
 		private function runStep(_evt:Event):void {
 			if (delay>0) {
