@@ -46,6 +46,10 @@ package com.greensock.plugins {
  * 
  * You can optionally set motionBlur to the Boolean value of true in order to use the defaults. (see below for examples)<br /><br />
  * 
+ * Also note that due to a bug in Flash, if you apply motionBlur to an object that was masked in the Flash IDE it won't work
+ * properly - you must apply the mask via ActionScript instead (and set both the mask's and the masked object's cacheAsBitmap
+ * property to true).<br /><br />
+ * 
  * <b>USAGE:</b><br /><br />
  * <code>
  * 		import com.greensock.TweenMax; <br />
