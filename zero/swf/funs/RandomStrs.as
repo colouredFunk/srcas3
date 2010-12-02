@@ -225,24 +225,6 @@ package zero.swf.funs{
 			return null;
 		}
 		*/
-		
-		
-		
-		
-		
-		
-		//
-		private static function disorderArr(arr:Array):void{
-			//打乱
-			var L:int=arr.length;
-			var i:int=L;
-			while(--i>=0){
-				var ran:int=int(Math.random()*L);
-				var temp:String=arr[i];
-				arr[i]=arr[ran];
-				arr[ran]=temp;
-			}
-		}
 	}
 }
 

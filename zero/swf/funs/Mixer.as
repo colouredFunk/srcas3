@@ -38,7 +38,7 @@ package zero.swf.funs{
 			var swf:SWF2,abcFile:ABCFile;
 			
 			trace("未处理override系统类属性的情况");
-			trace("swfOrSWFArr="+swfOrSWFArr);
+			//trace("swfOrSWFArr="+swfOrSWFArr);
 			
 			if(swfOrSWFArr is Array){
 			}else{

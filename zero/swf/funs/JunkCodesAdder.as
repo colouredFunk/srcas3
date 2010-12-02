@@ -232,14 +232,18 @@ package zero.swf.funs{
 											getLookUpSwitch()
 										);
 									break;
+									/*
 									case 2:
-										codeArr.splice(j++,0,[Op.pushnamespace,int(Math.random()*5)+1]);//这里假定了 constant_pool 里至少有 5 个 pushnamespace
-										codeArr.splice(j++,0,getPop());
-									break;
-									case 3:
+										//个别游戏出错 VerifyError: Error #1032: Cpool 索引 5 超出范围 5。
 										codeArr.splice(j++,0,[Op.pushstring,int(Math.random()*5)+1]);//这里假定了 constant_pool 里至少有 5 个 string
 										codeArr.splice(j++,0,getPop());
 									break;
+									case 3:
+										//个别游戏出错 VerifyError: Error #1032: Cpool 索引 5 超出范围 5。
+										codeArr.splice(j++,0,[Op.pushnamespace,int(Math.random()*5)+1]);//这里假定了 constant_pool 里至少有 5 个 pushnamespace
+										codeArr.splice(j++,0,getPop());
+									break;
+									//*/
 								}
 							}
 							
@@ -366,7 +370,7 @@ package zero.swf.funs{
 										var op:int=option[int(Math.random()*option.length)];
 										switch(op){
 											case Op.op_pushbyte:
-												var code_byte:Code_Byte=new Code_Byte(int(Math.random()*0x100));
+												var code_byte:Code_Byte=new Code_Byte(int(Math.random()*0x100)-0x80);
 												code_byte.op=op;
 												codeArr[codeArr.length]=code_byte;
 											break;
@@ -430,7 +434,7 @@ package zero.swf.funs{
 		}
 		private static function getPushTrue():Array{
 			var num1:int,num2:int;
-			switch(int(Math.random()*10)){
+			switch(int(Math.random()*11)){
 				case 0:
 					return [Op.pushtrue];
 				break;
@@ -441,32 +445,36 @@ package zero.swf.funs{
 					return [Op.getlocal0];
 				break;
 				case 3:
-					while(true){num1=int(Math.random()*0x100);num2=int(Math.random()*0x100);if(num1^num2){break;}}
+					while(true){num1=int(Math.random()*0x100)-0x80;num2=int(Math.random()*0x100)-0x80;if(num1^num2){break;}}
 					return [Op.pushbyte,num1,Op.pushbyte,num2,Op.bitxor];
 				break;
 				case 4:
-					while(true){num1=int(Math.random()*0x100);num2=int(Math.random()*0x100);if(num1&num2){break;}}
+					while(true){num1=int(Math.random()*0x100)-0x80;num2=int(Math.random()*0x100)-0x80;if(num1&num2){break;}}
 					return [Op.pushbyte,num1,Op.pushbyte,num2,Op.bitand];
 				break;
 				case 5:
-					while(true){num1=int(Math.random()*0x100);num2=int(Math.random()*0x100);if(num1|num2){break;}}
+					while(true){num1=int(Math.random()*0x100)-0x80;num2=int(Math.random()*0x100)-0x80;if(num1|num2){break;}}
 					return [Op.pushbyte,num1,Op.pushbyte,num2,Op.bitor];
 				break;
 				case 6:
-					while(true){num1=int(Math.random()*0x100);num2=int(Math.random()*0x100);if(num1+num2){break;}}
+					while(true){num1=int(Math.random()*0x100)-0x80;num2=int(Math.random()*0x100)-0x80;if(num1+num2){break;}}
 					return [Op.pushbyte,num1,Op.pushbyte,num2,Op.add_i];
 				break;
 				case 7:
-					while(true){num1=int(Math.random()*0x100);num2=int(Math.random()*0x100);if(num1-num2){break;}}
+					while(true){num1=int(Math.random()*0x100)-0x80;num2=int(Math.random()*0x100)-0x80;if(num1-num2){break;}}
 					return [Op.pushbyte,num1,Op.pushbyte,num2,Op.subtract_i];
 				break;
 				case 8:
-					while(true){num1=int(Math.random()*0x100);num2=int(Math.random()*4);if(num1<<num2){break;}}
+					while(true){num1=int(Math.random()*0x100)-0x80;num2=int(Math.random()*4);if(num1<<num2){break;}}
 					return [Op.pushbyte,num1,Op.pushbyte,num2,Op.lshift];
 				break;
 				case 9:
-					while(true){num1=int(Math.random()*0x100);num2=int(Math.random()*4);if(num1>>num2){break;}}
+					while(true){num1=int(Math.random()*0x100)-0x80;num2=int(Math.random()*4);if(num1>>num2){break;}}
 					return [Op.pushbyte,num1,Op.pushbyte,num2,Op.rshift];
+				break;
+				case 10:
+					while(true){num1=int(Math.random()*0x100)-0x80;if(~num1){break;}}
+					return [Op.pushbyte,num1,Op.bitnot];
 				break;
 			}
 			return null;
@@ -493,7 +501,7 @@ package zero.swf.funs{
 		}
 		private static function getLookUpSwitch():Array{
 			var arr:Array=[
-				Op.pushbyte,int(Math.random()*0x100),
+				Op.pushbyte,int(Math.random()*0x100)-0x80,
 				Op.lookupswitch
 			]
 			var case_count:int=int(Math.random()*2)+1;
