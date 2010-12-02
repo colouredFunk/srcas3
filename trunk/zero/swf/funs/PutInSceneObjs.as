@@ -1,26 +1,30 @@
-/***
-StageAdder 版本:v1.0
+﻿/***
+PutInSceneObjs 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月12日 20:30:08
+创建时间:2010年12月1日 21:06:31
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
 package zero.swf.funs{
+	import flash.utils.*;
+	
 	import zero.swf.*;
 	import zero.swf.avm2.*;
 	import zero.swf.avm2.advances.*;
 	import zero.swf.tagBodys.*;
 	import zero.swf.vmarks.*;
 	
-	public class StageAdder{
+	public class PutInSceneObjs{
 		private static var tagAndClassNameByDefIdArr:Array;
 		private static var putInSceneSpriteArr:Array;
-		public static function addStageToSWF(swf:SWF2,getStageMethod_traits_info:AdvanceTraits_info):void{
+		public static var classNameByDefIdArr:Array;
+		public static var classNameMark:Object;
+		public static function init(swf:SWF2):void{
 			var tag:Tag;
 			var className:String;
-			var classNameByDefIdArr:Array=new Array();
+			classNameByDefIdArr=new Array();
 			for each(tag in swf.tagV){
 				if(tag.type==TagType.SymbolClass){
 					var symbolClass:SymbolClass=tag.getBody() as SymbolClass;
@@ -57,7 +61,7 @@ package zero.swf.funs{
 			
 			tagAndClassNameByDefIdArr=null;
 			
-			var classNameMark:Object=new Object();
+			classNameMark=new Object();
 			for each(className in putInSceneSpriteArr){
 				if(className){
 					classNameMark["~"+className]=true;
@@ -66,41 +70,9 @@ package zero.swf.funs{
 			if(classNameByDefIdArr[0]){
 				classNameMark["~"+classNameByDefIdArr[0]]=true;//文档类
 			}
-			classNameByDefIdArr=null;
 			putInSceneSpriteArr=null;
-			
-			for each(tag in swf.tagV){
-				switch(tag.type){
-					case TagType.DoABC:
-					case TagType.DoABCWithoutFlagsAndName:
-						for each(var clazz:AdvanceClass in ((tag.getBody() as DoABCWithoutFlagsAndName).abc as AdvanceABC).clazzV){
-							if(classNameMark["~"+(
-								clazz.name.ns.name
-								?
-								clazz.name.ns.name+"."+clazz.name.name
-								:
-								clazz.name.name
-							)]){
-								//trace("className="+className);
-								var hasStage:Boolean=false;
-								for each(var traits_info:AdvanceTraits_info in clazz.itraits_infoV){
-									if(traits_info.name.name=="stage"){
-										hasStage=true;
-										break;
-									}
-								}
-								if(hasStage){
-									//import zero.Outputer;
-									//Outputer.output("hasStage="+hasStage);
-								}else{
-									clazz.itraits_infoV.push(getStageMethod_traits_info.cloneAsMethodTrait());
-								}
-							}
-						}
-					break;
-				}
-			}
 		}
+		
 		private static function getObjsPutInScene(placeObject:*):void{
 			if(tagAndClassNameByDefIdArr[placeObject.CharacterId]){
 				var tag:Tag=tagAndClassNameByDefIdArr[placeObject.CharacterId][0];

@@ -223,11 +223,11 @@ package zero.swf.avm2.advances{
 			for each(var method_body_info:Method_body_info in abcFile.method_body_infoV){
 				method_body_info_arr[method_body_info.method]=method_body_info;
 			}
+			
 			clazzV=new Vector.<AdvanceClass>(abcFile.instance_infoV.length);
 			script_infoV=new Vector.<AdvanceScript_info>(abcFile.script_infoV.length);
 			//准备完毕
 			
-			//
 			i=-1;
 			for each(var instance_info:Instance_info in abcFile.instance_infoV){
 				i++;
@@ -238,7 +238,7 @@ package zero.swf.avm2.advances{
 				i++;
 				getInfoByIdAndMemberType(i,Member.SCRIPT_INFO);
 			}
-			//
+			
 			
 			method_body_info_arr=null;
 			
