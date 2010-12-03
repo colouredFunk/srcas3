@@ -10,9 +10,8 @@ FileSelecterManager 版本:v1.0
 package zero.ui{
 	import flash.display.*;
 	import flash.events.*;
-	import flash.filesystem.File;
-	import flash.net.*;
 	import flash.utils.*;
+	import flash.net.*;
 	
 	import mx.controls.ComboBox;
 
@@ -328,9 +327,16 @@ package zero.ui{
 			ComboBoxManager.addLabel(cb,decodeURI(url));
 		}
 		public function addFile(file:*):void{
+			var FileClass:Class;
+			try{
+				FileClass=getDefinitionByName("flash.filesystem.File") as Class;
+			}catch(e:Error){
+				trace("不支持 addFile");
+				return;
+			}
 			__file.url=file.url;
 			if(__file.exists){
-				lastFSMFile=new File(__file.url);
+				lastFSMFile=new FileClass(__file.url);
 				addURL(__file.url);
 				select(null);
 				//trace("__file.url="+__file.url);
@@ -358,14 +364,14 @@ package zero.ui{
 					*/
 				break;
 				case DIR:
-					if(fileArr.length==1&&(fileArr[0] as File).isDirectory){
+					if(fileArr.length==1&&fileArr[0].isDirectory){
 						return true;
 					}
 				break;
 			}
 			return false;
 		}
-		private function checkFileIsMatchType(file:File):Boolean{
+		private function checkFileIsMatchType(file:*):Boolean{
 			for each(var fileFilter:FileFilter in fileFilterList){
 				if(fileFilter.extension.indexOf("*.*")==-1){
 					return new RegExp("^("+fileFilter.extension.replace(/;/g,"|").replace(/\./g,"\\.").replace(/\*/g,".*")+")$","i").test(decodeURI(file.url));
