@@ -5,13 +5,14 @@
 		 creationComplete="creationComplete()"
 		 removedFromStage="removed()"
 		 width="300" height="25"
-		 nativeDragEnter="nativeDragEnter(event)" nativeDragDrop="nativeDragDrop(event)"
 >
 	<mx:TextInput id="txt" editable="false" left="0" right="75" textAlign="right"/>
 	<mx:ComboBox id="cb" left="0" right="75" minWidth="0"/>
 	<mx:Button id="btn" y="0" label="浏览" right="0"/>
 	<fx:Script>
 		<![CDATA[
+			//import flash.desktop.ClipboardFormats;
+			
 			public var fsm:FileSelecterManager;
 			
 			private function creationComplete():void{
@@ -19,19 +20,33 @@
 				fsm.txt=txt;
 				fsm.cb=cb;
 				fsm.btn=btn;
+				try{
+					getDefinitionByName("flash.events.NativeDragEvent")
+				}catch(e:Error){
+					return;
+				}
+				this.addEventListener(getDefinitionByName("flash.events.NativeDragEvent").NATIVE_DRAG_ENTER,nativeDragEnter);
+				this.addEventListener(getDefinitionByName("flash.events.NativeDragEvent").NATIVE_DRAG_DROP,nativeDragDrop);
 			}
 			private function removed():void{
 				fsm.clear();
+				try{
+					getDefinitionByName("flash.events.NativeDragEvent")
+				}catch(e:Error){
+					return;
+				}
+				this.removeEventListener(getDefinitionByName("flash.events.NativeDragEvent").NATIVE_DRAG_ENTER,nativeDragEnter);
+				this.removeEventListener(getDefinitionByName("flash.events.NativeDragEvent").NATIVE_DRAG_DROP,nativeDragDrop);
 			}
 
-			private function nativeDragEnter(event:NativeDragEvent):void{
-				if(fsm.checkIsMatchType(event.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT) as Array)){
-					NativeDragManager.acceptDragDrop(this);
+			private function nativeDragEnter(event:*):void{//NativeDragEvent
+				if(fsm.checkIsMatchType(event.clipboard.getData(getDefinitionByName("flash.desktop.ClipboardFormats").FILE_LIST_FORMAT) as Array)){
+					getDefinitionByName("flash.desktop.NativeDragManager").acceptDragDrop(this);
 				}
 			}
 
-			private function nativeDragDrop(event:NativeDragEvent):void{
-				fsm.nativeDragDrop(event.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT) as Array);
+			private function nativeDragDrop(event:*):void{//NativeDragEvent
+				fsm.nativeDragDrop(event.clipboard.getData(getDefinitionByName("flash.desktop.ClipboardFormats").FILE_LIST_FORMAT) as Array);
 			}
 
 		]]>

@@ -122,15 +122,23 @@ package zero.swf.funs{
 		
 		public static function forEachTraits(
 			swf:SWF2,
-			className:String,
+			classNameArr:Array,
 			traitsNameArr:Array,
 			fun:Function
 		):void{
 			DoABCWithoutFlagsAndName.setDecodeABC(AdvanceABC);
 			var tag:Tag,advanceABC:AdvanceABC,clazz:AdvanceClass;
-			var traitsNameMark:Object=new Object();
-			for each(var traitsName:String in traitsNameArr){
-				traitsNameMark["~"+traitsName]=true;
+			if(traitsNameArr){
+				var traitsNameMark:Object=new Object();
+				for each(var traitsName:String in traitsNameArr){
+					traitsNameMark["~"+traitsName]=true;
+				}
+			}
+			if(classNameArr){
+				var classNameMark:Object=new Object();
+				for each(var className:String in classNameArr){
+					classNameMark["~"+className]=true;
+				}
 			}
 			for each(tag in swf.tagV){
 				switch(tag.type){
@@ -138,44 +146,55 @@ package zero.swf.funs{
 					case TagType.DoABCWithoutFlagsAndName:
 						advanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc as AdvanceABC
 						for each(clazz in advanceABC.clazzV){
-							if(
-								(
-									clazz.name.ns.name
-									?
-									clazz.name.ns.name+"."+clazz.name.name
-									:
-									clazz.name.name
-								)==className
-							){
-								var i:int;
-								i=clazz.itraits_infoV.length;
-								while(--i>=0){
-									traitsName=clazz.itraits_infoV[i].name.name;
-									//trace("traitsName="+traitsName);
+							className=(
+								clazz.name.ns.name
+								?
+								clazz.name.ns.name+"."+clazz.name.name
+								:
+								clazz.name.name
+							);
+							
+							if(classNameMark){
+								if(classNameMark["~"+className]){
+									delete classNameMark["~"+className];
+								}else{
+									continue;
+								}
+							}
+							
+							var i:int;
+							i=clazz.itraits_infoV.length;
+							while(--i>=0){
+								traitsName=clazz.itraits_infoV[i].name.name;
+								if(traitsNameMark){
 									if(traitsNameMark["~"+traitsName]){
-										//trace("traitsName="+traitsName);
-										//clazz.itraits_infoV.splice(i,1);
-										fun(clazz,clazz.itraits_infoV,i,traitsName);
+									}else{
+										continue;
 									}
 								}
-								i=clazz.ctraits_infoV.length;
-								while(--i>=0){
-									traitsName=clazz.ctraits_infoV[i].name.name;
-									//trace("traitsName="+traitsName);
+								fun(clazz,clazz.itraits_infoV,i,traitsName);
+							}
+							i=clazz.ctraits_infoV.length;
+							while(--i>=0){
+								traitsName=clazz.ctraits_infoV[i].name.name;
+								if(traitsNameMark){
 									if(traitsNameMark["~"+traitsName]){
-										//trace("traitsName="+traitsName);
-										//clazz.ctraits_infoV.splice(i,1);
-										fun(clazz,clazz.ctraits_infoV,i,traitsName);
+									}else{
+										continue;
 									}
 								}
-								DoABCWithoutFlagsAndName.setDecodeABC(null);
-								return;
+								fun(clazz,clazz.ctraits_infoV,i,traitsName);
 							}
 						}
 					break;
 				}
 			}
-			throw new Error("找不到 class: "+className);
+			DoABCWithoutFlagsAndName.setDecodeABC(null);
+			
+			for(className in classNameMark){
+				throw new Error("找不到 class: "+className);
+				break;
+			}
 		}
 		
 		public static function getCodesSWF(swf:SWF2,docClassSWF:SWF2=null,addFrame:Boolean=false):SWF2{
@@ -643,6 +662,28 @@ package zero.swf.funs{
 				method0.codes.codeArr.unshift(code1);
 				method0.codes.codeArr.unshift(code0);
 			}
+		}
+		
+		public static function addPlayerVersionSWF(swf:SWF2,playerVersionSWFData:ByteArray):void{
+			//检测播放器版本
+			var playerVersionSWF:SWF2=new SWF2();
+			playerVersionSWF.initBySWFData(playerVersionSWFData);
+			
+			swf.tagV.pop();//End
+			swf.tagV.pop();//ShowFrame
+			swf.tagV.pop();//ShowFrame
+			swf.tagV.pop();//ShowFrame
+			swf.tagV.pop();//ShowFrame
+			
+			swf.tagV=swf.tagV.concat(Za7Za8.getUsefulTags(playerVersionSWF.tagV));
+			
+			playerVersionSWF=null;
+			
+			swf.tagV.push(new Tag(TagType.ShowFrame));
+			swf.tagV.push(new Tag(TagType.ShowFrame));
+			swf.tagV.push(new Tag(TagType.ShowFrame));
+			swf.tagV.push(new Tag(TagType.ShowFrame));
+			swf.tagV.push(new Tag(TagType.End));
 		}
 	}
 }
