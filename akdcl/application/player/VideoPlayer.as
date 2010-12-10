@@ -67,7 +67,7 @@ package akdcl.application.player{
 		override public function set contentHeight(value:uint):void {
 			super.contentHeight = value;
 			if (content) {
-				content.fitHeight = contentWidth;
+				content.fitHeight = contentHeight;
 			}
 		}
 		override public function get content():* {

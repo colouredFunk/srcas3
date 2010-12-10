@@ -145,6 +145,9 @@ package akdcl.application.player{
 			return idPart.id;
 		}
 		public function set playID(_playID:int):void {
+			if (idPart.length == 1 && _playID == 1) {
+				idPart.setID( -1);
+			}
 			idPart.id = _playID;
 		}
 		//0:不循环，1:单首循环，2:顺序循环(全部播放完毕后停止)，3:顺序循环，4:随机播放
@@ -353,6 +356,9 @@ package akdcl.application.player{
 				case 4:
 					//待完善
 					stop();
+					break;
+				case 5:
+					pause();
 					break;
 			}
 			dispatchEvent(new MediaEvent(MediaEvent.PLAY_COMPLETE));

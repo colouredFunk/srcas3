@@ -27,7 +27,7 @@
 			if (btn_down) {
 				//btn_down.press=goDown;
 			}
-			slider.change=function(_value:Number,_min:Number,_max:Number):void{
+			slider.change=function(_value:Number):void{
 				setValue();
 			};
 			rectMask.visible=false;
@@ -47,11 +47,11 @@
 				content.x=offX;
 				rectMask.width=content.width+5;
 				maximum=content.height-rectMask.height+heightTB*2;
+				slider.maximum=maximum;
 				if (autoSize) {
 					slider.x=rectMask.width+10;
+					slider.length=rectMask.height-slider.y*2;
 				}
-				slider.maximum=maximum;
-				slider.length=rectMask.height-slider.y*2;
 				setValue();
 				content.cacheAsBitmap=true;
 				rectMask.cacheAsBitmap=true;

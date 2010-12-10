@@ -37,7 +37,7 @@ package akdcl.application
 					return;
 				}
 			}
-			if (__id==_id) {
+			if (__id == _id) {
 				return;
 			}
 			__dir = _id - __id;
