@@ -79,15 +79,15 @@ package ui{
 			}
 			if (thumb && bar) {
 				offXThumb = thumb.x - bar.width - bar.x;
-				length = (thumb.x - bar.x + offXThumb)  * scaleX;
+				length = Math.round((thumb.x - bar.x + offXThumb)  * scaleX);
 			}else if (bar) {
-				length = bar.width * scaleX;
+				length = Math.round(bar.width * scaleX);
 			}else {
-				length = thumb.x  * scaleX;
+				length = Math.round(thumb.x  * scaleX);
 			}
 			scaleX = 1;
-			enabled = false;
 			value = 0;
+			buttonMode = false;
 		}
 		override protected function onRemoveToStageHandler():void {
 			super.onRemoveToStageHandler();

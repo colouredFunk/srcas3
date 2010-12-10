@@ -5,6 +5,7 @@
 	import com.greensock.loading.ImageLoader;
 	import com.greensock.loading.display.ContentDisplay;
 	import flash.display.MovieClip;
+	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
 	import flash.text.TextField;
 	
@@ -228,6 +229,10 @@
 				autoFitArea.attach(_content, _scaleMode, _alignX, _alignY, false, 0, _widthMax, 0, _heightMax);
 			}
 		}
+		protected function onImageErrorHandler(_evt:*):void {
+			setProgressClip(false);
+			dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR));
+		}
 		protected function onImageLoadingHandler(_evt:*):void {
 			__loadProgress = _evt?_evt.target.progress:1;
 			setProgressClip(__loadProgress);
@@ -283,6 +288,7 @@
 			if (!loaderMaxDic[_imageGroup]) {
 				loaderMax = new LoaderMax( { name:_imageGroup,
 											noCache:false,
+											onChildFail:onChildFailHandler,
 											onChildProgress:onChildProgressHandler,
 											onChildComplete:onChildCompleteHandler,
 											onProgress:onProgressHandler,
@@ -339,6 +345,15 @@
 		private static function deregister(_source:String, _imageLoader:ui.ImageLoader):void {
 			if (registeredDic[_source]) {
 				delete registeredDic[_source][_imageLoader];
+			}
+		}
+		private static function onChildFailHandler(_evt:LoaderEvent):void {
+			var _dic:Dictionary = registeredDic[_evt.target.url];
+			if (!_dic) {
+				return;
+			}
+			for each(var _imageLoader:ui.ImageLoader in _dic) {
+				_imageLoader.onImageErrorHandler(_evt);
 			}
 		}
 		private static function onChildProgressHandler(_evt:LoaderEvent):void {

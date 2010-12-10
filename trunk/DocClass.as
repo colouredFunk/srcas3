@@ -37,18 +37,20 @@
 		protected function onInitHandler(_evt:Event):void {
 			Security.allowDomain("*");
 			Security.allowInsecureDomain("*");
-			if (isTopAndNoScale) {
-				stage.align=StageAlign.TOP;
-				stage.scaleMode = StageScaleMode.NO_SCALE;
-			}else {
-				stage.align=StageAlign.TOP_LEFT;
-				stage.scaleMode = StageScaleMode.SHOW_ALL;
+			if (stage) {
+				if (isTopAndNoScale) {
+					stage.align=StageAlign.TOP;
+					stage.scaleMode = StageScaleMode.NO_SCALE;
+				}else {
+					stage.align=StageAlign.TOP_LEFT;
+					stage.scaleMode = StageScaleMode.SHOW_ALL;
+				}
+				stage.showDefaultContextMenu = false;
 			}
-			stage.showDefaultContextMenu = false;
 			tabChildren = false;
 			__widthOrg = loaderInfo.width;
 			__heightOrg = loaderInfo.height;
-			__flashVars = loaderInfo.parameters;
+			flashVars = loaderInfo.parameters;
 			paramsObject.width = widthOrg;
 			paramsObject.height = heightOrg;
 			Common.addContextMenu(this, decodeURI(this.loaderInfo.url).split("/").pop() + ":" + widthOrg + " x " + heightOrg, onWHReleaseHandler);
@@ -156,6 +158,12 @@
 			return __heightOrg;
 		}
 		private var __flashVars:Object;
+		public function set flashVars(_flashVars:Object):void {
+			if (loaderInfo.parameters && __flashVars) {
+				return;
+			}
+			__flashVars = _flashVars;
+		}
 		public function get flashVars():Object {
 			return __flashVars;
 		}

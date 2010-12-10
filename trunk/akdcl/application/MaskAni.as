@@ -75,6 +75,7 @@
 		private function runStep(_evt:Event):void {
 			if (delay>0) {
 				delay--;
+				stop();
 				return;
 			}
 			for (var _i:uint; _i<speed; _i++) {

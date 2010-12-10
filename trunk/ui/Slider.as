@@ -70,7 +70,7 @@
 		}
 		public function $wheel(_delta:int):void {
 			if (timeHolded == 0) {
-				value += _delta * snapInterval;
+				value += (_delta > 0?10: -10) * snapInterval;
 			}
 		}
 		protected function onHoldingHandler(_evt:Event):void {

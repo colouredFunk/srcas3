@@ -34,7 +34,7 @@ package akdcl.application.player{
 		override protected function init():void {
 			super.init();
 			content = new ImageLoader();
-			//content.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);
+			content.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);
 			content.addEventListener(ProgressEvent.PROGRESS, onLoadProgressHandler);
 			content.addEventListener(Event.COMPLETE, onLoadCompleteHandler);
 		}
