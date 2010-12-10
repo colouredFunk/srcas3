@@ -26,15 +26,21 @@ public class StatusManager{
 	public static var msgPopUp:Function;
 	public static var statusCount:int;
 	public static var onStatus:Function;
+	
+	public static var statusName:String;
+	
 	public static var prevCheckStatus:Function=function():Boolean{
 		return true;
 	}
 	
 	private static var statusURLLoader:URLLoader;
 	
+	public static var loadedData:Object;
+	
 	public static function loadXML(url:String):void{
 		statusURLLoader=new URLLoader();
 		statusURLLoader.addEventListener(Event.COMPLETE,loadXMLComplete);
+		loadedData=null;
 		statusURLLoader.load(new URLRequest(url));
 	}
 	private static function loadXMLComplete(event:Event):void{
@@ -43,17 +49,22 @@ public class StatusManager{
 		statusURLLoader=null;
 		init(xml);
 	}
-	public static function init(_xml:XML,_loginStatus:String="1"/*,_normalStatus:String="2"*/):void{
+	public static function init(
+		_xml:XML,
+		_loginStatus:String="1",
+		_statusName:String="status"
+	):void{
 		xml=_xml;
 		loginStatus=_loginStatus;
 		//normalStatus=_normalStatus;
+		statusName=_statusName;
 		statusCount=0;
 		statusXMLs=new Array();
 		for each(var node:XML in xml.children()){
 			//trace(node.toXMLString());
 			switch(node.name().toString()){
-				case "status":
-					statusXMLs[node.@status.toString()]=node;
+				case statusName:
+					statusXMLs[node["@"+statusName].toString()]=node;
 				break;
 				default:
 					StatusManager[node.name()+"XML"]=node;
@@ -80,10 +91,12 @@ public class StatusManager{
 			request.data=urlVariables;
 			request.method=URLRequestMethod.POST;
 		}
+		loadedData=null;
 		statusURLLoader.load(request);
 	}
 	private static function loadStatusFinished(event:Event):void{
-		currXML=statusXMLs[statusURLLoader.data.status];
+		loadedData=statusURLLoader.data;
+		currXML=statusXMLs[loadedData[statusName]];
 		if(currXML){
 		}else{
 			currXML=errorXML;
@@ -107,7 +120,7 @@ public class StatusManager{
 	private static function runStatus(alertCallBackB:Boolean=true,noRemoveAlert:Boolean=false):void{
 		if(alertCallBackB){
 			GotoURL.goto(currXML,statusURLLoader.data);
-			switch(currXML.@status.toString()){
+			switch(currXML["@"+statusName].toString()){
 				case loginStatus:
 					//提示用户要登录
 					GotoURL.goto(getValue("login"),statusURLLoader.data);
