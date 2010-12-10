@@ -13,17 +13,23 @@ package zero.swf.funs{
 	import flash.utils.*;
 	
 	public class JunksAdder{
-		public static function getIdArr(total:int,L:int):Array{
-			var idArr:Array=new Array();
+		public static function getIdV(total:int,L:int,useMark:Boolean):*{
 			var i:int=total>L?L:total;
 			var id:int;
+			var idMarkV:Vector.<Boolean>=new Vector.<Boolean>(L);
+			var idV:Vector.<int>=new Vector.<int>();
+			idMarkV.fixed=true;
 			while(--i>=0){
 				do{
 					id=int(Math.random()*L);
-				}while(idArr[id]);
-				idArr[id]=true;
+				}while(idMarkV[id]);
+				idMarkV[id]=true;
+				idV.push(id);
 			}
-			return idArr;
+			if(useMark){
+				return idMarkV;
+			}
+			return idV;
 		}
 	}
 }

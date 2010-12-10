@@ -97,6 +97,7 @@ package zero.swf.funs{
 			]
 		];
 		private static var dict:Dictionary;
+		private static var ifCodeArr:Array=[Op.ifnlt,Op.ifnle,Op.ifngt,Op.ifnge,Op.ifeq,Op.ifne,Op.iflt,Op.ifle,Op.ifgt,Op.ifge,Op.ifstricteq,Op.ifstrictne];
 		public static function reset():void{
 			dict=new Dictionary();
 		}
@@ -165,14 +166,14 @@ package zero.swf.funs{
 			
 			var i:int=L-1;//不能 jump 到句子后面，否则播放器报错：VerifyError: Error #1020: 代码不能超出方法结尾。
 			
-			var idArr:Array=getIdArr(5,i);
+			var idMarkV:Vector.<Boolean>=getIdV(5,i,true);
 			
 			//trace("codes.codeArr.length="+codes.codeArr.length);
 			
 			var ran:int;
 			
 			while(--i>0){
-				if(idArr[i]){
+				if(idMarkV[i]){
 					if(codeArr[i]===Op.label){
 						continue;
 					}
@@ -219,7 +220,7 @@ package zero.swf.funs{
 							//扰码
 							ran=(Math.random()*3)+1;
 							while(--ran>=0){
-								switch(int(Math.random()*4)){
+								switch(int(Math.random()*3)){
 								//switch(2){
 									case 0:
 										codeArr.splice(j++,0,getPushTrue());
@@ -232,18 +233,25 @@ package zero.swf.funs{
 											getLookUpSwitch()
 										);
 									break;
-									/*
 									case 2:
-										//个别游戏出错 VerifyError: Error #1032: Cpool 索引 5 超出范围 5。
-										codeArr.splice(j++,0,[Op.pushstring,int(Math.random()*5)+1]);//这里假定了 constant_pool 里至少有 5 个 string
-										codeArr.splice(j++,0,getPop());
+										var junkLabelMark:LabelMark=new LabelMark();
+										//codeArr.splice(j++,0,junkLabelMark);
+										//codeArr.splice(j++,0,Op.label);
+										var junkJumpCode:Code;
+										if(Math.random()<0.1){
+											junkJumpCode=new Code(Op.jump,junkLabelMark);
+											codeArr.splice(j++,0,junkJumpCode);
+										}else{
+											codeArr.splice(j++,0,getPushTrue());
+											codeArr.splice(j++,0,getPushTrue());
+											junkJumpCode=new Code(
+												ifCodeArr[int(Math.random()*ifCodeArr.length)],
+												junkLabelMark
+											);
+											codeArr.splice(j++,0,junkJumpCode);
+										}
+										codeArr.splice(j++,0,junkLabelMark);
 									break;
-									case 3:
-										//个别游戏出错 VerifyError: Error #1032: Cpool 索引 5 超出范围 5。
-										codeArr.splice(j++,0,[Op.pushnamespace,int(Math.random()*5)+1]);//这里假定了 constant_pool 里至少有 5 个 pushnamespace
-										codeArr.splice(j++,0,getPop());
-									break;
-									//*/
 								}
 							}
 							
@@ -428,7 +436,7 @@ package zero.swf.funs{
 			
 			//trace("codes.codeArr.length="+codes.codeArr.length+"---------");
 			
-			method.max_stack+=2;
+			method.max_stack+=4;
 			
 			DoABCWithoutFlagsAndName.setDecodeABC(null);
 		}

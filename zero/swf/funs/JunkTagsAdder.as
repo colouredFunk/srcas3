@@ -8,31 +8,41 @@ JunkTagsAdder 版本:v1.0
 */
 
 package zero.swf.funs{
-	import flash.utils.ByteArray;
+	import flash.utils.*;
 	
+	import zero.Disorder;
 	import zero.swf.*;
+	import zero.swf.tagBodys.*;
 	
 	public class JunkTagsAdder extends JunksAdder{
+		private static const TYPE_LoopPlaceObject2:int=1;
+		private static const TYPE_LoopAction:int=2;
+		private static const TYPE_EmptySoundStreamBlock:int=3;
+		
 		public static function addJunkTags(swf:SWF2,total:int=10):void{
-			if(total>swf.tagV.length){
-				total=swf.tagV.length;
-			}
+			//挂 ASV:
+			//total个插入到 JunkSprite 中的 loopPlaceObject2
+			//total个插入到正常 DefineSprite 中的 loopPlaceObject2
 			
-			var actionLoopIdArr:Array=getIdArr(total,swf.tagV.length);
+			//挂 ASV:
+			//total个单独的 loopAction
+			//total个插入到 JunkSprite 中的 loopAction
+			//total个插入到正常 DefineSprite 中的 loopAction
 			
-			var loopSpriteIdArr:Array=getIdArr(total,swf.tagV.length);
+			//挂 闪客精灵:
+			//total个插入到 JunkSprite 中的 emptySoundStreamBlock
 			
-			//var emptySoundStreamBlockIdArr:Array=getIdArr(total,swf.tagV.length);
-			var emptySoundStreamBlockSpriteIdArr:Array=getIdArr(total,swf.tagV.length);
+			var pos:Pos,subPos:Pos,tag:Tag,subTag:Tag,tagOrPos:*,subTagOrPos:*;
+			
+			var posV:Vector.<Pos>=new Vector.<Pos>();
+			var in_normal_sprite_loopPlaceObject2PosV:Vector.<Pos>=new Vector.<Pos>();
+			var in_normal_sprite_posV:Vector.<Pos>=new Vector.<Pos>();
 			
 			var avalibleDefineObjIdV:Vector.<int>=GetAvalibleDefineObjIdV.getAvalibleDefineObjIdV(swf.tagV);
 			
-			var i:int=swf.tagV.length;
-			loop:while(--i>=0){
-				var tag:Tag=swf.tagV[i];
+			var tagAndPosArr:Array=new Array();
+			for each(tag in swf.tagV){
 				switch(tag.type){
-					case TagType.End:
-					break;
 					case TagType.FileAttributes:
 					case TagType.Metadata:
 					case TagType.SetBackgroundColor:
@@ -41,37 +51,202 @@ package zero.swf.funs{
 					case TagType.DebugID:
 					case TagType.ScriptLimits:
 					case TagType.ProductInfo:
-						break loop;
+					case TagType.DefineSceneAndFrameLabelData:
+					case TagType.End:
+						//这些 tag 前面不能有 pos
+						tagAndPosArr.push(tag);
 					break;
 					default:
-						///*
-						if(actionLoopIdArr[i]){
-							swf.tagV.splice(i,0,getActionLoopTag());
+						pos=new Pos();
+						posV.push(pos);
+						tagAndPosArr.push(pos);
+						if(tag.type==TagType.DefineSprite){
+							pos.id=tag.getDefId();
+							var subTagAndPosArr:Array=new Array();
+							var placeObject2:PlaceObject2=null;
+							for each(subTag in (tag.getBody() as DefineSprite).dataAndTags.tagV){
+								switch(subTag.type){
+									case TagType.End:
+										//这些 tag 前面不能有 pos
+										subTagAndPosArr.push(subTag);
+									break;
+									default:
+										subPos=new Pos();
+										in_normal_sprite_posV.push(subPos);
+										subTagAndPosArr.push(subPos);
+										if(placeObject2){
+											//上一个 tag 是符合条件的 PlaceObject2
+											subPos.parentId=pos.id;
+											subPos.placeObject2=placeObject2;
+											in_normal_sprite_loopPlaceObject2PosV.push(subPos);
+											placeObject2=null;
+										}
+										subTagAndPosArr.push(subTag);
+										if(subTag.type==TagType.PlaceObject2){
+											placeObject2=subTag.getBody() as PlaceObject2;
+											if(placeObject2.PlaceFlagHasCharacter&&placeObject2.CharacterId){
+											}else{
+												placeObject2=null;
+											}
+										}
+									break;
+								}
+							}
+							pos.tagAndPosArr=subTagAndPosArr;
+						}else{
+							tagAndPosArr.push(tag);
 						}
-						//*/
-						
-						///*
-						if(loopSpriteIdArr[i]){
-							swf.tagV.splice(i,0,getLoopSpriteTag(avalibleDefineObjIdV.shift()));
-						}
-						//*/
-						
-						/*
-						if(emptySoundStreamBlockIdArr[i]){
-							//trace("能挂闪客精灵，但是 FlashPlayer 10 播放时会有 “啪” 的一声，而且让 FlashPlayer 9 和 8 挂了");
-							
-							//使 闪客精灵 挂掉的元素
-							//一个空的 SoundStreamBlock:
-							swf.tagV.splice(i,0,new Tag(TagType.SoundStreamBlock));
-						}
-						//*/
-						if(emptySoundStreamBlockSpriteIdArr[i]){
-							swf.tagV.splice(i,0,getEmptySoundStreamBlockSpriteTag(avalibleDefineObjIdV.shift()));
-						}
-						
 					break;
 				}
 			}
+			//
+			
+			/////////////////////////////////////////////////////////////////////
+			var id:int,L:int,tagV:Vector.<Tag>;
+			
+			//挂 ASV:
+			///*
+			//total个插入到 JunkSprite 中的 loopPlaceObject2
+			for each(id in getIdV(total,posV.length,false)){
+				posV[id].tagV.push(
+					getJunkSpriteTag(
+						avalibleDefineObjIdV.shift(),
+						TYPE_LoopPlaceObject2
+					)
+				);
+			}
+			//*/
+			///*
+			//total个插入到正常 DefineSprite 中的 loopPlaceObject2
+			for each(id in getIdV(total,in_normal_sprite_loopPlaceObject2PosV.length,false)){
+				subPos=in_normal_sprite_loopPlaceObject2PosV[id];
+				subPos.tagV.push(
+					getPlaceObject2Tag(subPos.parentId,subPos.placeObject2.Depth)
+				);
+			}
+			//*/
+			
+			//挂 ASV:
+			///*
+			//total个单独的 loopAction
+			for each(id in getIdV(total,posV.length,false)){
+				posV[id].tagV.push(getActionLoopTag());
+			}
+			//*/
+			///*
+			//total个插入到 JunkSprite 中的 loopAction
+			for each(id in getIdV(total,posV.length,false)){
+				posV[id].tagV.push(
+					getJunkSpriteTag(
+						avalibleDefineObjIdV.shift(),
+						TYPE_LoopAction
+					)
+				);
+			}
+			//*/
+			///*
+			//total个插入到正常 DefineSprite 中的 loopAction
+			for each(id in getIdV(total,in_normal_sprite_posV.length,false)){
+				in_normal_sprite_posV[id].tagV.push(getActionLoopTag());
+			}
+			//*/
+			
+			//挂 闪客精灵:
+			///*
+			//total个插入到 JunkSprite 中的 emptySoundStreamBlock
+			for each(id in getIdV(total,posV.length,false)){
+				posV[id].tagV.push(
+					getJunkSpriteTag(
+						avalibleDefineObjIdV.shift(),
+						TYPE_EmptySoundStreamBlock
+					)
+				);
+			}
+			//*/
+			/////////////////////////////////////////////////////////////////////
+			
+			//
+			swf.tagV=new Vector.<Tag>();
+			for each(tagOrPos in tagAndPosArr){
+				if(tagOrPos is Tag){
+					tag=tagOrPos;
+					swf.tagV.push(tag);
+				}else{
+					pos=tagOrPos;
+					if(pos.tagV.length){
+						for each(tag in pos.tagV){
+							swf.tagV.push(tag);
+						}
+					}
+					if(pos.tagAndPosArr){
+						var defineSprite:DefineSprite=new DefineSprite();
+						defineSprite.id=pos.id;
+						defineSprite.dataAndTags=new DataAndTags();
+						defineSprite.dataAndTags.tagV=new Vector.<Tag>();
+						for each(subTagOrPos in pos.tagAndPosArr){
+							if(subTagOrPos is Tag){
+								subTag=subTagOrPos;
+								defineSprite.dataAndTags.tagV.push(subTag);
+							}else{
+								subPos=subTagOrPos;
+								if(subPos.tagV.length){
+									for each(subTag in subPos.tagV){
+										defineSprite.dataAndTags.tagV.push(subTag);
+									}
+								}
+							}
+						}
+						var defineSpriteTag:Tag=new Tag();
+						defineSpriteTag.setBody(defineSprite);
+						swf.tagV.push(defineSpriteTag);
+					}
+				}
+			}
+		}
+		
+		private static function getJunkSpriteTag(defId:int,type:int):Tag{
+			//ASV 会挂掉
+			//一个循环引用的DefineSprite:
+			
+			var defineSprite:DefineSprite=new DefineSprite();
+			defineSprite.id=defId;
+			defineSprite.dataAndTags=new DataAndTags();
+			defineSprite.dataAndTags.tagV=new Vector.<Tag>();
+			
+			var i:int=int(Math.random()*3);//随便给几帧
+			while(--i>=0){
+				defineSprite.dataAndTags.tagV.push(new Tag(TagType.ShowFrame));
+			}
+			
+			if(type==TYPE_LoopPlaceObject2||Math.random()<0.3){
+				defineSprite.dataAndTags.tagV.push(getPlaceObject2Tag(defId));
+			}
+			if(type==TYPE_LoopAction||Math.random()<0.3){
+				defineSprite.dataAndTags.tagV.push(getActionLoopTag());
+			}
+			if(type==TYPE_EmptySoundStreamBlock||Math.random()<0.3){
+				defineSprite.dataAndTags.tagV.push(new Tag(TagType.SoundStreamBlock));
+			}
+			
+			Disorder.disorder(defineSprite.dataAndTags.tagV);
+			defineSprite.dataAndTags.tagV.push(new Tag(TagType.ShowFrame));
+			defineSprite.dataAndTags.tagV.push(new Tag(TagType.End));
+			
+			var defineSpriteTag:Tag=new Tag();
+			defineSpriteTag.setBody(defineSprite);
+			return defineSpriteTag;
+		}
+		private static function getPlaceObject2Tag(CharacterId:int,Depth:int=0):Tag{
+			var placeObject2:PlaceObject2;
+			placeObject2=new PlaceObject2();
+			placeObject2.Depth=Depth>0?Depth:int(Math.random()*5)+1;//随便给个深度
+			
+			placeObject2.PlaceFlagHasCharacter=1;
+			placeObject2.CharacterId=CharacterId;
+			
+			var placeObjectTag:Tag=new Tag();
+			placeObjectTag.setBody(placeObject2);
+			return placeObjectTag;
 		}
 		
 		private static function getActionLoopTag():Tag{
@@ -99,76 +274,18 @@ package zero.swf.funs{
 			return doActionTag;
 		}
 		
-		private static function getLoopSpriteTag(defId:int):Tag{
-			var spriteTag:Tag=new Tag(TagType.DefineSprite);
-			
-			var data:ByteArray=new ByteArray();
-			
-			//ASV 会挂掉
-			//一个循环引用的DefineSprite:
-			
-			data[0]=defId;
-			data[1]=defId>>8;//sprite.id=defId
-			
-			data[2]=0x01;
-			data[3]=0x00;//sprite.dataAndTags.FrameCount=1
-			
-			data[4]=0x05;
-			data[5]=0x01;//placeObject header
-			
-			data[6]=defId;
-			data[7]=defId>>8;//placeObject.CharacterId=defId，把自己 place 到自己里面
-			
-			data[8]=0x01;
-			data[9]=0x00;//placeObject.Depth=1
-			
-			data[10]=0x00;//placeObject.MATRIX
-			
-			data[11]=0x40;
-			data[12]=0x00;//ShowFrame
-			
-			data[13]=0x00;
-			data[14]=0x00;//End
-			
-			spriteTag.setBodyData(data);
-			
-			return spriteTag;
-		}
-		
-		private static function getEmptySoundStreamBlockSpriteTag(defId:int):Tag{
-			var spriteTag:Tag=new Tag(TagType.DefineSprite);
-			
-			var data:ByteArray=new ByteArray();
-			
-			//闪客精灵 会挂掉
-			//一个带空白SoundStreamBlock的DefineSprite:
-			
-			data[0]=defId;
-			data[1]=defId>>8;//sprite.id=defId
-			
-			data[2]=0x01;
-			data[3]=0x00;//sprite.dataAndTags.FrameCount=1
-			
-			data[4]=0xff;
-			data[5]=0x04;
-			data[6]=0x00;
-			data[7]=0x00;
-			data[8]=0x00;
-			data[9]=0x00;//SoundStreamBlock header
-			
-			data[10]=0x40;
-			data[11]=0x00;//ShowFrame
-			
-			data[12]=0x00;
-			data[13]=0x00;//End
-			
-			spriteTag.setBodyData(data);
-			
-			return spriteTag;
-		}
 	}
 }
 
+import zero.swf.Tag;
+import zero.swf.tagBodys.PlaceObject2;
+class Pos{
+	public var parentId:int;
+	public var id:int;
+	public var tagV:Vector.<Tag>=new Vector.<Tag>();
+	public var placeObject2:PlaceObject2;
+	public var tagAndPosArr:Array;
+}
 //
 
 // 常忘正则表达式

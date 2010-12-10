@@ -432,7 +432,7 @@ package zero.swf.funs{
 									objCallMethodTraits_infoXML.methodi[0].codes=codesStr;
 									
 									var objCallMethodTraits_info:AdvanceTraits_info=new AdvanceTraits_info();
-									objCallMethodTraits_info.initByXMLAndMark(
+									objCallMethodTraits_info["initByXMLAndMark"](
 										infoMark,
 										objCallMethodTraits_infoXML
 									);
@@ -674,11 +674,13 @@ package zero.swf.funs{
 			swf.tagV.pop();//ShowFrame
 			swf.tagV.pop();//ShowFrame
 			swf.tagV.pop();//ShowFrame
+			swf.tagV.pop();//ShowFrame
 			
 			swf.tagV=swf.tagV.concat(Za7Za8.getUsefulTags(playerVersionSWF.tagV));
 			
 			playerVersionSWF=null;
 			
+			swf.tagV.push(new Tag(TagType.ShowFrame));
 			swf.tagV.push(new Tag(TagType.ShowFrame));
 			swf.tagV.push(new Tag(TagType.ShowFrame));
 			swf.tagV.push(new Tag(TagType.ShowFrame));

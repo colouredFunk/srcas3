@@ -8,8 +8,6 @@ FileUploader 版本:v1.0
 */
 
 package zero.net{
-	import com.adobe.images.JPGEncoder;
-	
 	import flash.display.*;
 	import flash.events.*;
 	import flash.geom.*;

@@ -28,8 +28,7 @@ package zero{
 			"e0","e1","e2","e3","e4","e5","e6","e7","e8","e9","ea","eb","ec","ed","ee","ef",
 			"f0","f1","f2","f3","f4","f5","f6","f7","f8","f9","fa","fb","fc","fd","fe","ff"
 		]);
-		public static const _16Obj:Object=get_16Obj();
-		private static function get_16Obj():Object{
+		public static const _16Obj:Object=function():Object{
 			var _16Obj:Object=new Object();
 			_16Obj["00"]=0x00;_16Obj["01"]=0x01;_16Obj["02"]=0x02;_16Obj["03"]=0x03;_16Obj["04"]=0x04;_16Obj["05"]=0x05;_16Obj["06"]=0x06;_16Obj["07"]=0x07;_16Obj["08"]=0x08;_16Obj["09"]=0x09;_16Obj["0a"]=0x0a;_16Obj["0b"]=0x0b;_16Obj["0c"]=0x0c;_16Obj["0d"]=0x0d;_16Obj["0e"]=0x0e;_16Obj["0f"]=0x0f;
 			_16Obj["10"]=0x10;_16Obj["11"]=0x11;_16Obj["12"]=0x12;_16Obj["13"]=0x13;_16Obj["14"]=0x14;_16Obj["15"]=0x15;_16Obj["16"]=0x16;_16Obj["17"]=0x17;_16Obj["18"]=0x18;_16Obj["19"]=0x19;_16Obj["1a"]=0x1a;_16Obj["1b"]=0x1b;_16Obj["1c"]=0x1c;_16Obj["1d"]=0x1d;_16Obj["1e"]=0x1e;_16Obj["1f"]=0x1f;
@@ -48,7 +47,7 @@ package zero{
 			_16Obj["e0"]=0xe0;_16Obj["e1"]=0xe1;_16Obj["e2"]=0xe2;_16Obj["e3"]=0xe3;_16Obj["e4"]=0xe4;_16Obj["e5"]=0xe5;_16Obj["e6"]=0xe6;_16Obj["e7"]=0xe7;_16Obj["e8"]=0xe8;_16Obj["e9"]=0xe9;_16Obj["ea"]=0xea;_16Obj["eb"]=0xeb;_16Obj["ec"]=0xec;_16Obj["ed"]=0xed;_16Obj["ee"]=0xee;_16Obj["ef"]=0xef;
 			_16Obj["f0"]=0xf0;_16Obj["f1"]=0xf1;_16Obj["f2"]=0xf2;_16Obj["f3"]=0xf3;_16Obj["f4"]=0xf4;_16Obj["f5"]=0xf5;_16Obj["f6"]=0xf6;_16Obj["f7"]=0xf7;_16Obj["f8"]=0xf8;_16Obj["f9"]=0xf9;_16Obj["fa"]=0xfa;_16Obj["fb"]=0xfb;_16Obj["fc"]=0xfc;_16Obj["fd"]=0xfd;_16Obj["fe"]=0xfe;_16Obj["ff"]=0xff;
 			return _16Obj;
-		}
+		}()
 		
 		public static function bytes2str16(bytes:ByteArray,offset:int,length:int):String{
 			//输出字节数据的 16 进制形式

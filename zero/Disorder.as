@@ -19,7 +19,7 @@ package zero{
 			var i:int=L;
 			while(--i>=0){
 				var ran:int=int(Math.random()*L);
-				var temp:String=arr[i];
+				var temp:*=arr[i];
 				arr[i]=arr[ran];
 				arr[ran]=temp;
 			}
