@@ -260,7 +260,18 @@ package zero.swf{
 				fileAttributes.HasMetadata=0;
 			}
 			
-			if(Version>=8){
+			//if(Version>=8){
+			if(
+				fileAttributes.UseDirectBlit
+				||
+				fileAttributes.UseGPU
+				||
+				fileAttributes.HasMetadata
+				||
+				fileAttributes.ActionScript3
+				||
+				fileAttributes.UseNetwork
+			){
 				tag=new Tag();
 				tag.setBody(fileAttributes);
 				tagV.unshift(tag);

@@ -25,10 +25,13 @@ FILLSTYLE 版本:v1.0
 //					If type = 0x13, FOCALGRADIENT (SWF 8 and later only)
 //BitmapId 			If type = 0x40, 0x41, 0x42 or 0x43, UI16				ID of bitmap character for fill.
 //BitmapMatrix 		If type = 0x40, 0x41, 0x42 or 0x43, MATRIX				Matrix for bitmap fill.
-package zero.swf.records{
+package zero.swf.records.fillStyles{
 	import flash.utils.ByteArray;
 	
 	import zero.BytesAndStr16;
+	
+	import zero.swf.records.MATRIX;
+	import zero.swf.records.SHAPE;
 	import zero.swf.records.gardents.BaseGardent;
 
 	public class FILLSTYLE{
@@ -47,7 +50,7 @@ package zero.swf.records{
 			FillStyleType=data[offset++];
 			switch(FillStyleType){
 				case 0x00:
-					if(SHAPEWITHSTYLE.currSolidFillUseRGBA){
+					if(SHAPE.currSolidFill_use_RGBA){
 						Color=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++]|(data[offset++]<<24);
 					}else{
 						Color=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++];
@@ -59,10 +62,10 @@ package zero.swf.records{
 					GradientMatrix=new MATRIX();
 					offset=GradientMatrix.initByData(data,offset,endOffset);
 					if(FillStyleType==0x13){
-						FocalGradient=new SHAPEWITHSTYLE.currFocalGradientClass();
+						FocalGradient=new SHAPE.currFocalGradientClass();
 						offset=FocalGradient.initByData(data,offset,endOffset);
 					}else{
-						Gradient=new SHAPEWITHSTYLE.currGradientClass();
+						Gradient=new SHAPE.currGradientClass();
 						offset=Gradient.initByData(data,offset,endOffset);
 					}
 				break;
@@ -85,7 +88,7 @@ package zero.swf.records{
 			data[0]=FillStyleType;
 			switch(FillStyleType){
 				case 0x00:
-					if(SHAPEWITHSTYLE.currSolidFillUseRGBA){
+					if(SHAPE.currSolidFill_use_RGBA){
 						data[1]=Color>>16;
 						data[2]=Color>>8;
 						data[3]=Color;
@@ -130,7 +133,7 @@ package zero.swf.records{
 			xml.@FillStyleType="0x"+BytesAndStr16._16V[FillStyleType];
 			switch(FillStyleType){
 				case 0x00:
-					if(SHAPEWITHSTYLE.currSolidFillUseRGBA){
+					if(SHAPE.currSolidFill_use_RGBA){
 						xml.@Color="0x"+BytesAndStr16._16V[(Color>>24)&0xff]+BytesAndStr16._16V[(Color>>16)&0xff]+BytesAndStr16._16V[(Color>>8)&0xff]+BytesAndStr16._16V[Color&0xff];
 					}else{
 						xml.@Color="0x"+BytesAndStr16._16V[(Color>>16)&0xff]+BytesAndStr16._16V[(Color>>8)&0xff]+BytesAndStr16._16V[Color&0xff];
@@ -171,10 +174,10 @@ package zero.swf.records{
 					GradientMatrix=new MATRIX();
 					GradientMatrix.initByXML(xml.GradientMatrix[0]);
 					if(FillStyleType==0x13){
-						FocalGradient=new SHAPEWITHSTYLE.currFocalGradientClass();
+						FocalGradient=new SHAPE.currFocalGradientClass();
 						FocalGradient.initByXML(xml.FocalGradient[0]);
 					}else{
-						Gradient=new SHAPEWITHSTYLE.currGradientClass();
+						Gradient=new SHAPE.currGradientClass();
 						Gradient.initByXML(xml.Gradient[0]);
 					}
 				break;

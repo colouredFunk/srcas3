@@ -2,7 +2,7 @@
 TEXTRECORD 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月4日 21:43:47 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年12月12日 20:19:51 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -63,13 +63,14 @@ package zero.swf.records{
 	public class TEXTRECORD{
 		public static var GlyphBits:int;
 		public static var AdvanceBits:int;
+		public static var TextColor_use_RGBA:Boolean;
 		public var TextRecordType:int;
 		public var StyleFlagsHasFont:int;
 		public var StyleFlagsHasColor:int;
 		public var StyleFlagsHasYOffset:int;
 		public var StyleFlagsHasXOffset:int;
 		public var FontID:int;							//UI16
-		public var TextColor:int;						//RGB
+		public var TextColor:int;						//RGB or RGBA
 		public var XOffset:int;							//SI16
 		public var YOffset:int;							//SI16
 		public var TextHeight:int;						//UI16
@@ -90,7 +91,11 @@ package zero.swf.records{
 			}
 			
 			if(StyleFlagsHasColor){
-				TextColor=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++];
+				if(TextColor_use_RGBA){
+					TextColor=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++]|(data[offset++]<<24);
+				}else{
+					TextColor=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++];
+				}
 			}
 			
 			if(StyleFlagsHasXOffset){
@@ -152,9 +157,16 @@ package zero.swf.records{
 			}
 			
 			if(StyleFlagsHasColor){
-				data[offset++]=TextColor>>16;
-				data[offset++]=TextColor>>8;
-				data[offset++]=TextColor;
+				if(TextColor_use_RGBA){
+					data[offset++]=TextColor>>16;
+					data[offset++]=TextColor>>8;
+					data[offset++]=TextColor;
+					data[offset++]=TextColor>>24;
+				}else{
+					data[offset++]=TextColor>>16;
+					data[offset++]=TextColor>>8;
+					data[offset++]=TextColor;
+				}
 			}
 			
 			if(StyleFlagsHasXOffset){
@@ -215,7 +227,7 @@ package zero.swf.records{
 				StyleFlagsHasYOffset={StyleFlagsHasYOffset}
 				StyleFlagsHasXOffset={StyleFlagsHasXOffset}
 				FontID={FontID}
-				TextColor={"0x"+BytesAndStr16._16V[(TextColor>>16)&0xff]+BytesAndStr16._16V[(TextColor>>8)&0xff]+BytesAndStr16._16V[TextColor&0xff]}
+				TextColor=""
 				XOffset={XOffset}
 				YOffset={YOffset}
 				TextHeight={TextHeight}
@@ -226,7 +238,11 @@ package zero.swf.records{
 				delete xml.@FontID;
 			}
 			if(StyleFlagsHasColor){
-				
+				if(TextColor_use_RGBA){
+					xml.@TextColor="0x"+BytesAndStr16._16V[(TextColor>>24)&0xff]+BytesAndStr16._16V[(TextColor>>16)&0xff]+BytesAndStr16._16V[(TextColor>>8)&0xff]+BytesAndStr16._16V[TextColor&0xff];
+				}else{
+					xml.@TextColor="0x"+BytesAndStr16._16V[(TextColor>>16)&0xff]+BytesAndStr16._16V[(TextColor>>8)&0xff]+BytesAndStr16._16V[TextColor&0xff];
+				}
 			}else{
 				delete xml.@TextColor;
 			}

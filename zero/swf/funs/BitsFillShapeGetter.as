@@ -14,6 +14,7 @@ package zero.swf.funs{
 	
 	import zero.swf.records.*;
 	import zero.swf.records.shapeRecords.*;
+	import zero.swf.records.fillStyles.*;
 	import zero.swf.records.lineStyles.*;
 	import zero.swf.tagBodys.DefineShape;
 	
@@ -35,10 +36,10 @@ package zero.swf.funs{
 			defineShape.ShapeBounds.Ymax=BitmapHei*20;
 			
 			defineShape.Shapes=new SHAPEWITHSTYLE();
-			defineShape.Shapes.fillAndLineStyles=new FillAndLineStyles();
-			defineShape.Shapes.fillAndLineStyles.FillStyleV=new Vector.<FILLSTYLE>();
-			defineShape.Shapes.fillAndLineStyles.LineStyleV=new Vector.<BaseLineStyle>();
-			defineShape.Shapes.fillAndLineStyles.NumFillBits=1;
+			defineShape.Shapes.FillStyleV=new Vector.<FILLSTYLE>();
+			defineShape.Shapes.LineStyleV=new Vector.<BaseLineStyle>();
+			defineShape.Shapes.NumFillBits=1;
+			defineShape.Shapes.NumLineBits=0;
 			
 			var FillStyle:FILLSTYLE=new FILLSTYLE();
 			FillStyle.FillStyleType=0x43;
@@ -47,7 +48,7 @@ package zero.swf.funs{
 			FillStyle.BitmapMatrix.HasScale=1;
 			FillStyle.BitmapMatrix.ScaleX=1310720;
 			FillStyle.BitmapMatrix.ScaleY=1310720;
-			defineShape.Shapes.fillAndLineStyles.FillStyleV[0]=FillStyle;
+			defineShape.Shapes.FillStyleV[0]=FillStyle;
 			
 			defineShape.Shapes.ShapeRecordV=new Vector.<SHAPERECORD>();
 			var styleChangeRecord:STYLECHANGERECORD=new STYLECHANGERECORD();

@@ -42,9 +42,9 @@ package zero.swf.funs{
 						if(DefineObjs[typeName]){
 							var id:int=tag.getDefId();
 							
-							//if(avalibleDefineObjIdMark[id]){
-							//	throw new Error("发现重复的 id:"+id+",typeName="+typeName);
-							//}
+							if(avalibleDefineObjIdMark[id]){
+								throw new Error("发现重复的 id:"+id+",typeName="+typeName);
+							}
 							avalibleDefineObjIdMark[id]=true;
 						}
 					}else{

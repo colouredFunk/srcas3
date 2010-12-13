@@ -2,7 +2,7 @@
 DefineButton 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月1日 19:58:02 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年12月12日 00:53:20 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -26,16 +26,24 @@ DefineButton 版本:v1.0
 //ButtonId 			UI16 						ID for this character
 //Characters 		BUTTONRECORD[one or more]	Characters that make up the button
 //CharacterEndFlag 	UI8 						Must be 0
-//Actions 			ACTIONRECORD[zero or more]	Actions to perform
+//Actions 			ACTIONRECORD[zero or more]	Actions to perform		//flash5 导出只有一个 ACTIONRECORD, flash8 导出是一个 BUTTONCONDACTION 的列表
 //ActionEndFlag 	UI8 						Must be 0
 package zero.swf.tagBodys{
 	import zero.swf.records.BUTTONRECORD_within_DefineButton;
-	import zero.swf.BytesData;
 	import flash.utils.ByteArray;
+	//import zero.swf.CurrSWFVersion;
+	//import zero.swf.avm1.ACTIONRECORD;
+	//import zero.swf.records.BUTTONCONDACTION;
+	import zero.swf.BytesData;
 	public class DefineButton{
 		public var id:int;								//UI16
 		public var CharacterV:Vector.<BUTTONRECORD_within_DefineButton>;
 		public var CharacterEndFlag:int;				//UI8
+		////
+		//public var Actions:ACTIONRECORD;
+		//public var ActionEndFlag:int;					//UI8
+		//public var ActionsV:Vector.<BUTTONCONDACTION>;
+		////
 		public var restDatas:BytesData;
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
@@ -50,7 +58,23 @@ package zero.swf.tagBodys{
 				offset=CharacterV[i].initByData(data,offset,endOffset);
 			}
 			CharacterEndFlag=data[offset++];
-			
+			/*
+			if(CurrSWFVersion.Version<6){
+				Actions=new ACTIONRECORD();
+				offset=Actions.initByData(data,offset,endOffset-1);
+				ActionEndFlag=data[offset++];
+			}else{
+				i=-1;
+				ActionsV=new Vector.<BUTTONCONDACTION>();
+				while(offset<endOffset){
+					i++;
+				
+					ActionsV[i]=new BUTTONCONDACTION();
+					offset=ActionsV[i].initByData(data,offset,endOffset);
+				}
+			}
+			return offset;
+			*/
 			restDatas=new BytesData();
 			return restDatas.initByData(data,offset,endOffset);
 		}
@@ -65,6 +89,26 @@ package zero.swf.tagBodys{
 			var offset:int=data.length;
 			data[offset++]=CharacterEndFlag;
 			data.position=offset;
+			/*
+			if(Actions){
+				data.writeBytes(Actions.toData());
+				data[data.length]=ActionEndFlag;
+			}else{
+				var restActionsNum:int=ActionsV.length;
+				for each(var Actions:BUTTONCONDACTION in ActionsV){
+					var ActionsData:ByteArray=Actions.toData();
+					if(--restActionsNum){
+						var CondActionSize:int=ActionsData.length;
+						ActionsData[0]=CondActionSize;
+						ActionsData[1]=CondActionSize>>8;
+					}//else{
+					//	ActionsData[0]=0;
+					//	ActionsData[1]=0;
+					//}
+					data.writeBytes(ActionsData);
+				}
+			}
+			*/
 			data.writeBytes(restDatas.toData());
 			return data;
 		}
@@ -83,6 +127,20 @@ package zero.swf.tagBodys{
 				}
 				xml.appendChild(listXML);
 			}
+			/*
+			if(Actions){
+				xml.appendChild(Actions.toXML("Actions"));
+				xml.@ActionEndFlag=ActionEndFlag;
+			}else{
+				if(ActionsV.length){
+					listXML=<ActionsList count={ActionsV.length}/>
+					for each(var Actions:BUTTONCONDACTION in ActionsV){
+						listXML.appendChild(Actions.toXML("Actions"));
+					}
+					xml.appendChild(listXML);
+				}
+			}
+			*/
 			xml.appendChild(restDatas.toXML("restDatas"));
 			return xml;
 		}
@@ -102,6 +160,27 @@ package zero.swf.tagBodys{
 				CharacterV=new Vector.<BUTTONRECORD_within_DefineButton>();
 			}
 			CharacterEndFlag=int(xml.@CharacterEndFlag.toString());
+			/*
+			if(xml.Actions.length()){
+				Actions=new ACTIONRECORD();
+				Actions.initByXML(xml.Actions[0]);
+				ActionEndFlag=int(xml.@ActionEndFlag.toString());
+			}else{
+				if(xml.ActionsList.length()){
+					listXML=xml.ActionsList[0];
+					var ActionsXMLList:XMLList=listXML.Actions;
+					i=-1;
+					ActionsV=new Vector.<BUTTONCONDACTION>(ActionsXMLList.length());
+					for each(var ActionsXML:XML in ActionsXMLList){
+						i++;
+						ActionsV[i]=new BUTTONCONDACTION();
+						ActionsV[i].initByXML(ActionsXML);
+					}
+				}else{
+					ActionsV=new Vector.<BUTTONCONDACTION>();
+				}
+			}
+			*/
 			restDatas=new BytesData();
 			restDatas.initByXML(xml.restDatas[0]);
 		}

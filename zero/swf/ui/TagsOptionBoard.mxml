@@ -248,7 +248,7 @@ TagsOptionBoard 版本:v1.0
 								<tag typeNum="04" type="PlaceObject" option={DataAndTags.noOutputOption}/>
 								<tag typeNum="05" type="RemoveObject" option={DataAndTags.noOutputOption}/>
 								<tag typeNum="06" type="DefineBits" option={DataAndTags.noOutputOption}/>
-								<tag typeNum="07" type="DefineButton" option={DataAndTags.noOutputOption}/>
+								<tag typeNum="07" type="DefineButton" option={DataAndTags.structorOption}/>
 								<tag typeNum="08" type="JPEGTables" option={DataAndTags.noOutputOption}/>
 								<tag typeNum="09"  type="SetBackgroundColor" option={DataAndTags.noOutputOption}/>
 								<tag typeNum="10" type="DefineFont" option={DataAndTags.noOutputOption}/>
