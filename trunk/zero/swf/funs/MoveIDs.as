@@ -1,5 +1,5 @@
 /***
-MoveSWFIDs 版本:v1.0
+MoveIDs 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
 创建时间:2010年12月12日 03:12:01
@@ -17,7 +17,7 @@ package zero.swf.funs{
 	import zero.swf.records.shapeRecords.*;
 	import zero.swf.tagBodys.*;
 
-	public class MoveSWFIDs{
+	public class MoveIDs{
 		private static var objAndValIdV:Vector.<Array>;
 		private static var idArr:Array;
 		public static function move(swf:SWF2,idV:Vector.<int>):void{
@@ -44,7 +44,7 @@ package zero.swf.funs{
 			}
 		}
 		private static function getIdVByTagV(tagV:Vector.<Tag>):void{
-			var TextRecord:TEXTRECORD;
+			var TextRecord:TEXTRECORD,Shapes:SHAPEWITHSTYLE;
 			for each(var tag:Tag in tagV){
 				if(DefineObjs[TagType.typeNameArr[tag.type]]){
 					markDefTag(tag);
@@ -55,7 +55,9 @@ package zero.swf.funs{
 					//case TagType.ShowFrame:
 					//break;
 					case TagType.DefineShape:						//id,BitmapId
-						getObjAndValIdByShapes((tag.getBody() as DefineShape).Shapes);
+						Shapes=(tag.getBody() as DefineShape).Shapes;
+						getObjAndValIdByFillAndLines(Shapes.FillStyleV,Shapes.LineStyleV);
+						getObjAndValIdByShapes(Shapes.ShapeRecordV);
 					break;
 					case TagType.PlaceObject:						//CharacterId
 						getObjAndValId(tag.getBody() as PlaceObject,"CharacterId");
@@ -109,7 +111,9 @@ package zero.swf.funs{
 					//case TagType.DefineBitsJPEG2:					//id
 					//break;
 					case TagType.DefineShape2:						//id,BitmapId
-						getObjAndValIdByShapes((tag.getBody() as DefineShape2).Shapes);
+						Shapes=(tag.getBody() as DefineShape2).Shapes;
+						getObjAndValIdByFillAndLines(Shapes.FillStyleV,Shapes.LineStyleV);
+						getObjAndValIdByShapes(Shapes.ShapeRecordV);
 					break;
 					case TagType.DefineButtonCxform:				//ButtonId
 						getObjAndValId(tag.getBody() as DefineButtonCxform,"ButtonId");
@@ -122,7 +126,9 @@ package zero.swf.funs{
 					//case TagType.RemoveObject2:
 					//break;
 					case TagType.DefineShape3:						//id,BitmapId
-						getObjAndValIdByShapes((tag.getBody() as DefineShape3).Shapes);
+						Shapes=(tag.getBody() as DefineShape3).Shapes;
+						getObjAndValIdByFillAndLines(Shapes.FillStyleV,Shapes.LineStyleV);
+						getObjAndValIdByShapes(Shapes.ShapeRecordV);
 					break;
 					case TagType.DefineText2:						//id,FontId
 						for each(TextRecord in (tag.getBody() as DefineText2).TextRecordV){
@@ -149,7 +155,10 @@ package zero.swf.funs{
 					//case TagType.SoundStreamHead2:
 					//break;
 					case TagType.DefineMorphShape:					//id,BitmapId
-						throw new Error("暂不支持 DefineMorphShape");
+						var defineMorphShape:DefineMorphShape=tag.getBody() as DefineMorphShape;
+						getObjAndValIdByFillAndLines(defineMorphShape.MorphFillStyleV,defineMorphShape.MorphLineStyleV);
+						getObjAndValIdByShapes(defineMorphShape.StartEdges.ShapeRecordV);
+						getObjAndValIdByShapes(defineMorphShape.EndEdges.ShapeRecordV);
 					break;
 					//case TagType.DefineFont2:						//id
 					//break;
@@ -205,10 +214,15 @@ package zero.swf.funs{
 					//case TagType.DoABC:
 					//break;
 					case TagType.DefineShape4:						//id,BitmapId
-						getObjAndValIdByShapes((tag.getBody() as DefineShape4).Shapes);
+						Shapes=(tag.getBody() as DefineShape4).Shapes;
+						getObjAndValIdByFillAndLines(Shapes.FillStyleV,Shapes.LineStyleV);
+						getObjAndValIdByShapes(Shapes.ShapeRecordV);
 					break;
 					case TagType.DefineMorphShape2:					//id,BitmapId
-						throw new Error("暂不支持 DefineMorphShape2");
+						var defineMorphShape2:DefineMorphShape2=tag.getBody() as DefineMorphShape2;
+						getObjAndValIdByFillAndLines(defineMorphShape2.MorphFillStyleV,defineMorphShape2.MorphLineStyleV);
+						getObjAndValIdByShapes(defineMorphShape2.StartEdges.ShapeRecordV);
+						getObjAndValIdByShapes(defineMorphShape2.EndEdges.ShapeRecordV);
 					break;
 					//case TagType.DefineSceneAndFrameLabelData:
 					//break;
@@ -243,15 +257,17 @@ package zero.swf.funs{
 				i++;
 			}
 		}
-		private static function getObjAndValIdByShapes(shapes:SHAPEWITHSTYLE):void{
-			var fillStyle:FILLSTYLE;
-			for each(fillStyle in shapes.FillStyleV){
+		private static function getObjAndValIdByFillAndLines(
+			FillStyleV:*,
+			LineStyleV:*
+		):void{
+			for each(var fillStyle:* in FillStyleV){
 				if(fillStyle.BitmapId==65535){
 				}else{
 					getObjAndValId(fillStyle,"BitmapId");
 				}
 			}
-			for each(var lineStyle:BaseLineStyle in shapes.LineStyleV){
+			for each(var lineStyle:BaseLineStyle in LineStyleV){
 				if(lineStyle is LINESTYLE2){
 					var lineStyle2:LINESTYLE2=lineStyle as LINESTYLE2;
 					if(lineStyle2.FillType){
@@ -262,9 +278,11 @@ package zero.swf.funs{
 					}
 				}
 			}
-			for each(var shapeRecord:SHAPERECORD in shapes.ShapeRecordV){
+		}
+		private static function getObjAndValIdByShapes(ShapeRecordV:Vector.<SHAPERECORD>):void{
+			for each(var shapeRecord:SHAPERECORD in ShapeRecordV){
 				if(shapeRecord is STYLECHANGERECORD){
-					for each(fillStyle in (shapeRecord as STYLECHANGERECORD).FillStyleV){
+					for each(var fillStyle:FILLSTYLE in (shapeRecord as STYLECHANGERECORD).FillStyleV){
 						if(fillStyle.BitmapId==65535){
 						}else{
 							getObjAndValId(fillStyle,"BitmapId");
