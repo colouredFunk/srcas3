@@ -35,7 +35,7 @@ package zero.swf{
 		CONFIG::toXMLAndInitByXML {
 		public function toXML(xmlName:String):XML{
 			if(dataLength>0){
-				return <{xmlName} class="BytesData" length={dataLength} value={BytesAndStr16.bytes2str16(ownData,dataOffset,dataLength)}/>;
+				return <{xmlName} length={dataLength} value={BytesAndStr16.bytes2str16(ownData,dataOffset,dataLength)}/>;
 			}
 			return <{xmlName} class="BytesData"/>;
 		}

@@ -2,7 +2,7 @@
 DefineShape4 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月1日 22:43:31 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年12月13日 10:59:11 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -37,6 +37,7 @@ package zero.swf.tagBodys{
 	import zero.swf.records.gardents.GRADIENT_Color_RGBA;
 	import zero.swf.records.gardents.FOCALGRADIENT_Color_RGBA;
 	import zero.swf.records.lineStyles.LINESTYLE2;
+	import  zero.swf.records.SHAPE;
 	import zero.swf.records.RECT;
 	import zero.swf.records.SHAPEWITHSTYLE;
 	import flash.utils.ByteArray;
@@ -63,10 +64,10 @@ package zero.swf.tagBodys{
 			UsesFillWindingRule=(flags<<29)>>>31;		//00000100
 			UsesNonScalingStrokes=(flags<<30)>>>31;		//00000010
 			UsesScalingStrokes=flags&0x01;				//00000001
-			SHAPEWITHSTYLE.currSolidFillUseRGBA=true;
-			SHAPEWITHSTYLE.currGradientClass=GRADIENT_Color_RGBA;
-			SHAPEWITHSTYLE.currFocalGradientClass=FOCALGRADIENT_Color_RGBA;
-			SHAPEWITHSTYLE.currLineStyleClass=LINESTYLE2;
+			SHAPE.currSolidFill_use_RGBA=true;
+			SHAPE.currGradientClass=GRADIENT_Color_RGBA;
+			SHAPE.currFocalGradientClass=FOCALGRADIENT_Color_RGBA;
+			SHAPE.currLineStyleClass=LINESTYLE2;
 			
 			Shapes=new SHAPEWITHSTYLE();
 			return Shapes.initByData(data,offset,endOffset);
@@ -86,10 +87,10 @@ package zero.swf.tagBodys{
 			flags|=UsesScalingStrokes;					//00000001
 			data[offset]=flags;
 			
-			SHAPEWITHSTYLE.currSolidFillUseRGBA=true;
-			SHAPEWITHSTYLE.currGradientClass=GRADIENT_Color_RGBA;
-			SHAPEWITHSTYLE.currFocalGradientClass=FOCALGRADIENT_Color_RGBA;
-			SHAPEWITHSTYLE.currLineStyleClass=LINESTYLE2;
+			SHAPE.currSolidFill_use_RGBA=true;
+			SHAPE.currGradientClass=GRADIENT_Color_RGBA;
+			SHAPE.currFocalGradientClass=FOCALGRADIENT_Color_RGBA;
+			SHAPE.currLineStyleClass=LINESTYLE2;
 			data.position=offset+1;
 			data.writeBytes(Shapes.toData());
 			return data;
@@ -106,10 +107,10 @@ package zero.swf.tagBodys{
 			/>;
 			xml.appendChild(ShapeBounds.toXML("ShapeBounds"));
 			xml.appendChild(EdgeBounds.toXML("EdgeBounds"));
-			SHAPEWITHSTYLE.currSolidFillUseRGBA=true;
-			SHAPEWITHSTYLE.currGradientClass=GRADIENT_Color_RGBA;
-			SHAPEWITHSTYLE.currFocalGradientClass=FOCALGRADIENT_Color_RGBA;
-			SHAPEWITHSTYLE.currLineStyleClass=LINESTYLE2;
+			SHAPE.currSolidFill_use_RGBA=true;
+			SHAPE.currGradientClass=GRADIENT_Color_RGBA;
+			SHAPE.currFocalGradientClass=FOCALGRADIENT_Color_RGBA;
+			SHAPE.currLineStyleClass=LINESTYLE2;
 			xml.appendChild(Shapes.toXML("Shapes"));
 			return xml;
 		}
@@ -122,10 +123,10 @@ package zero.swf.tagBodys{
 			UsesFillWindingRule=int(xml.@UsesFillWindingRule.toString());
 			UsesNonScalingStrokes=int(xml.@UsesNonScalingStrokes.toString());
 			UsesScalingStrokes=int(xml.@UsesScalingStrokes.toString());
-			SHAPEWITHSTYLE.currSolidFillUseRGBA=true;
-			SHAPEWITHSTYLE.currGradientClass=GRADIENT_Color_RGBA;
-			SHAPEWITHSTYLE.currFocalGradientClass=FOCALGRADIENT_Color_RGBA;
-			SHAPEWITHSTYLE.currLineStyleClass=LINESTYLE2;
+			SHAPE.currSolidFill_use_RGBA=true;
+			SHAPE.currGradientClass=GRADIENT_Color_RGBA;
+			SHAPE.currFocalGradientClass=FOCALGRADIENT_Color_RGBA;
+			SHAPE.currLineStyleClass=LINESTYLE2;
 			Shapes=new SHAPEWITHSTYLE();
 			Shapes.initByXML(xml.Shapes[0]);
 		}

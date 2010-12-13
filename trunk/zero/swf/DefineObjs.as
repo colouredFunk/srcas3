@@ -23,7 +23,7 @@ package zero.swf{
 		public static const DefineButton:String=SWF;//20101029
 		public static const DefineFont:String=DAT;
 		public static const DefineText:String=SWF;//20101029
-		public static const DefineFontInfo:String=DAT;//貌似是得和 DefineFont 或 DefineFont2 或 DefineFont3 用同一 id 的
+			//public static const DefineFontInfo:String=DAT;//貌似是得和 DefineFont 或 DefineFont2 或 DefineFont3 用同一 id 的
 		public static const DefineSound:String=DAT;
 			//public static const DefineButtonSound:int=17;
 		public static const DefineBitsLossless:String=IMG;
@@ -40,14 +40,14 @@ package zero.swf{
 		public static const DefineMorphShape:String=DAT;
 		public static const DefineFont2:String=DAT;
 		public static const DefineVideoStream:String=DAT;
-		public static const DefineFontInfo2:String=DAT;//貌似是得和 DefineFont 或 DefineFont2 或 DefineFont3 用同一 id 的
+			//public static const DefineFontInfo2:String=DAT;//貌似是得和 DefineFont 或 DefineFont2 或 DefineFont3 用同一 id 的
 			//public static const DefineFontAlignZones:int=73;
 		public static const DefineFont3:String=DAT;
 			//public static const DefineScalingGrid:int=78;
 		public static const DefineShape4:String=SWF;
 		public static const DefineMorphShape2:String=DAT;
 		public static const DefineBinaryData:String=DAT;
-			//DefineFontName:String=DAT;//FontID UI16 ID for this font to which this refers 没看懂...宁可信其有，不可信其无(经证实是指向 DefineFont 的)
+			//DefineFontName:String=DAT;//FontID UI16 ID for this font to which this refers 
 		public static const DefineBitsJPEG4:String=IMG;
 		public static const DefineFont4:String=DAT;
 	}

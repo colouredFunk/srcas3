@@ -28,7 +28,7 @@ package zero.swf.avm1{
 			totalActionRecord=1;
 			
 			DataAndTags.activateTagBodyClasses([
-				//DefineButton,
+				DefineButton,
 				DefineButton2,
 				DoAction,
 				DoInitAction,

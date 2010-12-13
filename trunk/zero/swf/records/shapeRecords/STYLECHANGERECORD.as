@@ -2,7 +2,7 @@
 STYLECHANGERECORD 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月9日 18:25:15 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年10月9日 18:25:15
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -42,7 +42,9 @@ STYLECHANGERECORD 版本:v1.0
 //index of zero means the path is not filled, and a line style index of zero means the path has no
 //stroke. Initially the fill and line style indices are set to zero—no fill or stroke.
 package zero.swf.records.shapeRecords{
-	import zero.swf.records.FillAndLineStyles;
+	import zero.swf.records.fillStyles.FILLSTYLE;
+	import zero.swf.records.lineStyles.BaseLineStyle;
+	import zero.swf.records.SHAPE;
 	import flash.utils.ByteArray;
 	public class STYLECHANGERECORD extends SHAPERECORD{
 		//public var TypeFlag:int;
@@ -51,13 +53,16 @@ package zero.swf.records.shapeRecords{
 		public var StateFillStyle1:int;
 		public var StateFillStyle0:int;
 		public var StateMoveTo:int;
-		//public var MoveBits:int;
+		//public var MoveBits0:int;//参考用的 MoveBits
 		public var MoveDeltaX:int;
 		public var MoveDeltaY:int;
 		public var FillStyle0:int;
 		public var FillStyle1:int;
 		public var LineStyle:int;
-		public var NewStyles:FillAndLineStyles;
+		public var FillStyleV:Vector.<FILLSTYLE>;
+		public var LineStyleV:Vector.<BaseLineStyle>;
+		public var NumFillBits:int;
+		public var NumLineBits:int;
 		//
 
 		////
@@ -70,7 +75,7 @@ package zero.swf.records.shapeRecords{
 				StateFillStyle1={StateFillStyle1}
 				StateFillStyle0={StateFillStyle0}
 				StateMoveTo={StateMoveTo}
-				//MoveBits={MoveBits}
+				//MoveBits0={MoveBits0}
 				MoveDeltaX={MoveDeltaX}
 				MoveDeltaY={MoveDeltaY}
 				FillStyle0={FillStyle0}
@@ -78,7 +83,22 @@ package zero.swf.records.shapeRecords{
 				LineStyle={LineStyle}
 			/>;
 			if(StateNewStyles){
-				xml.appendChild(NewStyles.toXML("NewStyles"));
+				if(FillStyleV.length){
+					var listXML:XML=<FillStyleList count={FillStyleV.length}/>
+					for each(var FillStyle:FILLSTYLE in FillStyleV){
+						listXML.appendChild(FillStyle.toXML("FillStyle"));
+					}
+					xml.appendChild(listXML);
+				}
+				if(LineStyleV.length){
+					listXML=<LineStyleList count={LineStyleV.length}/>
+					for each(var LineStyle:BaseLineStyle in LineStyleV){
+						listXML.appendChild(LineStyle.toXML("LineStyle"));
+					}
+					xml.appendChild(listXML);
+				}
+				xml.@NumFillBits=NumFillBits;
+				xml.@NumLineBits=NumLineBits;
 			}
 			return xml;
 		}
@@ -89,15 +109,41 @@ package zero.swf.records.shapeRecords{
 			StateFillStyle1=int(xml.@StateFillStyle1.toString());
 			StateFillStyle0=int(xml.@StateFillStyle0.toString());
 			StateMoveTo=int(xml.@StateMoveTo.toString());
-			//MoveBits=int(xml.@MoveBits.toString());
+			//MoveBits0=int(xml.@MoveBits0.toString());
 			MoveDeltaX=int(xml.@MoveDeltaX.toString());
 			MoveDeltaY=int(xml.@MoveDeltaY.toString());
 			FillStyle0=int(xml.@FillStyle0.toString());
 			FillStyle1=int(xml.@FillStyle1.toString());
 			LineStyle=int(xml.@LineStyle.toString());
 			if(StateNewStyles){
-				NewStyles=new FillAndLineStyles();
-				NewStyles.initByXML(xml.NewStyles[0]);
+				if(xml.FillStyleList.length()){
+					var listXML:XML=xml.FillStyleList[0];
+					var FillStyleXMLList:XMLList=listXML.FillStyle;
+					var i:int=-1;
+					FillStyleV=new Vector.<FILLSTYLE>(FillStyleXMLList.length());
+					for each(var FillStyleXML:XML in FillStyleXMLList){
+						i++;
+						FillStyleV[i]=new FILLSTYLE();
+						FillStyleV[i].initByXML(FillStyleXML);
+					}
+				}else{
+					FillStyleV=new Vector.<FILLSTYLE>();
+				}
+				if(xml.LineStyleList.length()){
+					listXML=xml.LineStyleList[0];
+					var LineStyleXMLList:XMLList=listXML.LineStyle;
+					i=-1;
+					LineStyleV=new Vector.<BaseLineStyle>(LineStyleXMLList.length());
+					for each(var LineStyleXML:XML in LineStyleXMLList){
+						i++;
+						LineStyleV[i]=new SHAPE.currLineStyleClass();
+						LineStyleV[i].initByXML(LineStyleXML);
+					}
+				}else{
+					LineStyleV=new Vector.<BaseLineStyle>();
+				}
+				NumFillBits=int(xml.@NumFillBits.toString());
+				NumLineBits=int(xml.@NumLineBits.toString());
 			}
 		}
 		}//end of CONFIG::toXMLAndInitByXML

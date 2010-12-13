@@ -23,7 +23,7 @@ package zero.swf.funs{
 	import zero.swf.TagType;
 	import zero.swf.records.BUTTONRECORD;
 	import zero.swf.records.BUTTONRECORD_within_DefineButton;
-	import zero.swf.records.FILLSTYLE;
+	import zero.swf.records.fillStyles.FILLSTYLE;
 	import zero.swf.records.SHAPEWITHSTYLE;
 	import zero.swf.records.TEXTRECORD;
 	import zero.swf.records.lineStyles.BaseLineStyle;
@@ -172,10 +172,10 @@ package zero.swf.funs{
 		}
 		public static function getImgTagsByShapes(shapes:SHAPEWITHSTYLE):void{
 			var fillStyle:FILLSTYLE;
-			for each(fillStyle in shapes.fillAndLineStyles.FillStyleV){
+			for each(fillStyle in shapes.FillStyleV){
 				getRelatedTag(fillStyle.BitmapId);
 			}
-			for each(var lineStyle:BaseLineStyle in shapes.fillAndLineStyles.LineStyleV){
+			for each(var lineStyle:BaseLineStyle in shapes.LineStyleV){
 				if(lineStyle is LINESTYLE2){
 					var lineStyle2:LINESTYLE2=lineStyle as LINESTYLE2;
 					if(lineStyle2.FillType){
@@ -185,7 +185,7 @@ package zero.swf.funs{
 			}
 			for each(var shapeRecord:SHAPERECORD in shapes.ShapeRecordV){
 				if(shapeRecord is STYLECHANGERECORD){
-					for each(fillStyle in (shapeRecord as STYLECHANGERECORD).NewStyles){
+					for each(fillStyle in (shapeRecord as STYLECHANGERECORD).FillStyleV){
 						getRelatedTag(fillStyle.BitmapId);
 					}
 				}

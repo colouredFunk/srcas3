@@ -2,7 +2,7 @@
 KeyPressKeyCodes 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年10月28日 19:35:39 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
+创建时间:2010年12月12日 00:59:54 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
@@ -10,6 +10,7 @@ KeyPressKeyCodes 版本:v1.0
 package zero.swf.vmarks{
 
 	public class KeyPressKeyCodes{
+		public static const none:int=0;
 		public static const left_arrow:int=1;
 		public static const right_arrow:int=2;
 		public static const home:int=3;
@@ -124,6 +125,7 @@ package zero.swf.vmarks{
 		private static function get_keyCodeV():Vector.<String>{
 			var keyCodeV:Vector.<String>=new Vector.<String>(127);
 			keyCodeV.fixed=true;
+			keyCodeV[0]="none";
 			keyCodeV[1]="left_arrow";
 			keyCodeV[2]="right_arrow";
 			keyCodeV[3]="home";
