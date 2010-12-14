@@ -7,6 +7,7 @@
 	 * @author Akdcl
 	 */
 	public class Slider extends ProgressBar {
+		public var mouseWheelEnabled:Boolean = true;
 		protected var timeHolded:uint;
 		protected var scale:Number;
 		
@@ -69,7 +70,7 @@
 			removeEventListener(Event.ENTER_FRAME, onHoldingHandler);
 		}
 		public function $wheel(_delta:int):void {
-			if (timeHolded == 0) {
+			if (mouseWheelEnabled && timeHolded == 0) {
 				value += (_delta > 0?10: -10) * snapInterval;
 			}
 		}
