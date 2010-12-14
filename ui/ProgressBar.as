@@ -1,5 +1,4 @@
 package ui{
-	import flash.events.Event;
 	
 	/**
 	 * ...
