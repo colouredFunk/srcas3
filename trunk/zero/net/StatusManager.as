@@ -37,6 +37,8 @@ public class StatusManager{
 	
 	public static var loadedData:Object;
 	
+	private static var decodeFun:Function;
+	
 	public static function loadXML(url:String):void{
 		statusURLLoader=new URLLoader();
 		statusURLLoader.addEventListener(Event.COMPLETE,loadXMLComplete);
@@ -52,12 +54,22 @@ public class StatusManager{
 	public static function init(
 		_xml:XML,
 		_loginStatus:String="1",
-		_statusName:String="status"
+		_statusName:String="status",
+		_decodeFun:Function=null
 	):void{
 		xml=_xml;
 		loginStatus=_loginStatus;
 		//normalStatus=_normalStatus;
 		statusName=_statusName;
+		
+		decodeFun=_decodeFun||function(data:String):Object{
+			var urlVariables:URLVariables=new URLVariables();
+			urlVariables.decode(data);
+			return urlVariables;
+		};
+		
+		//decodeFun=_decodeFun||com.adobe.serialization.json.JSON.decode;
+		
 		statusCount=0;
 		statusXMLs=new Array();
 		for each(var node:XML in xml.children()){
@@ -72,7 +84,6 @@ public class StatusManager{
 			}
 		}
 		statusURLLoader=new URLLoader();
-		statusURLLoader.dataFormat=URLLoaderDataFormat.VARIABLES;
 		statusURLLoader.addEventListener(Event.COMPLETE,loadStatusFinished);
 		statusURLLoader.addEventListener(IOErrorEvent.IO_ERROR,loadStatusError);
 		
@@ -95,7 +106,7 @@ public class StatusManager{
 		statusURLLoader.load(request);
 	}
 	private static function loadStatusFinished(event:Event):void{
-		loadedData=statusURLLoader.data;
+		loadedData=decodeFun(statusURLLoader.data);
 		currXML=statusXMLs[loadedData[statusName]];
 		if(currXML){
 		}else{
