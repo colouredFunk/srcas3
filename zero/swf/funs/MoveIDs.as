@@ -20,26 +20,54 @@ package zero.swf.funs{
 	public class MoveIDs{
 		private static var objAndValIdV:Vector.<Array>;
 		private static var idArr:Array;
-		public static function move(swf:SWF2,idV:Vector.<int>):void{
+		public static function move(swf:SWF2,idV:Vector.<int>=null,modifyIdV:Boolean=false):void{
+			if(modifyIdV){
+			}else if(idV){
+				idV=idV.slice();
+			}
+			
 			objAndValIdV=new Vector.<Array>();
 			idArr=new Array();
 			
 			getIdVByTagV(swf.tagV);
 			
 			var L:int=idArr.length;
-			for(var i:int=1;i<L;i++){
-				if(objAndValIdV[i]){
-					idArr[i]=idV.shift();
+			var i:int=1;
+			var objAndValId:Array,obj:*;
+			if(idV){
+				while(i<L){
+					if(objAndValIdV[i]){
+						idArr[i]=idV.shift();
+					}
+					i++;
 				}
-			}
-			idArr[0]=0;
-			
-			for each(var objAndValId:Array in objAndValIdV){
-				var obj:*=objAndValId[0];
-				if(obj is Tag){
-					(obj as Tag).setDefId(idArr[objAndValId[1]]);
-				}else{
-					obj[objAndValId[2]]=idArr[objAndValId[1]];
+				
+				idArr[0]=0;
+				
+				for each(objAndValId in objAndValIdV){
+					obj=objAndValId[0];
+					if(obj is Tag){
+						(obj as Tag).setDefId(idArr[objAndValId[1]]);
+					}else{
+						obj[objAndValId[2]]=idArr[objAndValId[1]];
+					}
+				}
+			}else{
+				idArr[0]=0;
+				var newId:int=0;
+				var newOrderArr:Array=new Array();
+				for each(objAndValId in objAndValIdV){
+					obj=objAndValId[0];
+					
+					var id:int=idArr[objAndValId[1]];
+					if(newOrderArr[id]==undefined){
+						newOrderArr[id]=++newId;
+					}
+					if(obj is Tag){
+						(obj as Tag).setDefId(newOrderArr[id]);
+					}else{
+						obj[objAndValId[2]]=newOrderArr[id];
+					}
 				}
 			}
 		}

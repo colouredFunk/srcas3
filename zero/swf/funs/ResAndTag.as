@@ -107,7 +107,7 @@ package zero.swf.funs{
 					getRelatedTags(defineTagV[tagId]);
 				}else{
 					if(tagId==65535){
-						Outputer.output("超出范围的 tagId: "+tagId+", 可能是奇怪的 fillStyle.BitmapId","brown");
+						//Outputer.output("超出范围的 tagId: "+tagId+", 可能是奇怪的 fillStyle.BitmapId","brown");
 					}else{
 						Outputer.output("超出范围的 tagId: "+tagId,"brown");
 					}
