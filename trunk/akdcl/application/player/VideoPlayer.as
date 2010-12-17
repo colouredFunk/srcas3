@@ -77,6 +77,7 @@ package akdcl.application.player{
 		protected var videoParams:Object;
 		override public function remove():void {
 			hideContent();
+			video.cancel();
 			video = null;
 			videoParams = null;
 			super.remove();
