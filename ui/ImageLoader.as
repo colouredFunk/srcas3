@@ -159,7 +159,8 @@
 				loadBMD(_source, this, _index);
 			}
 		}
-		public function unload():void {
+		public function unload(_changeImmediately:Boolean = true ):void {
+			changeImmediately = _changeImmediately;
 			hideBMP(bmp, onUnloadedHandler);
 		}
 		protected var isHideTweening:Boolean;
