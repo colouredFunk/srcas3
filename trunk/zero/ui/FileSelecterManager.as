@@ -58,8 +58,10 @@ package zero.ui{
 				btn.removeEventListener(MouseEvent.CLICK,browse);
 				btn=null;
 			}
-			ComboBoxManager.clearCb(cb);
-			cb.removeEventListener(Event.CHANGE,change);//20101112
+			if(cb){
+				ComboBoxManager.clearCb(cb);
+				cb.removeEventListener(Event.CHANGE,change);//20101112
+			}
 			if(__file){
 				__file.removeEventListener(Event.SELECT,select);
 				__file.removeEventListener((getDefinitionByName("flash.events.FileListEvent") as Object).SELECT_MULTIPLE,selectMultiple);
