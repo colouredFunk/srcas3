@@ -8,7 +8,7 @@ BmdObj 版本:v1.0
 */
 
 package zero{
-	import com.adobe.images.JPGEncoder;
+	import mx.graphics.codec.JPEGEncoder;
 	
 	import flash.display.*;
 	import flash.events.*;
@@ -75,7 +75,7 @@ package zero{
 			
 			//trace("bmdObj.imgData="+bmdObj.imgData);
 			//var pngData:ByteArray=PNGEncoder.encode(bmd);
-			var jpgData:ByteArray=new JPGEncoder().encode(bmd);
+			var jpgData:ByteArray=new JPEGEncoder().encode(bmd);
 			if(bmdObj.imgData){
 				
 				//trace("bmdObj.imgData.length="+bmdObj.imgData.length+",pngData.length="+pngData.length);

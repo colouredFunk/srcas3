@@ -17,6 +17,8 @@ package zero.ui{
 	import mx.events.FlexEvent;
 	import mx.preloaders.IPreloaderDisplay;
 	import mx.preloaders.Preloader;
+	
+	import zero.Paths;
 
 	public class PrevLoader extends Sprite implements IPreloaderDisplay{
 		private var zpl:*;
@@ -25,9 +27,11 @@ package zero.ui{
 		private var timeoutId:int=-1;
 		private var bg:Sprite;
 		
-		private static const ZeroPrevLoaderURL:String="http://zero.flashwing.net/common/ZeroPrevLoader.swf";
-		//private static const ZeroPrevLoaderURL:String="http://localhost/zero.flashwing.net/common/ZeroPrevLoader.swf";
+		private static const ZeroPrevLoaderURL:String=Paths.commonFolder+"ZeroPrevLoader.swf";
+		
 		public function PrevLoader(){
+			Security.allowDomain(Paths.domain);
+			Security.allowInsecureDomain(Paths.domain);
 		}
 		public function initialize():void{
 			this.visible=false;
@@ -46,9 +50,6 @@ package zero.ui{
 		private function initDelay():void{
 			clearTimeout(timeoutId);
 			
-			Security.allowDomain("zero.flashwing.net");
-			Security.allowInsecureDomain("zero.flashwing.net");
-			
 			loader=new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadZPLComplete);
 			this.addChild(loader);
@@ -58,6 +59,7 @@ package zero.ui{
 			urlLoader.dataFormat=URLLoaderDataFormat.BINARY;
 			urlLoader.load(new URLRequest(ZeroPrevLoaderURL));
 			urlLoader.addEventListener(Event.COMPLETE,loadZeroPrevLoaderComplete);
+			urlLoader.addEventListener(IOErrorEvent.IO_ERROR,loadZeroPrevLoaderError);
 			//*/
 			
 			/*
@@ -72,9 +74,11 @@ package zero.ui{
 		private function removed(event:Event):void{
 			clearTimeout(timeoutId);
 			this.removeEventListener(Event.REMOVED_FROM_STAGE,removed);
+			this.loaderInfo.removeEventListener(Event.COMPLETE,startGame);
 			if(urlLoader){
 				urlLoader.close();
 				urlLoader.removeEventListener(Event.COMPLETE,loadZeroPrevLoaderComplete);
+				urlLoader.removeEventListener(IOErrorEvent.IO_ERROR,loadZeroPrevLoaderError);
 			}
 			if(loader){
 				loader.contentLoaderInfo.removeEventListener(Event.COMPLETE,loadZPLComplete);
@@ -89,6 +93,9 @@ package zero.ui{
 				urlLoader.data
 				//,new LoaderContext(false,ApplicationDomain.currentDomain)
 			);
+		}
+		private function loadZeroPrevLoaderError(event:IOErrorEvent):void{
+			trace("loadZeroPrevLoaderError");
 		}
 		private function loadZPLComplete(event:Event):void{
 			this.visible=true;
@@ -116,13 +123,18 @@ package zero.ui{
 		}
 		private function initComplete(event:FlexEvent):void{
 			if(zpl){
-				trace("loadGameComplete");
-				zpl.cmd("loadGameComplete",startGame);
-			}else{
+				if(zpl.cmd("loadGameComplete",startGame)){
+					return;
+				}
+			}
+			if(this.loaderInfo.bytesLoaded==this.loaderInfo.bytesTotal){
 				startGame();
+			}else{
+				this.loaderInfo.addEventListener(Event.COMPLETE,startGame);
 			}
 		}
-		private function startGame():void{
+		private function startGame(event:Event=null):void{
+			this.loaderInfo.removeEventListener(Event.COMPLETE,startGame);
 			clearTimeout(timeoutId);
 			dispatchEvent(new Event(Event.COMPLETE));
 		}
