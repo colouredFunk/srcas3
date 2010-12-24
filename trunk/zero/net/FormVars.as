@@ -32,6 +32,7 @@ package zero.net{
 				var value:*=values[name];
 				data.writeUTFBytes("--" + boundary + "\r\n");
 				if(value is ByteArray){
+					trace(name+".length="+value.length);
 					//var dotId:int=name.lastIndexOf(".");
 					//if(dotId>=0){
 					//	
@@ -44,6 +45,7 @@ package zero.net{
 					data.writeBytes(values[name]);
 					data.writeUTFBytes("\r\n");
 				}else{
+					trace(name+"=\""+value+"\"");
 					data.writeUTFBytes(
 						"Content-Disposition: form-data; name=\"" + name + 
 						"\"\r\n\r\n"+values[name]+

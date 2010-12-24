@@ -12,6 +12,8 @@ package zero.swf.funs{
 	import flash.events.*;
 	import flash.net.*;
 	import flash.utils.*;
+	
+	import zero.Paths;
 
 	public class SWF2EXE{
 		private static var urlLoader:URLLoader;
@@ -27,7 +29,8 @@ package zero.swf.funs{
 			}catch(e:Error){}
 			clearURLLoader();
 		}
-		public static function loadPlayer(playerURL:String="http://zero.flashwing.net/common/FlashPlayer.exe.compress"):void{
+		public static function loadPlayer(playerURL:String=null):void{
+			playerURL||(playerURL=Paths.commonFolder+"FlashPlayer.exe.compress");
 			urlLoader=new URLLoader();
 			urlLoader.dataFormat=URLLoaderDataFormat.BINARY;
 			urlLoader.addEventListener(ProgressEvent.PROGRESS,loadPlayerProgress);

@@ -1,44 +1,18 @@
-﻿/***
-ExpDot 版本:v1.0
+/***
+Paths 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年2月12日 20:39:18
+创建时间:2010年12月18日 00:33:03
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.effects{
-	import flash.display.*;
-	import flash.events.*;
-	import flash.utils.*;
-	import flash.geom.*;
-	public class ExpDot extends Sprite{
-		private var vx:Number;
-		private var vy:Number;
-		public function ExpDot(_x:Number,_y:Number,speed:Number,radian:Number){
-			x=_x;
-			y=_y;
-			vx=speed*Math.cos(radian);
-			vy=speed*Math.sin(radian);
-			
-			var g:Graphics=this.graphics;
-			g.clear();
-			g.lineStyle(5,int(Math.random()*0x1000000));
-			g.drawCircle(0,0,Math.random()*5+5);
-		}
-		public function move():Boolean{
-			if(this.alpha<0.05){
-				return true;
-			}
-			x+=vx;
-			y+=vy;
-			vx*=0.8;
-			vy*=0.8;
-			if(vx*vx+vy*vy<100){
-				this.alpha*=0.9;
-			}
-			return false;
-		}
+package zero{
+	public class Paths{
+		public static const domain:String="zero.flashwing.net";
+		//public static const domain:String="localhost/zero.flashwing.net";
+		
+		public static const commonFolder:String="http://"+domain+"/common/";
 	}
 }
 

@@ -100,6 +100,9 @@ package zero.net{
 				if(variables is ByteArray){
 					urlRequest.data=variables;
 					urlRequest.contentType="application/octet-stream";
+				}else if(variables is FormVars){
+					urlRequest.data=(variables as FormVars).data;
+					urlRequest.contentType=(variables as FormVars).contentType;
 				}else{
 					for(var varName:String in variables){
 						urlVariables[varName]=variables[varName];
