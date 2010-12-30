@@ -66,7 +66,6 @@ package zero.zero3D.cameras{
 			
 			var ruV:Vector.<IRenderUnit>=new Vector.<IRenderUnit>();//渲染列表,用来存储要渲染的单元
 			
-			
 			//var t:int;
 			
 			//t=getTimer();
@@ -88,7 +87,7 @@ package zero.zero3D.cameras{
 		}
 		public function outputByContainerDict(containerDict:Dictionary,graMark:Object=null,containerKeyDict:Dictionary=null):void{
 			var obj1:*,obj2:*;
-			var container:Sprite;
+			var container:*;
 			for each(container in containerDict){
 				container.graphics.clear();
 				var i:int=container.numChildren;
@@ -96,29 +95,44 @@ package zero.zero3D.cameras{
 					container.removeChildAt(i);
 				}
 			}
+			
+			DocClassThis.txt.text+=(getTimer()-DocClassThis.t)+"毫秒\n";
+			
+			var objDict:Dictionary=new Dictionary();
 			for(obj1 in containerDict){
-				if(containerDict[obj1].visible){
-					for(obj2 in containerDict){
-						(obj2 as Obj3D).visible=false;
-					}
-					(obj1 as Obj3D).visible=true;
-					container=containerDict[obj1];
-					if(graMark&&containerKeyDict){
-						//记录渲染过的，以便下次直接读取(经实验发现很耗内存...)
-						var key:String=containerKeyDict[container];
-						if(key){
-							var gra:Shape=graMark[key];
-							if(gra){
-							}else{
-								graMark[key]=gra=new Shape();
-								output(gra);
-							}
-							container.addChild(gra);
-							continue;
-						}
-					}
-					output(container);
+				container=containerDict[obj1];
+				if(objDict[container]){
+				}else{
+					objDict[container]=new Array();
 				}
+				objDict[container].push(obj1);
+			}
+			
+			for(container in objDict){
+				for(obj2 in containerDict){
+					(obj2 as Obj3D).visible=false;
+				}
+				for each(obj1 in objDict[container]){
+					obj1.visible=true;
+				}
+				output(container);
+				
+				/*
+				if(graMark&&containerKeyDict){
+					//记录渲染过的，以便下次直接读取(经实验发现很耗内存...)
+					var key:String=containerKeyDict[container];
+					if(key){
+						var gra:Shape=graMark[key];
+						if(gra){
+						}else{
+							graMark[key]=gra=new Shape();
+							output(gra);
+						}
+						container.addChild(gra);
+						continue;
+					}
+				}
+				*/
 			}
 		}
 		private function sortByFocalLength(ru1:IRenderUnit,ru2:IRenderUnit):Number{
