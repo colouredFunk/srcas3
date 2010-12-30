@@ -9,7 +9,7 @@
 	
 	import flash.external.ExternalInterface;
 	import flash.utils.setTimeout;
-	import akdcl.media.Sound;
+	import akdcl.application.player.Sound;
 	import ui.UISprite;
 	
 	import flash.ui.ContextMenu;
