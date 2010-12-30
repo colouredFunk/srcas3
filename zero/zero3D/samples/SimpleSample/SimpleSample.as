@@ -7,7 +7,7 @@ SimpleSample 版本:v1.0
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.zero3D{
+package{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
@@ -21,6 +21,8 @@ package zero.zero3D{
 		public var scene:Scene3D;
 		public var room:Obj3DContainer;
 		public var camera:Camera3D;
+		
+		public var container:Sprite;
 		
 		public var init:Function=function():void{
 			trace("这是默认的初始化函数，可以直接覆盖掉");
@@ -83,7 +85,7 @@ package zero.zero3D{
 			}else{
 				update();
 			}
-			camera.output(this);
+			camera.output(container);
 		}
 	}
 }

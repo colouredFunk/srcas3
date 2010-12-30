@@ -17,6 +17,7 @@ BottomBarContainer 版本:v1.0
 	<fx:Script>
 		<![CDATA[
 			import zero.Paths;
+			import zero.GetAndSetValue;
 			
 			private var loader:Loader;
 			public var bottomBarPath:String;
@@ -58,37 +59,10 @@ BottomBarContainer 版本:v1.0
 				RoundRectBg.addHoleAtBottom(this,4,null,true);
 			}
 			public function getValue(objName:String,thisObj:*=null):*{
-				var objNameArr:Array=objName.split(".");
-				if(objNameArr.length){
-					var obj:Object;
-					if(thisObj){
-						obj=thisObj[objNameArr.shift()];
-					}else{
-						obj=getDefinitionByName(objNameArr.shift());
-					}
-					while(objNameArr.length){
-						obj=obj[objNameArr.shift()];
-					}
-					return obj;
-				}
-				return null;
+				return GetAndSetValue.getValue(objName,thisObj);
 			}
 			public function setValue(objName:String,value:*,thisObj:*=null):void{
-				var objNameArr:Array=objName.split(".");
-				if(objNameArr.length){
-					var obj:Object;
-					if(thisObj){
-						obj=thisObj[objNameArr.shift()];
-					}else{
-						obj=getDefinitionByName(objNameArr.shift());
-					}
-					while(objNameArr.length>1){
-						obj=obj[objNameArr.shift()];
-					}
-					if(objNameArr.length){
-						obj[objNameArr.shift()]=value;
-					}
-				}
+				GetAndSetValue.setValue(objName,value,thisObj);
 			}
 		]]>
 	</fx:Script>

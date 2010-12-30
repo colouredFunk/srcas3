@@ -44,8 +44,8 @@ OutputPane 版本:v1.0
 		<![CDATA[
 			import flash.display.*;
 			import flash.events.*;
-			import flash.utils.*;
 			import flash.text.*;
+			import flash.utils.*;
 			
 			import mx.core.mx_internal;
 			
@@ -128,13 +128,16 @@ OutputPane 版本:v1.0
 					}
 				}
 			}
+			private function encodeMsg(msg:String):String{
+				return msg.replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\x00/g,"\\x00");
+			}
 			private function msg2strArr(msg:String,styleOrXML:*,tail:*):void{
 				var execResult:Array;
-				msg=msg.replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\x00/g,"\\x00");
 				if(styleOrXML){
 					var html:XML;
 					switch(styleOrXML){
 						case "folder and file":
+							msg=encodeMsg(msg);
 							execResult=/^(.*?)(file:\/\/\/.*\/)(.*?)$/.exec(msg);
 							if(execResult[0]==msg){
 								msg='<span class="blue">'+execResult[1]+'</span>'+
@@ -145,6 +148,7 @@ OutputPane 版本:v1.0
 							}
 						break;
 						case "folder":
+							msg=encodeMsg(msg);
 							execResult=/^(.*?)(file:\/\/\/.*\/)(.*?)$/.exec(msg);
 							if(execResult[0]==msg){
 								msg='<span class="blue">'+execResult[1]+'</span>'+
@@ -167,6 +171,8 @@ OutputPane 版本:v1.0
 							msg=html.toXMLString();
 						break;
 					}
+				}else{
+					msg=encodeMsg(msg);
 				}
 				if(tail){
 					if(tail is XML){
