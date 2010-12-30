@@ -13,25 +13,25 @@ package zero.zero3D.objs{
 	import zero.zero3D.cameras.*;
 	public class Sprite3D extends VerticesObj3D implements IRenderUnit{
 		public var sprite:Sprite;
-		public function Sprite3D(_sprite:Sprite){
+		private var needScale:Boolean;
+		public function Sprite3D(_sprite:Sprite,_needScale:Boolean=true){
+			needScale=_needScale;
 			//3d 场景中的 Sprite
 			sprite=_sprite;
 			super(Vector.<Number>([
-				0,0,0,
-				0,
+				0,0,0
 			]));
 		}
 		override public function project(camera3D:Camera3D,ruV:Vector.<IRenderUnit>):void{
 			updateVertexVs(camera3D);
-			//if(needFocalLength){
-				var scale:Number=camera3D.dScreen/focalLength;
-				if(scale>0&&scale<10){
-					ruV[ruV.length]=this;//添加到渲染列表
+			
+			var scale:Number=camera3D.dScreen/focalLength;
+			if(scale>0&&scale<10){
+				ruV[ruV.length]=this;//添加到渲染列表
+				if(needScale){
 					sprite.scaleX=sprite.scaleY=scale;
 				}
-			//}else{
-				//throw new Error("needFocalLength="+needFocalLength);
-			//}
+			}
 		}
 		public function get focalLength():Number{
 			return focalLengthV[0];//以原点的 focalLength 作为 focalLength
