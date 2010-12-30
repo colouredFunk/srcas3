@@ -23,11 +23,24 @@
 			mouseEnabled = mouseChildren = _enabled;
 			__enabled = _enabled;
 		}
+		private var __autoRemove:Boolean = true;
+		public function get autoRemove():Boolean{
+			return __autoRemove;
+		}
+		public function set autoRemove(_autoRemove:Boolean):void{
+			__autoRemove = _autoRemove;
+			if (__autoRemove) {
+				addEventListener(Event.REMOVED_FROM_STAGE, onRemoveToStageDelayHandler);
+			}else {
+				removeEventListener(Event.REMOVED_FROM_STAGE, onRemoveToStageDelayHandler);
+			}
+		}
 		public function UISprite() {
 			init();
 		}
 		public function remove():void {
 			if (parent) {
+				autoRemove = true;
 				parent.removeChild(this);
 			}
 		}
