@@ -41,7 +41,7 @@
 			return __text;
 		}
 		[Inspectable(defaultValue="Txt",type="String",name="文本")]
-		public function set text(_text):void {
+		public function set text(_text:String):void {
 			if (__text!=_text) {
 				if (html) {
 					txt.htmlText=__text=_text;
