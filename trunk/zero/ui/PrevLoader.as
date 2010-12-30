@@ -19,10 +19,10 @@ package zero.ui{
 	import mx.preloaders.Preloader;
 	
 	import zero.Paths;
+	import zero.GetAndSetValue;
 
 	public class PrevLoader extends Sprite implements IPreloaderDisplay{
 		private var zpl:*;
-		private var urlLoader:URLLoader;
 		private var loader:Loader;
 		private var timeoutId:int=-1;
 		private var bg:Sprite;
@@ -34,7 +34,6 @@ package zero.ui{
 			Security.allowInsecureDomain(Paths.domain);
 		}
 		public function initialize():void{
-			this.visible=false;
 			this.addEventListener(Event.REMOVED_FROM_STAGE,removed);
 			bg=new Sprite();
 			this.addChild(bg);
@@ -44,42 +43,19 @@ package zero.ui{
 			g.drawRect(0,0,100,100);
 			g.endFill();
 			
-			//initDelay();
-			timeoutId=setTimeout(initDelay,2000);//就是如果作品已经在缓存里的话就不打算加载广告了
-		}
-		private function initDelay():void{
-			clearTimeout(timeoutId);
-			
 			loader=new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadZPLComplete);
+			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,loadZPLError);
+			loader.load(new URLRequest(ZeroPrevLoaderURL));
 			this.addChild(loader);
-			
-			///*
-			urlLoader=new URLLoader();
-			urlLoader.dataFormat=URLLoaderDataFormat.BINARY;
-			urlLoader.load(new URLRequest(ZeroPrevLoaderURL));
-			urlLoader.addEventListener(Event.COMPLETE,loadZeroPrevLoaderComplete);
-			urlLoader.addEventListener(IOErrorEvent.IO_ERROR,loadZeroPrevLoaderError);
-			//*/
-			
-			/*
-			loader.load(
-				new URLRequest(ZeroPrevLoaderURL)
-				,new LoaderContext(false,ApplicationDomain.currentDomain)
-			);
-			*/
-			
+
+			resize(null);
 			stage.addEventListener(Event.RESIZE,resize);
 		}
 		private function removed(event:Event):void{
 			clearTimeout(timeoutId);
 			this.removeEventListener(Event.REMOVED_FROM_STAGE,removed);
 			this.loaderInfo.removeEventListener(Event.COMPLETE,startGame);
-			if(urlLoader){
-				urlLoader.close();
-				urlLoader.removeEventListener(Event.COMPLETE,loadZeroPrevLoaderComplete);
-				urlLoader.removeEventListener(IOErrorEvent.IO_ERROR,loadZeroPrevLoaderError);
-			}
 			if(loader){
 				loader.contentLoaderInfo.removeEventListener(Event.COMPLETE,loadZPLComplete);
 				loader.unloadAndStop();
@@ -87,21 +63,13 @@ package zero.ui{
 			}
 			stage.removeEventListener(Event.RESIZE,resize);
 		}
-		private function loadZeroPrevLoaderComplete(event:Event):void{
-			trace("loadZeroPrevLoaderComplete");
-			loader.loadBytes(
-				urlLoader.data
-				//,new LoaderContext(false,ApplicationDomain.currentDomain)
-			);
-		}
-		private function loadZeroPrevLoaderError(event:IOErrorEvent):void{
-			trace("loadZeroPrevLoaderError");
-		}
 		private function loadZPLComplete(event:Event):void{
-			this.visible=true;
-			trace("loadZPLComplete");
 			zpl=(event.target as LoaderInfo).loader.content;
+			zpl.cmd("loadGameProgress",this.loaderInfo.bytesLoaded,this.loaderInfo.bytesTotal);
 			resize(null);
+		}
+		private function loadZPLError(event:IOErrorEvent):void{
+			trace("loadZPLError");
 		}
 		public function set preloader(_preloader:Sprite):void{
 			(_preloader as Preloader).addEventListener(ProgressEvent.PROGRESS,loadProgress);
@@ -122,6 +90,10 @@ package zero.ui{
 			}
 		}
 		private function initComplete(event:FlexEvent):void{
+			timeoutId=setTimeout(initDelay,1000);
+		}
+		private function initDelay():void{
+			clearTimeout(timeoutId);
 			if(zpl){
 				if(zpl.cmd("loadGameComplete",startGame)){
 					return;
@@ -172,6 +144,13 @@ package zero.ui{
 			return 0;
 		}
 		public function set stageHeight(_stageHeight:Number):void{
+		}
+		
+		public function getValue(objName:String,thisObj:*=null):*{
+			return GetAndSetValue.getValue(objName,thisObj);
+		}
+		public function setValue(objName:String,value:*,thisObj:*=null):void{
+			GetAndSetValue.setValue(objName,value,thisObj);
 		}
 	}
 }

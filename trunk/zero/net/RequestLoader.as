@@ -98,6 +98,7 @@ package zero.net{
 				var urlVariables:URLVariables=new URLVariables();
 				urlRequest.method=method?method:URLRequestMethod.POST;
 				if(variables is ByteArray){
+					//trace("ByteArray variables.length="+variables.length);
 					urlRequest.data=variables;
 					urlRequest.contentType="application/octet-stream";
 				}else if(variables is FormVars){

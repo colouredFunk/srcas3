@@ -1,31 +1,49 @@
 /***
-ACTIONRECORD 版本:v1.0
+GetAndSetValue 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年8月31日 14:22:20
+创建时间:2010年12月29日 20:39:50
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.swf.avm1{
+package zero{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
 	
-	import zero.swf.BytesData;
-	
-	public class ACTIONRECORD extends BytesData{
-		public static var actionRecordV:Vector.<ACTIONRECORD>;
-		public static function reset():void{
-			actionRecordV=new Vector.<ACTIONRECORD>();
+	public class GetAndSetValue{
+		public static function getValue(objName:String,thisObj:*=null):*{
+			var objNameArr:Array=objName.split(".");
+			if(objNameArr.length){
+				var obj:Object;
+				if(thisObj){
+					obj=thisObj[objNameArr.shift()];
+				}else{
+					obj=getDefinitionByName(objNameArr.shift());
+				}
+				while(objNameArr.length){
+					obj=obj[objNameArr.shift()];
+				}
+				return obj;
+			}
+			return null;
 		}
-		public static function clear():void{
-			actionRecordV=null;
-		}
-		
-		public function ACTIONRECORD(){
-			if(actionRecordV){
-				actionRecordV[actionRecordV.length]=this;
+		public static function setValue(objName:String,value:*,thisObj:*=null):void{
+			var objNameArr:Array=objName.split(".");
+			if(objNameArr.length){
+				var obj:Object;
+				if(thisObj){
+					obj=thisObj[objNameArr.shift()];
+				}else{
+					obj=getDefinitionByName(objNameArr.shift());
+				}
+				while(objNameArr.length>1){
+					obj=obj[objNameArr.shift()];
+				}
+				if(objNameArr.length){
+					obj[objNameArr.shift()]=value;
+				}
 			}
 		}
 	}

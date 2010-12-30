@@ -1,32 +1,17 @@
-/***
-ACTIONRECORD 版本:v1.0
+﻿/***
+WorldMapBmd 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年8月31日 14:22:20
+创建时间:2010年12月29日 17:13:46
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.swf.avm1{
-	import flash.display.*;
-	import flash.events.*;
-	import flash.utils.*;
-	
-	import zero.swf.BytesData;
-	
-	public class ACTIONRECORD extends BytesData{
-		public static var actionRecordV:Vector.<ACTIONRECORD>;
-		public static function reset():void{
-			actionRecordV=new Vector.<ACTIONRECORD>();
-		}
-		public static function clear():void{
-			actionRecordV=null;
-		}
-		
-		public function ACTIONRECORD(){
-			if(actionRecordV){
-				actionRecordV[actionRecordV.length]=this;
-			}
+package{
+	import flash.display.Bitmap;
+	[Embed(source="texture.jpg")]
+	public class WorldMapBmd extends Bitmap{
+		public function WorldMapBmd(){
 		}
 	}
 }
