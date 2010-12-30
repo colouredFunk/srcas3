@@ -66,24 +66,21 @@ package zero.zero3D.cameras{
 			
 			var ruV:Vector.<IRenderUnit>=new Vector.<IRenderUnit>();//渲染列表,用来存储要渲染的单元
 			
-			//var t:int;
-			
-			//t=getTimer();
+			//DocClassThis.t=getTimer();
 			scene3D.project(this,ruV);
-			//trace("project 耗时: "+(getTimer()-t)+" 毫秒");
+			//DocClassThis.txt.text+="project 耗时: "+(getTimer()-DocClassThis.t)+" 毫秒\n";
 			
 			if(needFocalLength){
-				//t=getTimer();
+				//DocClassThis.t=getTimer();
 				ruV.sort(sortByFocalLength);//按从远到近的顺序排列
-				//trace("sort 耗时: "+(getTimer()-t)+" 毫秒");
+				//DocClassThis.txt.text+="sort 耗时: "+(getTimer()-DocClassThis.t)+" 毫秒\n";
 			}
 			
-			//t=getTimer();
-			//container.graphics.clear();
+			//DocClassThis.t=getTimer();
 			for each(var ru:IRenderUnit in ruV){
 				ru.render(container);//按从远到近的顺序渲染所有要渲染的单元
 			}
-			//trace("render 耗时: "+(getTimer()-t)+" 毫秒");
+			//DocClassThis.txt.text+="render 耗时: "+(getTimer()-DocClassThis.t)+" 毫秒\n";
 		}
 		public function outputByContainerDict(containerDict:Dictionary,graMark:Object=null,containerKeyDict:Dictionary=null):void{
 			var obj1:*,obj2:*;
@@ -96,8 +93,6 @@ package zero.zero3D.cameras{
 				}
 			}
 			
-			DocClassThis.txt.text+=(getTimer()-DocClassThis.t)+"毫秒\n";
-			
 			var objDict:Dictionary=new Dictionary();
 			for(obj1 in containerDict){
 				container=containerDict[obj1];
@@ -108,6 +103,9 @@ package zero.zero3D.cameras{
 				objDict[container].push(obj1);
 			}
 			
+			//DocClassThis.txt.text+="输出前: "+(getTimer()-DocClassThis.t)+"毫秒\n";
+			//DocClassThis.t=getTimer();
+			
 			for(container in objDict){
 				for(obj2 in containerDict){
 					(obj2 as Obj3D).visible=false;
@@ -116,6 +114,9 @@ package zero.zero3D.cameras{
 					obj1.visible=true;
 				}
 				output(container);
+				
+				//DocClassThis.txt.text+="输出: "+(getTimer()-DocClassThis.t)+"毫秒\n";
+				//DocClassThis.t=getTimer();
 				
 				/*
 				if(graMark&&containerKeyDict){
