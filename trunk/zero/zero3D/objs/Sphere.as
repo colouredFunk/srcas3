@@ -18,15 +18,16 @@ package zero.zero3D.objs{
 		
 		private var r:Number;
 		
-		private var segW:int=24;
-		private var segH:int=24;
+		private var segW:int;
+		private var segH:int;
 		
-		public function Sphere(_r:Number,bmd:BitmapData){
+		public function Sphere(_r:Number, _segW:int = 12, _segH:int = 12, bmd:BitmapData = null) {
 			var vertexV:Vector.<Number>=new Vector.<Number>();
 			var uvV:Vector.<Number>=new Vector.<Number>();
 			var vertexIdV:Vector.<int>=new Vector.<int>();
 			var uvIdV:Vector.<int>=new Vector.<int>();
-			
+			segW = _segW;
+			segH = _segH;
 			/*
 			vertexV[0]=0;
 			vertexV[1]=0;
