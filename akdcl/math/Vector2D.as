@@ -11,7 +11,7 @@
 		/** 
 		* Constructor.  
 		*/
-		public function Vector2D(x:Number=0,y:Number=0) {
+		public function Vector2D(x:Number = 0, y:Number = 0) {
 			_x=x;
 			_y=y;
 		}
