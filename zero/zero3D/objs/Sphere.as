@@ -21,7 +21,7 @@ package zero.zero3D.objs{
 		private var segW:int;
 		private var segH:int;
 		
-		public function Sphere(_r:Number, _segW:int = 12, _segH:int = 12, bmd:BitmapData = null) {
+		public function Sphere(_r:Number, _segW:int = 12, _segH:int = 12, bmd:BitmapData=null,needOwnContainer:Boolean=true) {
 			var vertexV:Vector.<Number>=new Vector.<Number>();
 			var uvV:Vector.<Number>=new Vector.<Number>();
 			var vertexIdV:Vector.<int>=new Vector.<int>();
@@ -101,7 +101,8 @@ package zero.zero3D.objs{
 				vertexV,
 				uvV,
 				vertexIdV,
-				uvIdV
+				uvIdV,
+				needOwnContainer
 			);
 		}
 	}

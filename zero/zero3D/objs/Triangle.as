@@ -13,6 +13,8 @@ package zero.zero3D.objs{
 	import flash.display.*;
 	import flash.geom.*;
 	public class Triangle implements IRenderUnit{
+		public var needOwnContainer:Boolean;
+		
 		public var bmd:BitmapData;
 		
 		public var lineThickness:int=1;
@@ -48,7 +50,8 @@ package zero.zero3D.objs{
 			meshVertexV:Vector.<Number>,
 			meshVertexIdV:Vector.<int>,
 			meshUvV:Vector.<Number>,
-			meshUvIdV:Vector.<int>
+			meshUvIdV:Vector.<int>,
+			_needOwnContainer:Boolean
 		){
 			//三角面
 			meshVertexId1=meshVertexIdV[id1];
@@ -92,7 +95,11 @@ package zero.zero3D.objs{
 				uvV=null;
 			}
 			
-			sp=new Sprite();//渲染用
+			needOwnContainer=_needOwnContainer;
+			
+			if(needOwnContainer){
+				sp=new Sprite();//渲染用
+			}
 		}
 		public function get isFront():Boolean{
 			return (vertexV[0]-vertexV[2])*(vertexV[1]-vertexV[5])-(vertexV[1]-vertexV[3])*(vertexV[0]-vertexV[4])<0;//三角形三个顶点投影到屏幕后为逆时针方向的为正面
@@ -118,10 +125,15 @@ package zero.zero3D.objs{
 		}
 		
 		public function render(container:*):void{
-			container.addChild(sp);
-			var g:Graphics=sp.graphics;
+			var g:Graphics;
+			if(needOwnContainer){
+				container.addChild(sp);
+				g=sp.graphics;
+				g.clear();
+			}else{
+				g=container.graphics;
+			}
 			
-			g.clear();
 			if(lineColor>=0){
 				g.lineStyle(lineThickness,lineColor,lineAlpha);
 			}
@@ -135,13 +147,17 @@ package zero.zero3D.objs{
 				g.endFill();
 			}
 			
-			if(Obj3D.needHighLight){
-				sp.transform.colorTransform=new ColorTransform(highlight,highlight,highlight,1,0,0,0,0);
+			if(needOwnContainer){
+				if(Obj3D.needHighLight){
+					sp.transform.colorTransform=new ColorTransform(highlight,highlight,highlight,1,0,0,0,0);
+				}
 			}
 		}
 		
 		public function clearGraphics():void{
-			sp.graphics.clear();
+			if(sp){
+				sp.graphics.clear();
+			}
 		}
 	}
 }

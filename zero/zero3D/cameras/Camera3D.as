@@ -56,7 +56,9 @@ package zero.zero3D.cameras{
 				}
 			}
 		}
-		public function output(container:DisplayObject):void{
+		public function output(container:Sprite):void{
+			container.graphics.clear();
+			
 			//trace("output");
 			//输出图像到一个容器里
 			cameraMatrix3D.rawData=matrix3D.rawData;
@@ -86,7 +88,6 @@ package zero.zero3D.cameras{
 			var obj1:*,obj2:*;
 			var container:*;
 			for each(container in containerDict){
-				container.graphics.clear();
 				var i:int=container.numChildren;
 				while(--i>=0){
 					container.removeChildAt(i);

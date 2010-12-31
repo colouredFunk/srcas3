@@ -48,7 +48,8 @@ package zero.zero3D.objs{
 			vertexV:Vector.<Number>,
 			uvV:Vector.<Number>,
 			_vertexIdV:Vector.<int>,
-			uvIdV:Vector.<int>=null
+			uvIdV:Vector.<int>,
+			needOwnContainer:Boolean
 		){
 			//三角面片组成的3d物体
 			super(vertexV);
@@ -67,7 +68,7 @@ package zero.zero3D.objs{
 			triangleV=new Vector.<Triangle>(i/3);
 			var idId:int=0;
 			while((i-=3)>=0){
-				var triangle:Triangle=triangleV[i/3]=new Triangle(i,i+1,i+2,vertexV,_vertexIdV,uvV,uvIdV);
+				var triangle:Triangle=triangleV[i/3]=new Triangle(i,i+1,i+2,vertexV,_vertexIdV,uvV,uvIdV,needOwnContainer);
 			}
 			vertexIdV=_vertexIdV;
 		}
