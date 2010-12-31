@@ -76,20 +76,20 @@
 		}
 		//返回正常的弧度数
 		public static function rFloor(r:Number):Number {
-			if (r>=Math.PI) {
+			if (r>Math.PI) {
 				r-=2*Math.PI;
 			}
-			if (r<=- Math.PI) {
+			if (r<- Math.PI) {
 				r+=2*Math.PI;
 			}
 			return r;
 		}
 		//返回正常的弧度数
 		public static function rFloor360(r:Number):Number {
-			if (r>=180) {
+			if (r>180) {
 				r-=2*180;
 			}
-			if (r<=- 180) {
+			if (r<- 180) {
 				r+=2*180;
 			}
 			return r;

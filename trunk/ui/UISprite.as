@@ -42,6 +42,8 @@
 			if (parent) {
 				autoRemove = true;
 				parent.removeChild(this);
+			}else {
+				onRemoveToStageHandler();
 			}
 		}
 		protected function init():void {
