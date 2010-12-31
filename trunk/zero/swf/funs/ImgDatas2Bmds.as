@@ -15,8 +15,8 @@ package zero.swf.funs{
 	import flash.system.ApplicationDomain;
 	import flash.utils.*;
 	
-	import zero.swf.*;
 	import zero.encoder.BMPEncoder;
+	import zero.swf.*;
 	import mx.graphics.codec.PNGEncoder;
 
 	public class ImgDatas2Bmds{

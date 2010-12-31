@@ -19,7 +19,7 @@ OutputPane 版本:v1.0
  width="400" height="400"
 >
 	<mx:TextArea id="txt" wordWrap="false" left="0" top="0" right="0" bottom="0"/>
-	<mx:Button label="清空" bottom="2" right="22" click="click()"/>
+	<mx:Button label="清空" bottom="2" right="22" click="click()" id="btn"/>
 	<fx:Declarations>
 		<fx:String id="cssStr">
 			<![CDATA[
