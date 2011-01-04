@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 width="640" height="290"
+		 close="close()"
+		 showCloseButton="true"
+ xmlns:ui="zero.ui.*">
+	<s:Group id="itemArea" width="630" height="240">
+		<ui:URLItem y="0" width="100%"/>
+		<ui:URLItem y="30" width="100%"/>
+		<ui:URLItem y="60" width="100%"/>
+		<ui:URLItem y="90" width="100%"/>
+		<ui:URLItem y="120" width="100%"/>
+		<ui:URLItem y="150" width="100%"/>
+		<ui:URLItem y="180" width="100%"/>
+		<ui:URLItem y="210" width="100%"/>
+	</s:Group>
+	<fx:Script>
+		<![CDATA[
+			import mx.managers.PopUpManager;
+			public static function show(
+				container:Sprite,
+				_title:String,
+				so:SharedObject,
+				saveId:String
+			):void{
+				(PopUpManager.createPopUp(
+					container,
+					URLBoard,
+					true
+				) as URLBoard).init(_title,so,saveId);
+			}
+			private function init(
+				_title:String,
+				so:SharedObject,
+				saveId:String
+			):void{
+				title=_title;
+				var i:int=itemArea.numElements;
+				var item:URLItem;
+				item=itemArea.getElementAt(0) as URLItem;
+				item.txt.text="${当前地址}";
+				item.cb.selected=true;
+				while(--i>=0){
+					item=itemArea.getElementAt(i) as URLItem;
+					item.init(so,saveId+"_URLItem_"+i);
+				}
+				
+				this.x=(stage.stageWidth-this.width)/2;
+				this.y=(stage.stageHeight-this.height)/2;
+			}
+			
+			private function close():void{
+				var i:int=itemArea.numElements;
+				while(--i>=0){
+					var item:URLItem=itemArea.getElementAt(i) as URLItem;
+					item.clear();
+				}
+				PopUpManager.removePopUp(this);
+			}
+			
+			public static function getXML(so:SharedObject,saveId:String):XML{
+				var itemId:int=0;
+				var xml:XML=<urls/>;
+				while(true){
+					var txt_saveId:String=saveId+"_URLItem_"+itemId+"_txt";
+					if(so.data[txt_saveId]===undefined){
+						break;
+					}
+					var url:String=so.data[txt_saveId].replace(/^\s*|\s*$/g,"");
+					if(url){
+						var cb_saveId:String=saveId+"_URLItem_"+itemId+"_cb";
+						var urlXML:XML=<url url={url}/>;
+						if(so.data[saveId+"_URLItem_"+itemId+"_cb"]){
+							urlXML.@strictMatch=true;
+						}
+						xml.appendChild(urlXML);
+					}
+					itemId++;
+				}
+				if(xml.url.length()==0){
+					xml.appendChild(<url url="${当前地址}" strictMatch="true"/>);
+				}
+				return xml;
+			}
+		]]>
+	</fx:Script>
+</mx:TitleWindow>

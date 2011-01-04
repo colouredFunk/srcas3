@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<class>
+  <instance_info infos="public class" name="Class12345" super_name="flash.display.BitmapData" protectedNs="Class12345">
+    <iinit methodName="Class12345" methodId="1">
+      <method_info return_type="*">
+        <flags>NEED_REST</flags>
+      </method_info>
+      <method_body max_stack="3" local_count="2" init_scope_depth="5" max_scope_depth="6">
+        <codes><![CDATA[
+	getlocal0
+	pushscope
+	getlocal0
+	pushbyte 0
+	dup
+	constructsuper (param count:2)
+	returnvoid
+]]></codes>
+      </method_body>
+    </iinit>
+  </instance_info>
+  <class_info>
+    <cinit methodName="Class12345_cinit" methodId="0">
+      <method_info return_type="*"/>
+      <method_body max_stack="1" local_count="1" init_scope_depth="4" max_scope_depth="5">
+        <codes><![CDATA[
+	getlocal0
+	pushscope
+	returnvoid
+]]></codes>
+      </method_body>
+    </cinit>
+  </class_info>
+</class>
