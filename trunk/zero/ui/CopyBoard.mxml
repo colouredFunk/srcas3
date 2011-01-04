@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group
+	xmlns:fx="http://ns.adobe.com/mxml/2009"
+	xmlns:s="library://ns.adobe.com/flex/spark"
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	width="500" height="300"
+	creationComplete="creationComplete()"
+	removedFromStage="clear()"
+>
+	<mx:TextArea id="txt" wordWrap="false" left="10" top="10" right="10" bottom="10"/>
+	<mx:Button id="btnCopy" label="复制" bottom="2" right="100" click="click(event)"/>
+	<mx:Button id="btnExit" label="关闭" bottom="2" right="22" click="click(event)"/>
+	<fx:Script>
+		<![CDATA[
+			import flash.display.*;
+			import flash.events.*;
+			import flash.utils.*;
+			
+			private static var instance:CopyBoard;
+			public static function output(msg:String):void{
+				if(instance){
+					instance.output(msg);
+				}
+			}
+			
+			private function creationComplete():void{
+				instance=this;
+			}
+			private function clear():void{
+				instance=null;
+			}
+			
+			public function output(msg:String):void{
+				txt.text=msg;
+				this.visible=true;
+			}
+			private function click(event:MouseEvent):void{
+				switch(event.target){
+					case btnCopy:
+						System.setClipboard(txt.text);
+						txt.text+="\n已保存至剪贴板";
+					break;
+					case btnExit:
+						this.visible=false;
+					break;
+				}
+			}
+		]]>
+	</fx:Script>
+</s:Group>
