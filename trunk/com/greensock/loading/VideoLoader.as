@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.741
- * DATE: 2010-11-21
+ * VERSION: 1.767
+ * DATE: 2010-12-17
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -13,10 +13,12 @@ package com.greensock.loading {
 	import flash.events.Event;
 	import flash.events.NetStatusEvent;
 	import flash.events.ProgressEvent;
+	import flash.events.TimerEvent;
 	import flash.media.SoundTransform;
 	import flash.media.Video;
 	import flash.net.NetConnection;
 	import flash.net.NetStream;
+	import flash.utils.Timer;
 	import flash.utils.getTimer;
 	
 	/** Dispatched when the loader's <code>httpStatus</code> value changes. **/
@@ -230,6 +232,8 @@ function errorHandler(event:LoaderEvent):void {
 		protected var _firstCuePoint:CuePoint;
 		/** @private due to a bug in the NetStream class, we cannot seek() or pause() before the NetStream has dispatched a RENDER Event (or the NetStream.Buffer.Full status event is received for Flash Player 9). **/
 		protected var _renderedOnce:Boolean;
+		/** @private primarily used for FP9 to work around a Flash bug with seek() and pause() (see the _onBufferFull() method for note). **/
+		protected var _timer:Timer =  new Timer(50, 1);
 		
 		/** The metaData that was received from the video (contains information about its width, height, frame rate, etc.). See Adobe's docs for information about a NetStream's onMetaData callback. **/
 		public var metaData:Object;
@@ -318,7 +322,7 @@ function errorHandler(event:LoaderEvent):void {
 			_nc.addEventListener("asyncError", _failHandler, false, 0, true);
 			_nc.addEventListener("securityError", _failHandler, false, 0, true);
 			
-			_video = _content = new Video(this.vars.width || 320, this.vars.height || 240);
+			_video = new Video(this.vars.width || 320, this.vars.height || 240);
 			_video.smoothing = Boolean(this.vars.smoothing != false);
 			_video.deblocking = uint(this.vars.deblocking);
 			
@@ -382,6 +386,7 @@ function errorHandler(event:LoaderEvent):void {
 			_prevTime = 0;
 			_bufferFull = false;
 			_renderedOnce = false;
+			_timer.reset();
 			this.metaData = null;
 			_pausePending = _videoPaused;
 			if (_videoPaused) {
@@ -402,6 +407,7 @@ function errorHandler(event:LoaderEvent):void {
 			_sprite.removeEventListener(Event.ENTER_FRAME, _enterFrameHandler);
 			_ns.removeEventListener(Event.RENDER, _renderHandler);
 			_sprite.removeEventListener(Event.ENTER_FRAME, _forceTimeHandler);
+			_timer.removeEventListener(TimerEvent.TIMER, _renderHandler);
 			_forceTime = NaN;
 			_prevTime = 0;
 			_initted = false;
@@ -496,6 +502,8 @@ function errorHandler(event:LoaderEvent):void {
 		 * @param parameters An object containing any data that you want associated with the cue point. For example, <code>{message:"descriptive text", id:5}</code>. This data can be retrieved in the VIDEO_CUE_POINT handler via the LoaderEvent's <code>data</code> property like <code>event.data.parameters</code>
 		 * @return The cue point that was added
 		 * @see #removeASCuePoint()
+		 * @see #gotoVideoCuePoint()
+		 * @see #getCuePointTime()
 		 */
 		public function addASCuePoint(time:Number, name:String="", parameters:Object=null):Object {
 			var prev:CuePoint = _firstCuePoint;
@@ -518,8 +526,9 @@ function errorHandler(event:LoaderEvent):void {
 		}
 		
 		/**
-		 * Removes an ActionScript cue point that was added with <code>addASCuePoint()</code>. If multiple ActionScript cue points match the search criteria, only one is removed. 
-		 * To remove all, call this function repeatedly in a loop with the same parameters until it returns null. 
+		 * Removes an ActionScript cue point that was added with <code>addASCuePoint()</code>. If multiple ActionScript
+		 * cue points match the search criteria, only one is removed. To remove all, call this function repeatedly in a 
+		 * loop with the same parameters until it returns null. 
 		 * 
 		 * @param timeNameOrCuePoint The time, name or cue point object that should be removed. The method removes the first cue point that matches the criteria. 
 		 * @return The cue point that was removed (or <code>null</code> if none were found that match the criteria)
@@ -544,6 +553,57 @@ function errorHandler(event:LoaderEvent):void {
 				cp = cp.next;
 			}
 			return null;
+		}
+		
+		/**
+		 * Finds a cue point by name and returns its corresponding time (where it is positioned in the video). 
+		 * All cue points will be included in the search (cue points embedded into the video when it was encoded
+		 * as well as cue points that were added with <code>addASCuePoint()</code>).
+		 * 
+		 * @param name The name of the cue point
+		 * @return The cue point's time (NaN if no cue point was found with the specified name)
+		 * @see #addASCuePoint()
+		 * @see #gotoVideoCuePoint()
+		 * @see #gotoVideoTime()
+		 */
+		public function getCuePointTime(name:String):Number {
+			if (this.metaData != null && this.metaData.cuePoints is Array) {
+				var i:int = this.metaData.cuePoints.length;
+				while (--i > -1) { 
+					if (name == this.metaData.cuePoints[i].name) {
+						return Number(this.metaData.cuePoints[i].time);
+					}
+				}
+			}
+			var cp:CuePoint = _firstCuePoint;
+			while (cp) {
+				if (cp.name == name) {
+					return cp.time;
+				}
+				cp = cp.next;
+			}
+			return NaN;
+		}
+		
+		/**
+		 * Attempts to jump to a certain cue point (either a cue point that was embedded in the
+		 * video itself when it was encoded or a cue point that was added via <code>addASCuePoint()</code>). 
+		 * If the video hasn't downloaded enough to get to the cue point or if there is no keyframe at that 
+		 * point in the video, it will get as close as possible. For example, to jump to a cue point
+		 * named "highlight1" and play from there:<br /><br /><code>
+		 * 
+		 * loader.gotoVideoCuePoint("highlight1", true);<br /><br /></code>
+		 * 
+		 * @param name The name of the cue point
+		 * @param forcePlay If <code>true</code>, the video will resume playback immediately after seeking to the new position.
+		 * @param skipCuePoints If <code>true</code> (the default), any cue points that are positioned between the current videoTime and the destination cue point will be ignored when moving to the new videoTime. In other words, it is like a record player that has its needle picked up, moved, and dropped into a new position rather than dragging it across the record, triggering the various cue points (if any exist there). IMPORTANT: cue points are only triggered when the time advances in the forward direction; they are never triggered when rewinding or restarting. 
+		 * @return The cue point's time (NaN if the cue point wasn't found)
+		 * @see #gotoVideoTime()
+		 * @see #addASCuePoint()
+		 * @see #removeASCuePoint()
+		 */
+		public function gotoVideoCuePoint(name:String, forcePlay:Boolean=false, skipCuePoints:Boolean=true):Number {
+			return gotoVideoTime(getCuePointTime(name), forcePlay, skipCuePoints);
 		}
 		
 		/** 
@@ -591,8 +651,10 @@ function errorHandler(event:LoaderEvent):void {
 		 * @see #videoTime
 		 * @see #playProgress
 		 **/
-		public function gotoVideoTime(time:Number, forcePlay:Boolean=false, skipCuePoints:Boolean=true):void {
-			if (time > _duration) {
+		public function gotoVideoTime(time:Number, forcePlay:Boolean=false, skipCuePoints:Boolean=true):Number {
+			if (isNaN(time)) {
+				return NaN;
+			} else if (time > _duration) {
 				time = _duration;
 			}
 			var changed:Boolean = (time != this.videoTime);
@@ -615,6 +677,7 @@ function errorHandler(event:LoaderEvent):void {
 			if (changed && skipCuePoints && _dispatchPlayProgress) {
 				dispatchEvent(new LoaderEvent(PLAY_PROGRESS, this));
 			}
+			return time;
 		}
 		
 		/** @private **/
@@ -627,6 +690,11 @@ function errorHandler(event:LoaderEvent):void {
 		
 		/** @private **/
 		protected function _onBufferFull():void {
+			if (!_renderedOnce && !_timer.running) { //in Flash Player 9, NetStream doesn't dispatch the RENDER event and the only reliable way I could find to sense when a render truly must have occured is to wait about 50 milliseconds after the buffer fills. Even waiting for an ENTER_FRAME event wouldn't work consistently (depending on the frame rate). Also, depending on the version of Flash that published the swf, the NetStream's NetStream.Buffer.Full status event may not fire (CS3 and CS4)!
+				_timer.addEventListener(TimerEvent.TIMER, _renderHandler, false, 0, true);
+				_timer.start();
+				return;
+			}
 			if (_pausePending) {
 				if (!_initted && getTimer() - _time < 10000) {
 					_video.attachNetStream(null); //in some rare circumstances, the NetStream will finish buffering even before the metaData has been received. If we pause() the NetStream before the metaData arrives, it can prevent the metaData from ever arriving (bug in Flash) even after you resume(). So in this case, we allow the NetStream to continue playing so that metaData can be received, but we detach it from the Video object so that the user doesn't see the video playing. The volume is also muted, so to the user things look paused even though the NetStream is continuing to play/load. We'll re-attach the NetStream to the Video after either the metaData arrives or 10 seconds elapse.
@@ -670,7 +738,9 @@ function errorHandler(event:LoaderEvent):void {
 		
 		/** @private **/
 		protected function _metaDataHandler(info:Object):void {
-			this.metaData = info;
+			if (this.metaData == null || this.metaData.cuePoints == null) { //sometimes videos will trigger the onMetaData multiple times (especially F4V files) and occassionally the last call doesn't contain cue point data!
+				this.metaData = info;
+			}
 			_duration = info.duration;
 			if ("width" in info) {
 				_video.width = Number(info.width); 
@@ -682,7 +752,9 @@ function errorHandler(event:LoaderEvent):void {
 		
 		/** @private **/
 		protected function _cuePointHandler(info:Object):void {
-			dispatchEvent(new LoaderEvent(VIDEO_CUE_POINT, this, "", info));
+			if (!_videoPaused) { //in case there's a cue point very early on and autoPlay was set to false - remember, to work around bugs in NetStream, we cannot pause() it until we receive metaData and the first frame renders.
+				dispatchEvent(new LoaderEvent(VIDEO_CUE_POINT, this, "", info));
+			}
 		}
 		
 		/** @private **/
@@ -734,9 +806,6 @@ function errorHandler(event:LoaderEvent):void {
 					dispatchEvent(new LoaderEvent(VIDEO_COMPLETE, this));
 				}
 			} else if (code == "NetStream.Buffer.Full") {
-				if (!_renderedOnce) { //in Flash Player 9, NetStream doesn't dispatch the RENDER event and the only reliable way I could find to sense when a render truly must have occured is to wait for the NetStream.Buffer.Full status. We don't just put this code in the _onBufferFull() method because there's a chance it can be called from elsewhere before the NetStream.Buffer.Full status event occurs.
-					_renderHandler(null);
-				}
 				_onBufferFull();
 			} else if (code == "NetStream.Buffer.Empty") {
 				_bufferFull = false;
@@ -763,7 +832,7 @@ function errorHandler(event:LoaderEvent):void {
 			if (!_bufferFull && _ns.bufferLength >= _ns.bufferTime) {
 				_onBufferFull();
 			}
-			if (_cachedBytesLoaded == _cachedBytesTotal && _renderedOnce && _ns.bytesTotal > 5 && (_initted || getTimer() - _time >= 10000)) { //make sure the metaData has been received because if the NetStream file is cached locally sometimes the bytesLoaded == bytesTotal BEFORE the metaData arrives. Or timeout after 10 seconds.
+			if (_cachedBytesLoaded == _cachedBytesTotal && _ns.bytesTotal > 5 && ((_initted && _renderedOnce) || getTimer() - _time >= 10000)) { //make sure the metaData has been received because if the NetStream file is cached locally sometimes the bytesLoaded == bytesTotal BEFORE the metaData arrives. Or timeout after 10 seconds.
 				_sprite.removeEventListener(Event.ENTER_FRAME, _enterFrameHandler);
 				if (!_bufferFull) {
 					_onBufferFull();
@@ -788,8 +857,8 @@ function errorHandler(event:LoaderEvent):void {
 		
 		/** @private **/
 		protected function _renderHandler(event:Event):void {
+			event.target.removeEventListener(event.type, _renderHandler);
 			_renderedOnce = true;
-			_ns.removeEventListener(Event.RENDER, _renderHandler);
 			if (_pausePending) {
 				if (_bufferFull) {
 					_applyPendingPause();
@@ -827,7 +896,7 @@ function errorHandler(event:LoaderEvent):void {
 		
 		/** The <code>Video</code> object to which the NetStream was attached (automatically created by VideoLoader internally) **/
 		public function get rawContent():Video {
-			return _content as Video;
+			return _video;
 		}
 		
 		/** The <code>NetStream</code> object used to load the video **/

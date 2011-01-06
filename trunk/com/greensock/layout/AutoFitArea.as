@@ -1,8 +1,8 @@
 /**
- * VERSION: 1.61
- * DATE: 2010-10-01
+ * VERSION: 1.7
+ * DATE: 2010-12-16
  * AS3
- * UPDATES AND DOCUMENTATION AT: http://www.greensock.com/autofitarea/
+ * UPDATES AND DOCS AT: http://www.greensock.com/autofitarea/
  **/
 package com.greensock.layout {
 	import flash.display.BitmapData;
@@ -74,7 +74,7 @@ var area:AutoFitArea = AutoFitArea.createAround(myImage);
  */	 
 	public class AutoFitArea extends Shape {
 		/** @private **/
-		public static const version:Number = 1.61;
+		public static const version:Number = 1.7;
 		
 		/** @private **/
 		private static var _bd:BitmapData;
@@ -164,13 +164,14 @@ var area:AutoFitArea = AutoFitArea.createAround(myImage);
 		 * @param maxHeight Maximum height to which the target is allowed to scale
 		 * @param calculateVisible If true, only the visible portions of the target will be taken into account when determining its position and scale which can be useful for objects that have masks applied (otherwise, Flash reports their width/height and getBounds() values including the masked portions). Setting <code>calculateVisible</code> to <code>true</code> degrades performance, so only use it when absolutely necessary.
 		 * @param customAspectRatio Normally if you set the <code>scaleMode</code> to <code>PROPORTIONAL_INSIDE</code> or <code>PROPORTIONAL_OUTSIDE</code>, its native (unscaled) dimensions will be used to determine the proportions (aspect ratio), but if you prefer to define a custom width-to-height ratio, use <code>customAspectRatio</code>. For example, if an item is 100 pixels wide and 50 pixels tall at its native size, the aspect ratio would be 100/50 or 2. If, however, you want it to be square (a 1-to-1 ratio), the <code>customAspectRatio</code> would be 1. 
+		 * @param roundPosition To force the target's x/y position to snap to whole pixel values, set <code>roundPosition</code> to <code>true</code> (it is <code>false</code> by default).
 		 */
-		public function attach(target:DisplayObject, scaleMode:String="proportionalInside", hAlign:String="center", vAlign:String="center", crop:Boolean=false, minWidth:Number=0, maxWidth:Number=999999999, minHeight:Number=0, maxHeight:Number=999999999, calculateVisible:Boolean=false, customAspectRatio:Number=NaN):void {
+		public function attach(target:DisplayObject, scaleMode:String="proportionalInside", hAlign:String="center", vAlign:String="center", crop:Boolean=false, minWidth:Number=0, maxWidth:Number=999999999, minHeight:Number=0, maxHeight:Number=999999999, calculateVisible:Boolean=false, customAspectRatio:Number=NaN, roundPosition:Boolean=false):void {
 			if (target.parent != _parent) {
 				throw new Error("The parent of the DisplayObject " + target.name + " added to AutoFitArea " + this.name + " doesn't share the same parent.");
 			}
 			release(target);
-			_rootItem = new AutoFitItem(target, scaleMode, hAlign, vAlign, minWidth, maxWidth, minHeight, maxHeight, calculateVisible, customAspectRatio, _rootItem);
+			_rootItem = new AutoFitItem(target, scaleMode, hAlign, vAlign, minWidth, maxWidth, minHeight, maxHeight, calculateVisible, customAspectRatio, roundPosition, _rootItem);
 			if (crop) {
 				var shape:Shape = new Shape();
 				var bounds:Rectangle = this.getBounds(this);
@@ -260,7 +261,7 @@ var area:AutoFitArea = AutoFitArea.createAround(myImage);
 			var matrix:Matrix = this.transform.matrix;
 			
 			var item:AutoFitItem = _rootItem;
-			var w:Number, h:Number, target:DisplayObject, bounds:Rectangle, tRatio:Number, scaleMode:String, ratio:Number, angle:Number, sin:Number, cos:Number, m:Matrix, mScale:Number, mPrev:Matrix;
+			var w:Number, h:Number, tx:Number, ty:Number, target:DisplayObject, bounds:Rectangle, tRatio:Number, scaleMode:String, ratio:Number, angle:Number, sin:Number, cos:Number, m:Matrix, mScale:Number, mPrev:Matrix;
 			while (item) {
 				target = item.target;
 				scaleMode = item.scaleMode;
@@ -357,21 +358,31 @@ var area:AutoFitArea = AutoFitArea.createAround(myImage);
 				
 				bounds = (item.calculateVisible) ? getVisibleBounds(target, _parent) : target.getBounds(_parent);
 				
+				tx = target.x;
+				ty = target.y;
 				if (item.hAlign == AlignMode.LEFT) {
-					target.x += (x - bounds.x);
+					tx += (x - bounds.x);
 				} else if (item.hAlign == AlignMode.CENTER) {
-					target.x += (x - bounds.x) + ((width - bounds.width) * 0.5);
+					tx += (x - bounds.x) + ((width - bounds.width) * 0.5);
 				} else {
-					target.x += (x - bounds.x) + (width - bounds.width);
+					tx += (x - bounds.x) + (width - bounds.width);
 				}
 				
 				if (item.vAlign == AlignMode.TOP) {
-					target.y += (y - bounds.y);
+					ty += (y - bounds.y);
 				} else if (item.vAlign == AlignMode.CENTER) {
-					target.y += (y - bounds.y) + ((height - bounds.height) * 0.5);
+					ty += (y - bounds.y) + ((height - bounds.height) * 0.5);
 				} else {
-					target.y += (y - bounds.y) + (height - bounds.height);
+					ty += (y - bounds.y) + (height - bounds.height);
 				}
+				
+				if (item.roundPosition) {
+					tx = (tx + 0.5) >> 0; //much faster than Math.round()
+					ty = (ty + 0.5) >> 0;
+				}
+				
+				target.x = tx;
+				target.y = ty;
 				
 				if (item.mask) {
 					item.mask.transform.matrix = matrix;
@@ -593,6 +604,7 @@ internal class AutoFitItem {
 	public var mask:Shape;
 	public var matrix:Matrix;
 	public var hasCustomRatio:Boolean;
+	public var roundPosition:Boolean;
 	
 	public var next:AutoFitItem;
 	public var prev:AutoFitItem;
@@ -601,7 +613,7 @@ internal class AutoFitItem {
 	public var bounds:Rectangle;
 	
 	/** @private **/
-	public function AutoFitItem(target:DisplayObject, scaleMode:String, hAlign:String, vAlign:String, minWidth:Number, maxWidth:Number, minHeight:Number, maxHeight:Number, calculateVisible:Boolean, customAspectRatio:Number, next:AutoFitItem) {
+	public function AutoFitItem(target:DisplayObject, scaleMode:String, hAlign:String, vAlign:String, minWidth:Number, maxWidth:Number, minHeight:Number, maxHeight:Number, calculateVisible:Boolean, customAspectRatio:Number, roundPosition:Boolean, next:AutoFitItem) {
 		this.target = target;
 		this.scaleMode = scaleMode;
 		this.hAlign = hAlign;
@@ -610,6 +622,7 @@ internal class AutoFitItem {
 		this.maxWidth = maxWidth;
 		this.minHeight = minHeight;
 		this.maxHeight = maxHeight;
+		this.roundPosition = roundPosition;
 		this.matrix = target.transform.matrix;
 		this.calculateVisible = calculateVisible;
 		if (!isNaN(customAspectRatio)) {

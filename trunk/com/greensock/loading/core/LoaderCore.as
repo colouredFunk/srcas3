@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.7
- * DATE: 2010-11-13
+ * VERSION: 1.77
+ * DATE: 2010-12-21
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -30,6 +30,8 @@ package com.greensock.loading.core {
 	[Event(name="fail", 	type="com.greensock.events.LoaderEvent")]
 	/** Dispatched when the loader experiences some type of error, like a SECURITY_ERROR or IO_ERROR. **/
 	[Event(name="error", 	type="com.greensock.events.LoaderEvent")]
+	/** Dispatched when the loader unloads (which happens when either <code>unload()</code> or <code>dispose(true)</code> is called or if a loader is canceled while in the process of loading). **/
+	[Event(name="unload", 	type="com.greensock.events.LoaderEvent")]
 /**
  * Serves as the base class for GreenSock loading tools like <code>LoaderMax, ImageLoader, XMLLoader, SWFLoader</code>, etc. 
  * There is no reason to use this class on its own. Please see the documentation for the other classes.
@@ -41,7 +43,7 @@ package com.greensock.loading.core {
  */	
 	public class LoaderCore extends EventDispatcher {
 		/** @private **/
-		public static const version:Number = 1.7;
+		public static const version:Number = 1.77;
 		
 		/** @private **/
 		protected static var _loaderCount:uint = 0;
@@ -67,7 +69,8 @@ package com.greensock.loading.core {
 													  onChildCancel:"childCancel",
 													  onChildComplete:"childComplete", 
 													  onChildProgress:"childProgress",
-													  onChildFail:"childFail"};
+													  onChildFail:"childFail",
+													  onRawLoad:"rawLoad"};
 		/** @private **/
 		protected static var _types:Object = {};
 		/** @private **/
@@ -239,8 +242,13 @@ package com.greensock.loading.core {
 				}
 				dispatchEvent(new LoaderEvent(LoaderEvent.PROGRESS, this));
 			}
-			if (isLoading && !suppressEvents) {
-				dispatchEvent(new LoaderEvent(LoaderEvent.CANCEL, this));
+			if (!suppressEvents) {
+				if (isLoading) {
+					dispatchEvent(new LoaderEvent(LoaderEvent.CANCEL, this));
+				}
+				if (scrubLevel != 2) {
+					dispatchEvent(new LoaderEvent(LoaderEvent.UNLOAD, this));
+				}
 			}
 			if (newStatus == LoaderStatus.DISPOSED) {
 				if (!suppressEvents) {

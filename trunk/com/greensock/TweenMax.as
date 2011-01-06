@@ -1,8 +1,8 @@
 ﻿/**
- * VERSION: 11.411
- * DATE: 2010-11-28
+ * VERSION: 11.62
+ * DATE: 2010-12-24
  * AS3 (AS2 version is also available)
- * UPDATES AND DOCUMENTATION AT: http://www.TweenMax.com 
+ * UPDATES AND DOCS AT: http://www.greensock.com 
  **/
 package com.greensock {
 	import com.greensock.core.*;
@@ -296,7 +296,7 @@ package com.greensock {
  */
 	public class TweenMax extends TweenLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:Number = 11.411;
+		public static const version:Number = 11.62;
 		
 		TweenPlugin.activate([
 			
@@ -426,91 +426,6 @@ package com.greensock {
 				_easeType = fastEaseLookup[_ease][0];
 				_easePower = fastEaseLookup[_ease][1];
 			}
-			//accommodate rounding if necessary...
-			if (this.vars.roundProps != null && "roundProps" in TweenLite.plugins) {
-				var prop:String, multiProps:String, rp:Array = this.vars.roundProps, plugin:Object, ptPlugin:PropTween, pt:PropTween;
-				var i:int = rp.length;
-				while (--i > -1) {
-					prop = rp[i];
-					pt = this.cachedPT1;
-					while (pt) {
-						if (pt.name == prop) {
-							if (pt.isPlugin) {
-								pt.target.round = true;
-							} else {
-								if (plugin == null) {
-									plugin = new TweenLite.plugins.roundProps();
-									plugin.add(pt.target, prop, pt.start, pt.change);
-									_hasPlugins = true;
-									this.cachedPT1 = ptPlugin = insertPropTween(plugin, "changeFactor", 0, 1, "_MULTIPLE_", true, this.cachedPT1);
-								} else {
-									plugin.add(pt.target, prop, pt.start, pt.change); //using a single plugin for rounding speeds processing
-								}
-								this.removePropTween(pt);
-								this.propTweenLookup[prop] = ptPlugin;
-							}
-						} else if (pt.isPlugin && pt.name == "_MULTIPLE_" && !pt.target.round) {
-							multiProps = " " + pt.target.overwriteProps.join(" ") + " ";
-							if (multiProps.indexOf(" " + prop + " ") != -1) {
-								pt.target.round = true;
-							}
-						}
-						pt = pt.nextNode;
-					}
-				}
-			}
-		}
-		
-		/**
-		 * @private
-		 * Inserts a new property tween into the linked list.
-		 * 
-		 * @param target Object whose property is being tweened
-		 * @param property Name of the property that is being tweened (according to the property tween's target)
-		 * @param start Starting value of the property
-		 * @param end End value of the property (if it is a String, it will be interpreted as relative)
-		 * @param name The name of the property that is being tweened (according to tween's target). This can be different than the "property". For example, for a bezier tween, the target could be the plugin, the property could be "changeFactor", and the name could be "x" or "_MULTIPLE_" if the plugin is managing more than one property. This aids in overwrite management.
-		 * @param isPlugin Indicates whether or not the property tween is a plugin
-		 * @param nextNode Next PropTween instance in the linked list. (this just helps speed things up)
-		 * @return PropTween instance that was created/inserted
-		 */
-		protected function insertPropTween(target:Object, property:String, start:Number, end:*, name:String, isPlugin:Boolean, nextNode:PropTween):PropTween {
-			var pt:PropTween = new PropTween(target, property, start, (typeof(end) == "number") ? end - start : Number(end), name, isPlugin, nextNode);
-			if (isPlugin && name == "_MULTIPLE_") {
-				var op:Array = target.overwriteProps;
-				var i:int = op.length;
-				while (--i > -1) {
-					this.propTweenLookup[op[i]] = pt;
-				}
-			} else {
-				this.propTweenLookup[name] = pt;
-			}
-			return pt;
-		}
-		
-		/**
-		 * @private
-		 * Removes a PropTween from the linked list
-		 * 
-		 * @param propTween PropTween to remove
-		 * @return Boolean value indicating whether or not properties may have changed on the target when the PropTween was disabled. For example, when a motionBlur (plugin) is disabled, it swaps out a BitmapData for the target and may alter the alpha. We need to know this in order to determine whether or not a new tween that is overwriting this one should be re-initted() with the changed properties. 
-		 */
-		protected function removePropTween(propTween:PropTween):Boolean {
-			if (propTween.nextNode) {
-				propTween.nextNode.prevNode = propTween.prevNode;
-			}
-			if (propTween.prevNode) {
-				propTween.prevNode.nextNode = propTween.nextNode;
-			} else if (this.cachedPT1 == propTween) {
-				this.cachedPT1 = propTween.nextNode;
-			}
-			if (propTween.isPlugin && propTween.target.onDisable) {
-				propTween.target.onDisable(); //some plugins need to be notified so they can perform cleanup tasks first
-				if (propTween.target.activeDisable) {
-					return true;
-				}
-			}
-			return false;
 		}
 	
 		/** @inheritDoc **/
@@ -559,7 +474,7 @@ package com.greensock {
 				if (this.gc) {
 					this.setEnabled(true, false);
 				} else {
-					this.timeline.addChild(this); //ensures that any necessary re-sequencing of TweenCores in the timeline occurs to make sure the rendering order is correct.
+					this.timeline.insert(this, this.cachedStartTime - _delay); //ensures that any necessary re-sequencing of TweenCores in the timeline occurs to make sure the rendering order is correct.
 				}
 			}
 			for (var p:String in vars) {
@@ -645,12 +560,14 @@ package com.greensock {
 				if (time < 0) {
 					this.active = false;
 					if (this.cachedDuration == 0) { //zero-duration tweens are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
-						if (_rawPrevTime > 0) {
+						if (_rawPrevTime >= 0) {
 							force = true;
 							isComplete = true;
 						}
 						_rawPrevTime = time;
 					}
+				} else if (time == 0 && !this.initted) { //if we render the very beginning (time == 0) of a TweenMax.fromTo(), we must force the render (normal tweens wouldn't need to render at a time of 0 when the prevTime was also 0). This is also mandatory to make sure overwriting kicks in immediately.
+					force = true;
 				}
 				this.cachedTotalTime = this.cachedTime = this.ratio = 0;
 				if (this.cachedReversed && prevTime != 0) {
@@ -742,7 +659,7 @@ package com.greensock {
 				}
 			}
 			
-			if (prevTime == 0 && this.cachedTotalTime != 0 && !suppressEvents) {
+			if (prevTime == 0 && (this.cachedTotalTime != 0 || this.cachedDuration == 0) && !suppressEvents) {
 				if (this.vars.onStart) {
 					this.vars.onStart.apply(null, this.vars.onStartParams);
 				}
@@ -953,7 +870,7 @@ package com.greensock {
 			var curDelay:Number = ("delay" in vars) ? Number(vars.delay) : 0;
 			var onCompleteProxy:Function = vars.onComplete;
 			var onCompleteParamsProxy:Array = vars.onCompleteParams;
-			var lastIndex:int = (stagger <= 0) ? 0 : l - 1;
+			var lastIndex:int = l - 1;
 			for (i = 0; i < l; i += 1) {
 				varsDup = {};
 				for (p in vars) {
@@ -968,7 +885,7 @@ package com.greensock {
 						onCompleteAll.apply(null, onCompleteAllParams);
 					}
 				}
-				a[a.length] = new TweenMax(targets[i], duration, varsDup);
+				a[i] = new TweenMax(targets[i], duration, varsDup);
 				curDelay += stagger;
 			}
 			return a;
@@ -1295,7 +1212,7 @@ package com.greensock {
 			this.duration = (n - (_repeat * _repeatDelay)) / (_repeat + 1);
 		}
 		
-		/** Multiplier describing the speed of the timeline where 1 is normal speed, 0.5 is half-speed, 2 is double speed, etc. **/
+		/** Multiplier affecting the speed of the timeline where 1 is normal speed, 0.5 is half-speed, 2 is double speed, etc. **/
 		public function get timeScale():Number {
 			return this.cachedTimeScale;
 		}
