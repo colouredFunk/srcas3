@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.01
- * DATE: 2010-11-17
+ * VERSION: 1.1
+ * DATE: 2010-12-09
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -41,7 +41,7 @@ package com.greensock.loading.data {
  */	 
 	public class ImageLoaderVars {
 		/** @private **/
-		public static const version:Number = 1.0;
+		public static const version:Number = 1.1;
 		
 		/** @private **/
 		protected var _vars:Object;
@@ -52,7 +52,12 @@ package com.greensock.loading.data {
 		 * @param vars A generic Object containing properties that you'd like to add to this ImageLoaderVars instance.
 		 */
 		public function ImageLoaderVars(vars:Object=null) {
-			_vars = vars || {};
+			_vars = {};
+			if (vars != null) {
+				for (var p:String in vars) {
+					_vars[p] = vars[p];
+				}
+			}
 		}
 		
 		/** @private **/

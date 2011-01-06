@@ -1,7 +1,6 @@
-/**
- * VERSION: 1.741
- * DATE: 2010-11-22
- * AS3
+﻿/**
+ * VERSION: 1.772
+ * DATE: 2010-12-28
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
 package com.greensock.loading {
@@ -144,7 +143,7 @@ function errorHandler(event:LoaderEvent):void {
  */	
 	public class LoaderMax extends LoaderCore {		
 		/** @private **/
-		public static const version:Number = 1.741;
+		public static const version:Number = 1.772;
 		/** The default value that will be used for the <code>estimatedBytes</code> on loaders that don't declare one in the <code>vars</code> parameter of the constructor. **/
 		public static var defaultEstimatedBytes:uint = 20000;
 		/** Controls the default value of <code>auditSize</code> in LoaderMax instances (normally <code>true</code>). For most situations, the auditSize feature is very convenient for ensuring that the overall progress of LoaderMax instances is reported accurately, but when working with very large quantities of files that have no <code>estimatedBytes</code> defined, some developers prefer to turn auditSize off by default. Of course you can always override the default for individual LoaderMax instances by defining an <code>auditSize</code> value in the <code>vars</code> parameter of the constructor. **/
@@ -401,6 +400,8 @@ function completeHandler(event:LoaderEvent):void {
 					_loadNext(null);
 				}
 			}
+			_cacheIsDirty = true;
+			_progressHandler(null); //has conditional logic that will only dispatch a PROGRESS event if bytesLoaded or bytesTotal has changed.
 		}
 		
 		/**
@@ -744,7 +745,7 @@ function completeHandler(event:LoaderEvent):void {
 		
 		/** @private **/
 		protected function _loadNext(event:Event=null):void {
-			if (event != null) {
+			if (event != null && _activeLoaders != null) {
 				delete _activeLoaders[event.target];
 				_removeLoaderListeners(LoaderCore(event.target), false);
 			}
@@ -801,7 +802,7 @@ function completeHandler(event:LoaderEvent):void {
 			} else {
 				_cacheIsDirty = true;
 			}
-			if (_dispatchChildProgress) {
+			if (_dispatchChildProgress && event != null) {
 				dispatchEvent(new LoaderEvent(LoaderEvent.CHILD_PROGRESS, event.target));
 			}
 		}

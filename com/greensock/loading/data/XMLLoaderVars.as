@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.01
- * DATE: 2010-11-17
+ * VERSION: 1.1
+ * DATE: 2010-12-09
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -41,7 +41,7 @@ package com.greensock.loading.data {
  */	 
 	public class XMLLoaderVars {
 		/** @private **/
-		public static const version:Number = 1.0;
+		public static const version:Number = 1.1;
 		
 		/** @private **/
 		protected var _vars:Object;
@@ -51,7 +51,12 @@ package com.greensock.loading.data {
 		 * @param vars A generic Object containing properties that you'd like to add to this XMLLoaderVars instance.
 		 */
 		public function XMLLoaderVars(vars:Object=null) {
-			_vars = vars || {};
+			_vars = {};
+			if (vars != null) {
+				for (var p:String in vars) {
+					_vars[p] = vars[p];
+				}
+			}
 		}
 		
 		/** @private **/
@@ -194,6 +199,11 @@ package com.greensock.loading.data {
 		/** A handler function for <code>LoaderEvent.INIT</code> events which are dispatched when the XML finishes loading and its contents are parsed (creating any dynamic XML-driven loader instances necessary). If any dynamic loaders are created and have a <code>load="true"</code> attribute, they will begin loading at this point and the XMLLoader's <code>COMPLETE</code> will not be dispatched until the loaders have completed as well. **/
 		public function onInit(value:Function):XMLLoaderVars {
 			return _set("onInit", value);
+		}
+		
+		/** A handler function for <code>XMLLoader.RAW_LOAD</code> events which are dispatched when the loader finishes loading the XML but has <b>NOT</b> parsed the XML yet. This can be useful in rare situations when you want to alter the XML before it is parsed by XMLLoader (for identifying LoaderMax-related nodes like <code>&lt;ImageLoader&gt;</code>, etc.). Make sure your onRawLoad function accepts a single parameter of type <code>LoaderEvent</code> (<code>com.greensock.events.LoaderEvent</code>) **/
+		public function onRawLoad(value:Function):XMLLoaderVars {
+			return _set("onRawLoad", value);
 		}
 		
 		

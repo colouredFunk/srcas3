@@ -1,8 +1,8 @@
 ﻿/**
- * VERSION: 1.38
- * DATE: 2010-05-24
+ * VERSION: 1.62
+ * DATE: 2010-12-24
  * AS3 (AS2 version is also available)
- * UPDATES AND DOCUMENTATION AT: http://www.TweenLite.com
+ * UPDATES AND DOCS AT: http://www.greensock.com
  **/
 package com.greensock.core {
 /**
@@ -26,22 +26,32 @@ package com.greensock.core {
 			super(0, vars);
 		}
 		
-		/** @private **/
-		public function addChild(tween:TweenCore):void {
+		/**
+		 * Inserts a TweenLite, TweenMax, TimelineLite, or TimelineMax instance into the timeline at a specific time. 
+		 * 
+		 * @param tween TweenLite, TweenMax, TimelineLite, or TimelineMax instance to insert
+		 * @param time The time in seconds (or frames for frames-based timelines) at which the tween/timeline should be inserted. For example, myTimeline.insert(myTween, 3) would insert myTween 3-seconds into the timeline.
+		 * @return TweenLite, TweenMax, TimelineLite, or TimelineMax instance that was inserted
+		 */
+		public function insert(tween:TweenCore, time:*=0):TweenCore {
 			if (!tween.cachedOrphan && tween.timeline) {
 				tween.timeline.remove(tween, true); //removes from existing timeline so that it can be properly added to this one.
 			}
 			tween.timeline = this;
+			tween.cachedStartTime = Number(time) + tween.delay;
 			if (tween.gc) {
 				tween.setEnabled(true, true);
 			}
-			if (_firstChild) {
-				_firstChild.prevNode = tween;	
-			} 
-			tween.nextNode = _firstChild;
-			_firstChild = tween;
-			tween.prevNode = null;
+			if (_lastChild) {
+				_lastChild.nextNode = tween;
+			} else {
+				_firstChild = tween;
+			}
+			tween.prevNode = _lastChild;
+			_lastChild = tween;
+			tween.nextNode = null;
 			tween.cachedOrphan = false;
+			return tween;
 		}
 		
 		/** @private **/
@@ -84,7 +94,6 @@ package com.greensock.core {
 				}
 				tween = next;
 			}
-			
 		}
 		
 //---- GETTERS / SETTERS ------------------------------------------------------------------------------

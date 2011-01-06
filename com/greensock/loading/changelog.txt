@@ -1,6 +1,122 @@
 CHANGE LOG : GREENSOCK LOADERMAX SYSTEM
 ----------------------------------------
 
+2010-12-28
+--------------------------------------------
+SWFLoader			1.772
+LoaderMax			1.772
+SWFLoaderVars		1.12
+	- Changed the default suppressInitReparentEvents value in SWFLoader to true instead of false because some users had coded their swfs in a way that required ADDED_TO_STAGE to fire which shouldn't be necessary when the swf is run on its own or in a Loader that has already been added to the stage before it started loading, but nevertheless after mulling it over it did seem better not to suppress events unless specifically requested.
+
+2010-12-23
+--------------------------------------------
+SWFLoader			1.771
+LoaderMax			1.771
+DisplayObjectLoader		1.771
+	- Fixed issue introduced in version 1.77 that could cause a Type Coercion failure with SecurityDomains
+
+2010-12-21
+--------------------------------------------
+LoaderMax			1.77
+SWFLoader			1.77
+DisplayObjectLoader	1.77
+LoaderCore			1.77
+LoaderEvent			1.77
+	- Added new LoaderEvent.UNLOAD event dispatching which can be very convenient for notifying a child swf about when it should run disposal/cleanup code. For example, if you create stage event listeners or start sounds or NetStreams, etc. inside the child swf, those should be cleaned up when the SWFLoader is asked to unload (otherwise your listeners/NetStreams/Sounds might interfere with garbage collection and never go away). So in the child swf, you could run this code at start:
+		
+		var curParent:DisplayObjectContainer = this.parent;
+		while (curParent) {
+			if (curParent.hasOwnProperty("loader")) {
+			    Object(curParent).loader.addEventListener("unload", dispose, false, 0, true); 
+			}
+			curParent = curParent.parent;
+		}
+		
+		function dispose(event:Event):void {
+			//cleanup code here...
+		}
+		
+	- Corrected an issue that prevented the LoaderMax.defaultContext from taking effect when the swf was run locally
+
+2010-12-19
+--------------------------------------------
+SWFLoader			1.769
+LoaderMax			1.769
+XMLLoader			1.769
+SWFLoaderVars		1.11
+	- Added a new suppressInitReparentEvents special property to SWFLoader that suppresses the ADDED_TO_STAGE and REMOVED_FROM_STAGE events that are normally dispatched when the rawContent is reparented from the internal Loader to the ContentDisplay object. By default, the value is true but you can set it to false if you prefer. See the ASDocs for more details
+
+2010-12-17
+---------------------------------------------
+ContentDisplay		1.768
+FlexContentDisplay	1.768
+LoaderMax			1.768
+	- Fixed issue that could cause a SWFLoader's rawContent to not scale/position properly if script access was denied (like if the subloaded swf was AS2 or cross-loaded from another domain that didn't have the appropriate crossdomain.xml file in place) and a width/height was defined in the SWFLoader's vars parameter. 
+
+2010-12-17
+---------------------------------------------
+VideoLoader			1.767
+LoaderMax			1.767
+	- Added gotoVideoCuePoint() method to VideoLoader
+	- Added getCuePointTime() method to VideoLoader
+	- Minor internal optimizations in VideoLoader
+
+2010-12-16
+---------------------------------------------
+LoaderMax			1.766
+SWFLoader			1.766
+VideoLoader			1.765
+	- Fixed issue that could allow a VideoLoader to dispatch a CUE_POINT event if the cue point is very early in the video and autoPlay was set to false.
+	- Changed the way SWFLoader handles the Loader internally so that it temporarily adds it to the ContentDisplay object's display list while it loads initially so that any code that references "stage" in the child swf doesn't throw null object reference errors (as long as you've added the ContentDisplay to the display list, like by defining a "container" in the vars parameter). As soon as the swf inits (and as long as no script access denied errors occur), the swf's root is added to the ContentDisplay instead.
+	- Fixed a small gc issue with SWFLoader - if there were sub-loaders inside the SWFLoader that had requireWithRoot set to that swf's root and then the SWFLoader was disposed, a LoaderMax instance could remain behind (it wouldn't hurt anything, but it would consume a small amount of memory)
+
+2010-12-15
+---------------------------------------------
+LoaderMax			1.764
+SWFLoader			1.764
+	- Fixed issue that could cause a SWFLoader to not switch to its alternateURL properly when the initial url fails.
+	- Enhanced SWFLoader so that if you change the url between the time load() is called and when it inits or fails, that new URL will attempt to load as soon as possible (when the old url either fails or inits - we must wait for that in order to avoid garbage collection issues in Flash).
+
+2010-12-14
+---------------------------------------------
+LoaderMax			1.763
+	- Fixed issue that could cause an error in a LoaderMax instance if dispose() is called more than once on the last child loader as it completes and autoDispose is true on the LoaderMax instance.
+
+2010-12-13
+---------------------------------------------
+LoaderMax			1.762
+SWFLoader			1.762
+XMLLoader			1.762
+LoaderCore			1.762
+	- Fixed issue that could cause a SWFLoader's or XMLLoader's "progress" property to report incorrectly as 1 after unload() was called
+	- Forced a refresh of a LoaderMax instance's progress/bytesLoaded/bytesTotal values after one of its children is disposed
+
+2010-12-07
+---------------------------------------------
+VideoLoader			1.761
+LoaderMax			1.761
+	- Fixed an issue that could cause a VideoLoader's "rawContent" to become null after unload() was called and then load() was called again on the same instance.
+
+2010-12-03
+---------------------------------------------
+LoaderMax			1.76
+VideoLoader			1.76
+	- Worked around Flash bug that could cause VideoLoaders not to dispatch a COMPLETE event when the swf is compiled with CS3 or CS4 (very odd, I know). Apparently when you publish with CS3 or CS4, NetStreams don't consistently dispatch a NetStreamEvent for code "NetStream.Buffer.Full" and if you seek() a NetStream before about 50 millseconds after it finishes buffering (even if it has COMPLETELY loaded!) it can lose its audio, so VideoLoader works around that as well now. 
+
+2010-12-02
+---------------------------------------------
+LoaderMax			1.75
+XMLLoader			1.75
+LoaderCore			1.75
+XMLLoaderVars		1.02
+	- Added a new event to XMLLoader (RAW_LOAD) that gets dispatched when the XML has finished loading but has NOT been parsed yet so that you can alter the XML if necessary before it gets parsed for LoaderMax-related data. There is also a new onRawLoad event listener shortcut. 
+
+2010-11-29
+---------------------------------------------
+VideoLoader			1.742
+LoaderMax			1.742
+	- Very minor adjustment to VideoLoader that could help avoid a very rare scenario where it wouldn't dispatch its COMPLETE event 
+
 2010-11-22
 ---------------------------------------------
 VideoLoader			1.741
