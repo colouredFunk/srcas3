@@ -1,5 +1,5 @@
 /***
-Common 版本:v1.0
+ZeroCommon 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
 创建时间:2011年1月2日 17:15:43
@@ -11,9 +11,45 @@ package zero{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
-	import flash.filters.ColorMatrixFilter;
+	import flash.geom.*;
 	
-	public class Common{
+	import flash.filters.ColorMatrixFilter;
+	import flash.system.Security;
+	
+	public class ZeroCommon{
+		public static const domain:String=function():String{
+			var domain:String="zero.flashwing.net";
+			//var domain:String="localhost/zero.flashwing.net";
+			Security.allowDomain(domain);
+			Security.allowInsecureDomain(domain);
+			return domain;
+		}();
+		
+		public static const path_common:String="http://"+domain+"/common/";
+		public static const path_ZeroPrevLoader:String=path_common+"ZeroPrevLoader.swf";
+		public static const path_getMsg:String=path_common+"getMsg.php";
+		public static const path_FlashPlayer_exe_compress:String=path_common+"FlashPlayer.exe.compress";
+		
+		public static const path_jigsaw:String="http://"+domain+"/jigsaw/";
+		public static const path_jigsaw_BottomBar:String=path_jigsaw+"BottomBar.swf";
+		
+		public static const path_card3d:String="http://"+domain+"/card3d/";
+		public static const path_card3d_ctrlpan:String=path_card3d+"ctrlpan.swf";
+		
+		public static const path_photodiy:String="http://"+domain+"/photodiy/";
+		
+		public static const path_photodiy_album:String=path_photodiy+"album/";
+		public static const path_photodiy_album_getlist:String=path_photodiy_album+"getlist.php";
+		public static const path_photodiy_album_uploadFile:String=path_photodiy_album+"uploadFile.php";
+		public static const path_photodiy_album_newFolder:String=path_photodiy_album+"newFolder.php";
+		public static const path_photodiy_album_swf_PhotoDIY_Album:String=path_photodiy_album+"swf/PhotoDIY_Album.swf";
+		//public static const path_photodiy_album_swf_PhotoDIY_Album:String="http://localhost/zero.flashwing.net/test.swf";
+		public static const path_photodiy_album_swf_PhotoDIY_SrcGetter:String=path_photodiy_album+"swf/PhotoDIY_SrcGetter.swf";
+		
+		public static const path_photodiy_tackfilm:String=path_photodiy+"tackfilm/";
+		public static const path_photodiy_tackfilm_tackfilmmovie:String=path_photodiy_tackfilm+"tackfilmmovie.swf";
+		//public static const path_photodiy_tackfilm_tackfilmmovie_hide:String="http://localhost/zero.flashwing.net/photodiy/tackfilm/tackfilmmovie_插入数据前.swf";
+		public static const path_photodiy_tackfilm_online:String=path_photodiy_tackfilm+"online.htm";
 		
 		public static function removeAll(obj:DisplayObjectContainer):void{
 			//清空一个容器
@@ -70,7 +106,21 @@ package zero{
 			return arr;
 		}
 		
-		
+		public static function getContainBmd(bg:DisplayObject,obj:DisplayObject):BitmapData{
+			//从obj"往外看",截到的bg的部分转成位图返回
+			return getRectContainBmd(bg,obj,obj.getBounds(obj));
+		}
+		public static function getRectContainBmd(bg:DisplayObject,obj:DisplayObject,rect:Rectangle):BitmapData{
+			var bmd:BitmapData=new BitmapData(rect.width,rect.height,true,0x00000000);
+			var m:Matrix=bg.transform.concatenatedMatrix;
+			var objM:Matrix=new Matrix(1,0,0,1,rect.x,rect.y);
+			var m2:Matrix=obj.transform.concatenatedMatrix;
+			objM.concat(m2);
+			objM.invert();
+			m.concat(objM);
+			bmd.draw(bg,m);
+			return bmd;
+		}
 		
 		
 		//////
@@ -111,7 +161,7 @@ package zero{
 			//SecurityError: Error #2148: SWF 文件 file:///C|/Documents%20and%20Settings/Administrator/桌面/Test.swf 不能访问本地资源 file:///C|/Documents%20and%20Settings/Administrator/桌面/Test.swf/[[DYNAMIC]]/1。只有仅限于文件系统的 SWF 文件和可信的本地 SWF 文件可以访问本地资源。
 			//at flash.display::Loader/get content()
 			
-			//如果仅仅是为获取 BitmapData，请直接使用 Common.zeroGIFBmd
+			//如果仅仅是为获取 BitmapData，请直接使用 ZeroCommon.zeroGIFBmd
 			
 			var zeroGIFData:ByteArray=new ByteArray();
 			zeroGIFData[0]=0x47;zeroGIFData[1]=0x49;zeroGIFData[2]=0x46;zeroGIFData[3]=0x38;zeroGIFData[4]=0x39;zeroGIFData[5]=0x61;zeroGIFData[6]=0x28;zeroGIFData[7]=0x00;

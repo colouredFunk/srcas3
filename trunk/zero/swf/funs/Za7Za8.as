@@ -492,7 +492,7 @@ package zero.swf.funs{
 					strData.writeUTFBytes(str);
 					var len:int=strData.length;
 					newCodesStr+=execResult[1]+"\n";
-					for each(i in Common.getDisorderArr(len)){
+					for each(i in ZeroCommon.getDisorderArr(len)){
 						encodeStrObj=getPushStringCodeIdAndKeys(strData[i]);
 						newCodesStr+=execResult[2]
 							.replace(/\${i\}/g,i.toString())

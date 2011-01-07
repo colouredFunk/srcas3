@@ -11,7 +11,7 @@ package zero.swf.avm2.advances{
 	import flash.utils.ByteArray;
 	
 	import zero.Outputer;
-	import zero.Common;
+	import zero.ZeroCommon;
 	import zero.swf.avm2.advances.AdvanceABC;
 	import zero.swf.avm2.advances.AdvanceMultiname_info;
 	import zero.swf.avm2.advances.Member;

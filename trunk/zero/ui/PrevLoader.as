@@ -18,8 +18,7 @@ package zero.ui{
 	import mx.preloaders.IPreloaderDisplay;
 	import mx.preloaders.Preloader;
 	
-	import zero.Paths;
-	import zero.GetAndSetValue;
+	import zero.*;
 
 	public class PrevLoader extends Sprite implements IPreloaderDisplay{
 		private var zpl:*;
@@ -27,11 +26,7 @@ package zero.ui{
 		private var timeoutId:int=-1;
 		private var bg:Sprite;
 		
-		private static const ZeroPrevLoaderURL:String=Paths.commonFolder+"ZeroPrevLoader.swf";
-		
 		public function PrevLoader(){
-			Security.allowDomain(Paths.domain);
-			Security.allowInsecureDomain(Paths.domain);
 		}
 		public function initialize():void{
 			this.addEventListener(Event.REMOVED_FROM_STAGE,removed);
@@ -46,7 +41,7 @@ package zero.ui{
 			loader=new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadZPLComplete);
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,loadZPLError);
-			loader.load(new URLRequest(ZeroPrevLoaderURL));
+			loader.load(new URLRequest(ZeroCommon.path_ZeroPrevLoader));
 			this.addChild(loader);
 
 			resize(null);
