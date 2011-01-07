@@ -97,55 +97,55 @@ package zero.swf{
 		//
 		//
 		//
-		public static const End:int=0;
-		public static const ShowFrame:int=1;
-		public static const DefineShape:int=2;
+		public static var End:int;
+		public static var ShowFrame:int;
+		public static var DefineShape:int;
 		//3
-		public static const PlaceObject:int=4;
-		public static const RemoveObject:int=5;
-		public static const DefineBits:int=6;
-		public static const DefineButton:int=7;
-		public static const JPEGTables:int=8;
-		public static const SetBackgroundColor:int=9;
-		public static const DefineFont:int=10;
-		public static const DefineText:int=11;
-		public static const DoAction:int=12;
-		public static const DefineFontInfo:int=13;
-		public static const DefineSound:int=14;
-		public static const StartSound:int=15;
+		public static var PlaceObject:int;
+		public static var RemoveObject:int;
+		public static var DefineBits:int;
+		public static var DefineButton:int;
+		public static var JPEGTables:int;
+		public static var SetBackgroundColor:int;
+		public static var DefineFont:int;
+		public static var DefineText:int;
+		public static var DoAction:int;
+		public static var DefineFontInfo:int;
+		public static var DefineSound:int;
+		public static var StartSound:int;
 		//16
-		public static const DefineButtonSound:int=17;
-		public static const SoundStreamHead:int=18;
-		public static const SoundStreamBlock:int=19;
-		public static const DefineBitsLossless:int=20;
-		public static const DefineBitsJPEG2:int=21;
-		public static const DefineShape2:int=22;
-		public static const DefineButtonCxform:int=23;
-		public static const Protect:int=24;
+		public static var DefineButtonSound:int;
+		public static var SoundStreamHead:int;
+		public static var SoundStreamBlock:int;
+		public static var DefineBitsLossless:int;
+		public static var DefineBitsJPEG2:int;
+		public static var DefineShape2:int;
+		public static var DefineButtonCxform:int;
+		public static var Protect:int;
 		//25
-		public static const PlaceObject2:int=26;
+		public static var PlaceObject2:int;
 		//27
-		public static const RemoveObject2:int=28;
+		public static var RemoveObject2:int;
 		//29
 		//30
 		//31
-		public static const DefineShape3:int=32;
-		public static const DefineText2:int=33;
-		public static const DefineButton2:int=34;
-		public static const DefineBitsJPEG3:int=35;
-		public static const DefineBitsLossless2:int=36;
-		public static const DefineEditText:int=37;
+		public static var DefineShape3:int;
+		public static var DefineText2:int;
+		public static var DefineButton2:int;
+		public static var DefineBitsJPEG3:int;
+		public static var DefineBitsLossless2:int;
+		public static var DefineEditText:int;
 		//38
-		public static const DefineSprite:int=39;
+		public static var DefineSprite:int;
 		//40
-		public static const ProductInfo:int=41;
+		public static var ProductInfo:int;
 		//42
-		public static const FrameLabel:int=43;
+		public static var FrameLabel:int;
 		//44
-		public static const SoundStreamHead2:int=45;
-		public static const DefineMorphShape:int=46;
+		public static var SoundStreamHead2:int;
+		public static var DefineMorphShape:int;
 		//47
-		public static const DefineFont2:int=48;
+		public static var DefineFont2:int;
 		//49
 		//50
 		//51
@@ -153,42 +153,42 @@ package zero.swf{
 		//53
 		//54
 		//55
-		public static const ExportAssets:int=56;
-		public static const ImportAssets:int=57;
-		public static const EnableDebugger:int=58;
-		public static const DoInitAction:int=59;
-		public static const DefineVideoStream:int=60;
-		public static const VideoFrame:int=61;
-		public static const DefineFontInfo2:int=62;
-		public static const DebugID:int=63;
-		public static const EnableDebugger2:int=64;
-		public static const ScriptLimits:int=65;
-		public static const SetTabIndex:int=66;
+		public static var ExportAssets:int;
+		public static var ImportAssets:int;
+		public static var EnableDebugger:int;
+		public static var DoInitAction:int;
+		public static var DefineVideoStream:int;
+		public static var VideoFrame:int;
+		public static var DefineFontInfo2:int;
+		public static var DebugID:int;
+		public static var EnableDebugger2:int;
+		public static var ScriptLimits:int;
+		public static var SetTabIndex:int;
 		//67
 		//68
-		public static const FileAttributes:int=69;
-		public static const PlaceObject3:int=70;
-		public static const ImportAssets2:int=71;
-		public static const DoABCWithoutFlagsAndName:int=72;
-		public static const DefineFontAlignZones:int=73;
-		public static const CSMTextSettings:int=74;
-		public static const DefineFont3:int=75;
-		public static const SymbolClass:int=76;
-		public static const Metadata:int=77;
-		public static const DefineScalingGrid:int=78;
+		public static var FileAttributes:int;
+		public static var PlaceObject3:int;
+		public static var ImportAssets2:int;
+		public static var DoABCWithoutFlagsAndName:int;
+		public static var DefineFontAlignZones:int;
+		public static var CSMTextSettings:int;
+		public static var DefineFont3:int;
+		public static var SymbolClass:int;
+		public static var Metadata:int;
+		public static var DefineScalingGrid:int;
 		//79
 		//80
 		//81
-		public static const DoABC:int=82;
-		public static const DefineShape4:int=83;
-		public static const DefineMorphShape2:int=84;
+		public static var DoABC:int;
+		public static var DefineShape4:int;
+		public static var DefineMorphShape2:int;
 		//85
-		public static const DefineSceneAndFrameLabelData:int=86;
-		public static const DefineBinaryData:int=87;
-		public static const DefineFontName:int=88;
-		public static const StartSound2:int=89;
-		public static const DefineBitsJPEG4:int=90;
-		public static const DefineFont4:int=91;
+		public static var DefineSceneAndFrameLabelData:int;
+		public static var DefineBinaryData:int;
+		public static var DefineFontName:int;
+		public static var StartSound2:int;
+		public static var DefineBitsJPEG4:int;
+		public static var DefineFont4:int;
 		
 		//
 		//
@@ -196,7 +196,10 @@ package zero.swf{
 		//
 		//
 		//
-		public static const typeNameArr:Array=[
+		public static var typeNameArr:Array;
+		
+		private static const firstInitResult:*=function():void{
+			typeNameArr=[
 			"End",
 			"ShowFrame",
 			"DefineShape",
@@ -290,6 +293,14 @@ package zero.swf{
 			"DefineBitsJPEG4",
 			"DefineFont4"
 		];
+		var type:int=0;
+		for each(var typeName:String in typeNameArr){
+			if(typeName){
+				TagType[typeName]=type;
+			}
+			type++;
+		}
+		}();
 	}
 }
 
@@ -299,7 +310,7 @@ package zero.swf{
 // /^\s*|\s*$/					//前后空白						"\nabc d  e 哈 哈\t \r".replace(/^\s*|\s*$/g,"") === "abc d  e 哈 哈"
 // /[\\\/:*?\"<>|]/				//不合法的windows文件名字符集		"\\\/:*?\"<>|\\\/:*哈 哈?\"<>|\\哈 \/:*?\"<>|".replace(/[\\\/:*?\"<>|]/g,"") === "哈 哈哈 "
 // /[a-zA-Z_][a-zA-Z0-9_]*/		//合法的变量名(不考虑中文)
-// value=value.replace(/[^a-zA-Z0-9_]/g,"").replace(/^[0-9]*/,"");//替换不合法的变量名
+// value;//替换不合法的变量名
 // 先把除字母数字下划线的字符去掉,再把开头的数字去掉
 // 想不到怎样能用一个正则表达式搞定...
 

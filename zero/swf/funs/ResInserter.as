@@ -141,13 +141,15 @@ package zero.swf.funs{
 					frameObj=frameObjs["~"+frameId];
 					//trace("frameObj="+frameObj);
 					if(frameObj){
-						var symbolClass:SymbolClass=new SymbolClass();
-						symbolClass.NameV=frameObj.classNameV;
-						symbolClass.TagV=frameObj.defIdV;
-						var symbolClassTag:Tag=new Tag();
-						symbolClassTag.setBody(symbolClass);
+						if(frameObj.classNameV.length){
+							var symbolClass:SymbolClass=new SymbolClass();
+							symbolClass.NameV=frameObj.classNameV;
+							symbolClass.TagV=frameObj.defIdV;
+							var symbolClassTag:Tag=new Tag();
+							symbolClassTag.setBody(symbolClass);
+							swfTagV.splice(swfTagId,0,symbolClassTag);
+						}
 						var tagId:int=frameObj.tagV.length;
-						swfTagV.splice(swfTagId,0,symbolClassTag);
 						while(--tagId>=0){
 							swfTagV.splice(swfTagId,0,frameObj.tagV[tagId]);
 						}

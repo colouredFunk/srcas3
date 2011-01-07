@@ -16,11 +16,9 @@ BottomBarContainer 版本:v1.0
 					xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:ui="zero.ui.*">
 	<fx:Script>
 		<![CDATA[
-			import zero.Paths;
-			import zero.GetAndSetValue;
+			import zero.*;
 			
 			private var loader:Loader;
-			public var bottomBarPath:String;
 			
 			override public function creationComplete():void{
 				super.creationComplete();
@@ -31,7 +29,7 @@ BottomBarContainer 版本:v1.0
 				loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,loadError);
 				
 				try{
-					loader.load(new URLRequest("http://"+Paths.domain+"/"+bottomBarPath));
+					loader.load(new URLRequest(ZeroCommon.path_jigsaw_BottomBar));
 					//loader.load(new URLRequest("http://"+Paths.domain+"/"+bottomBarPath+"?"+Math.random()));trace("测试，添加随机数字");
 				}catch(e:Error){}
 				

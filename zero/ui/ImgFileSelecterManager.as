@@ -11,7 +11,11 @@ package zero.ui{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
-	import zero.swf.funs.ImgDatas2Bmds;
+	
+	import zero.FileTypes;
+	
+	import zero.net.RawDatas2BmdOrLoaderAndDatas;
+	
 	public class ImgFileSelecterManager extends FileSelecterManager{
 		public var onLoadImgsFinished:Function;
 		public var bmdV:Vector.<BitmapData>;
@@ -38,10 +42,24 @@ package zero.ui{
 		}
 		
 		private function loadImgDataV():void{
-			ImgDatas2Bmds.imgDatas2Bmds(dataV,imgDatas2BmdsFinished);
+			var i:int=dataV.length;
+			while(--i>=0){
+				switch((FileTypes.getType(dataV[i]))){
+					case FileTypes.JPG:
+					case FileTypes.PNG:
+					case FileTypes.GIF:
+					case FileTypes.BMP:
+					break;
+					default:
+						fileList.splice(i,1);
+						dataV.splice(i,1);
+					break;
+				}
+			}
+			new RawDatas2BmdOrLoaderAndDatas(imgDatas2BmdsFinished,dataV);
 		}
-		private function imgDatas2BmdsFinished(_bmdV:Vector.<BitmapData>):void{
-			bmdV=_bmdV;
+		private function imgDatas2BmdsFinished(bmdArr:Array,dataArr:Array):void{
+			bmdV=Vector.<BitmapData>(bmdArr);
 			(onLoadImgsFinished==null)||onLoadImgsFinished();
 		}
 	}

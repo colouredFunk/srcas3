@@ -10,9 +10,9 @@ FreeTran 版本:v1.0
 package zero.ui{
 	import flash.display.*;
 	import flash.events.*;
-	import flash.utils.*;
 	import flash.geom.*;
 	import flash.ui.*;
+	import flash.utils.*;
 	public class FreeTran extends Sprite{
 		private static const TYPE_ROTATE:String="rotate";
 		private static const TYPE_SKEW:String="skew";
@@ -26,6 +26,13 @@ package zero.ui{
 		public var scaleArea:Sprite;
 		private var userMouse:MovieClip;
 		private var currTarget:Sprite;
+		
+		private var typeDict:Dictionary;
+		private var dxDict:Dictionary;
+		private var dyDict:Dictionary;
+		private var dot_rotateDict:Dictionary;
+		private var dot_skewDict:Dictionary;
+		private var dot_scaleDict:Dictionary;
 		
 		private var oldMouseX:Number;
 		private var oldMouseY:Number;
@@ -125,6 +132,8 @@ package zero.ui{
 		private var __realMaxWid2:Number=-1;
 		private var __realMaxHei2:Number=-1;
 		
+		private var currCankaoK:Number;
+		
 		public var onTran:Function;
 		public var onStartTran:Function;
 		public var onStopTran:Function;
@@ -132,23 +141,93 @@ package zero.ui{
 		private var midP:Point;
 		
 		public function FreeTran(){
-			rotateArea=this.getChildAt(0) as Sprite;
-			skewArea=this.getChildAt(1) as Sprite;
+			var dragArea_sp:Sprite;
 			
-			dragArea=this.getChildAt(2) as Sprite;
+			if(this.numChildren){
+				rotateArea=this.getChildAt(0) as Sprite;
+				skewArea=this.getChildAt(1) as Sprite;
+				dragArea=this.getChildAt(2) as Sprite;
+				
+				dragArea_sp=new Sprite();
+				dragArea_shape=dragArea.getChildAt(0) as Shape;
+				dragArea_sp.addChild(dragArea_shape);
+				dragArea_sp.mouseEnabled=dragArea_sp.mouseChildren=false;
+				dragArea.addChild(dragArea_sp);
+				
+				scaleArea=this.getChildAt(3) as Sprite;
+				userMouse=this.getChildAt(4) as MovieClip;
+			}else{
+				
+				rotateArea=new Sprite();
+				this.addChild(rotateArea);
+				addDot(rotateArea,-50,-50,25,25,0x000000,0);
+				addDot(rotateArea,50,-50,25,25,0x000000,0);
+				addDot(rotateArea,50,50,25,25,0x000000,0);
+				addDot(rotateArea,-50,50,25,25,0x000000,0);
+				
+				skewArea=new Sprite();
+				this.addChild(skewArea);
+				addDot(skewArea,0,-50,25,25,0x000000,0);
+				addDot(skewArea,50,0,25,25,0x000000,0);
+				addDot(skewArea,0,50,25,25,0x000000,0);
+				addDot(skewArea,-50,0,25,25,0x000000,0);
+				
+				dragArea=new Sprite();
+				dragArea_sp=new Sprite();
+				dragArea_shape=new Shape();
+				dragArea_shape.graphics.clear();
+				dragArea_shape.graphics.lineStyle(0,0x999999,0.6);
+				dragArea_shape.graphics.beginFill(0x000000,0);
+				dragArea_shape.graphics.drawRect(0,0,100,100);
+				dragArea_shape.graphics.endFill();
+				dragArea_sp.addChild(dragArea_shape);
+				dragArea_sp.mouseEnabled=dragArea_sp.mouseChildren=false;
+				dragArea.addChild(dragArea_sp);
+				this.addChild(dragArea);
+				
+				scaleArea=new Sprite();
+				this.addChild(scaleArea);
+				addDot(scaleArea,-50,-50,7,7,0x000000,2,0xffffff);
+				addDot(scaleArea,50,-50,7,7,0x000000,2,0xffffff);
+				addDot(scaleArea,50,50,7,7,0x000000,2,0xffffff);
+				addDot(scaleArea,-50,50,7,7,0x000000,2,0xffffff);
+				addDot(scaleArea,0,-50,7,7,0x000000,2,0xffffff);
+				addDot(scaleArea,50,0,7,7,0x000000,2,0xffffff);
+				addDot(scaleArea,0,50,7,7,0x000000,2,0xffffff);
+				addDot(scaleArea,-50,0,7,7,0x000000,2,0xffffff);
+				
+				userMouse=new MovieClip();
+				this.addChild(userMouse);
+				userMouse.blendMode=BlendMode.INVERT;
+			}
 			
-			var dragArea_sp:Sprite=new Sprite();
-			dragArea_shape=dragArea.getChildAt(0) as Shape;
-			dragArea_sp.addChild(dragArea_shape);
-			dragArea_sp.mouseEnabled=dragArea_sp.mouseChildren=false;
-			dragArea.addChild(dragArea_sp);
-			
-			scaleArea=this.getChildAt(3) as Sprite;
-			userMouse=this.getChildAt(4) as MovieClip;
-			updateUserMouse("");
+			updateUserMouse(null);
 			this.visible=false;
 			this.addEventListener(Event.ADDED_TO_STAGE,added);
 		}
+		
+		private function addDot(
+			area:Sprite,
+			x:int,y:int,
+			wid:int,hei:int,
+			fillColor:int,fillAlpha:Number,
+			lineColor:int=-1
+		):void{
+			var dot:Sprite=new Sprite();
+			
+			area.addChild(dot);
+			
+			dot.x=x;
+			dot.y=y;
+			dot.graphics.clear();
+			if(lineColor>=0){
+				dot.graphics.lineStyle(1,lineColor);
+			}
+			dot.graphics.beginFill(fillColor,fillAlpha);
+			dot.graphics.drawRect(-wid/2,-hei/2,wid,hei);
+			dot.graphics.endFill();
+		}
+		
 		private function added(event:Event):void{
 			this.removeEventListener(Event.ADDED_TO_STAGE,added);
 			this.addEventListener(Event.REMOVED_FROM_STAGE,removed);
@@ -156,6 +235,14 @@ package zero.ui{
 			stage.addEventListener(MouseEvent.MOUSE_MOVE,mouseMove);
 			stage.addEventListener(MouseEvent.MOUSE_UP,mouseUp);
 			userMouse.mouseEnabled=userMouse.mouseChildren=false;
+			
+			
+			typeDict=new Dictionary();
+			dxDict=new Dictionary();
+			dyDict=new Dictionary();
+			dot_rotateDict=new Dictionary();
+			dot_skewDict=new Dictionary();
+			dot_scaleDict=new Dictionary();
 			
 			rotateDotArr=new Array();
 			initArea(rotateArea,TYPE_ROTATE,rotateDotArr);
@@ -215,7 +302,7 @@ package zero.ui{
 				dragArea_shape.parent.x-=dragArea_shape_rect.x;
 				dragArea_shape.parent.y-=dragArea_shape_rect.y;
 				
-				trace(pic_rect);
+				//trace(pic_rect);
 				
 				if(__minScaleX>=0||__minWid>=0){
 					//计算 __realMinWid2，如果 __minScaleX 和 __minWid 同时被设置，取大的那个
@@ -236,7 +323,7 @@ package zero.ui{
 				}else{
 					__realMinWid2=-1;
 				}
-				trace("__realMinWid2="+__realMinWid2);
+				//trace("__realMinWid2="+__realMinWid2);
 				
 				if(__maxScaleX>=0||__maxWid>=0){
 					//计算 __realMaxWid2，如果 __maxScaleX 和 __maxWid 同时被设置，取小的那个
@@ -257,7 +344,7 @@ package zero.ui{
 				}else{
 					__realMaxWid2=-1;
 				}
-				trace("__realMaxWid2="+__realMaxWid2);
+				//trace("__realMaxWid2="+__realMaxWid2);
 				
 				if(__minScaleY>=0||__minHei>=0){
 					//计算 __realMinHei2，如果 __minScaleY 和 __minHei 同时被设置，取大的那个
@@ -278,7 +365,7 @@ package zero.ui{
 				}else{
 					__realMinHei2=-1;
 				}
-				trace("__realMinHei2="+__realMinHei2);
+				//trace("__realMinHei2="+__realMinHei2);
 				
 				if(__maxScaleY>=0||__maxHei>=0){
 					//计算 __realMaxHei2，如果 __maxScaleY 和 __maxHei 同时被设置，取小的那个
@@ -299,14 +386,25 @@ package zero.ui{
 				}else{
 					__realMaxHei2=-1;
 				}
-				trace("__realMaxHei2="+__realMaxHei2);
+				//trace("__realMaxHei2="+__realMaxHei2);
+				
+				/*
+				this.graphics.clear();
+				this.graphics.lineStyle(1,0x0000ff);
+				if(__realMaxWid2>=0){
+					this.graphics.drawRect(-__realMaxWid2,-__realMaxHei2,__realMaxWid2*2,__realMaxHei2*2);
+				}
+				if(__realMinWid2>=0){
+					this.graphics.drawRect(-__realMinWid2,-__realMinHei2,__realMinWid2*2,__realMinHei2*2);
+				}
+				*/
 				
 				updateByPic();
 				
 				this.visible=true;
 				if(drag){
 					currTarget=dragArea;
-					updateUserMouse(currTarget["type"]);
+					updateUserMouse(currTarget);
 					oldMouseX=this.parent.mouseX;
 					oldMouseY=this.parent.mouseY;
 				}
@@ -325,7 +423,8 @@ package zero.ui{
 			scaleArea.visible=_scaleEnabled;
 		}
 		public function set dragEnabled(_dragEnabled:Boolean):void{
-			dragArea.visible=_dragEnabled;
+			dragArea.mouseEnabled=_dragEnabled;
+			//dragArea.visible=_dragEnabled;
 		}
 		public var lockScale:Boolean;
 		
@@ -345,22 +444,25 @@ package zero.ui{
 			while(--i>=0){
 				var dot:Sprite=area.getChildAt(i) as Sprite;
 				if(dot.x<-1){
-					dot["dx"]=-1;
+					dxDict[dot]=-1;
 				}else if(dot.x>1){
-					dot["dx"]=1;
+					dxDict[dot]=1;
 				}else{
-					dot["dx"]=0;
+					dxDict[dot]=0;
 				}
 				if(dot.y<-1){
-					dot["dy"]=-1;
+					dyDict[dot]=-1;
 				}else if(dot.y>1){
-					dot["dy"]=1;
+					dyDict[dot]=1;
 				}else{
-					dot["dy"]=0;
+					dyDict[dot]=0;
 				}
+				
+				//trace("dot_"+type+"Dict");
+				this["dot_"+type+"Dict"]["dot"+dxDict[dot]+dyDict[dot]]=dot;
+				
 				initTarget(dot,type);
 				
-				area["dot"+dot["dx"]+dot["dy"]]=dot;
 				if(dotArr){
 					dotArr[dotArr.length]=dot;
 				}
@@ -370,19 +472,19 @@ package zero.ui{
 			target.addEventListener(MouseEvent.MOUSE_OVER,mouseOver);
 			target.addEventListener(MouseEvent.MOUSE_OUT,mouseOut);
 			target.addEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
-			target["type"]=type;
+			typeDict[target]=type;
 		}
 		private function mouseMove(event:MouseEvent):void{
 			if(currTarget){
-				switch(currTarget["type"]){
+				switch(typeDict[currTarget]){
 					case TYPE_ROTATE:
 						this.rotation+=(Math.atan2(this.parent.mouseY-this.y,this.parent.mouseX-this.x)-Math.atan2(oldMouseY-this.y,oldMouseX-this.x))*(180/Math.PI);
 						updatePic();
 					break;
 					case TYPE_SCALE:
 						var dot:Sprite;
-						var currDx:int=currTarget["dx"];
-						var currDy:int=currTarget["dy"];
+						var currDx:int=dxDict[currTarget];
+						var currDy:int=dyDict[currTarget];
 						
 						var currX:Number;
 						var currY:Number;
@@ -397,183 +499,83 @@ package zero.ui{
 							currY=0;
 						}
 						
-						/*
-						if(lockScale){
-							if(currDx&&currDy){
-								//等比缩放
-								var k:Number=dragArea.scaleX/dragArea.scaleY;
-								if(currX/currY<k){
-									currX=currY*k;
-								}else{
-									currY=currX/k;
-								}
-							}
-						}
-						*/
-						
 						if(currDx){
-							if(__realMinWid2>=0){
+							if(__realMinWid2>=0&&currX<__realMinWid2){
 								//如果小于最小宽度
-								if(currX<__realMinWid2){
-									currX=__realMinWid2;
-								}
-							}
-							if(__realMaxWid2>=0){
+								currX=__realMinWid2;
+							}else if(__realMaxWid2>=0&&currX>__realMaxWid2){
 								//如果大于最大宽度
-								if(currX>__realMaxWid2){
-									currX=__realMaxWid2;
-								}
-							}
-							
-							//如果被拖的很接近0，调成1
-							if(currX>1||currX<-1){
-							}else if(currX<0){
-								currX=-1;
-							}else{
-								currX=1;
+								currX=__realMaxWid2;
 							}
 						}
 						if(currDy){
-							if(__realMinHei2>=0){
+							if(__realMinHei2>=0&&currY<__realMinHei2){
 								//如果小于最小高度
-								if(currY<__realMinHei2){
-									currY=__realMinHei2;
-								}
+								currY=__realMinHei2;
 							}
-							if(__realMaxHei2>=0){
+							if(__realMaxHei2>=0&&currY>__realMaxHei2){
 								//如果大于最大高度
-								if(currY>__realMaxHei2){
-									currY=__realMaxHei2;
-								}
+								currY=__realMaxHei2;
+							}
+						}
+						
+						if(lockScale&&currDx&&currDy){
+							//等比缩放
+							//以绝对值小的为标准
+							
+							if(currX*currY*currCankaoK<-1){
+								currCankaoK*=-1;
 							}
 							
-							//如果被拖的很接近0，调成1
-							if(currY>1||currY<-1){
-							}else if(currY<0){
-								currY=-1;
+							if(currCankaoK<0){
+								if(currX/currY<currCankaoK){
+									currX=currY*currCankaoK;
+								}else{
+									currY=currX/currCankaoK;
+								}
 							}else{
-								currY=1;
+								if(currX/currY>currCankaoK){
+									currX=currY*currCankaoK;
+									if(__realMinWid2>=0&&currX<__realMinWid2){
+										//如果小于最小宽度
+										currX=__realMinWid2;
+										currY=currX/currCankaoK;
+									}
+								}else{
+									currY=currX/currCankaoK;
+									if(__realMinHei2>=0&&currY<__realMinHei2){
+										//如果小于最小高度
+										currY=__realMinHei2;
+										currX=currY*currCankaoK;
+									}
+								}
 							}
+						}else{
+							if(currDx&&currDy){
+								currCankaoK=currX/currY;
+							}else if(currDx){
+								currCankaoK=currX/dot_scaleDict["dot11"].y;
+							}else if(currDy){
+								currCankaoK=dot_scaleDict["dot11"].x/currY;
+							}
+							
+							//trace("currCankaoK="+currCankaoK);
 						}
 						
 						if(currDx){
 							for each(dot in scaleDotArr){
-								dot.x=dot["dx"]*currX;
+								dot.x=dxDict[dot]*currX;
 							}
 						}
 						if(currDy){
 							for each(dot in scaleDotArr){
-								dot.y=dot["dy"]*currY;
+								dot.y=dyDict[dot]*currY;
 							}
 						}
 						
 						updateOtherDotsByScaleDots();
 						updateDragAreaByDots();
 						updatePic();
-						
-						trace(dragArea.scaleX,dragArea.scaleY);
-						
-						/*
-						var oldPicMatrix:Matrix=null;
-						if(lockScale){
-							oldPicMatrix=__pic.transform.matrix;//防止 __pic 的 matrix 跳变的
-							switch(currTarget){
-								case scaleArea["dot-1-1"]:
-								case scaleArea["dot1-1"]:
-								case scaleArea["dot11"]:
-								case scaleArea["dot-11"]:
-									//trace(currTarget.x,currTarget.y,otherTarget.x,otherTarget.y);
-									
-									var otherTarget:Sprite=scaleArea["dot"+(-currTarget["dx"])+(-currTarget["dy"])];
-									var x1:Number=otherTarget.x;
-									var y1:Number=otherTarget.y;
-									
-									var x21:Number=currTarget.x-x1;
-									var y21:Number=currTarget.y-y1;
-									var xm1:Number=this.mouseX-x1;
-									var ym1:Number=this.mouseY-y1;
-									
-									var k:Number=(x21*xm1+y21*ym1)/(x21*x21+y21*y21);
-									
-									//if(k>0.1||k<-0.1){
-										//trace("k="+k);
-										currTarget.x=x1+x21*k;
-										currTarget.y=y1+y21*k;
-									//}
-								break;
-								default:
-									currTarget.x=this.mouseX;
-									currTarget.y=this.mouseY;
-								break;
-							}
-						}else{
-							currTarget.x=this.mouseX;
-							currTarget.y=this.mouseY;
-						}
-						updateDotsByCurrDot(currTarget);
-						updateDragAreaByDots();
-						
-						updatePic();
-						
-				////
-				var adjustScale:Boolean=false;
-				var pic_scaleX:Number=Math.round(__pic.scaleX*1000)/1000;
-				var pic_scaleY:Number=Math.round(__pic.scaleY*1000)/1000;
-				if(minScale>0){
-					if(pic_scaleX<minScale){
-						pic_scaleX=minScale;
-						adjustScale=true;
-					}
-					if(pic_scaleY<minScale){
-						pic_scaleY=minScale;
-						adjustScale=true;
-					}
-				}
-				if(maxScale>0){
-					if(pic_scaleX<-maxScale){
-						pic_scaleX=-maxScale;
-						adjustScale=true;
-					}else if(pic_scaleX>maxScale){
-						pic_scaleX=maxScale;
-						adjustScale=true;
-					}
-					if(pic_scaleY<-maxScale){
-						pic_scaleY=-maxScale;
-						adjustScale=true;
-					}else if(pic_scaleY>maxScale){
-						pic_scaleY=maxScale;
-						adjustScale=true;
-					}
-				}
-				if(adjustScale){
-					__pic.scaleX=pic_scaleX;
-					__pic.scaleY=pic_scaleY;
-				}
-				if(oldPicMatrix){
-					var m:Matrix=__pic.transform.matrix;
-					if(
-						  m.a*oldPicMatrix.a<=0
-						  ||
-						  m.d*oldPicMatrix.d<=0
-					){
-						trace("防跳变");
-						adjustScale=true;
-						__pic.transform.matrix=oldPicMatrix;
-						(onTran==null)||onTran(__pic,oldPicMatrix);
-					}
-				}
-				if(adjustScale){
-					var x0:Number=this.x;
-					var y0:Number=this.y;
-					updateByPic();
-					this.x=x0;
-					this.y=y0;
-					updatePic();
-				}
-				////
-					
-					*/
-						
 					break;
 					case TYPE_DRAG:
 						this.x+=this.parent.mouseX-oldMouseX;
@@ -593,24 +595,17 @@ package zero.ui{
 			if(currTarget){
 				return;
 			}
-			var target:Sprite=event.target as Sprite;
-			switch(target["type"]){
-				case TYPE_ROTATE:
-				case TYPE_SCALE:
-				case TYPE_DRAG:
-					updateUserMouse(target["type"]);
-				break;
-			}
+			updateUserMouse(event.target as Sprite);
 		}
 		private function mouseOut(event:MouseEvent):void{
 			if(currTarget){
 				return;
 			}
-			updateUserMouse("");
+			updateUserMouse(null);
 		}
 		private function mouseDown(event:MouseEvent):void{
 			currTarget=event.target as Sprite;
-			switch(currTarget["type"]){
+			switch(typeDict[currTarget]){
 				case TYPE_ROTATE:
 				case TYPE_SCALE:
 				case TYPE_DRAG:
@@ -622,19 +617,7 @@ package zero.ui{
 		}
 		private function mouseUp(event:MouseEvent):void{
 			var target:Sprite=event.target as Sprite;
-			if(target){
-				if(target==dragArea){
-					updateUserMouse(TYPE_DRAG);
-				}else if(target.parent==rotateArea){
-					updateUserMouse(TYPE_ROTATE);
-				}else if(target.parent==scaleArea){
-					updateUserMouse(TYPE_SCALE);
-				}else{
-					updateUserMouse("");
-				}
-			}else{
-				updateUserMouse("");
-			}
+			updateUserMouse(event.target as Sprite);
 			if(currTarget){
 				(onStopTran==null)||onStopTran(__pic,__pic.transform.matrix);
 				currTarget=null;
@@ -645,12 +628,12 @@ package zero.ui{
 			var dot:Sprite;
 			var scaleDot:Sprite;
 			for each(dot in rotateDotArr){
-				scaleDot=scaleArea["dot"+dot["dx"]+dot["dy"]];
+				scaleDot=dot_scaleDict["dot"+dxDict[dot]+dyDict[dot]];
 				dot.x=scaleDot.x;
 				dot.y=scaleDot.y;
 			}
 			for each(dot in skewDotArr){
-				scaleDot=scaleArea["dot"+dot["dx"]+dot["dy"]];
+				scaleDot=dot_scaleDict["dot"+dxDict[dot]+dyDict[dot]];
 				dot.x=scaleDot.x;
 				dot.y=scaleDot.y;
 			}
@@ -660,9 +643,9 @@ package zero.ui{
 			dot0.y=(dot1.y+dot2.y)/2;
 		}
 		private function updateDragAreaByDots():void{
-			var dot0:Sprite=scaleArea["dot-1-1"];
-			var dotx:Sprite=scaleArea["dot1-1"];
-			var doty:Sprite=scaleArea["dot-11"];
+			var dot0:Sprite=dot_scaleDict["dot-1-1"];
+			var dotx:Sprite=dot_scaleDict["dot1-1"];
+			var doty:Sprite=dot_scaleDict["dot-11"];
 			dragArea.transform.matrix=new Matrix((dotx.x-dot0.x)/100,(dotx.y-dot0.y)/100,(doty.x-dot0.x)/100,(doty.y-dot0.y)/100,dot0.x,dot0.y);
 		}
 		private function updateDotsByDragArea():void{
@@ -670,27 +653,100 @@ package zero.ui{
 			
 			var dot:Sprite;
 			for each(dot in scaleDotArr){
-				var p:Point=m.transformPoint(new Point(50+50*dot["dx"],50+50*dot["dy"]));
+				var p:Point=m.transformPoint(new Point(50+50*dxDict[dot],50+50*dyDict[dot]));
 				dot.x=p.x;
 				dot.y=p.y;
 			}
 			updateOtherDotsByScaleDots();
 		}
-		private function updateUserMouse(type:String):void{
-			if(type){
-				if(type==TYPE_DRAG){
-					userMouse.rotation=0;
-				}else{
-					userMouse.rotation=Math.atan2(this.mouseY,this.mouseX)*(180/Math.PI);
-				}
+		private function updateUserMouse(target:Sprite):void{
+			if(target&&typeDict[target]){
 				userMouse.x=this.mouseX;
 				userMouse.y=this.mouseY;
 				Mouse.hide();
-				userMouse.gotoAndStop(type);
-			}else{
-				Mouse.show();
-				userMouse.gotoAndStop(1);
+				switch(typeDict[target]){
+					case TYPE_DRAG:
+						userMouse.rotation=0;
+						if(userMouse.totalFrames>1){
+							userMouse.gotoAndStop(typeDict[target]);
+						}else{
+							userMouse.graphics.clear();
+							userMouse.graphics.lineStyle(1,0x000000);
+							
+							userMouse.graphics.moveTo(-10,0);
+							userMouse.graphics.lineTo(10,0);
+							userMouse.graphics.moveTo(0,-10);
+							userMouse.graphics.lineTo(0,10);
+							
+							userMouse.graphics.beginFill(0x000000);
+							userMouse.graphics.moveTo(-6,-4);
+							userMouse.graphics.lineTo(-10,0);
+							userMouse.graphics.lineTo(-6,4);
+							userMouse.graphics.lineTo(-6,-4);
+							userMouse.graphics.moveTo(6,-4);
+							userMouse.graphics.lineTo(10,0);
+							userMouse.graphics.lineTo(6,4);
+							userMouse.graphics.lineTo(6,-4);
+							userMouse.graphics.moveTo(-4,-6);
+							userMouse.graphics.lineTo(0,-10);
+							userMouse.graphics.lineTo(4,-6);
+							userMouse.graphics.lineTo(-4,-6);
+							userMouse.graphics.moveTo(-4,6);
+							userMouse.graphics.lineTo(0,10);
+							userMouse.graphics.lineTo(4,6);
+							userMouse.graphics.lineTo(-4,6);
+							userMouse.graphics.endFill();
+						}
+						return;
+					break;
+					case TYPE_ROTATE:
+						userMouse.rotation=0;
+						if(userMouse.totalFrames>1){
+							userMouse.gotoAndStop(typeDict[target]);
+						}else{
+							userMouse.graphics.clear();
+							userMouse.graphics.lineStyle(1,0x000000);
+							userMouse.graphics.moveTo(0,8);
+							userMouse.graphics.curveTo(-8,8,-8,0);
+							userMouse.graphics.curveTo(-8,-8,0,-8);
+							userMouse.graphics.curveTo(8,-8,8,0);
+							userMouse.graphics.beginFill(0x000000);
+							userMouse.graphics.moveTo(4,0);
+							userMouse.graphics.lineTo(8,4);
+							userMouse.graphics.lineTo(12,0);
+							userMouse.graphics.lineTo(4,0);
+						}
+						return;
+					break;
+					case TYPE_SCALE:
+						userMouse.rotation=Math.atan2((currCankaoK<0?-1:1)*dyDict[target],dxDict[target])*(180/Math.PI);
+						if(userMouse.totalFrames>1){
+							userMouse.gotoAndStop(typeDict[target]);
+						}else{
+							userMouse.graphics.clear();
+							userMouse.graphics.lineStyle(1,0x000000);
+							
+							userMouse.graphics.moveTo(-10,0);
+							userMouse.graphics.lineTo(10,0);
+							
+							userMouse.graphics.beginFill(0x000000);
+							userMouse.graphics.moveTo(-6,-4);
+							userMouse.graphics.lineTo(-10,0);
+							userMouse.graphics.lineTo(-6,4);
+							userMouse.graphics.lineTo(-6,-4);
+							userMouse.graphics.moveTo(6,-4);
+							userMouse.graphics.lineTo(10,0);
+							userMouse.graphics.lineTo(6,4);
+							userMouse.graphics.lineTo(6,-4);
+							userMouse.graphics.endFill();
+						}
+						return;
+					break;
+				}
 			}
+			userMouse.graphics.clear();
+			Mouse.show();
+			userMouse.gotoAndStop(1);
 		}
 		private function updateByPic():void{
 			var p:Point=getM(__pic,this.parent).transformPoint(midP);
@@ -703,7 +759,8 @@ package zero.ui{
 			
 			updateDotsByDragArea();
 			
-			trace("__pic.scaleX="+__pic.scaleX,"__pic.scaleY="+__pic.scaleY);
+			currCankaoK=(dot_scaleDict["dot-1-1"].x-dot_scaleDict["dot11"].x)/(dot_scaleDict["dot-1-1"].y-dot_scaleDict["dot11"].y);
+			//trace("currCankaoK="+currCankaoK);
 		}
 		private function updatePic():void{
 			__pic.transform.matrix=getM(dragArea_shape.parent,__pic.parent);
