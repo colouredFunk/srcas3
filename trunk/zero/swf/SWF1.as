@@ -13,9 +13,13 @@ package zero.swf{
 	import zero.swf.records.RECT;
 	
 	public class SWF1 extends SWF0{
-		public static const baseInfoNameV:Vector.<String>=SWF0.baseInfoNameV.concat(Vector.<String>([
-			"x","y","width","height","FrameRate"
-		]));
+		public static var baseInfoNameV:Vector.<String>;
+		
+		private static const firstInitResult:*=function():void{
+			baseInfoNameV=Vector.<String>([
+				"type","Version","x","y","width","height","FrameRate"
+			]);
+		}();
 		
 		public var x:Number;
 		public var y:Number;

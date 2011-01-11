@@ -10,8 +10,7 @@ CodesAddJunks 版本:v1.0
 package zero.swf.funs{
 	import flash.utils.Dictionary;
 	
-	import zero.BytesAndStr16;
-	import zero.Xattr;
+	import zero.*;
 	import zero.swf.*;
 	import zero.swf.avm2.advances.*;
 	import zero.swf.tagBodys.*;

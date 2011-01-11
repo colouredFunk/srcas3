@@ -14,9 +14,7 @@ package zero.ui{
 	import flash.system.*;
 	import flash.utils.*;
 	
-	import mx.events.FlexEvent;
 	import mx.preloaders.IPreloaderDisplay;
-	import mx.preloaders.Preloader;
 	
 	import zero.*;
 
@@ -27,8 +25,16 @@ package zero.ui{
 		private var bg:Sprite;
 		
 		public function PrevLoader(){
+			if(ZeroCommon.FileClass){
+			}else{
+				Security.allowDomain("*");
+				Security.allowInsecureDomain("*");
+			}
 		}
 		public function initialize():void{
+			if(ZeroCommon.FileClass){
+				return;
+			}
 			this.addEventListener(Event.REMOVED_FROM_STAGE,removed);
 			bg=new Sprite();
 			this.addChild(bg);
@@ -66,10 +72,30 @@ package zero.ui{
 		private function loadZPLError(event:IOErrorEvent):void{
 			trace("loadZPLError");
 		}
+		
+		//仅在 flex 项目中会用到
 		public function set preloader(_preloader:Sprite):void{
-			(_preloader as Preloader).addEventListener(ProgressEvent.PROGRESS,loadProgress);
-			(_preloader as Preloader).addEventListener(FlexEvent.INIT_COMPLETE,initComplete);
+			_preloader.addEventListener(ProgressEvent.PROGRESS,loadProgress);
+			_preloader.addEventListener("initComplete",initComplete);//FlexEvent.INIT_COMPLETE
 		}
+		private function loadProgress(event:ProgressEvent):void{
+			setProgress(event.bytesLoaded,event.bytesTotal);
+		}
+		//
+		
+		public function setProgress(bytesLoaded:int,bytesTotal:int):void{
+			if(zpl){
+				zpl.cmd("loadGameProgress",bytesLoaded,bytesTotal);
+			}
+		}
+		public function initComplete(...args):void{
+			if(ZeroCommon.FileClass){
+				initDelay();
+			}else{
+				timeoutId=setTimeout(initDelay,1000);
+			}
+		}
+		
 		private function resize(event:Event):void{
 			if(bg){
 				bg.width=stage.stageWidth;
@@ -79,14 +105,7 @@ package zero.ui{
 				}
 			}
 		}
-		private function loadProgress(event:ProgressEvent):void{
-			if(zpl){
-				zpl.cmd("loadGameProgress",event.bytesLoaded,event.bytesTotal);
-			}
-		}
-		private function initComplete(event:FlexEvent):void{
-			timeoutId=setTimeout(initDelay,1000);
-		}
+		
 		private function initDelay():void{
 			clearTimeout(timeoutId);
 			if(zpl){

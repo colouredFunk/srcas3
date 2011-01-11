@@ -10,18 +10,30 @@ ZeroCommon 版本:v1.0
 package zero{
 	import flash.display.*;
 	import flash.events.*;
-	import flash.utils.*;
-	import flash.geom.*;
-	
 	import flash.filters.ColorMatrixFilter;
+	import flash.geom.*;
 	import flash.system.Security;
+	import flash.utils.*;
 	
 	public class ZeroCommon{
+		public static const FileClass:Class=function():Class{//就是 File，可用作判断是否 air ... - -
+			try{
+				return getDefinitionByName("flash.filesystem.File") as Class;
+			}catch(e:Error){}
+			
+			return null;
+		}();
+		
 		public static const domain:String=function():String{
-			var domain:String="zero.flashwing.net";
-			//var domain:String="localhost/zero.flashwing.net";
-			Security.allowDomain(domain);
-			Security.allowInsecureDomain(domain);
+			//var domain:String="zero.flashwing.net";
+			var domain:String="localhost/zero.flashwing.net";
+			
+			if(FileClass){
+			}else{
+				Security.allowDomain(domain);
+				Security.allowInsecureDomain(domain);
+			}
+			
 			return domain;
 		}();
 		
@@ -32,6 +44,10 @@ package zero{
 		
 		public static const path_jigsaw:String="http://"+domain+"/jigsaw/";
 		public static const path_jigsaw_BottomBar:String=path_jigsaw+"BottomBar.swf";
+		
+		public static const path_ZeroSWFEncrypt:String="http://"+domain+"/ZeroSWFEncrypt/";
+		public static const path_ZeroSWFEncrypt_BottomBar:String=path_ZeroSWFEncrypt+"BottomBar.swf";
+		public static const path_ZeroSWFEncryptAIR:String=path_ZeroSWFEncrypt+"ZeroSWFEncrypt.rar";
 		
 		public static const path_card3d:String="http://"+domain+"/card3d/";
 		public static const path_card3d_ctrlpan:String=path_card3d+"ctrlpan.swf";
@@ -47,7 +63,7 @@ package zero{
 		public static const path_photodiy_album_swf_PhotoDIY_SrcGetter:String=path_photodiy_album+"swf/PhotoDIY_SrcGetter.swf";
 		
 		public static const path_photodiy_tackfilm:String=path_photodiy+"tackfilm/";
-		public static const path_photodiy_tackfilm_tackfilmmovie:String=path_photodiy_tackfilm+"tackfilmmovie.swf";
+		public static const path_photodiy_tackfilm_tackfilmmovie_encrypt:String=path_photodiy_tackfilm+"tackfilmmovie_encrypt.swf";
 		//public static const path_photodiy_tackfilm_tackfilmmovie_hide:String="http://localhost/zero.flashwing.net/photodiy/tackfilm/tackfilmmovie_插入数据前.swf";
 		public static const path_photodiy_tackfilm_online:String=path_photodiy_tackfilm+"online.htm";
 		

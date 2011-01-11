@@ -36,7 +36,7 @@ package zero.ui{
 			try{
 				urlLoader.load(urlRequest);
 			}catch(e:Error){
-				trace("e="+e);
+				//trace("e="+e);
 			}
 		}
 		private static function sendMsgComplete(event:Event):void{
@@ -64,7 +64,7 @@ package zero.ui{
 					_parent=_parent.parent;
 				}
 			}catch(e:Error){
-				trace("e="+e);
+				//trace("e="+e);
 			}
 			
 			return null;
@@ -79,7 +79,7 @@ package zero.ui{
 					pageURL=ExternalInterface.call("window.location.href.toString").toString();
 				}
 			}catch(e:Error){
-				trace("e="+e);
+				//trace("e="+e);
 			}
 			
 			if(pageURL){
@@ -89,7 +89,7 @@ package zero.ui{
 					pageURL=getValueObj["getValue"]("loaderInfo.url",getValueObj);
 					//trace("pageURL="+pageURL);
 				}catch(e:Error){
-					trace("e="+e);
+					//trace("e="+e);
 				}
 			}
 			

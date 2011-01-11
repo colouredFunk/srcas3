@@ -16,11 +16,15 @@ package zero.swf{
 	import zero.Outputer;
 
 	public class SWF0{
-		public static const playerVersion:int=int(Capabilities.version.match(/\d+,/)[0].replace(",",""));//例如 WIN 10,0,22,91 抽出 10;
+		public static var playerVersion:int;
+		public static var baseInfoNameV:Vector.<String>;
 		
-		public static const baseInfoNameV:Vector.<String>=Vector.<String>([
-			"type","Version"
-		]);
+		private static const firstInitResult:*=function():void{
+			playerVersion=int(Capabilities.version.match(/\d+,/)[0].replace(",",""));//例如 WIN 10,0,22,91 抽出 10;
+			baseInfoNameV=Vector.<String>([
+				"type","Version"
+			]);
+		}();
 		
 		public var type:String;
 		public var Version:int=playerVersion;
