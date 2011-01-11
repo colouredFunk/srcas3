@@ -590,7 +590,7 @@ package zero.swf.avm2.advances{
 										codesStr+=" "+code.value;
 									break;
 									case Op.type_u8_u30__string:
-										codesStr+=" \""+Common.esc_xattr(code.value)+"\"";
+										codesStr+=" \""+ZeroCommon.esc_xattr(code.value)+"\"";
 									break;
 									case Op.type_u8_u30__namespace_info:
 										if(useMarkKey){
@@ -614,7 +614,7 @@ package zero.swf.avm2.advances{
 											codesStr+=" "+methodMarkStr;
 											infoMark.addSpecialXML(methodMarkStr,methodXML);
 										}else{
-											codesStr+=" "+Common.esc_xattr(methodXML.toXMLString());
+											codesStr+=" "+ZeroCommon.esc_xattr(methodXML.toXMLString());
 										}
 									break;
 									case Op.type_u8_u30__class:
@@ -658,7 +658,7 @@ package zero.swf.avm2.advances{
 									break;
 									
 									case Op.type_u8_u8_u30_u8_u30__debug:
-										codesStr+=" "+code.value.debug_type+" \""+Common.esc_xattr(code.value.index)+"\" "+code.value.reg+" "+code.value.extra;//- -
+										codesStr+=" "+code.value.debug_type+" \""+ZeroCommon.esc_xattr(code.value.index)+"\" "+code.value.reg+" "+code.value.extra;//- -
 									break;
 									
 									default:
@@ -758,7 +758,7 @@ package zero.swf.avm2.advances{
 									code=new Code(op,Number(codeStr.replace(/\s+/g,"")));
 								break;
 								case Op.type_u8_u30__string:
-									code=new Code(op,Common.unesc_xattr(codeStr.substr(1,codeStr.length-2)));
+									code=new Code(op,ZeroCommon.unesc_xattr(codeStr.substr(1,codeStr.length-2)));
 								break;
 								case Op.type_u8_u30__namespace_info:
 									if(/^<.*>$/.test(codeStr)){
@@ -776,7 +776,7 @@ package zero.swf.avm2.advances{
 								break;
 								case Op.type_u8_u30__method:
 									if(/^\&lt;.*\&gt;$/.test(codeStr)){
-										code=new Code(op,MarkStrs.markStr2method(infoMark,new XML(Common.unesc_xattr(codeStr)).toXMLString()));
+										code=new Code(op,MarkStrs.markStr2method(infoMark,new XML(ZeroCommon.unesc_xattr(codeStr)).toXMLString()));
 									}else{
 										code=new Code(op,MarkStrs.markStr2method(infoMark,codeStr));
 									}
@@ -880,7 +880,7 @@ package zero.swf.avm2.advances{
 									if(execResult[0]===codeStr){
 										code=new Code(op,{
 											debug_type:int(execResult[1]),
-											index:Common.unesc_xattr(execResult[2]),//- -
+											index:ZeroCommon.unesc_xattr(execResult[2]),//- -
 											reg:int(execResult[3]),
 											extra:int(execResult[4])
 										});

@@ -10,7 +10,7 @@ JunkTagsAdder 版本:v1.0
 package zero.swf.funs{
 	import flash.utils.*;
 	
-	import zero.Disorder;
+	import zero.*;
 	import zero.swf.*;
 	import zero.swf.tagBodys.*;
 	
@@ -228,7 +228,7 @@ package zero.swf.funs{
 				defineSprite.dataAndTags.tagV.push(new Tag(TagType.SoundStreamBlock));
 			}
 			
-			Disorder.disorder(defineSprite.dataAndTags.tagV);
+			ZeroCommon.disorder(defineSprite.dataAndTags.tagV);
 			defineSprite.dataAndTags.tagV.push(new Tag(TagType.ShowFrame));
 			defineSprite.dataAndTags.tagV.push(new Tag(TagType.End));
 			

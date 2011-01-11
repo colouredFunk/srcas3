@@ -14,21 +14,38 @@ package zero.swf{
 	import zero.swf.tagBodys.Metadata;
 	
 	public class SWF2 extends SWF1{
-		public static const TagTypeOrderV:Vector.<int>=Vector.<int>([
-			//TagType.FileAttributes,
-			//TagType.Metadata,
-			TagType.SetBackgroundColor,
-			TagType.EnableDebugger,
-			TagType.EnableDebugger2,
-			TagType.DebugID,
-			TagType.ScriptLimits,
-			TagType.ProductInfo
-		]);
+		//
+		public static var baseInfoNameV:Vector.<String>;
 		
-		private static var getSetValueTagBodyClasses:Vector.<Class>=new Vector.<Class>(256);
-		private static var getSetValueMemberNames:Vector.<String>=new Vector.<String>(256);
-		private static var getSetValueValueNames:Vector.<String>=new Vector.<String>(256);
-		private static var getSetValueDefaultValues:Vector.<Object>=new Vector.<Object>(256);
+		public static var TagTypeOrderV:Vector.<int>;
+		
+		private static var getSetValueTagBodyClasses:Vector.<Class>;
+		private static var getSetValueMemberNames:Vector.<String>;
+		private static var getSetValueValueNames:Vector.<String>;
+		private static var getSetValueDefaultValues:Vector.<Object>;
+		
+		private static const firstInitResult:*=function():void{
+			baseInfoNameV=Vector.<String>([
+				"type","Version","x","y","width","height","FrameRate","acceleration","isAS3","accessNetworkOnly","metadataStr"
+			]);
+			
+			TagTypeOrderV=Vector.<int>([
+				//TagType.FileAttributes,
+				//TagType.Metadata,
+				TagType.SetBackgroundColor,
+				TagType.EnableDebugger,
+				TagType.EnableDebugger2,
+				TagType.DebugID,
+				TagType.ScriptLimits,
+				TagType.ProductInfo
+			]);
+			
+			getSetValueTagBodyClasses=new Vector.<Class>(256);
+			getSetValueMemberNames=new Vector.<String>(256);
+			getSetValueValueNames=new Vector.<String>(256);
+			getSetValueDefaultValues=new Vector.<Object>(256);
+		}();
+		
 		public static function addGetSetValueTagBody(
 			TagBodyClass:Class,
 			memberName:String,
@@ -66,11 +83,6 @@ package zero.swf{
 			}
 			throw new Error("TagBodyClass="+TagBodyClass+", typeName="+typeName);
 		}
-		
-		//
-		public static const baseInfoNameV:Vector.<String>=SWF1.baseInfoNameV.concat(Vector.<String>([
-			"acceleration","isAS3","accessNetworkOnly","metadataStr"
-		]));
 		
 		private var getSetValueValues:Object;
 		public function getValue(valueName:String):*{

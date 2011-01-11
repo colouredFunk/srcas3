@@ -325,100 +325,98 @@ package zero.swf.funs{
 			return firstInitV;
 		}
 		
+		private static function getMethods(swf:SWF2):Vector.<AdvanceMethod>{
+			var methodV:Vector.<AdvanceMethod>=new Vector.<AdvanceMethod>();
+			var i:int=0;
+			var traits_info:AdvanceTraits_info;
+			for each(var tag:Tag in swf.tagV){
+				switch(tag.type){
+					case TagType.DoABC:
+					case TagType.DoABCWithoutFlagsAndName:
+						var advanceABC:AdvanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc;
+						for each(var clazz:AdvanceClass in advanceABC.clazzV){
+							methodV[i++]=clazz.iinit;
+							for each(traits_info in clazz.itraits_infoV){
+								switch(traits_info.kind_trait_type){
+									case TraitTypes.Method:
+									case TraitTypes.Getter:
+									case TraitTypes.Setter:
+										methodV[i++]=traits_info.methodi;
+									break;
+									case TraitTypes.Function:
+										methodV[i++]=traits_info.functioni;
+									break;
+								}
+							}
+							methodV[i++]=clazz.cinit;
+							for each(traits_info in clazz.ctraits_infoV){
+								switch(traits_info.kind_trait_type){
+									case TraitTypes.Method:
+									case TraitTypes.Getter:
+									case TraitTypes.Setter:
+										methodV[i++]=traits_info.methodi;
+									break;
+									case TraitTypes.Function:
+										methodV[i++]=traits_info.functioni;
+									break;
+								}
+							}
+						}
+						for each(var script_info:AdvanceScript_info in advanceABC.script_infoV){
+							methodV[i++]=script_info.init;
+							for each(traits_info in script_info.traits_infoV){
+								switch(traits_info.kind_trait_type){
+									case TraitTypes.Method:
+									case TraitTypes.Getter:
+									case TraitTypes.Setter:
+										methodV[i++]=traits_info.methodi;
+									break;
+									case TraitTypes.Function:
+										methodV[i++]=traits_info.functioni;
+									break;
+								}
+							}
+						}
+					break;
+				}
+			}
+			return methodV;
+		}
 		public static function insertFirstInitVInSWF(
 			swf:SWF2,
 			firstInitV:Vector.<Vector.<AdvanceMultiname_info>>,
 			getPushStringCodeIdAndKeys:Function,
 			infoMark:InfoMark,
 			pushStringCodeTraits_infoXML:XML,
-			objCallMethodTraits_infoXML:XML,
-			markName:String
-		):Vector.<AdvanceTraits_info>{
-			var insert_traits_infoV:Vector.<AdvanceTraits_info>=new Vector.<AdvanceTraits_info>();
-			var tag:Tag,advanceABC:AdvanceABC,clazz:AdvanceClass,script_info:AdvanceScript_info;
-			loop:while(firstInitV.length){
-				for each(tag in swf.tagV){
-					switch(tag.type){
-						case TagType.DoABC:
-						case TagType.DoABCWithoutFlagsAndName:
-							advanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc;
-							for each(clazz in advanceABC.clazzV){
-								if(firstInitV.length){
-									insertFirstInitInTraits(
-										clazz.itraits_infoV,
-										firstInitV,
-										getPushStringCodeIdAndKeys,
-										infoMark,
-										pushStringCodeTraits_infoXML,
-										objCallMethodTraits_infoXML,
-										markName,
-										insert_traits_infoV
-									);
-								}else{
-									break loop;
-								}
-								if(firstInitV.length){
-									insertFirstInitInTraits(
-										clazz.ctraits_infoV,
-										firstInitV,
-										getPushStringCodeIdAndKeys,
-										infoMark,
-										pushStringCodeTraits_infoXML,
-										objCallMethodTraits_infoXML,
-										markName,
-										insert_traits_infoV
-									);
-								}else{
-									break loop;
-								}
-							}
-							for each(script_info in advanceABC.script_infoV){
-								if(firstInitV.length){
-									insertFirstInitInTraits(
-										script_info.traits_infoV,
-										firstInitV,
-										getPushStringCodeIdAndKeys,
-										infoMark,
-										pushStringCodeTraits_infoXML,
-										objCallMethodTraits_infoXML,
-										markName,
-										insert_traits_infoV
-									);
-								}else{
-									break loop;
-								}
-							}
-						break;
-					}
-				}
-			}
-			return insert_traits_infoV;
-		}
-		
-		private static function insertFirstInitInTraits(
-			traits_infoV:Vector.<AdvanceTraits_info>,
-			firstInitV:Vector.<Vector.<AdvanceMultiname_info>>,
-			getPushStringCodeIdAndKeys:Function,
-			infoMark:InfoMark,
-			pushStringCodeTraits_infoXML:XML,
 			objCallMethodTraits_infoXML0:XML,
-			markName:String,
-			insert_traits_infoV:Vector.<AdvanceTraits_info>
-		):void{
+			objCallMethod2Traits_infoXML0:XML,
+			markName:String
+		):Vector.<AdvanceMethod>{
+			var insert_methodV:Vector.<AdvanceMethod>=new Vector.<AdvanceMethod>();
+			var tag:Tag,advanceABC:AdvanceABC,clazz:AdvanceClass,script_info:AdvanceScript_info;
+			var methodV:Vector.<AdvanceMethod>=getMethods(swf);
+			
 			var firstInitResultMultinameName:AdvanceMultiname_info;
 			var pushStringCodeStr:String=pushStringCodeTraits_infoXML.methodi[0].codes[0].toString();
-			for each(var traits_info:AdvanceTraits_info in traits_infoV){
-				switch(traits_info.kind_trait_type){
-					case TraitTypes.Method:
-					//case TraitTypes.Getter:
-					//case TraitTypes.Setter:
-						var codeArr:Array=traits_info.methodi.codes.codeArr;
+			
+			loop:while(firstInitV.length){
+				for each(var method:AdvanceMethod in methodV){
+					if(firstInitV.length){
+						var codeArr:Array=method.codes.codeArr;
 						var i:int=codeArr.length;
 						while(--i>=0){
 							if(checkIsTraceMarkName(codeArr,i,markName)){
 								if(firstInitV.length){
-									var objCallMethodTraits_infoXML:XML=objCallMethodTraits_infoXML0.copy();
 									var objAndMethodName:Vector.<AdvanceMultiname_info>=firstInitV.shift();
+									var objCallMethodTraits_infoXML:XML;
+									var firstInitClassName:String;
+									if(objAndMethodName[0].ns.name){
+										objCallMethodTraits_infoXML=objCallMethod2Traits_infoXML0.copy();
+										firstInitClassName=objAndMethodName[0].ns.name+"."+objAndMethodName[0].name;
+									}else{
+										objCallMethodTraits_infoXML=objCallMethodTraits_infoXML0.copy();
+										firstInitClassName=objAndMethodName[0].name;
+									}
 									var codesStr:String=objCallMethodTraits_infoXML.methodi[0].codes[0].toString();
 									//trace("codesStr="+codesStr);
 									//trace("------------------------------------------------------------");
@@ -427,7 +425,7 @@ package zero.swf.funs{
 										pushStringCodeStr,
 										getPushStringCodeIdAndKeys,
 										["objName","methodName"],
-										[objAndMethodName[0].name,objAndMethodName[1].name]
+										[firstInitClassName,objAndMethodName[1].name]
 									);
 									objCallMethodTraits_infoXML.methodi[0].codes=codesStr;
 									
@@ -445,23 +443,24 @@ package zero.swf.funs{
 									//*/
 									
 									var max_stack:int=int(pushStringCodeTraits_infoXML.methodi[0].@max_stack.toString());
-									if(traits_info.methodi.max_stack<max_stack){
-										traits_info.methodi.max_stack=max_stack;
+									if(method.max_stack<max_stack){
+										method.max_stack=max_stack;
 									}
-									insert_traits_infoV.push(traits_info);
-									Outputer.output("　分离"+(objAndMethodName[0].ns.name?objAndMethodName[0].ns.name+"."+objAndMethodName[0].name:objAndMethodName[0].name)+".firstInitResult","green");
+									insert_methodV.push(method);
+									Outputer.output("　分离"+firstInitClassName+".firstInitResult","green");
 								}else{
-									break;
+									break loop;
 								}
 							}
 						}
-					break;
-					//case TraitTypes.Function:
-					//	traits_info.functioni.codes.codeArr
-					//break;
+					}else{
+						break loop;
+					}
 				}
 			}
+			return insert_methodV;
 		}
+		
 		public static function replacePushStringCode(
 			codesStr:String,
 			pushStringCodeStr:String,
@@ -512,39 +511,8 @@ package zero.swf.funs{
 			return newCodesStr;
 		}
 		public static function clearTraceMarkNames(swf:SWF2,markName:String):void{
-			var tag:Tag,advanceABC:AdvanceABC,clazz:AdvanceClass,script_info:AdvanceScript_info;
-			for each(tag in swf.tagV){
-				switch(tag.type){
-					case TagType.DoABC:
-					case TagType.DoABCWithoutFlagsAndName:
-						advanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc;
-						for each(clazz in advanceABC.clazzV){
-							clearTraits_infosTraceMarkName(clazz.itraits_infoV,markName);
-							clearTraits_infosTraceMarkName(clazz.ctraits_infoV,markName);
-						}
-						for each(script_info in advanceABC.script_infoV){
-							clearTraits_infosTraceMarkName(script_info.traits_infoV,markName);
-						}
-					break;
-				}
-			}
-		}
-		private static function clearTraits_infosTraceMarkName(
-			traits_infoV:Vector.<AdvanceTraits_info>,
-			markName:String
-		):void{
-			var firstInitResultMultinameName:AdvanceMultiname_info;
-			for each(var traits_info:AdvanceTraits_info in traits_infoV){
-				switch(traits_info.kind_trait_type){
-					case TraitTypes.Method:
-					//case TraitTypes.Getter:
-					//case TraitTypes.Setter:
-						clearTraceMarkName(traits_info.methodi.codes.codeArr,markName)
-					break;
-					//case TraitTypes.Function:
-					//	traits_info.functioni.codes.codeArr
-					//break;
-				}
+			for each(var method:AdvanceMethod in getMethods(swf)){
+				clearTraceMarkName(method.codes.codeArr,markName);
 			}
 		}
 		
