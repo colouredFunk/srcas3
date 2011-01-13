@@ -39,14 +39,13 @@ package zero{
 		
 		public static const path_common:String="http://"+domain+"/common/";
 		public static const path_ZeroPrevLoader:String=path_common+"ZeroPrevLoader.swf";
+		public static const path_BottomBar:String=path_common+"BottomBar.swf";
 		public static const path_getMsg:String=path_common+"getMsg.php";
 		public static const path_FlashPlayer_exe_compress:String=path_common+"FlashPlayer.exe.compress";
 		
 		public static const path_jigsaw:String="http://"+domain+"/jigsaw/";
-		public static const path_jigsaw_BottomBar:String=path_jigsaw+"BottomBar.swf";
 		
 		public static const path_ZeroSWFEncrypt:String="http://"+domain+"/ZeroSWFEncrypt/";
-		public static const path_ZeroSWFEncrypt_BottomBar:String=path_ZeroSWFEncrypt+"BottomBar.swf";
 		public static const path_ZeroSWFEncryptAIR:String=path_ZeroSWFEncrypt+"ZeroSWFEncrypt.rar";
 		
 		public static const path_card3d:String="http://"+domain+"/card3d/";
