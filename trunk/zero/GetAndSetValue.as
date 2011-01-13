@@ -18,17 +18,28 @@ package zero{
 			//GetAndSetValue.getValue("XML")//获取类
 			//GetAndSetValue.getValue("XML.prettyIndent")//获取静态属性
 			//GetAndSetValue.getValue("loaderInfo.url",this)//获取属性
-			
 			var objNameArr:Array=objName.split(".");
 			if(objNameArr.length){
 				var obj:Object;
 				if(thisObj){
 					obj=thisObj[objNameArr.shift()];
 				}else{
-					obj=getDefinitionByName(objNameArr.shift());
+					var defCache:String="";
+					while(objNameArr.length){
+						var defStr:String=objNameArr.shift();
+						try{
+							obj=getDefinitionByName(defCache+defStr);
+						}catch(e:Error){
+							defCache+=defStr+".";
+							continue;
+						}
+						break;
+					}
 				}
-				while(objNameArr.length){
-					obj=obj[objNameArr.shift()];
+				if(obj){
+					while(objNameArr.length){
+						obj=obj[objNameArr.shift()];
+					}
 				}
 				return obj;
 			}
@@ -44,13 +55,25 @@ package zero{
 				if(thisObj){
 					obj=thisObj[objNameArr.shift()];
 				}else{
-					obj=getDefinitionByName(objNameArr.shift());
+					var defCache:String="";
+					while(objNameArr.length>1){
+						var defStr:String=objNameArr.shift();
+						try{
+							obj=getDefinitionByName(defCache+defStr);
+						}catch(e:Error){
+							defCache+=defStr+".";
+							continue;
+						}
+						break;
+					}
 				}
-				while(objNameArr.length>1){
-					obj=obj[objNameArr.shift()];
-				}
-				if(objNameArr.length){
-					obj[objNameArr.shift()]=value;
+				if(obj){
+					while(objNameArr.length>1){
+						obj=obj[objNameArr.shift()];
+					}
+					if(objNameArr.length){
+						obj[objNameArr.shift()]=value;
+					}
 				}
 			}
 		}

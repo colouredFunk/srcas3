@@ -134,7 +134,10 @@ public class StatusManager{
 			switch(currXML["@"+statusName].toString()){
 				case loginStatus:
 					//提示用户要登录
-					GotoURL.goto(getValue("login"),statusURLLoader.data);
+					var loginXML:XML=getValue("login");
+					if(loginXML){
+						GotoURL.goto(loginXML,statusURLLoader.data);
+					}
 				break;
 				//case normalStatus:
 					//正常状态
@@ -158,7 +161,8 @@ public class StatusManager{
 			}
 			return StatusManager[xmlName+"XML"];
 		}
-		throw new Error("找不到 xml 节点, xmlName="+xmlName);
+		trace("找不到 xml 节点, xmlName="+xmlName);
+		return null;
 	}
 }
 }

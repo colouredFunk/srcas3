@@ -10,31 +10,25 @@ PrevLoader 版本:v1.0
 package zero.ui{
 	import flash.display.*;
 	import flash.events.*;
-	import flash.net.*;
-	import flash.system.*;
 	import flash.utils.*;
 	
 	import mx.preloaders.IPreloaderDisplay;
 	
 	import zero.*;
-
+	
 	public class PrevLoader extends Sprite implements IPreloaderDisplay{
-		private var zpl:*;
-		private var loader:Loader;
+		///*
 		private var timeoutId:int=-1;
 		private var bg:Sprite;
+		private var zplContainer:Sprite;
 		
 		public function PrevLoader(){
-			if(ZeroCommon.FileClass){
-			}else{
-				Security.allowDomain("*");
-				Security.allowInsecureDomain("*");
-			}
+			ZPLManager.init();
 		}
 		public function initialize():void{
-			if(ZeroCommon.FileClass){
-				return;
-			}
+			//if(ZeroCommon.FileClass){
+			//	return;
+			//}
 			this.addEventListener(Event.REMOVED_FROM_STAGE,removed);
 			bg=new Sprite();
 			this.addChild(bg);
@@ -44,12 +38,10 @@ package zero.ui{
 			g.drawRect(0,0,100,100);
 			g.endFill();
 			
-			loader=new Loader();
-			loader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadZPLComplete);
-			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,loadZPLError);
-			loader.load(new URLRequest(ZeroCommon.path_ZeroPrevLoader));
-			this.addChild(loader);
-
+			zplContainer=new Sprite();
+			this.addChild(zplContainer);
+			ZPLManager.add(zplContainer);
+			
 			resize(null);
 			stage.addEventListener(Event.RESIZE,resize);
 		}
@@ -57,20 +49,8 @@ package zero.ui{
 			clearTimeout(timeoutId);
 			this.removeEventListener(Event.REMOVED_FROM_STAGE,removed);
 			this.loaderInfo.removeEventListener(Event.COMPLETE,startGame);
-			if(loader){
-				loader.contentLoaderInfo.removeEventListener(Event.COMPLETE,loadZPLComplete);
-				loader.unloadAndStop();
-				loader=null;
-			}
+			
 			stage.removeEventListener(Event.RESIZE,resize);
-		}
-		private function loadZPLComplete(event:Event):void{
-			zpl=(event.target as LoaderInfo).loader.content;
-			zpl.cmd("loadGameProgress",this.loaderInfo.bytesLoaded,this.loaderInfo.bytesTotal);
-			resize(null);
-		}
-		private function loadZPLError(event:IOErrorEvent):void{
-			trace("loadZPLError");
 		}
 		
 		//仅在 flex 项目中会用到
@@ -79,15 +59,10 @@ package zero.ui{
 			_preloader.addEventListener("initComplete",initComplete);//FlexEvent.INIT_COMPLETE
 		}
 		private function loadProgress(event:ProgressEvent):void{
-			setProgress(event.bytesLoaded,event.bytesTotal);
+			ZPLManager.setProgress(event.bytesLoaded,event.bytesTotal);
 		}
 		//
 		
-		public function setProgress(bytesLoaded:int,bytesTotal:int):void{
-			if(zpl){
-				zpl.cmd("loadGameProgress",bytesLoaded,bytesTotal);
-			}
-		}
 		public function initComplete(...args):void{
 			if(ZeroCommon.FileClass){
 				initDelay();
@@ -100,18 +75,14 @@ package zero.ui{
 			if(bg){
 				bg.width=stage.stageWidth;
 				bg.height=stage.stageHeight;
-				if(zpl){
-					zpl.cmd("resize",bg.x,bg.y,bg.width,bg.height);
-				}
+				ZPLManager.resize(bg.x,bg.y,bg.width,bg.height);
 			}
 		}
 		
 		private function initDelay():void{
 			clearTimeout(timeoutId);
-			if(zpl){
-				if(zpl.cmd("loadGameComplete",startGame)){
-					return;
-				}
+			if(ZPLManager.setComplete(startGame)){
+				return;
 			}
 			if(this.loaderInfo.bytesLoaded==this.loaderInfo.bytesTotal){
 				startGame();
@@ -122,8 +93,17 @@ package zero.ui{
 		private function startGame(event:Event=null):void{
 			this.loaderInfo.removeEventListener(Event.COMPLETE,startGame);
 			clearTimeout(timeoutId);
+			ZPLManager.remove();
 			dispatchEvent(new Event(Event.COMPLETE));
 		}
+		//*/
+		
+		/*
+		public function initialize():void{
+		}
+		public function set preloader(_preloader:Sprite):void{
+		}
+		//*/
 		
 		public function get backgroundAlpha():Number{
 			return 0;

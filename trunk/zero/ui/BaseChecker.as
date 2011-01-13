@@ -17,7 +17,7 @@ package zero.ui{
 	public class BaseChecker extends Sprite{
 		private static var firstSend:Boolean=true;
 		public static function sendMsg(url:String,variables:Object):void{
-			//trace("pageURL="+pageURL);
+			trace("sendMsg url="+url);
 			var urlLoader:URLLoader=new URLLoader();
 			urlLoader.addEventListener(Event.COMPLETE,sendMsgComplete);
 			urlLoader.addEventListener(IOErrorEvent.IO_ERROR,sendMsgError);
@@ -93,7 +93,17 @@ package zero.ui{
 				}
 			}
 			
-			return decodeURI(pageURL);
+			if(pageURL){
+				pageURL=decodeURI(pageURL);
+				if(pageURL.indexOf("app:/")==0){
+					//trace("Air应用程序：pageURL="+pageURL);
+					pageURL=pageURL.replace("app:",getValueObj["getValue"]("flash.filesystem.File.applicationDirectory.nativePath"));
+				}
+				pageURL=pageURL.replace(/\\/g,"/");
+				return pageURL;
+			}
+			
+			return null;
 		}
 		
 		public function getClass(getValueObj:*,className:String):Class{
