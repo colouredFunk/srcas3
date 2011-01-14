@@ -16,9 +16,26 @@ package zero{
 	public class GetAndSetValue{
 		public static function getValue(objName:String,thisObj:*=null):*{
 			//GetAndSetValue.getValue("XML")//获取类
+			//GetAndSetValue.getValue("flash.filesystem.File")//获取类
 			//GetAndSetValue.getValue("XML.prettyIndent")//获取静态属性
+			//GetAndSetValue.getValue("flash.filesystem.File.applicationDirectory.nativePath")//获取静态属性
 			//GetAndSetValue.getValue("loaderInfo.url",this)//获取属性
+			return getObj(objName.split("."),thisObj);
+		}
+		public static function setValue(objName:String,value:*,thisObj:*=null):void{
+			//GetAndSetValue.setValue("XML.prettyIndent",1)//设置静态属性
+			//GetAndSetValue.setValue("x",0,this)//设置属性
+			
 			var objNameArr:Array=objName.split(".");
+			if(objNameArr.length){
+				var valueName:String=objNameArr.pop();
+				var obj:Object=getObj(objNameArr,thisObj);
+				if(obj){
+					obj[valueName]=value;
+				}
+			}
+		}
+		public static function getObj(objNameArr:Array,thisObj:*):*{
 			if(objNameArr.length){
 				var obj:Object;
 				if(thisObj){
@@ -44,38 +61,6 @@ package zero{
 				return obj;
 			}
 			return null;
-		}
-		public static function setValue(objName:String,value:*,thisObj:*=null):void{
-			//GetAndSetValue.setValue("XML.prettyIndent",1)//设置静态属性
-			//GetAndSetValue.setValue("x",0,this)//设置静态属性
-			
-			var objNameArr:Array=objName.split(".");
-			if(objNameArr.length){
-				var obj:Object;
-				if(thisObj){
-					obj=thisObj[objNameArr.shift()];
-				}else{
-					var defCache:String="";
-					while(objNameArr.length>1){
-						var defStr:String=objNameArr.shift();
-						try{
-							obj=getDefinitionByName(defCache+defStr);
-						}catch(e:Error){
-							defCache+=defStr+".";
-							continue;
-						}
-						break;
-					}
-				}
-				if(obj){
-					while(objNameArr.length>1){
-						obj=obj[objNameArr.shift()];
-					}
-					if(objNameArr.length){
-						obj[objNameArr.shift()]=value;
-					}
-				}
-			}
 		}
 	}
 }
