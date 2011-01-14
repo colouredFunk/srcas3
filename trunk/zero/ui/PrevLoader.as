@@ -23,7 +23,7 @@ package zero.ui{
 		private var zplContainer:Sprite;
 		
 		public function PrevLoader(){
-			ZPLManager.init();
+			ZPLManager.init({startGame:startGame});
 		}
 		public function initialize():void{
 			//if(ZeroCommon.FileClass){
@@ -40,7 +40,7 @@ package zero.ui{
 			
 			zplContainer=new Sprite();
 			this.addChild(zplContainer);
-			ZPLManager.add(zplContainer);
+			ZPLManager.add(zplContainer,resize,resize);
 			
 			resize(null);
 			stage.addEventListener(Event.RESIZE,resize);
@@ -59,11 +59,12 @@ package zero.ui{
 			_preloader.addEventListener("initComplete",initComplete);//FlexEvent.INIT_COMPLETE
 		}
 		private function loadProgress(event:ProgressEvent):void{
-			ZPLManager.setProgress(event.bytesLoaded,event.bytesTotal);
+			ZPLManager.showLoadGameProgress(event.bytesLoaded,event.bytesTotal);
 		}
 		//
 		
 		public function initComplete(...args):void{
+			resize(null);
 			if(ZeroCommon.FileClass){
 				initDelay();
 			}else{
@@ -71,7 +72,7 @@ package zero.ui{
 			}
 		}
 		
-		private function resize(event:Event):void{
+		private function resize(event:Event=null):void{
 			if(bg){
 				bg.width=stage.stageWidth;
 				bg.height=stage.stageHeight;
@@ -80,8 +81,9 @@ package zero.ui{
 		}
 		
 		private function initDelay():void{
+			resize(null);
 			clearTimeout(timeoutId);
-			if(ZPLManager.setComplete(startGame)){
+			if(ZPLManager.showLoadGameComplete()){
 				return;
 			}
 			if(this.loaderInfo.bytesLoaded==this.loaderInfo.bytesTotal){
@@ -138,13 +140,6 @@ package zero.ui{
 			return 0;
 		}
 		public function set stageHeight(_stageHeight:Number):void{
-		}
-		
-		public function getValue(objName:String,thisObj:*=null):*{
-			return GetAndSetValue.getValue(objName,thisObj);
-		}
-		public function setValue(objName:String,value:*,thisObj:*=null):void{
-			GetAndSetValue.setValue(objName,value,thisObj);
 		}
 	}
 }

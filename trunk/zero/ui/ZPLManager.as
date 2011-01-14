@@ -14,7 +14,7 @@ package zero.ui{
 	import flash.system.*;
 	import flash.utils.*;
 	
-	import zero.ZeroCommon;
+	import zero.*;
 	
 	public class ZPLManager{
 		private static var zpl:*;
@@ -22,9 +22,10 @@ package zero.ui{
 		private static var container:Sprite;
 		private static var onAddComplete:Function;
 		private static var onAddError:Function;
+		private static var initValues:Object;
 		
-		public static function init():void{
-			trace("init");
+		public static function init(_initValues:Object):void{
+			initValues=_initValues;
 			if(loader||zpl){
 				return;
 			}
@@ -38,7 +39,12 @@ package zero.ui{
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadZPLComplete);
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,loadZPLError);
 			loader.load(new URLRequest(ZeroCommon.path_ZeroPrevLoader));
-			trace(ZeroCommon.path_ZeroPrevLoader);
+			
+			//trace("ZPLManager.init "+ZeroCommon.path_ZeroPrevLoader);
+			
+			//for(var initValueName:String in initValues){
+			//	trace("ZPLManager.init initValues."+initValueName+"="+initValues[initValueName])
+			//}
 		}
 		/*
 		public static function clear():void{
@@ -51,17 +57,18 @@ package zero.ui{
 			}
 			onAddComplete=null;
 			onAddError=null;
+			initValues=null;
 		}
 		*/
-		public static function setProgress(bytesLoaded:int,bytesTotal:int):void{
+		public static function showLoadGameProgress(bytesLoaded:int,bytesTotal:int):void{
 			if(container&&zpl){
 				zpl.cmd("loadGameProgress",bytesLoaded,bytesTotal);
 			}
 		}
-		public static function setComplete(startGame:Function):Boolean{
-			trace("setComplete");
+		public static function showLoadGameComplete():Boolean{
+			//trace("showLoadGameComplete");
 			if(container&&zpl){
-				if(zpl.cmd("loadGameComplete",startGame)){
+				if(zpl.cmd("loadGameComplete")){
 					return true;
 				}
 			}
@@ -71,14 +78,14 @@ package zero.ui{
 			container=_container;
 			onAddComplete=_onAddComplete;
 			onAddError=_onAddError;
-			trace("zpl="+zpl);
+			//trace("zpl="+zpl);
 			if(zpl){
 				initZPL();
 			}
 		}
 		public static function remove():void{
 			if(zpl&&zpl.parent==container){
-				container.removeChild(zpl);
+				zpl.cmd("remove");
 			}
 			container=null;
 		}
@@ -88,29 +95,22 @@ package zero.ui{
 			}
 		}
 		private static function loadZPLComplete(event:Event):void{
-			trace("loadZPLComplete");
+			//trace("loadZPLComplete");
 			loader.contentLoaderInfo.removeEventListener(Event.COMPLETE,loadZPLComplete);
 			loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,loadZPLError);
 			zpl=(event.target as LoaderInfo).loader.content;
 			loader=null;
-			trace("container="+container);
+			//trace("container="+container);
 			if(container){
 				initZPL();
 			}
-			
-			var _onAddComplete:Function=onAddComplete;
-			onAddComplete=null;
-			onAddError=null;
-			if(_onAddComplete==null){
-			}else{
-				_onAddComplete();
-			}
 		}
 		private static function loadZPLError(event:IOErrorEvent):void{
-			trace("loadZPLError");
+			//trace("loadZPLError");
 			loader.contentLoaderInfo.removeEventListener(Event.COMPLETE,loadZPLComplete);
 			loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,loadZPLError);
 			loader=null;
+			
 			var _onAddError:Function=onAddError;
 			onAddComplete=null;
 			onAddError=null;
@@ -120,12 +120,21 @@ package zero.ui{
 			}
 		}
 		private static function initZPL():void{
-			if(zpl.parent){
+			if(zpl.parent is Sprite){
 				return;
 			}
-			container.addChild(zpl);
-			zpl.cmd("initApp",container);
-			zpl.cmd("loadGameProgress",container.loaderInfo.bytesLoaded,container.loaderInfo.bytesTotal);
+			//for(var initValueName:String in initValues){
+			//	trace("ZPLManager.initZPL initValues."+initValueName+"="+initValues[initValueName])
+			//}
+			zpl.cmd("add",container,GetAndSetValue,initValues);
+			
+			var _onAddComplete:Function=onAddComplete;
+			onAddComplete=null;
+			onAddError=null;
+			if(_onAddComplete==null){
+			}else{
+				_onAddComplete();
+			}
 		}
 	}
 }

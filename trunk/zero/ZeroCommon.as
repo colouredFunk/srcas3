@@ -25,8 +25,8 @@ package zero{
 		}();
 		
 		public static const domain:String=function():String{
-			//var domain:String="zero.flashwing.net";
-			var domain:String="localhost/zero.flashwing.net";
+			var domain:String="zero.flashwing.net";
+			//var domain:String="localhost/zero.flashwing.net";
 			
 			if(FileClass){
 			}else{
@@ -43,10 +43,10 @@ package zero{
 		public static const path_getMsg:String=path_common+"getMsg.php";
 		public static const path_FlashPlayer_exe_compress:String=path_common+"FlashPlayer.exe.compress";
 		
-		public static const path_jigsaw:String="http://"+domain+"/jigsaw/";
+		public static const path_JigsawPuzzle:String="http://"+domain+"/JigsawPuzzle/";
 		
 		public static const path_ZeroSWFEncrypt:String="http://"+domain+"/ZeroSWFEncrypt/";
-		public static const path_ZeroSWFEncryptAIR:String=path_ZeroSWFEncrypt+"ZeroSWFEncrypt.rar";
+		public static const path_ZeroSWFEncryptAIR:String=path_ZeroSWFEncrypt+"ZeroSWFEncryptAIR.rar";
 		
 		public static const path_card3d:String="http://"+domain+"/card3d/";
 		public static const path_card3d_ctrlpan:String=path_card3d+"ctrlpan.swf";
