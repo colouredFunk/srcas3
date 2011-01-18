@@ -83,6 +83,9 @@
 			timeHolded++;
 		}
 		override protected function formatValue(_value:Number):Number {
+			if (isNaN(_value)) {
+				_value = 0;
+			}
 			if (_value<minimum) {
 				_value=minimum;
 			} else if (_value>maximum) {

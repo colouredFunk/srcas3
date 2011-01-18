@@ -53,7 +53,8 @@
 			flashVars = loaderInfo.parameters;
 			paramsObject.width = widthOrg;
 			paramsObject.height = heightOrg;
-			Common.addContextMenu(this, decodeURI(this.loaderInfo.url).split("/").pop() + ":" + widthOrg + " x " + heightOrg, onWHReleaseHandler);
+			//decodeURI(this.loaderInfo.url).split("/").pop()
+			Common.addContextMenu(this, "size:" + widthOrg + " x " + heightOrg, onWHReleaseHandler);
 			//loaderInfo.addEventListener(ProgressEvent.PROGRESS,onLoadingHandler);
 			loaderInfo.addEventListener(Event.COMPLETE,onLoadedHandler);
 			if (onLoaded==null) {
@@ -102,15 +103,18 @@
 			}
 			if (loaded == 1 && onLoaded != null) {
 				removeEventListener(Event.ENTER_FRAME, onLoadingHandler);
-				
 				//获取修改时间:
 				SWFMetadataGetter.init(this.loaderInfo.bytes);
 				
 				var modifyDate:String=SWFMetadataGetter.getModifyDate();
-				if(modifyDate){
-					Common.addContextMenu(this, "发布时间:"+modifyDate.split("+")[0].replace("T"," "));
+				if (modifyDate) {
+					modifyDate = modifyDate.split("+")[0];
+					var _ary:Array = modifyDate.split("T");
+					_ary[0]=_ary[0].split("-");
+					_ary[1] = _ary[1].split(":");
+					modifyDate = _ary[0][1] + _ary[0][2] + "." + (int(_ary[1][0]) * 60 + int(_ary[1][1]));
+					Common.addContextMenu(this, "version:" +_ary[0][0].substr(2, 2) + "." + modifyDate);
 				}
-				//
 				onLoaded();
 			}
 		}
