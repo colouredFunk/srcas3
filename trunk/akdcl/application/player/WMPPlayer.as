@@ -15,11 +15,12 @@ package akdcl.application.player{
 			if(!pwrd.wmpPlayer){pwrd.wmpPlayer={};pwrd.wmpPlayer.player={};pwrd.wmpPlayer.swf={};pwrd.wmpPlayer.mediaLast={};pwrd.wmpPlayer.listener={};}
 			pwrd.wmpPlayer.createWMPContainer=function(){
 				if(pwrd.wmpPlayer.playerContainer){return;}
-				var _wmpContainer=document.createElement("div");
-				_wmpContainer.style.height=_wmpContainer.style.width=0;
-				_wmpContainer.style.overflow="hidden";
+				var _wmpContainer = document.createElement("div");
+				_wmpContainer.style.height = 0;
+				_wmpContainer.style.width = 0;
+				_wmpContainer.style.overflow = "hidden";
 				document.body.appendChild(_wmpContainer);
-				pwrd.wmpPlayer.playerContainer=_wmpContainer;
+				pwrd.wmpPlayer.playerContainer = _wmpContainer;
 			}
 			pwrd.wmpPlayer.getPlayerID=function(_swfID){
 				return _swfID+"_wmp";
@@ -62,7 +63,7 @@ package akdcl.application.player{
 							{name:"enableErrorDialogs",value:"false"}
 						];
 						pwrd.wmpPlayer.playerContainer.innerHTML=pwrd.createItem("object",_object);
-						_player=document.getElementById(_wmpPlayerID);
+						_player = document.getElementById(_wmpPlayerID);
 						if(_player.addEventListener){
 							_player.addEventListener('PlayStateChange',_listener,false);
 						}else if(_player.attachEvent){
@@ -77,8 +78,8 @@ package akdcl.application.player{
 			}
 			pwrd.wmpPlayer.play=function(_swfID,_positionTo){
 				var _player=pwrd.wmpPlayer.getPlayer(_swfID);
-				if(pwrd.wmpPlayer.isWMPNow){
-					if(_positionTo!=0){
+				if (pwrd.wmpPlayer.isWMPNow) {
+					if(_positionTo!=undefined){
 						_player.controls.currentPosition=_positionTo;
 					}
 					_player.controls.play();
@@ -90,7 +91,7 @@ package akdcl.application.player{
 			}
 			pwrd.wmpPlayer.pause=function(_swfID){
 				var _player=pwrd.wmpPlayer.getPlayer(_swfID);
-				if(pwrd.wmpPlayer.isWMPNow){
+				if (pwrd.wmpPlayer.isWMPNow) {
 					_player.controls.pause();
 				}else{
 					_player.src="";
@@ -199,6 +200,7 @@ package akdcl.application.player{
 			}
 		}
 		protected var wmpInfo:Object;
+		protected var isPlayComplete:Boolean;
 		override protected function init():void {
 			super.init();
 			if (ExternalInterface.available) {
@@ -247,7 +249,12 @@ package akdcl.application.player{
 					break;
 				case 1 :
 					//停止
-					setPlayState(MediaPlayer.STATE_STOP);
+					if (isPlayComplete) {
+						isPlayComplete = false;
+						onPlayCompleteHandler();
+					}else {
+						setPlayState(MediaPlayer.STATE_STOP);
+					}
 					break;
 				case 2 :
 					//暂停
@@ -276,7 +283,7 @@ package akdcl.application.player{
 					break;
 				case 8 :
 					//完毕
-					onPlayCompleteHandler();
+					isPlayComplete = true;
 					break;
 				case 9 :
 					//连接

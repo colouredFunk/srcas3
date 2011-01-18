@@ -319,11 +319,15 @@ package akdcl.application.player{
 			switch(player.playState) {
 				case MediaPlayer.STATE_PAUSE:
 				case MediaPlayer.STATE_STOP:
-					TweenLite.to(btnPlay, 0.5, { alpha:1, scaleX:1, scaleY:1  } );
+					if (btnPlay) {
+						TweenLite.to(btnPlay, 0.5, { alpha:1, scaleX:1, scaleY:1  } );
+					}
 				break;
 				case MediaPlayer.STATE_PLAY:
 				default:
-					TweenLite.to(btnPlay, 0.5, { alpha:0, scaleX:0, scaleY:0 } );
+					if (btnPlay) {
+						TweenLite.to(btnPlay, 0.5, { alpha:0, scaleX:0, scaleY:0 } );
+					}
 				break;
 			}
 		}

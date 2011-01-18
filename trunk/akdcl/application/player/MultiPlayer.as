@@ -105,7 +105,8 @@ package akdcl.application.player{
 			super.onPlayIDChangeHandler(_playID);
 			
 			var _mediaSource:String = getMediaByID(_playID);
-			var _mediaType:String = String(_mediaSource.split(".").pop()).toLowerCase();
+			var _mediaType:String = _mediaSource.split("?")[0];
+			_mediaType = String(_mediaType.split(".").pop()).toLowerCase();
 			switch(_mediaType) {
 				case "mp3":
 				case "wav":
@@ -124,6 +125,7 @@ package akdcl.application.player{
 					currentPlayer = videoPlayer;
 					break;
 				case "wma":
+				case "wmv":
 				case "mms":
 				default:
 					currentPlayer = wmpPlayer;
