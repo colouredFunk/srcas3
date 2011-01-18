@@ -1,4 +1,4 @@
-/***
+﻿/***
 ZeroCommon 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
@@ -9,11 +9,12 @@ ZeroCommon 版本:v1.0
 
 package zero{
 	import flash.display.*;
-	import flash.events.*;
-	import flash.filters.ColorMatrixFilter;
-	import flash.geom.*;
-	import flash.system.Security;
+	import flash.events.*;;
 	import flash.utils.*;
+	import flash.geom.*;
+	import flash.external.*;
+	import flash.filters.ColorMatrixFilter;
+	import flash.system.Security
 	
 	public class ZeroCommon{
 		public static const FileClass:Class=function():Class{//就是 File，可用作判断是否 air ... - -
@@ -25,8 +26,8 @@ package zero{
 		}();
 		
 		public static const domain:String=function():String{
-			var domain:String="zero.flashwing.net";
-			//var domain:String="localhost/zero.flashwing.net";
+			//var domain:String="zero.flashwing.net";
+			var domain:String="localhost/zero.flashwing.net";
 			
 			if(FileClass){
 			}else{
@@ -48,8 +49,9 @@ package zero{
 		public static const path_ZeroSWFEncrypt:String="http://"+domain+"/ZeroSWFEncrypt/";
 		public static const path_ZeroSWFEncryptAIR:String=path_ZeroSWFEncrypt+"ZeroSWFEncryptAIR.rar";
 		
-		public static const path_card3d:String="http://"+domain+"/card3d/";
-		public static const path_card3d_ctrlpan:String=path_card3d+"ctrlpan.swf";
+		//public static const path_Card3D:String="http://"+domain+"/Card3D/";
+		//public static const path_Card3D_CtrlPan:String=path_Card3D+"CtrlPan.swf";
+		//public static const path_Card3D_motionList:String=path_Card3D+"motionList.xml";
 		
 		public static const path_photodiy:String="http://"+domain+"/photodiy/";
 		
@@ -59,11 +61,15 @@ package zero{
 		public static const path_photodiy_album_newFolder:String=path_photodiy_album+"newFolder.php";
 		public static const path_photodiy_album_swf_PhotoDIY_Album:String=path_photodiy_album+"swf/PhotoDIY_Album.swf";
 		//public static const path_photodiy_album_swf_PhotoDIY_Album:String="http://localhost/zero.flashwing.net/test.swf";
-		public static const path_photodiy_album_swf_PhotoDIY_SrcGetter:String=path_photodiy_album+"swf/PhotoDIY_SrcGetter.swf";
+		//public static const path_photodiy_album_swf_PhotoDIY_SrcGetter:String=path_photodiy_album+"swf/PhotoDIY_SrcGetter.swf";
+		
+		public static const path_photodiy_Card2011:String=path_photodiy+"Card2011/";
+		public static const path_photodiy_Card2011_Card_encrypt:String=path_photodiy_Card2011+"Card.swf";
+		public static const path_photodiy_Card2011_uploadFiles:String=path_photodiy_Card2011+"uploadFiles.php";
+		public static const path_photodiy_Card2011_online:String=path_photodiy_Card2011+"online.htm";
 		
 		public static const path_photodiy_tackfilm:String=path_photodiy+"tackfilm/";
 		public static const path_photodiy_tackfilm_tackfilmmovie_encrypt:String=path_photodiy_tackfilm+"tackfilmmovie_encrypt.swf";
-		//public static const path_photodiy_tackfilm_tackfilmmovie_hide:String="http://localhost/zero.flashwing.net/photodiy/tackfilm/tackfilmmovie_插入数据前.swf";
 		public static const path_photodiy_tackfilm_online:String=path_photodiy_tackfilm+"online.htm";
 		
 		public static function removeAll(obj:DisplayObjectContainer):void{
@@ -86,6 +92,38 @@ package zero{
 					stopAll(child as DisplayObjectContainer);
 				}
 			}
+		}
+		
+		public static function getURLValues():Object{
+			var pageURL:String;
+			try{
+				pageURL=ExternalInterface.call("eval","top.location.href");
+			}catch(e:Error){
+				return null;
+			}
+			if(pageURL){
+			}else{
+				try{
+					pageURL=ExternalInterface.call("eval","window.location.href");
+				}catch(e:Error){
+					return null;
+				}
+			}
+			if(pageURL){
+				var v_id:Number=pageURL.lastIndexOf("?");
+				if(v_id>0){
+					var valuesStr:String=pageURL.substr(v_id+1);
+					var arr:Array=valuesStr.split("&");
+					var i:Number=arr.length;
+					var urlValues:Object=new Object();
+					while(--i>=0){
+						var nameAndValue:Array=arr[i].split("=");
+						urlValues[nameAndValue[0]]=nameAndValue[1];
+					}
+					return urlValues;
+				}
+			}
+			return null;
 		}
 		
 		public static function setGrey(obj:InteractiveObject,enabled:Boolean):void{

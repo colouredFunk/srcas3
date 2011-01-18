@@ -11,16 +11,14 @@ package zero.net{
 	
 	import flash.display.*;
 	import flash.events.*;
-	import flash.net.*;
-	import flash.system.ApplicationDomain;
 	import flash.utils.*;
+	import flash.net.*;
 	
 	import mx.graphics.codec.PNGEncoder;
 	
 	import zero.FileTypes;
 	import zero.encoder.BMPEncoder;
-	import zero.swf.*;
-	import zero.swf.funs.*;
+	import zero.swf.funs.ImgDatas2SWFData;
 
 	public class RawDatas2BmdOrLoaderAndDatas{
 		private var rawDatas2BmdOrLoaderAndDatasFinished:Function;
@@ -38,10 +36,8 @@ package zero.net{
 			//new RawDatas2BmdOrLoaderAndDatas(trace,[testData1,testData2,testData3]);
 			rawDatas2BmdOrLoaderAndDatasFinished=_rawDatas2BmdOrLoaderAndDatasFinished;
 			
-			var swf:SWF2=new SWF2();
-			swf.tagV.push(new Tag(TagType.ShowFrame));
-			swf.tagV.push(new Tag(TagType.End));
-			var resInserter:ResInserter=new ResInserter(swf.tagV);
+			var imgDataArr:Array=new Array();
+			var classNameArr:Array=new Array();
 			
 			var i:int=-1;
 			bmdOrLoaderArr=new Array();
@@ -55,7 +51,8 @@ package zero.net{
 						bmdOrLoaderArr[i]="Bmd"+i;
 						
 						dataArr[i]=rawData;
-						resInserter.insert(rawData,"Bmd"+i,ResInserter.BITMAP,-1,true);
+						imgDataArr.push(rawData);
+						classNameArr.push("Bmd"+i);
 						
 					break;
 					case FileTypes.SWF:
@@ -78,11 +75,12 @@ package zero.net{
 					break;
 				}
 			}
-			resInserter.getTagVAndReset();
+			
+			
 			
 			imgsSWFLoader=new Loader();
 			imgsSWFLoader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadComplete);
-			imgsSWFLoader.loadBytes(swf.toSWFData());
+			imgsSWFLoader.loadBytes(ImgDatas2SWFData.imgDatas2SWFData(imgDataArr,classNameArr));
 			rest++;
 		}
 		private function getRawDataArr(rawDatas:*):Array{
