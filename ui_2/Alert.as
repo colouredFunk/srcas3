@@ -162,7 +162,7 @@
 			if (item && contains(item)) {
 				removeChild(item);
 			}
-			if (itemHeight!=0) {
+			if (_itemHeight != 0) {
 				itemHeight = _itemHeight;
 			}else {
 				itemHeight = _item.height;
