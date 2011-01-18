@@ -17,7 +17,7 @@
 		public var delay:uint = 0;
 		public var onUpdate:Function;
 		public var onComplete:Function;
-		public var autoRemove:Boolean = true;
+		public var autoRemoveMask:Boolean = true;
 		public var playBack:Boolean;
 		private var isTempAsBmp:Boolean;
 		private var masked:DisplayObject;
@@ -89,7 +89,7 @@
 				onUpdate();
 			}
 			if (playBack?(currentFrame == 1):(currentFrame == totalFrames)) {
-				if (autoRemove) {
+				if (autoRemoveMask) {
 					remove();
 				}else {
 					removeEventListener(Event.ENTER_FRAME, runStep);

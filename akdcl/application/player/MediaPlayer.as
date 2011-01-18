@@ -173,6 +173,7 @@ package akdcl.application.player{
 			}
 			switch(_playState) {
 				case STATE_PLAY:
+					onPlayProgressHander(null);
 					timer.addEventListener(TimerEvent.TIMER, onPlayProgressHander);
 					break;
 				case STATE_PAUSE:
@@ -180,6 +181,7 @@ package akdcl.application.player{
 						return false;
 					}
 				case STATE_STOP:
+					onPlayProgressHander(null);
 					timer.removeEventListener(TimerEvent.TIMER, onPlayProgressHander);
 					break;
 			}
@@ -267,6 +269,7 @@ package akdcl.application.player{
 		}
 		//
 		public function play():void {
+			timer.start();
 			if (playID<0) {
 				playID = 0;
 				return;
@@ -351,7 +354,11 @@ package akdcl.application.player{
 					}
 					break;
 				case 3:
-					next();
+					if (idPart.length == 1) {
+						play();
+					}else {
+						next();
+					}
 					break;
 				case 4:
 					//待完善
