@@ -67,7 +67,7 @@ package zero.swf.funs{
 				
 				objAndValIdDict=new Dictionary();
 				
-				getObjAndValIds(swf);
+				getObjAndValIds(swf.tagV);
 				
 				var obj:*,valIdMark:Object,_valId:String;
 				for(obj in objAndValIdDict){
@@ -186,9 +186,9 @@ package zero.swf.funs{
 				}
 			}
 		}
-		private static function getObjAndValIds(swf:SWF2):void{
+		private static function getObjAndValIds(tagV:Vector.<Tag>):void{
 			//trace("swf------------------------------");
-			for each(var tag:Tag in swf.tagV){
+			for each(var tag:Tag in tagV){
 				switch(tag.type){
 					case TagType.DoABC:
 					case TagType.DoABCWithoutFlagsAndName:
@@ -202,6 +202,9 @@ package zero.swf.funs{
 					break;
 					case TagType.PlaceObject2:
 						getObjAndValId(tag.getBody() as PlaceObject3,"Name");//和部分 traits_info 有关
+					break;
+					case TagType.DefineSprite:
+						getObjAndValIds((tag.getBody() as DefineSprite).dataAndTags.tagV);
 					break;
 				}
 			}
@@ -319,6 +322,10 @@ package zero.swf.funs{
 		private static function getObjAndValId(obj:*,valId:*):void{
 			if(obj){
 				var string:String=obj[valId];
+				//if(obj is PlaceObject2||obj is PlaceObject3){
+				//	trace(valId+"="+string);
+				//	trace("CharacterId="+obj.CharacterId);
+				//}
 				if(string){
 					//trace("string="+string);
 					//if(string=="FWAd_AS3"){
