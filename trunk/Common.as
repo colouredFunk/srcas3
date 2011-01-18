@@ -125,6 +125,9 @@
 			}
 			return true;
 		}
+		public static function isValidQQ(_qq:String):Boolean {
+			return /\d{5,12}/.test(_qq) || isValidEmail(_qq);
+		}
 		public static function isValidEmail(_email:String):Boolean {
 			var _emailExpression:RegExp =/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+(w+([.-]\w+))*/;
 			/////^[a-z][\w.-]+@\w[\w.-]+\.[\w.-]*[a-z][a-z]$/i;
