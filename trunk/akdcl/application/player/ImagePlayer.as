@@ -33,15 +33,10 @@ package akdcl.application.player{
 		}
 		override protected function init():void {
 			super.init();
-			content = new ImageLoader();
+			__content = new ImageLoader();
 			content.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);
 			content.addEventListener(ProgressEvent.PROGRESS, onLoadProgressHandler);
 			content.addEventListener(Event.COMPLETE, onLoadCompleteHandler);
-		}
-		override public function remove():void {
-			content.remove();
-			content = null;
-			super.remove();
 		}
 		override public function play():void {
 			super.play();
