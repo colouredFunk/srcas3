@@ -25,6 +25,8 @@ package zero.net{
 			onLoadFinished=null;
 		}
 		public function loadPHPXMLFinished(info:String):void{
+			//trace("info="+info);
+			//trace("this.data="+this.data);
 			if(info==RequestLoader.SUCCESS){
 				try{
 					xml=new XML(this.data);

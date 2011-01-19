@@ -1,4 +1,4 @@
-/***
+﻿/***
 FormVars 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
@@ -32,7 +32,7 @@ package zero.net{
 				var value:*=values[name];
 				data.writeUTFBytes("--" + boundary + "\r\n");
 				if(value is ByteArray){
-					trace(name+".length="+value.length);
+					//trace(name+".length="+value.length);
 					//var dotId:int=name.lastIndexOf(".");
 					//if(dotId>=0){
 					//	
@@ -45,7 +45,7 @@ package zero.net{
 					data.writeBytes(values[name]);
 					data.writeUTFBytes("\r\n");
 				}else{
-					trace(name+"=\""+value+"\"");
+					//trace(name+"=\""+value+"\"");
 					data.writeUTFBytes(
 						"Content-Disposition: form-data; name=\"" + name + 
 						"\"\r\n\r\n"+values[name]+

@@ -65,6 +65,7 @@ package zero{
 		
 		public static const path_photodiy_Card2011:String=path_photodiy+"Card2011/";
 		public static const path_photodiy_Card2011_Card_encrypt:String=path_photodiy_Card2011+"Card.swf";
+		public static const path_photodiy_Card2011_motionList:String=path_photodiy_Card2011+"motionList.xml";
 		public static const path_photodiy_Card2011_uploadFiles:String=path_photodiy_Card2011+"uploadFiles.php";
 		public static const path_photodiy_Card2011_online:String=path_photodiy_Card2011+"online.htm";
 		
