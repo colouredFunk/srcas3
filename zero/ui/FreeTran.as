@@ -127,6 +127,14 @@ package zero.ui{
 			}
 		}
 		
+		/*
+		private var __moveBounds:Rectangle=null;
+		public function set moveBounds(_moveBounds:Rectangle):void{
+			__moveBounds=_moveBounds;
+		}
+		*/
+		public var moveBounds:Rectangle;
+		
 		private var __realMinWid2:Number=-1;
 		private var __realMinHei2:Number=-1;
 		private var __realMaxWid2:Number=-1;
@@ -204,6 +212,24 @@ package zero.ui{
 			updateUserMouse(null);
 			this.visible=false;
 			this.addEventListener(Event.ADDED_TO_STAGE,added);
+			
+			typeDict=new Dictionary();
+			dxDict=new Dictionary();
+			dyDict=new Dictionary();
+			dot_rotateDict=new Dictionary();
+			dot_skewDict=new Dictionary();
+			dot_scaleDict=new Dictionary();
+			
+			rotateDotArr=new Array();
+			initArea(rotateArea,TYPE_ROTATE,rotateDotArr);
+			
+			skewDotArr=new Array();
+			initArea(skewArea,TYPE_SKEW,skewDotArr);
+			
+			scaleDotArr=new Array();
+			initArea(scaleArea,TYPE_SCALE,scaleDotArr);
+			
+			initTarget(dragArea,TYPE_DRAG);
 		}
 		
 		private function addDot(
@@ -235,25 +261,6 @@ package zero.ui{
 			stage.addEventListener(MouseEvent.MOUSE_MOVE,mouseMove);
 			stage.addEventListener(MouseEvent.MOUSE_UP,mouseUp);
 			userMouse.mouseEnabled=userMouse.mouseChildren=false;
-			
-			
-			typeDict=new Dictionary();
-			dxDict=new Dictionary();
-			dyDict=new Dictionary();
-			dot_rotateDict=new Dictionary();
-			dot_skewDict=new Dictionary();
-			dot_scaleDict=new Dictionary();
-			
-			rotateDotArr=new Array();
-			initArea(rotateArea,TYPE_ROTATE,rotateDotArr);
-			
-			skewDotArr=new Array();
-			initArea(skewArea,TYPE_SKEW,skewDotArr);
-			
-			scaleDotArr=new Array();
-			initArea(scaleArea,TYPE_SCALE,scaleDotArr);
-			
-			initTarget(dragArea,TYPE_DRAG);
 		}
 		private function removed(event:Event):void{
 			this.removeEventListener(Event.REMOVED_FROM_STAGE,removed);
@@ -422,6 +429,13 @@ package zero.ui{
 		public function set scaleEnabled(_scaleEnabled:Boolean):void{
 			scaleArea.visible=_scaleEnabled;
 		}
+		public function set scaleSideEnabled(_scaleSideEnabled:Boolean):void{
+			dot_scaleDict["dot0-1"].visible=
+			dot_scaleDict["dot01"].visible=
+			dot_scaleDict["dot-10"].visible=
+			dot_scaleDict["dot10"].visible=
+			_scaleSideEnabled;
+		}
 		public function set dragEnabled(_dragEnabled:Boolean):void{
 			dragArea.mouseEnabled=_dragEnabled;
 			//dragArea.visible=_dragEnabled;
@@ -479,7 +493,6 @@ package zero.ui{
 				switch(typeDict[currTarget]){
 					case TYPE_ROTATE:
 						this.rotation+=(Math.atan2(this.parent.mouseY-this.y,this.parent.mouseX-this.x)-Math.atan2(oldMouseY-this.y,oldMouseX-this.x))*(180/Math.PI);
-						updatePic();
 					break;
 					case TYPE_SCALE:
 						var dot:Sprite;
@@ -575,14 +588,26 @@ package zero.ui{
 						
 						updateOtherDotsByScaleDots();
 						updateDragAreaByDots();
-						updatePic();
 					break;
 					case TYPE_DRAG:
 						this.x+=this.parent.mouseX-oldMouseX;
 						this.y+=this.parent.mouseY-oldMouseY;
-						updatePic();
 					break;
 				}
+				if(moveBounds){
+					var b:Rectangle=dragArea_shape.getBounds(__pic.parent);
+					if(b.left<moveBounds.left){
+						this.x+=moveBounds.left-b.left;
+					}else if(b.right>moveBounds.right){
+						this.x+=moveBounds.right-b.right;
+					}
+					if(b.top<moveBounds.top){
+						this.y+=moveBounds.top-b.top;
+					}else if(b.bottom>moveBounds.bottom){
+						this.y+=moveBounds.bottom-b.bottom;
+					}
+				}
+				updatePic();
 			}
 			
 			oldMouseX=this.parent.mouseX;

@@ -47,6 +47,7 @@ package zero.net{
 					break;
 				}
 				var blockSize:int=blockData.length;
+				trace("blockSize="+blockSize);
 				if(blockSize>>>7){if(blockSize>>>14){if(blockSize>>>21){if(blockSize>>>28){data[data.length]=(blockSize&0x7f)|0x80;data[data.length]=((blockSize>>>7)&0x7f)|0x80;data[data.length]=((blockSize>>>14)&0x7f)|0x80;data[data.length]=((blockSize>>>21)&0x7f)|0x80;data[data.length]=blockSize>>>28;}else{data[data.length]=(blockSize&0x7f)|0x80;data[data.length]=((blockSize>>>7)&0x7f)|0x80;data[data.length]=((blockSize>>>14)&0x7f)|0x80;data[data.length]=blockSize>>>21;}}else{data[data.length]=(blockSize&0x7f)|0x80;data[data.length]=((blockSize>>>7)&0x7f)|0x80;data[data.length]=blockSize>>>14;}}else{data[data.length]=(blockSize&0x7f)|0x80;data[data.length]=blockSize>>>7;}}else{data[data.length]=blockSize;}
 				data.position=data.length;
 				data.writeBytes(blockData);
