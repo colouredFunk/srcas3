@@ -137,6 +137,7 @@ package akdcl.application.player{
 			currentPlayer.addEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);
 			currentPlayer.container = container;
 			currentPlayer.playlist = _mediaSource;
+			__content = currentPlayer.content;
 			play();
 		}
 	}

@@ -1,9 +1,12 @@
 package akdcl.application.player{
 	import flash.events.Event;
-	import com.greensock.TweenLite;
+	import flash.events.FullScreenEvent;
+	import flash.display.StageDisplayState;
 	import ui.UISprite;
 	import ui.SimpleBtn;
 	import ui.ImageLoader;
+	import com.greensock.TweenMax;
+	import com.greensock.loading.display.ContentDisplay;
 	/**
 	 * ...
 	 * @author Akdcl
@@ -40,6 +43,7 @@ package akdcl.application.player{
 		public var btnNext:*;
 		public var btnPrev:*;
 		public var btnVolume:*;
+		public var btnScreen:*;
 		public var barVolume:*;
 		public var barLoadProgress:*;
 		public var barPlayProgress:*;
@@ -50,8 +54,46 @@ package akdcl.application.player{
 		public var btnLabel_0, btnLabel_1, btnLabel_2, btnLabel_3, btnLabel_4, btnLabel_5, btnLabel_6, btnLabel_7, btnLabel_8, btnLabel_9:*;
 		public var autoHideProgress:Boolean;
 		protected var btnLabelList:Array;
-		
 		protected var player:MediaPlayer;
+		protected var startXBtn:int;
+		protected var startYBtn:int;
+		protected var formatBtnXY:Boolean;
+		
+		//
+		private var __against:Boolean = false;
+		public function get against():Boolean {
+			return __against;
+		}
+		[Inspectable(defaultValue = false, type = "Boolean", name = "逆向对齐")]
+		public function set against(_against:Boolean):void {
+			__against = _against;
+		}
+		private var __horizontal:Boolean = true;
+		public function get horizontal():Boolean {
+			return __horizontal;
+		}
+		[Inspectable(defaultValue = true, type = "Boolean", name = "水平排布")]
+		public function set horizontal(_horizontal:Boolean):void {
+			__horizontal = _horizontal;
+		}
+		private var __distanceBtn:uint = 25;
+		public function get distanceBtn():uint {
+			return __distanceBtn;
+		}
+		[Inspectable(defaultValue = 25, type = "uint", name = "标签间距")]
+		public function set distanceBtn(_distanceBtn:uint):void {
+			__distanceBtn = _distanceBtn;
+		}
+		private var __allowFullScreen:Boolean = true;
+		public function get allowFullScreen():Boolean {
+			return __allowFullScreen;
+		}
+		public function set allowFullScreen(_b:Boolean):void {
+			__allowFullScreen = _b;
+			if (btnScreen) {
+				btnScreen.visible = __allowFullScreen;
+			}
+		}
 		override protected function init():void {
 			super.init();
 			if (btnLabel_0) {
@@ -62,9 +104,24 @@ package akdcl.application.player{
 			}
 			enabled = false;
 		}
+		override protected function onAddedToStageHandler(_evt:Event):void {
+			super.onAddedToStageHandler(_evt);
+			stage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullSreenHandler);
+		}
 		override protected function onRemoveToStageHandler():void {
 			setPlayer(null);
+			stage.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullSreenHandler);
 			super.onRemoveToStageHandler();
+		}
+		public function changeFullScreen(_evt:* = null):void {
+			if (!stage) {
+				return;
+			}
+			if (stage.displayState==StageDisplayState.FULL_SCREEN) {
+				stage.displayState = StageDisplayState.NORMAL;
+			}else {
+				stage.displayState = StageDisplayState.FULL_SCREEN;
+			}
 		}
 		public function setPlayer(_player:MediaPlayer):void {
 			if (!_player) {
@@ -106,6 +163,9 @@ package akdcl.application.player{
 				btnVolume.release = function():void {
 					player.mute = !player.mute;
 				}
+			}
+			if (btnScreen) {
+				btnScreen.release = changeFullScreen;
 			}
 			if (barVolume) {
 				barVolume.maximum = 1;
@@ -155,38 +215,16 @@ package akdcl.application.player{
 			player.addEventListener(MediaEvent.VOLUME_CHANGE, onVolumeChangeHandler);
 			player.addEventListener(MediaEvent.PLAY_PROGRESS, onPlayProgressHandler);
 			player.addEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
+		}
+		protected function onFullSreenHandler(e:FullScreenEvent):void {
+			if (btnScreen) {
+				btnScreen.select = e.fullScreen;
+			}
+		}
+		protected function onListChangeHandler(_evt:MediaEvent):void {
 			enabled = true;
 			buttonMode = false;
-		}
-		//
-		private var __against:Boolean = false;
-		public function get against():Boolean {
-			return __against;
-		}
-		[Inspectable(defaultValue = false, type = "Boolean", name = "逆向对齐")]
-		public function set against(_against:Boolean):void {
-			__against = _against;
-		}
-		private var __horizontal:Boolean = true;
-		public function get horizontal():Boolean {
-			return __horizontal;
-		}
-		[Inspectable(defaultValue = true, type = "Boolean", name = "水平排布")]
-		public function set horizontal(_horizontal:Boolean):void {
-			__horizontal = _horizontal;
-		}
-		private var __distanceBtn:uint = 25;
-		public function get distanceBtn():uint {
-			return __distanceBtn;
-		}
-		[Inspectable(defaultValue = 25, type = "uint", name = "标签间距")]
-		public function set distanceBtn(_distanceBtn:uint):void {
-			__distanceBtn = _distanceBtn;
-		}
-		protected var startXBtn:int;
-		protected var startYBtn:int;
-		protected var formatBtnXY:Boolean;
-		protected function onListChangeHandler(_evt:MediaEvent):void {
+			//
 			btnLabelList = [btnLabel_0, btnLabel_1, btnLabel_2, btnLabel_3, btnLabel_4, btnLabel_5, btnLabel_6, btnLabel_7, btnLabel_8, btnLabel_9];
 			var _btn:*;
 			for (var _i:int = btnLabelList.length - 1; _i >= 0 ; _i--) {
@@ -308,25 +346,23 @@ package akdcl.application.player{
 			if (btnStop) {
 				btnStop.select = player.playState == MediaPlayer.STATE_STOP;
 			}
-			/*switch(player.playState) {
-				case MediaPlayer.STATE_PLAY:
-				break;
-				case MediaPlayer.STATE_PAUSE:
-				break;
-				case MediaPlayer.STATE_STOP:
-				break;
-			}*/
 			switch(player.playState) {
 				case MediaPlayer.STATE_PAUSE:
 				case MediaPlayer.STATE_STOP:
 					if (btnPlay) {
-						TweenLite.to(btnPlay, 0.5, { alpha:1, scaleX:1, scaleY:1  } );
+						TweenMax.to(btnPlay, 0.5, { alpha:1, scaleX:1, scaleY:1  } );
+					}
+					if (player.content&&(player.content is ContentDisplay)) {
+						TweenMax.to(player.content, 0.5, { colorTransform: { brightness:0.5 }} );
 					}
 				break;
 				case MediaPlayer.STATE_PLAY:
 				default:
 					if (btnPlay) {
-						TweenLite.to(btnPlay, 0.5, { alpha:0, scaleX:0, scaleY:0 } );
+						TweenMax.to(btnPlay, 0.5, { alpha:0, scaleX:0, scaleY:0 } );
+					}
+					if (player.content&&(player.content is ContentDisplay)) {
+						TweenMax.to(player.content, 0.5, { colorTransform: { brightness:1 }} );
 					}
 				break;
 			}
@@ -357,11 +393,11 @@ package akdcl.application.player{
 				btnsContainer.mask.x = int(btnsContainer.mask.x);
 				if (btnsContainer.x + _btnSelect.x < btnsContainer.mask.x) {
 					_x = btnsContainer.mask.x - _btnSelect.x;
-					TweenLite.to(btnsContainer, 0.3, { x:_x } );
+					TweenMax.to(btnsContainer, 0.3, { x:_x } );
 				}else if (btnsContainer.x + _btnSelect.x + _btnSelect.width > btnsContainer.mask.x + btnsContainer.mask.width) {
 					_x = btnsContainer.mask.x + btnsContainer.mask.width - _btnSelect.width;
 					_x = _btnSelect.x - _x;
-					TweenLite.to(btnsContainer, 0.3, { x: -_x } );
+					TweenMax.to(btnsContainer, 0.3, { x: -_x } );
 				}
 			}
 		}

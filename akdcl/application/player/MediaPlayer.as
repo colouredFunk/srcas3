@@ -204,12 +204,9 @@ package akdcl.application.player{
 		public function set contentHeight(value:uint):void {
 			__contentHeight = value;
 		}
-		private var __content:*;
+		protected var __content:*;
 		public function get content():* {
 			return __content;
-		}
-		public function set content(_content:*):* {
-			__content = _content;
 		}
 		private var __container:*;
 		public function get container():*{
@@ -260,7 +257,10 @@ package akdcl.application.player{
 			idPart = null;
 			playlist = null;
 			container = null;
-			content = null;
+			if ("remove" in __content) {
+				__content.remove();
+			}
+			__content = null;
 			super.remove();
 		}
 		//
