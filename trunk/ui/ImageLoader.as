@@ -270,9 +270,13 @@
 					progressClip.play();
 				}
 			}else {
-				progressClip.visible = false;
+				progressClip.visible = _progress;
 				if (progressClip is MovieClip) {
-					progressClip.stop();
+					if (_progress) {
+						progressClip.play();
+					}else {
+						progressClip.stop();
+					}
 				}
 			}
 		}
