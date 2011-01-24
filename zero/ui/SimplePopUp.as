@@ -136,6 +136,7 @@ package zero.ui{
 			}else{
 				this.visible=false;
 			}
+			trace("callBackResult="+callBackResult);
 		}
 	}
 }
