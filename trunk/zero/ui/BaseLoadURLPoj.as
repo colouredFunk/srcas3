@@ -36,7 +36,7 @@ package zero.ui{
 			if(needXML){
 				this.visible=false;
 				urlLoader=new URLLoader();
-				urlLoader.load(new URLRequest((this.loaderInfo.parameters[xmlVarName]||defaultXMLPath)));
+				urlLoader.load(new URLRequest((stage.loaderInfo.parameters[xmlVarName]||defaultXMLPath)));
 				urlLoader.addEventListener(Event.COMPLETE,loadXMLComplete);
 			}else{
 				this["init"]();
