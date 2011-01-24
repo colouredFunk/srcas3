@@ -33,12 +33,78 @@ package zero.text{
 			tab:[],
 			br:[]
 		}
-		public function TextLayout(
-			width:int,
-			height:int,
-			xml:XML,
-			styleXML:XML
-		){
+		
+		private var textFlow:TextFlow;
+		
+		public var wid:int;
+		public var hei:int;
+		
+		public function TextLayout(...args){
+			init(args);
+		}
+		private function normalizeArgs(args:Array):Array{
+			var argArr:Array=new Array();
+			for each(var arg:* in args){
+				if(arg is Array){
+					argArr=argArr.concat(normalizeArgs(arg));
+				}else{
+					argArr.push(arg);
+				}
+			}
+			return argArr;
+		}
+		public function init(...args):void{
+			var xml:XML,_wid:int,_hei:int,styleXML:XML;
+			var hasWid:Boolean=false;
+			for each(var _arg:* in normalizeArgs(args)){
+				var arg:*;
+				
+				if(_arg is String){
+					arg=new XML(_arg);
+				}else{
+					arg=_arg;
+				}
+				
+				if(arg is XML){
+					if(xml){
+						styleXML=arg;
+					}else{
+						xml=arg;
+					}
+				}else{
+					if(hasWid){
+						_hei=arg;
+					}else{
+						_wid=arg;
+						hasWid=true;
+					}
+				}
+			}
+			if(xml){
+			}else{
+				return;
+			}
+			
+			if(_wid>0){
+				wid=_wid;
+			}else{
+				wid=this.width;
+			}
+			if(_hei>0){
+				hei=_hei;
+			}else{
+				hei=this.height;
+			}
+			
+			if(wid>0){
+			}else{
+				wid=400;
+			}
+			if(hei>0){
+			}else{
+				hei=300;
+			}
+			
 			
 			var xmlName:String=xml.name();
 			if(xmlName==="TextFlow"){
@@ -63,15 +129,29 @@ package zero.text{
 				xml.setNamespace(new Namespace(null,"http://ns.adobe.com/textLayout/2008"));
 			}
 			
+			if(textFlow){
+				textFlow.flowComposer.removeAllControllers();
+			}
 			
-			trace(xml.toXMLString());
+			textFlow = TextConverter.importToFlow(xml.toXMLString(), TextConverter.TEXT_LAYOUT_FORMAT);
 			
-			var textFlow:TextFlow = new TextFlow();
-            textFlow = TextConverter.importToFlow(xml.toXMLString(), TextConverter.TEXT_LAYOUT_FORMAT);
-			textFlow.formatResolver=new CSSFormatResolver(styleXML);
-            textFlow.flowComposer.addController(new ContainerController(this,width,height));
+			if(styleXML){
+			}else{
+				styleXML=xml.style[0];
+			}
+			if(styleXML){
+				textFlow.formatResolver=new CSSFormatResolver(styleXML);
+			}
+			
+			textFlow.flowComposer.addController(new ContainerController(this,wid,hei));
             textFlow.flowComposer.updateAllControllers();
+			
+			this.scaleX=this.scaleY=1;
 		}
+		public function set text(_text:*):void{
+			init(_text,wid,hei);
+		}
+		
 		private function normalizeNodes(xml:XML,parentChildrenArr:Array):void{
 			//尝试标准化成可正常显示
 			var xmlName:String=xml.name();

@@ -131,7 +131,7 @@ package zero.swf.avm2.advances{
 											code[code.length]=data[i];
 										}
 									}
-									Outputer.outputError("e="+e);
+									Outputer.outputError("dataType_u8_u30 e="+e);
 								}
 							break;
 							case Op.dataType_u8_u30_u30:
@@ -173,7 +173,7 @@ package zero.swf.avm2.advances{
 											code[code.length]=data[i];
 										}
 									}
-									Outputer.outputError("e="+e);
+									Outputer.outputError("dataType_u8_u30_u30 e="+e);
 								}
 							break;
 							case Op.dataType_u8_s24:
