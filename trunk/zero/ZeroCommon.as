@@ -26,8 +26,8 @@ package zero{
 		}();
 		
 		public static const domain:String=function():String{
-			//var domain:String="zero.flashwing.net";
-			var domain:String="localhost/zero.flashwing.net";
+			var domain:String="zero.flashwing.net";
+			//var domain:String="localhost/zero.flashwing.net";
 			
 			if(FileClass){
 			}else{
@@ -64,7 +64,7 @@ package zero{
 		//public static const path_photodiy_album_swf_PhotoDIY_SrcGetter:String=path_photodiy_album+"swf/PhotoDIY_SrcGetter.swf";
 		
 		public static const path_photodiy_Card2011:String=path_photodiy+"Card2011/";
-		public static const path_photodiy_Card2011_Card_encrypt:String=path_photodiy_Card2011+"Card.swf";
+		public static const path_photodiy_Card2011_Card_encrypt:String=path_photodiy_Card2011+"Card_encrypt.swf";
 		public static const path_photodiy_Card2011_motionList:String=path_photodiy_Card2011+"motionList.xml";
 		public static const path_photodiy_Card2011_uploadFiles:String=path_photodiy_Card2011+"uploadFiles.php";
 		public static const path_photodiy_Card2011_online:String=path_photodiy_Card2011+"online.htm";

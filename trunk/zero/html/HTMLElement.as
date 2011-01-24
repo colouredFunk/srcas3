@@ -12,14 +12,20 @@ package zero.html{
 	import flash.events.*;
 	import flash.utils.*;
 	import flash.text.*;
-	import zero.Grey;
+	import flash.filters.*;
 	
 	public class HTMLElement extends TextField{
 		public var id:String;
 		public function HTMLElement(){
 		}
 		public function set enabled(_enabled:Boolean):void{
-			Grey.setEnabled(this,_enabled);
+			if(_enabled){
+				this.mouseEnabled=true;
+				this.filters=null;
+			}else{
+				this.mouseEnabled=false;
+				this.filters=[new ColorMatrixFilter([0.3086000084877014,0.6093999743461609,0.0820000022649765,0,0,0.3086000084877014,0.6093999743461609,0.0820000022649765,0,0,0.3086000084877014,0.6093999743461609,0.0820000022649765,0,0,0,0,0,1,0])];
+			}
 		}
 	}
 }

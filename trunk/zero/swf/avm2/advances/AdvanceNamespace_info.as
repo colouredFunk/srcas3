@@ -48,16 +48,23 @@ package zero.swf.avm2.advances{
 		}
 		
 		public function initByInfo(advanceABC:AdvanceABC,namespace_info:Namespace_info):void{
-			initByInfo_fun(advanceABC,namespace_info,memberV);
+			if(namespace_info){
+				initByInfo_fun(advanceABC,namespace_info,memberV);
+			}else{
+				trace("namespace_info="+namespace_info);
+			}
 		}
 		public function toInfoId(advanceABC:AdvanceABC):int{
-			var namespace_info:Namespace_info=new Namespace_info();
-			
-			toInfo_fun(advanceABC,namespace_info,memberV);
-			
-			//--
-			advanceABC.abcFile.namespace_infoV.push(namespace_info);
-			return advanceABC.abcFile.namespace_infoV.length-1;
+			if(kind){
+				var namespace_info:Namespace_info=new Namespace_info();
+				toInfo_fun(advanceABC,namespace_info,memberV);
+				
+				//--
+				advanceABC.abcFile.namespace_infoV.push(namespace_info);
+				return advanceABC.abcFile.namespace_infoV.length-1;
+			}
+			trace("namespace_info toInfoId: 0");
+			return 0;
 		}
 	}
 }

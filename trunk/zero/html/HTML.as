@@ -13,8 +13,6 @@ package zero.html{
 	import flash.text.*;
 	import flash.utils.*;
 	
-	import zero.Grey;
-	
 	public class HTML extends Sprite{
 		public static function getStyle(xml:XML):StyleSheet{
 			var style:StyleSheet=new StyleSheet();
@@ -162,10 +160,13 @@ package zero.html{
 				onChange(event.target);
 			}
 		}
+		
+		///*
 		public function set enabled(_enabled:Boolean):void{
-			Grey.setEnabled(this,_enabled);
-			this.mouseChildren=_enabled;
+			//Grey.setEnabled(this,_enabled);
+			this.mouseEnabled=this.mouseChildren=_enabled;
 		}
+		//*/
 	}
 }
 
