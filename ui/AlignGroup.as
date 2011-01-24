@@ -69,36 +69,15 @@ package ui {
 			super.init();
 			childrenDic = new Dictionary();
 		}
-		public function addChild(_child:*, _alignX:int = 0, _alignY:int = 0):void {
-			if (!_child) {
+		public function addChild(_child:*, ...args):void {
+			if (!_child || !rect) {
 				return;
 			}
 			if (!childrenDic[_child]) {
 				childrenDic[_child] = { };
 			}
 			var _obj:Object = childrenDic[_child];
-			switch(_alignX) {
-				case -1:
-				break;
-				case 0:
-				break;
-				case 1:
-				break;
-				default:
-				break;
-			}
-			_obj.alignX = _alignX;
-			switch(_alignY) {
-				case -1:
-				break;
-				case 0:
-				break;
-				case 1:
-				break;
-				default:
-				break;
-			}
-			_obj.alignY = _alignY;
+			
 		}
 	}
 	

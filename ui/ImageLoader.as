@@ -1,9 +1,5 @@
 ﻿package ui {
 	
-	import com.greensock.events.LoaderEvent;
-	import com.greensock.loading.LoaderMax;
-	import com.greensock.loading.ImageLoader;
-	import com.greensock.loading.display.ContentDisplay;
 	import flash.display.MovieClip;
 	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
@@ -14,6 +10,12 @@
 	import com.greensock.layout.AutoFitArea;
 	import com.greensock.layout.ScaleMode;
 	import com.greensock.easing.Sine;
+	
+	import com.greensock.events.LoaderEvent;
+	import com.greensock.loading.LoaderMax;
+	import com.greensock.loading.ImageLoader;
+	import com.greensock.loading.display.ContentDisplay;
+	import com.greensock.loading.LoaderStatus;
 	
 	import flash.display.Sprite;
 	import flash.display.Bitmap;
@@ -135,6 +137,7 @@
 			}
 			bmp.bitmapData = null;
 			bmdNow = null;
+			deregister(__source, this);
 			__source = null;
 			progressClip = null;
 			container = null;
@@ -142,26 +145,42 @@
 			background = null;
 			autoFitArea.destroy();
 		}
-		public var changeImmediately:Boolean;
-		public function load(_source:*, _index:uint = 0, _changeImmediately:Boolean = false ):void {
+		protected var tweenMode:uint;
+		public function load(_source:*, _index:uint = 0, _tweenMode:* = 2):void {
 			if (_source && __source == _source) {
+				//这是为了干什么来着?
 				onImageLoadingHandler(null);
 				onImageLoadedHandler(null);
 				return;
 			}
-			__source = _source;
-			changeImmediately = _changeImmediately;
+			if (_tweenMode === true) {
+				_tweenMode = 1;
+			}else if (_tweenMode === false) {
+				_tweenMode = 2;
+			}
+			tweenMode = _tweenMode;
 			if (_source is BitmapData) {
-				bmdNow = _source;
+				onImageLoadingHandler(null);
+				onImageLoadedHandler(_source);
+				deregister(__source, this);
 				__source = null;
-				setBMP(bmdNow);
 			}else {
+				if (tweenMode == 0 && getProgress(_source) < 1) {
+					tweenMode = 1;
+				}
 				loadBMD(_source, this, _index);
 			}
+			//loadBMD后再更新__source，因为dic需要依靠__source来注销上一个监听
+			__source = _source;
 		}
-		public function unload(_changeImmediately:Boolean = true ):void {
-			changeImmediately = _changeImmediately;
-			hideBMP(bmp, onUnloadedHandler);
+		public function unload(_changeImmediately:Boolean = true):void {
+			autoFitArea.release(bmp);
+			TweenMax.killTweensOf(bmp);
+			bmp.alpha = 0;
+			deregister(__source, this);
+			__source = null;
+			bmp.bitmapData = null;
+			bmdNow = null;
 		}
 		protected var isHideTweening:Boolean;
 		protected function hideBMP(_content:*, onHideComplete:Function = null):void {
@@ -171,13 +190,7 @@
 			isHideTweening = true;
 			autoFitArea.release(_content);
 			TweenMax.killTweensOf(bmp);
-			TweenMax.to(bmp, changeImmediately?0:12, { alpha:0, useFrames:true, ease:Sine.easeInOut, onComplete:onHideComplete } );
-		}
-		private function onUnloadedHandler():void {
-			isHideTweening = false;
-			bmp.bitmapData = null;
-			bmdNow = null;
-			__source = null;
+			TweenMax.to(bmp, (tweenMode == 2)?10:0, { alpha:0, useFrames:true, ease:Sine.easeInOut, onComplete:onHideComplete } );
 		}
 		private function onHideEndHandler():void {
 			isHideTweening = false;
@@ -199,7 +212,7 @@
 				container.addChild(bmp);
 			}
 			TweenMax.killTweensOf(bmp);
-			TweenMax.to(bmp, changeImmediately?0:15, { alpha:1, useFrames:true, ease:Sine.easeInOut } );
+			TweenMax.to(bmp, (tweenMode == 0)?0:12, { alpha:1, useFrames:true, ease:Sine.easeInOut } );
 			updateArea(bmp);
 		}
 		private const LIMITWH_MAX:uint = 999999;
@@ -235,8 +248,10 @@
 			dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR));
 		}
 		protected function onImageLoadingHandler(_evt:*):void {
-			__loadProgress = _evt?_evt.target.progress:1;
-			setProgressClip(__loadProgress);
+			if (_evt) {
+				__loadProgress = _evt.target.progress;
+				setProgressClip(__loadProgress);
+			}
 			dispatchEvent(new ProgressEvent(ProgressEvent.PROGRESS, false, false, _evt?_evt.target.bytesLoaded:100, _evt?_evt.target.bytesTotal:100));
 		}
 		protected function onImageLoadedHandler(_evt:*):void {
@@ -247,6 +262,7 @@
 				bmdNow = _evt as BitmapData;
 			}
 			if (_evt && bmdNow) {
+				__loadProgress = 1;
 				if (_isReady) {
 					setBMP(bmdNow);
 				}else {
@@ -306,6 +322,15 @@
 		}
 		public static var onGroupLoading:Function;
 		public static var onGroupLoaded:Function;
+		public static function getProgress(_source:String):Number {
+			imageLoader = imageLoaderDic[_source];
+			if (imageLoader) {
+				return imageLoader.progress;
+			}else {
+				//NaN?
+				return 0;
+			}
+		}
 		protected static function loadBMD(_source:String, _imageLoader:ui.ImageLoader, _index:uint = 0):void {
 			imageLoader = imageLoaderDic[_source];
 			if (imageLoader) {
@@ -341,7 +366,7 @@
 			return;
 		}
 		private static function register(_source:String, _imageLoader:ui.ImageLoader):void {
-			deregister(_imageLoader.__source, _imageLoader);
+			deregister(_imageLoader.source, _imageLoader);
 			if (!registeredDic[_source]) {
 				registeredDic[_source] = new Dictionary();
 			}
@@ -379,6 +404,11 @@
 				_imageLoader.onImageLoadedHandler(_evt);
 				deregister(_evt.target.url,_imageLoader);
 			}
+			/*for each(imageLoader in imageLoaderDic) {
+				if (imageLoader.progress == 1) {
+					_evt.currentTarget.remove(imageLoader);
+				}
+			}*/
 		}
 		private static function onErrorHandler(_evt:LoaderEvent):void {
 			//removeLoaderFormDic
@@ -388,6 +418,7 @@
 			if (onGroupLoading!=null) {
 				onGroupLoading(_evt.currentTarget.name, _evt.currentTarget.progress);
 			}
+			trace(_evt.currentTarget.getChildrenByStatus(LoaderStatus.LOADING));
 		}
 		private static function onCompleteHandler(_evt:LoaderEvent):void{
 			if (onGroupLoaded!=null) {
