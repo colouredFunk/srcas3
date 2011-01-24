@@ -345,7 +345,9 @@
 					loaderMax = createManager(_imageLoader.imageGroup);
 					if (imageLoader == loaderMax.getLoader(_source)) {
 						//同组请求图片的情况
-						loaderMax.insert(imageLoader, _index);
+						if (imageLoader.progress == 0) {
+							loaderMax.insert(imageLoader, _index);
+						}
 					}else {
 						//异组请求图片的情况,要找到imageLoader属于哪个loaderMax
 					}
@@ -418,7 +420,6 @@
 			if (onGroupLoading!=null) {
 				onGroupLoading(_evt.currentTarget.name, _evt.currentTarget.progress);
 			}
-			trace(_evt.currentTarget.getChildrenByStatus(LoaderStatus.LOADING));
 		}
 		private static function onCompleteHandler(_evt:LoaderEvent):void{
 			if (onGroupLoaded!=null) {
