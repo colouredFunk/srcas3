@@ -355,6 +355,7 @@ package akdcl.application.player{
 					break;
 				case 3:
 					if (idPart.length == 1) {
+						stop();
 						play();
 					}else {
 						next();
