@@ -2,6 +2,7 @@
 	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.text.StyleSheet;
+	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	public class BtnLabel extends Btn {
 		public var txt:*;
@@ -47,6 +48,15 @@
 				$setStyle(false);
 			}
 		}
+		override public function set hrefXML(_hrefXML:XML):void {
+			super.hrefXML = _hrefXML;
+			if (!_hrefXML) {
+				return;
+			}
+			if (_hrefXML.@label.length()>0) {
+				label = _hrefXML.@label;
+			}
+		}
 		override protected function init():void {
 			if (bar) {
 				xOff = int(bar.x - txt.x);
@@ -64,6 +74,7 @@
 		}
 		public function $setStyle(_isActive:Boolean):void {
 			if (totalFrames > 8 || !bar) {
+				if (!(txt is TextField)) {
 					if (txt.autoSize == TextFieldAutoSize.RIGHT) {
 						txt.txt.x = -int(txt.width);
 					} else if (txt.autoSize == TextFieldAutoSize.CENTER) {
@@ -71,6 +82,7 @@
 					} else {
 						txt.txt.x = 0;
 					}
+				}
 			}else if (bar){
 				if (txt.width + widthAdd < __widthMax && txt.width + widthAdd * 0.25 < __widthMax) {
 					bar.width = __widthMax;
