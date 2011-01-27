@@ -1,9 +1,10 @@
-﻿package akdcl.key{
+﻿package akdcl.key {
 	import flash.events.IEventDispatcher;
-	public interface IKey extends IEventDispatcher {
+
+	interface IKey extends IEventDispatcher {
 		//
-		function isDown(_state:Boolean=false):Boolean;
-		function isUp(_state:Boolean=false):Boolean;
+		function isDown(_state:Boolean = false):Boolean;
+		function isUp(_state:Boolean = false):Boolean;
 		//
 		function get keyCode():uint;
 		function set keyCode(_code:uint):void;
