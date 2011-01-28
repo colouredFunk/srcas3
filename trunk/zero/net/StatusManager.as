@@ -93,7 +93,15 @@ public class StatusManager{
 	
 	public static function loadStatus(_onLoadStatus:Function=null,xmlName:String=null,varObj:Object=null):void{
 		onLoadStatus=_onLoadStatus;
-		var request:URLRequest=new URLRequest(getValue(xmlName||"action","url"));
+		var url:String="";
+		if(xmlName){
+			url=getValue(xmlName,"url");
+		}
+		if(url){
+		}else{
+			url=getValue("action","url");
+		}
+		var request:URLRequest=new URLRequest(url);
 		if(varObj){
 			var urlVariables:URLVariables=new URLVariables();
 			for(var varName:String in varObj){
