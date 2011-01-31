@@ -20,11 +20,13 @@ package zero.net{
 		private var onSelectFiles:Function;
 		private var onCancelFiles:Function;
 		private var onLoadFilesComplete:Function;
-		private var onLoadFilesError:Function;
+		private var onLoadFileError:Function;
+		private var onLoadFilesProgress:Function;
 		
 		private var frs:*;
 		
-		private var rest:int;//只在浏览多个文件时有用
+		private var frV:Vector.<FileReference>;
+		private var frId:int;
 		
 		public function BrowseAndLoadFileDatas(
 			fileTypeName:String,
@@ -33,12 +35,14 @@ package zero.net{
 			_onSelectFiles:Function=null,
 			_onCancelFiles:Function=null,
 			_onLoadFilesComplete:Function=null,
-			_onLoadFilesError:Function=null
+			_onLoadFileError:Function=null,
+			_onLoadFilesProgress:Function=null
 		){
 			onSelectFiles=_onSelectFiles;
 			onCancelFiles=_onCancelFiles;
 			onLoadFilesComplete=_onLoadFilesComplete;
-			onLoadFilesError=_onLoadFilesError;
+			onLoadFileError=_onLoadFileError;
+			onLoadFilesProgress=_onLoadFilesProgress;
 			
 			if(multiple){
 				frs=new FileReferenceList();
@@ -53,41 +57,36 @@ package zero.net{
 		private function clear():void{
 			frs.removeEventListener(Event.SELECT,selectFiles);
 			frs.removeEventListener(Event.CANCEL,cancelFiles);
-			if(frs is FileReference){
-				frs.removeEventListener(Event.COMPLETE,loadFilesComplete);
-				frs.removeEventListener(IOErrorEvent.IO_ERROR,loadFilesError);
-			}else{
-				for each(var file:FileReference in (frs as FileReferenceList).fileList){
-					file.removeEventListener(Event.COMPLETE,loadFilesComplete);
-					file.removeEventListener(IOErrorEvent.IO_ERROR,loadFilesError);
-				}
-			}
+			
 			frs=null;
 			onSelectFiles=null;
 			onCancelFiles=null;
 			onLoadFilesComplete=null;
-			onLoadFilesError=null;
+			onLoadFileError=null;
+			onLoadFilesProgress=null;
 		}
 		private function selectFiles(event:Event):void{
-			if(onSelectFiles==null){
-			}else{
-				if(frs is FileReference){
+			if(frs is FileReference){
+				frV=new Vector.<FileReference>();
+				frV[0]=frs;
+				if(onSelectFiles==null){
+				}else{
 					onSelectFiles((frs as FileReference).name);
-					frs.addEventListener(Event.COMPLETE,loadFilesComplete);
-					frs.addEventListener(IOErrorEvent.IO_ERROR,loadFilesError);
-					(frs as FileReference).load();
+				}
+			}else{
+				frV=Vector.<FileReference>((frs as FileReferenceList).fileList);
+				if(onSelectFiles==null){
 				}else{
 					var fileNameV:Vector.<String>=new Vector.<String>();
-					rest=(frs as FileReferenceList).fileList.length;
 					for each(var file:FileReference in (frs as FileReferenceList).fileList){
 						fileNameV.push(file.name);
-						file.addEventListener(Event.COMPLETE,loadFilesComplete);
-						file.addEventListener(IOErrorEvent.IO_ERROR,loadFilesError);
-						file.load();
 					}
 					onSelectFiles(fileNameV);
 				}
 			}
+			
+			frId=-1;
+			loadNextFile();
 		}
 		private function cancelFiles(event:Event):void{
 			if(onCancelFiles==null){
@@ -96,14 +95,17 @@ package zero.net{
 			}
 			clear();
 		}
-		private function loadFilesComplete(event:Event):void{
-			if(onLoadFilesComplete==null){
-			}else{
-				if(frs is FileReference){
-					onLoadFilesComplete((frs as FileReference).data,(frs as FileReference).name);
-					clear();
+		private function loadNextFile():void{
+			if(++frId>=frV.length){
+				if(onLoadFilesProgress==null){
 				}else{
-					if(--rest<=0){
+					onLoadFilesProgress(frV.length,frV);
+				}
+				if(onLoadFilesComplete==null){
+				}else{
+					if(frs is FileReference){
+						onLoadFilesComplete(frV[0].data,frV[0].name);
+					}else{
 						var fileDataV:Vector.<ByteArray>=new Vector.<ByteArray>();
 						var fileNameV:Vector.<String>=new Vector.<String>();
 						for each(var file:FileReference in (frs as FileReferenceList).fileList){
@@ -111,20 +113,35 @@ package zero.net{
 							fileNameV.push(file.name);
 						}
 						onLoadFilesComplete(fileDataV,fileNameV);
-						clear();
 					}
-					//trace("rest="+rest);
 				}
+				clear();
+				return;
 			}
+			frV[frId].addEventListener(Event.COMPLETE,loadFileComplete);
+			frV[frId].addEventListener(IOErrorEvent.IO_ERROR,loadFileError);
+			frV[frId].load();
 		}
-		private function loadFilesError(event:IOErrorEvent):void{
-			if(onLoadFilesError==null){
+		private function loadFileComplete(event:Event):void{
+			frV[frId].removeEventListener(Event.COMPLETE,loadFileComplete);
+			frV[frId].removeEventListener(IOErrorEvent.IO_ERROR,loadFileError);
+			
+			if(onLoadFilesProgress==null){
 			}else{
-				onLoadFilesError();
+				onLoadFilesProgress(frId,frV);
 			}
-			clear();
+			
+			loadNextFile();
 		}
-		
+		private function loadFileError(event:IOErrorEvent):void{
+			frV[frId].removeEventListener(Event.COMPLETE,loadFileComplete);
+			frV[frId].removeEventListener(IOErrorEvent.IO_ERROR,loadFileError);
+			if(onLoadFileError==null){
+			}else{
+				onLoadFileError();
+			}
+			loadNextFile();
+		}
 	}
 }
 
