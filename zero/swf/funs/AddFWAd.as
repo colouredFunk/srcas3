@@ -12,6 +12,8 @@ package zero.swf.funs{
 	import flash.events.*;
 	import flash.utils.*;
 	
+	import riaidea.utils.zip.*;
+	
 	import zero.*;
 	import zero.swf.*;
 	import zero.swf.avm1.Op;
@@ -110,11 +112,11 @@ package zero.swf.funs{
 			b_addShell:Boolean,
 			
 			b_addStage:Boolean,
-			bgColor:int,
+			bgColor:int=-1,
 			
-			bgWid:int,
-			bgHei:int,
-			bgName:String
+			bgWid:int=0,
+			bgHei:int=0,
+			bgName:String=null
 		):Boolean{
 			if(b_addShell){
 				encode_addShell(FWAd_ID,b_addStage,bgColor);
@@ -265,7 +267,9 @@ package zero.swf.funs{
 			
 			swf.accessNetworkOnly=true;
 			
-			swf.setValue("bgColor",bgColor);
+			if(bgColor>=0){
+				swf.setValue("bgColor",bgColor);
+			}
 			
 			swfData=swf.toSWFData();
 		}
@@ -364,8 +368,10 @@ package zero.swf.funs{
 			
 			//从 gameArtworksSWF 中获取宽高等信息到 swf:
 			swf.copyBaseInfo(gameSWF);
-			//swf.setValue("bgColor",gameSWF.getValue("bgColor"));
-			swf.setValue("bgColor",bgColor);
+			if(bgColor>=0){
+				//swf.setValue("bgColor",gameSWF.getValue("bgColor"));
+				swf.setValue("bgColor",bgColor);
+			}
 			//设置一些值
 			//swf.type="CWS";
 			if(swf.Version<10){
@@ -439,6 +445,69 @@ package zero.swf.funs{
 				}
 			}
 			DoABCWithoutFlagsAndName.setDecodeABC(null);
+		}
+		
+		private static function addDataInZip(
+			zipArchive:ZipArchive,
+			swfName:String,
+			wid:int,
+			hei:int,
+			swfData:ByteArray
+		):void{
+			if(swfName.toLowerCase().substr(swfName.length-4)==".swf"){
+				swfName=swfName.substr(0,swfName.length-4);
+			}
+			var htmlData:ByteArray=new ByteArray();
+			htmlData.writeUTFBytes(
+				'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\r\n'+
+				'<html xmlns="http://www.w3.org/1999/xhtml">\r\n'+
+				'<head>\r\n'+
+				'<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\r\n'+
+				'<title>'+swfName+'.swf</title>\r\n'+
+				'</head>\r\n'+
+				'<body>\r\n'+
+				'<br />\r\n'+
+				'<br />\r\n'+
+				'<object id="object_id" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0"'+
+				' width="'+wid+'"'+
+				' height="'+hei+'"'+
+				'>\r\n'+
+				'  <param name="allowScriptAccess" value="always"/>\r\n'+
+				'  <param name="movie" value="'+swfName+'.swf" />\r\n'+
+				'  <param name="quality" value="high" />\r\n'+
+				'  <embed name="embed_name" src="'+swfName+'.swf" quality="high" pluginspage="http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash" type="application/x-shockwave-flash"'+
+				' width="'+wid+'"'+
+				' height="'+hei+'"'+
+				' allowScriptAccess="always"></embed>\r\n'+
+				'</object>\r\n'+
+				'</body>\r\n'+
+				'</html>\r\n'
+			);
+			
+			zipArchive.addFileFromBytes(swfName+".htm",htmlData);
+			
+			zipArchive.addFileFromBytes(swfName+".swf",swfData);
+		}
+		public static function getGameZipData(
+			swfName:String,
+			wid:int,
+			hei:int,
+			swfData:ByteArray
+		):ByteArray{
+			var zipArchive:ZipArchive=new ZipArchive();
+			
+			addDataInZip(zipArchive,swfName,wid,hei,swfData);
+			
+			return zipArchive.output();
+		}
+		public static function getGamesZipData(swfNameAndDataArr:Array):ByteArray{
+			var zipArchive:ZipArchive=new ZipArchive();
+			
+			for each(var swfNameAndData:Array in swfNameAndDataArr){
+				addDataInZip(zipArchive,swfNameAndData[0],swfNameAndData[1],swfNameAndData[2],swfNameAndData[3]);
+			}
+			
+			return zipArchive.output();
 		}
 	}
 }
