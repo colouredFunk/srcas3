@@ -20,8 +20,6 @@ package zero.net{
 		public static const op_pushstring:int=0x81;
 		
 		public static const op_writefile:int=0x91;
-		public static const op_overwritefile:int=0x92;
-		public static const op_appendfile:int=0x93;
 		
 		public static const op_addstring:int=0xa1;
 		
@@ -91,22 +89,35 @@ package zero.net{
 			add(op_pushstring,dateName,dateFormat||"U");
 			add(op_date);
 		}
+		
+		/*
 		public function addWriteFile(filePathName:String,fileName:String,fileData:*):void{
 			//上传文件数据，后台保存到一个不覆盖的地址，并返回此地址（如果地址为 "" 表示保存失败，否则表示保存成功）
 			add(op_pushstring,filePathName,fileName);
 			add(op_writefile,fileData);
 		}
-		public function addOverwriteFile(overwriteResultName:String,fileSrc:String,fileData:*):void{
-			//上传文件数据，后台保存到一个指定的地址（如果已有文件存在将被覆盖），并返回结果（"true" 表示保存成功，"false" 表示保存失败）
-			add(op_pushstring,overwriteResultName,fileSrc);
+		public function addOverwriteFile(filePathName:String,fileSrc:String,fileData:*):void{
+			//上传文件数据，后台保存到一个指定的地址（如果已有文件存在将被覆盖），并返回此地址（如果地址为 "" 表示保存失败，否则表示保存成功）
+			add(op_pushstring,filePathName,fileSrc);
 			add(op_overwritefile,fileData);
 		}
-		public function addAppendFile(appendResultName:String,fileSrc:String,fileData:*):void{
-			//上传文件数据，后台把数据添加到一个指定的地址的文件的末尾（如果文件不存在则创建），并返回结果（"true" 表示添加成功，"false" 表示添加失败）
+		public function addAppendFile(filePathName:String,fileSrc:String,fileData:*):void{
+			//上传文件数据，后台把数据添加到一个指定的地址的文件的末尾（如果文件不存在则创建），并返回此地址（如果地址为 "" 表示保存失败，否则表示保存成功）
 			//例如可用于大文件的分块上传
-			add(op_pushstring,appendResultName,fileSrc);
+			add(op_pushstring,filePathName,fileSrc);
 			add(op_appendfile,fileData);
 		}
+		*/
+		
+		public function addFile(filePathName:String,filePath:String,fileDataPos:int,fileData:*):void{
+			//上传文件数据
+			//1 stack: filePathName, "", 0（或 >0 ）		自动计算不覆盖的地址 $filePath 然后 file_put_contents($filePath,$fileData);
+			//2 stack: filePathName, filePath, 0		file_put_contents($filePath,$fileData);
+			//3 stack: filePathName, filePath, >0		file_put_contents($filePath,$fileData,FILE_APPEND);
+			add(op_pushstring,filePathName,filePath,fileDataPos.toString());
+			add(op_writefile,fileData);
+		}
+		
 		public function addString(strName:String,str:String):void{
 			add(op_pushstring,str);
 			add(op_addstring,strName);
