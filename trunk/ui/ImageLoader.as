@@ -214,6 +214,8 @@
 				container.addChildAt(bmp, getChildIndex(foreground));
 			}else if (background) {
 				container.addChildAt(bmp, getChildIndex(background) + 1);
+			}else if (progressClip) {
+				container.addChildAt(bmp, getChildIndex(progressClip));
 			}else {
 				container.addChild(bmp);
 			}
