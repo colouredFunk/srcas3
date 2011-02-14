@@ -32,7 +32,7 @@ package akdcl.application.website{
 				}
 				sourceXMLReady();
 			}else if (optionsXML && optionsXML.@xml.length() > 0) {
-				DataLoader.load(String(optionsXML.@xml), null, checkSourceXML, onSourceXMLErrorHandler);
+				DataLoader.load(String(optionsXML.@xml), null, checkSourceXML, checkSourceXML);
 			}else if (testSourceXMLPath) {
 				DataLoader.load(testSourceXMLPath, null, checkSourceXML, checkSourceXML);
 			}else {
