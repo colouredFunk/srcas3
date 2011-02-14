@@ -3,6 +3,7 @@
 	import flash.display.MovieClip;
 	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
+	import flash.geom.Rectangle;
 	import flash.text.TextField;
 	
 	import com.greensock.TweenMax;
@@ -125,7 +126,12 @@
 			setProgressClip(false);
 			bmp = new Bitmap();
 			bmp.alpha = 0;
-			autoFitArea = new AutoFitArea(container, 0, 0, _areaWidth, _areaHeight);
+			if (container) {
+				var _rect:Rectangle = container.getBounds(container);
+				autoFitArea = new AutoFitArea(container, _rect.x, _rect.y, _areaWidth, _areaHeight);
+			}else {
+				autoFitArea = new AutoFitArea(container, 0, 0, _areaWidth, _areaHeight);
+			}
 			contextMenu = createMenu(this);
 		}
 		override protected function onRemoveToStageHandler():void {
@@ -255,6 +261,7 @@
 			dispatchEvent(new ProgressEvent(ProgressEvent.PROGRESS, false, false, _evt?_evt.target.bytesLoaded:100, _evt?_evt.target.bytesTotal:100));
 		}
 		protected function onImageLoadedHandler(_evt:*):void {
+			dispatchEvent(new Event(Event.COMPLETE));
 			var _isReady:Boolean = !Boolean(bmdNow);
 			if (_evt is LoaderEvent) {
 				bmdNow = _evt.target.rawContent.bitmapData;
@@ -270,7 +277,6 @@
 				}
 			}
 			setProgressClip(false);
-			dispatchEvent(new Event(Event.COMPLETE));
 		}
 		protected function setProgressClip(_progress:*):void {
 			if (!progressClip) {
