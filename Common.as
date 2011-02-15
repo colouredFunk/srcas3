@@ -40,7 +40,7 @@
 			}
 			return item;
 		}
-		//_eachFun(_instanceCopy, _i, _instanceCopy != _instance, _length);
+		//_eachFun(_instanceCopy, _i, _ary, _length);
 		public static function copyInstanceToArray(_instance:*, _length:uint, _ary:Array, _eachFun:Function, ...args):Array {
 			if (!_ary) {
 				_ary = new Array();
