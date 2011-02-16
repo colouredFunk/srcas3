@@ -114,6 +114,7 @@ public class StatusManager{
 		statusURLLoader.load(request);
 	}
 	private static function loadStatusFinished(event:Event):void{
+		trace("statusURLLoader.data="+statusURLLoader.data);
 		loadedData=decodeFun(statusURLLoader.data);
 		currXML=statusXMLs[loadedData[statusName]];
 		if(currXML){

@@ -24,6 +24,7 @@ package zero.ui{
 		public function BaseLoadURLPoj(_defaultXMLPath:String=null,_xmlVarName:String="xml"){
 			needXML=true;
 			if(_defaultXMLPath){
+				trace("使用指定的 xml 路径: "+_defaultXMLPath);
 				defaultXMLPath=_defaultXMLPath;
 			}else{
 				defaultXMLPath="xml/"+getQualifiedClassName(this).toLowerCase()+".xml";
