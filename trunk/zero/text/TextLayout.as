@@ -13,10 +13,15 @@ package zero.text{
 	import flash.text.engine.*;
 	import flash.utils.*;
 	
+	import flashx.textLayout.*;
 	import flashx.textLayout.container.*;
 	import flashx.textLayout.conversion.*;
+	import flashx.textLayout.edit.*;
 	import flashx.textLayout.elements.*;
+	import flashx.textLayout.events.*;
 	import flashx.textLayout.formats.*;
+	
+	use namespace tlf_internal;
 	
 	//非官方的 Table 类:
 	//http://code.google.com/p/tlfx/source/browse/trunk/tlf/src/main/flex/flashx/textLayout/?r=97#textLayout/elements/table%3Fstate%3Dclosed
@@ -33,15 +38,62 @@ package zero.text{
 			tab:[],
 			br:[]
 		}
-		
+			
 		private var textFlow:TextFlow;
+		private var containerController:ContainerController;
+		private var container:Sprite;
+		private var bg:Sprite;
 		
 		public var wid:int;
 		public var hei:int;
 		
+		public var onScroll:Function;
+		
+		//用法1: textLayout.text=<TextFlow...>; 或 textLayout.text="<TextFlow...>";
+		//用法2: textLayout.init(<TextFlow...>); 或 textLayout.init("<TextFlow...>");
+		
+		
+		//格式1: textLayout.init(<TextFlow...>,400,300); 或 textLayout.init(400,300,"<TextFlow...>"); 或 textLayout.init(400,<TextFlow...>,300);
+		//init 中的参数，如果是 String 或 xml 将直接转成内容，如果是数字，将转成 wid 或 hei（按从左到右的顺序）
+		
 		public function TextLayout(...args){
+			this.addEventListener(Event.ADDED_TO_STAGE,added);
 			init(args);
 		}
+		private function added(event:Event){
+			this.removeEventListener(Event.ADDED_TO_STAGE,added);
+			this.addEventListener(Event.REMOVED_FROM_STAGE,removed);
+		}
+		private function removed(event:Event){
+			this.removeEventListener(Event.REMOVED_FROM_STAGE,removed);
+			clear();
+		}
+		public function clear():void{
+			if(textFlow){
+				textFlow.removeEventListener(flashx.textLayout.events.TextLayoutEvent.SCROLL,scrollSelf);
+				textFlow=null;
+			}
+			containerController=null;
+			
+			onScroll=null;
+		}
+		
+		/*
+		private var __showAll:Boolean;
+		public function get showAll():Boolean{
+			return __showAll;
+		}
+		public function set showAll(_showAll:Boolean):void{
+			__showAll=_showAll;
+			if(containerController){
+				if(__showAll){
+					//textFlow.flowComposer.
+					//containerController.container.
+				}
+			}
+		}
+		*/
+		
 		private function normalizeArgs(args:Array):Array{
 			var argArr:Array=new Array();
 			for each(var arg:* in args){
@@ -84,6 +136,13 @@ package zero.text{
 			}else{
 				return;
 			}
+			xml=xml.copy();
+			if(styleXML){
+			}else{
+				styleXML=xml.style[0];
+				delete xml.style;
+			}
+			
 			
 			if(_wid>0){
 				wid=_wid;
@@ -104,7 +163,6 @@ package zero.text{
 			}else{
 				hei=300;
 			}
-			
 			
 			var xmlName:String=xml.name();
 			if(xmlName==="TextFlow"){
@@ -130,24 +188,80 @@ package zero.text{
 			}
 			
 			if(textFlow){
+				textFlow.removeEventListener(flashx.textLayout.events.TextLayoutEvent.SCROLL,scrollSelf);
 				textFlow.flowComposer.removeAllControllers();
+				textFlow=null;
+				containerController=null;
 			}
 			
-			textFlow = TextConverter.importToFlow(xml.toXMLString(), TextConverter.TEXT_LAYOUT_FORMAT);
+			textFlow=TextConverter.importToFlow(xml.toXMLString(), TextConverter.TEXT_LAYOUT_FORMAT);
 			
-			if(styleXML){
-			}else{
-				styleXML=xml.style[0];
-			}
 			if(styleXML){
 				textFlow.formatResolver=new CSSFormatResolver(styleXML);
 			}
 			
-			textFlow.flowComposer.addController(new ContainerController(this,wid,hei));
-            textFlow.flowComposer.updateAllControllers();
+			if(container){
+				this.removeChild(container);
+				container=null;
+			}
 			
-			this.scaleX=this.scaleY=1;
+			if(bg){
+			}else{
+				bg=new Sprite();
+				var i:int=this.numChildren;
+				while(--i>=0){
+					bg.addChild(this.getChildAt(0));
+				}
+				this.addChild(bg);
+				bg.width=this.width;
+				bg.height=this.height;
+				this.scaleX=this.scaleY=1;
+			}
+			
+			container=new Sprite();
+			this.addChild(container);
+			textFlow.flowComposer.addController(containerController=new ContainerController(container,wid,hei));
+            textFlow.flowComposer.updateAllControllers();
+			//containerController.horizontalScrollPolicy=ScrollPolicy.ON;
+			textFlow.interactionManager=new SelectionManager();
+			textFlow.addEventListener(flashx.textLayout.events.TextLayoutEvent.SCROLL,scrollSelf);
+			
 		}
+		
+		private function scrollSelf(event:Event):void{
+			//内部检测鼠标滚轮，或是拖动选中文本时自动滚动
+			//trace(containerController.verticalScrollPosition);
+			//trace(containerController.compositionHeight);//containerController.compositionHeight==hei
+			//trace(containerController.contentHeight);
+			if(onScroll==null){
+			}else{
+				onScroll();
+			}
+		}
+		
+		public function get scrollPosition():Number{
+			//获取当前滚动位置
+			if(containerController){
+				return containerController.verticalScrollPosition;
+			}
+			return 0;
+		}
+		public function set scrollPosition(_scrollPosition:Number):void{
+			//例如被外部滚动条控制滚动
+			if(containerController){
+				containerController.verticalScrollPosition=_scrollPosition;
+			}
+		}
+		
+		public function get contentHeight():Number{
+			//内容高度
+			//例如 hei/contentHeight 是滚动条和滚动槽的比例
+			if(containerController){
+				return containerController.contentHeight;
+			}
+			return 0;
+		}
+		
 		public function set text(_text:*):void{
 			init(_text,wid,hei);
 		}
