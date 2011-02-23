@@ -68,7 +68,6 @@
 		public var limitSize:Boolean;
 		protected var autoFitArea:AutoFitArea;
 		protected var bmp:Bitmap;
-		protected var bmdNow:BitmapData;
 		protected var __loadProgress:Number = 0;
 		public function get loadProgress():Number {
 			return __loadProgress;
@@ -107,6 +106,10 @@
 		protected var __source:String;
 		public function get source():String {
 			return __source;
+		}
+		protected var bmdNow:BitmapData;
+		public function get bitmapData():BitmapData {
+			return bmdNow;
 		}
 		override protected function init():void {
 			super.init();
@@ -153,8 +156,9 @@
 		}
 		protected var tweenMode:uint;
 		public function load(_source:*, _index:uint = 0, _tweenMode:* = 2):void {
-			if (_source && __source == _source) {
+			if (_source && _source is String && __source == _source) {
 				//这是为了干什么来着?
+				trace("//这是为了干什么来着");
 				onImageLoadingHandler(null);
 				onImageLoadedHandler(null);
 				return;
@@ -172,7 +176,7 @@
 				__source = null;
 			}else {
 				if (tweenMode == 0 && getProgress(_source) < 1) {
-					tweenMode = 1;
+					//tweenMode = 1;
 				}
 				loadBMD(_source, this, _index);
 			}
