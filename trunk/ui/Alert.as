@@ -1,4 +1,5 @@
 ﻿package ui{
+	import akdcl.utils.destroyObject;
 	import flash.display.DisplayObject;
 	import flash.display.LoaderInfo;
 	import flash.display.Sprite;
@@ -21,6 +22,7 @@
 		private static var alertLast:Alert;
 		private static var dataClassAlert:ByteArray;
 		private static var delayCallBack:Function;
+		private static var delayCallBackParams:Array;
 		public static function init(_layer:*= null, _Class:Class = null):void {
 			alertLayer = _layer;
 			if (_Class) {
@@ -48,20 +50,21 @@
 			_loaderInfo.removeEventListener(Event.COMPLETE,defaultSkinLoadedHandler);
 			ClassAlert = _loaderInfo.applicationDomain.getDefinition("ui.Alert") as Class;
 			if (delayCallBack!=null) {
-				delayCallBack();
+				delayCallBack.apply(Alert, delayCallBackParams);
 				delayCallBack = null;
+				destroyObject(delayCallBackParams);
+				delayCallBackParams = null;
 			}
 		}
-		public static function show(_str:String, _ctrlLabel:* = "确定", _callBack:Function = null, _Class:Class=null):Alert {
+		public static function show(_strOrXML:*, _ctrlLabel:* = "确定", _callBack:Function = null, _Class:Class=null):Alert {
 			if (!alertLayer) {
 				if (ButtonManager.stage) {
 					if (_Class) {
 						init(ButtonManager.stage, _Class);
 					}else {
 						init(ButtonManager.stage);
-						delayCallBack = function():void {
-							show(_str, _ctrlLabel, _callBack);
-						}
+						delayCallBackParams = [_strOrXML, _ctrlLabel, _callBack];
+						delayCallBack = show;
 						return null;
 					}
 				}else {
@@ -76,13 +79,28 @@
 				_alert = new ClassAlert();
 			}else {
 				init(alertLayer);
-				delayCallBack = function():void {
-					show(_str, _ctrlLabel, _callBack);
-				}
+				delayCallBackParams = [_strOrXML, _ctrlLabel, _callBack];
+				delayCallBack = show;
 				return null;;
 			}
+			if (_strOrXML is XMLList) {
+				_strOrXML = _strOrXML[0];
+			}
+			if (_strOrXML is XML) {
+				if (_strOrXML.@label.length() > 0) {
+					_ctrlLabel = String(_strOrXML.@label);
+				}
+				if (_callBack==null) {
+					_alert.btnY.hrefXML = _strOrXML;
+				}
+				if (_strOrXML.msg.length() > 0) {
+					_strOrXML = _strOrXML.msg;
+				}else {
+					_strOrXML = _strOrXML.@msg;
+				}
+			}
 			_alert.label = _ctrlLabel;
-			_alert.text = _str;
+			_alert.text = _strOrXML;
 			_alert.callBack = _callBack;
 			alertLayer.addChild(_alert);
 			return _alert;
@@ -266,6 +284,16 @@
 		}
 		override protected function onRemoveToStageHandler():void {
 			super.onRemoveToStageHandler();
+			destroyObject(btnList);
+			btnList = null;
+			callBack = null;
+			txtTitle = null;
+			txtText = null;
+			btnY = null;
+			btnX = null;
+			bar = null;
+			maskArea = null;
+			item = null;
 		}
 		public function setStyle():void {
 			btnList.forEach(setBtnStyle);
