@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<!--AS登录配置，session：session，path：path-->
+	<login session="ZHUXIAN_LOVEMARKET_USER_SESSION" path="/extend/"/>
+	
+	
+	
+	
+	
+	
+	
+	
+	<!--提交配置，url：提交地址，label：页面显示文字，key：提交字段，source：数据源，maxChars：提交字符串最长限制，restrict：限制可输入字符集，required：是否为必填选项，reg：正则检测-->
+	<submit url="http://10.14.0.16:22888/zhuxian/lovemarket/userSubmit.action">
+		<server label="服务器：" key="bean.server" source="http://10.14.0.16:22800/zhuxian/201102/lovemarket/xml/serverList.xml"/>
+		<roleName label="角色名：" key="bean.rolename" maxChars="10" required="true"/>
+		<nickname label="昵称：" key="bean.nickname" maxChars="10" required="true"/>
+		<sex label="性别：" key="bean.gender" required="true" styleType="RadioButton">
+			<item label="男" value="男"/>
+			<item label="女" value="女"/>
+		</sex>
+		<email label="邮箱：" key="bean.email" maxChars="45" reg="^(\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+(w+([.-]\w+))*)$"/>
+		<favorite label="爱好：" key="bean.hobby" maxChars="10"/>
+		<constellation label="星座：" key="bean.star" styleType="CheckBox">
+			<item label="白羊座" value="白羊座"/>
+			<item label="金牛座" value="金牛座"/>
+			<item label="双子座" value="双子座"/>
+			<item label="巨蟹座" value="巨蟹座"/>
+			<item label="狮子座" value="狮子座"/>
+			<item label="处女座" value="处女座"/>
+			<item label="天秤座" value="天秤座"/>
+			<item label="天蝎座" value="天蝎座"/>
+			<item label="射手座" value="射手座"/>
+			<item label="摩羯座" value="摩羯座"/>
+			<item label="水瓶座" value="水瓶座"/>
+			<item label="双鱼座" value="双鱼座"/>
+		</constellation>
+		<age label="年龄：" key="bean.age" maxChars="2" reg="(^[0-9]{1,2})"/>
+		<lover label="爱情宣言：" key="bean.ganyan" maxChars="20" required="true"/>
+		<qq label="QQ：" key="bean.qqnumber" maxChars="12" reg="(^[0-9]{5,12})"/>
+		<image key="upload" quality="80"/>
+	</submit>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!--返回数据配置，key：返回字段，js：执行js代码，href：点击确定后跳转-->
+	<result>
+		<status key="status">
+			<item value="1" msg="请先登录！" js="login();"/>
+			<item value="2" msg="提交成功！" href="/zhuxian/lovemarket/uList.action"/>
+			<item value="3" msg="活动维护中！"/>
+			<item value="4" msg="活动已结束！"/>
+			<item value="5" msg="网络繁忙，稍后再试！"/>
+			<item value="6" msg="字段数据为空。"/>
+			<item value="7" msg="上传文件出错。"/>
+			<item value="8" msg="错误。"/>
+		</status>
+		<something key="字段">
+			<item value="1" msg="代表什么的"/>
+			<item value="2" msg="代表什么的"/>
+			<item value="3" msg="代表什么的"/>
+		</something>
+		<something key="字段"/>
+	</result>
+	<!--AS内部alert配置，${*}：动态替换内容，请勿删除-->
+	<alert>
+		<unlogin msg="请先登录！"/>
+		<inputError msg="请正确填写${value}！"/>
+		<submit msg="上传中，请稍后……"/>
+		<subimtError msg="网络错误，请稍后再试！"/>
+		<unknownStatus msg="未知的status：${value}！"/>
+	</alert>
+</root>
