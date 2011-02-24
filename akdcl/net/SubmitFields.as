@@ -1,10 +1,14 @@
 package akdcl.net {
 
+	import akdcl.utils.stringToBoolean;
 	/**
 	 * ...
 	 * @author Akdcl
 	 */
 	public class SubmitFields {
+		public static var REQUIRED:String = "required";
+		public static var KEY:String = "key";
+		public static var REG:String = "reg";
 		protected var sourceXML:XML;
 		protected var __data:Object;
 
@@ -53,17 +57,16 @@ package akdcl.net {
 
 		public function isAllComplete():* {
 			var _key:String;
-			for each (var _xml:XML in sourceXML.children()){
-				if (_xml.@required.length() > 0 && stringIsTrue(String(_xml.@required))){
-					_key = _xml.@key;
-					if (!__data[_key]){
+			for each (var _xml:XML in sourceXML.children()) {
+				_key = _xml.attribute(KEY);
+				if (stringToBoolean(_xml.attribute(REQUIRED))) {
+					if (!stringToBoolean(__data[_key])) {
 						return _xml.childIndex();
 					}
 				}
-				if (_xml.@reg.length() > 0){
-					_key = _xml.@key;
-					if (__data[_key]){
-						if (testStringReg(__data[_key], String(_xml.@reg))){
+				if (stringToBoolean(_xml.attribute(REG))) {
+					if (__data[_key]) {
+						if (testStringReg(__data[_key], String(_xml.attribute(REG)))) {
 							return _xml.childIndex();
 						}
 					}
@@ -75,13 +78,6 @@ package akdcl.net {
 		private static function testStringReg(_str:String, _regStr:String):Boolean {
 			var _reg:RegExp = new RegExp(_regStr);
 			return !_reg.test(_str);
-		}
-
-		private static function stringIsTrue(_str:String):Boolean {
-			if (!_str || _str == "" || _str == "0" || _str == " " || _str == "false"){
-				return false;
-			}
-			return true;
 		}
 	}
 
