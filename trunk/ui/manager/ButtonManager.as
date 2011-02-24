@@ -131,7 +131,7 @@ package ui.manager {
 		}
 		private static var frameTo:uint;
 		public static function setButtonStyle(_button:*):void {
-			var _isActive:Boolean = buttonInDic[_button] || buttonDownDic[_button] || (_button.hasOwnProperty("select") && _button.select);
+			var _isActive:Boolean = buttonInDic[_button] || buttonDownDic[_button] || (_button.hasOwnProperty("selected") && _button.selected);
 			if (_button is MovieClip) {
 				if (_button.totalFrames > 8) {
 					setButtonClipPlay(_button, _isActive);
@@ -141,7 +141,7 @@ package ui.manager {
 					}else {
 						frameTo = buttonDownDic[_button]?3:1;
 					}
-					frameTo += _button.select?4:0;
+					frameTo += _button.selected?4:0;
 					if (_button.currentFrame == frameTo) {
 						_button.stop();
 					}else {
@@ -196,14 +196,14 @@ package ui.manager {
 		}
 		//
 		private static var groupItemDic:Object = { };
-		private static var groupSelectDic:Object = { };
+		private static var groupSelectedDic:Object = { };
 		private static var groupParamsDic:Object = { };
 		private static const KEY_LIMIT:String = "limit";
 		private static const KEY_RADIO_UNSELECT_FUN:String = "radioUnselectFun";
 		public static function addToGroup(_groupName:String, _item:*):void {
 			if (!groupItemDic[_groupName]) {
 				groupItemDic[_groupName] = new Array();
-				groupSelectDic[_groupName] = new Array();
+				groupSelectedDic[_groupName] = new Array();
 				setLimit(_groupName, 0);
 			}
 			/*if (_n != 0 && obGroup[_s+"_limit"]<_n) {
@@ -213,33 +213,33 @@ package ui.manager {
 		}
 		public static function removeFromGroup(_groupName:String, _item:*):void {
 			removeFromArray(groupItemDic[_groupName], _item);
-			removeFromArray(groupSelectDic[_groupName], _item);
+			removeFromArray(groupSelectedDic[_groupName], _item);
 		}
 		public static function selectItem(_groupName:String, _item:*):Boolean {
 			var _limit:uint = getLimit(_groupName);
-			var _groupSelect:Array = groupSelectDic[_groupName];
+			var _groupSelected:Array = groupSelectedDic[_groupName];
 			if (_limit == 0) {
-				if (_groupSelect[0]) {
-					getRadioUnselectFun(_groupName)(_groupSelect[0]);
-					unselectItem(_groupName, _groupSelect[0]);
+				if (_groupSelected[0]) {
+					getRadioUnselectFun(_groupName)(_groupSelected[0]);
+					unselectItem(_groupName, _groupSelected[0]);
 				}
-				_groupSelect.push(_item);
+				_groupSelected.push(_item);
 				return true;
-			}else if (_limit > _groupSelect.length) {
-				_groupSelect.push(_item);
+			}else if (_limit > _groupSelected.length) {
+				_groupSelected.push(_item);
 				return true;
 			} else {
 				return false;
 			}
 		}
 		public static function unselectItem(_groupName:String, _item:*):void {
-			removeFromArray(groupSelectDic[_groupName], _item);
+			removeFromArray(groupSelectedDic[_groupName], _item);
 		}
 		public static function unselectGroup(_groupName:String):void {
-			var _groupSelect:Array = groupSelectDic[_groupName];
-			for each(var _select:* in _groupSelect) {
-				getRadioUnselectFun(_groupName)(_select);
-				unselectItem(_groupName, _select);
+			var _groupSelected:Array = groupSelectedDic[_groupName];
+			for each(var _selected:* in _groupSelected) {
+				getRadioUnselectFun(_groupName)(_selected);
+				unselectItem(_groupName, _selected);
 			}
 		}
 		public static function getRadioUnselectFun(_groupName:String):Function {
@@ -262,7 +262,7 @@ package ui.manager {
 			}
 		}
 		private static function unSelectItemFun(_item:*):void {
-			_item.select = false;
+			_item.selected = false;
 		}
 		//
 		public static function removeFromArray(_a:Array,_ai:*):* {
