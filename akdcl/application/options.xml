@@ -2,26 +2,23 @@
 <root>
 	<!--AS登录配置，session：session，path：path-->
 	<login session="ZHUXIAN_LOVEMARKET_USER_SESSION" path="/extend/"/>
-	
-	
-	
-	
-	
-	
-	
-	
-	<!--提交配置，url：提交地址，label：页面显示文字，key：提交字段，source：数据源，maxChars：提交字符串最长限制，restrict：限制可输入字符集，required：是否为必填选项，reg：正则检测-->
+	<!--提交配置，url：提交地址，label：页面显示文字，key：提交字段，source：数据源，most：提交字符串最长限制，restrict：限制可输入字符集，required：是否为必填选项，reg：正则检测-->
 	<submit url="http://10.14.0.16:22888/zhuxian/lovemarket/userSubmit.action">
-		<server label="服务器：" key="bean.server" source="http://10.14.0.16:22800/zhuxian/201102/lovemarket/xml/serverList.xml"/>
-		<roleName label="角色名：" key="bean.rolename" maxChars="10" required="true"/>
-		<nickname label="昵称：" key="bean.nickname" maxChars="10" required="true"/>
+		<server label="服务器：" key="bean.server" source="serverlist.xml"/>
+		<roleName label="角色名：" key="bean.rolename" most="10" required="true" hint="限${most}字以内"/>
+		<nickname label="昵称：" key="bean.nickname" most="10" required="true" hint="限${most}字以内"/>
 		<sex label="性别：" key="bean.gender" required="true" styleType="RadioButton">
 			<item label="男" value="男"/>
 			<item label="女" value="女"/>
 		</sex>
-		<email label="邮箱：" key="bean.email" maxChars="45" reg="^(\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+(w+([.-]\w+))*)$"/>
-		<favorite label="爱好：" key="bean.hobby" maxChars="10"/>
-		<constellation label="星座：" key="bean.star" styleType="CheckBox">
+		<favorite label="爱好：" key="bean.hobby" styleType="CheckBox" least="2" most="3" hint="至少选${least}项，至多选${most}项">
+			<item label="吃" value="吃"/>
+			<item label="喝" value="喝"/>
+			<item label="玩" value="玩"/>
+			<item label="乐" value="乐"/>
+			<item label="睡" value="睡"/>
+		</favorite>
+		<constellation label="星座：" key="bean.star">
 			<item label="白羊座" value="白羊座"/>
 			<item label="金牛座" value="金牛座"/>
 			<item label="双子座" value="双子座"/>
@@ -35,20 +32,12 @@
 			<item label="水瓶座" value="水瓶座"/>
 			<item label="双鱼座" value="双鱼座"/>
 		</constellation>
-		<age label="年龄：" key="bean.age" maxChars="2" reg="(^[0-9]{1,2})"/>
-		<lover label="爱情宣言：" key="bean.ganyan" maxChars="20" required="true"/>
-		<qq label="QQ：" key="bean.qqnumber" maxChars="12" reg="(^[0-9]{5,12})"/>
+		<age label="年龄：" key="bean.age" most="3" restrict="0-9" hint="请输入阿拉伯数字"/>
+		<msg label="留言：" key="bean.ganyan" most="20" styleType="TextArea" hint="限${most}字以内" required="true"/>
+		<qq label="QQ：" key="bean.qqnumber" most="12" restrict="0-9" hint="请输入阿拉伯数字"/>
+		<email label="邮箱：" key="bean.email" most="45" reg="^(\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+(w+([.-]\w+))*)$" required="true"/>
 		<image key="upload" quality="80"/>
 	</submit>
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	<!--返回数据配置，key：返回字段，js：执行js代码，href：点击确定后跳转-->
 	<result>
 		<status key="status">
