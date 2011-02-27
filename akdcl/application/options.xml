@@ -34,7 +34,7 @@
 		</constellation>
 		<age label="年龄：" key="bean.age" most="3" restrict="0-9" hint="请输入阿拉伯数字"/>
 		<msg label="留言：" key="bean.ganyan" most="20" styleType="TextArea" hint="限${most}字以内" required="true"/>
-		<qq label="QQ：" key="bean.qqnumber" most="12" restrict="0-9" hint="请输入阿拉伯数字"/>
+		<qq label="QQ：" key="bean.qqnumber" least="5" most="12" restrict="0-9" hint="请输入阿拉伯数字"/>
 		<email label="邮箱：" key="bean.email" most="45" reg="^(\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+(w+([.-]\w+))*)$" required="true"/>
 		<image key="upload" quality="80"/>
 	</submit>

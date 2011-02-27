@@ -24,7 +24,7 @@
 		//private static var listLoading:Vector.<DataLoader> = new Vector.<DataLoader>();
 
 		//返回DataLoader实例，DataLoader的原理类似工厂模式，会重复使用DataLoader，所以尽量不要保持对DataLoader实例的引用。
-		public static function load(_urlOrRequest:*, _onProgressHandler:Function = null, _onCompleteHandler:Function = null, _onIOErrorHandler:Function = null, _data:Object = null, _contentType:String = null):DataLoader {
+		public static function load(_urlOrRequest:*, _onProgressHandler:Function = null, _onCompleteHandler:Function = null, _onIOErrorHandler:Function = null, _data:Object = null, _contentTypeOrIsJSONData:* = null):DataLoader {
 			//
 			var _dataLoader:DataLoader;
 			if (listReady.length > 0){
@@ -49,8 +49,12 @@
 			if (_data){
 				if ((_data is URLVariables) || (_data is String) || (_data is ByteArray)){
 					_request.data = _data;
-				} else if (_data is Object){
-					_request.data = objectToURLVariables(_data);
+				} else if (_data is Object) {
+					if (_contentTypeOrIsJSONData is Boolean) {
+						_request.data = JSON.encode(_data);
+					}else {
+						_request.data = objectToURLVariables(_data);
+					}
 				} else {
 					_request.data = String(_data);
 				}
@@ -59,7 +63,11 @@
 				_request.data = null;
 				_request.method = URLRequestMethod.GET;
 			}
-			_request.contentType = _contentType;
+			if (_contentTypeOrIsJSONData is String) {
+				_request.contentType = _contentTypeOrIsJSONData;
+			}else {
+				_request.contentType = null;
+			}
 			//
 			_dataLoader.clear();
 			_dataLoader.load(_request);
@@ -93,17 +101,14 @@
 			try {
 				var _data:URLVariables = new URLVariables(data);
 			} catch (_error:*){
-				
 			}
 			return _data;
 		}
 
 		public function get dataJSON():Object {
-			var _data:Object;
 			try {
-				_data = JSON.decode(data);
+				var _data:Object = JSON.decode(data);
 			} catch (_error:*){
-				_data = null;
 			}
 			return _data;
 		}
