@@ -20,10 +20,11 @@ package ui.manager {
 		private static const TEXT_FORMAT:String = "textFormat";
 		private static var textFormat:TextFormat = new TextFormat();
 
-		public static function setTextFormat(_size:uint, _color:uint = 0x000000, _font:String = "宋体"):void {
+		public static function setTextFormat(_size:uint, _color:uint = 0x000000, _font:String = "宋体", _leading:uint = 3):void {
 			textFormat.font = _font;
 			textFormat.size = _size;
 			textFormat.color = _color;
+			textFormat.leading = _leading;
 
 			StyleManager.setComponentStyle(CellRenderer, TEXT_FORMAT, textFormat);
 			
