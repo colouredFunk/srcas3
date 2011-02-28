@@ -54,7 +54,7 @@ package zero.swf.funs{
 							break;
 							default:
 								//主要是如果新版本的 flash 出新 tag 了知道一下
-								throw new Error("未知 TagType: "+tag.type);
+								//throw new Error("未知 TagType: "+tag.type);
 							break;
 						}
 					}
