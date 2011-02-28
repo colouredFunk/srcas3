@@ -37,6 +37,7 @@
 		<qq label="QQ：" key="bean.qqnumber" least="5" most="12" restrict="0-9" hint="请输入阿拉伯数字"/>
 		<email label="邮箱：" key="bean.email" most="45" reg="^(\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+(w+([.-]\w+))*)$" required="true"/>
 		<image key="upload" quality="80"/>
+		<style width="150" height="22" widthLabel="100" dxLF="0" dxRAC="0" dxFL="5" dyFF="8" color="0x000000" colorLabel="#000000" colorNormal="#000000" colorHint="#666666" colorError="#FF0000" colorComplete="#00FF00"/>
 	</submit>
 	<!--返回数据配置，key：返回字段，js：执行js代码，href：点击确定后跳转-->
 	<result>
