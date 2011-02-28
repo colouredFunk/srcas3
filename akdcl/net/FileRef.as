@@ -9,8 +9,6 @@
 	import zero.encoder.BMPEncoder;
 	
 	public class FileRef extends FileReference {
-
-		public static var FILETYPES_IMAGES:String = "jpg,jpeg,gif,png,bmp";
 		protected var fileInfos:String;
 		public var fileTypes:String;
 		public var maxSize:int = 10000;
@@ -100,9 +98,6 @@
 			var _data:*;
 			_data = _evt.currentTarget.data;
 			if (autoImage) {
-				//var _nameAry:Array = name.split(".");
-				//var _fileType:String = _nameAry.pop().toLowerCase();
-				//if (FILETYPES_IMAGES.indexOf(_fileType) >= 0) {
 				if (FileTypes.getType(_data, name) == FileTypes.BMP ) {
 					_data = BMPEncoder.decode(_data);
 					if (onLoadComplete!=null) {

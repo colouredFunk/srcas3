@@ -31,7 +31,6 @@ package akdcl.application.image {
 		protected var bitmapView:Bitmap;
 
 		protected var imageLoader:ImageLoader;
-		protected var matrixTemp:Matrix = new Matrix();
 		protected var bitmapTemp:Bitmap;
 		//
 		private var __rectWidth:uint = 100;
@@ -127,7 +126,6 @@ package akdcl.application.image {
 			onChanging = null;
 			imageLoader = null;
 			transformTool = null;
-			matrixTemp = null;
 			__croppedBMD = null;
 		}
 
