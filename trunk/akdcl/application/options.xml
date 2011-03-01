@@ -5,7 +5,6 @@
 	<!--提交配置，url：提交地址，label：页面显示文字，key：提交字段，source：数据源，most：提交字符串最长限制，restrict：限制可输入字符集，required：是否为必填选项，reg：正则检测-->
 	<submit url="http://10.14.0.16:22888/zhuxian/lovemarket/userSubmit.action">
 		<server label="服务器：" key="bean.server" source="serverlist.xml"/>
-		<roleName label="角色名：" key="bean.rolename" most="10" required="true" hint="限${most}字以内"/>
 		<nickname label="昵称：" key="bean.nickname" most="10" required="true" hint="限${most}字以内"/>
 		<sex label="性别：" key="bean.gender" required="true" styleType="RadioButton">
 			<item label="男" value="男"/>
@@ -36,7 +35,7 @@
 		<msg label="留言：" key="bean.ganyan" most="20" styleType="TextArea" hint="限${most}字以内" required="true"/>
 		<qq label="QQ：" key="bean.qqnumber" least="5" most="12" restrict="0-9" hint="请输入阿拉伯数字"/>
 		<email label="邮箱：" key="bean.email" most="45" reg="^(\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+(w+([.-]\w+))*)$" required="true"/>
-		<image key="upload" quality="80"/>
+		<image label="头像：" key="upload" styleType="ImageBrowse" quality="80"/>
 		<style width="150" height="22" widthLabel="100" dxLF="0" dxRAC="0" dxFL="5" dyFF="8" color="0x000000" colorLabel="#000000" colorNormal="#000000" colorHint="#666666" colorError="#FF0000" colorComplete="#00FF00"/>
 	</submit>
 	<!--返回数据配置，key：返回字段，js：执行js代码，href：点击确定后跳转-->

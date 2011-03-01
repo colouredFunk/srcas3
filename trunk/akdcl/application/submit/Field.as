@@ -1,4 +1,5 @@
 package akdcl.application.submit {
+	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
 	import flash.events.FocusEvent;
@@ -13,6 +14,8 @@ package akdcl.application.submit {
 	import fl.controls.CheckBox;
 
 	import fl.core.UIComponent;
+	
+	import akdcl.application.submit.ImageBrowse;
 
 	import akdcl.utils.stringToBoolean;
 	import akdcl.net.DataLoader;
@@ -43,6 +46,7 @@ package akdcl.application.submit {
 		public static const A_COMBO_BOX:String = "ComboBox";
 		public static const A_RADIO_BUTTON:String = "RadioButton";
 		public static const A_CHECK_BOX:String = "CheckBox";
+		public static const A_IMAGE_BROWSE:String = "ImageBrowse";
 
 		public static const E_ITEM:String = "item";
 
@@ -158,6 +162,16 @@ package akdcl.application.submit {
 				_checkBox.label = _eachXML.attribute(A_LABEL);
 				_checkBox.textField.autoSize = TextFieldAutoSize.RIGHT;
 			}
+			return _field;
+		}
+
+		protected static function setImageBrowse(_field:ImageBrowse, _source:XML):ImageBrowse {
+			if (_field){
+
+			} else {
+				_field = new ImageBrowse();
+			}
+			
 			return _field;
 		}
 
@@ -403,6 +417,8 @@ package akdcl.application.submit {
 					case A_TEXT_AREA:
 						view = setTextArea(_view, sourceXML);
 						break;
+					case A_IMAGE_BROWSE:
+						view = setImageBrowse(_view, sourceXML);
 					default:
 				}
 			}
@@ -411,6 +427,7 @@ package akdcl.application.submit {
 			} else {
 				label = new Label();
 			}
+			label.enabled = false;
 			label.autoSize = TextFieldAutoSize.RIGHT;
 			label.htmlText = setHtmlColor(sourceXML.attribute(A_LABEL), style.colorLabel);
 			//
@@ -418,6 +435,7 @@ package akdcl.application.submit {
 			} else {
 				followLabel = new Label();
 			}
+			followLabel.enabled = false;
 			followLabel.autoSize = TextFieldAutoSize.LEFT;
 			followLabel.htmlText = setHtmlColor(getNormalFollowText(), style.colorNormal);
 			//
@@ -458,7 +476,13 @@ package akdcl.application.submit {
 				view.x = style.startX + style.widthLabel + style.dxLF;
 				view.y = label.y;
 				view.width = style.width;
-				view.height = style.height;
+				if (view is TextArea) {
+					view.height = style.height * 2;
+				}else if (view is ImageBrowse) {
+					view.height = style.height * 2;
+				}else{
+					view.height = style.height;
+				}
 				viewContainer.addChild(view);
 			}
 			//
@@ -469,7 +493,15 @@ package akdcl.application.submit {
 			//delay
 			setTimeout(setViewStyle, 0);
 			setTimeout(offSetTextY, 0);
-			return (view is TextArea) ? (view.height - style.height) : 0;
+			/*if (view is TextArea || view is ImageBrowse) {
+				
+			}*/
+			
+			if (view is DisplayObject) {
+				return view.height - style.height;
+			}else {
+				return 0;
+			}
 		}
 
 		protected function setViewStyle():void {
