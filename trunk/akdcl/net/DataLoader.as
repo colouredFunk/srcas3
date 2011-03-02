@@ -150,6 +150,7 @@
 		}
 	}
 }
+import flash.utils.ByteArray;
 class FormVariables{
 	private var values:Object;
 	public var contentType:String;

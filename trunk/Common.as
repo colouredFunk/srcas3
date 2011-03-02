@@ -18,6 +18,7 @@
 	import flash.ui.ContextMenu;
 	import flash.ui.ContextMenuItem;
 	import flash.ui.ContextMenuBuiltInItems;
+	import akdcl.net.getURL;
 
 	final public class Common {
 		public static function addContextMenu(obj:*, caption:String, onSelect:Function = null):ContextMenuItem {
