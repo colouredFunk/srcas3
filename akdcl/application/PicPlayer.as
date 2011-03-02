@@ -367,11 +367,15 @@
 				picNow.y = (picHeight - picNow.height) * 0.5;
 			}
 			
+			
 			var _ob:Object;
+			TweenMax.to(picPrev, 0, getObjInTween(tweenStyle.prev.from[0]));
+			TweenMax.to(picPrev, timeTween, getObjInTween(tweenStyle.prev.to[0]));
+			
+			TweenMax.to(picNow, 0, getObjInTween(tweenStyle.now.from[0]));
 			_ob = getObjInTween(tweenStyle.now.to[0]);
 			_ob.onComplete = tweenEnd;
-			TweenMax.fromTo(picPrev, timeTween, getObjInTween(tweenStyle.prev.from[0]), getObjInTween(tweenStyle.prev.to[0]));
-			TweenMax.fromTo(picNow, timeTween, getObjInTween(tweenStyle.now.from[0]), _ob);
+			TweenMax.to(picNow, timeTween, _ob);
 		}
 		private function tweenEnd():void {
 			setState(TWEENED);
