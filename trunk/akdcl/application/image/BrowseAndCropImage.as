@@ -1,7 +1,9 @@
 package {
 	import flash.geom.Matrix;
-	import com.JPEGEncoder;
+	import flash.utils.ByteArray;
 
+	import com.JPEGEncoder;
+	
 	import akdcl.application.image.CropImage;
 	import akdcl.net.FileRef;
 
@@ -14,6 +16,7 @@ package {
 		public var onLoaded:Function;
 		protected var matrixTemp:Matrix;
 		protected var fileRef:FileRef;
+		protected var jpegEncoder:JPEGEncoder
 
 		override protected function init():void {
 			super.init();
@@ -50,13 +53,16 @@ package {
 				throw Error("not cropped image yet!");
 				return null;
 			}
-			var _jpgEncoder:JPEGEncoder = new JPEGEncoder(_quality);
+			if (jpegEncoder) {
+			}else {
+				jpegEncoder = new JPEGEncoder(_quality);
+			}
 			if (_list){
 				var _bmd:BitmapData;
-				var _resultList:Array = [];
+				var _resultList:Vector.<ByteArray> = new Vector.<ByteArray>();
 				for (var _i:uint; _i < _list.length; _i++){
 					if (int(_list[_i]) == 0){
-						_resultList[_i] = _jpgEncoder.encode(bitmapData);
+						_resultList[_i] = jpegEncoder.encode(bitmapData);
 					} else {
 						bitmapTemp.bitmapData = __croppedBMD;
 						bitmapTemp.smoothing = true;
@@ -65,13 +71,13 @@ package {
 						bitmapTemp.height = Math.round(bitmapTemp.height);
 						_bmd = new BitmapData(bitmapTemp.width, bitmapTemp.height, true, 0x000000);
 						_bmd.draw(bitmapTemp, matrixTemp);
-						_resultList[_i] = _jpgEncoder.encode(_bmd);
+						_resultList[_i] = jpegEncoder.encode(_bmd);
 						_bmd.dispose();
 					}
 				}
 				return _resultList;
 			} else {
-				return _jpgEncoder.encode(__croppedBMD);
+				return jpegEncoder.encode(__croppedBMD);
 			}
 		}
 	}

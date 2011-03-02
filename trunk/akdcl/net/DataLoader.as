@@ -9,7 +9,9 @@
 	import flash.utils.ByteArray;
 
 	import com.adobe.serialization.json.JSON;
+	import akdcl.utils.destroyObject;
 	import akdcl.utils.objectToURLVariables;
+	import akdcl.net.FormVariables;
 
 	import ui.manager.EventManager;
 
@@ -18,13 +20,16 @@
 	 * @author Akdcl
 	 */
 	public class DataLoader extends URLLoader {
+		public static const TYPE_URL:String = "URLVariables";
+		public static const TYPE_FORM:String = "FormVariables";
+		public static const TYPE_JSON:String = "JavaScriptObjectNotation";
 		private static var request:URLRequest = new URLRequest();
 		private static var listReady:Vector.<DataLoader> = new Vector.<DataLoader>();
 
 		//private static var listLoading:Vector.<DataLoader> = new Vector.<DataLoader>();
 
 		//返回DataLoader实例，DataLoader的原理类似工厂模式，会重复使用DataLoader，所以尽量不要保持对DataLoader实例的引用。
-		public static function load(_urlOrRequest:*, _onProgressHandler:Function = null, _onCompleteHandler:Function = null, _onIOErrorHandler:Function = null, _data:Object = null, _contentTypeOrIsJSONData:* = null):DataLoader {
+		public static function load(_urlOrRequest:*, _onProgressHandler:Function = null, _onCompleteHandler:Function = null, _onIOErrorHandler:Function = null, _data:Object = null, _uploadType:String = null):DataLoader {
 			//
 			var _dataLoader:DataLoader;
 			if (listReady.length > 0){
@@ -36,6 +41,9 @@
 			_dataLoader.onProgressHandler = _onProgressHandler;
 			_dataLoader.onCompleteHandler = _onCompleteHandler;
 			_dataLoader.onIOErrorHandler = _onIOErrorHandler;
+			if (_onProgressHandler != null) {
+				_dataLoader.addEventListener(ProgressEvent.PROGRESS, _onProgressHandler);
+			}
 			_dataLoader.addEventListener(Event.COMPLETE, onCompleteOrIOErrorHandler);
 			_dataLoader.addEventListener(IOErrorEvent.IO_ERROR, onCompleteOrIOErrorHandler);
 			//
@@ -46,11 +54,17 @@
 				_request = request;
 				_request.url = _urlOrRequest;
 			}
+			_request.contentType = null;
+			_dataLoader.clear();
 			if (_data){
 				if ((_data is URLVariables) || (_data is String) || (_data is ByteArray)){
 					_request.data = _data;
-				} else if (_data is Object) {
-					if (_contentTypeOrIsJSONData is Boolean) {
+				} else if (_data === Object) {
+					if (_uploadType == TYPE_FORM) {
+						var _formVars:FormVariables = new FormVariables(_data);
+						_request.contentType = _formVars.contentType;
+						_request.data = _formVars.data;
+					}else if (_uploadType==TYPE_JSON) {
 						_request.data = JSON.encode(_data);
 					}else {
 						_request.data = objectToURLVariables(_data);
@@ -63,13 +77,6 @@
 				_request.data = null;
 				_request.method = URLRequestMethod.GET;
 			}
-			if (_contentTypeOrIsJSONData is String) {
-				_request.contentType = _contentTypeOrIsJSONData;
-			}else {
-				_request.contentType = null;
-			}
-			//
-			_dataLoader.clear();
 			_dataLoader.load(_request);
 			return _dataLoader;
 		}
@@ -82,7 +89,7 @@
 				}
 			} else {
 				if (_dataLoader.onProgressHandler != null){
-
+					
 				}
 				if (_dataLoader.onCompleteHandler != null){
 					_dataLoader.onCompleteHandler(_evt);
@@ -138,9 +145,7 @@
 		}
 		public function clear():void {
 			data = null;
-			for each (var _i:*in userData){
-				delete userData[_i];
-			}
+			destroyObject(userData);
 			userData = null;
 		}
 	}
