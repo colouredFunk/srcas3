@@ -563,14 +563,17 @@
 	
 		public function JPEGEncoder(quality:int=50)
 		{
-			if (quality <= 0)
-				quality = 1;
-		
-			if (quality > 100)
-				quality = 100;
-				
-			sf = quality < 50 ? int(5000 / quality) : int(200 - (quality<<1));
+			setQuality(quality);
 			init();
+		}
+		public function setQuality(_quality:uint = 50):void {
+			if (_quality <= 0)
+				_quality = 1;
+		
+			if (_quality > 100)
+				_quality = 100;
+				
+			sf = _quality < 50 ? int(5000 / _quality) : int(200 - (_quality<<1));
 		}
 		
 		private function init():void
