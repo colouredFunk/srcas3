@@ -45,7 +45,7 @@ package {
 			fileRef.browseFile();
 		}
 
-		public function upload(_quality:uint = 80, _list:Array = null):* {
+		public function getJPEGData(_quality:uint = 80, _list:Array = null):* {
 			if (!__croppedBMD){
 				throw Error("not cropped image yet!");
 				return null;
