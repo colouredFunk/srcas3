@@ -92,7 +92,7 @@
 					_ctrlLabel = String(_strOrXML.@label);
 				}
 				if (_callBack==null) {
-					_alert.btnY.hrefXML = _strOrXML;
+					_alert.btnY.href = _strOrXML;
 				}
 				if (_strOrXML.msg.length() > 0) {
 					_strOrXML = _strOrXML.msg;

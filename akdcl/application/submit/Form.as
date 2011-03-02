@@ -123,7 +123,7 @@ package akdcl.application.submit {
 			if (alertSubmit) {
 				alertSubmit.remove();
 			}
-			alertSubmit = Alert.show(String(alertXML.submit).replace("${" + Field.A_VALUE + "}", 0), 0);
+			//alertSubmit = Alert.show(String(alertXML.submit).replace("${" + Field.A_VALUE + "}", 0), 0);
 			//fieldData里是否包含BtyeArray，BitmapData
 			var _isFormVar:Boolean;
 			for (var _i:String in fieldsData) {

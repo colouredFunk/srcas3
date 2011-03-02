@@ -50,11 +50,13 @@
 				stage.showDefaultContextMenu = false;
 			}
 			tabChildren = false;
+			__widthOrg = loaderInfo.width;
+			__heightOrg = loaderInfo.height;
 			flashVars = loaderInfo.parameters;
-			paramsObject.width = loaderInfo.width;
-			paramsObject.height = loaderInfo.height;
+			paramsObject.width = widthOrg;
+			paramsObject.height = heightOrg;
 			//decodeURI(this.loaderInfo.url).split("/").pop()
-			addContextMenu(this, "size:" + loaderInfo.width + " x " + loaderInfo.height, onWHReleaseHandler);
+			addContextMenu(this, "size:" + widthOrg + " x " + heightOrg, onWHReleaseHandler);
 			//loaderInfo.addEventListener(ProgressEvent.PROGRESS,onLoadingHandler);
 			loaderInfo.addEventListener(Event.COMPLETE,onLoadedHandler);
 			if (onLoaded==null) {
@@ -152,6 +154,14 @@
 			}else {
 				loaded = _loaded;
 			}
+		}
+		private var __widthOrg:int;
+		private var __heightOrg:int;
+		public function get widthOrg():int{
+			return __widthOrg;
+		}
+		public function get heightOrg():int{
+			return __heightOrg;
 		}
 		private var __flashVars:Object;
 		public function set flashVars(_flashVars:Object):void {
