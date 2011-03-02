@@ -1,5 +1,4 @@
 ﻿package ui{
-	import akdcl.utils.destroyObject;
 	import flash.display.DisplayObject;
 	import flash.display.LoaderInfo;
 	import flash.display.Sprite;
@@ -14,6 +13,8 @@
 	import flash.system.ApplicationDomain;
 	
 	import ui.manager.ButtonManager;
+	
+	import akdcl.utils.destroyObject;
 	
 	public class Alert extends UISprite {
 		public static var alertLayer:*;

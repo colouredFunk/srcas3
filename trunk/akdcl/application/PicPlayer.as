@@ -12,7 +12,13 @@
 	import flash.events.ProgressEvent;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
+	
 	import com.greensock.TweenMax;
+	
+	import akdcl.net.getURL;
+	import akdcl.net.DataLoader;
+	import akdcl.utils.addContextMenu;
+	
 	import ui_2.SimpleBtn;
 	/**
 	 * ...
@@ -130,12 +136,12 @@
 			if (_xml.pic.length() > 0) {
 				xmlLoaded( { currentTarget: { data:_url }} );
 			}else {
-				Common.urlLoader(_url, xmlLoaded);
+				DataLoader.load(_url,null,xmlLoaded);
 			}
 		}
 		public function clickPic():void {
 			if (btn.userData.href) {
-				Common.getURL(btn.userData.href,btn.userData.target)
+				getURL(btn.userData.href, btn.userData.target);
 			}
 		}
 		private var __masked:Boolean;
@@ -169,7 +175,7 @@
 				backShape.height = picHeight;
 			}
 			txt_debug.text = "轮播图片:" + picWidth + " x " + picHeight;
-			Common.addContextMenu(parent, txt_debug.text);
+			addContextMenu(parent, txt_debug.text);
 			fillMode = int(xml.fillMode) || fillMode;
 			timeDelay = Number(xml.timeDelay) || timeDelay;
 			timeTween = Number(xml.timeTween) || timeTween;

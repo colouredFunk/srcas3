@@ -1,7 +1,6 @@
 package ui{
 	import flash.display.MovieClip;
 	import flash.events.Event;
-	import flash.utils.Dictionary;
 	
 	import ui.manager.EventManager;
 	
@@ -42,6 +41,8 @@ package ui{
 			if (parent) {
 				autoRemove = true;
 				parent.removeChild(this);
+			}else {
+				onRemoveToStageHandler();
 			}
 		}
 		protected function init():void {

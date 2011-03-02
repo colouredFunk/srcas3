@@ -1,5 +1,4 @@
 package akdcl.application.submit{
-	import fl.controls.Label;
 	import flash.display.Sprite;
 	import flash.events.FocusEvent;
 	
@@ -12,7 +11,7 @@ package akdcl.application.submit{
 	 * @author Akdcl
 	 */
 	public class ImageBrowse extends ImageLoader{
-		public var label:Label;
+		public var label:*;
 		public var focusRectClip:Sprite
 		//override public function get width():Number { return areaWidth; }
 		
