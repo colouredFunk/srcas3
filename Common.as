@@ -1,6 +1,7 @@
 ﻿package {
 	import flash.events.*;
 	import flash.display.*;
+	import flash.utils.*;
 	import flash.net.URLRequest;
 	import flash.net.URLRequestMethod;
 	import flash.net.URLLoader;
@@ -9,11 +10,11 @@
 	import flash.net.navigateToURL;
 	import flash.net.URLStream;
 	import flash.system.LoaderContext;
-	import flash.utils.*;
 	import flash.geom.ColorTransform;
 	import flash.filters.ColorMatrixFilter;
 	import flash.system.Capabilities;
 	import flash.external.ExternalInterface;
+	
 	import flash.ui.ContextMenu;
 	import flash.ui.ContextMenuItem;
 	import flash.ui.ContextMenuBuiltInItems;
@@ -124,35 +125,12 @@
 			return _strOld.split(_str).join(_rep);
 		}
 
-		public static function stringIsTrue(_str:String):Boolean {
-			if (!_str || _str == "" || _str == "0" || _str == " " || _str == "false"){
-				return false;
-			}
-			return true;
-		}
-
-		public static function isValidQQ(_qq:String):Boolean {
-			return /\d{5,12}/.test(_qq) || isValidEmail(_qq);
-		}
-
-		public static function isValidEmail(_email:String):Boolean {
-			var _emailExpression:RegExp = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+(w+([.-]\w+))*/;
-			/////^[a-z][\w.-]+@\w[\w.-]+\.[\w.-]*[a-z][a-z]$/i;
-			return _emailExpression.test(_email);
-		}
-
 		//
 		public static function playerVersion():int {
 			return int(flash.system.Capabilities.version.split(",")[0].split(" ")[1]);
 		}
 
 		//
-		public static function clone(_source:Object):* {
-			var _copy:ByteArray = new ByteArray();
-			_copy.writeObject(_source);
-			_copy.position = 0;
-			return (_copy.readObject());
-		}
 
 		//_funLoaded(event:Event):void {event.currentTarget.content as Bitmap;event.currentTarget.loader as Loader};
 		public static function loader(_obj:*, _funLoaded:Function = null, _funLoading:Function = null, _funError:Function = null):Loader {
@@ -229,39 +207,7 @@
 			}
 			_loader.load(_request);
 			return _loader;
-		} //_funLoaded(event:Event):void {event.currentTarget.data}
-
-		public static function urlStream(_url:String, _funLoaded:Function = null, _funLoading:Function = null, _funError:Function = null):URLStream {
-			var _stream:URLStream = new URLStream();
-			//_loader.dataFormat=URLLoaderDataFormat.BINARY;
-			if (_funLoaded != null){
-				if (_funLoading != null){
-					_stream.addEventListener(ProgressEvent.PROGRESS, _funLoading);
-				}
-				var _tempLoaded:Function = function(event:Event):void {
-					_funLoaded(event);
-					if (_funLoading != null){
-						_stream.removeEventListener(ProgressEvent.PROGRESS, _funLoading);
-					}
-					_stream.removeEventListener(Event.COMPLETE, _tempLoaded);
-				};
-				_stream.addEventListener(Event.COMPLETE, _tempLoaded);
-			}
-			if (_funError != null){
-				var _tempError:Function = function(event:IOErrorEvent):void {
-					_funError(event);
-					if (_funLoading != null){
-						_stream.removeEventListener(ProgressEvent.PROGRESS, _funLoading);
-					}
-					_stream.removeEventListener(Event.COMPLETE, _tempLoaded);
-					_stream.removeEventListener(IOErrorEvent.IO_ERROR, _tempError);
-				};
-				_stream.addEventListener(IOErrorEvent.IO_ERROR, _tempError);
-			}
-			_stream.load(new URLRequest(_url));
-			return _stream;
 		}
-		public static var call:Function = ExternalInterface.call;
 
 		public static function getPageHREF():String {
 			var _href:String;
@@ -271,86 +217,12 @@
 			return _href;
 		}
 
-		public static function getURLByXMLNode(_xml:*, _data:Object = null, _hrefKey:String = "href", _jsKey:String = "js", _targetKey:String = "target"):void {
-			if (_xml is XMLList){
-				_xml = _xml[0];
-			} else if (!(_xml is XML)){
-				throw Error("ERROR:need XML Source");
-			}
-			var _href:String = String(_xml.attribute(_hrefKey));
-			if (_href){
-				getURL(_href, String(_xml.attribute(_targetKey) || "_blank"), _data);
-				return;
-			}
-			var _js:String = String(_xml.attribute(_jsKey));
-			if (_js && ExternalInterface.available){
-				ExternalInterface.call("eval", _js);
-			}
+		public static function getURLByXMLNode(_xml:*):void {
+			akdcl.net.getURL(_xml);
 		}
 
 		public static function getURL(_url:String, _target:String = "_blank", _data:Object = null):void {
-			var _request:URLRequest = new URLRequest(_url);
-			if (_data){
-				var _urlVariables:URLVariables = new URLVariables();
-				for (var _i:String in _data){
-					_urlVariables[_i] = _data[_i];
-				}
-				_request.data = _urlVariables;
-				_request.method = URLRequestMethod.POST;
-				navigateToURL(_request, _target);
-				return;
-			}
-			var _browserName:String = getBrowserName();
-			var _features:String = "";
-			switch (_browserName){
-				case "Firefox":
-				case "IE":
-					if (ExternalInterface.available){
-						ExternalInterface.call("window.open", _url, _target, "");
-					} else {
-						navigateToURL(_request, _target);
-					}
-					break;
-				case "Safari":
-				case "Opera":
-					navigateToURL(_request, _target);
-					break;
-				default:
-					navigateToURL(_request, _target);
-					break;
-			}
-		}
-
-		public static function getBrowserName():String {
-			var _browserName:String;
-			var _browserAgent:String;
-			if (ExternalInterface.available){
-				_browserAgent = ExternalInterface.call("function getBrowser(){return navigator.userAgent;}");
-			}
-			if (_browserAgent){
-				if (_browserAgent.indexOf("Firefox") >= 0){
-					_browserName = "Firefox";
-				} else if (_browserAgent.indexOf("Safari") >= 0){
-					_browserName = "Safari";
-				} else if (_browserAgent.indexOf("MSIE") >= 0){
-					_browserName = "IE";
-				} else if (_browserAgent.indexOf("Opera") >= 0){
-					_browserName = "Opera";
-				} else {
-					_browserName = "Unknown";
-				}
-			} else {
-				//_browserName = "undefined";
-			}
-			return _browserName;
-		}
-
-		public static function garbageCallback():void {
-			try {
-				new LocalConnection().connect("GC");
-				new LocalConnection().connect("GC");
-			} catch (error:Error){
-			}
+			akdcl.net.getURL(_url, _target, _data);
 		}
 	}
 }

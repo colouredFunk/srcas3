@@ -12,7 +12,7 @@ package akdcl.application.submit {
 	
 	import akdcl.utils.destroyObject;
 	import akdcl.net.DataLoader;
-	import akdcl.net.FormVariables;
+	import akdcl.net.getURL;
 
 	/**
 	 * ...
@@ -32,14 +32,12 @@ package akdcl.application.submit {
 		protected var style:FormStyle;
 		protected var alertSubmit:Alert;
 		protected var jpegEncoder:JPEGEncoder;
-		protected var formVars:FormVariables;
 
 		public function setSource(_xml:XML, _container:DisplayObjectContainer = null, _views:Object = null):void {
 			data = {};
 			fieldsData = { };
 			fieldDic = { };
 			jpegEncoder = new JPEGEncoder();
-			formVars = new FormVariables();
 			
 			submitXML = _xml.submit[0];
 			resultXML = _xml.result[0];
@@ -182,7 +180,7 @@ package akdcl.application.submit {
 						if (_xmlList.@msg.length() > 0 || _xmlList.msg.length() > 0){
 							Alert.show(_xmlList);
 						} else {
-							Common.getURLByXMLNode(_xmlList);
+							getURL(_xmlList);
 						}
 						break;
 					default:
