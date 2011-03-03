@@ -349,18 +349,12 @@ package akdcl.application.player{
 			switch(player.playState) {
 				case MediaPlayer.STATE_PAUSE:
 				case MediaPlayer.STATE_STOP:
-					if (btnPlay) {
-						TweenMax.to(btnPlay, 0.5, { alpha:1, scaleX:1, scaleY:1  } );
-					}
 					if (player.content&&(player.content is ContentDisplay)) {
 						TweenMax.to(player.content, 0.5, { colorTransform: { brightness:0.5 }} );
 					}
 				break;
 				case MediaPlayer.STATE_PLAY:
 				default:
-					if (btnPlay) {
-						TweenMax.to(btnPlay, 0.5, { alpha:0, scaleX:0, scaleY:0 } );
-					}
 					if (player.content&&(player.content is ContentDisplay)) {
 						TweenMax.to(player.content, 0.5, { colorTransform: { brightness:1 }} );
 					}

@@ -19,9 +19,8 @@ package akdcl.application.player{
 		public function set totalTime(_totalTime:uint):void {
 			__totalTime = _totalTime;
 		}
-		protected var timeOff:uint;
 		override public function get position():uint {
-			return (timer.currentCount-timeOff) * timer.delay;
+			return timer.currentCount * timer.delay;
 		}
 		override public function set contentWidth(value:uint):void {
 			super.contentWidth = value;
@@ -40,7 +39,16 @@ package akdcl.application.player{
 		}
 		override public function play():void {
 			super.play();
-			timeOff = timer.currentCount;
+			timer.start();
+		}
+		override public function pause():void {
+			super.pause();
+			timer.stop();
+		}
+		override public function stop():void {
+			super.stop();
+			timer.reset();
+			timer.stop();
 		}
 		override public function hideContent():void {
 			super.hideContent();
@@ -48,7 +56,6 @@ package akdcl.application.player{
 		}
 		override protected function onPlayIDChangeHandler(_playID:int):void {
 			stop();
-			
 			super.onPlayIDChangeHandler(_playID);
 			
 			var _imageSource:String = getMediaByID(_playID);
