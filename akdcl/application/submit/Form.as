@@ -12,7 +12,7 @@ package akdcl.application.submit {
 	
 	import akdcl.utils.destroyObject;
 	import akdcl.net.DataLoader;
-	import akdcl.net.getURL;
+	import akdcl.net.FormVariables;
 
 	/**
 	 * ...
@@ -32,12 +32,14 @@ package akdcl.application.submit {
 		protected var style:FormStyle;
 		protected var alertSubmit:Alert;
 		protected var jpegEncoder:JPEGEncoder;
+		protected var formVars:FormVariables;
 
 		public function setSource(_xml:XML, _container:DisplayObjectContainer = null, _views:Object = null):void {
 			data = {};
 			fieldsData = { };
 			fieldDic = { };
 			jpegEncoder = new JPEGEncoder();
+			formVars = new FormVariables();
 			
 			submitXML = _xml.submit[0];
 			resultXML = _xml.result[0];
@@ -123,7 +125,7 @@ package akdcl.application.submit {
 			if (alertSubmit) {
 				alertSubmit.remove();
 			}
-			//alertSubmit = Alert.show(String(alertXML.submit).replace("${" + Field.A_VALUE + "}", 0), 0);
+			alertSubmit = Alert.show(String(alertXML.submit).replace("${" + Field.A_VALUE + "}", 0), 0);
 			//fieldData里是否包含BtyeArray，BitmapData
 			var _isFormVar:Boolean;
 			for (var _i:String in fieldsData) {
@@ -180,7 +182,7 @@ package akdcl.application.submit {
 						if (_xmlList.@msg.length() > 0 || _xmlList.msg.length() > 0){
 							Alert.show(_xmlList);
 						} else {
-							getURL(_xmlList);
+							Common.getURLByXMLNode(_xmlList);
 						}
 						break;
 					default:

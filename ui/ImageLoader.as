@@ -29,7 +29,7 @@
 	import flash.events.ContextMenuEvent;
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
-	import akdcl.utils.addContextMenu;
+	import flash.system.ApplicationDomain;
 	
 	/**
 	 * ...
@@ -39,8 +39,11 @@
 		private static var contextMenuImageLoader:ContextMenu;
 		private static var contextMenuItemImageLoader:ContextMenuItem;
 		private static function createMenu(_target:*):ContextMenu {
+			if (!ApplicationDomain.currentDomain.hasDefinition("Common")) {
+				return null;
+			}
 			if (!contextMenuImageLoader) {
-				addContextMenu(_target, "");
+				contextMenuItemImageLoader = ApplicationDomain.currentDomain.getDefinition("Common").addContextMenu(_target, "");
 				contextMenuImageLoader = _target.contextMenu;
 				contextMenuImageLoader.addEventListener(ContextMenuEvent.MENU_SELECT, onImageMenuShowHandler);
 			}

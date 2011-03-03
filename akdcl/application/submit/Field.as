@@ -3,8 +3,8 @@ package akdcl.application.submit {
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
 	import flash.events.FocusEvent;
-	import flash.text.TextFieldAutoSize;
 	import flash.utils.setTimeout;
+	import flash.text.TextFieldAutoSize;
 
 	import fl.controls.Label;
 	import fl.controls.TextInput;
@@ -12,6 +12,8 @@ package akdcl.application.submit {
 	import fl.controls.ComboBox;
 	import fl.controls.RadioButton;
 	import fl.controls.CheckBox;
+	
+	import akdcl.application.submit.ImageBrowse;
 
 	import akdcl.utils.stringToBoolean;
 	import akdcl.net.DataLoader;

@@ -46,9 +46,7 @@ package zero.swf{
 		public static var initByXML_getResourceTag:Function;
 		
 		
-		//public static var ignoreUnknownTag:Boolean=true;
-		public static var ignoreUnknownTag:Boolean=false;//- - 20110222 个别带 未知 type: 253 的 swf 忽略后出问题
-		
+		public static var ignoreUnknownTag:Boolean=true;
 		public static var currSrcName:String;
 		
 		public static const structorOption:String="结构";
