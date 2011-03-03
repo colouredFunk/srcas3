@@ -1,6 +1,5 @@
 ﻿package akdcl.application
 {
-	//import br.com.stimuli.loading.loadingtypes.VideoItem;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Loader;
@@ -14,6 +13,7 @@
 	import flash.utils.Timer;
 	import com.greensock.TweenMax;
 	import ui_2.SimpleBtn;
+	import akdcl.utils.addContextMenu;
 	/**
 	 * ...
 	 * @author Akdcl
@@ -169,7 +169,7 @@
 				backShape.height = picHeight;
 			}
 			txt_debug.text = "轮播图片:" + picWidth + " x " + picHeight;
-			Common.addContextMenu(parent, txt_debug.text);
+			addContextMenu(parent, txt_debug.text);
 			fillMode = int(xml.fillMode) || fillMode;
 			timeDelay = Number(xml.timeDelay) || timeDelay;
 			timeTween = Number(xml.timeTween) || timeTween;

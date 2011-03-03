@@ -9,12 +9,10 @@
 	
 	import flash.external.ExternalInterface;
 	import flash.utils.setTimeout;
-	import akdcl.application.player.Sound;
-	import ui.UISprite;
 	
-	import flash.ui.ContextMenu;
-	import flash.ui.ContextMenuItem;
-	import flash.events.ContextMenuEvent;
+	import akdcl.application.player.Sound;
+	
+	import ui.UISprite;
 	public class MusicPlayer extends UISprite {
 		public static const WMP_STATE_LIST:Array = ["连接超时", "停止", "暂停", "播放", "向前", "向后", "正在缓冲", "等待...", "完毕", "正在连接", "就绪", "重新连接"];
 		
@@ -22,21 +20,6 @@
 		public static var SOUND_PAUSE:String = "pause";
 		public static var SOUND_STOP:String = "stop";
 		public static var SOUND_IDCHANGE:String = "idChange";
-		
-		private static var contextMenuMusicPlayer:ContextMenu;
-		private static var contextMenuItemMusicPlayer:ContextMenuItem;
-		private static function createMenu(_target:*):void {
-			if (!contextMenuMusicPlayer) {
-				contextMenuItemMusicPlayer = Common.addContextMenu(_target, "");
-				contextMenuMusicPlayer = _target.contextMenu;
-				contextMenuMusicPlayer.addEventListener(ContextMenuEvent.MENU_SELECT, onImageMenuShowHandler);
-			}
-		}
-		private static function onImageMenuShowHandler(_evt:ContextMenuEvent):void {
-			var _musicPlayer:*=_evt.contextMenuOwner as MusicPlayer;
-			//var _source:String = _musicPlayer.sourceNow;
-			contextMenuItemMusicPlayer.caption = "MusicPlayer";
-		}
 		
 		public var btnPlay:*;
 		public var btnStop:*;
@@ -478,8 +461,6 @@
 				ExternalInterface.addCallback("stop", stop);
 				isPlugin = ExternalInterface.call("initMusicPlayer");
 			}
-			//createMenu(this);
-			//contextMenu = contextMenuMusicPlayer;
 		}
 		override protected function onRemoveToStageHandler():void {
 			stop();

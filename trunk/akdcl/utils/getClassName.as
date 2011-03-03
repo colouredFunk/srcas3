@@ -4,7 +4,7 @@ package akdcl.utils {
 	 * ...
 	 * @author Akdcl
 	 */
-	public function getObjectClassName(_object:Object):String {
+	public function getClassName(_object:Object):String {
 		return getQualifiedClassName(_object).split("::").pop();
 	}
 }

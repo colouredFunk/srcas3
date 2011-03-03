@@ -1,9 +1,9 @@
 package ui{
 	import flash.display.MovieClip;
 	import flash.events.Event;
-	import flash.utils.Dictionary;
 	
 	import ui.manager.EventManager;
+	import akdcl.utils.destroyObject;
 	
 	/**
 	 * ...
@@ -11,10 +11,6 @@ package ui{
 	 */
 	public class UIMovieClip extends MovieClip {
 		public var userData:Object;
-		private var __isRemoved:Boolean;
-		public function get isRemoved():Boolean {
-			return __isRemoved;
-		}
 		private var __isPlaying:Boolean = true;
 		public function get isPlaying():Boolean {
 			return __isPlaying;
@@ -37,12 +33,6 @@ package ui{
 		}
 		public function UIMovieClip() {
 			init();
-		}
-		public function remove():void {
-			if (parent) {
-				autoRemove = true;
-				parent.removeChild(this);
-			}
 		}
 		protected function init():void {
 			addEventListener(Event.ADDED_TO_STAGE, onAddedToStageHandler);
@@ -72,11 +62,16 @@ package ui{
 			contextMenu = null;
 			EventManager.removeTargetAllEvent(this);
 			UISprite.removeChildren(this);
-			for each (var _i:* in userData) {
-				delete userData[_i];
-			}
+			destroyObject(userData);
 			userData = null;
-			__isRemoved = true;
+		}
+		public function remove():void {
+			if (parent) {
+				autoRemove = true;
+				parent.removeChild(this);
+			}else {
+				onRemoveToStageHandler();
+			}
 		}
 		override public function play():void {
 			super.play();

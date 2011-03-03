@@ -44,6 +44,7 @@ package ui.manager {
 		}
 		public static function addButton(_button:*, _buttonMode:Boolean = true):void {
 			_button.buttonMode = _buttonMode;
+			_button.mouseChildren = false;
 			_button.addEventListener(MouseEvent.ROLL_OVER, onButtonRollOverHandler);
 			buttonDic[_button] = _button;
 			setButtonStyle(_button);
@@ -158,9 +159,6 @@ package ui.manager {
 			if (! _buttonClip) {
 				return;
 			}
-			/*if (_clip != this) {
-				_clip.buttonMode = false;
-			}*/
 			if (_nextFrame) {
 				_buttonClip.removeEventListener(Event.ENTER_FRAME, onEnterFramePrevHandler);
 				_buttonClip.addEventListener(Event.ENTER_FRAME, onEnterFrameNextHandler);

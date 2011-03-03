@@ -1,4 +1,5 @@
 package akdcl.utils {
+	import flash.net.LocalConnection;
 	/**
 	 * ...
 	 * @author Akdcl

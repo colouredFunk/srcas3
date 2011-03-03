@@ -12,7 +12,7 @@ package akdcl.application.submit {
 	
 	import akdcl.utils.destroyObject;
 	import akdcl.net.DataLoader;
-	import akdcl.net.FormVariables;
+	import akdcl.net.gotoURL;
 
 	/**
 	 * ...
@@ -32,14 +32,12 @@ package akdcl.application.submit {
 		protected var style:FormStyle;
 		protected var alertSubmit:Alert;
 		protected var jpegEncoder:JPEGEncoder;
-		protected var formVars:FormVariables;
 
 		public function setSource(_xml:XML, _container:DisplayObjectContainer = null, _views:Object = null):void {
 			data = {};
 			fieldsData = { };
 			fieldDic = { };
 			jpegEncoder = new JPEGEncoder();
-			formVars = new FormVariables();
 			
 			submitXML = _xml.submit[0];
 			resultXML = _xml.result[0];
@@ -83,7 +81,6 @@ package akdcl.application.submit {
 				_offHeight += style.dyFF;
 				fieldDic[_fieldXML.name()] = _field;
 			}
-			Alert.init(_container.stage);
 		}
 
 		public function add(_key:String, _value:*):void {
@@ -125,7 +122,7 @@ package akdcl.application.submit {
 			if (alertSubmit) {
 				alertSubmit.remove();
 			}
-			alertSubmit = Alert.show(String(alertXML.submit).replace("${" + Field.A_VALUE + "}", 0), 0);
+			alertSubmit = Alert.show(String(alertXML.submit.@msg).replace("${" + Field.A_VALUE + "}", 0), 0);
 			//fieldData里是否包含BtyeArray，BitmapData
 			var _isFormVar:Boolean;
 			for (var _i:String in fieldsData) {
@@ -151,7 +148,7 @@ package akdcl.application.submit {
 		protected function onUploadingHandler(_evt:ProgressEvent):void {
 			var _progress:uint = Math.round(_evt.bytesLoaded / _evt.bytesTotal * 100);
 			if (alertSubmit) {
-				alertSubmit.text = String(alertXML.submit).replace("${" + Field.A_VALUE + "}", _progress);
+				alertSubmit.text = String(alertXML.submit.@msg).replace("${" + Field.A_VALUE + "}", _progress);
 			}
 		}
 
@@ -175,19 +172,19 @@ package akdcl.application.submit {
 				switch (_xmlList.length()){
 					case 0:
 						//未知的结果
-						_str = String(alertXML.unknownStatus).replace("${" + Field.A_VALUE + "}", _data);
+						_str = String(alertXML.unknownStatus.@msg).replace("${" + Field.A_VALUE + "}", _data);
 						Alert.show(_str);
 						break;
 					case 1:
 						if (_xmlList.@msg.length() > 0 || _xmlList.msg.length() > 0){
 							Alert.show(_xmlList);
 						} else {
-							Common.getURLByXMLNode(_xmlList);
+							gotoURL(_xmlList);
 						}
 						break;
 					default:
 						//重复的结果
-						_str = String(alertXML.repeatStatus).replace("${" + Field.A_VALUE + "}", _data);
+						_str = String(alertXML.repeatStatus.@msg).replace("${" + Field.A_VALUE + "}", _data);
 						Alert.show(_str);
 						break;
 				}
