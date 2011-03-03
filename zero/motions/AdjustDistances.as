@@ -45,7 +45,8 @@ package zero.motions{
 			var x:int=left;
 			for each(dspObj in dspObjArr){
 				rect=dspObj.getBounds(dspObj.parent);
-				dspObj.x+=x-rect.x;
+				//dspObj.x+=x-rect.x;//立刻
+				dspObj.x+=(x-rect.x)*0.2;//缓动
 				x+=rect.width+d;
 			}
 			
