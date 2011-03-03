@@ -1,37 +1,35 @@
 ﻿package ui{
-	import akdcl.utils.destroyObject;
 	import flash.display.DisplayObject;
-	import flash.display.LoaderInfo;
 	import flash.display.Sprite;
 	
 	import flash.geom.Point;
 	import flash.events.Event;
 	import flash.text.TextFieldAutoSize;
 	
-	import flash.utils.ByteArray;
-	import flash.display.Loader;
-	import flash.system.LoaderContext;
-	import flash.system.ApplicationDomain;
+	//import flash.utils.ByteArray;
+	//import flash.display.LoaderInfo;
+	//import flash.display.Loader;
+	//import flash.system.LoaderContext;
+	//import flash.system.ApplicationDomain;
 	
-	import ui.manager.ButtonManager;
+	import akdcl.utils.destroyObject;
 	
 	public class Alert extends UISprite {
 		public static var alertLayer:*;
-		public static var ClassAlert:Class;
+		public static var AlertClass:Class = Alert;
 		public static var alertPoint:Point;
-		private static var alertLast:Alert;
-		private static var dataClassAlert:ByteArray;
-		private static var delayCallBack:Function;
-		private static var delayCallBackParams:Array;
+		//private static var dataClassAlert:ByteArray;
+		//private static var delayCallBack:Function;
+		//private static var delayCallBackParams:Array;
 		public static function init(_layer:*= null, _Class:Class = null):void {
 			alertLayer = _layer;
 			if (_Class) {
-				ClassAlert = _Class;
+				AlertClass = _Class;
 			}else {
-				loadDefaultSkin();
+				//loadDefaultSkin();
 			}
 		}
-		private static function loadDefaultSkin():void {
+		/*private static function loadDefaultSkin():void {
 			if (dataClassAlert) {
 				return;
 			}
@@ -48,41 +46,25 @@
 		private static function defaultSkinLoadedHandler(event:Event):void {
 			var _loaderInfo:LoaderInfo = event.currentTarget as LoaderInfo;
 			_loaderInfo.removeEventListener(Event.COMPLETE,defaultSkinLoadedHandler);
-			ClassAlert = _loaderInfo.applicationDomain.getDefinition("ui.Alert") as Class;
+			AlertClass = _loaderInfo.applicationDomain.getDefinition("ui.Alert") as Class;
 			if (delayCallBack!=null) {
 				delayCallBack.apply(Alert, delayCallBackParams);
 				delayCallBack = null;
 				destroyObject(delayCallBackParams);
 				delayCallBackParams = null;
 			}
-		}
+		}*/
 		public static function show(_strOrXML:*, _ctrlLabel:* = "确定", _callBack:Function = null, _Class:Class=null):Alert {
-			if (!alertLayer) {
-				if (ButtonManager.stage) {
-					if (_Class) {
-						init(ButtonManager.stage, _Class);
-					}else {
-						init(ButtonManager.stage);
-						delayCallBackParams = [_strOrXML, _ctrlLabel, _callBack];
-						delayCallBack = show;
-						return null;
-					}
-				}else {
-					throw Error("Alert.alertLayer is undefined!\nAlert.init(layer);");
-					return null;
-				}
+			if (!alertLayer||(!AlertClass&&!_Class)) {
+				throw Error("Alert.alertLayer is undefined!\nAlert.init(layer,class);");
 			}
 			var _alert:Alert;
 			if (_Class) {
 				_alert = new _Class();
-			}else if (ClassAlert) {
-				_alert = new ClassAlert();
-			}else {
-				init(alertLayer);
-				delayCallBackParams = [_strOrXML, _ctrlLabel, _callBack];
-				delayCallBack = show;
-				return null;;
+			}else if (AlertClass) {
+				_alert = new AlertClass();
 			}
+			
 			if (_strOrXML is XMLList) {
 				_strOrXML = _strOrXML[0];
 			}
@@ -90,8 +72,8 @@
 				if (_strOrXML.@label.length() > 0) {
 					_ctrlLabel = String(_strOrXML.@label);
 				}
-				if (_callBack==null) {
-					_alert.btnY.hrefXML = _strOrXML;
+				if (_callBack == null) {
+					_alert.btnY.href = _strOrXML;
 				}
 				if (_strOrXML.msg.length() > 0) {
 					_strOrXML = _strOrXML.msg;
@@ -192,7 +174,7 @@
 					default:
 					_label = "确定";
 					for (var _i:uint = 1; _i < _label; _i++ ) {
-						_label += "| ";
+						_label += "|";
 					}
 				}
 			}
@@ -260,7 +242,7 @@
 			dYTextBottomToBarBottom = bar.height - (txtText.y + txtText.height);
 			
 			
-			txtText.autoSize = "left";
+			txtText.autoSize = TextFieldAutoSize.LEFT;
 			txtText.mouseWheelEnabled = false;
 			txtText.mouseEnabled = false;
 			btnList = [btnY];

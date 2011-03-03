@@ -141,7 +141,6 @@
 			startY = btn_0.y;
 			btnsContainer = new Sprite();
 			addChild(btnsContainer);
-			//Common.copyInstanceToArray();
 			var _BtnClass:Class = btn_0.constructor as Class;
 			for (_i = 0; _i < picPlayer.picLength; _i++ ) {
 				_btn = btnList[_i];
@@ -234,9 +233,10 @@
 					if (btn_info) {
 						if (btn_info is SimpleBtn) {
 							btn_info.html = true;
-							btn_info.label = Common.replaceStr(picPlayer.getPicXML(picPlayer.id_pic).info);
+							btn_info.label = picPlayer.getPicXML(picPlayer.id_pic).info.split("\r\n").join("\r");
+							Common.replaceStr();
 						}else if(btn_info is TextField){
-							btn_info.htmlText = Common.replaceStr(picPlayer.getPicXML(picPlayer.id_pic).info);
+							btn_info.htmlText = picPlayer.getPicXML(picPlayer.id_pic).info.split("\r\n").join("\r");
 						}
 					}
 					if (btn_progress) {

@@ -2,6 +2,8 @@ package ui{
 	import flash.events.EventDispatcher;
 	import flash.events.Event;
 	
+	import akdcl.utils.destroyObject;
+	
 	import ui.manager.EventManager;
 	
 	/**
@@ -10,20 +12,13 @@ package ui{
 	 */
 	public class UIEventDispatcher extends EventDispatcher {
 		public var userData:Object;
-		private var __isRemoved:Boolean;
-		public function get isRemoved():Boolean {
-			return __isRemoved;
-		}
 		public function UIEventDispatcher() {
 			init();
 		}
 		public function remove():void {
 			EventManager.removeTargetAllEvent(this);
-			for each (var _i:* in userData) {
-				delete userData[_i];
-			}
+			destroyObject(userData);
 			userData = null;
-			__isRemoved = true;
 		}
 		protected function init():void {
 			

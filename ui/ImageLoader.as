@@ -6,18 +6,6 @@
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
 	
-	import com.greensock.TweenMax;
-	import com.greensock.layout.AlignMode;
-	import com.greensock.layout.AutoFitArea;
-	import com.greensock.layout.ScaleMode;
-	import com.greensock.easing.Sine;
-	
-	import com.greensock.events.LoaderEvent;
-	import com.greensock.loading.LoaderMax;
-	import com.greensock.loading.ImageLoader;
-	import com.greensock.loading.display.ContentDisplay;
-	import com.greensock.loading.LoaderStatus;
-	
 	import flash.display.Sprite;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -31,6 +19,20 @@
     import flash.ui.ContextMenuItem;
 	import flash.system.ApplicationDomain;
 	
+	import com.greensock.TweenMax;
+	import com.greensock.layout.AlignMode;
+	import com.greensock.layout.AutoFitArea;
+	import com.greensock.layout.ScaleMode;
+	import com.greensock.easing.Sine;
+	
+	import com.greensock.events.LoaderEvent;
+	import com.greensock.loading.LoaderMax;
+	import com.greensock.loading.ImageLoader;
+	import com.greensock.loading.display.ContentDisplay;
+	import com.greensock.loading.LoaderStatus;
+	
+	import akdcl.utils.addContextMenu;
+	
 	/**
 	 * ...
 	 * @author Akdcl
@@ -39,11 +41,8 @@
 		private static var contextMenuImageLoader:ContextMenu;
 		private static var contextMenuItemImageLoader:ContextMenuItem;
 		private static function createMenu(_target:*):ContextMenu {
-			if (!ApplicationDomain.currentDomain.hasDefinition("Common")) {
-				return null;
-			}
 			if (!contextMenuImageLoader) {
-				contextMenuItemImageLoader = ApplicationDomain.currentDomain.getDefinition("Common").addContextMenu(_target, "");
+				contextMenuItemImageLoader = addContextMenu(_target, "");
 				contextMenuImageLoader = _target.contextMenu;
 				contextMenuImageLoader.addEventListener(ContextMenuEvent.MENU_SELECT, onImageMenuShowHandler);
 			}

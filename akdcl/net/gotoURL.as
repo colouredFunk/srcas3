@@ -1,6 +1,5 @@
 package akdcl.net {
 	import flash.net.URLRequest;
-	import flash.net.URLRequestMethod;
 	import flash.net.navigateToURL;
 	import flash.external.ExternalInterface;
 	import akdcl.utils.objectToURLVariables;
@@ -9,35 +8,41 @@ package akdcl.net {
 	 * @author Akdcl
 	 */
 
-	public function getURL(_urlOrXML:*, _target:String = "_blank", _data:Object = null):void {
+	public function gotoURL(_urlOrXML:*, _target:String = "_blank", _data:Object = null, _method:String = "GET"):void {
 		if (_urlOrXML is XMLList) {
 			_urlOrXML = _urlOrXML[0];
 		}
+		var _href:String;
 		if (_urlOrXML is XML) {
-			var _js:String = String(_urlOrXML.attribute("js"));
 			_target = String(_urlOrXML.attribute("target")) || _target;
-			_urlOrXML = String(_urlOrXML.attribute("href"));
-			if (!_urlOrXML && _js && ExternalInterface.available) {
-				ExternalInterface.call("eval", _js);
-				return;
-			}
+			_href = String(_urlOrXML.attribute("href"));
+		}else {
+			_href = _urlOrXML;
 		}
-		
+		if (_href) {
+			
+		}else {
+			var _js:String = (_urlOrXML.attribute("js"));
+			if (_js && ExternalInterface.available) {
+				ExternalInterface.call("eval", _js);
+			}
+			return;
+		}
 		var _request:URLRequest = new URLRequest(_urlOrXML);
 		if (_data) {
-			if (_data["constructor"]===Object) {
+			if (_data["constructor"] === Object) {
 				_request.data = objectToURLVariables(_data);
 			}else {
 				_request.data = _data;
 			}
-			_request.method = URLRequestMethod.POST;
+			_request.method = _method;
 			navigateToURL(_request, _target);
 			return;
 		}
 		
 		var _browserAgent:String;
 		if (ExternalInterface.available){
-			_browserAgent = ExternalInterface.call("function getBrowser(){return navigator.userAgent;}");
+			_browserAgent = ExternalInterface.call("eval", "navigator.userAgent;");
 		}
 		if (_browserAgent){
 			var _browserName:String;

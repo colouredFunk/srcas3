@@ -4,6 +4,7 @@
 	import flash.events.Event;
 	
 	import ui.manager.EventManager;
+	import akdcl.utils.destroyObject;
 	
 	/**
 	 * ...
@@ -11,10 +12,6 @@
 	 */
 	public class UISprite extends Sprite {
 		public var userData:Object;
-		private var __isRemoved:Boolean;
-		public function get isRemoved():Boolean {
-			return __isRemoved;
-		}
 		private var __enabled:Boolean = true;
 		public function get enabled():Boolean {
 			return __enabled;
@@ -37,14 +34,6 @@
 		}
 		public function UISprite() {
 			init();
-		}
-		public function remove():void {
-			if (parent) {
-				autoRemove = true;
-				parent.removeChild(this);
-			}else {
-				onRemoveToStageHandler();
-			}
 		}
 		protected function init():void {
 			addEventListener(Event.ADDED_TO_STAGE, onAddedToStageHandler);
@@ -73,11 +62,16 @@
 			contextMenu = null;
 			EventManager.removeTargetAllEvent(this);
 			removeChildren(this);
-			for each (var _i:* in userData) {
-				delete userData[_i];
-			}
+			destroyObject(userData);
 			userData = null;
-			__isRemoved = true;
+		}
+		public function remove():void {
+			if (parent) {
+				autoRemove = true;
+				parent.removeChild(this);
+			}else {
+				onRemoveToStageHandler();
+			}
 		}
 		override public function addEventListener(_type:String, _listener:Function, _useCapture:Boolean = false, _priority:int = 0, _useWeakReference:Boolean = false):void {
 			super.addEventListener(_type, _listener, _useCapture, _priority, false);

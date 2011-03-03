@@ -14,9 +14,11 @@
 	import flash.system.Security;
 	import flash.system.System;
 	
-	import zero.SWFMetadataGetter;
-	
 	import com.adobe.serialization.json.JSON;
+	
+	import zero.SWFMetadataGetter;
+	import akdcl.net.DataLoader;
+	import akdcl.utils.addContextMenu;
 	
 	public class DocClass extends MovieClip {
 		protected static var instance:*;
@@ -54,7 +56,7 @@
 			paramsObject.width = widthOrg;
 			paramsObject.height = heightOrg;
 			//decodeURI(this.loaderInfo.url).split("/").pop()
-			Common.addContextMenu(this, "size:" + widthOrg + " x " + heightOrg, onWHReleaseHandler);
+			addContextMenu(this, "size:" + widthOrg + " x " + heightOrg, onWHReleaseHandler);
 			//loaderInfo.addEventListener(ProgressEvent.PROGRESS,onLoadingHandler);
 			loaderInfo.addEventListener(Event.COMPLETE,onLoadedHandler);
 			if (onLoaded==null) {
@@ -66,7 +68,7 @@
 			}
 			optionsXMLPath = flashVars.xml || optionsXMLPath;
 			if (optionsXMLPath) {
-				Common.urlLoader(optionsXMLPath, onOptionsXMLLoadedHandler, onOptionsXMLLoadingHandler,onOptionsXMLLoadErrorHandler);
+				DataLoader.load(optionsXMLPath, onOptionsXMLLoadingHandler, onOptionsXMLLoadedHandler,onOptionsXMLLoadErrorHandler);
 			}
 			addEventListener(Event.ENTER_FRAME,onLoadingHandler);
 		}
@@ -76,10 +78,10 @@
 				paramsObject.flashVars.xml = optionsXMLPath;
 			}
 			var _jsonStr:String = JSON.encode(paramsObject);
-			_jsonStr = Common.replaceStr(_jsonStr, '{"', '{');
-			_jsonStr = Common.replaceStr(_jsonStr, '":', ':');
-			_jsonStr = Common.replaceStr(_jsonStr, ',"', ',');
-			_jsonStr = Common.replaceStr(_jsonStr, '"', "'");
+			_jsonStr = _jsonStr.split('{"').join('{');
+			_jsonStr = _jsonStr.split('":').join(':');
+			_jsonStr = _jsonStr.split(',"').join(',');
+			_jsonStr = _jsonStr.split('"').join("'");
 			var _url:String = decodeURI(this.loaderInfo.url);
 			var _ary:Array = _url.split("/");
 			_url = _ary.pop();
@@ -113,7 +115,7 @@
 					_ary[0]=_ary[0].split("-");
 					_ary[1] = _ary[1].split(":");
 					modifyDate = _ary[0][1] + _ary[0][2] + "." + (int(_ary[1][0]) * 60 + int(_ary[1][1]));
-					Common.addContextMenu(this, "version:" +_ary[0][0].substr(2, 2) + "." + modifyDate);
+					addContextMenu(this, "version:" +_ary[0][0].substr(2, 2) + "." + modifyDate);
 				}
 				onLoaded();
 			}
