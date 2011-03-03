@@ -5,7 +5,6 @@
 	import flash.text.TextFormat;
 	public class Txt extends UISprite {
 		public var txt:TextField;
-		public var html:Boolean;
 		protected var textFormat:TextFormat;
 		override protected function init():void {
 			super.init();
@@ -43,11 +42,7 @@
 		[Inspectable(defaultValue="Txt",type="String",name="文本")]
 		public function set text(_text:String):void {
 			if (__text!=_text) {
-				if (html) {
-					txt.htmlText=__text=_text;
-				} else {
-					txt.text=__text=_text;
-				}
+				txt.htmlText = __text = _text;
 				setStyle();
 			}
 		}
