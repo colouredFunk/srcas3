@@ -123,13 +123,22 @@ package zero.ui{
 			switch(btnDict[event.target]){
 				case 0:
 					if(btn1.visible){
-						callBackResult=callBack(true);
+						if(callBack==null){
+						}else{
+							callBackResult=callBack(true);
+						}
 					}else{
-						callBackResult=callBack();
+						if(callBack==null){
+						}else{
+							callBackResult=callBack();
+						}
 					}
 				break;
 				case 1:
-					callBackResult=callBack(false);
+					if(callBack==null){
+					}else{
+						callBackResult=callBack(false);
+					}
 				break;
 			}
 			if(callBackResult){
