@@ -28,7 +28,7 @@ package akdcl.net {
 			}
 			return;
 		}
-		var _request:URLRequest = new URLRequest(_urlOrXML);
+		var _request:URLRequest = new URLRequest(_href);
 		if (_data) {
 			if (_data["constructor"] === Object) {
 				_request.data = objectToURLVariables(_data);
@@ -63,7 +63,7 @@ package akdcl.net {
 			case "Firefox":
 			case "IE":
 				if (ExternalInterface.available){
-					ExternalInterface.call("window.open", _urlOrXML, _target, "");
+					ExternalInterface.call("window.open", _href, _target, "");
 				} else {
 					navigateToURL(_request, _target);
 				}

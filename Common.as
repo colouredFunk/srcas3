@@ -7,6 +7,7 @@
 	import flash.filters.ColorMatrixFilter;
 	import flash.system.Capabilities;
 	import flash.external.ExternalInterface;
+	import flash.net.URLRequest;
 	
 	
 	import akdcl.net.gotoURL;
