@@ -1,4 +1,5 @@
 ﻿package ui{
+	import akdcl.utils.destroyObject;
 	import flash.display.DisplayObject;
 	import flash.display.LoaderInfo;
 	import flash.display.Sprite;
@@ -13,8 +14,6 @@
 	import flash.system.ApplicationDomain;
 	
 	import ui.manager.ButtonManager;
-	
-	import akdcl.utils.destroyObject;
 	
 	public class Alert extends UISprite {
 		public static var alertLayer:*;
@@ -92,7 +91,7 @@
 					_ctrlLabel = String(_strOrXML.@label);
 				}
 				if (_callBack==null) {
-					_alert.btnY.href = _strOrXML;
+					_alert.btnY.hrefXML = _strOrXML;
 				}
 				if (_strOrXML.msg.length() > 0) {
 					_strOrXML = _strOrXML.msg;

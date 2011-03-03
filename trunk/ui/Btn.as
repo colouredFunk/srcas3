@@ -1,8 +1,7 @@
 ﻿package ui {
 	import flash.events.Event;
 	import flash.external.ExternalInterface;
-	
-	import akdcl.net.getURL;
+	import flash.system.ApplicationDomain;
 
 	import ui.UIMovieClip;
 	import ui.manager.ButtonManager;
@@ -18,10 +17,18 @@
 		public var release:Function;
 
 		public var area:*;
-		
-		public var href:*;
+		public var href:String;
 		public var hrefTarget:String = "_blank";
 		public var eEval:String;
+
+		public function set hrefXML(_hrefXML:XML):void {
+			if (!_hrefXML){
+				return;
+			}
+			href = String(_hrefXML.@href);
+			hrefTarget = String(_hrefXML.@target) || hrefTarget;
+			eEval = String(_hrefXML.@js);
+		}
 
 		override public function set enabled(_enabled:Boolean):void {
 			super.enabled = _enabled;
@@ -83,7 +90,9 @@
 
 		public function $release():void {
 			if (href){
-				getURL(href, hrefTarget);
+				if (ApplicationDomain.currentDomain.hasDefinition("Common")){
+					ApplicationDomain.currentDomain.getDefinition("Common").getURL(href, hrefTarget);
+				}
 			} else if (eEval){
 				ExternalInterface.call("eval", eEval);
 			}
@@ -109,9 +118,9 @@
 			press = null;
 			release = null;
 
+			eEval = null;
 			href = null;
 			hrefTarget = null;
-			eEval = null;
 			area = null;
 			group = null;
 			enabled = false;

@@ -48,6 +48,15 @@
 				$setStyle(false);
 			}
 		}
+		override public function set hrefXML(_hrefXML:XML):void {
+			super.hrefXML = _hrefXML;
+			if (!_hrefXML) {
+				return;
+			}
+			if (_hrefXML.@label.length()>0) {
+				label = _hrefXML.@label;
+			}
+		}
 		override protected function init():void {
 			if (bar) {
 				xOff = int(bar.x - txt.x);
