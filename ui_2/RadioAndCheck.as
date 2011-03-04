@@ -1,6 +1,6 @@
-package ui_2
+﻿package ui_2
 {
-	
+	import akdcl.utils.removeFromObject;
 	/**
 	 * ...
 	 * @author Akdcl
@@ -22,8 +22,8 @@ package ui_2
 			groupItemDic[_groupName].push(_item);
 		}
 		public static function removeFromGroup(_groupName:String, _item:*):void {
-			Common.removeFromArray(groupItemDic[_groupName], _item);
-			Common.removeFromArray(groupSelectDic[_groupName], _item);
+			removeFromObject(groupItemDic[_groupName], _item);
+			removeFromObject(groupSelectDic[_groupName], _item);
 		}
 		public static function selectItem(_groupName:String, _item:*):Boolean {
 			var _limit:uint = getLimit(_groupName);
@@ -43,7 +43,7 @@ package ui_2
 			}
 		}
 		public static function unselectItem(_groupName:String, _item:*):void {
-			Common.removeFromArray(groupSelectDic[_groupName], _item);
+			removeFromObject(groupSelectDic[_groupName], _item);
 		}
 		private static const KEY_LIMIT:String = "limit";
 		private static const KEY_RADIO_UNSELECT_FUN:String = "radioUnselectFun";
