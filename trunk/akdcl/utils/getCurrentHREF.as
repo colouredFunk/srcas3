@@ -4,7 +4,7 @@ package akdcl.utils {
 	 * ...
 	 * @author Akdcl
 	 */
-	public function getCurrentHREF(_object:Object):String {
+	public function getCurrentHREF():String {
 		var _href:String;
 		if (ExternalInterface.available){
 			_href = ExternalInterface.call("eval", "window.location.href;");
