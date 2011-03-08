@@ -20,7 +20,7 @@ package akdcl.application.submit {
 	 */
 	public class Form {
 		protected static const jpegEncoder:JPEGEncoder = new JPEGEncoder();
-		
+
 		public var uploadComplete:Function;
 		public var uploadError:Function;
 		public var startX:uint = 0;
@@ -36,29 +36,29 @@ package akdcl.application.submit {
 
 		protected var style:FormStyle;
 		protected var alertSubmit:Alert;
-		
+
 		public function remove():void {
-			for each(var _field:Field in fieldDic) {
+			for each (var _field:Field in fieldDic){
 				_field.remove();
 			}
-			
+
 			destroyObject(data);
 			destroyObject(fieldsData);
 			destroyObject(fieldDic);
-			
+
 			uploadComplete = null;
 			uploadError = null;
-			
+
 			data = null;
 			fieldsData = null;
 			fieldDic = null;
-			
+
 			submitXML = null;
 			resultXML = null;
 			alertXML = null;
-			
+
 			style = null;
-			if (alertSubmit) {
+			if (alertSubmit){
 				alertSubmit.remove();
 			}
 			alertSubmit = null;
@@ -103,13 +103,12 @@ package akdcl.application.submit {
 			var _offHeight:uint = 0;
 			for (var _i:uint; _i < submitXML.children().length(); _i++){
 				var _fieldXML:XML = submitXML.children()[_i];
-				if (_fieldXML.attribute(Field.A_LABEL).length() == 0){
-					continue;
+				if ((_fieldXML.attribute(Field.A_LABEL).length() > 0) || (_fieldXML.attribute(Field.A_STYLE_TYPE).length() > 0)){
+					var _field:Field = new Field();
+					_offHeight += _field.setSource(submitXML.children()[_i], _container, style, null, _offHeight);
+					_offHeight += style.dyFF;
+					fieldDic[_fieldXML.name()] = _field;
 				}
-				var _field:Field = new Field();
-				_offHeight += _field.setSource(submitXML.children()[_i], _container, style, null, _offHeight);
-				_offHeight += style.dyFF;
-				fieldDic[_fieldXML.name()] = _field;
 			}
 		}
 
@@ -144,7 +143,7 @@ package akdcl.application.submit {
 					//true（字段为非必要且没有数据）
 				} else {
 					//data（数据）
-					fieldsData[_field.name] = _data;
+					fieldsData[_field.key] = _data;
 				}
 			}
 			if (_result){
@@ -220,37 +219,25 @@ package akdcl.application.submit {
 						//未知的结果
 						_xml = XML(alertXML.unknownStatus);
 						_xml.unknownStatus.@msg = String(alertXML.unknownStatus.@msg).replace("${" + Field.A_VALUE + "}", _data);
-						_alert = Alert.show(_xml);
-						if (uploadError != null){
-							uploadError(_data, _xml, _alert);
-						}
+						_alert = Alert.show(_xml, 1, uploadError);
 						break;
 					case 1:
 						if (_xmlList.@msg.length() > 0 || _xmlList.msg.length() > 0){
-							_alert = Alert.show(_xmlList);
+							_alert = Alert.show(_xmlList, 1, uploadComplete);
 						} else {
 							gotoURL(_xmlList);
-						}
-						if (uploadComplete != null){
-							uploadComplete(_data, _xmlList[0], _alert);
 						}
 						break;
 					default:
 						//重复的结果
 						_xml = XML(alertXML.repeatStatus[0]);
 						_xml.repeatStatus.@msg = String(alertXML.repeatStatus.@msg).replace("${" + Field.A_VALUE + "}", _statusData);
-						_alert = Alert.show(_xml);
-						if (uploadError != null){
-							uploadError(_data, _xml, _alert);
-						}
+						_alert = Alert.show(_xml, 1, uploadError);
 						break;
 				}
 			} else {
 				//错误的数据
-				_alert = Alert.show(alertXML.resultError + "\n" + _dataLoader.data);
-				if (uploadError != null){
-					uploadError(_dataLoader.data, alertXML.resultError[0], _alert);
-				}
+				_alert = Alert.show(alertXML.resultError + "\n" + _dataLoader.data, 1, uploadError);
 			}
 			destroyObject(data);
 		}
@@ -264,10 +251,11 @@ package akdcl.application.submit {
 			_alert.callBack = function(_b:Boolean):void {
 				if (_b){
 					upload();
+				}else {
+					if (uploadError != null){
+						uploadError();
+					}
 				}
-			}
-			if (uploadError != null){
-				uploadError(null, alertXML.subimtError[0], _alert);
 			}
 		}
 	}
