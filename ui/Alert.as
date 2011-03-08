@@ -2,6 +2,7 @@
 	import akdcl.utils.replaceString;
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
+	import flash.text.TextField;
 	
 	import flash.geom.Point;
 	import flash.events.Event;
@@ -92,8 +93,8 @@
 		//
 		public var callBack:Function;
 		
-		public var txtTitle:*;
-		public var txtText:*;
+		public var txtTitle:TextField;
+		public var txtText:TextField;
 		public var btnY:*;
 		public var btnX:*;
 		public var bar:*;
