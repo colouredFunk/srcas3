@@ -1,4 +1,5 @@
 ﻿package ui{
+	import akdcl.utils.replaceString;
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	
@@ -82,7 +83,7 @@
 				}
 			}
 			_alert.label = _ctrlLabel;
-			_alert.text = _strOrXML;
+			_alert.text = replaceString(_strOrXML);
 			_alert.callBack = _callBack;
 			alertLayer.addChild(_alert);
 			return _alert;
@@ -116,6 +117,7 @@
 			__barWidth = _barWidth;
 			bar.width = __barWidth;
 			txtText.width = __barWidth - widthAddText;
+			//自动调整了width可能会影响的height
 			barHeight = 0;
 		}
 		//
@@ -129,6 +131,7 @@
 			if (!btnY.visible) {
 				bar.height -= int(btnY.height);
 			}
+			moveToCenter();
 			setStyle();
 		}
 		//
@@ -172,9 +175,9 @@
 						_label="确定|取消"
 					break;
 					default:
-					_label = "确定";
-					for (var _i:uint = 1; _i < _label; _i++ ) {
-						_label += "|";
+					var _total:uint = _label;
+					for (var _i:uint = 1; _i < _total; _i++ ) {
+						_label += "| ";
 					}
 				}
 			}
@@ -195,6 +198,7 @@
 				}
 				setBtn(_instanceCopy,_i,btnList,_length);
 			}
+			setStyle();
 		}
 		//
 		private var __labelsAutoSize:String = TextFieldAutoSize.CENTER;
@@ -286,6 +290,9 @@
 				x = alertPoint.x;
 				y = alertPoint.y;
 			}else {
+				if (!stage) {
+					return;
+				}
 				x = int(stage.stageWidth * 0.5 - barWidth * 0.5);
 				y = int(stage.stageHeight * 0.5 - barHeight * 0.5);
 			}

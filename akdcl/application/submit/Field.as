@@ -293,9 +293,10 @@ package akdcl.application.submit {
 			sourceXML = null;
 			name = null;
 			viewContainer = null;
-			//label
-			//followLabel
-			//view
+			//
+			label = null;
+			followLabel = null;
+			view = null;
 		}
 		//返回true（字段为非必要且没有数据）,false（没有数据或数据非法）或data（数据）
 		public function checkData(_checkUndata:Boolean = true):* {

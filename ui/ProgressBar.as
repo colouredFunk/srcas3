@@ -90,6 +90,7 @@ package ui{
 		}
 		override protected function onRemoveToStageHandler():void {
 			super.onRemoveToStageHandler();
+			labelFunction = null;
 			change = null;
 			txt = null;
 			thumb = null;
