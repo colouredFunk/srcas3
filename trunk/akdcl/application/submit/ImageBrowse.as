@@ -62,23 +62,24 @@ package akdcl.application.submit{
 			label.text = "浏览";
 			focusRectClip.visible = false;
 			
-			rollOver = onRollOver;
-			rollOut = onRollOut;
+			rollOver = onRollOverHandler;
+			rollOut = onRollOutHandler;
 			release = browseImage;
 			tabEnabled = false;
 			tabChildren = false;
 			focusRect = false;
+			autoRemove = false;
 		}
 		override public function $release():void {
 			super.$release();
 			dispatchEvent(new FocusEvent(FocusEvent.FOCUS_IN, false));
 		}
 		
-		private function onRollOver():void {
+		private function onRollOverHandler():void {
 			focusRectClip.visible = true;
 		}
 		
-		private function onRollOut():void{
+		private function onRollOutHandler():void{
 			focusRectClip.visible = false;
 			dispatchEvent(new FocusEvent(FocusEvent.FOCUS_OUT));
 		}

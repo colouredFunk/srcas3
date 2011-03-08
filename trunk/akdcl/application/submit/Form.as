@@ -4,12 +4,12 @@ package akdcl.application.submit {
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
 	import flash.utils.ByteArray;
-	
+
 	import com.JPEGEncoder;
 
 	import ui.manager.FLManager;
 	import ui.Alert;
-	
+
 	import akdcl.utils.destroyObject;
 	import akdcl.net.DataLoader;
 	import akdcl.net.gotoURL;
@@ -19,26 +19,56 @@ package akdcl.application.submit {
 	 * @author Akdcl
 	 */
 	public class Form {
+		protected static const jpegEncoder:JPEGEncoder = new JPEGEncoder();
 		
+		public var uploadComplete:Function;
+		public var uploadError:Function;
 		public var startX:uint = 0;
 		public var startY:uint = 0;
-		
+
 		protected var data:Object;
 		protected var fieldsData:Object;
 		protected var fieldDic:Object;
+
 		protected var submitXML:XML;
 		protected var resultXML:XML;
 		protected var alertXML:XML;
+
 		protected var style:FormStyle;
 		protected var alertSubmit:Alert;
-		protected var jpegEncoder:JPEGEncoder;
+		
+		public function remove():void {
+			for each(var _field:Field in fieldDic) {
+				_field.remove();
+			}
+			
+			destroyObject(data);
+			destroyObject(fieldsData);
+			destroyObject(fieldDic);
+			
+			uploadComplete = null;
+			uploadError = null;
+			
+			data = null;
+			fieldsData = null;
+			fieldDic = null;
+			
+			submitXML = null;
+			resultXML = null;
+			alertXML = null;
+			
+			style = null;
+			if (alertSubmit) {
+				alertSubmit.remove();
+			}
+			alertSubmit = null;
+		}
 
 		public function setSource(_xml:XML, _container:DisplayObjectContainer = null, _views:Object = null):void {
 			data = {};
-			fieldsData = { };
-			fieldDic = { };
-			jpegEncoder = new JPEGEncoder();
-			
+			fieldsData = {};
+			fieldDic = {};
+
 			submitXML = _xml.submit[0];
 			resultXML = _xml.result[0];
 			alertXML = _xml.alert[0];
@@ -47,7 +77,7 @@ package akdcl.application.submit {
 			style.startX = startX;
 			style.startY = startY;
 			if (submitXML.style.length() > 0){
-				for each (var _styleParams:XML in submitXML.style.attributes()) {
+				for each (var _styleParams:XML in submitXML.style.attributes()){
 					var _paramName:String = _styleParams.name();
 					switch (_paramName){
 						case "width":
@@ -73,7 +103,7 @@ package akdcl.application.submit {
 			var _offHeight:uint = 0;
 			for (var _i:uint; _i < submitXML.children().length(); _i++){
 				var _fieldXML:XML = submitXML.children()[_i];
-				if (_fieldXML.attribute(Field.A_LABEL).length() == 0) {
+				if (_fieldXML.attribute(Field.A_LABEL).length() == 0){
 					continue;
 				}
 				var _field:Field = new Field();
@@ -89,8 +119,14 @@ package akdcl.application.submit {
 					add(_i, _value[_i]);
 				}
 			} else {
-				var _keyTo:String = submitXML.elements(_key)[0].attribute(Field.A_KEY).toString();
-				data[_keyTo] = _value;
+				var _xmlList:XMLList = submitXML.elements(_key);
+				if (_xmlList.length() > 0){
+					var _keyTo:String = _xmlList[0].attribute(Field.A_KEY).toString();
+					data[_keyTo] = _value;
+				} else {
+					data[_key] = _value;
+					trace("添加的值并没有在配置的xml中\n", "key：" + _key, "value：" + _value);
+				}
 			}
 		}
 
@@ -117,89 +153,122 @@ package akdcl.application.submit {
 				return null;
 			}
 		}
-		
+
 		public function upload():DataLoader {
-			if (alertSubmit) {
+			if (alertSubmit){
 				alertSubmit.remove();
 			}
-			alertSubmit = Alert.show(String(alertXML.submit.@msg).replace("${" + Field.A_VALUE + "}", 0), 0);
+			alertSubmit = Alert.show(alertXML.submit, 0);
 			//fieldData里是否包含BtyeArray，BitmapData
 			var _isFormVar:Boolean;
-			for (var _i:String in fieldsData) {
-				var _data:*= fieldsData[_i];
-				if (_data is ByteArray) {
+			for (var _i:String in fieldsData){
+				var _data:* = fieldsData[_i];
+				if (_data is ByteArray){
 					_isFormVar = true;
-				}else if (_data is BitmapData) {
+				} else if (_data is BitmapData){
 					_isFormVar = true;
 					jpegEncoder.setQuality(int(submitXML.elements(_i)[0].attribute(Field.A_QUALITY)));
 					fieldsData[_i] = jpegEncoder.encode(_data);
 				}
 			}
+			//
+			for (_i in data){
+				if (fieldsData[_i]){
+					trace("覆盖了field原有数据：" + _i + "\n", "原有数据：" + fieldsData[_i], "添加数据：" + data[_i]);
+				}
+				fieldsData[_i] = data[_i];
+			}
+			//
 			var _submitType:String;
-			if (_isFormVar) {
+			if (_isFormVar){
 				_submitType = DataLoader.TYPE_FORM;
-			}else if (submitXML.@dataType == "JSON") {
+			} else if (submitXML.@dataType == "JSON"){
 				_submitType = DataLoader.TYPE_JSON;
 			}
-			
+
 			return DataLoader.load(submitXML.@url, onUploadingHandler, onUploadCompleteHandler, onUploadErrorHandler, fieldsData, _submitType);
 		}
-		
+
 		protected function onUploadingHandler(_evt:ProgressEvent):void {
 			var _progress:uint = Math.round(_evt.bytesLoaded / _evt.bytesTotal * 100);
-			if (alertSubmit) {
-				alertSubmit.text = String(alertXML.submit.@msg).replace("${" + Field.A_VALUE + "}", _progress);
+			if (alertSubmit){
+				//alertSubmit.text = _progress;
 			}
 		}
 
 		protected function onUploadCompleteHandler(_evt:Event):void {
-			if (alertSubmit) {
+			if (alertSubmit){
 				alertSubmit.remove();
 			}
 			var _dataLoader:DataLoader = _evt.currentTarget as DataLoader;
 			trace(_dataLoader.data);
-			
+
 			var _data:*;
 			if (resultXML.@dataType == "JSON"){
 				_data = _dataLoader.dataJSON;
 			} else {
 				_data = _dataLoader.dataURLVariables;
 			}
-			
-			if (_data) {
-				var _xmlList:XMLList = resultXML.status.(attribute(Field.A_VALUE) == _data);
+			var _alert:Alert;
+			if (_data){
+				var _statusData:String = _data[resultXML.status.attribute(Field.A_KEY)];
+				var _xmlList:XMLList = resultXML.status.elements(Field.E_ITEM).(attribute(Field.A_VALUE) == _statusData);
 				var _str:String;
+				var _xml:XML;
 				switch (_xmlList.length()){
 					case 0:
 						//未知的结果
-						_str = String(alertXML.unknownStatus.@msg).replace("${" + Field.A_VALUE + "}", _data);
-						Alert.show(_str);
+						_xml = XML(alertXML.unknownStatus);
+						_xml.unknownStatus.@msg = String(alertXML.unknownStatus.@msg).replace("${" + Field.A_VALUE + "}", _data);
+						_alert = Alert.show(_xml);
+						if (uploadError != null){
+							uploadError(_data, _xml, _alert);
+						}
 						break;
 					case 1:
 						if (_xmlList.@msg.length() > 0 || _xmlList.msg.length() > 0){
-							Alert.show(_xmlList);
+							_alert = Alert.show(_xmlList);
 						} else {
 							gotoURL(_xmlList);
+						}
+						if (uploadComplete != null){
+							uploadComplete(_data, _xmlList[0], _alert);
 						}
 						break;
 					default:
 						//重复的结果
-						_str = String(alertXML.repeatStatus.@msg).replace("${" + Field.A_VALUE + "}", _data);
-						Alert.show(_str);
+						_xml = XML(alertXML.repeatStatus[0]);
+						_xml.repeatStatus.@msg = String(alertXML.repeatStatus.@msg).replace("${" + Field.A_VALUE + "}", _statusData);
+						_alert = Alert.show(_xml);
+						if (uploadError != null){
+							uploadError(_data, _xml, _alert);
+						}
 						break;
 				}
-			}else {
+			} else {
 				//错误的数据
-				Alert.show(alertXML.resultError + "\n" + _dataLoader.data);
+				_alert = Alert.show(alertXML.resultError + "\n" + _dataLoader.data);
+				if (uploadError != null){
+					uploadError(_dataLoader.data, alertXML.resultError[0], _alert);
+				}
 			}
+			destroyObject(data);
 		}
 
 		protected function onUploadErrorHandler(_evt:Event):void {
-			if (alertSubmit) {
+			if (alertSubmit){
 				alertSubmit.remove();
 			}
 			//上传失败
-			Alert.show(alertXML.subimtError);
+			var _alert:Alert = Alert.show(alertXML.subimtError, "重试|取消");
+			_alert.callBack = function(_b:Boolean):void {
+				if (_b){
+					upload();
+				}
+			}
+			if (uploadError != null){
+				uploadError(null, alertXML.subimtError[0], _alert);
+			}
 		}
 	}
 
