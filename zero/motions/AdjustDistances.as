@@ -13,38 +13,34 @@ package zero.motions{
 	import flash.utils.*;
 	import flash.geom.*;
 	
-	public class AdjustDistances extends Sprite{//就为了有个 enterframe 事件扩展 Sprite - -
+	public class AdjustDistances{
 		private var dspObjArr:Array;
 		private var left:Number;
 		private var right:Number;
 		public function AdjustDistances(..._dspObjArr){
 			dspObjArr=_dspObjArr;
-			var rect:Rectangle=new Rectangle(0,0,0,0);
+			var u_rect:Rectangle=new Rectangle(0,0,0,0);
+			var rect:Rectangle;
 			for each(var dspObj:DisplayObject in dspObjArr){
-				rect=rect.union(dspObj.getBounds(dspObj.parent));
+				rect=getB(dspObj);
+				u_rect=u_rect.union(rect);
 			}
 			
-			left=rect.left;
-			right=rect.right;
-			
-			this.addEventListener(Event.ENTER_FRAME,enterFrame);
+			left=u_rect.left;
+			right=u_rect.right;
 		}
-		public function clear():void{
-			dspObjArr=null;
-			this.removeEventListener(Event.ENTER_FRAME,enterFrame);
-		}
-		private function enterFrame(event:Event):void{
+		public function step():void{
 			var widSum:Number=0;
 			var dspObj:DisplayObject;
 			var rect:Rectangle;
 			for each(dspObj in dspObjArr){
-				rect=dspObj.getBounds(dspObj.parent);
+				rect=getB(dspObj);
 				widSum+=rect.width;
 			}
 			var d:Number=((right-left)-widSum)/(dspObjArr.length-1);
 			var x:int=left;
 			for each(dspObj in dspObjArr){
-				rect=dspObj.getBounds(dspObj.parent);
+				rect=getB(dspObj);
 				//dspObj.x+=x-rect.x;//立刻
 				dspObj.x+=(x-rect.x)*0.2;//缓动
 				x+=rect.width+d;
@@ -52,8 +48,14 @@ package zero.motions{
 			
 			//最右边的有些振动，调一下：
 			dspObj=dspObjArr[dspObjArr.length-1];
-			rect=dspObj.getBounds(dspObj.parent);
+			rect=getB(dspObj);
 			dspObj.x+=right-rect.right;
+		}
+		private function getB(dspObj:DisplayObject):Rectangle{
+			if(dspObj.hasOwnProperty("adjust_b_area")){
+				return dspObj["adjust_b_area"].getBounds(dspObj.parent);
+			}
+			return dspObj.getBounds(dspObj.parent);
 		}
 	}
 }
