@@ -197,7 +197,17 @@
 			if (_xmlList.length() > 0) {
 				_ob = { };
 				for each(_each in _xmlList) {
-					_ob[String(_each.name())] = Number(_each);
+					_ob[String(_each.name())] = _each=="true"
+												?
+												true
+												:
+												(
+													_each=="false"
+													?
+													false
+													:
+													Number(_each)
+												);
 					//trace(_each.name()+":"+_each);
 				}
 			}
