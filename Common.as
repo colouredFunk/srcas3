@@ -68,7 +68,36 @@
 		public static function urlLoader(_url:String, _funLoaded:Function = null, _funLoading:Function = null, _funError:Function = null, _data:Object = null):* {
 			return DataLoader.load(_url, _funLoading, _funLoaded, _funError, _data);
 		}
-
+		public static function urlStream(_url:String,_funLoaded:Function=null,_funLoading:Function=null,_funError:Function=null):URLStream {
+			var _stream:URLStream=new URLStream();
+			//_loader.dataFormat=URLLoaderDataFormat.BINARY;
+			if (_funLoaded!=null) {
+				if (_funLoading!=null) {
+					_stream.addEventListener(ProgressEvent.PROGRESS,_funLoading);
+				}
+				var _tempLoaded:Function=function(event:Event):void{
+					_funLoaded(event);
+					if(_funLoading!=null){
+						_stream.removeEventListener(ProgressEvent.PROGRESS,_funLoading);
+					}
+					_stream.removeEventListener(Event.COMPLETE,_tempLoaded);
+				};
+				_stream.addEventListener(Event.COMPLETE,_tempLoaded);
+			}
+			if(_funError!=null){
+				var _tempError:Function=function(event:IOErrorEvent):void{
+					_funError(event);
+					if(_funLoading!=null){
+						_stream.removeEventListener(ProgressEvent.PROGRESS,_funLoading);
+					}
+					_stream.removeEventListener(Event.COMPLETE,_tempLoaded);
+					_stream.removeEventListener(IOErrorEvent.IO_ERROR,_tempError);
+				};
+				_stream.addEventListener(IOErrorEvent.IO_ERROR,_tempError);
+			}
+			_stream.load(new URLRequest(_url));
+			return _stream;
+		}
 		public static function getURLByXMLNode(_xml:*):void {
 			gotoURL(_xml);
 		}
