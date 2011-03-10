@@ -8,6 +8,7 @@
 	import flash.system.Capabilities;
 	import flash.external.ExternalInterface;
 	import flash.net.URLRequest;
+	import flash.net.URLStream;
 	
 	
 	import akdcl.net.gotoURL;
