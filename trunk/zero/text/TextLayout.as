@@ -62,11 +62,20 @@ package zero.text{
 		}
 		private function added(event:Event){
 			this.removeEventListener(Event.ADDED_TO_STAGE,added);
-			this.addEventListener(Event.REMOVED_FROM_STAGE,removed);
+			addEventListener(Event.REMOVED_FROM_STAGE, onRemoveToStageDelayHandler);
 		}
-		private function removed(event:Event){
-			this.removeEventListener(Event.REMOVED_FROM_STAGE,removed);
-			clear();
+		private function onRemoveToStageDelayHandler(_evt:Event):void {
+			if (stage && stage.focus == this) {
+				stage.focus = null;
+			}
+			addEventListener(Event.ENTER_FRAME, onRemoveToStageDelayHandler);
+			if (_evt.type == Event.ENTER_FRAME) {
+				removeEventListener(Event.ENTER_FRAME, onRemoveToStageDelayHandler);
+				if (stage) {
+					return;
+				}
+				clear();
+			}
 		}
 		public function clear():void{
 			if(textFlow){
