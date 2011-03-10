@@ -234,7 +234,7 @@
 						if (btn_info is SimpleBtn) {
 							btn_info.html = true;
 							btn_info.label = picPlayer.getPicXML(picPlayer.id_pic).info.split("\r\n").join("\r");
-							Common.replaceStr();
+							//Common.replaceStr();
 						}else if(btn_info is TextField){
 							btn_info.htmlText = picPlayer.getPicXML(picPlayer.id_pic).info.split("\r\n").join("\r");
 						}
