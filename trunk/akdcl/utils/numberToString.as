@@ -3,7 +3,7 @@ package akdcl.utils {
 	 * ...
 	 * @author Akdcl
 	 */
-	public function numberToTime(_value:uint, _lenght:uint = 2):String {
+	public function numberToString(_value:uint, _lenght:uint = 2):String {
 		var _str:String = String(_value);
 		_lenght--;
 		var _d:uint = Math.pow(10, _lenght);
