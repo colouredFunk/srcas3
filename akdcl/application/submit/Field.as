@@ -93,7 +93,7 @@ package akdcl.application.submit {
 			return "<font color='" + _color + "'>" + _str + "</font>";
 		}
 
-		private static function setTextInput(_field:TextInput, _source:XML):TextInput {
+		private static function setTextInput(_field:*, _source:XML):* {
 			if (_field){
 
 			} else {
@@ -105,11 +105,11 @@ package akdcl.application.submit {
 			} else {
 				_field.restrict = null;
 			}
-			_field.displayAsPassword = stringToBoolean(_source.attribute(A_PASSWORD));
+			//_field.displayAsPassword = stringToBoolean(_source.attribute(A_PASSWORD));
 			return _field;
 		}
 
-		private static function setTextArea(_field:TextArea, _source:XML):TextArea {
+		private static function setTextArea(_field:*, _source:XML):* {
 			if (_field){
 
 			} else {
@@ -139,11 +139,11 @@ package akdcl.application.submit {
 			return _field;
 		}
 
-		private static function setRadioBtns(_field:Vector.<RadioButton>, _source:XML):Vector.<RadioButton> {
+		private static function setRadioBtns(_field:Array, _source:XML):Array {
 			if (_field){
 
 			} else {
-				_field = new Vector.<RadioButton>();
+				_field = new Array();
 			}
 			for each (var _eachXML:XML in _source.elements(E_ITEM)){
 				var _id:uint = _eachXML.childIndex();
@@ -156,16 +156,15 @@ package akdcl.application.submit {
 				}
 				_radioBtn.groupName = String(_source.name());
 				_radioBtn.label = _eachXML.attribute(A_LABEL);
-				_radioBtn.textField.autoSize = TextFieldAutoSize.RIGHT;
 			}
 			return _field;
 		}
 
-		private static function setCheckBoxes(_field:Vector.<CheckBox>, _source:XML):Vector.<CheckBox> {
+		private static function setCheckBoxes(_field:Array, _source:XML):Array {
 			if (_field){
 
 			} else {
-				_field = new Vector.<CheckBox>();
+				_field = new Array();
 			}
 			for each (var _eachXML:XML in _source.elements(E_ITEM)){
 				var _id:uint = _eachXML.childIndex();
@@ -177,7 +176,6 @@ package akdcl.application.submit {
 					_field[_id] = _checkBox;
 				}
 				_checkBox.label = _eachXML.attribute(A_LABEL);
-				_checkBox.textField.autoSize = TextFieldAutoSize.RIGHT;
 			}
 			return _field;
 		}
@@ -188,7 +186,7 @@ package akdcl.application.submit {
 			} else {
 				_field = new ImageBrowse();
 			}
-
+			//
 			return _field;
 		}
 
@@ -218,7 +216,7 @@ package akdcl.application.submit {
 		}
 
 		//>=0(selectedIndex)
-		private static function getRadioBtnsData(_field:Vector.<RadioButton>):int {
+		private static function getRadioBtnsData(_field:Array):int {
 			var _item:RadioButton;
 			for (var _i:uint = 0; _i < _field.length; _i++){
 				_item = _field[_i];
@@ -230,7 +228,7 @@ package akdcl.application.submit {
 		}
 
 		//Array(uint or String)
-		private static function getCheckBoxesData(_field:Vector.<CheckBox>):* {
+		private static function getCheckBoxesData(_field:Array):* {
 			var _item:CheckBox;
 			var _list:Array = [];
 			for (var _i:uint = 0; _i < _field.length; _i++){
@@ -244,7 +242,7 @@ package akdcl.application.submit {
 		}
 
 		//ByteArray or Vector.<ByteArray>
-		private static function getImageBrowseData(_field:ImageBrowse):* {
+		private static function getImageBrowseData(_field:*):* {
 			return _field.data ? _field.data : VALUE_UNSELECT;
 		}
 
@@ -272,7 +270,7 @@ package akdcl.application.submit {
 			viewContainer = _container;
 			offY = _offY;
 			formStyle = _style;
-
+			//
 			height = formStyle.height;
 			name = sourceXML.name();
 			key = sourceXML.attribute(A_KEY);
