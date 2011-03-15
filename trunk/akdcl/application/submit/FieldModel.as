@@ -1,5 +1,4 @@
 package akdcl.application.submit {
-	import akdcl.utils.replaceString;
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
@@ -18,12 +17,13 @@ package akdcl.application.submit {
 
 	import akdcl.utils.stringToBoolean;
 	import akdcl.net.DataLoader;
+	import akdcl.utils.replaceString;
 
 	/**
 	 * ...
 	 * @author Akdcl
 	 */
-	public class Field {
+	public class FieldModel {
 		public static const A_LABEL:String = "label";
 		public static const A_KEY:String = "key";
 		public static const A_VALUE:String = "value";
