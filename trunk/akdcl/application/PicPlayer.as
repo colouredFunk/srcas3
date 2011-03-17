@@ -321,8 +321,10 @@
 					btn.userData.target = "_blank";
 				}
 				btn.enabled = true;
+				btn.visible = true;
 			}else {
 				btn.enabled = false;
+				btn.visible = false;
 			}
 			changePic(_evtOrLoader);
 		}
