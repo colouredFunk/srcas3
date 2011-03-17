@@ -235,8 +235,6 @@ package zero.text{
 			textFlow.interactionManager=new SelectionManager();
 			textFlow.addEventListener(flashx.textLayout.events.TextLayoutEvent.SCROLL,scrollSelf);
 			
-			scrollPosition=0;
-			
 		}
 		
 		private function scrollSelf(event:Event):void{
@@ -253,7 +251,9 @@ package zero.text{
 		public function get scrollPosition():Number{
 			//获取当前滚动位置
 			if(containerController){
-				return containerController.verticalScrollPosition;
+				if(containerController.verticalScrollPosition>0){
+					return containerController.verticalScrollPosition;
+				}
 			}
 			return 0;
 		}
