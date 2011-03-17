@@ -55,12 +55,15 @@ public class StatusManager{
 		_xml:XML,
 		_loginStatus:String="1",
 		_statusName:String="status",
-		_decodeFun:Function=null
+		_decodeFun:Function=null,
+		statusNodeName:String=null,//20110314
+		_errorXML:XML=null//20110314
 	):void{
 		xml=_xml;
 		loginStatus=_loginStatus;
 		//normalStatus=_normalStatus;
 		statusName=_statusName;
+		statusNodeName=statusNodeName||statusName;
 		
 		decodeFun=_decodeFun||function(data:String):Object{
 			var urlVariables:URLVariables=new URLVariables();
@@ -75,7 +78,7 @@ public class StatusManager{
 		for each(var node:XML in xml.children()){
 			//trace(node.toXMLString());
 			switch(node.name().toString()){
-				case statusName:
+				case statusNodeName:
 					statusXMLs[node["@"+statusName].toString()]=node;
 				break;
 				default:
@@ -83,35 +86,37 @@ public class StatusManager{
 				break;
 			}
 		}
+		if(_errorXML){
+			errorXML=_errorXML;
+		}
+		
 		statusURLLoader=new URLLoader();
 		statusURLLoader.addEventListener(Event.COMPLETE,loadStatusFinished);
 		statusURLLoader.addEventListener(IOErrorEvent.IO_ERROR,loadStatusError);
+		statusURLLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR,loadStatusError);
 		
-		onInit();
+		if(onInit==null){
+		}else{
+			onInit();
+		}
 	}
 	
 	
-	public static function loadStatus(_onLoadStatus:Function=null,xmlName:String=null,varObj:Object=null):void{
+	public static function loadStatus(_onLoadStatus:Function=null,xmlOrXMLName:*=null,varObj:Object=null):void{
 		onLoadStatus=_onLoadStatus;
 		var url:String="";
-		if(xmlName){
-			url=getValue(xmlName,"url");
+		if(xmlOrXMLName is XML){
+			url=xmlOrXMLName.@url.toString();
+		}else if(xmlOrXMLName){
+			url=getValue(xmlOrXMLName,"url");
 		}
 		if(url){
 		}else{
 			url=getValue("action","url");
 		}
-		var request:URLRequest=new URLRequest(url);
-		if(varObj){
-			var urlVariables:URLVariables=new URLVariables();
-			for(var varName:String in varObj){
-				urlVariables[varName]=varObj[varName];
-			}
-			request.data=urlVariables;
-			request.method=URLRequestMethod.POST;
-		}
+		
 		loadedData=null;
-		statusURLLoader.load(request);
+		statusURLLoader.load(RequestLoader.getRequest(url,varObj));
 	}
 	private static function loadStatusFinished(event:Event):void{
 		trace("statusURLLoader.data="+statusURLLoader.data);
@@ -123,7 +128,7 @@ public class StatusManager{
 		}
 		checkStatus();
 	}
-	private static function loadStatusError(event:IOErrorEvent):void{
+	private static function loadStatusError(event:Event):void{
 		currXML=errorXML;
 		checkStatus();
 	}
@@ -160,7 +165,10 @@ public class StatusManager{
 			onLoadStatus(alertCallBackB,noRemoveAlert);
 		}
 		
-		onStatus(currXML,statusCount++);
+		if(onStatus==null){
+		}else{
+			onStatus(currXML,statusCount++);
+		}
 	}
 	
 	public static function getValue(xmlName:String,attName:String=null):*{
