@@ -59,9 +59,13 @@ package zero.ui{
 			_preloader.addEventListener("initComplete",initComplete);//FlexEvent.INIT_COMPLETE
 		}
 		private function loadProgress(event:ProgressEvent):void{
-			ZPLManager.showLoadGameProgress(event.bytesLoaded,event.bytesTotal);
+			setProgress(event.bytesLoaded,event.bytesTotal);
 		}
 		//
+		
+		public function setProgress(bytesLoaded:int,bytesTotal:int):void{
+			ZPLManager.showLoadGameProgress(bytesLoaded,bytesTotal);
+		}
 		
 		public function initComplete(...args):void{
 			resize(null);

@@ -41,6 +41,8 @@ package zero{
 		public static const path_common:String="http://"+domain+"/common/";
 		public static const path_ZeroPrevLoader:String=path_common+"ZeroPrevLoader.swf";
 		public static const path_BottomBar:String=path_common+"BottomBar.swf";
+		public static const path_Paihangbang:String=path_common+"Paihangbang.swf";
+		public static const path_SubmitScore:String=path_common+"SubmitScore.swf";
 		public static const path_getMsg:String=path_common+"getMsg.php";
 		public static const path_FlashPlayer_exe_compress:String=path_common+"FlashPlayer.exe.compress";
 		
