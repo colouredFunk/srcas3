@@ -60,7 +60,7 @@ package zero.text{
 			this.addEventListener(Event.ADDED_TO_STAGE,added);
 			init(args);
 		}
-		private function added(event:Event){
+		private function added(event:Event):void{
 			this.removeEventListener(Event.ADDED_TO_STAGE,added);
 			addEventListener(Event.REMOVED_FROM_STAGE, onRemoveToStageDelayHandler);
 		}
@@ -234,6 +234,8 @@ package zero.text{
 			//containerController.horizontalScrollPolicy=ScrollPolicy.ON;
 			textFlow.interactionManager=new SelectionManager();
 			textFlow.addEventListener(flashx.textLayout.events.TextLayoutEvent.SCROLL,scrollSelf);
+			
+			scrollPosition=0;
 			
 		}
 		

@@ -7,7 +7,7 @@
 		 width="300" height="25"
 >
 	<mx:TextInput id="txt" editable="false" left="0" right="75" textAlign="right"/>
-	<mx:ComboBox id="cb" left="0" right="75" minWidth="0"/>
+	<mx:ComboBox id="cb" left="0" right="75" minWidth="0" rowCount="10"/>
 	<mx:Button id="btn" y="0" label="浏览" right="0"/>
 	<fx:Script>
 		<![CDATA[
