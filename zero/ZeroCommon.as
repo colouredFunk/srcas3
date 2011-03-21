@@ -26,8 +26,8 @@ package zero{
 		}();
 		
 		public static const domain:String=function():String{
-			var domain:String="zero.flashwing.net";
-			//var domain:String="localhost/zero.flashwing.net";
+			//var domain:String="zero.flashwing.net";
+			var domain:String="localhost/zero.flashwing.net";
 			
 			if(FileClass){
 			}else{
@@ -42,7 +42,8 @@ package zero{
 		public static const path_ZeroPrevLoader:String=path_common+"ZeroPrevLoader.swf";
 		public static const path_BottomBar:String=path_common+"BottomBar.swf";
 		public static const path_Paihangbang:String=path_common+"Paihangbang.swf";
-		public static const path_SubmitScore:String=path_common+"SubmitScore.swf";
+		//public static const path_SubmitScore:String=path_common+"SubmitScore.swf";
+		public static const path_SubmitScore:String=path_common+"SubmitScore_encrypt.swf";
 		public static const path_getMsg:String=path_common+"getMsg.php";
 		public static const path_FlashPlayer_exe_compress:String=path_common+"FlashPlayer.exe.compress";
 		

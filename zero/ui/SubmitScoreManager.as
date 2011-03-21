@@ -10,43 +10,65 @@ SubmitScoreManager 版本:v1.0
 package zero.ui{
 	import flash.display.*;
 	import flash.events.*;
-	import flash.utils.*;
 	import flash.net.*;
+	import flash.utils.*;
 	
 	import zero.*;
 	
-	public class SubmitScoreManager{
+	public class SubmitScoreManager extends Loader{
 		public static var loader:Loader;
-		public static var ready:Boolean;
-		public static function init():void{
-			clear();
+		public static var submitScore:Sprite;
+		
+		private static var initFinished:Function;
+		
+		public static function init(_initFinished:Function):void{
+			initFinished=_initFinished;
 			
 			loader=new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadSubmitScoreComplete);
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,loadSubmitScoreError);
 			
 			try{
-				loader.load(new URLRequest(ZeroCommon.path_SubmitScore));
-				//loader.load(new URLRequest(ZeroCommon.path_SubmitScore+"?"+Math.random()));trace("测试，添加随机数字");
+				//loader.load(new URLRequest(ZeroCommon.path_SubmitScore));
+				loader.load(new URLRequest(ZeroCommon.path_SubmitScore+"?"+Math.random()));trace("测试，添加随机数字");
 			}catch(e:Error){}
 		}
-		public static function clear():void{
-			ready=false;
-			if(loader){
-				loader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadSubmitScoreComplete);
-				loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,loadSubmitScoreError);
-				loader=null;
-			}
-		}
 		private static function loadSubmitScoreComplete(event:Event):void{
-			ready=true;
-			
 			loader.contentLoaderInfo.removeEventListener(Event.COMPLETE,loadSubmitScoreComplete);
 			loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,loadSubmitScoreError);
+			
+			loader.content.addEventListener(Event.ENTER_FRAME,checkInit);
 		}
 		private static function loadSubmitScoreError(event:IOErrorEvent):void{
 			loader.contentLoaderInfo.removeEventListener(Event.COMPLETE,loadSubmitScoreComplete);
 			loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,loadSubmitScoreError);
+			if(initFinished==null){
+			}else{
+				initFinished(false);
+				initFinished=null;
+			}
+		}
+		private static function checkInit(event:Event):void{
+			try{
+				var SubmitScoreClass:*=loader.contentLoaderInfo.applicationDomain.getDefinition("SubmitScore");
+			}catch(e:Error){
+				//trace("e="+e);
+				return;
+			}
+			try{
+				submitScore=SubmitScoreClass.instance;
+			}catch(e:Error){
+				//trace("e="+e);
+				return;
+			}
+			if(submitScore){
+				loader.content.removeEventListener(Event.ENTER_FRAME,checkInit);
+				if(initFinished==null){
+				}else{
+					initFinished(true);
+					initFinished=null;
+				}
+			}
 		}
 	}
 }

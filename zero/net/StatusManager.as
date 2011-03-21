@@ -28,6 +28,7 @@ public class StatusManager{
 	public static var onStatus:Function;
 	
 	public static var statusName:String;
+	public static var statusKey:String;
 	
 	public static var prevCheckStatus:Function=function():Boolean{
 		return true;
@@ -57,6 +58,7 @@ public class StatusManager{
 		_statusName:String="status",
 		_decodeFun:Function=null,
 		statusNodeName:String=null,//20110314
+		_statusKey:String=null,//20110318
 		_errorXML:XML=null//20110314
 	):void{
 		xml=_xml;
@@ -64,6 +66,7 @@ public class StatusManager{
 		//normalStatus=_normalStatus;
 		statusName=_statusName;
 		statusNodeName=statusNodeName||statusName;
+		statusKey=_statusKey||statusName;
 		
 		decodeFun=_decodeFun||function(data:String):Object{
 			var urlVariables:URLVariables=new URLVariables();
@@ -121,7 +124,7 @@ public class StatusManager{
 	private static function loadStatusFinished(event:Event):void{
 		trace("statusURLLoader.data="+statusURLLoader.data);
 		loadedData=decodeFun(statusURLLoader.data);
-		currXML=statusXMLs[loadedData[statusName]];
+		currXML=statusXMLs[loadedData[statusKey]];
 		if(currXML){
 		}else{
 			currXML=errorXML;
