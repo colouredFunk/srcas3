@@ -11,20 +11,26 @@ package zero.net{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
+
 	public class FormVars{
 		private var values:Object;
+		private var filenames:Object;
 		
 		public var contentType:String;
 		public var boundary:String;
-		public function FormVars(_values:Object=null){
+		public function FormVars(_values:Object=null,_filenames:Object=null){
 			values=_values||new Object();
+			filenames=_filenames||new Object();
 			boundary="-=-=-=-=-=-=-=-=-=-"+Math.random();
 			contentType="multipart/form-data; boundary="+boundary;//只能用户点击时上传
 			//contentType="application/octet-stream; boundary="+boundary;
 			
 		}
-		public function add(name:String,value:*):void{
+		public function add(name:String,value:*,filename:String=null):void{
 			values[name]=value;
+			if(filename){
+				filenames[name]=filename;
+			}
 		}
 		public function get data():ByteArray{
 			var data:ByteArray=new ByteArray();
@@ -39,7 +45,7 @@ package zero.net{
 					//}
 					data.writeUTFBytes(
 						"Content-Disposition: form-data; name=\"" + name + 
-						"\"; filename=\"\\" + name +
+						"\"; filename=\"\\" + (filenames[name]||name) +
 						"\"\r\nContent-Type: application/octet-stream\r\n\r\n"
 					);
 					data.writeBytes(values[name]);
