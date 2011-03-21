@@ -139,7 +139,7 @@ public class StatusManager{
 		if(prevCheckStatus()){
 			var msg:String=currXML.@msg.toString();
 			if(msg){
-				msgPopUp(ReplaceVars.replace(msg,statusURLLoader.data),currXML.@btnLabel.toString()).callBack=runStatus;
+				msgPopUp(ReplaceVars.replace(msg,loadedData),currXML.@btnLabel.toString()).callBack=runStatus;
 			}else{
 				runStatus(true);
 			}
@@ -147,13 +147,13 @@ public class StatusManager{
 	}
 	private static function runStatus(alertCallBackB:Boolean=true,noRemoveAlert:Boolean=false):void{
 		if(alertCallBackB){
-			GotoURL.goto(currXML,statusURLLoader.data);
+			GotoURL.goto(currXML,loadedData);
 			switch(currXML["@"+statusName].toString()){
 				case loginStatus:
 					//提示用户要登录
 					var loginXML:XML=getValue("login");
 					if(loginXML){
-						GotoURL.goto(loginXML,statusURLLoader.data);
+						GotoURL.goto(loginXML,loadedData);
 					}
 				break;
 				//case normalStatus:

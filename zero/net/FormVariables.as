@@ -13,12 +13,17 @@ package zero.net{
 	import flash.utils.*;
 
 	public class FormVariables{
+		public static var default_extName:String=null;
+		
 		private var values:Object;
 		private var filenames:Object;
 		
 		public var contentType:String;
 		public var boundary:String;
-		public function FormVariables(_values:Object=null,_filenames:Object=null){
+		public function FormVariables(
+			_values:Object=null,
+			_filenames:Object=null
+		){
 			values=_values||new Object();
 			filenames=_filenames||new Object();
 			boundary="-=-=-=-=-=-=-=-=-=-"+Math.random();
@@ -45,7 +50,16 @@ package zero.net{
 					//}
 					data.writeUTFBytes(
 						"Content-Disposition: form-data; name=\"" + name + 
-						"\"; filename=\"\\" + (filenames[name]||name) +
+						"\"; filename=\"\\" + (
+							filenames[name]
+							||(
+								name+(
+									"."+default_extName
+									||
+									""
+								)
+							)
+						) +
 						"\"\r\nContent-Type: application/octet-stream\r\n\r\n"
 					);
 					data.writeBytes(values[name]);
