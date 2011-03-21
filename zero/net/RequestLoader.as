@@ -101,9 +101,9 @@ package zero.net{
 					//trace("ByteArray variables.length="+variables.length);
 					urlRequest.data=variables;
 					urlRequest.contentType="application/octet-stream";
-				}else if(variables is FormVars){
-					urlRequest.data=(variables as FormVars).data;
-					urlRequest.contentType=(variables as FormVars).contentType;
+				}else if(variables is FormVariables){
+					urlRequest.data=(variables as FormVariables).data;
+					urlRequest.contentType=(variables as FormVariables).contentType;
 				}else{
 					for(var varName:String in variables){
 						urlVariables[varName]=variables[varName];

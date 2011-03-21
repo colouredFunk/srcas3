@@ -1,5 +1,5 @@
 ﻿/***
-FormVars 版本:v1.0
+FormVariables 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
 创建时间:2010年6月2日 09:38:09
@@ -12,13 +12,13 @@ package zero.net{
 	import flash.events.*;
 	import flash.utils.*;
 
-	public class FormVars{
+	public class FormVariables{
 		private var values:Object;
 		private var filenames:Object;
 		
 		public var contentType:String;
 		public var boundary:String;
-		public function FormVars(_values:Object=null,_filenames:Object=null){
+		public function FormVariables(_values:Object=null,_filenames:Object=null){
 			values=_values||new Object();
 			filenames=_filenames||new Object();
 			boundary="-=-=-=-=-=-=-=-=-=-"+Math.random();

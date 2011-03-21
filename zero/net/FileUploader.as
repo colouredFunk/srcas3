@@ -26,7 +26,7 @@ package zero.net{
 			uploadFilePHPPath:String,
 			variables:Object=null
 		):void{推荐使用 PHPXMLLoader
-			var formVars:FormVars=new FormVars({
+			var formVars:FormVariables=new FormVariables({
 				fileName:fileName,
 				fileData:fileData
 			});
