@@ -140,45 +140,46 @@ package akdcl.application.submit {
 			return _field;
 		}
 
-		private static function setRadioBtns(_field:Vector.<RadioButton>, _source:XML):Vector.<RadioButton> {
+		private static function setRadioBtns(_field:Array, _source:XML):Array {
 			if (_field){
 
 			} else {
-				_field = new Vector.<RadioButton>();
+				_field = new Array();
 			}
 			for each (var _eachXML:XML in _source.elements(E_ITEM)){
 				var _id:uint = _eachXML.childIndex();
 				var _radioBtn:RadioButton;
-				try {
+				
+				if (_field[_id]) {
 					_radioBtn = _field[_id];
-				} catch (_ero:*){
+				}else {
 					_radioBtn = new RadioButton();
 					_field[_id] = _radioBtn;
 				}
 				_radioBtn.groupName = String(_source.name());
 				_radioBtn.label = _eachXML.attribute(A_LABEL);
-				_radioBtn.textField.autoSize = TextFieldAutoSize.RIGHT;
+				_radioBtn.textField.autoSize = TextFieldAutoSize.LEFT;
 			}
 			return _field;
 		}
 
-		private static function setCheckBoxes(_field:Vector.<CheckBox>, _source:XML):Vector.<CheckBox> {
+		private static function setCheckBoxes(_field:Array, _source:XML):Array {
 			if (_field){
 
 			} else {
-				_field = new Vector.<CheckBox>();
+				_field = new Array();
 			}
 			for each (var _eachXML:XML in _source.elements(E_ITEM)){
 				var _id:uint = _eachXML.childIndex();
 				var _checkBox:CheckBox;
-				try {
+				if (_field[_id]) {
 					_checkBox = _field[_id];
-				} catch (_ero:*){
+				}else {
 					_checkBox = new CheckBox();
 					_field[_id] = _checkBox;
 				}
 				_checkBox.label = _eachXML.attribute(A_LABEL);
-				_checkBox.textField.autoSize = TextFieldAutoSize.RIGHT;
+				_checkBox.textField.autoSize = TextFieldAutoSize.LEFT;
 			}
 			return _field;
 		}
@@ -219,7 +220,7 @@ package akdcl.application.submit {
 		}
 
 		//>=0(selectedIndex)
-		private static function getRadioBtnsData(_field:Vector.<RadioButton>):int {
+		private static function getRadioBtnsData(_field:Array):int {
 			var _item:RadioButton;
 			for (var _i:uint = 0; _i < _field.length; _i++){
 				_item = _field[_i];
@@ -231,7 +232,7 @@ package akdcl.application.submit {
 		}
 
 		//Array(uint or String)
-		private static function getCheckBoxesData(_field:Vector.<CheckBox>):* {
+		private static function getCheckBoxesData(_field:Array):* {
 			var _item:CheckBox;
 			var _list:Array = [];
 			for (var _i:uint = 0; _i < _field.length; _i++){
@@ -244,7 +245,7 @@ package akdcl.application.submit {
 			return _list.length > 0 ? _list : VALUE_UNSELECT;
 		}
 
-		//ByteArray or Vector.<ByteArray>
+		//ByteArray or Array
 		private static function getImageBrowseData(_field:ImageBrowse):* {
 			return _field.data ? _field.data : VALUE_UNSELECT;
 		}
@@ -259,11 +260,13 @@ package akdcl.application.submit {
 		protected var offY:uint;
 		protected var formStyle:FormStyle;
 		protected var height:uint;
+		protected var autoCreateView:Boolean = true;
 
+		public var styleType:String;
 		public var name:String;
 		public var key:String;
-		protected var styleType:String;
-		protected var required:Boolean;
+		public var required:Boolean;
+		
 		protected var reg:String;
 		protected var least:uint;
 		protected var most:uint;
@@ -273,11 +276,17 @@ package akdcl.application.submit {
 			viewContainer = _container;
 			offY = _offY;
 			formStyle = _style;
-
 			height = formStyle.height;
+			
+			styleType = String(sourceXML.attribute(A_STYLE_TYPE));
 			name = sourceXML.name();
 			key = sourceXML.attribute(A_KEY);
-			styleType = String(sourceXML.attribute(A_STYLE_TYPE));
+			required = stringToBoolean(sourceXML.attribute(A_REQUIRED));
+			
+			reg = String(sourceXML.attribute(A_REG));
+			least = int(sourceXML.attribute(A_LEAST));
+			most = int(sourceXML.attribute(A_MOST));
+			
 			if (!styleType) {
 				//没有指定styleType
 				if (sourceXML.elements(E_ITEM).length() > 0 || sourceXML.attribute(A_SOURCE).length() > 0){
@@ -291,11 +300,12 @@ package akdcl.application.submit {
 					styleType = ST_TEXT_INPUT;
 				}
 			}
-			required = stringToBoolean(sourceXML.attribute(A_REQUIRED));
-			reg = String(sourceXML.attribute(A_REG));
-			least = int(sourceXML.attribute(A_LEAST));
-			most = int(sourceXML.attribute(A_MOST));
-			setLabels();
+			
+			if (_view) {
+				autoCreateView = false;
+			}else {
+				setLabels();
+			}
 			setView(_view);
 			return height;
 		}
@@ -358,50 +368,54 @@ package akdcl.application.submit {
 			}
 			//
 			var _result:Boolean;
+			var _hintString:String = "";
 			switch (_data){
 				case ERROR_UNSELECTED:
-					if (required && _checkUndata){
-						followLabel.htmlText = setHtmlColor(formatString(TIP_ERROR_UNSELECTED), formStyle.colorError);
+					if (required && _checkUndata) {
+						_hintString = setHtmlColor(formatString(TIP_ERROR_UNSELECTED), formStyle.colorError);
 					} else {
-						followLabel.htmlText = setHtmlColor(getNormalFollowText(), formStyle.colorNormal);
+						_hintString = setHtmlColor(getNormalFollowText(), formStyle.colorNormal);
 					}
 					break;
 				case ERROR_UNINPUT:
 					if (required && _checkUndata){
-						followLabel.htmlText = setHtmlColor(formatString(TIP_ERROR_UNINPUT), formStyle.colorError);
+						_hintString = setHtmlColor(formatString(TIP_ERROR_UNINPUT), formStyle.colorError);
 					} else {
-						followLabel.htmlText = setHtmlColor(getNormalFollowText(), formStyle.colorNormal);
+						_hintString = setHtmlColor(getNormalFollowText(), formStyle.colorNormal);
 					}
 					break;
 				case ERROR_UNINPUT_CUSTOM:
-					followLabel.htmlText = setHtmlColor(formatString(TIP_ERROR_UNINPUT_CUSTOM), formStyle.colorError);
+					_hintString = setHtmlColor(formatString(TIP_ERROR_UNINPUT_CUSTOM), formStyle.colorError);
 					break;
 				case ERROR_LEAST:
-					followLabel.htmlText = setHtmlColor(formatString(TIP_ERROR_LEAST), formStyle.colorError);
+					_hintString = setHtmlColor(formatString(TIP_ERROR_LEAST), formStyle.colorError);
 					break;
 				case ERROR_MOST:
-					followLabel.htmlText = setHtmlColor(formatString(TIP_ERROR_MOST), formStyle.colorError);
+					_hintString = setHtmlColor(formatString(TIP_ERROR_MOST), formStyle.colorError);
 					break;
 				case ERROR_LEAST_CHAR:
-					followLabel.htmlText = setHtmlColor(formatString(TIP_ERROR_LEAST_CHAR), formStyle.colorError);
+					_hintString = setHtmlColor(formatString(TIP_ERROR_LEAST_CHAR), formStyle.colorError);
 					break;
 				case ERROR_MOST_CHAR:
-					followLabel.htmlText = setHtmlColor(formatString(TIP_ERROR_MOST_CHAR), formStyle.colorError);
+					_hintString = setHtmlColor(formatString(TIP_ERROR_MOST_CHAR), formStyle.colorError);
 					break;
 				case ERROR_REG:
-					followLabel.htmlText = setHtmlColor(formatString(TIP_ERROR_REG), formStyle.colorError);
+					_hintString = setHtmlColor(formatString(TIP_ERROR_REG), formStyle.colorError);
 					break;
 				default:
 					_result = true;
 					if (required){
-						followLabel.htmlText = setHtmlColor(formatString(TIP_REQUIRED_COMPLETE), formStyle.colorComplete);
+						_hintString = setHtmlColor(formatString(TIP_REQUIRED_COMPLETE), formStyle.colorComplete);
 					} else {
-						followLabel.htmlText = setHtmlColor(getNormalFollowText(), formStyle.colorNormal);
+						_hintString = setHtmlColor(getNormalFollowText(), formStyle.colorNormal);
 					}
 			}
-			//
-			setTimeout(fixComponentTextY, 45);
-			//
+			hint(_hintString);
+			
+			if (autoCreateView) {
+				setTimeout(fixComponentTextY, 45);
+			}
+			
 			if (_result){
 				//数据
 				if (_data is Number){
@@ -484,32 +498,37 @@ package akdcl.application.submit {
 			}
 			if (sourceXML.attribute(A_SOURCE).length() > 0 && sourceXML.elements(E_ITEM).length() == 0){
 				//读取item列表
+				view = _view;
 				DataLoader.load(sourceXML.attribute(A_SOURCE), null, setView);
 				return;
 			} else {
 				switch (styleType){
 					case ST_TEXT_INPUT:
-						view = setTextInput(_view, sourceXML);
+						view = setTextInput(_view || view, sourceXML);
 						break;
 					case ST_TEXT_AREA:
-						view = setTextArea(_view, sourceXML);
+						view = setTextArea(_view || view, sourceXML);
 						break;
 					case ST_COMBO_BOX:
-						view = setComboBox(_view, sourceXML);
+						view = setComboBox(_view || view, sourceXML);
 						break;
 					case ST_RADIO_BUTTON:
-						view = setRadioBtns(_view, sourceXML);
+						view = setRadioBtns(_view || view, sourceXML);
 						break;
 					case ST_CHECK_BOX:
-						view = setCheckBoxes(_view, sourceXML);
+						view = setCheckBoxes(_view || view, sourceXML);
 						break;
 					case ST_IMAGE_BROWSE:
-						view = setImageBrowse(_view, sourceXML);
+						view = setImageBrowse(_view || view, sourceXML);
 						break;
 					case ST_LABEL:
-						label.autoSize = TextFieldAutoSize.LEFT;
-						label.wordWrap = true;
-						view = label;
+						if (_view) {
+							view = _view;
+						}else {
+							view = label;
+						}
+						view.autoSize = TextFieldAutoSize.LEFT;
+						view.wordWrap = true;
 						break;
 					default:
 						trace("unknown styleType!!!");
@@ -538,7 +557,9 @@ package akdcl.application.submit {
 						view.addEventListener(FocusEvent.FOCUS_OUT, onFocusOutHandler);
 					}
 			}
-			setViewStyle();
+			if (autoCreateView) {
+				setViewStyle();
+			}
 		}
 
 		protected function setViewStyle():void {
@@ -611,7 +632,6 @@ package akdcl.application.submit {
 				height = view.height;
 			}
 			//delay
-			//setTimeout(delaySetComponentXY, 0);
 			setTimeout(fixComponentTextY, 0);
 		}
 
@@ -619,9 +639,9 @@ package akdcl.application.submit {
 			label.textField.y = OFFY_LABEL;
 			followLabel.textField.y = OFFY_LABEL;
 			if (styleType == ST_RADIO_BUTTON || styleType == ST_CHECK_BOX){
-				for (var _i:uint = 0; _i < view.length; _i++){
+				/*for (var _i:uint = 0; _i < view.length; _i++){
 					var _item:* = view[_i];
-				}
+				}*/
 			} else if (styleType == ST_COMBO_BOX){
 				view.textField.y = OFFY_COMBOBOX;
 			} else if (styleType == ST_TEXT_INPUT){
@@ -641,13 +661,20 @@ package akdcl.application.submit {
 
 		protected function onFocusInHandler(e:FocusEvent):void {
 			//hint
-			followLabel.htmlText = setHtmlColor(formatString(sourceXML.attribute(A_HINT)), formStyle.colorHint);
+			hint(setHtmlColor(formatString(sourceXML.attribute(A_HINT)), formStyle.colorHint));
+			
 		}
 
 		protected function onFocusOutHandler(e:FocusEvent):void {
 			checkData(false);
 		}
-
+		
+		protected function hint(_htmlString:String):void{
+			if (followLabel) {
+				followLabel.htmlText = _htmlString;
+			}
+		}
+		
 		protected function formatString(_str:String):String {
 			var _label:String = String(sourceXML.attribute(A_LABEL)).replace("：", "");
 			_str = _str.replace("${" + A_LABEL + "}", _label);
