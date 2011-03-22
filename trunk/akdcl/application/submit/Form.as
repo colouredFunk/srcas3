@@ -1,4 +1,5 @@
 package akdcl.application.submit {
+	import akdcl.utils.traceObject;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
@@ -28,7 +29,7 @@ package akdcl.application.submit {
 
 		protected var data:Object;
 		protected var fieldsData:Object;
-		protected var fieldDic:Object;
+		protected var fields:Object;
 
 		protected var submitXML:XML;
 		protected var resultXML:XML;
@@ -36,22 +37,24 @@ package akdcl.application.submit {
 
 		protected var style:FormStyle;
 		protected var alertSubmit:Alert;
-
+		public function Form() {
+			data = {};
+		}
 		public function remove():void {
-			for each (var _field:Field in fieldDic){
+			for each (var _field:Field in fields){
 				_field.remove();
 			}
 
 			destroyObject(data);
 			destroyObject(fieldsData);
-			destroyObject(fieldDic);
+			destroyObject(fields);
 
 			uploadComplete = null;
 			uploadError = null;
 
 			data = null;
 			fieldsData = null;
-			fieldDic = null;
+			fields = null;
 
 			submitXML = null;
 			resultXML = null;
@@ -65,9 +68,8 @@ package akdcl.application.submit {
 		}
 
 		public function setSource(_xml:XML, _container:DisplayObjectContainer = null, _views:Object = null):void {
-			data = {};
 			fieldsData = {};
-			fieldDic = {};
+			fields = {};
 
 			submitXML = _xml.submit[0];
 			resultXML = _xml.result[0];
@@ -104,10 +106,21 @@ package akdcl.application.submit {
 			for (var _i:uint; _i < submitXML.children().length(); _i++){
 				var _fieldXML:XML = submitXML.children()[_i];
 				if ((_fieldXML.attribute(Field.A_LABEL).length() > 0) || (_fieldXML.attribute(Field.A_STYLE_TYPE).length() > 0)){
-					var _field:Field = new Field();
-					_offHeight += _field.setSource(submitXML.children()[_i], _container, style, null, _offHeight);
-					_offHeight += style.dyFF;
-					fieldDic[_fieldXML.name()] = _field;
+					var _field:Field;
+					if (_views) {
+						if (_views[_fieldXML.name()]) {
+							_field = new Field();
+							_field.setSource(submitXML.children()[_i], _container, style, _views[_fieldXML.name()]);
+						}else {
+							//
+							continue;
+						}
+					}else {
+						_field = new Field();
+						_offHeight += _field.setSource(submitXML.children()[_i], _container, style, null, _offHeight);
+						_offHeight += style.dyFF;
+					}
+					fields[_fieldXML.name()] = _field;
 				}
 			}
 		}
@@ -134,7 +147,7 @@ package akdcl.application.submit {
 			FLManager.setTextFormat(14, int(submitXML.style.@color));
 			destroyObject(fieldsData);
 			var _result:Boolean = true;
-			for each (var _field:Field in fieldDic){
+			for each (var _field:Field in fields){
 				var _data:* = _field.checkData();
 				if (_data === false){
 					//false（没有数据或数据非法）
@@ -178,13 +191,13 @@ package akdcl.application.submit {
 				fieldsData[_i] = data[_i];
 			}
 			//
-			var _submitType:String;
+			var _submitType:String = DataLoader.TYPE_URL;
 			if (_isFormVar){
 				_submitType = DataLoader.TYPE_FORM;
 			} else if (submitXML.@dataType == "JSON"){
 				_submitType = DataLoader.TYPE_JSON;
 			}
-
+			traceObject("提交数据格式:" + _submitType, fieldsData);
 			return DataLoader.load(submitXML.@url, onUploadingHandler, onUploadCompleteHandler, onUploadErrorHandler, fieldsData, _submitType);
 		}
 

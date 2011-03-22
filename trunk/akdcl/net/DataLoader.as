@@ -12,7 +12,7 @@
 	
 	import akdcl.utils.destroyObject;
 	import akdcl.utils.objectToURLVariables;
-	import zero.net.FormVars;
+	import zero.net.FormVariables;
 
 	import ui.manager.EventManager;
 
@@ -141,45 +141,5 @@
 			destroyObject(userData);
 			userData = null;
 		}
-	}
-}
-import flash.utils.ByteArray;
-class FormVariables{
-	private var datas:Object;
-	
-	public var contentType:String;
-	public var boundary:String;
-	public function FormVariables(_values:Object=null){
-		datas=_values||new Object();
-		boundary="-=-=-=-=-=-=-=-=-=-"+Math.random();
-		contentType="multipart/form-data; boundary="+boundary;//只能用户点击时上传
-		//contentType="application/octet-stream; boundary="+boundary;
-	}
-	public function add(name:String,value:*):void{
-		datas[name]=value;
-	}
-	public function get data():ByteArray{
-		var data:ByteArray=new ByteArray();
-		for(var name:String in datas){
-			var value:*=datas[name];
-			data.writeUTFBytes("--" + boundary + "\r\n");
-			if(value is ByteArray){
-				data.writeUTFBytes(
-					"Content-Disposition: form-data; name=\"" + name + 
-					"\"; filename=\"\\" + name +
-					"\"\r\nContent-Type: application/octet-stream\r\n\r\n"
-				);
-				data.writeBytes(datas[name]);
-				data.writeUTFBytes("\r\n");
-			}else{
-				data.writeUTFBytes(
-					"Content-Disposition: form-data; name=\"" + name + 
-					"\"\r\n\r\n"+datas[name]+
-					"\r\n"
-				);
-			}
-		}
-		data.writeUTFBytes("--" + this.boundary + "--\r\n");
-		return data;
 	}
 }
