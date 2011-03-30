@@ -56,12 +56,15 @@
 						var _formVars:FormVariables = new FormVariables(_data);
 						request.contentType = _formVars.contentType;
 						request.data = _formVars.data;
-					}else if (_dataType==TYPE_JSON) {
+					}else if (_dataType == TYPE_JSON) {
 						request.data = JSON.encode(_data);
 					}else {
 						request.data = objectToURLVariables(_data);
 					}
 				} else {
+					if (_data is ByteArray) {
+						request.contentType = "application/octet-stream";
+					}
 					request.data = _data;
 				}
 				request.method = URLRequestMethod.POST;

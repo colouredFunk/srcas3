@@ -194,7 +194,7 @@ package akdcl.application.submit {
 			var _submitType:String = DataLoader.TYPE_URL;
 			if (_isFormVar){
 				_submitType = DataLoader.TYPE_FORM;
-			} else if (submitXML.@dataType == "JSON"){
+			} else if (submitXML.@dataStructure == "JSON"){
 				_submitType = DataLoader.TYPE_JSON;
 			}
 			traceObject("提交数据格式:" + _submitType, fieldsData);
@@ -216,7 +216,7 @@ package akdcl.application.submit {
 			trace(_dataLoader.data);
 
 			var _data:*;
-			if (resultXML.@dataType == "JSON"){
+			if (resultXML.@dataStructure == "JSON"){
 				_data = _dataLoader.dataJSON;
 			} else {
 				_data = _dataLoader.dataURLVariables;

@@ -240,6 +240,7 @@ package akdcl.application.player{
 		}
 		//
 		public var autoPlay:Boolean = true;
+		public var autoRewind:Boolean = true;
 		public var updateInterval:uint = 30;
 		protected var timer:Timer;
 		protected var idPart:IDPart;
