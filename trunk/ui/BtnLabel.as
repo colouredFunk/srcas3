@@ -65,7 +65,7 @@
 		}
 		public function $setStyle(_isActive:Boolean):void {
 			if (totalFrames > 8 || !bar) {
-				if (!(txt is TextField)) {
+				if (txt && !(txt is TextField)) {
 					if (txt.autoSize == TextFieldAutoSize.RIGHT) {
 						txt.txt.x = -int(txt.width);
 					} else if (txt.autoSize == TextFieldAutoSize.CENTER) {
