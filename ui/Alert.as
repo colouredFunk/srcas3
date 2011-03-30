@@ -1,6 +1,7 @@
 ﻿package ui{
 	import akdcl.utils.replaceString;
 	import flash.display.DisplayObject;
+	import flash.display.Loader;
 	import flash.display.Sprite;
 	import flash.text.TextField;
 	
@@ -78,13 +79,16 @@
 					_alert.btnY.href = _strOrXML;
 				}
 				if (_strOrXML.msg.length() > 0) {
-					_strOrXML = _strOrXML.msg;
+					_strOrXML = _strOrXML.msg[0];
 				}else {
-					_strOrXML = _strOrXML.@msg;
+					_strOrXML = _strOrXML.@msg[0];
 				}
 			}
 			_alert.label = _ctrlLabel;
+			var _prettyIndent:int = XML.prettyIndent;
+			XML.prettyIndent = -1;
 			_alert.text = replaceString(_strOrXML);
+			XML.prettyIndent = _prettyIndent;
 			_alert.callBack = _callBack;
 			alertLayer.addChild(_alert);
 			return _alert;
@@ -146,9 +150,20 @@
 		public function get text():String{
 			return txtText.text;
 		}
-		public function set text(_text:String):void{
+		public function set text(_text:String):void {
 			txtText.htmlText = _text;
+			var _loader:Loader = txtText.getImageReference("msg") as Loader;
+			if (_loader) {
+				txtText.filters = null;
+				_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, autoStyle);
+			}
 			barHeight = 0;
+		}
+		
+		protected function autoStyle(...args):void {
+			if (txtText.width + widthAddText > barWidth) {
+				barWidth = txtText.width + widthAddText;
+			}
 		}
 		//
 		private var __labelWidth:uint;
