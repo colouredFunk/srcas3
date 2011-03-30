@@ -94,7 +94,7 @@ package akdcl.application.player{
 		}
 		override public function stop():void {
 			if (video) {
-				if (video.videoTime!=0) {
+				if (autoRewind && video.videoTime != 0) {
 					video.videoTime = 0;
 				}
 				video.pauseVideo();

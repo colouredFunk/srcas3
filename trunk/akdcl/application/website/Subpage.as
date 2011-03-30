@@ -36,6 +36,7 @@ package akdcl.application.website{
 			}else if (testSourceXMLPath) {
 				DataLoader.load(testSourceXMLPath, null, checkSourceXML, checkSourceXML);
 			}else {
+				trace("!!!!!");
 				sourceXMLReady();
 			}
 		}

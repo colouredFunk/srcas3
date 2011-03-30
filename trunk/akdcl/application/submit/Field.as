@@ -1,5 +1,4 @@
 package akdcl.application.submit {
-	import akdcl.utils.replaceString;
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
@@ -17,6 +16,7 @@ package akdcl.application.submit {
 	import akdcl.application.submit.ImageBrowse;
 
 	import akdcl.utils.stringToBoolean;
+	import akdcl.utils.replaceString;
 	import akdcl.net.DataLoader;
 
 	/**
@@ -66,7 +66,7 @@ package akdcl.application.submit {
 		public static var ERROR_REG:String = "errorREG";
 		public static var ERROR_UNINPUT_CUSTOM:String = "errorUndataCustom";
 
-		
+
 		//√×✔✘☜☞
 		public static var TIP_ERROR_UNSELECTED:String = "✘请选择${" + A_LABEL + "}";
 		public static var TIP_ERROR_UNINPUT:String = "✘请输入${" + A_LABEL + "}";
@@ -149,10 +149,10 @@ package akdcl.application.submit {
 			for each (var _eachXML:XML in _source.elements(E_ITEM)){
 				var _id:uint = _eachXML.childIndex();
 				var _radioBtn:RadioButton;
-				
-				if (_field[_id]) {
+
+				if (_field[_id]){
 					_radioBtn = _field[_id];
-				}else {
+				} else {
 					_radioBtn = new RadioButton();
 					_field[_id] = _radioBtn;
 				}
@@ -172,9 +172,9 @@ package akdcl.application.submit {
 			for each (var _eachXML:XML in _source.elements(E_ITEM)){
 				var _id:uint = _eachXML.childIndex();
 				var _checkBox:CheckBox;
-				if (_field[_id]) {
+				if (_field[_id]){
 					_checkBox = _field[_id];
-				}else {
+				} else {
 					_checkBox = new CheckBox();
 					_field[_id] = _checkBox;
 				}
@@ -266,7 +266,7 @@ package akdcl.application.submit {
 		public var name:String;
 		public var key:String;
 		public var required:Boolean;
-		
+
 		protected var reg:String;
 		protected var least:uint;
 		protected var most:uint;
@@ -277,22 +277,22 @@ package akdcl.application.submit {
 			offY = _offY;
 			formStyle = _style;
 			height = formStyle.height;
-			
+
 			styleType = String(sourceXML.attribute(A_STYLE_TYPE));
 			name = sourceXML.name();
 			key = sourceXML.attribute(A_KEY);
 			required = stringToBoolean(sourceXML.attribute(A_REQUIRED));
-			
+
 			reg = String(sourceXML.attribute(A_REG));
 			least = int(sourceXML.attribute(A_LEAST));
 			most = int(sourceXML.attribute(A_MOST));
-			
-			if (!styleType) {
+
+			if (!styleType){
 				//没有指定styleType
 				if (sourceXML.elements(E_ITEM).length() > 0 || sourceXML.attribute(A_SOURCE).length() > 0){
 					//有item节点或source属性则默认为comboBox
 					styleType = ST_COMBO_BOX;
-				} else if (!key) {
+				} else if (!key){
 					//没有key属性则默认为label
 					styleType = ST_LABEL;
 				} else {
@@ -300,10 +300,10 @@ package akdcl.application.submit {
 					styleType = ST_TEXT_INPUT;
 				}
 			}
-			
-			if (_view) {
+
+			if (_view){
 				autoCreateView = false;
-			}else {
+			} else {
 				setLabels();
 			}
 			setView(_view);
@@ -371,7 +371,7 @@ package akdcl.application.submit {
 			var _hintString:String = "";
 			switch (_data){
 				case ERROR_UNSELECTED:
-					if (required && _checkUndata) {
+					if (required && _checkUndata){
 						_hintString = setHtmlColor(formatString(TIP_ERROR_UNSELECTED), formStyle.colorError);
 					} else {
 						_hintString = setHtmlColor(getNormalFollowText(), formStyle.colorNormal);
@@ -411,11 +411,11 @@ package akdcl.application.submit {
 					}
 			}
 			hint(_hintString);
-			
-			if (autoCreateView) {
+
+			if (autoCreateView){
 				setTimeout(fixComponentTextY, 45);
 			}
-			
+
 			if (_result){
 				//数据
 				if (_data is Number){
@@ -473,9 +473,9 @@ package akdcl.application.submit {
 			label.mouseChildren = false;
 			label.mouseEnabled = false;
 			label.autoSize = TextFieldAutoSize.RIGHT;
-			if (sourceXML.attribute(A_LABEL).length() > 0) {
+			if (sourceXML.attribute(A_LABEL).length() > 0){
 				label.htmlText = setHtmlColor(sourceXML.attribute(A_LABEL), formStyle.colorLabel);
-			}else {
+			} else {
 				label.htmlText = replaceString(sourceXML.children().toXMLString());
 			}
 			//
@@ -493,13 +493,42 @@ package akdcl.application.submit {
 		protected function setView(_view:* = null):void {
 			if (_view is Event){
 				//读取到item列表后再初始化view
-				sourceXML.appendChild(XML(_view.currentTarget.data).elements(E_ITEM));
+				var _xml:XML;
+				var _dataLoader:DataLoader = _view.currentTarget as DataLoader;
+
+				if (sourceXML.elements("result").length() > 0){
+					var _resultXML:XML = sourceXML.elements("result")[0];
+					//String(_resultXML.attribute(dataType)=="Array");
+					if (String(_resultXML.attribute("dataStructure")) == "JSON"){
+						var _dataJSON:Object = _dataLoader.dataJSON;
+						if (_dataJSON){
+							_xml = <root/>;
+							for each(var _item:Object in _dataJSON){
+								var _label:String = _item[_resultXML.elements(A_LABEL).attribute(A_KEY)];
+								var _value:String = _item[_resultXML.elements(A_VALUE).attribute(A_KEY)];
+								_xml.appendChild(<item label={_label} value={_value}/>);
+							}
+							sourceXML.appendChild(_xml.elements(E_ITEM));
+						} else {
+							//error
+							return;
+						}
+					}
+				} else {
+					sourceXML.appendChild(XML(_dataLoader.data).elements(E_ITEM));
+				}
 				_view = null;
 			}
 			if (sourceXML.attribute(A_SOURCE).length() > 0 && sourceXML.elements(E_ITEM).length() == 0){
 				//读取item列表
 				view = _view;
-				DataLoader.load(sourceXML.attribute(A_SOURCE), null, setView);
+				var _dataSubmit:Object = {};
+				if (sourceXML.elements("submit").length() > 0){
+					for each (var _eachSubmit:XML in sourceXML.elements("submit").children()){
+						_dataSubmit[_eachSubmit.attribute(A_KEY)] = _eachSubmit.attribute(A_VALUE);
+					}
+				}
+				DataLoader.load(sourceXML.attribute(A_SOURCE), null, setView, null, _dataSubmit);
 				return;
 			} else {
 				switch (styleType){
@@ -522,9 +551,9 @@ package akdcl.application.submit {
 						view = setImageBrowse(_view || view, sourceXML);
 						break;
 					case ST_LABEL:
-						if (_view) {
+						if (_view){
 							view = _view;
-						}else {
+						} else {
 							view = label;
 						}
 						view.autoSize = TextFieldAutoSize.LEFT;
@@ -557,7 +586,7 @@ package akdcl.application.submit {
 						view.addEventListener(FocusEvent.FOCUS_OUT, onFocusOutHandler);
 					}
 			}
-			if (autoCreateView) {
+			if (autoCreateView){
 				setViewStyle();
 			}
 		}
@@ -616,7 +645,12 @@ package akdcl.application.submit {
 				viewContainer.addChild(view);
 				if (styleType == ST_LABEL){
 					view.x = formStyle.startX;
-					view.width = formStyle.widthLabel + formStyle.dxLF + formStyle.width;
+					view.width = formStyle.widthLabel + formStyle.dxLF;
+					if (sourceXML.style.length() > 0 && int(sourceXML.style.@width) > 0) {
+						view.width += int(sourceXML.style.@width);
+					}else {
+						view.width += formStyle.width;
+					}
 				} else {
 					view.x = formStyle.startX + formStyle.widthLabel + formStyle.dxLF;
 					view.width = formStyle.width;
@@ -640,8 +674,8 @@ package akdcl.application.submit {
 			followLabel.textField.y = OFFY_LABEL;
 			if (styleType == ST_RADIO_BUTTON || styleType == ST_CHECK_BOX){
 				/*for (var _i:uint = 0; _i < view.length; _i++){
-					var _item:* = view[_i];
-				}*/
+				   var _item:* = view[_i];
+				 }*/
 			} else if (styleType == ST_COMBO_BOX){
 				view.textField.y = OFFY_COMBOBOX;
 			} else if (styleType == ST_TEXT_INPUT){
@@ -662,19 +696,19 @@ package akdcl.application.submit {
 		protected function onFocusInHandler(e:FocusEvent):void {
 			//hint
 			hint(setHtmlColor(formatString(sourceXML.attribute(A_HINT)), formStyle.colorHint));
-			
+
 		}
 
 		protected function onFocusOutHandler(e:FocusEvent):void {
 			checkData(false);
 		}
-		
-		protected function hint(_htmlString:String):void{
-			if (followLabel) {
+
+		protected function hint(_htmlString:String):void {
+			if (followLabel){
 				followLabel.htmlText = _htmlString;
 			}
 		}
-		
+
 		protected function formatString(_str:String):String {
 			var _label:String = String(sourceXML.attribute(A_LABEL)).replace("：", "");
 			_str = _str.replace("${" + A_LABEL + "}", _label);

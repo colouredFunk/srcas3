@@ -9,7 +9,7 @@
 	import zero.encoder.BMPEncoder;
 	
 	public class FileRef extends FileReference {
-		protected var fileInfos:String;
+		protected var fileInfo:String;
 		public var fileTypes:String;
 		public var maxSize:int = 10000;
 		public var autoLoad:Boolean = true;
@@ -44,15 +44,15 @@
 			
 			onFailed=null;
 		}
-		public function browseFile(_fileInfos:String = "图片", _fileTypes:String = "jpg,jpeg,gif,png,bmp"):void {
+		public function browseFile(_fileInfo:String = "图片", _fileTypes:String = "jpg,jpeg,gif,png,bmp"):void {
 			try {
-				fileInfos = _fileInfos;
+				fileInfo = _fileInfo;
 				fileTypes = _fileTypes;
 				addEventListener(Event.SELECT, selectFile);
-				browse([new FileFilter(fileInfos, "*." + fileTypes.replace(/\,/g, ";*."))]);
+				browse([new FileFilter(fileInfo, "*." + fileTypes.replace(/\,/g, ";*."))]);
 			} catch (e) {
 				if(onFailed!=null){
-					onFailed("打开" + fileInfos + "失败!");
+					onFailed("打开" + fileInfo + "失败!");
 				}
 			}
 		}
@@ -60,7 +60,7 @@
 			removeEventListener(Event.SELECT, selectFile);
 			if (size > maxSize * 1024) {
 				if (onFailed != null) {
-					onFailed(fileInfos + "大小不要超过" + maxSize + "K!");
+					onFailed(fileInfo + "大小不要超过" + maxSize + "K!");
 				}
 				isSet = false;
 				return;
@@ -79,7 +79,7 @@
 		public function loadFile():Boolean{
 			if(!isSet){
 				if(onFailed!=null){
-					onFailed("选择要打开的" + fileInfos + "!");
+					onFailed("选择要打开的" + fileInfo + "!");
 				}
 				return false;
 			}
@@ -127,7 +127,7 @@
 		public function uploadFile(_url:String, _id:String):Boolean {
 			if(!isSet){
 				if(onFailed!=null){
-					onFailed("选择要打开的"+fileInfos+"!");
+					onFailed("选择要打开的"+fileInfo+"!");
 				}
 				return false;
 			}else if(!_url){
