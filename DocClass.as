@@ -80,6 +80,10 @@
 				paramsObject.flashVars.xml = optionsXMLPath;
 			}
 			
+			var _url:String = decodeURI(this.loaderInfo.url);
+			var _ary:Array = _url.split("/");
+			_url = _ary.pop();
+			_url = _ary.pop() +"/" + _url;
 			var _str:String = "addSWF('"+_url+"',containerID,"+widthOrg+","+heightOrg+");";
 
 			_str = "<script src='http://www.wanmei.com/public/js/swfobject.js' type='text/javascript'></script>\r\n\r\n<script type='text/javascript'>\r\n	" + _str;
