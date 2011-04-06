@@ -24,6 +24,7 @@ package akdcl.manager {
 			}
 			return instance;
 		}
+		public var data:*;
 		private var __isAvailable:Boolean = false;
 
 		public function get isAvailable():Boolean {
@@ -48,7 +49,7 @@ package akdcl.manager {
 			return false;
 		}
 
-		public function runInterface(_funName:String, ... args):* {
+		public function callInterface(_funName:String, ... args):* {
 			if (isAvailable && hasInterface(_funName)){
 				if (args){
 					return ExternalInterface.call.apply(ExternalInterface, [_funName].concat(args));
@@ -57,24 +58,36 @@ package akdcl.manager {
 			}
 		}
 
-		private function swfInterface(_type:String):void {
-			var _event:Event = new Event(_type);
+		private function swfInterface(_type:String,...args):void {
+			var _event:Event = new Event(SWF_INTERFACE);
+			if (args) {
+				data = [_type].concat(args);
+			}else {
+				data = [_type];
+			}
+			dispatchEvent(_event);
+			//
+			_event = new Event(_type);
+			if (args) {
+				data = args;
+			}else {
+				data = null;
+			}
 			dispatchEvent(_event);
 		}
 
 		public function dispatchSWFEvent(_type:String, ... args):void {
 			if (isAvailable){
 				if (args){
-					runInterface.apply(ExternalInterfaceManager, [EXTERNAL_LISTENER, _type].concat(args));
+					callInterface.apply(ExternalInterfaceManager, [EXTERNAL_LISTENER, _type].concat(args));
 				} else {
-					runInterface(EXTERNAL_LISTENER, _type);
+					callInterface(EXTERNAL_LISTENER, _type);
 				}
 			}
 		}
 
 		public function debugMessage(_str:String):void {
-			runInterface("alert", "[" + ExternalInterface.objectID + "]\r\n" + _str);
+			callInterface("alert", "[" + ExternalInterface.objectID + "]\r\n" + _str);
 		}
 	}
-
 }
