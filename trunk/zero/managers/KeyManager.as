@@ -1,4 +1,4 @@
-﻿package zero.manager{
+﻿package zero.managers{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;

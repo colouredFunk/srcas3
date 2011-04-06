@@ -494,10 +494,15 @@ TagsOptionBoard 版本:v1.0
 			
 			private var removeClose:Function;
 			
-			//private var so:SharedObject;
+			//private var so:So;
+			
 			private var tagXMLListCol:XMLListCollection;
 			
-			public function init(addClose:Function,_removeClose:Function,so:SharedObject):void{
+			public function init(
+				addClose:Function,
+				_removeClose:Function,
+				so:So
+			):void{
 				//^_^
 				instance=this;
 				

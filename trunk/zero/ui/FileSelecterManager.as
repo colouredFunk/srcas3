@@ -13,6 +13,8 @@ package zero.ui{
 	import flash.utils.*;
 	import flash.net.*;
 	
+	import zero.net.So;
+	
 	//import mx.controls.ComboBox;
 
 	public class FileSelecterManager{
@@ -103,7 +105,7 @@ package zero.ui{
 			fileTypes:String="*",
 			_browseType:String=OPEN,
 			_browseTitle:String="选择一个文件: ",
-			so:SharedObject=null,
+			so:So=null,
 			saveId:String=null,
 			defaultFileURLOrFileURLArr:*=null
 		):void{

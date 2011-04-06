@@ -105,7 +105,7 @@ public class StatusManager{
 	}
 	
 	
-	public static function loadStatus(_onLoadStatus:Function=null,xmlOrXMLName:*=null,varObj:Object=null):void{
+	public static function loadStatus(_onLoadStatus:Function=null,xmlOrXMLName:*=null,varObj:Object=null,method:String=null):void{
 		onLoadStatus=_onLoadStatus;
 		var url:String="";
 		if(xmlOrXMLName is XML){
@@ -119,10 +119,10 @@ public class StatusManager{
 		}
 		
 		loadedData=null;
-		statusURLLoader.load(RequestLoader.getRequest(url,varObj));
+		statusURLLoader.load(RequestLoader.getRequest(url,varObj,method));
 	}
 	private static function loadStatusFinished(event:Event):void{
-		trace("statusURLLoader.data="+statusURLLoader.data);
+		//trace("statusURLLoader.data="+statusURLLoader.data);
 		loadedData=decodeFun(statusURLLoader.data);
 		currXML=statusXMLs[loadedData[statusKey]];
 		if(currXML){

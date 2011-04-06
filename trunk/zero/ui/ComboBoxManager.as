@@ -10,13 +10,21 @@ ComboBoxManager 版本:v1.0
 package zero.ui{
 	import flash.display.*;
 	import flash.events.*;
-	import flash.net.*;
 	import flash.utils.*;
 	
+	import zero.net.So;
+	
 	//import mx.controls.ComboBox;
+	
 	public class ComboBoxManager{
 		private static var dict:Dictionary=new Dictionary();
-		public static function addCb(cb:*,so:SharedObject,saveId:String,dataProvider:Array=null,setDataProvider:Boolean=false):void{
+		public static function addCb(
+			cb:*,
+			so:So,
+			saveId:String,
+			dataProvider:Array=null,
+			setDataProvider:Boolean=false
+		):void{
 			var cbm:ComboBoxManager=new ComboBoxManager();
 			dict[cb]=cbm;
 			cbm.init(cb,so,saveId,dataProvider,setDataProvider);
@@ -47,7 +55,13 @@ package zero.ui{
 			cb.removeEventListener(FocusEvent.FOCUS_OUT,focusOut);
 			cb=null;
 		}
-		private function init(_cb:*,so:SharedObject,saveId:String,dataProvider:Array,setDataProvider:Boolean):void{
+		private function init(
+			_cb:*,
+			so:So,
+			saveId:String,
+			dataProvider:Array,
+			setDataProvider:Boolean
+		):void{
 			cb=_cb;
 			if(so){
 				saveObj=so.data[saveId];

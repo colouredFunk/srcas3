@@ -75,7 +75,8 @@ package zero.net{
 			}
 			target.removeEventListener(Event.COMPLETE,loadComplete);
 			target.removeEventListener(IOErrorEvent.IO_ERROR,loadError);
-			if(onLoadProgress!=null){
+			if(onLoadProgress==null){
+			}else{
 				target.removeEventListener(ProgressEvent.PROGRESS,onLoadProgress);
 			}
 			
@@ -84,7 +85,8 @@ package zero.net{
 			onLoadFinished=null;
 		}
 		public function load(url:String,variables:Object=null,method:String=null):URLRequest{
-			if(onLoadProgress!=null){
+			if(onLoadProgress==null){
+			}else{
 				target.removeEventListener(ProgressEvent.PROGRESS,onLoadProgress);
 				target.addEventListener(ProgressEvent.PROGRESS,onLoadProgress);
 			}
@@ -97,6 +99,14 @@ package zero.net{
 			if(variables){
 				var urlVariables:URLVariables=new URLVariables();
 				urlRequest.method=method?method:URLRequestMethod.POST;
+				
+				if(variables is String){
+					//20110323
+					var str:String=variables as String;
+					variables=new ByteArray();
+					variables.writeUTFBytes(str);
+				}
+				
 				if(variables is ByteArray){
 					//trace("ByteArray variables.length="+variables.length);
 					urlRequest.data=variables;
@@ -119,7 +129,8 @@ package zero.net{
 			}
 		}
 		private function loadComplete(event:Event):void{
-			if(onLoadProgress!=null){
+			if(onLoadProgress==null){
+			}else{
 				target.removeEventListener(ProgressEvent.PROGRESS,onLoadProgress);
 			}
 			if(!responseURL){
@@ -128,7 +139,8 @@ package zero.net{
 			onLoadFinished(SUCCESS);
 		}
 		private function loadError(event:IOErrorEvent):void{
-			if(onLoadProgress!=null){
+			if(onLoadProgress==null){
+			}else{
 				target.removeEventListener(ProgressEvent.PROGRESS,onLoadProgress);
 			}
 			//trace("event="+event);

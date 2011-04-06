@@ -11,11 +11,15 @@ package zero.ui{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
+	import zero.net.So;
 	import spark.components.CheckBox;
-	import flash.net.*;
 	public class CheckBoxManager{
 		private static var dict:Dictionary=new Dictionary();
-		public static function addCb(cb:spark.components.CheckBox,so:SharedObject,saveId:String):void{
+		public static function addCb(
+			cb:spark.components.CheckBox,
+			so:So,
+			saveId:String
+		):void{
 			var cbm:CheckBoxManager=new CheckBoxManager();
 			dict[cb]=cbm;
 			cbm.init(cb,so,saveId);
@@ -35,7 +39,7 @@ package zero.ui{
 		
 		
 		private var cb:spark.components.CheckBox;
-		private var so:SharedObject;
+		private var so:Object;
 		private var saveId:String;
 		public function CheckBoxManager(){}
 		private function clear():void{
@@ -43,7 +47,11 @@ package zero.ui{
 			cb=null;
 			so=null;
 		}
-		private function init(_cb:spark.components.CheckBox,_so:SharedObject,_saveId:String):void{
+		private function init(
+			_cb:spark.components.CheckBox,
+			_so:So,
+			_saveId:String
+		):void{
 			cb=_cb;
 			so=_so;
 			saveId=_saveId;
