@@ -13,9 +13,16 @@ package zero.ui
 	import flash.events.*;
 	import flash.net.*;
 	import flash.utils.*;
+	
+	import zero.net.So;
+	
 	public class TxtManager{
 		private static var dict:Dictionary=new Dictionary();
-		public static function addTxt(txt:*,so:SharedObject,saveId:String):void{
+		public static function addTxt(
+			txt:*,
+			so:So,
+			saveId:String
+		):void{
 			var tm:TxtManager=new TxtManager();
 			dict[txt]=tm;
 			tm.init(txt,so,saveId);
@@ -34,7 +41,7 @@ package zero.ui
 		}
 		
 		private var txt:*;
-		private var so:SharedObject;
+		private var so:So;
 		private var saveId:String;
 		public function TxtManager(){}
 		private function clear():void{
@@ -42,7 +49,11 @@ package zero.ui
 			txt=null;
 			so=null;
 		}
-		private function init(_txt:*,_so:SharedObject,_saveId:String):void{
+		private function init(
+			_txt:*,
+			_so:So,
+			_saveId:String
+		):void{
 			txt=_txt;
 			so=_so;
 			saveId=_saveId;

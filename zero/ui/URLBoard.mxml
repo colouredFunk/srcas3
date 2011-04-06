@@ -18,11 +18,15 @@
 	</s:Group>
 	<fx:Script>
 		<![CDATA[
+			
+			import zero.net.So;
+			
 			import mx.managers.PopUpManager;
+			
 			public static function show(
 				container:Sprite,
 				_title:String,
-				so:SharedObject,
+				so:So
 				saveId:String
 			):void{
 				(PopUpManager.createPopUp(
@@ -33,7 +37,7 @@
 			}
 			private function init(
 				_title:String,
-				so:SharedObject,
+				so:So,
 				saveId:String
 			):void{
 				title=_title;
@@ -60,7 +64,10 @@
 				PopUpManager.removePopUp(this);
 			}
 			
-			public static function getXML(so:SharedObject,saveId:String):XML{
+			public static function getXML(
+				so:So,
+				saveId:String
+			):XML{
 				var itemId:int=0;
 				var xml:XML=<urls/>;
 				while(true){

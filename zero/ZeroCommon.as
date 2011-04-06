@@ -17,6 +17,20 @@ package zero{
 	import flash.system.Security
 	
 	public class ZeroCommon{
+		public static function getTime():String{
+			var date:Date=new Date();
+			var hours:int=date.getHours();
+			var minutes:int=date.getMinutes();
+			var seconds:int=date.getSeconds();
+			
+			return date.getFullYear()+"年"
+				+(date.getMonth()+1)+"月"
+				+date.getDate()+"日 "
+				+(hours<10?"0":"")+hours+":"
+				+(minutes<10?"0":"")+minutes+":"
+				+(seconds<10?"0":"")+seconds;
+		}
+		
 		public static const FileClass:Class=function():Class{//就是 File，可用作判断是否 air ... - -
 			try{
 				return getDefinitionByName("flash.filesystem.File") as Class;
@@ -26,8 +40,8 @@ package zero{
 		}();
 		
 		public static const domain:String=function():String{
-			//var domain:String="zero.flashwing.net";
-			var domain:String="localhost/zero.flashwing.net";
+			var domain:String="zero.flashwing.net";
+			//var domain:String="localhost/zero.flashwing.net";
 			
 			if(FileClass){
 			}else{
@@ -50,7 +64,7 @@ package zero{
 		public static const path_JigsawPuzzle:String="http://"+domain+"/JigsawPuzzle/";
 		
 		public static const path_ZeroSWFEncrypt:String="http://"+domain+"/ZeroSWFEncrypt/";
-		public static const path_ZeroSWFEncryptAIR:String=path_ZeroSWFEncrypt+"ZeroSWFEncryptAIR.rar";
+		//public static const path_ZeroSWFEncryptAIR:String=path_ZeroSWFEncrypt+"ZeroSWFEncryptAIR.rar";
 		
 		//public static const path_Card3D:String="http://"+domain+"/Card3D/";
 		//public static const path_Card3D_CtrlPan:String=path_Card3D+"CtrlPan.swf";

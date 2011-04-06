@@ -17,8 +17,20 @@ package zero.motions{
 		private var dspObjArr:Array;
 		private var left:Number;
 		private var right:Number;
+		
+		public var u:Number=0.2;
+		
 		public function AdjustDistances(..._dspObjArr){
+			if(
+				_dspObjArr[0] is Array
+				&&
+				_dspObjArr.length==1
+			){
+				_dspObjArr=_dspObjArr[0];
+			}
+			
 			dspObjArr=_dspObjArr;
+			
 			var u_rect:Rectangle=new Rectangle(0,0,0,0);
 			var rect:Rectangle;
 			for each(var dspObj:DisplayObject in dspObjArr){
@@ -42,7 +54,7 @@ package zero.motions{
 			for each(dspObj in dspObjArr){
 				rect=getB(dspObj);
 				//dspObj.x+=x-rect.x;//立刻
-				dspObj.x+=(x-rect.x)*0.2;//缓动
+				dspObj.x+=(x-rect.x)*u;//缓动
 				x+=rect.width+d;
 			}
 			
