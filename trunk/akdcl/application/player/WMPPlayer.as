@@ -28,28 +28,33 @@ package akdcl.application.player{
 			pwrd.wmpPlayer.getPlayer=function(_swfID){
 				return pwrd.wmpPlayer.player[pwrd.wmpPlayer.getPlayerID(_swfID)];
 			}
-			pwrd.wmpPlayer.createWMPPlayer=function(_swfID, _listener){
+			pwrd.wmpPlayer.createWMPPlayer=function(_swfID, _listener,_mediaSource){
 				var _wmpPlayerID=pwrd.wmpPlayer.getPlayerID(_swfID);
 				var _object={};
 				var _player;
 				var _swf=pwrd.getSWFByID(_swfID);
-				pwrd.wmpPlayer.swf[_swfID]=_swf;
-				_listener=_swf[_listener];
-				pwrd.wmpPlayer.listener[_swfID]=_listener;
+				pwrd.wmpPlayer.swf[_swfID] = _swf;
+				if (_listener) {
+					_listener=_swf[_listener];
+					pwrd.wmpPlayer.listener[_swfID]=_listener;
+				}
 				switch(pwrd.getBrowserName()){
 					case "Firefox":
 						pwrd.wmpPlayer.isWMPNow=false;
-						_object.id=_wmpPlayerID;
-						_object.name=_wmpPlayerID;
-						_object.pluginspage="http://microsoft.com/windows/mediaplayer/en/download/";
-						_object.type="application/x-mplayer2";
-						//_object.type='application/x-ms-wmp';
-						_object.showControls=false;
-						_object.showstatusbar=false;
-						_object.width=0;
-						_object.height=0;
-						pwrd.wmpPlayer.playerContainer.innerHTML=pwrd.createItem("embed",_object);
-						_player=document.getElementById(_wmpPlayerID);
+						if (_mediaSource) {
+							_object.id=_wmpPlayerID;
+							_object.name=_wmpPlayerID;
+							_object.pluginspage="http://microsoft.com/windows/mediaplayer/en/download/";
+							_object.type="application/x-mplayer2";
+							//_object.type="application/x-ms-wmp";
+							_object.showControls=false;
+							_object.showstatusbar=false;
+							_object.width=0;
+							_object.height=0;
+							_object.src=_mediaSource;
+							pwrd.wmpPlayer.playerContainer.innerHTML=pwrd.createItem("embed",_object);
+							_player = document.getElementById(_wmpPlayerID);
+						}
 					break;
 					default:
 						pwrd.wmpPlayer.isWMPNow=true;
@@ -64,17 +69,26 @@ package akdcl.application.player{
 						];
 						pwrd.wmpPlayer.playerContainer.innerHTML=pwrd.createItem("object",_object);
 						_player = document.getElementById(_wmpPlayerID);
-						if(_player.addEventListener){
-							_player.addEventListener('PlayStateChange',_listener,false);
-						}else if(_player.attachEvent){
-							_player.attachEvent('PlayStateChange',_listener);
-						}else{
-							_player.PlayStateChange=_listener;
+						if (_listener) {
+							if(_player.addEventListener){
+								_player.addEventListener('PlayStateChange',_listener,false);
+							}else if(_player.attachEvent){
+								_player.attachEvent('PlayStateChange',_listener);
+							}else{
+								_player.PlayStateChange=_listener;
+							}
 						}
 					break;
 				}
-				pwrd.wmpPlayer.player[_wmpPlayerID]=_player;
+				if (_player) {
+					pwrd.wmpPlayer.player[_wmpPlayerID]=_player;
+				}
 				return true;
+			}
+			pwrd.wmpPlayer.removeWMPPlayer = function(_swfID) {
+				if (pwrd.wmpPlayer.playerContainer) {
+					pwrd.wmpPlayer.playerContainer.innerHTML = "<div></div>";
+				}
 			}
 			pwrd.wmpPlayer.play=function(_swfID,_positionTo){
 				var _player=pwrd.wmpPlayer.getPlayer(_swfID);
@@ -83,9 +97,8 @@ package akdcl.application.player{
 						_player.controls.currentPosition=_positionTo;
 					}
 					_player.controls.play();
-				}else{
-					_player.src=pwrd.wmpPlayer.mediaLast[_swfID];
-					_player.src=pwrd.wmpPlayer.mediaLast[_swfID];
+				}else {
+					pwrd.wmpPlayer.createWMPPlayer(_swfID,null,pwrd.wmpPlayer.mediaLast[_swfID]);
 					pwrd.wmpPlayer.listener[_swfID](3);
 				}
 			}
@@ -94,8 +107,7 @@ package akdcl.application.player{
 				if (pwrd.wmpPlayer.isWMPNow) {
 					_player.controls.pause();
 				}else{
-					_player.src="";
-					_player.src="";
+					pwrd.wmpPlayer.removeWMPPlayer(_swfID);
 					pwrd.wmpPlayer.listener[_swfID](2);
 				}
 			}
@@ -104,8 +116,7 @@ package akdcl.application.player{
 				if(pwrd.wmpPlayer.isWMPNow){
 					_player.controls.stop();
 				}else{
-					_player.src="";
-					_player.src="";
+					pwrd.wmpPlayer.removeWMPPlayer(_swfID);
 					pwrd.wmpPlayer.listener[_swfID](1);
 				}
 			}
@@ -119,10 +130,9 @@ package akdcl.application.player{
 				var _player=pwrd.wmpPlayer.getPlayer(_swfID);
 				if(pwrd.wmpPlayer.isWMPNow){
 					_player.URL=_mediaSource;
-				}else{
+				}else {
 					pwrd.wmpPlayer.mediaLast[_swfID]=_mediaSource;
-					_player.src=_mediaSource;
-					_player.src=_mediaSource;
+					//
 				}
 			}
 			pwrd.wmpPlayer.getWMPInfo=function(_swfID){
@@ -154,22 +164,36 @@ package akdcl.application.player{
 				}
 			}
 		]]></script>
-		public static const WMP_STATE_LIST:Array = ["连接超时", "停止", "暂停", "播放", "向前", "向后", "缓冲", "等待", "完毕", "连接", "就绪", "重新连接"];
 		public static var isPlugin:Boolean;
 		
 		override public function get loadProgress():Number {
-			var _loadedProgress:Number;
+			var _loadProgress:Number;
 			if (isPlugin) {
 				var _playingInfo:Object = getWMPPlayingInfo();
 				if (_playingInfo) {
-					_loadedProgress = int(_playingInfo.loadProgress) * 0.01;
+					_loadProgress = int(_playingInfo.loadProgress) * 0.01;
 				}else {
-					_loadedProgress = 1;
+					_loadProgress = 1;
 				}
 			}else {
-				_loadedProgress = 0;
+				_loadProgress = 0;
 			}
-			return _loadedProgress;
+			return _loadProgress;
+		}
+		
+		override public function get bufferProgress():Number {
+			var _bufferProgress:Number;
+			if (isPlugin) {
+				var _playingInfo:Object = getWMPPlayingInfo();
+				if (_playingInfo) {
+					_bufferProgress = int(_playingInfo.bufferProgress) * 0.01;
+				}else {
+					_bufferProgress = 1;
+				}
+			}else {
+				_bufferProgress = 0;
+			}
+			return _bufferProgress;
 		}
 		override public function get totalTime():uint {
 			if (isPlugin && wmpInfo) {
@@ -221,19 +245,21 @@ package akdcl.application.player{
 				ExternalInterface.call("pwrd.wmpPlayer.play",ExternalInterface.objectID);
 				volume = volume;
 			}
-			super.play();
+			timer.start();
+			if (playID<0) {
+				playID = 0;
+				return;
+			}
 		}
 		override public function pause():void {
 			if (isPlugin) {
 				ExternalInterface.call("pwrd.wmpPlayer.pause",ExternalInterface.objectID);
 			}
-			super.pause();
 		}
 		override public function stop():void {
 			if (isPlugin) {
 				ExternalInterface.call("pwrd.wmpPlayer.stop",ExternalInterface.objectID);
 			}
-			super.stop();
 		}
 		protected function getWMPPlayingInfo():Object {
 			if (isPlugin) {

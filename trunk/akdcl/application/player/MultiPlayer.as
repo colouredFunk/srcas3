@@ -1,4 +1,5 @@
 package akdcl.application.player{
+	import akdcl.application.player.MediaEvent;
 	
 	/**
 	 * ...
@@ -7,6 +8,9 @@ package akdcl.application.player{
 	public class MultiPlayer extends MediaPlayer{
 		override public function get loadProgress():Number {
 			return currentPlayer?currentPlayer.loadProgress:0; 
+		}
+		override public function get bufferProgress():Number {
+			return currentPlayer?currentPlayer.bufferProgress:0; 
 		}
 		override public function get totalTime():uint { 
 			return currentPlayer?currentPlayer.totalTime:0;
@@ -95,6 +99,7 @@ package akdcl.application.player{
 		override protected function onPlayIDChangeHandler(_playID:int):void {
 			stop();
 			if (currentPlayer) {
+				currentPlayer.removeEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 				currentPlayer.removeEventListener(MediaEvent.LOAD_ERROR, onLoadErrorHandler);
 				currentPlayer.removeEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
 				currentPlayer.removeEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
@@ -131,6 +136,7 @@ package akdcl.application.player{
 					currentPlayer = wmpPlayer;
 					break;
 			}
+			currentPlayer.addEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 			currentPlayer.addEventListener(MediaEvent.LOAD_ERROR, onLoadErrorHandler);
 			currentPlayer.addEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
 			currentPlayer.addEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
