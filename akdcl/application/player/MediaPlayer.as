@@ -51,6 +51,20 @@ package akdcl.application.player{
 		public static const STATE_READY:String = "ready";
 		public static const STATE_RECONNECT:String = "reconnect";
 		
+		public static const STATE_NAMELIST:Object = function():Object {
+			var _obj:Object = { };
+			_obj[STATE_STOP] = "停止";
+			_obj[STATE_PAUSE] = "暂停";
+			_obj[STATE_PLAY] = "播放";
+			_obj[STATE_BUFFER] = "缓冲";
+			_obj[STATE_WAIT] = "等待";
+			_obj[STATE_CONNECT] = "连接";
+			_obj[STATE_READY] = "就绪";
+			_obj[STATE_RECONNECT] = "重新连接";
+			return _obj;
+		}();
+		
+		
 		
 		public static const VALUE_PERCENTAGE:Number = 0.004;
 		public static const VOLUME_DEFAULT:Number = 0.8;
