@@ -79,9 +79,9 @@ package akdcl.manager {
 		public function dispatchSWFEvent(_type:String, ... args):void {
 			if (isAvailable){
 				if (args){
-					callInterface.apply(ExternalInterfaceManager, [EXTERNAL_LISTENER, _type].concat(args));
+					callInterface.apply(ExternalInterfaceManager, [EXTERNAL_LISTENER, ExternalInterface.objectID, _type].concat(args));
 				} else {
-					callInterface(EXTERNAL_LISTENER, _type);
+					callInterface(EXTERNAL_LISTENER, ExternalInterface.objectID, _type);
 				}
 			}
 		}

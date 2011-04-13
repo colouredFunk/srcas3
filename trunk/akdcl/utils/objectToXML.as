@@ -1,4 +1,5 @@
 package akdcl.utils {
+	import flash.net.URLVariables;
 
 	/**
 	 * ...
@@ -9,6 +10,7 @@ package akdcl.utils {
 		var _result:*;
 		switch (_obj["constructor"]){
 			case Object:
+			case URLVariables:
 				_xml = <{_nodeName}/>;
 				for (var _key:String in _obj){
 					_result = objectToXML(_obj[_key], _key, _xml);
@@ -38,6 +40,4 @@ package akdcl.utils {
 		}
 		return null;
 	}
-账号：爱刈追随
-密码：MEImei19840702
 }
