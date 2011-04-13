@@ -21,16 +21,16 @@
 	 * @author Akdcl
 	 */
 	public class DataLoader extends URLLoader {
-		public static const TYPE_URL:String = "URLVariables";
-		public static const TYPE_FORM:String = "FormVariables";
-		public static const TYPE_JSON:String = "JavaScriptObjectNotation";
+		public static const TYPE_URL:String = "URL";
+		public static const TYPE_FORM:String = "FORM";
+		public static const TYPE_JSON:String = "JSON";
 		private static var request:URLRequest = new URLRequest();
 		private static var listReady:Vector.<DataLoader> = new Vector.<DataLoader>();
 
 		//private static var listLoading:Vector.<DataLoader> = new Vector.<DataLoader>();
 
 		//返回DataLoader实例，DataLoader的原理类似工厂模式，会重复使用DataLoader，所以尽量不要保持对DataLoader实例的引用。
-		public static function load(_url:*, _onProgressHandler:Function = null, _onCompleteHandler:Function = null, _onIOErrorHandler:Function = null, _data:Object = null, _dataType:String = null):DataLoader {
+		public static function load(_url:*, _onProgressHandler:Function = null, _onCompleteHandler:Function = null, _onIOErrorHandler:Function = null, _data:Object = null, _dataType:String = null, _method:String = null):DataLoader {
 			//
 			var _dataLoader:DataLoader;
 			if (listReady.length > 0){
@@ -67,10 +67,10 @@
 					}
 					request.data = _data;
 				}
-				request.method = URLRequestMethod.POST;
+				request.method = _method||URLRequestMethod.POST;
 			} else {
 				request.data = null;
-				request.method = URLRequestMethod.GET;
+				request.method = _method||URLRequestMethod.GET;
 			}
 			_dataLoader.clear();
 			_dataLoader.load(request);

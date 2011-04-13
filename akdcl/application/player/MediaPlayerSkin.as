@@ -1,4 +1,5 @@
 package akdcl.application.player{
+	import akdcl.utils.copyInstanceToArray;
 	import flash.events.Event;
 	import flash.events.FullScreenEvent;
 	import flash.display.StageDisplayState;
@@ -94,6 +95,7 @@ package akdcl.application.player{
 				btnScreen.visible = __allowFullScreen;
 			}
 		}
+		private var btnOffID:int = 0;
 		override protected function init():void {
 			super.init();
 			if (btnLabel_0) {
@@ -238,6 +240,9 @@ package akdcl.application.player{
 			if (!player || player.playlist.length() < 2) {
 				return;
 			}
+			
+			var _length:uint;
+			
 			switch(btnLabelList.length) {
 				case 0:
 				return;
@@ -250,25 +255,16 @@ package akdcl.application.player{
 					distanceBtn *= against? -1:1;
 				case 1:
 					formatBtnXY = true;
+					_length = Math.max(player.playlist.length(), btnLabelList.length);
 					break;
 				default:
 					formatBtnXY = false;
+					_length = btnLabelList.length;
 			}
-			
-			
-			var _length:uint = Math.max(player.playlist.length(), btnLabelList.length);
-			var _instanceCopy:*;
-			var _instanceClass:Class = btnLabelList[0].constructor as Class;
-			for (_i = 0; _i < _length;_i++ ) {
-				_instanceCopy = btnLabelList[_i];
-				if (!_instanceCopy) {
-					_instanceCopy = new _instanceClass();
-					btnLabelList[_i] = _instanceCopy;
-				}
-				setBtn(_instanceCopy,_i,btnLabelList,_length);
-			}
+			copyInstanceToArray(btnLabelList[0],_length,btnLabelList,setBtn);
 		}
 		protected function setBtn(_btn:*, _id:uint, ...args):void {
+			var _offID:int = _id + btnOffID;
 			if (formatBtnXY) {
 				if (horizontal) {
 					_btn.y = startYBtn;
@@ -286,14 +282,19 @@ package akdcl.application.player{
 					}
 					_btn.y = startYBtn + _id * (against? -distanceBtn:distanceBtn);
 				}
+			}else {
+				
 			}
-			if (_id>=player.playlist.length()) {
+			if (_offID >= player.playlist.length()) {
 				_btn.visible = false;
 				return;
 			}
 			btnsContainer.addChild(_btn);
 			_btn.visible = true;
-			_btn.userData = { id:_id };
+			if (!_btn.userData) {
+				_btn.userData = { };
+			}
+			_btn.userData.id = _offID;
 			_btn.release = function():void {
 				player.playID = this.userData.id;
 			}
@@ -304,13 +305,13 @@ package akdcl.application.player{
 				_btn.group = "btnGroup_" + name;
 			}
 			try {
-				var _label:String = String(player.playlist[_id].@label);
+				var _label:String = String(player.playlist[_offID].@label);
 				_btn.autoSize = "center";
-				_btn.label = _label || String(_id + 1);
+				_btn.label = _label || String(_offID + 1);
 			}catch (_ero:*) {
 				
 			}
-			var _icon:String = String(player.playlist[_id].@icon);
+			var _icon:String = String(player.playlist[_offID].@icon);
 			if (_icon.length > 0) {
 				if (_btn is ImageLoader) {
 					_btn.load(_icon, _id);
@@ -378,20 +379,32 @@ package akdcl.application.player{
 					btnInfo.htmlText = _info;
 				}
 			}
-			var _btnSelect:*= btnLabelList[player.playID];
-			if (_btnSelect) {
-				_btnSelect.select = true;
-			}
-			if (btnsContainer && btnsContainer.mask && _btnSelect) {
-				var _x:int;
-				btnsContainer.mask.x = int(btnsContainer.mask.x);
-				if (btnsContainer.x + _btnSelect.x < btnsContainer.mask.x) {
-					_x = btnsContainer.mask.x - _btnSelect.x;
-					TweenMax.to(btnsContainer, 0.3, { x:_x } );
-				}else if (btnsContainer.x + _btnSelect.x + _btnSelect.width > btnsContainer.mask.x + btnsContainer.mask.width) {
-					_x = btnsContainer.mask.x + btnsContainer.mask.width - _btnSelect.width;
-					_x = _btnSelect.x - _x;
-					TweenMax.to(btnsContainer, 0.3, { x: -_x } );
+			var _btnSelect:*; 
+			if (btnsContainer && btnsContainer.mask) {
+				_btnSelect = btnLabelList[player.playID];
+				if (_btnSelect) {
+					_btnSelect.select = true;
+					var _x:int;
+					btnsContainer.mask.x = int(btnsContainer.mask.x);
+					if (btnsContainer.x + _btnSelect.x < btnsContainer.mask.x) {
+						_x = btnsContainer.mask.x - _btnSelect.x;
+						TweenMax.to(btnsContainer, 0.3, { x:_x } );
+					}else if (btnsContainer.x + _btnSelect.x + _btnSelect.width > btnsContainer.mask.x + btnsContainer.mask.width) {
+						_x = btnsContainer.mask.x + btnsContainer.mask.width - _btnSelect.width;
+						_x = _btnSelect.x - _x;
+						TweenMax.to(btnsContainer, 0.3, { x: -_x } );
+					}
+				}
+			}else {
+				//if (btnLabelList.length > 0 && player.playID - btnOffID >= btnLabelList.length) {
+					//btnOffID = player.playID;
+					//btnLabelList.forEach(setBtn);
+				//}else {
+					//btnOffID = 0;
+				//}
+				_btnSelect = btnLabelList[player.playID - btnOffID];
+				if (_btnSelect) {
+					_btnSelect.select = true;
 				}
 			}
 		}
