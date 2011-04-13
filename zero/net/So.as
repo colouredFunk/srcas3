@@ -16,78 +16,116 @@ package zero.net{
 	public class So{
 		
 		private var so:SharedObject;
-		public var name:String;
-		private var initFinished:Function;
-		
-		private var xmlLoader:URLLoader;
+		private var soXMLFile:*;
+		private var name:String;
+		private var xml:XML;
 		
 		public function So(
 			_name:String,
-			_version:String,
-			xmlOrXMLURL:*=null,
-			_initFinished:Function=null
+			_so_version:String,
+			_xml:XML=null
 		){
-			name=_name;
-			so=SharedObject.getLocal(name,"/");
 			
-			if(version==_version){
+			name=_name;
+			
+			var FileClass:Class;
+			try{
+				FileClass=getDefinitionByName("flash.filesystem.File") as Class;
+			}catch(e:Error){
+				FileClass=null;
+			}
+			
+			
+			if(FileClass){
+				soXMLFile=new FileClass(FileClass.applicationDirectory.nativePath+"/so.xml");
+				if(soXMLFile.exists){
+					xml=readXMLFromFile(soXMLFile);
+				}else{
+					xml=<so/>;
+					writeXMLToFile(xml,soXMLFile);
+				}
+				
+			}else{
+				so=SharedObject.getLocal(name,"/");
+				if(so.data.xml){
+					xml=new XML(so.data.xml);
+				}else{
+					xml=<so/>;
+					so.data.xml=xml.toXMLString();
+				}
+			}
+			
+			if(xml.@so_version.toString()==_so_version){
 			}else{
 				
 				reset();
 				
-				version=_version;
+				xml=_xml||<so/>;
+				xml.@so_version=_so_version;
+				update();
 				
-				trace("重置 so, version="+version);
+				trace("重置 so, xml="+xml.toXMLString());
 			}
-			
-			if(xmlOrXMLURL is XML){
+		}
+		
+		private function getNodeByKey(key:String):XML{
+			return xml.node.(@key==key)[0];
+		}
+		public function getXMLByKey(key:String):XML{
+			var node:XML=getNodeByKey(key);
+			if(node){
+				return node.children()[0];
+			}
+			return null;
+		}
+		public function setXMLByKey(key:String,newXML:XML):void{
+			var node:XML=getNodeByKey(key);
+			if(node){
 			}else{
-				////===
-				//加载 xml
-				//创建时间：2011年4月6日 10:42:25
-				xmlLoader=new URLLoader();
-				xmlLoader.addEventListener(Event.COMPLETE,xmlLoadComplete);
-				xmlLoader.addEventListener(IOErrorEvent.IO_ERROR,xmlLoadError);
-				xmlLoader.load(new URLRequest(xmlOrXMLURL));
-				////===
+				node=<node key={key}/>;
+				xml.appendChild(node);
 			}
-		}
-		
-		////===
-		//加载 xml
-		//创建时间：2011年4月6日 10:42:25
-		private function xmlLoadComplete(event:Event):void{
-			trace("xmlLoader.data="+xmlLoader.data);
-			xmlLoader.removeEventListener(Event.COMPLETE,xmlLoadComplete);
-			xmlLoader.removeEventListener(IOErrorEvent.IO_ERROR,xmlLoadError);
-			xmlLoader=null;
-		}
-		private function xmlLoadError(event:IOErrorEvent):void{
-			trace("加载 xml 失败");
-			xmlLoader.removeEventListener(Event.COMPLETE,xmlLoadComplete);
-			xmlLoader.removeEventListener(IOErrorEvent.IO_ERROR,xmlLoadError);
-			xmlLoader=null;
-		}
-		////===
-			
-			
-			
-		
-		public function get version():String{
-			return so.data.version;
-		}
-		public function set version(_version:String):void{
-			so.data.version=_version;
+			node.setChildren(newXML);
+			//trace("node="+node);
+			update();
 		}
 		
 		public function reset():void{
-			//
-			//so.data={version:so_version};//属性是只读的
-			
-			//
-			for(var valueName:String in so.data){
-				delete so.data[valueName];
+			xml=<so/>;
+			if(soXMLFile){
+				writeXMLToFile(xml,soXMLFile);
+			}else{
+				//
+				//so.data={};//属性是只读的
+				
+				//
+				for(var valueName:String in so.data){
+					delete so.data[valueName];
+				}
+				
+				so.data.xml=xml.toXMLString();
 			}
+		}
+		
+		public function update():void{
+			if(soXMLFile){
+				writeXMLToFile(xml,soXMLFile);
+			}else{
+				so.data.xml=xml.toXMLString();
+			}
+		}
+		private function readXMLFromFile(file:*):XML{
+			var fs:*=new (getDefinitionByName("flash.filesystem.FileStream"))();
+			fs.open(file,getDefinitionByName("flash.filesystem.FileMode").READ);
+			var xmlStr:String=fs.readUTFBytes(fs.bytesAvailable);
+			fs.close();
+			return new XML(xmlStr);
+		}
+		private function writeXMLToFile(xml:XML,file:*):void{
+			var fs:*=new (getDefinitionByName("flash.filesystem.FileStream"))();
+			fs.open(file,getDefinitionByName("flash.filesystem.FileMode").WRITE);
+			fs.writeUTFBytes(('<?xml version="1.0" encoding="utf-8"?>\n'+xml.toXMLString()).replace(/\r\n/g,"\n").replace(/\n/g,"\r\n"));
+			fs.close();
 		}
 		
 		public function flush():void{

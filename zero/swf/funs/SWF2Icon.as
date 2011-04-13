@@ -19,7 +19,7 @@ package zero.swf.funs{
 	import mx.graphics.codec.PNGEncoder;
 	
 	import zero.Outputer;
-	import zero.air.FileAndData;
+	import zero.air.ReadAndWriteFile;
 	
 	public class SWF2Icon{
 		private static var startTime:int=0;
@@ -50,7 +50,7 @@ package zero.swf.funs{
 			currFile=fileV.shift();
 			var loaderContext:LoaderContext=new LoaderContext();
 			loaderContext.allowLoadBytesCodeExecution=true;
-			loader.loadBytes(FileAndData.readDataFromFile(currFile),loaderContext);
+			loader.loadBytes(ReadAndWriteFile.readDataFromFile(currFile),loaderContext);
 		}
 		private static function loadComplete(event:Event):void{
 			if(getTimer()-startTime>1000){
@@ -61,7 +61,7 @@ package zero.swf.funs{
 			iconBmd.draw(loader);
 			var pngFileURL:String=currFile.url;
 			pngFileURL=pngFileURL.substr(0,pngFileURL.lastIndexOf("."))+"_icon.png";
-			FileAndData.writeDataToURL(new PNGEncoder().encode(iconBmd),pngFileURL);
+			ReadAndWriteFile.writeDataToURL(new PNGEncoder().encode(iconBmd),pngFileURL);
 			currFile=null;
 			if(fileV.length){
 				load();
@@ -119,7 +119,7 @@ package zero.swf.funs{
 				iconBmd.draw(dspObj,new Matrix(scale,0,0,scale,-rect.x*scale+(wid-rect.width*scale)/2,-rect.y*scale+(hei-rect.height*scale)/2));
 				
 				var iconPath:String=xmlFolderURL+resourceV[itemId].bodyXML.@resource.toString();
-				FileAndData.writeDataToURL(new PNGEncoder().encode(iconBmd),iconPath=iconPath.substr(0,iconPath.lastIndexOf("."))+"_icon.png");
+				ReadAndWriteFile.writeDataToURL(new PNGEncoder().encode(iconBmd),iconPath=iconPath.substr(0,iconPath.lastIndexOf("."))+"_icon.png");
 			}
 			if(getTimer()-startTime>1000){
 				startTime=getTimer();

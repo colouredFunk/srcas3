@@ -138,11 +138,23 @@ OutputPane 版本:v1.0
 					switch(styleOrXML){
 						case "folder and file":
 							msg=encodeMsg(msg);
-							execResult=/^(.*?)(file:\/\/\/.*\/)(.*?)$/.exec(msg);
-							if(execResult[0]==msg){
-								msg='<span class="blue">'+execResult[1]+'</span>'+
-									'<a href="event:file:'+execResult[2]+'">'+execResult[2]+'</a>'+
-									'<a href="event:file:'+execResult[2]+execResult[3]+'">'+execResult[3]+'</a>';
+							if(msg.indexOf("file:///")>-1){
+								execResult=/^(.*?)(file:\/\/\/.*\/)(.*?)$/.exec(msg);
+								if(execResult[0]==msg){
+									msg='<span class="blue">'+execResult[1]+'</span>'+
+										'<a href="event:file:'+execResult[2]+'">'+execResult[2]+'</a>'+
+										'<a href="event:file:'+execResult[2]+execResult[3]+'">'+execResult[3]+'</a>';
+								}else{
+									throw new Error("msg 格式不正确");
+								}
+							}else if(msg.indexOf("http://")>-1){
+								execResult=/^(.*?)(http:\/\/.*?)(\s*)$/.exec(msg);
+								if(execResult[0]==msg){
+									msg='<span class="blue">'+execResult[1]+'</span>'+
+										'<a href="'+execResult[2]+'" target="_blank">'+execResult[2]+'</a>';
+								}else{
+									throw new Error("msg 格式不正确");
+								}
 							}else{
 								throw new Error("msg 格式不正确");
 							}
@@ -180,6 +192,10 @@ OutputPane 版本:v1.0
 					}else{
 						msg+="　"+tail;
 					}
+				}
+				if(strArr.length>100){
+					clear();
+					strArr[0]="输出过多自动清除...<br>";
 				}
 				strArr[strArr.length]=msg+"<br>";
 			}

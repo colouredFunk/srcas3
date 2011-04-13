@@ -13,67 +13,50 @@ package zero.net{
 	import flash.utils.*;
 	
 	public class MultiData{
-		public static var default_extName:String=null;
+		public static const STRING:int=0x01;
+		public static const DATA:int=0x02;
 		
 		private var values:Object;
-		private var filenames:Object;
-		
-		public var contentType:String;
-		public var boundary:String;
-		public function MultiData(
-			_values:Object=null,
-			_filenames:Object=null
-		){
+		public function MultiData(_values:Object=null){
 			values=_values||new Object();
-			filenames=_filenames||new Object();
-			boundary="-=-=-=-=-=-=-=-=-=-"+Math.random();
-			contentType="multipart/form-data; boundary="+boundary;//只能用户点击时上传
-			//contentType="application/octet-stream; boundary="+boundary;
 			
 		}
-		public function add(name:String,value:*,filename:String=null):void{
+		public function add(name:String,value:*):void{
 			values[name]=value;
-			if(filename){
-				filenames[name]=filename;
-			}
 		}
 		public function get data():ByteArray{
 			var data:ByteArray=new ByteArray();
+			var strData:ByteArray;
 			for(var name:String in values){
 				var value:*=values[name];
-				data.writeUTFBytes("--" + boundary + "\r\n");
 				if(value is ByteArray){
-					//trace(name+".length="+value.length);
-					//var dotId:int=name.lastIndexOf(".");
-					//if(dotId>=0){
-					//	
-					//}
-					data.writeUTFBytes(
-						"Content-Disposition: form-data; name=\"" + name + 
-						"\"; filename=\"\\" + (
-							filenames[name]
-							||(
-								name+(
-									"."+default_extName
-									||
-									""
-								)
-							)
-						) +
-						"\"\r\nContent-Type: application/octet-stream\r\n\r\n"
-					);
-					data.writeBytes(values[name]);
-					data.writeUTFBytes("\r\n");
+					
+					data.writeByte(DATA);
+					
+					strData=new ByteArray();
+					strData.writeUTFBytes(name);
+					data.writeInt(strData.length);
+					data.writeBytes(strData);
+					
+					data.writeInt(value.length);
+					data.writeBytes(value);
+					
 				}else{
-					//trace(name+"=\""+value+"\"");
-					data.writeUTFBytes(
-						"Content-Disposition: form-data; name=\"" + name + 
-						"\"\r\n\r\n"+values[name]+
-						"\r\n"
-					);
+					
+					data.writeByte(STRING);
+					
+					strData=new ByteArray();
+					strData.writeUTFBytes(name);
+					data.writeInt(strData.length);
+					data.writeBytes(strData);
+					
+					strData=new ByteArray();
+					strData.writeUTFBytes(value);
+					data.writeInt(strData.length);
+					data.writeBytes(strData);
+					
 				}
 			}
-			data.writeUTFBytes("--" + this.boundary + "--\r\n");
 			return data;
 		}
 	}

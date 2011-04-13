@@ -19,13 +19,15 @@ package zero{
 	public class ZeroCommon{
 		public static function getTime():String{
 			var date:Date=new Date();
+			var month:int=date.getMonth()+1;
+			var day:int=date.getDate();
 			var hours:int=date.getHours();
 			var minutes:int=date.getMinutes();
 			var seconds:int=date.getSeconds();
 			
 			return date.getFullYear()+"年"
-				+(date.getMonth()+1)+"月"
-				+date.getDate()+"日 "
+				+(month<10?"0":"")+"月"
+				+(day<10?"0":"")+"日 "
 				+(hours<10?"0":"")+hours+":"
 				+(minutes<10?"0":"")+minutes+":"
 				+(seconds<10?"0":"")+seconds;

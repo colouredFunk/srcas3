@@ -96,7 +96,8 @@ TagsOptionBoard 版本:v1.0
 			import mx.collections.XMLListCollection;
 			
 			import zero.Outputer;
-			import zero.air.FileAndStr;
+			import zero.net.So;
+			import zero.air.ReadAndWriteFile;
 			import zero.swf.DataAndTags;
 			import zero.swf.TagType;
 			import zero.swf.avm2.AVM2Obj;
@@ -128,7 +129,7 @@ TagsOptionBoard 版本:v1.0
 			private static function initSettings():void{
 				settingFile=new File(settingFolderPath+"setting.xml");
 				if(settingFile.exists){
-					settingXML=new XML(FileAndStr.readStrFromFile(settingFile));
+					settingXML=new XML(ReadAndWriteFile.readStrFromFile(settingFile));
 				}else{
 					//settingXML=<setting selectedOptionName="输出位图为资源"/>;
 					settingXML=<setting selectedOptionName="AS3代码"/>;
@@ -432,7 +433,7 @@ TagsOptionBoard 版本:v1.0
 							optionPath=optionsFolderPath+optionXML.@name.toString()+".xml";
 							delete optionXML.@name;
 							optionFile=new File(optionPath);
-							FileAndStr.writeStrToFile('<?xml version="1.0" encoding="utf-8"?>\n'+optionXML.toXMLString(),optionFile);
+							ReadAndWriteFile.writeStrToFile('<?xml version="1.0" encoding="utf-8"?>\n'+optionXML.toXMLString(),optionFile);
 							Outputer.output("保存默认 option 至: "+optionPath,"blue");
 							optionFileArr[i++]=optionFile;
 						}
@@ -661,7 +662,7 @@ TagsOptionBoard 版本:v1.0
 						Outputer.output("保存 option 至: "+optionFilePath,"blue");
 					}
 					
-					FileAndStr.writeStrToFile('<?xml version="1.0" encoding="utf-8"?>\n'+getCurrOptionXML().toXMLString(),optionFile);
+					ReadAndWriteFile.writeStrToFile('<?xml version="1.0" encoding="utf-8"?>\n'+getCurrOptionXML().toXMLString(),optionFile);
 					
 					currOptionName=addOptionName(optionFile);
 				}else{
@@ -675,7 +676,7 @@ TagsOptionBoard 版本:v1.0
 					addTempOption();
 				}
 				
-				FileAndStr.writeStrToFile(
+				ReadAndWriteFile.writeStrToFile(
 					'<?xml version="1.0" encoding="utf-8"?>\n'+settingXML.toXMLString(),
 					settingFile
 				);
@@ -723,7 +724,7 @@ TagsOptionBoard 版本:v1.0
 								optionNameArrCol.addItem(optionName);
 							}
 						}
-						optionXMLs[optionName]=new XML(FileAndStr.readStrFromFile(optionFile));
+						optionXMLs[optionName]=new XML(ReadAndWriteFile.readStrFromFile(optionFile));
 						return optionName;
 					}else{
 						Outputer.outputError("后缀名必须是\".xml\": "+optionName);
@@ -737,12 +738,12 @@ TagsOptionBoard 版本:v1.0
 				var optionFile:File=new File(optionPath);
 				var oldOptionStr:String=null;
 				if(optionFile.exists){
-					oldOptionStr=FileAndStr.readStrFromFile(optionFile);
+					oldOptionStr=ReadAndWriteFile.readStrFromFile(optionFile);
 				}
 				var optionStr:String='<?xml version="1.0" encoding="utf-8"?>\n'+getCurrOptionXML().toXMLString();
 				if(oldOptionStr==optionStr){
 				}else{
-					FileAndStr.writeStrToFile(optionStr,optionFile);
+					ReadAndWriteFile.writeStrToFile(optionStr,optionFile);
 					Outputer.output("保存临时 option 至: "+optionPath,"blue");
 				}
 				addOptionName(optionFile);

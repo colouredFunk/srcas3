@@ -18,11 +18,11 @@ package zero.ui{
 		public static function addCb(
 			cb:spark.components.CheckBox,
 			so:So,
-			saveId:String
+			so_key:String
 		):void{
 			var cbm:CheckBoxManager=new CheckBoxManager();
 			dict[cb]=cbm;
-			cbm.init(cb,so,saveId);
+			cbm.init(cb,so,so_key);
 		}
 		public static function clearCb(cb:spark.components.CheckBox):void{
 			if(dict[cb]){
@@ -40,7 +40,9 @@ package zero.ui{
 		
 		private var cb:spark.components.CheckBox;
 		private var so:Object;
-		private var saveId:String;
+		private var so_key:String;
+		private var xml:XML;
+		
 		public function CheckBoxManager(){}
 		private function clear():void{
 			cb.removeEventListener(Event.CHANGE,change);
@@ -50,20 +52,24 @@ package zero.ui{
 		private function init(
 			_cb:spark.components.CheckBox,
 			_so:So,
-			_saveId:String
+			_so_key:String
 		):void{
 			cb=_cb;
 			so=_so;
-			saveId=_saveId;
-			if(so.data[saveId]==undefined){
-				so.data[saveId]=cb.selected;
+			so_key=_so_key;
+			
+			xml=so.getXMLByKey(so_key);
+			if(xml){
+				cb.selected=(xml.@selected.toString()=="true");
 			}else{
-				cb.selected=so.data[saveId];
+				xml=<CheckBoxManager selected={cb.selected}/>;
+				so.setXMLByKey(so_key,xml);
 			}
 			cb.addEventListener(Event.CHANGE,change);
 		}
 		private function change(event:Event):void{
-			so.data[saveId]=cb.selected;
+			xml.@selected=cb.selected;
+			so.setXMLByKey(so_key,xml);
 		}
 		public static function updateByCb(cb:spark.components.CheckBox):void{
 			dict[cb].change(null);

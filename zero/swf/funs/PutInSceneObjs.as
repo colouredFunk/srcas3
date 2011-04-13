@@ -22,6 +22,11 @@ package zero.swf.funs{
 		public static var classNameByDefIdArr:Array;
 		public static var classNameMark:Object;
 		public static function init(swf:SWF2):void{
+			
+			PlaceObject;
+			PlaceObject2;
+			PlaceObject3;
+			
 			var tag:Tag;
 			var className:String;
 			classNameByDefIdArr=new Array();
