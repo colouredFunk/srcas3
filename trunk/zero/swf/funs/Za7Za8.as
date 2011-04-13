@@ -105,11 +105,7 @@ package zero.swf.funs{
 						var i:int=advanceABC.clazzV.length;
 						while(--i>=0){
 							clazz=advanceABC.clazzV[i];
-							className=clazz.name.ns.name
-									?
-									clazz.name.ns.name+"."+clazz.name.name
-									:
-									clazz.name.name;
+							className=getClassNameByMultinameInfo(clazz.name);
 							if(classNameMark["~"+className]){
 								fun(advanceABC,advanceABC.clazzV,i,className);
 							}
@@ -146,13 +142,7 @@ package zero.swf.funs{
 					case TagType.DoABCWithoutFlagsAndName:
 						advanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc as AdvanceABC
 						for each(clazz in advanceABC.clazzV){
-							className=(
-								clazz.name.ns.name
-								?
-								clazz.name.ns.name+"."+clazz.name.name
-								:
-								clazz.name.name
-							);
+							className=getClassNameByMultinameInfo(clazz.name);
 							
 							if(classNameMark){
 								if(classNameMark["~"+className]){
@@ -216,7 +206,7 @@ package zero.swf.funs{
 				codesSWF.tagV.unshift(new Tag(TagType.ShowFrame));
 			}
 			if(docClassSWF){
-				codesSWF.tagV=Za7Za8.getUsefulTags(docClassSWF.tagV).concat(codesSWF.tagV);
+				codesSWF.tagV=getUsefulTags(docClassSWF.tagV).concat(codesSWF.tagV);
 			}
 			codesSWF.tagV.push(new Tag(TagType.ShowFrame));
 			codesSWF.tagV.push(new Tag(TagType.End));
@@ -437,7 +427,7 @@ package zero.swf.funs{
 									objCallMethodTraits_info.slot_id=0;//否则可能会出错
 									objCallMethodTraits_info.disp_id=0;//否则可能会出错
 									
-									var objCallMethodCodeArr:Array=Za7Za8.normalizeCodeArr(objCallMethodTraits_info.methodi.codes.codeArr);
+									var objCallMethodCodeArr:Array=normalizeCodeArr(objCallMethodTraits_info.methodi.codes.codeArr);
 									objCallMethodCodeArr.unshift(i,0);
 									codeArr.splice.apply(codeArr,objCallMethodCodeArr);
 									//*/
@@ -570,8 +560,8 @@ package zero.swf.funs{
 			var i:int=-1;
 			for each(var code:* in method0.codes.codeArr){
 				i++;
-				if(Za7Za8.checkIsTraceMarkName(method0.codes.codeArr,i,markName)){
-					Za7Za8.clearTraceMarkName(method0.codes.codeArr,markName);
+				if(checkIsTraceMarkName(method0.codes.codeArr,i,markName)){
+					clearTraceMarkName(method0.codes.codeArr,markName);
 					codeArr.unshift(i,0);//因为 codeArr 已经是副本所以不会影响原 codeArr
 					method0.codes.codeArr.splice.apply(method0.codes.codeArr,codeArr);
 					if(method0.max_stack<method.max_stack){
@@ -644,7 +634,7 @@ package zero.swf.funs{
 			swf.tagV.pop();//ShowFrame
 			swf.tagV.pop();//ShowFrame
 			
-			swf.tagV=swf.tagV.concat(Za7Za8.getUsefulTags(playerVersionSWF.tagV));
+			swf.tagV=swf.tagV.concat(getUsefulTags(playerVersionSWF.tagV));
 			
 			playerVersionSWF=null;
 			
@@ -654,6 +644,75 @@ package zero.swf.funs{
 			swf.tagV.push(new Tag(TagType.ShowFrame));
 			swf.tagV.push(new Tag(TagType.ShowFrame));
 			swf.tagV.push(new Tag(TagType.End));
+		}
+		
+		public static function getClassNameByMultinameInfo(multiname_info:AdvanceMultiname_info):String{
+			return multiname_info.ns.name
+				?
+				multiname_info.ns.name+"."+multiname_info.name
+				:
+				multiname_info.name
+		}
+		
+		public static function getAdvanceClassByClassName(swf:SWF2,className:String):AdvanceClass{
+			for each(var tag:Tag in swf.tagV){
+				switch(tag.type){
+					case TagType.DoABC:
+					case TagType.DoABCWithoutFlagsAndName:
+						var abc:AdvanceABC=tag.getBody().abc;
+						for each(var clazz:AdvanceClass in abc.clazzV){
+							if(className==getClassNameByMultinameInfo(clazz.name)){
+								return clazz;
+							}
+						}
+					break;
+				}
+			}
+			return null;
+		}
+		
+		public static function checkIsClass(swf:SWF2,name:String,className:String):Boolean{
+			while(name){
+				if(name==className){
+					return true;
+				}
+				var clazz:AdvanceClass=getAdvanceClassByClassName(swf,name);
+				if(clazz){
+					name=getClassNameByMultinameInfo(clazz.super_name);
+				}else{
+					break;
+				}
+			}
+			return false
+		}
+		public static function getMethodByName(clazz:AdvanceClass,name:String):AdvanceMethod{
+			for each(var traits_info:AdvanceTraits_info in clazz.itraits_infoV){
+				if(traits_info.kind_trait_type==TraitTypes.Method){
+					if(traits_info.name.name==name){
+						return traits_info.methodi;
+					}
+				}
+			}
+			return null;
+		}
+		
+		public static function getDefineBinaryDataTagByClassName(swf:SWF2,DefineBinaryDataClassName:String):Tag{
+			var defineBinaryDataTagArr:Array=new Array();
+			var defineBinaryDataTag:Tag=null;
+			for each(var tag:Tag in swf.tagV){
+				if(tag.type==TagType.DefineBinaryData){
+					defineBinaryDataTagArr[tag.getDefId()]=tag;
+				}else if(tag.type==TagType.SymbolClass){
+					var symbolClass:SymbolClass=tag.getBody() as SymbolClass;
+					for each(var Name:String in symbolClass.NameV){
+						if(Name==DefineBinaryDataClassName){
+							defineBinaryDataTag=defineBinaryDataTagArr[symbolClass.TagV[symbolClass.NameV.indexOf(Name)]];
+							break;
+						}
+					}
+				}
+			}
+			return defineBinaryDataTag;
 		}
 	}
 }

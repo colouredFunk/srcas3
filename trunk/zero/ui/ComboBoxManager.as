@@ -21,13 +21,13 @@ package zero.ui{
 		public static function addCb(
 			cb:*,
 			so:So,
-			saveId:String,
+			so_key:String,
 			dataProvider:Array=null,
 			setDataProvider:Boolean=false
 		):void{
 			var cbm:ComboBoxManager=new ComboBoxManager();
 			dict[cb]=cbm;
-			cbm.init(cb,so,saveId,dataProvider,setDataProvider);
+			cbm.init(cb,so,so_key,dataProvider,setDataProvider);
 		}
 		public static function clearCb(cb:*):void{
 			if(dict[cb]){
@@ -48,8 +48,11 @@ package zero.ui{
 		
 		
 		private var cb:*;
-		private var saveObj:Object;
-		private var labelArr:Array;
+		private var so:So;
+		private var so_key:String;
+		private var xml:XML;
+		
+		
 		public function ComboBoxManager(){}
 		private function clear():void{
 			cb.removeEventListener(FocusEvent.FOCUS_OUT,focusOut);
@@ -57,31 +60,60 @@ package zero.ui{
 		}
 		private function init(
 			_cb:*,
-			so:So,
-			saveId:String,
+			_so:So,
+			_so_key:String,
 			dataProvider:Array,
 			setDataProvider:Boolean
 		):void{
 			cb=_cb;
+			so=_so;
+			so_key=_so_key;
 			if(so){
-				saveObj=so.data[saveId];
-				if(!saveObj){
-					so.data[saveId]=saveObj={
-						currId:0,
-						labelArr:[]
-					}
+				xml=so.getXMLByKey(so_key);
+				if(xml){
+				}else{
+					xml=<ComboBoxManager currId="0">
+							<labels/>
+						</ComboBoxManager>;
+					so.setXMLByKey(so_key,xml);
 				}
-				if(dataProvider&&(saveObj.labelArr.length==0||setDataProvider)){
-					saveObj.labelArr=dataProvider;
+				
+				
+				if(
+					dataProvider
+					&&
+					(
+						labelsXML2labelArr(xml.labels[0]).length==0
+						||
+						setDataProvider
+					)
+				){
+					xml.labels=labelArr2labelsXML(dataProvider);
 				}
-				cb.dataProvider=saveObj.labelArr;
-				cb.selectedIndex=saveObj.currId;
-				labelArr=saveObj.labelArr;
+				
+				cb.dataProvider=labelsXML2labelArr(xml.labels[0]);
+				cb.selectedIndex=int(xml.@currId.toString());
 			}else{
-				labelArr=dataProvider||[];
-				saveObj=null;
+				//
 			}
+			
 			cb.addEventListener(FocusEvent.FOCUS_OUT,focusOut);
+		}
+		private function labelArr2labelsXML(labelArr:Array):XML{
+			var labelsXML:XML=<labels/>;
+			for each(var label:String in labelArr){
+				labelsXML.appendChild(<label value={label}/>);
+			}
+			return labelsXML;
+		}
+		private function labelsXML2labelArr(labelsXML:XML):Array{
+			var labelArr:Array=new Array();
+			if(labelsXML){
+				for each(var labelXML:XML in labelsXML.label){
+					labelArr[labelArr.length]=labelXML.@value.toString();
+				}
+			}
+			return labelArr;
 		}
 		private function focusOut(event:FocusEvent):void{
 			addLabel(cb.text);
@@ -90,14 +122,17 @@ package zero.ui{
 			if(label){
 				label=label.replace(/^\s*|\s*$/g,"");
 				if(label){
+					var labelArr:Array=labelsXML2labelArr(xml.labels[0]);
 					if(labelArr.indexOf(label)==-1){
 						labelArr.push(label);
 						labelArr.sort();
 						cb.dataProvider=labelArr;
 					}
 					cb.selectedIndex=labelArr.indexOf(label);
-					if(saveObj){
-						saveObj.currId=cb.selectedIndex;
+					if(so){
+						xml.labels=labelArr2labelsXML(labelArr);
+						xml.@currId=cb.selectedIndex;
+						so.setXMLByKey(so_key,xml);
 					}
 				}
 			}

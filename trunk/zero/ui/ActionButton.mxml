@@ -14,39 +14,14 @@ ActionButton 版本:v1.0
 
 <mx:Button xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		  xmlns:s="library://ns.adobe.com/flex/spark" 
-		  xmlns:mx="library://ns.adobe.com/flex/mx" 
-		  removedFromStage="removed()"
-		  click="click()"
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  creationComplete="creationComplete()"
 >
 	<fx:Script>
 		<![CDATA[
-			private var label0:String;
-			public var onClick:Function;
-			private var flag:Boolean;
-			private function removed():void{
-				onClick=null;
-			}
-			override public function set label(_label:String):void{
-				label0=_label;
-				reset();
-			}
-			public function reset():void{
-				flag=false;
-				super.label=label0;
-			}
-			private function click():void{
-				if(flag){
-					reset();
-					flag=false;
-				}else{
-					super.label="取消";
-					flag=true;
-				}
-				onClick(flag);
-			}
-			public function setProgress(value:int,total:int):void{
-				//super.label="取消("+value+"/"+total+")";
-				super.label="取消 "+int(value/total*100)+"%";
+			public var abm:ActionButtonManager;
+			private function creationComplete():void{
+				abm=new ActionButtonManager(this);
 			}
 		]]>
 	</fx:Script>

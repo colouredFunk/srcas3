@@ -133,6 +133,8 @@ package zero.net{
 			}else{
 				target.removeEventListener(ProgressEvent.PROGRESS,onLoadProgress);
 			}
+			if(xml.toXMLString().search(/<html>\s*<head>\s*<title>\s*404\s*Not\s*Found<\/title>\s*<\/head>/)==0){
+				
 			if(!responseURL){
 				responseURL=getRealURL("",currURL);
 			}

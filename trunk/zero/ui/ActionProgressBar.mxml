@@ -21,7 +21,7 @@ ActionProgressBar 版本:v1.0
 >
 	<fx:Script>
 		<![CDATA[
-			public function start(progressBarLabel:String,maximum:int):void{
+			public function start(progressBarLabel:String,maximum:int=0):void{
 				this.label=progressBarLabel;
 				this.maximum=maximum;
 			}

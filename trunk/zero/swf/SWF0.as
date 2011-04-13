@@ -80,7 +80,19 @@ package zero.swf{
 					case "FWS":
 					break;
 					default:
-						throw new Error("不是有效的SWF文件");
+						//throw new Error("不是有效的SWF文件");
+						var outputData:ByteArray=new ByteArray();
+						var outputLen:int=100;
+						outputData.writeBytes(swfData,0,Math.min(outputLen,swfData.length));
+						throw new Error(
+							"不是有效的SWF文件: "+outputData+(
+								outputLen<swfData.length
+								?
+								"..."
+								:
+								""
+							)
+						);
 					break;
 				}
 				

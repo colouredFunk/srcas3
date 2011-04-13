@@ -10,8 +10,8 @@ FileSelecterManager 版本:v1.0
 package zero.ui{
 	import flash.display.*;
 	import flash.events.*;
-	import flash.utils.*;
 	import flash.net.*;
+	import flash.utils.*;
 	
 	import zero.net.So;
 	
@@ -49,6 +49,7 @@ package zero.ui{
 		public var onLoadDatas:Function;
 		public var onSelect:Function;
 		
+		public var dragDropClient:*;
 		public var cb:*;
 		public var txt:*;
 		public var btn:*;
@@ -56,6 +57,20 @@ package zero.ui{
 		private static var lastFSMFile:*;//最近一次 FileSelecterManager 初始化的 File
 
 		public function clear():void{
+			(cb||txt||btn).removeEventListener(Event.REMOVED_FROM_STAGE,removed);
+			
+			var NativeDragEventClass:Class;
+			try{
+				NativeDragEventClass=getDefinitionByName("flash.events.NativeDragEvent") as Class;
+			}catch(e:Error){
+				NativeDragEventClass=null;
+			}
+			
+			if(NativeDragEventClass){
+				(dragDropClient||cb||txt||btn).removeEventListener(NativeDragEventClass.NATIVE_DRAG_ENTER,evt_nativeDragEnter);
+				(dragDropClient||cb||txt||btn).removeEventListener(NativeDragEventClass.NATIVE_DRAG_DROP,evt_nativeDragDrop);
+			}
+			
 			if(btn){
 				btn.removeEventListener(MouseEvent.CLICK,browse);
 				btn=null;
@@ -83,6 +98,7 @@ package zero.ui{
 			onSelect=null;
 			dataV=null;
 			fileList=null;
+			
 		}
 		private function normalizeFileURLByLastFSMFile(fileURL:String):String{
 			if(lastFSMFile){
@@ -146,7 +162,7 @@ package zero.ui{
 					
 					__fileURL=normalizeFileURLByLastFSMFile(__fileURL);
 					
-					if(__fileURL){
+					if(__fileURL&&__fileURL.indexOf("http://")==-1){
 						__file=new FileClass(__fileURL);
 						if(lastFSMFile){
 						}else{
@@ -193,7 +209,37 @@ package zero.ui{
 					}
 				}
 			}
+			
+			var NativeDragEventClass:Class;
+			try{
+				NativeDragEventClass=getDefinitionByName("flash.events.NativeDragEvent") as Class;
+			}catch(e:Error){
+				NativeDragEventClass=null;
+			}
+			
+			if(NativeDragEventClass){
+				(dragDropClient||cb||txt||btn).addEventListener(NativeDragEventClass.NATIVE_DRAG_ENTER,evt_nativeDragEnter);
+				(dragDropClient||cb||txt||btn).addEventListener(NativeDragEventClass.NATIVE_DRAG_DROP,evt_nativeDragDrop);
+			}
+			
+			
+			(cb||txt||btn).addEventListener(Event.REMOVED_FROM_STAGE,removed);
 		}
+		
+		private function removed(event:Event):void{
+			clear();
+		}
+		
+		private function evt_nativeDragEnter(event:*):void{//NativeDragEvent
+			if(checkIsMatchType(event.clipboard.getData(getDefinitionByName("flash.desktop.ClipboardFormats").FILE_LIST_FORMAT) as Array)){
+				getDefinitionByName("flash.desktop.NativeDragManager").acceptDragDrop(event.currentTarget);
+			}
+		}
+		
+		private function evt_nativeDragDrop(event:*):void{//NativeDragEvent
+			nativeDragDrop(event.clipboard.getData(getDefinitionByName("flash.desktop.ClipboardFormats").FILE_LIST_FORMAT) as Array);
+		}
+		
 		private function browse(event:MouseEvent=null):void{
 			if(__file){
 				var fileURL:String;
@@ -310,6 +356,10 @@ package zero.ui{
 			loadNextData();
 		}
 		private function change(...args):void{
+			if(cb.text.indexOf("http://")>-1){
+				select(null);
+				return;
+			}
 			try{
 				__file.url=cb.text=cb.text.replace(/\\/g,"/");
 			}catch(e:Error){

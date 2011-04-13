@@ -37,6 +37,11 @@ package zero.net{
 					onLoadFinished(RequestLoader.ERROR);
 					return;
 				}
+				if(xml.toXMLString().search(/<html>\s*<head>\s*<title>\s*404\s*Not\s*Found<\/title>\s*<\/head>/)==0){
+					xml=null;
+					onLoadFinished(RequestLoader.ERROR);
+					return;
+				}
 				onLoadFinished(info);
 				return;
 			}

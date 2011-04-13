@@ -29,12 +29,12 @@ package zero.net{
 			requestLoader.clear();
 			requestLoader=null;
 		}
-		public function loadData(_url:String,variables:Object=null,_dataFormat:String=null):void{
+		public function loadData(_url:String,variables:Object=null,_dataFormat:String=null,_method:String=null):void{
 			url=_url;
 			this.dataFormat=_dataFormat?_dataFormat:(
 				RequestLoader.isText(url)?URLLoaderDataFormat.TEXT:URLLoaderDataFormat.BINARY
 			);
-			this.load(requestLoader.load(url,variables));
+			this.load(requestLoader.load(url,variables,_method));
 		}
 	}
 }
