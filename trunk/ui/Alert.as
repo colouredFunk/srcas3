@@ -3,6 +3,7 @@
 	import flash.display.DisplayObject;
 	import flash.display.Loader;
 	import flash.display.Sprite;
+	import flash.system.System;
 	import flash.text.TextField;
 	
 	import flash.geom.Point;
@@ -57,7 +58,7 @@
 				delayCallBackParams = null;
 			}
 		}*/
-		public static function show(_strOrXML:*, _ctrlLabel:* = "确定", _callBack:Function = null, _Class:Class=null):Alert {
+		public static function show(_text:String, _ctrlLabel:* = "确定", _callBack:Function = null, _Class:Class=null):Alert {
 			if (!alertLayer||(!AlertClass&&!_Class)) {
 				throw Error("Alert.alertLayer is undefined!\nAlert.init(layer,class);");
 			}
@@ -67,27 +68,27 @@
 			}else if (AlertClass) {
 				_alert = new AlertClass();
 			}
-			
-			if (_strOrXML is XMLList) {
-				_strOrXML = _strOrXML[0];
+			/*
+			if (_text is XMLList) {
+				_text = _text[0];
 			}
-			if (_strOrXML is XML) {
-				if (_strOrXML.@label.length() > 0) {
-					_ctrlLabel = String(_strOrXML.@label);
+			if (_text is XML) {
+				if (_text.@label.length() > 0) {
+					_ctrlLabel = String(_text.@label);
 				}
 				if (_callBack == null) {
-					_alert.btnY.href = _strOrXML;
+					_alert.btnY.href = _text;
 				}
-				if (_strOrXML.msg.length() > 0) {
-					_strOrXML = _strOrXML.msg[0];
+				if (_text.msg.length() > 0) {
+					_text = _text.msg[0];
 				}else {
-					_strOrXML = _strOrXML.@msg[0];
+					_text = _text.@msg[0];
 				}
-			}
+			}*/
 			_alert.label = _ctrlLabel;
 			var _prettyIndent:int = XML.prettyIndent;
 			XML.prettyIndent = -1;
-			_alert.text = replaceString(_strOrXML);
+			_alert.text = replaceString(_text);
 			XML.prettyIndent = _prettyIndent;
 			_alert.callBack = _callBack;
 			alertLayer.addChild(_alert);
@@ -263,8 +264,8 @@
 			
 			
 			txtText.autoSize = TextFieldAutoSize.LEFT;
-			txtText.mouseWheelEnabled = false;
-			txtText.mouseEnabled = false;
+			setTextSelectable(false);
+			
 			btnList = [btnY];
 			bar.press = pressBar;
 			bar.release = releaseBar;
@@ -311,6 +312,22 @@
 				}
 				x = int(stage.stageWidth * 0.5 - barWidth * 0.5);
 				y = int(stage.stageHeight * 0.5 - barHeight * 0.5);
+			}
+		}
+		public function setTextSelectable(_b:Boolean):void {
+			txtText.selectable = _b;
+			txtText.mouseEnabled = _b;
+			txtText.mouseWheelEnabled = _b;
+		}
+		public function setTextSelectedText(_str:String):void {
+			var _beginIndex:int;
+			var _endIndex:int;
+			_beginIndex = txtText.text.indexOf(_str);
+			if (_beginIndex >= 0) {
+				setTextSelectable(true);
+				_endIndex = _beginIndex + _str.length;
+				stage.focus = txtText;
+				txtText.setSelection(_beginIndex, _endIndex);
 			}
 		}
 		protected var dragX:int;
@@ -373,6 +390,9 @@
 			}
 		}
 		protected function btnRelease(_flag:*):void {
+			if (txtText.selectedText) {
+				System.setClipboard(txtText.selectedText);
+			}
 			if (_flag!=null) {
 				if ((callBack != null)?(callBack(_flag) != false):true) {
 					remove();

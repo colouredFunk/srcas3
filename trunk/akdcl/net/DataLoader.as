@@ -9,7 +9,7 @@
 	import flash.utils.ByteArray;
 
 	import com.adobe.serialization.json.JSON;
-	
+
 	import akdcl.utils.destroyObject;
 	import akdcl.utils.objectToURLVariables;
 	import zero.net.FormVariables;
@@ -42,7 +42,7 @@
 			_dataLoader.onProgressHandler = _onProgressHandler;
 			_dataLoader.onCompleteHandler = _onCompleteHandler;
 			_dataLoader.onIOErrorHandler = _onIOErrorHandler;
-			if (_onProgressHandler != null) {
+			if (_onProgressHandler != null){
 				_dataLoader.addEventListener(ProgressEvent.PROGRESS, _onProgressHandler);
 			}
 			_dataLoader.addEventListener(Event.COMPLETE, onCompleteOrIOErrorHandler);
@@ -51,26 +51,26 @@
 			request.url = _url;
 			request.contentType = null;
 			if (_data){
-				if (_data["constructor"] === Object) {
-					if (_dataType == TYPE_FORM) {
+				if (_data["constructor"] === Object){
+					if (_dataType == TYPE_FORM){
 						var _formVars:FormVariables = new FormVariables(_data);
 						request.contentType = _formVars.contentType;
 						request.data = _formVars.data;
-					}else if (_dataType == TYPE_JSON) {
+					} else if (_dataType == TYPE_JSON){
 						request.data = JSON.encode(_data);
-					}else {
+					} else {
 						request.data = objectToURLVariables(_data);
 					}
 				} else {
-					if (_data is ByteArray) {
+					if (_data is ByteArray){
 						request.contentType = "application/octet-stream";
 					}
 					request.data = _data;
 				}
-				request.method = _method||URLRequestMethod.POST;
+				request.method = _method || URLRequestMethod.POST;
 			} else {
 				request.data = null;
-				request.method = _method||URLRequestMethod.GET;
+				request.method = _method || URLRequestMethod.GET;
 			}
 			_dataLoader.clear();
 			_dataLoader.load(request);
@@ -85,7 +85,7 @@
 				}
 			} else {
 				if (_dataLoader.onProgressHandler != null){
-					
+
 				}
 				if (_dataLoader.onCompleteHandler != null){
 					_dataLoader.onCompleteHandler(_evt);
@@ -128,17 +128,30 @@
 			super.removeEventListener(_type, _listener, _useCapture);
 			EventManager.removeTargetEvent(_type, _listener, this);
 		}
+
+		public function getData(_type:String):Object {
+			switch (_type){
+				case TYPE_JSON:
+					return dataJSON;
+				case TYPE_URL:
+					return dataURLVariables;
+				default:
+					return data;
+			}
+		}
+
 		public function remove():void {
 			clear();
 			EventManager.removeTargetAllEvent(this);
 			onProgressHandler = null;
 			onCompleteHandler = null;
-			onIOErrorHandler  = null;
+			onIOErrorHandler = null;
 			var _id:int = listReady.indexOf(this);
-			if (_id >= 0) {
+			if (_id >= 0){
 				listReady.splice(_id, 1);
 			}
 		}
+
 		public function clear():void {
 			data = null;
 			destroyObject(userData);
