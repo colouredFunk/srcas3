@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.74
- * DATE: 2010-11-21
+ * VERSION: 1.84
+ * DATE: 2011-03-23
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -22,7 +22,7 @@ package com.greensock.loading.core {
  * Please see the documentation for the other classes.
  * <br /><br />
  * 
- * <b>Copyright 2010, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
+ * <b>Copyright 2011, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
  * 
  * @author Jack Doyle, jack@greensock.com
  */	
@@ -70,7 +70,7 @@ package com.greensock.loading.core {
 		
 		/** @private Flash doesn't properly apply extra GET url parameters when the URL contains them already (like "http://www.greensock.com?id=2") - it ends up missing an "&" delimiter so this method splits any that exist out into a URLVariables object and optionally adds extra parameters like gsCacheBusterID, etc. **/
 		protected function _setRequestURL(request:URLRequest, url:String, extraParams:String=""):void {
-			var a:Array = url.split("?");
+			var a:Array = (this.vars.allowMalformedURL) ? [url] : url.split("?");
 			
 			//in order to avoid a VERY strange bug in certain versions of the Flash Player (like 10.0.12.36), we must loop through each character and rebuild a separate String variable instead of just using a[0], otherwise the "?" delimiter will be omitted when GET parameters are appended to the URL by Flash! Performing any String manipulations on the url will cause the issue as long as there is a "?" in the url. Like url.split("?") or url.substr(0, url.indexOf("?"), etc. Absolutely baffling. Definitely a bug in the Player - it was fixed in 10.1.
 			var s:String = a[0];
@@ -80,7 +80,7 @@ package com.greensock.loading.core {
 			}
 			
 			request.url = parsedURL;
-			if (a.length == 2) {
+			if (a.length >= 2) {
 				extraParams += (extraParams == "") ? a[1] : "&" + a[1];
 			}
 			if (extraParams != "") {
@@ -90,7 +90,7 @@ package com.greensock.loading.core {
 				var pair:Array;
 				while (--i > -1) {
 					pair = a[i].split("=");
-					data[pair[0]] = pair[1];
+					data[pair.shift()] = pair.join("=");
 				}
 				request.data = data;
 			}
@@ -163,14 +163,14 @@ package com.greensock.loading.core {
 		}
 		
 		/** @private **/
-		override protected function _failHandler(event:Event):void {
+		override protected function _failHandler(event:Event, dispatchError:Boolean=true):void {
 			if (this.vars.alternateURL != undefined && this.vars.alternateURL != "" && !_skipAlternateURL) { //don't do (_url != vars.alternateURL) because the audit could have changed it already - that's the whole purpose of _skipAlternateURL.
 				_skipAlternateURL = true;
 				_url = "temp" + Math.random(); //in case the audit already changed the _url to vars.alternateURL, we temporarily make it something different in order to force the refresh in the url setter which skips running the code if the url is set to the same value as it previously was. 
 				this.url = this.vars.alternateURL; //also calls _load()
 				_errorHandler(event);
 			} else {
-				super._failHandler(event);
+				super._failHandler(event, dispatchError);
 			}
 		}
 		

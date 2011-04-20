@@ -37,7 +37,7 @@ LoaderMax.contentDisplayClass = FlexContentDisplay;
  * After that, all ImageLoaders, SWFLoaders, and VideoLoaders will return FlexContentDisplay objects 
  * as their <code>content</code> instead of regular ContentDisplay objects. <br /><br />
  * 
- * <b>Copyright 2010, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
+ * <b>Copyright 2011, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
  * 
  * @author Jack Doyle, jack@greensock.com
  */	
@@ -94,10 +94,10 @@ LoaderMax.contentDisplayClass = FlexContentDisplay;
 		 * @param disposeLoader If <code>true</code>, <code>dispose()</code> will be called on the loader. It is <code>true</code> by default.
 		 */
 		public function dispose(unloadLoader:Boolean=true, disposeLoader:Boolean=true):void {
+			this.rawContent = null;
 			if (this.parent != null) {
 				this.parent.removeChild(this);
 			}
-			this.rawContent = null;
 			this.gcProtect = null;
 			if (_loader != null) {
 				if (unloadLoader) {

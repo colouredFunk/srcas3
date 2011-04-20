@@ -1,6 +1,51 @@
 CHANGE LOG : GREENSOCK TWEENING PLATFORM
 ----------------------------------------
 
+2011-04-12
+---------------------------------------------
+TweenMax			11.67
+	- Fixed issue that could cause allTo(), allFrom(), or allFromTo() not to function properly if the vars parameter(s) was a TweenMaxVars object (for strict data typing or code hinting). 
+
+2011-01-25
+---------------------------------------------
+TweenMax			11.66
+TimelineMax			1.66
+	- Fixed issue that could prevent an onRepeat from getting called if the repeat occurs on the same render as the tween/timeline completes. 
+
+2011-01-24
+---------------------------------------------
+AutoFitArea			2.5
+LiquidArea			2.5
+	- Added a new "customBoundsTarget" special property to AutoFitArea and LiquidArea taht allows you to define a DisplayObject to use when determining the bounds instead of the regular target. For example, maybe the target contains 3 boxes arranged next to each other, left-to-right and instead of fitting ALL of those boxes into the area, you only want the center one fit into the area. In this case, you can define the customBoundsTarget as that center box so that the AutoFitArea/LiquidArea only uses it when calculating bounds. Make sure that the object is in the display list (its visible property can be set to false if you want to use an invisible object to define custom bounds).
+	- Changed the attach() and createAround() parameters so that a a generic vars object is accepted instead of the numerous regular parameters. For example, attach(mc, {scaleMode:"proportionalOutside", crop:true}); instead of attach(mc, "proportionalOutside", "center", "center", true, 0, 99999999, 0, 99999999, false, NaN, false)
+	- Worked around an issue with Flash components that could cause them to be positioned at slightly offset x/y coordinates in some situations (forced a drawNow() call internally on the components after resizing them).
+	- Note taht even though the method signature has changed on attach() and createAround(), legacy code should still work because I implemented a technique with ...args to parse that data and convert it to the new vars data automatically. 
+
+2011-01-18
+---------------------------------------------
+TimelineLite		1.65
+TimelineMax			1.65
+	- Fixed issue that could cause a TimelineLite or TimelineMax to report an incorrect currentTime if a nested tween/timeline's onComplete called a function that changed the parent TimelineLite/Max's currentTime (this would only happen if the tween's onComplete ran at the VERY end of the parent TimelineLite/Max).
+	- Added code to reposition a TimelineLite/Max's startTime if a new tween/timeline was appended/inserted AFTER the parent timeline had completed (and only if the parent timeline is at the root level, not nested inside another timeline in which case it is generally more desireable to maintain a consistent startTime). Typically the only time you'd see the benefit of this new code is if you create a TimelineLite/Max and then a while later (after it completed), you append() a tween and then play() - the old version would render the tween as though time had elapsed between the parent timeline's startTime and now (skipping ahead). 
+
+2011-01-06
+---------------------------------------------
+TweenMax			11.64
+TimelineLite		1.64
+TimelineMax			1.64
+SimpleTimeline		1.64
+TweenCore			1.64
+	- Fixed issue that could cause a TweenMax or TimelineMax to call its onRepeat after it ran once and then was restarted (with restart() or gotoAndPlay(0)) 
+	- Fixed issue that could cause a paused tween's resume() to pick up at the wrong time if it was paused and then reparented into another TimelineLite/Max instance before being resumed.
+
+2010-12-30
+---------------------------------------------
+TimelineLite		1.63
+TimelineMax			1.63
+SimpleTimeline		1.63
+	- Fixed issue that could cause a tween that was paused while it was in one timeline but resumed after being inserted into a different timeline to not honor the correct startTime.
+	- When a new tween/timeline is inserted into a completed timeline, the timeline's new end time will be analyzed and if it exceeds the parent timeline's currentTime, the timeline (and any anscestors) will automatically be re-enabled.
+
 2010-12-24
 ---------------------------------------------
 TimelineLite		1.62
@@ -9,6 +54,7 @@ TweenMax			11.62
 SimpleTimeline		1.62
 TweenCore			1.62
 	- Consolidated the addChild() method into insert() which helped clean up the API a bit (addChild() really wasn't meant for anyone to use). This also accommodates inserting tweens into the TweenLite.rootTimeline and TweenLite.rootFramesTimeline (not a common task, but it could come in handy in some rare scenarios)
+	- [IMPORTANT]: this change affects a core class which means that if you use TweenLite or TweenMax in a parent swf that subloads a swf that was compiled with an OLDER version of TimelineLite or TimelineMax, you will get an error message about there being an illegal override of addChild() or insert(). The solution is to either recompile the child swf(s) with the latest version so that they're all consistent OR use a custom LoaderContext that defines a descrete ApplicationDomain into which the swf will be subloaded.
 
 2010-12-21
 ---------------------------------------------

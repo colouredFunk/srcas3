@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 11.62
- * DATE: 2010-12-24
+ * VERSION: 11.67
+ * DATE: 2011-04-12
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com 
  **/
@@ -290,13 +290,13 @@ package com.greensock {
  * 	  to members. Learn more at <a href="http://www.greensock.com/club/">http://www.greensock.com/club/</a></li>
  * 	</ul>
  * 	  
- * <b>Copyright 2010, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
+ * <b>Copyright 2011, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
  * 
  * @author Jack Doyle, jack@greensock.com
  */
 	public class TweenMax extends TweenLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:Number = 11.62;
+		public static const version:Number = 11.67;
 		
 		TweenPlugin.activate([
 			
@@ -543,7 +543,7 @@ package com.greensock {
 		 * @param force Normally the tween will skip rendering if the time matches the cachedTotalTime (to improve performance), but if force is true, it forces a render. This is primarily used internally for tweens with durations of zero in TimelineLite/Max instances.
 		 */
 		override public function renderTime(time:Number, suppressEvents:Boolean=false, force:Boolean=false):void {
-			var totalDur:Number = (this.cacheIsDirty) ? this.totalDuration : this.cachedTotalDuration, prevTime:Number = this.cachedTime, isComplete:Boolean, repeated:Boolean, setRatio:Boolean;
+			var totalDur:Number = (this.cacheIsDirty) ? this.totalDuration : this.cachedTotalDuration, prevTime:Number = this.cachedTotalTime, isComplete:Boolean, repeated:Boolean, setRatio:Boolean;
 			if (time >= totalDur) {
 				this.cachedTotalTime = totalDur;
 				this.cachedTime = this.cachedDuration;
@@ -581,20 +581,20 @@ package com.greensock {
 			if (_repeat != 0) {
 				
 				var cycleDuration:Number = this.cachedDuration + _repeatDelay;
+				var prevCycles:int = _cyclesComplete;
+				_cyclesComplete = (this.cachedTotalTime / cycleDuration) >> 0; //rounds result down, like int()
+				if (_cyclesComplete == this.cachedTotalTime / cycleDuration) {
+					_cyclesComplete--; //otherwise when rendered exactly at the end time, it will act as though it is repeating (at the beginning)
+				}
+				if (prevCycles != _cyclesComplete) {
+					repeated = true;
+				}
+				
 				if (isComplete) {
 					if (this.yoyo && _repeat % 2) {
 						this.cachedTime = this.ratio = 0;
 					}
 				} else if (time > 0) {
-					var prevCycles:int = _cyclesComplete;
-					_cyclesComplete = (this.cachedTotalTime / cycleDuration) >> 0; //rounds result, like int()
-					if (_cyclesComplete == this.cachedTotalTime / cycleDuration) {
-						_cyclesComplete--; //otherwise when rendered exactly at the end time, it will act as though it is repeating (at the beginning)
-					}
-					if (prevCycles != _cyclesComplete) {
-						repeated = true;
-					}
-					
 					this.cachedTime = ((this.cachedTotalTime / cycleDuration) - _cyclesComplete) * cycleDuration; //originally this.cachedTotalTime % cycleDuration but floating point errors caused problems, so I normalized it. (4 % 0.8 should be 0 but Flash reports it as 0.79999999!)
 					
 					if (this.yoyo && _cyclesComplete % 2) {
@@ -609,11 +609,13 @@ package com.greensock {
 						this.cachedTime = this.ratio = 0;
 						setRatio = false;
 					}
-				}	
+				} else {
+					_cyclesComplete = 0;
+				}
 				
 			}
 			
-			if (prevTime == this.cachedTime && !force) {
+			if (prevTime == this.cachedTotalTime && !force) {
 				return;
 			} else if (!this.initted) {
 				init();
@@ -679,18 +681,19 @@ package com.greensock {
 			if (_hasUpdateListener && !suppressEvents) {
 				_dispatcher.dispatchEvent(new TweenEvent(TweenEvent.UPDATE));
 			}
-			if (isComplete && !this.gc) { //check gc because there's a chance that kill() could be called in an onUpdate
-				if (_hasPlugins && this.cachedPT1) {
-					onPluginEvent("onComplete", this);
-				}
-				complete(true, suppressEvents);
-			} else if (repeated && !suppressEvents && !this.gc) { 
+			if (repeated && !suppressEvents && !this.gc) { 
 				if (this.vars.onRepeat) {
 					this.vars.onRepeat.apply(null, this.vars.onRepeatParams);
 				}
 				if (_dispatcher) {
 					_dispatcher.dispatchEvent(new TweenEvent(TweenEvent.REPEAT));
 				}
+			}
+			if (isComplete && !this.gc) { //check gc because there's a chance that kill() could be called in an onUpdate
+				if (_hasPlugins && this.cachedPT1) {
+					onPluginEvent("onComplete", this);
+				}
+				complete(true, suppressEvents);
 			}
 		}
 		
@@ -867,6 +870,9 @@ package com.greensock {
 			var i:int, varsDup:Object, p:String;
 			var l:int = targets.length;
 			var a:Array = [];
+			if (vars.isGSVars) { //to accommodate TweenMaxVars instances for strong data typing and code hinting
+				vars = vars.vars;
+			}
 			var curDelay:Number = ("delay" in vars) ? Number(vars.delay) : 0;
 			var onCompleteProxy:Function = vars.onComplete;
 			var onCompleteParamsProxy:Array = vars.onCompleteParams;
@@ -1035,11 +1041,11 @@ package com.greensock {
 		 * 
 		 * But if you want to kill only the tweens but allow the delayedCalls to continue, you'd do:<br /><br /><code>
 		 * 
-		 * TweenMax.killAll(false, false, true);<br /><br /></code>
+		 * TweenMax.killAll(false, true, false);<br /><br /></code>
 		 * 
 		 * And if you want to kill only the delayedCalls but not the tweens, you'd do:<br /><br /><code>
 		 * 
-		 * TweenMax.killAll(false, true, false);<br /></code>
+		 * TweenMax.killAll(false, false, true);<br /></code>
 		 *  
 		 * @param complete Determines whether or not the tweens/delayedCalls/callbacks should be forced to completion before being killed.
 		 * @param tweens If true, all tweens will be killed
