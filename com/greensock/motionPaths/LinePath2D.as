@@ -48,7 +48,7 @@ addChild(path);
 
 //create an array containing 30 blue squares
 var boxes:Array = [];
-for (var i:int = 0; i < 30; i++) {
+for (var i:int = 0; i &lt; 30; i++) {
 	boxes.push(createSquare(10, 0x0000FF));
 }
 
@@ -82,7 +82,7 @@ function createSquare(size:Number, color:uint=0xFF0000):Shape {
  * 			property which will provide better performance than tweening each follower independently.</li>
  * </ul>
  * 
- * <b>Copyright 2010, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
+ * <b>Copyright 2011, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
  * 
  * @author Jack Doyle, jack@greensock.com
  */	

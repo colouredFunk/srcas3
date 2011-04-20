@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.767
- * DATE: 2010-12-17
+ * VERSION: 1.842
+ * DATE: 2011-04-14
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -99,6 +99,7 @@ package com.greensock.loading {
  * 		<li><strong> noCache : Boolean</strong> - If <code>noCache</code> is <code>true</code>, a "gsCacheBusterID" parameter will be appended to the url with a random set of numbers to prevent caching (don't worry, this info is ignored when you <code>getLoader()</code> or <code>getContent()</code> by url and when you're running locally)</li>
  * 		<li><strong> estimatedBytes : uint</strong> - Initially, the loader's <code>bytesTotal</code> is set to the <code>estimatedBytes</code> value (or <code>LoaderMax.defaultEstimatedBytes</code> if one isn't defined). Then, when the loader begins loading and it can accurately determine the bytesTotal, it will do so. Setting <code>estimatedBytes</code> is optional, but the more accurate the value, the more accurate your loaders' overall progress will be initially. If the loader will be inserted into a LoaderMax instance (for queue management), its <code>auditSize</code> feature can attempt to automatically determine the <code>bytesTotal</code> at runtime (there is a slight performance penalty for this, however - see LoaderMax's documentation for details).</li>
  * 		<li><strong> requireWithRoot : DisplayObject</strong> - LoaderMax supports <i>subloading</i>, where an object can be factored into a parent's loading progress. If you want LoaderMax to require this VideoLoader as part of its parent SWFLoader's progress, you must set the <code>requireWithRoot</code> property to your swf's <code>root</code>. For example, <code>var loader:VideoLoader = new VideoLoader("myScript.php", {name:"textData", requireWithRoot:this.root});</code></li>
+ * 		<li><strong> allowMalformedURL : Boolean</strong> - Normally, the URL will be parsed and any variables in the query string (like "?name=test&state=il&gender=m") will be placed into a URLVariables object which is added to the URLRequest. This avoids a few bugs in Flash, but if you need to keep the entire URL intact (no parsing into URLVariables), set <code>allowMalformedURL:true</code>. For example, if your URL has duplicate variables in the query string like <code>http://www.greensock.com/?c=S&c=SE&c=SW</code>, it is technically considered a malformed URL and a URLVariables object can't properly contain all the duplicates, so in this case you'd want to set <code>allowMalformedURL</code> to <code>true</code>.</li>
  * 		<li><strong> autoDispose : Boolean</strong> - When <code>autoDispose</code> is <code>true</code>, the loader will be disposed immediately after it completes (it calls the <code>dispose()</code> method internally after dispatching its <code>COMPLETE</code> event). This will remove any listeners that were defined in the vars object (like onComplete, onProgress, onError, onInit). Once a loader is disposed, it can no longer be found with <code>LoaderMax.getLoader()</code> or <code>LoaderMax.getContent()</code> - it is essentially destroyed but its content is not unloaded (you must call <code>unload()</code> or <code>dispose(true)</code> to unload its content). The default <code>autoDispose</code> value is <code>false</code>.
  * 		
  * 		<br /><br />----EVENT HANDLER SHORTCUTS----</li>
@@ -122,6 +123,12 @@ package com.greensock.loading {
  * the <code>COMPLETE</code> event has been dispatched. Otherwise, if you store a reference to the VideoLoader's 
  * <code>netStream</code> before or during a load and it gets cancelled or unloaded for some reason, it won't reference 
  * the one that was used to load the video.<br /><br />
+ * 
+ * <strong>Note:</strong> There is a bug/inconsistency in Adobe's NetStream class that causes relative URLs 
+ * to use the swf's location as the base path instead of the HTML page's location like all other loaders. Therefore,
+ * it would be wise to use the "base" attribute of the &lt;OBJECT&gt; and &lt;EMBED&gt; tags in the HTML to 
+ * make sure all relative paths are consistent. See <a href="http://kb2.adobe.com/cps/041/tn_04157.html" target="_blank">http://kb2.adobe.com/cps/041/tn_04157.html</a>
+ * for details.<br /><br />
  * 
  * @example Example AS3 code:<listing version="3.0">
  import com.greensock.loading.~~;
@@ -169,7 +176,7 @@ function errorHandler(event:LoaderEvent):void {
 }
  </listing>
  * 
- * <b>Copyright 2010, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
+ * <b>Copyright 2011, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
  * 
  * @see com.greensock.loading.data.VideoLoaderVars
  * 
@@ -230,10 +237,10 @@ function errorHandler(event:LoaderEvent):void {
 		protected var _prevTime:Number;
 		/** @private **/
 		protected var _firstCuePoint:CuePoint;
-		/** @private due to a bug in the NetStream class, we cannot seek() or pause() before the NetStream has dispatched a RENDER Event (or the NetStream.Buffer.Full status event is received for Flash Player 9). **/
+		/** @private due to a bug in the NetStream class, we cannot seek() or pause() before the NetStream has dispatched a RENDER Event (or after 50ms for Flash Player 9). **/
 		protected var _renderedOnce:Boolean;
-		/** @private primarily used for FP9 to work around a Flash bug with seek() and pause() (see the _onBufferFull() method for note). **/
-		protected var _timer:Timer =  new Timer(50, 1);
+		/** @private primarily used for FP9 to work around a Flash bug with seek() and pause() (see the _waitForRender() method for note). **/
+		protected var _timer:Timer =  new Timer(50, 0);
 		
 		/** The metaData that was received from the video (contains information about its width, height, frame rate, etc.). See Adobe's docs for information about a NetStream's onMetaData callback. **/
 		public var metaData:Object;
@@ -300,6 +307,7 @@ function errorHandler(event:LoaderEvent):void {
 		 * 		<li><strong> noCache : Boolean</strong> - If <code>noCache</code> is <code>true</code>, a "gsCacheBusterID" parameter will be appended to the url with a random set of numbers to prevent caching (don't worry, this info is ignored when you <code>getLoader()</code> or <code>getContent()</code> by url and when you're running locally)</li>
 		 * 		<li><strong> estimatedBytes : uint</strong> - Initially, the loader's <code>bytesTotal</code> is set to the <code>estimatedBytes</code> value (or <code>LoaderMax.defaultEstimatedBytes</code> if one isn't defined). Then, when the loader begins loading and it can accurately determine the bytesTotal, it will do so. Setting <code>estimatedBytes</code> is optional, but the more accurate the value, the more accurate your loaders' overall progress will be initially. If the loader will be inserted into a LoaderMax instance (for queue management), its <code>auditSize</code> feature can attempt to automatically determine the <code>bytesTotal</code> at runtime (there is a slight performance penalty for this, however - see LoaderMax's documentation for details).</li>
 		 * 		<li><strong> requireWithRoot : DisplayObject</strong> - LoaderMax supports <i>subloading</i>, where an object can be factored into a parent's loading progress. If you want LoaderMax to require this VideoLoader as part of its parent SWFLoader's progress, you must set the <code>requireWithRoot</code> property to your swf's <code>root</code>. For example, <code>var loader:VideoLoader = new VideoLoader("myScript.php", {name:"textData", requireWithRoot:this.root});</code></li>
+		 * 		<li><strong> allowMalformedURL : Boolean</strong> - Normally, the URL will be parsed and any variables in the query string (like "?name=test&state=il&gender=m") will be placed into a URLVariables object which is added to the URLRequest. This avoids a few bugs in Flash, but if you need to keep the entire URL intact (no parsing into URLVariables), set <code>allowMalformedURL:true</code>. For example, if your URL has duplicate variables in the query string like <code>http://www.greensock.com/?c=S&c=SE&c=SW</code>, it is technically considered a malformed URL and a URLVariables object can't properly contain all the duplicates, so in this case you'd want to set <code>allowMalformedURL</code> to <code>true</code>.</li>
 		 * 		<li><strong> autoDispose : Boolean</strong> - When <code>autoDispose</code> is <code>true</code>, the loader will be disposed immediately after it completes (it calls the <code>dispose()</code> method internally after dispatching its <code>COMPLETE</code> event). This will remove any listeners that were defined in the vars object (like onComplete, onProgress, onError, onInit). Once a loader is disposed, it can no longer be found with <code>LoaderMax.getLoader()</code> or <code>LoaderMax.getContent()</code> - it is essentially destroyed but its content is not unloaded (you must call <code>unload()</code> or <code>dispose(true)</code> to unload its content). The default <code>autoDispose</code> value is <code>false</code>.
 		 * 		
 		 * 		<br /><br />----EVENT HANDLER SHORTCUTS----</li>
@@ -356,7 +364,6 @@ function errorHandler(event:LoaderEvent):void {
 					
 				}
 				_sprite.removeEventListener(Event.ENTER_FRAME, _playProgressHandler);
-				_sprite.removeEventListener(Event.ENTER_FRAME, _forceTimeHandler);
 				_ns.client = {};
 				_ns.removeEventListener(NetStatusEvent.NET_STATUS, _statusHandler);
 				_ns.removeEventListener("ioError", _failHandler);
@@ -373,6 +380,8 @@ function errorHandler(event:LoaderEvent):void {
 			_ns.addEventListener("ioError", _failHandler, false, 0, true);
 			_ns.addEventListener("asyncError", _failHandler, false, 0, true);
 			
+			_timer.addEventListener(TimerEvent.TIMER, _renderHandler, false, 0, true); 
+			
 			_ns.bufferTime = isNaN(this.vars.bufferTime) ? 5 : Number(this.vars.bufferTime);
 			
 			_video.attachNetStream(_ns);
@@ -386,7 +395,6 @@ function errorHandler(event:LoaderEvent):void {
 			_prevTime = 0;
 			_bufferFull = false;
 			_renderedOnce = false;
-			_timer.reset();
 			this.metaData = null;
 			_pausePending = _videoPaused;
 			if (_videoPaused) {
@@ -396,24 +404,24 @@ function errorHandler(event:LoaderEvent):void {
 			} else {
 				this.volume = _volume; //ensures the volume is back to normal in case it had been temporarily silenced while buffering
 			}
-			_sprite.addEventListener(Event.ENTER_FRAME, _enterFrameHandler);
-			_ns.addEventListener(Event.RENDER, _renderHandler, false, 0, true);
+			_sprite.addEventListener(Event.ENTER_FRAME, _loadingProgressCheck);
+			_waitForRender();
 			_videoComplete = _initted = false;
 			_ns.play(_request.url);
 		}
 		
 		/** @private scrubLevel: 0 = cancel, 1 = unload, 2 = dispose, 3 = flush **/
 		override protected function _dump(scrubLevel:int=0, newStatus:int=0, suppressEvents:Boolean=false):void {
-			_sprite.removeEventListener(Event.ENTER_FRAME, _enterFrameHandler);
+			_sprite.removeEventListener(Event.ENTER_FRAME, _loadingProgressCheck);
 			_ns.removeEventListener(Event.RENDER, _renderHandler);
-			_sprite.removeEventListener(Event.ENTER_FRAME, _forceTimeHandler);
 			_timer.removeEventListener(TimerEvent.TIMER, _renderHandler);
+			_timer.stop();
 			_forceTime = NaN;
 			_prevTime = 0;
 			_initted = false;
 			_renderedOnce = false;
 			this.metaData = null;
-			if (scrubLevel != 2) {
+			if (scrubLevel < 2) {
 				_refreshNetStream();
 				(_sprite as Object).rawContent = null;
 				if (_video.parent != null) {
@@ -469,12 +477,11 @@ function errorHandler(event:LoaderEvent):void {
 					if (_ns.bufferLength > 0) {
 						_cachedBytesLoaded = (_ns.bufferLength / _ns.bufferTime) * _cachedBytesTotal;
 					}
-					if (_cachedBytesTotal <= _cachedBytesLoaded) {
-						_cachedBytesTotal = (this.metaData == null || !_renderedOnce) ? int(1.01 * _cachedBytesLoaded) + 1 : _cachedBytesLoaded;
-					}
-					
 				} else {
 					_cachedBytesTotal = _ns.bytesTotal;
+				}
+				if (_cachedBytesTotal <= _cachedBytesLoaded) {
+					_cachedBytesTotal = ((this.metaData != null && _renderedOnce && _initted) || (getTimer() - _time >= 10000)) ? _cachedBytesLoaded : int(1.01 * _cachedBytesLoaded) + 1; //make sure the metaData has been received because if the NetStream file is cached locally sometimes the bytesLoaded == bytesTotal BEFORE the metaData arrives. Or timeout after 10 seconds.
 				}
 				if (!_auditedSize) {
 					_auditedSize = true;
@@ -683,16 +690,22 @@ function errorHandler(event:LoaderEvent):void {
 		/** @private **/
 		protected function _setForceTime(time:Number):void {
 			if (!(_forceTime || _forceTime == 0)) { //if _forceTime is already set, the listener was already added (we remove it after 1 frame or after the buffer fills for the first time and metaData is received (whichever takes longer)
-				_sprite.addEventListener(Event.ENTER_FRAME, _forceTimeHandler, false, 0, true); //if, for example, after a video has finished playing, we seek(0) the video and immediately check the playProgress, it returns 1 instead of 0 because it takes a short time to render the first frame and accurately reflect the _ns.time variable. So we use a single ENTER_FRAME to help us override the _ns.time value briefly.
+				_waitForRender(); //if, for example, after a video has finished playing, we seek(0) the video and immediately check the playProgress, it returns 1 instead of 0 because it takes a short time to render the first frame and accurately reflect the _ns.time variable. So we use a single ENTER_FRAME to help us override the _ns.time value briefly.
 			}
 			_forceTime = time;
 		}
 		
 		/** @private **/
+		protected function _waitForRender():void {
+			_ns.addEventListener(Event.RENDER, _renderHandler, false, 0, true); //only works in Flash Player 10 and later
+			_timer.reset();
+			_timer.start(); //backup for Flash Player 9
+		}
+		
+		/** @private **/
 		protected function _onBufferFull():void {
 			if (!_renderedOnce && !_timer.running) { //in Flash Player 9, NetStream doesn't dispatch the RENDER event and the only reliable way I could find to sense when a render truly must have occured is to wait about 50 milliseconds after the buffer fills. Even waiting for an ENTER_FRAME event wouldn't work consistently (depending on the frame rate). Also, depending on the version of Flash that published the swf, the NetStream's NetStream.Buffer.Full status event may not fire (CS3 and CS4)!
-				_timer.addEventListener(TimerEvent.TIMER, _renderHandler, false, 0, true);
-				_timer.start();
+				_waitForRender();
 				return;
 			}
 			if (_pausePending) {
@@ -720,15 +733,15 @@ function errorHandler(event:LoaderEvent):void {
 		
 		/** @private **/
 		protected function _forceInit():void {
-			if (_ns.bufferTime > _duration) {
-				_ns.bufferTime = _duration;
+			if (_ns.bufferTime >= _duration) {
+				_ns.bufferTime = uint(_duration - 1);
 			}
 			_initted = true;
 			if (!_bufferFull && _ns.bufferLength >= _ns.bufferTime) { 
 				_onBufferFull();
 			}
 			(_sprite as Object).rawContent = _video; //resizes it appropriately
-			if (!_bufferFull && _pausePending) {
+			if (!_bufferFull && _pausePending && _renderedOnce) {
 				_video.attachNetStream(null); //if the NetStream is still buffering, there's a good chance that the video will appear to play briefly right before we pause it, so we detach the NetStream from the Video briefly to avoid that funky visual behavior (we attach it again as soon as it buffers).
 			}
 		}
@@ -825,15 +838,15 @@ function errorHandler(event:LoaderEvent):void {
 		}
 		
 		/** @private **/
-		protected function _enterFrameHandler(event:Event):void {
+		protected function _loadingProgressCheck(event:Event):void {
 			var bl:uint = _cachedBytesLoaded;
 			var bt:uint = _cachedBytesTotal;
-			_calculateProgress();
 			if (!_bufferFull && _ns.bufferLength >= _ns.bufferTime) {
 				_onBufferFull();
 			}
-			if (_cachedBytesLoaded == _cachedBytesTotal && _ns.bytesTotal > 5 && ((_initted && _renderedOnce) || getTimer() - _time >= 10000)) { //make sure the metaData has been received because if the NetStream file is cached locally sometimes the bytesLoaded == bytesTotal BEFORE the metaData arrives. Or timeout after 10 seconds.
-				_sprite.removeEventListener(Event.ENTER_FRAME, _enterFrameHandler);
+			_calculateProgress();
+			if (_cachedBytesLoaded == _cachedBytesTotal) { 
+				_sprite.removeEventListener(Event.ENTER_FRAME, _loadingProgressCheck);
 				if (!_bufferFull) {
 					_onBufferFull();
 				}
@@ -857,8 +870,12 @@ function errorHandler(event:LoaderEvent):void {
 		
 		/** @private **/
 		protected function _renderHandler(event:Event):void {
-			event.target.removeEventListener(event.type, _renderHandler);
 			_renderedOnce = true;
+			if (!_videoPaused || _initted) { //if the video hasn't initted yet and it's paused, keep reporting the _forceTime and let the _timer keep calling until the condition is no longer met. 
+				_forceTime = NaN;
+				_timer.stop();
+				_ns.removeEventListener(Event.RENDER, _renderHandler);
+			}
 			if (_pausePending) {
 				if (_bufferFull) {
 					_applyPendingPause();
@@ -875,14 +892,6 @@ function errorHandler(event:LoaderEvent):void {
 			_sprite.removeEventListener(Event.ENTER_FRAME, _detachNS);
 			if (!_bufferFull && _pausePending) {
 				_video.attachNetStream(null); //if the NetStream is still buffering, there's a good chance that the video will appear to play briefly right before we pause it, so we detach the NetStream from the Video briefly to avoid that funky visual behavior (we attach it again as soon as it buffers).
-			}
-		}
-		
-		/** @private **/
-		protected function _forceTimeHandler(event:Event):void {
-			if (!_videoPaused || (_initted && _renderedOnce)) {
-				_forceTime = NaN;
-				event.target.removeEventListener(Event.ENTER_FRAME, _forceTimeHandler);
 			}
 		}
 		
@@ -1018,6 +1027,10 @@ function errorHandler(event:LoaderEvent):void {
 			_bufferMode = value;
 			_preferEstimatedBytesInAudit = _bufferMode;
 			_calculateProgress();
+			if (_cachedBytesLoaded < _cachedBytesTotal && _status == LoaderStatus.COMPLETED) {
+				_status = LoaderStatus.LOADING;
+				_sprite.addEventListener(Event.ENTER_FRAME, _loadingProgressCheck);
+			}
 		}
 		
 	}

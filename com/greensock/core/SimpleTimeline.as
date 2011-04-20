@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 1.62
- * DATE: 2010-12-24
+ * VERSION: 1.64
+ * DATE: 2011-01-06
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -10,7 +10,7 @@ package com.greensock.core {
  * most basic timeline functionality and is used for the root timelines in TweenLite. It is meant
  * to be very fast and lightweight. <br /><br />
  * 
- * <b>Copyright 2010, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
+ * <b>Copyright 2011, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
  * 
  * @author Jack Doyle, jack@greensock.com
  */	
@@ -41,6 +41,9 @@ package com.greensock.core {
 			tween.cachedStartTime = Number(time) + tween.delay;
 			if (tween.gc) {
 				tween.setEnabled(true, true);
+			}
+			if (tween.cachedPaused) {
+				tween.cachedPauseTime = tween.cachedStartTime + ((this.rawTime - tween.cachedStartTime) / tween.cachedTimeScale);
 			}
 			if (_lastChild) {
 				_lastChild.nextNode = tween;

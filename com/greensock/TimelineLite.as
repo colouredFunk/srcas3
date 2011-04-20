@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 1.62
- * DATE: 2010-12-24
+ * VERSION: 1.65
+ * DATE: 2011-01-18
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -107,13 +107,13 @@ package com.greensock {
  * 	<li> TimelineLite adds about 2.6k to your SWF (3.3kb including OverwriteManager).</li>
  * </ul>
  * 
- * <b>Copyright 2010, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
+ * <b>Copyright 2011, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
  * 
  * @author Jack Doyle, jack@greensock.com
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:Number = 1.62;
+		public static const version:Number = 1.65;
 		/** @private **/
 		private static var _overwriteMode:int = (OverwriteManager.enabled) ? OverwriteManager.mode : OverwriteManager.init(2); //Ensures that TweenLite instances don't overwrite each other before being put into the timeline/sequence.
 		/** @private **/
@@ -270,13 +270,13 @@ package com.greensock {
 			}
 			tween.timeline = this;
 			tween.cachedStartTime = Number(timeOrLabel) + tween.delay;
+			if (tween.cachedPaused) {
+				tween.cachedPauseTime = tween.cachedStartTime + ((this.rawTime - tween.cachedStartTime) / tween.cachedTimeScale);
+			}
 			if (tween.gc) {
 				tween.setEnabled(true, true);
 			}
 			setDirtyCache(true);
-			if (tween.cachedPauseTime || tween.cachedPauseTime == 0) {  //faster than isNaN()
-				tween.cachedPauseTime = tween.cachedStartTime + tween.cachedTime / tween.cachedTimeScale;
-			}
 			
 			//now make sure it is inserted in the proper order...
 			
@@ -315,6 +315,22 @@ package com.greensock {
 			} else {
 				_firstChild = first;
 				_lastChild = last;
+			}
+			
+			//if the timeline has already ended but the inserted tween/timeline extends the duration past the parent timeline's currentTime, we should enable this timeline again so that it renders properly.  
+			if (this.gc && !this.cachedPaused && this.cachedStartTime + (tween.cachedStartTime + (tween.cachedTotalDuration / tween.cachedTimeScale)) / this.cachedTimeScale > this.timeline.cachedTime) {
+				if (this.timeline == TweenLite.rootTimeline || this.timeline == TweenLite.rootFramesTimeline) { //we don't typically want to shift the startTime if this TimelineLite/Max is nested inside of another one, but if it's at the root, we would. For example, if a TimelineLite/Max was created (empty) and then a while later a tween was appended to it and then play() was called, if we don't have this code in place, it would appear to skip ahead however much time has elapsed since the TimelineLite/Max's startTime on the parent timeline (typically not what folks expect).
+					this.setTotalTime(this.cachedTotalTime, true);
+				}
+				this.setEnabled(true, false);
+				//in case any of the anscestors had completed but should now be enabled...
+				var tl:SimpleTimeline = this.timeline;
+				while (tl.gc && tl.timeline) {
+					if (tl.cachedStartTime + tl.totalDuration / tl.cachedTimeScale > tl.timeline.cachedTime) {
+						tl.setEnabled(true, false);
+					}
+					tl = tl.timeline;
+				}
 			}
 			
 			return tween;
@@ -533,9 +549,9 @@ package com.greensock {
 					force = true;
 				}
 				if (_rawPrevTime >= 0 && _rawPrevTime != time) {
-					forceChildrenToBeginning(0, suppressEvents);
 					this.cachedTotalTime = 0;
 					this.cachedTime = 0;
+					forceChildrenToBeginning(0, suppressEvents);
 					rendered = true;
 					if (this.cachedReversed) {
 						isComplete = true;

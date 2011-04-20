@@ -1,6 +1,136 @@
 CHANGE LOG : GREENSOCK LOADERMAX SYSTEM
 ----------------------------------------
 
+2011-04-14
+--------------------------------------------
+LoaderMax			1.842
+VideoLoader			1.842
+	- Fixed issue with VideoLoader that could cause an error if an instance is disposed almost immediately after it starts loading.
+
+2011-03-26
+--------------------------------------------
+LoaderMax			1.841
+VideoLoader			1.841
+	- Fixed issue with VideoLoader that could cause a video not to display properly if autoPlay was set to false and the video file loaded in a very particular way/speed. 
+
+2011-03-23
+--------------------------------------------
+LoaderMax			1.84
+XMLLoader			1.84
+LoaderItem			1.84
+	- Added ability for XMLLoader to recognize a root LoaderMax-related node. Previously, the XML document's root couldn't be a <LoaderMax> (or other LoaderMax-related tag). Well, it could be but that node wouldn't be parsed.
+	- Added new "allowMalformedURL" Boolean special property to all loaders which accommodates URLs that are technically not valid, like if they have multiple values defined for the same variable in the query string (like ?c=S&c=SE&c=SW). By default, allowMalformedURL is false which means LoaderMax will parse the query string and translate it into a URLVariables which gets attached to the URLRequest - this avoids 2 particular bugs in Flash. It is very unlikely that you'll ever need to set allowMalformedURL:true
+	- A LoaderMax's rawProgress value will factor in any nested LoaderMax instances' rawProgress (previously it factored in the progress instead). It is very unlikely you'd run into situations where this matters, but it can prevent jerky progress reporting.
+
+2011-02-16
+--------------------------------------------
+LoaderMax			1.831
+SWFLoader			1.831
+	- Very minor enhancement to SWFLoader's getClass() method that prevents an error if you try to find a class definition that doesn't exist in the subloaded swf. 
+
+2011-02-15
+--------------------------------------------
+LoaderMax			1.83
+SWFLoader			1.83
+DisplayObjectLoader	1.83
+DataLoader			1.83
+LoaderCore			1.83
+BinaryDataLoader	1.83
+	- Added a new BinaryDataLoader class that's essentially the same as using a DataLoader with its "format" special property set to "binary". The reason for having a BinaryDataLoader class is to allow certain file extensions (like ".zip") to be associated with it so that the LoaderMax.parse() method can accurately parse URLs with those file extensions.
+	- Added a new registerFileType() method to LoaderMax so that you can associate unrecognized file types (like "pdf") with particular loader types (like BinaryDataLoader) so that LoaderMax.parse() can correctly identify them.
+	- Improved the garbage collection routines in SWFLoader so that there is a greater likelihood that even sub-swfs that use non-weak listeners on the stage will be garbage collected after dispose(true) is called. 
+	- Updated ASDocs 
+
+2011-02-11
+--------------------------------------------
+LoaderMax			1.821
+VideoLoader			1.821
+	- Worked around issue on a Mac that could cause VideoLoader to report its videoTime incorrectly if autoPlay was set to false. This could also lead to cue points that were added with addASCuePoint() not getting triggered as a result of the videoTime being reported incorrectly. 
+
+2011-02-09
+--------------------------------------------
+LoaderMax			1.82
+VideoLoader			1.82
+	- Fixed issue that could cause VideoLoader to act as though it ignored the "skipCuePoints" parameter of the gotoVideoTime() method. This would only happen when the frame rate was high enough in the swf and it was caused by problems in Adobe's NetStream class incorrectly reporting its time for a brief moment after its seek() method was called.
+
+2011-02-03
+--------------------------------------------
+LoaderMax			1.81
+LoaderCore			1.81
+	- Fixed issue that caused the "paused" property to not be reported correctly if set directly through the "paused" setter when the loader wasn't in the process of loading. 
+
+2011-01-21
+--------------------------------------------
+LoaderMax			1.8
+XMLLoader			1.8
+SWFLoader			1.8
+LoaderCore			1.8
+	- Added new feature to XMLLoader that causes it to attach a "rawXML" property to the vars object of any loader parsed in the XML document. For example, if this node is found in the XML: <VideoLoader url="video.flv" name="video1" description="Hidden dangers of steel wool" autoPlay="false"><link url="http://www.greensock.com" /></VideoLoader>, you could get the "description" data in the resulting VideoLoader's vars like this: myVideoLoader.vars.description. And the full XML node (including children) could be accessed with myVideoLoader.vars.rawXML. 
+	- Fixed a few issues with the order of bubbling events and one particular scenario that could cause an extra FAIL event to be dispatched (two in a row).
+	- Fixed issue that could cause a loader with requireWithRoot not to be integrated a parent SWFLoader's progress if that loader was nested inside another LoaderMax instance in the child swf. 
+	- Altered SWFLoader's behavior so that if the swf loads fine but a child loader inside that swf fails (one that has their requireWithRoot set to that swf's root), it will dispatch a FAIL event but it will not reset the progress to 0 or clear the subloading queue. This way, it's still possible to getChildren() on the SWFLoader.
+	- Fixed a problem introduced in version 1.79 (2 days ago) that caused XMLLoader not to parse the "prependURLs" attribute on <LoaderMax> nodes inside the XML.
+
+2011-01-20
+--------------------------------------------
+LoaderMax			1.791
+VideoLoader			1.791
+LoaderCore			1.79
+	- Fixed issue that would cause a VideoLoader to not dispatch its PROGRESS and COMPLETE events if its bufferMode was initially set to true and then in its onComplete handler it was set to false.
+
+2011-01-19
+--------------------------------------------
+LoaderMax			1.79
+XMLLoader			1.79
+XMLLoaderVars		1.2
+	- Added a new "prependURLs" special property to XMLLoader that allows you to prepend all of the URLs of LoaderMax-related loaders parsed in the XML.
+	- Added a new "recursivePrependURLs" special property to XMLLoader that allows you to prepend all of the URLs of LoaderMax-related loaders parsed in the XML and all of the other XML files that it loads too (infinitely deep). For example, if you load doc1.xml that has an <XMLLoader> that loads doc2.xml that has an <XMLLoader> that loads doc3.xml, recursivePrependURLs would prepend the URLs of LoaderMax-related loaders in all of those documents.
+	- Fixed issue that could cause an "error" or "fail" event to dispatch and bubble in a way that would flow up the chain of any anscestor LoaderMax instances BEFORE an onError/onFail handler you added directly to the loader. Basically, the order in which the handlers were called was unintuitive in that particular case. 
+	- Exposed the getChildren() methods in SWFLoader's and XMLLoader's ASDocs
+
+2011-01-18
+--------------------------------------------
+LoaderMax			1.781
+SWFLoader			1.781
+LoaderCore			1.781
+	- Fixed issue that could cause nested loaders discovered in a SWFLoader that had requireWithRoot set to that swf's root to prevent the parent LoaderMax from dispatching a COMPLETE or FAIL event if on of those nested loaders failed. 
+	- Fixed issue that could cause the auditing process to stall on a LoaderMax when it had a nested LoaderMax as a child that failed during its auditing process.
+
+2011-01-17
+--------------------------------------------
+LoaderMax			1.78
+LoaderCore			1.78
+	- Fixed issue that could cause an error if "requireWithRoot" was set to a DisplayObject that wasn't actually a root and was not in the display list
+
+2011-01-15
+--------------------------------------------
+LoaderMax			1.777
+LoaderItem			1.777
+	- Fixed issue that could cause part of the URL query string to be lost if more than one "=" sign was used in a single value pair (extremely rare), like http://www.greensock.com/?prop1=value1=extraValue&prop2=value2 - the extraValue would be dropped in some previous versions (that's fixed now obviously). 
+	- Fixed typo in ASDocs that mentioned LoaderStatus.COMPLETE instead of LoaderStatus.COMPLETED (missing the "D").
+	
+2011-01-11
+--------------------------------------------
+LoaderMax			1.776
+VideoLoader			1.776
+	- Fixed issue that could cause VERY short videos whose duration is equal to or less than the bufferTime (defaults to 5 seconds) not to play correctly. This would only happen if the duration reported in the metaData was slightly inflated which sometimes happens when videos are encoded.
+
+2011-01-10
+--------------------------------------------
+LoaderMax			1.775
+VideoLoader			1.775
+	- Fixed issue that could cause a LoaderMax instance to dispatch a PROGRESS event after being disposed
+	- Fixed issue in VideoLoader that could cause it to report its "progress" as 1 before the metaData has been received (very rare, and only in situations where the file is already completely cached).
+
+2011-01-06
+--------------------------------------------
+LoaderMax			1.773
+VideoLoader			1.773
+DisplayObjectLoader	1.773
+	- Fixed an issue that could cause a LoaderMax not to dispatch its COMPLETE event if it has a VideoLoader that changes its bufferMode from true to false upon its completion while the LoaderMax is loading
+	- Fixed issue that would cause a LoaderMax to dispatch a PROGRESS event when a child loader is appended/inserted. 
+	- Added a very small amount of code to DisplayObjectLoader to make it easier to use it in a standalone fashion (typically it is used only as a base class for SWFLoader and ImageLoader). Again, it isn't recommended to use DisplayObjectLoader on its own, but if you need absolute minimum file size and can do without the bells & whistles of SWFLoader and ImageLoader, you could do it. 
+
 2010-12-28
 --------------------------------------------
 SWFLoader			1.772

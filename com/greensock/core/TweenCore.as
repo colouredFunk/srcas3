@@ -1,23 +1,22 @@
 /**
- * VERSION: 1.62
- * DATE: 2010-12-24
+ * VERSION: 1.64
+ * DATE: 2011-01-06
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
-
 package com.greensock.core {
 	import com.greensock.*;
 /**
  * TweenCore is the base class for all TweenLite, TweenMax, TimelineLite, and TimelineMax classes and 
  * provides core functionality and properties. There is no reason to use this class directly.<br /><br />
  * 
- * <b>Copyright 2010, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
+ * <b>Copyright 2011, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
  * 
  * @author Jack Doyle, jack@greensock.com
  */
 	public class TweenCore {
 		/** @private **/
-		public static const version:Number = 1.62;
+		public static const version:Number = 1.64;
 		
 		/** @private **/
 		protected static var _classInitted:Boolean;
@@ -257,7 +256,7 @@ package com.greensock.core {
 		 **/
 		protected function setTotalTime(time:Number, suppressEvents:Boolean=false):void {
 			if (this.timeline) {
-				var tlTime:Number = (this.cachedPauseTime || this.cachedPauseTime == 0) ? this.cachedPauseTime : this.timeline.cachedTotalTime;
+				var tlTime:Number = (this.cachedPaused) ? this.cachedPauseTime : this.timeline.cachedTotalTime;
 				if (this.cachedReversed) {
 					var dur:Number = (this.cacheIsDirty) ? this.totalDuration : this.cachedTotalDuration;
 					this.cachedStartTime = tlTime - ((dur - time) / this.cachedTimeScale);
