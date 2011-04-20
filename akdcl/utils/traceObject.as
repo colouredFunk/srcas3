@@ -17,7 +17,11 @@ package akdcl.utils {
 					_eachStr = replaceString(JSON.encode(_obj),",{",",\n{");
 					break;
 				default:
-					_eachStr = _obj + "\n";
+					if (_obj is Vector.<*>) {
+						_eachStr = replaceString(JSON.encode(_obj),",{",",\n{")+"\n"+_obj;
+					}else {
+						_eachStr = _obj + "\n";
+					}
 					break;
 			}
 			_str += _eachStr;

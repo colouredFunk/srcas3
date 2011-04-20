@@ -20,16 +20,11 @@
 	import flash.system.ApplicationDomain;
 	
 	import com.greensock.TweenMax;
-	import com.greensock.layout.AlignMode;
-	import com.greensock.layout.AutoFitArea;
-	import com.greensock.layout.ScaleMode;
 	import com.greensock.easing.Sine;
 	
 	import com.greensock.events.LoaderEvent;
 	import com.greensock.loading.LoaderMax;
 	import com.greensock.loading.ImageLoader;
-	import com.greensock.loading.display.ContentDisplay;
-	import com.greensock.loading.LoaderStatus;
 	
 	import akdcl.utils.addContextMenu;
 	
@@ -65,7 +60,7 @@
 		public var foreground:*;
 		public var background:*;
 		public var limitSize:Boolean;
-		protected var autoFitArea:AutoFitArea;
+		protected var areaRect:Rectangle;
 		protected var bmp:Bitmap;
 		protected var __loadProgress:Number = 0;
 		public function get loadProgress():Number {
@@ -90,17 +85,21 @@
 		public function set noCache(_noCache:Boolean):void{
 			createManager(imageGroup).vars.noCache = _noCache;
 		}
-		public function get areaWidth():uint {
-			return autoFitArea.width;
+		private var __areaWidth:int = 0;
+		public function get areaWidth():int {
+			return __areaWidth;
 		}
-		public function set areaWidth(_areaWidth:uint):void {
-			autoFitArea.width = _areaWidth;
+		public function set areaWidth(_areaWidth:int):void {
+			__areaWidth = _areaWidth;
+			//autoFitArea.width = _areaWidth;
 		}
-		public function get areaHeight():uint {
-			return autoFitArea.height;
+		private var __areaHeight:int = 0;
+		public function get areaHeight():int {
+			return __areaHeight;
 		}
-		public function set areaHeight(_areaHeight:uint):void {
-			autoFitArea.height = _areaHeight;
+		public function set areaHeight(_areaHeight:int):void {
+			__areaHeight = _areaHeight;
+			//autoFitArea.height = _areaHeight;
 		}
 		protected var __source:String;
 		public function get source():String {
@@ -116,24 +115,20 @@
 			if (!container) {
 				container = this;
 			}
-			var _areaWidth:uint = 1;
-			var _areaHeight:uint = 1;
 			if (background) {
-				_areaWidth = background.width;
-				_areaHeight = background.height;
+				areaWidth = background.width;
+				areaHeight = background.height;
+				areaRect = getBounds(background);
 			}else if (container.width * container.height > 0) {
-				_areaWidth = container.width;
-				_areaHeight = container.height;
+				areaWidth = container.width;
+				areaHeight = container.height;
+				areaRect = container.getBounds(container);
+			}else {
+				areaRect = getBounds(this);
 			}
 			setProgressClip(false);
 			bmp = new Bitmap();
 			bmp.alpha = 0;
-			if (container) {
-				var _rect:Rectangle = container.getBounds(container);
-				autoFitArea = new AutoFitArea(container, _rect.x, _rect.y, _areaWidth, _areaHeight);
-			}else {
-				autoFitArea = new AutoFitArea(container, 0, 0, _areaWidth, _areaHeight);
-			}
 			contextMenu = createMenu(this);
 		}
 		override protected function onRemoveToStageHandler():void {
@@ -151,13 +146,12 @@
 			container = null;
 			foreground = null;
 			background = null;
-			autoFitArea.destroy();
 		}
 		protected var tweenMode:uint;
 		public function load(_source:*, _index:uint = 0, _tweenMode:* = 2):void {
 			if (_source && _source is String && __source == _source) {
 				//这是为了干什么来着?
-				trace("//这是为了干什么来着");
+				//trace("//这是为了干什么来着");
 				onImageLoadingHandler(null);
 				onImageLoadedHandler(null);
 				return;
@@ -183,7 +177,6 @@
 			__source = _source;
 		}
 		public function unload(_changeImmediately:Boolean = true):void {
-			autoFitArea.release(bmp);
 			TweenMax.killTweensOf(bmp);
 			bmp.alpha = 0;
 			deregister(__source, this);
@@ -197,7 +190,6 @@
 				return;
 			}
 			isHideTweening = true;
-			autoFitArea.release(_content);
 			TweenMax.killTweensOf(bmp);
 			TweenMax.to(bmp, (tweenMode == 2)?10:0, { alpha:0, useFrames:true, ease:Sine.easeInOut, onComplete:onHideComplete } );
 		}
@@ -228,30 +220,22 @@
 		}
 		private const LIMITWH_MAX:uint = 999999;
 		protected function updateArea(_content:*):void {
-			if (areaWidth + areaHeight <= 2) {
+			if (areaWidth + areaHeight <= 0) {
 				//原始大小显示
 			}else {
-				var _widthMax:uint;
-				var _heightMax:uint;
-				var _scaleMode:String
-				var _alignX:String = AlignMode.CENTER;
-				var _alignY:String = AlignMode.CENTER;
-				if (areaWidth <= 1) {
-					_scaleMode = ScaleMode.PROPORTIONAL_OUTSIDE;
-					_alignX = AlignMode.LEFT;
-					_widthMax = limitSize?_content.width:LIMITWH_MAX;
-					_heightMax = limitSize?Math.min(_content.height, areaHeight):LIMITWH_MAX;
-				}else if (areaHeight <= 1) {
-					_scaleMode = ScaleMode.PROPORTIONAL_OUTSIDE;
-					_alignY = AlignMode.TOP;
-					_widthMax = limitSize?Math.min(_content.width, areaWidth):LIMITWH_MAX;
-					_heightMax = limitSize?_content.height:LIMITWH_MAX;
+				var _areaAspectRatio:Number = areaWidth / areaHeight;
+				var _contentAspectRatio:Number = _content.width / _content.height;
+				if (_areaAspectRatio>_contentAspectRatio) {
+					_content.height = areaHeight;
+					_content.scaleX = _content.scaleY;
+					_content.y = areaRect.y;
+					_content.x = areaRect.x + (areaWidth - _content.width) * 0.5;
 				}else {
-					_scaleMode = ScaleMode.PROPORTIONAL_INSIDE;
-					_widthMax = limitSize?Math.min(_content.width, areaWidth):LIMITWH_MAX;
-					_heightMax = limitSize?Math.min(_content.height, areaHeight):LIMITWH_MAX;
+					_content.width = areaWidth;
+					_content.scaleY = _content.scaleX;
+					_content.x = areaRect.x;
+					_content.y = areaRect.y + (areaHeight - _content.height) * 0.5;
 				}
-				autoFitArea.attach(_content, _scaleMode, _alignX, _alignY, false, 0, _widthMax, 0, _heightMax);
 			}
 		}
 		protected function onImageErrorHandler(_evt:*):void {
