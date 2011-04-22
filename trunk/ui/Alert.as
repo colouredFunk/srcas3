@@ -19,6 +19,9 @@
 	import akdcl.utils.destroyObject;
 	
 	public class Alert extends UISprite {
+		public static const A_ALERT:String = "alert";
+		public static const A_LABEL:String = "label";
+		
 		public static var alertLayer:*;
 		public static var AlertClass:Class = Alert;
 		public static var alertPoint:Point;
@@ -58,7 +61,7 @@
 				delayCallBackParams = null;
 			}
 		}*/
-		public static function show(_text:String, _ctrlLabel:* = "确定", _callBack:Function = null, _Class:Class=null):Alert {
+		public static function show(_text:*, _ctrlLabel:* = "确定", _callBack:Function = null, _Class:Class=null):Alert {
 			if (!alertLayer||(!AlertClass&&!_Class)) {
 				throw Error("Alert.alertLayer is undefined!\nAlert.init(layer,class);");
 			}
@@ -68,23 +71,16 @@
 			}else if (AlertClass) {
 				_alert = new AlertClass();
 			}
-			/*
+			
 			if (_text is XMLList) {
 				_text = _text[0];
 			}
 			if (_text is XML) {
-				if (_text.@label.length() > 0) {
-					_ctrlLabel = String(_text.@label);
-				}
-				if (_callBack == null) {
-					_alert.btnY.href = _text;
-				}
-				if (_text.msg.length() > 0) {
-					_text = _text.msg[0];
-				}else {
-					_text = _text.@msg[0];
-				}
-			}*/
+				_ctrlLabel = _text.attribute(A_LABEL)[0] || _ctrlLabel;
+				_alert.btnY.href = _text;
+				_text = _text.attribute(A_ALERT)[0] || _text;
+			}
+			
 			_alert.label = _ctrlLabel;
 			var _prettyIndent:int = XML.prettyIndent;
 			XML.prettyIndent = -1;
