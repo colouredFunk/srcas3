@@ -50,7 +50,7 @@ package zero.motions{
 				widSum+=rect.width;
 			}
 			var d:Number=((right-left)-widSum)/(dspObjArr.length-1);
-			var x:int=left;
+			var x:Number=left;
 			for each(dspObj in dspObjArr){
 				rect=getB(dspObj);
 				//dspObj.x+=x-rect.x;//立刻

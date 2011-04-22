@@ -16,7 +16,7 @@ package zero.ui{
 	import flash.utils.*;
 	
 	public class ActionButtonManager{
-		private var btn:ActionButton;
+		private var btn:*;
 		
 		private var label0:String;
 		public var onClick:Function;
@@ -34,7 +34,7 @@ package zero.ui{
 			}
 		}
 		
-		public function ActionButtonManager(_btn:ActionButton){
+		public function ActionButtonManager(_btn:*){
 			btn=_btn;
 			btn.addEventListener(Event.REMOVED_FROM_STAGE,removed);
 			btn.addEventListener(MouseEvent.CLICK,click);
@@ -44,8 +44,13 @@ package zero.ui{
 		}
 		
 		private function removed(event:Event):void{
-			btn.removeEventListener(Event.REMOVED_FROM_STAGE,removed);
-			btn.removeEventListener(MouseEvent.CLICK,click);
+			clear();
+		}
+		public function clear():void{
+			if(btn){
+				btn.removeEventListener(Event.REMOVED_FROM_STAGE,removed);
+				btn.removeEventListener(MouseEvent.CLICK,click);
+			}
 			btn=null;
 			onClick=null;
 		}

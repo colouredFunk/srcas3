@@ -8,7 +8,7 @@
 		<![CDATA[
 			import zero.net.So;
 			public function init(
-				so:So
+				so:So,
 				saveId:String
 			):void{
 				TxtManager.addTxt(txt,so,saveId+"_txt");

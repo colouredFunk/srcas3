@@ -21,11 +21,11 @@ package zero.ui
 		public static function addTxt(
 			txt:*,
 			so:So,
-			saveId:String
+			so_key:String
 		):void{
 			var tm:TxtManager=new TxtManager();
 			dict[txt]=tm;
-			tm.init(txt,so,saveId);
+			tm.init(txt,so,so_key);
 		}
 		public static function clearTxt(txt:*):void{
 			if(dict[txt]){
@@ -42,7 +42,7 @@ package zero.ui
 		
 		private var txt:*;
 		private var so:So;
-		private var saveId:String;
+		private var so_key:String;
 		public function TxtManager(){}
 		private function clear():void{
 			txt.removeEventListener(Event.CHANGE,change);
@@ -52,20 +52,25 @@ package zero.ui
 		private function init(
 			_txt:*,
 			_so:So,
-			_saveId:String
+			_so_key:String
 		):void{
 			txt=_txt;
 			so=_so;
-			saveId=_saveId;
-			if(so.data[saveId]==undefined){
-				so.data[saveId]=txt.text;
+			so_key=_so_key;
+			var xml:XML=so.getXMLByKey(so_key);
+			if(xml){
+				txt.text=xml.@text.toString();
 			}else{
-				txt.text=so.data[saveId];
+				xml=<TxtManager/>;
+				xml.@text=txt.text;
+				so.setXMLByKey(so_key,xml);
 			}
 			txt.addEventListener(Event.CHANGE,change);
 		}
 		private function change(event:Event):void{
-			so.data[saveId]=txt.text;
+			var xml:XML=so.getXMLByKey(so_key);
+			xml.@text=txt.text;
+			so.setXMLByKey(so_key,xml);
 		}
 	}
 }

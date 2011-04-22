@@ -14,8 +14,26 @@ package zero.html{
 	import flash.text.*;
 	
 	public class Label extends HTMLElement{
+		private var txt:TextField;
 		public function Label(){
-			this.autoSize=TextFieldAutoSize.LEFT;
+			txt=new TextField();
+			this.addChild(txt);
+			
+			txt.autoSize=TextFieldAutoSize.LEFT;
+		}
+		
+		public function get text():String{
+			return txt.text;
+		}
+		public function set text(_text:String):void{
+			txt.text=_text;
+		}
+		
+		public function get styleSheet():StyleSheet{
+			return txt.styleSheet;
+		}
+		public function set styleSheet(_styleSheet:StyleSheet):void{
+			txt.styleSheet=_styleSheet;
 		}
 	}
 }
