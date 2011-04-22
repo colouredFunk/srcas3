@@ -11,10 +11,9 @@ package zero.html{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
-	import flash.text.*;
 	import flash.filters.*;
 	
-	public class HTMLElement extends TextField{
+	public class HTMLElement extends Sprite{
 		public var id:String;
 		public function HTMLElement(){
 		}

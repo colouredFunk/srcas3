@@ -16,8 +16,14 @@ package zero.net{
 	public class DataLoader extends URLLoader{
 		public var requestLoader:RequestLoader;
 		public var url:String;
+		
+		private var onLoadFinished:Function;
+		
 		public function DataLoader(_onLoadProgress:Function,_onLoadFinished:Function){
-			requestLoader=new RequestLoader(this,_onLoadProgress,_onLoadFinished);
+			
+			onLoadFinished=_onLoadFinished;
+			
+			requestLoader=new RequestLoader(this,_onLoadProgress,loadFinished);
 		}
 		public function clear():void{
 			try{
@@ -29,12 +35,35 @@ package zero.net{
 			requestLoader.clear();
 			requestLoader=null;
 		}
+		
+		private var __dataFormat:String;
 		public function loadData(_url:String,variables:Object=null,_dataFormat:String=null,_method:String=null):void{
 			url=_url;
+			
+			/*
 			this.dataFormat=_dataFormat?_dataFormat:(
 				RequestLoader.isText(url)?URLLoaderDataFormat.TEXT:URLLoaderDataFormat.BINARY
 			);
+			*/
+			
+			__dataFormat=_dataFormat?_dataFormat:(
+				RequestLoader.isText(url)?URLLoaderDataFormat.TEXT:URLLoaderDataFormat.BINARY
+			);
+			this.dataFormat=URLLoaderDataFormat.BINARY;
+			
 			this.load(requestLoader.load(url,variables,_method));
+		}
+		
+		private function loadFinished(info:String):void{
+			if(__dataFormat==URLLoaderDataFormat.TEXT){
+				data.position=0;
+				data=data.readUTFBytes(data.bytesAvailable);
+			}
+			
+			if(onLoadFinished==null){
+			}else{
+				onLoadFinished(info);
+			}
 		}
 	}
 }

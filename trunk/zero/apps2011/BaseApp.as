@@ -15,8 +15,11 @@ package zero.apps2011{
 	import flash.text.*;
 	import flash.utils.*;
 	
+	import ui.Btn;
+	
 	public class BaseApp extends MovieClip{
-		
+		private var btns:Object;
+		private var statusMcs:Object;
 		public var settingXMLPath:String;//仅在编译测试时使用
 		
 		private var settingXMLLoader:URLLoader;
@@ -24,6 +27,8 @@ package zero.apps2011{
 		public var settingXML:XML;
 		
 		public function BaseApp(){
+			btns=new Object();
+			statusMcs=new Object();
 			if(stage){
 				initByShell({});
 			}
@@ -33,6 +38,14 @@ package zero.apps2011{
 		}
 		public function initByShell(values:Object):void{
 			//被壳初始化
+			
+			//20110418
+			if(stage.loaderInfo.parameters.xml){
+				values.settingXML=null;
+				settingXMLPath=stage.loaderInfo.parameters.xml;
+			}
+			//
+			
 			if(values.settingXML){
 				settingXML=values.settingXML;
 			}
@@ -45,8 +58,54 @@ package zero.apps2011{
 		private function added(event:Event):void{
 			addThingsToStage(event.target as DisplayObject);
 		}
-		public function addThingsToStage(thing:DisplayObject):void{
-			throw new Error("舞台上添加东西将调用此函数，请 override 来使用");
+		private function addThingsToStage(thing:DisplayObject):void{
+			if(thing is Btn){
+				var btnKey:String=getBtnKey(thing as Btn);
+				btns[btnKey]=thing;
+				if(settingXML){
+					initItems(btnKey);
+				}
+			}else if(thing.name.indexOf("_status_mc")>-1){
+				var statusMcKey:String=thing.name.replace("_status_mc","");
+				if(thing is MovieClip){
+					thing["mouseEnabled"]=thing["mouseChildren"]=false;
+					statusMcs[statusMcKey]=thing;
+					thing["stop"]();
+					if(settingXML){
+						initItems(statusMcKey);
+					}
+				}else{
+					throw new Error("status_mc 只能是影片剪辑");
+				}
+			}
+		}
+		private function initItems(key:String):void{
+			for each(var btnXML:XML in settingXML.btn){
+				if(btnXML.@key.toString()==key){
+					//trace("btnXML="+btnXML.toXMLString());
+					if(btns[key]){
+						btns[key].hrefXML=btnXML;
+						if(btnXML.@status.toString()=="未开放"){
+							btns[key].mouseEnabled=btns[key].mouseChildren=false;
+						}
+					}else{
+						throw new Error("key="+key+", 找不到 btn");
+					}
+					if(statusMcs[key]){
+						statusMcs[key].gotoAndStop(btnXML.@status.toString());
+					}
+				}
+			}
+		}
+		private function getBtnKey(btn:Btn):String{
+			if(btn.name){
+				if(/^instance\d+$/.test(btn.name)){
+					//一般就是没命名的，系统给自动命名成：instancexxx
+				}else{
+					return btn.name;
+				}
+			}
+			return getQualifiedClassName(btn);
 		}
 		public function forEachChildAddThingsToStage(obj:DisplayObjectContainer):void{
 			var i:int=obj.numChildren;
@@ -111,8 +170,13 @@ package zero.apps2011{
 		}
 		////===
 		
-		public function initSettingXMLFinished():void{
-			throw new Error("数据初始化完毕将调用此函数，请 override 来使用");
+		
+		private function initSettingXMLFinished():void{
+			for(var btnKey:String in btns){
+				initItems(btnKey);
+			}
+			
+			//throw new Error("settingXML="+settingXML.toXMLString());
 		}
 	}
 }

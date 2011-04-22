@@ -13,17 +13,25 @@ package zero.html{
 	import flash.text.*;
 	import flash.utils.*;
 	
+	import zero.DescribeTypes;
+	
 	public class HTML extends Sprite{
 		public static function getStyle(xml:XML):StyleSheet{
 			var style:StyleSheet=new StyleSheet();
 			style.parseCSS(xml.toString().replace(/\s*[\r\n]\s*/g,""));
 			return style;
 		}
-		private static const elementClasses:Object={
-			label:Label,
-			txt:Txt,
-			btn:Btn
-		}
+		private static const elementClasses:Object=function():Object{
+			var elementClasses:Object=new Object();
+			for each(var clazz:Class in [Label,Txt,Btn]){
+				var className:String=getQualifiedClassName(clazz);
+				className=className.substr(className.lastIndexOf(":")+1);
+				className=className.charAt(0).toLowerCase()+className.substr(1);
+				//trace("className="+className);
+				elementClasses[className]=clazz;
+			}
+			return elementClasses;
+		}();
 		public static const defaultStyle:StyleSheet=getStyle(
 			<style><![CDATA[
 				body {
@@ -53,13 +61,8 @@ package zero.html{
 							obj.id=att.toString();
 							parentObj.elements[obj.id]=obj;
 						break;
-						case "eventId":
-							//已被征用
-						break;
 						default:
-							//if(obj.hasOwnProperty(attName)){
-								obj[attName]=att.toString();
-							//}
+							DescribeTypes.setValueByStr(obj,attName,att.toString());
 						break;
 					}
 				}
@@ -72,7 +75,6 @@ package zero.html{
 		public var elements:Object;
 		
 		public function HTML(){
-			
 		}
 		public function init(xml:XML,_onClick:Function=null,_onChange:Function=null,style:StyleSheet=null):void{
 			var rootHTML:HTML=this;
@@ -109,22 +111,27 @@ package zero.html{
 						this.addChild(htmlElement);
 						initByXMLAtts(rootHTML,htmlElement,node);
 						
-						if(htmlElement.type==TextFieldType.INPUT){
-							//- -
-							//如果使用样式, 将无法编辑文本
-							htmlElement.addEventListener(Event.CHANGE,change);
-						}else{
-							htmlElement.styleSheet=style;
-						}
-						
-						switch(nodeName){
-							case "label":
-							case "txt":
+						switch(htmlElement["constructor"]){
+							case Label:
+								(htmlElement as Label).styleSheet=style;
 							break;
-							case "btn":
+							case Txt:
+								var txt:Txt=htmlElement as Txt;
+								if(txt.type==TextFieldType.INPUT){
+									//- -
+									//如果使用样式, 将无法编辑文本
+									txt.addEventListener(Event.CHANGE,change);
+								}else{
+									txt.styleSheet=style;
+								}
+							break;
+							case Btn:
 								var btn:Btn=htmlElement as Btn;
-								btn.eventId=node.@eventId.toString()||node.@id.toString();
-								btn.addEventListener(TextEvent.LINK,click);
+								btn.styleSheet=style;
+								btn.addEventListener(MouseEvent.CLICK,click);
+							break;
+							default:
+								throw new Error("未知类型: "+htmlElement["constructor"]);
 							break;
 						}
 					}
@@ -142,21 +149,36 @@ package zero.html{
 			var i:int=this.numChildren;
 			while(--i>=0){
 				var child:DisplayObject=this.getChildAt(i);
-				child.removeEventListener(TextEvent.LINK,click);
-				child.removeEventListener(Event.CHANGE,change);
+				if(child is HTML){
+				}else{
+					switch(child["constructor"]){
+						case Label:
+						break;
+						case Txt:
+							(child as Txt).removeEventListener(Event.CHANGE,change);
+						break;
+						case Btn:
+							(child as Btn).removeEventListener(MouseEvent.CLICK,click);
+						break;
+						default:
+							throw new Error("未知类型: "+child["constructor"]);
+						break;
+					}
+				}
 			}
 			onClick=null;
 			onChange=null;
 			elements=null;
 		}
-		private function click(event:TextEvent):void{
-			trace("event.text="+event.text);
-			if(onClick!=null){
+		private function click(event:MouseEvent):void{
+			if(onClick==null){
+			}else{
 				onClick(event.target);
 			}
 		}
 		private function change(event:Event):void{
-			if(onChange!=null){
+			if(onChange==null){
+			}else{
 				onChange(event.target);
 			}
 		}
@@ -165,6 +187,11 @@ package zero.html{
 		public function set enabled(_enabled:Boolean):void{
 			//Grey.setEnabled(this,_enabled);
 			this.mouseEnabled=this.mouseChildren=_enabled;
+			if(_enabled){
+				this.alpha=1;
+			}else{
+				this.alpha=0.5;
+			}
 		}
 		//*/
 	}

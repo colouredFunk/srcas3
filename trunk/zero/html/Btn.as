@@ -10,46 +10,52 @@ Btn 版本:v1.0
 package zero.html{
 	import flash.display.*;
 	import flash.events.*;
-	import flash.text.*;
 	import flash.utils.*;
+	import flash.text.*;
 	
 	public class Btn extends HTMLElement{
+		private var txt:TextField;
 		public function Btn(){
-			this.autoSize=TextFieldAutoSize.LEFT;
-			this.border=true;
-			this.background=true;
-			this.selectable=false;
-		}
-		
-		private var __eventId:String;
-		public function set eventId(_eventId:String):void{
-			__eventId=_eventId;
-			updateHTMLText();
-		}
-		
-		private var __text:String;
-		override public function set text(_text:String):void{
-			//大致的补齐按钮文本的两边
-			__text=_text;
+			txt=new TextField();
+			this.addChild(txt);
 			
-			updateHTMLText();
+			txt.autoSize=TextFieldAutoSize.LEFT;
+			txt.border=true;
+			txt.background=true;
+			txt.selectable=false;
+			
+			this.buttonMode=true;
+			this.mouseChildren=false;
 		}
-		private function updateHTMLText():void{
-			var _text:String=__text;
-			var i:int=_text.length;
+		
+		private var __label:String;
+		public function get label():String{
+			return __label;
+		}
+		public function set label(_label:String):void{
+			//大致的补齐按钮文本的两边
+			__label=_label;
+			var i:int=_label.length;
 			var wid:int=0;
 			while(--i>=0){
-				if(_text.charCodeAt(i)>0xff){
+				if(_label.charCodeAt(i)>0xff){
 					wid+=2;
 				}else{
 					wid++;
 				}
 			}
 			while(wid<16){
-				_text=" "+_text+" ";
+				_label=" "+_label+" ";
 				wid+=2;
 			}
-			this.htmlText='<a href="event:'+__eventId+'">'+_text+'</a>';
+			txt.htmlText='<a href="event:'+id+'">'+_label+'</a>';
+		}
+		
+		public function get styleSheet():StyleSheet{
+			return txt.styleSheet;
+		}
+		public function set styleSheet(_styleSheet:StyleSheet):void{
+			txt.styleSheet=_styleSheet;
 		}
 	}
 }

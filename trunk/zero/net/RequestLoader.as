@@ -133,11 +133,34 @@ package zero.net{
 			}else{
 				target.removeEventListener(ProgressEvent.PROGRESS,onLoadProgress);
 			}
-			if(xml.toXMLString().search(/<html>\s*<head>\s*<title>\s*404\s*Not\s*Found<\/title>\s*<\/head>/)==0){
 				
 			if(!responseURL){
 				responseURL=getRealURL("",currURL);
 			}
+			
+			if(target is URLLoader){
+				var urlLoader:URLLoader=target as URLLoader;
+				var reg404:RegExp=/<html>\s*<head>\s*<title>\s*404\s*Not\s*Found<\/title>\s*<\/head>/;
+				if(urlLoader.data is ByteArray){
+					var data:ByteArray=urlLoader.data;
+					if(data.length>6&&data.length<10240){
+						data.position=0;
+						if(data.readUTFBytes(6)=="<html>"){
+							data.position=0;
+							if(data.readUTFBytes(data.bytesAvailable).search(reg404)==0){
+								onLoadFinished(ERROR);
+								return;
+							}
+						}
+					}
+				}else{
+					if(urlLoader.data.search(reg404)==0){
+						onLoadFinished(ERROR);
+						return;
+					}
+				}
+			}
+			
 			onLoadFinished(SUCCESS);
 		}
 		private function loadError(event:IOErrorEvent):void{
