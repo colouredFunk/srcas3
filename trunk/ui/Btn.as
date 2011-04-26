@@ -16,6 +16,7 @@
 		public var rollOut:Function;
 		public var press:Function;
 		public var release:Function;
+		public var select:Function;
 
 		public var area:*;
 		public var href:*;
@@ -42,13 +43,6 @@
 				ButtonManager.addToGroup(__group, this);
 			}
 		}
-
-		public function get select():Boolean {
-			return selected;
-		}
-		public function set select(_selected:Boolean):void {
-			selected = _selected;
-		}
 		
 		private var __selected:Boolean;
 		public function get selected():Boolean {
@@ -70,6 +64,9 @@
 				}
 			}
 			ButtonManager.setButtonStyle(this);
+			if (select != null) {
+				select();
+			}
 		}
 		override public function set enabled(_enabled:Boolean):void {
 			super.enabled = _enabled;

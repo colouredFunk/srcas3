@@ -64,11 +64,13 @@
 				
 				setStyle();
 				enabled = true;
+				visible = true;
 			} else {
 				if (__content) {
 					__content.mask = null;
 				}
 				enabled = false;
+				visible = false;
 			}
 		}
 		override protected function init():void {
