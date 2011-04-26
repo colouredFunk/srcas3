@@ -77,7 +77,7 @@
 
 		protected function onWHReleaseHandler(_evt:ContextMenuEvent):void {
 			if (optionsXMLPath){
-				paramsObject.flashVars.xml = optionsXMLPath;
+				paramsObject.xml = optionsXMLPath;
 			}
 			
 			var _url:String = decodeURI(this.loaderInfo.url);
