@@ -220,7 +220,7 @@ package akdcl.application.player{
 		}
 		protected function onFullSreenHandler(e:FullScreenEvent):void {
 			if (btnScreen) {
-				btnScreen.select = e.fullScreen;
+				btnScreen.selected = e.fullScreen;
 			}
 		}
 		protected function onListChangeHandler(_evt:MediaEvent):void {
@@ -333,19 +333,19 @@ package akdcl.application.player{
 		//
 		protected function onStateChangeHandler(_evt:MediaEvent):void {
 			if (btnPlay) {
-				btnPlay.select = player.playState == MediaPlayer.STATE_PLAY;
+				btnPlay.selected = player.playState == MediaPlayer.STATE_PLAY;
 			}
 			if (btnPlayPause) {
-				btnPlayPause.select = player.playState == MediaPlayer.STATE_PLAY;
+				btnPlayPause.selected = player.playState == MediaPlayer.STATE_PLAY;
 			}
 			if (btnPlayStop) {
-				btnPlayStop.select = player.playState == MediaPlayer.STATE_PLAY;
+				btnPlayStop.selected = player.playState == MediaPlayer.STATE_PLAY;
 			}
 			if (btnPause) {
-				btnPause.select = player.playState == MediaPlayer.STATE_PAUSE;
+				btnPause.selected = player.playState == MediaPlayer.STATE_PAUSE;
 			}
 			if (btnStop) {
-				btnStop.select = player.playState == MediaPlayer.STATE_STOP;
+				btnStop.selected = player.playState == MediaPlayer.STATE_STOP;
 			}
 			switch(player.playState) {
 				case MediaPlayer.STATE_PAUSE:
@@ -383,7 +383,7 @@ package akdcl.application.player{
 			if (btnsContainer && btnsContainer.mask) {
 				_btnSelect = btnLabelList[player.playID];
 				if (_btnSelect) {
-					_btnSelect.select = true;
+					_btnSelect.selected = true;
 					var _x:int;
 					btnsContainer.mask.x = int(btnsContainer.mask.x);
 					if (btnsContainer.x + _btnSelect.x < btnsContainer.mask.x) {
@@ -404,15 +404,15 @@ package akdcl.application.player{
 				//}
 				_btnSelect = btnLabelList[player.playID - btnOffID];
 				if (_btnSelect) {
-					_btnSelect.select = true;
+					_btnSelect.selected = true;
 				}
 			}
 		}
 		protected function onVolumeChangeHandler(_evt:MediaEvent):void {
 			if (btnVolume) {
-				btnVolume.select = player.mute;
+				btnVolume.selected = player.mute;
 				if (btnVolume.valueClip) {
-					if (btnVolume.select) {
+					if (btnVolume.selected) {
 						btnVolume.valueClip.gotoAndStop(1);
 					}else {
 						btnVolume.valueClip.gotoAndStop(1 + 1 + int(player.volume * (btnVolume.valueClip.totalFrames - 2)));
