@@ -33,6 +33,7 @@
 	 * @author Akdcl
 	 */
 	public class  ImageLoader extends Btn {
+		
 		private static var contextMenuImageLoader:ContextMenu;
 		private static var contextMenuItemImageLoader:ContextMenuItem;
 		private static function createMenu(_target:*):ContextMenu {
@@ -59,9 +60,15 @@
 		public var container:*;
 		public var foreground:*;
 		public var background:*;
+		public var content:Bitmap;
+		
 		public var limitSize:Boolean;
+		
 		protected var areaRect:Rectangle;
-		protected var bmp:Bitmap;
+		protected var eventComplete:Event = new Event(Event.COMPLETE);
+		protected var eventProgress:ProgressEvent = new ProgressEvent(ProgressEvent.PROGRESS);
+		
+		
 		protected var __loadProgress:Number = 0;
 		public function get loadProgress():Number {
 			return __loadProgress;
@@ -127,18 +134,18 @@
 				areaRect = getBounds(this);
 			}
 			setProgressClip(false);
-			bmp = new Bitmap();
-			bmp.alpha = 0;
+			content = new Bitmap();
+			content.alpha = 0;
 			contextMenu = createMenu(this);
 		}
 		override protected function onRemoveToStageHandler():void {
 			TweenMax.killChildTweensOf(this);
-			TweenMax.killTweensOf(bmp);
+			TweenMax.killTweensOf(content);
 			super.onRemoveToStageHandler();
-			if (container != this && container.contains(bmp)) {
-				container.removeChild(bmp);
+			if (container != this && container.contains(content)) {
+				container.removeChild(content);
 			}
-			bmp.bitmapData = null;
+			content.bitmapData = null;
 			bmdNow = null;
 			deregister(__source, this);
 			__source = null;
@@ -177,11 +184,11 @@
 			__source = _source;
 		}
 		public function unload(_changeImmediately:Boolean = true):void {
-			TweenMax.killTweensOf(bmp);
-			bmp.alpha = 0;
+			TweenMax.killTweensOf(content);
+			content.alpha = 0;
 			deregister(__source, this);
 			__source = null;
-			bmp.bitmapData = null;
+			content.bitmapData = null;
 			bmdNow = null;
 		}
 		protected var isHideTweening:Boolean;
@@ -190,8 +197,8 @@
 				return;
 			}
 			isHideTweening = true;
-			TweenMax.killTweensOf(bmp);
-			TweenMax.to(bmp, (tweenMode == 2)?10:0, { alpha:0, useFrames:true, ease:Sine.easeInOut, onComplete:onHideComplete } );
+			TweenMax.killTweensOf(content);
+			TweenMax.to(content, (tweenMode == 2)?10:0, { alpha:0, useFrames:true, ease:Sine.easeInOut, onComplete:onHideComplete } );
 		}
 		private function onHideEndHandler():void {
 			isHideTweening = false;
@@ -201,22 +208,22 @@
 			if (!_content || isHideTweening) {
 				return;
 			}
-			bmp.bitmapData = _content;
-			bmp.smoothing = true;
+			content.bitmapData = _content;
+			content.smoothing = true;
 			if (container != this) {
-				container.addChild(bmp);
+				container.addChild(content);
 			}else if (foreground) {
-				container.addChildAt(bmp, getChildIndex(foreground));
+				container.addChildAt(content, getChildIndex(foreground));
 			}else if (background) {
-				container.addChildAt(bmp, getChildIndex(background) + 1);
+				container.addChildAt(content, getChildIndex(background) + 1);
 			}else if (progressClip) {
-				container.addChildAt(bmp, getChildIndex(progressClip));
+				container.addChildAt(content, getChildIndex(progressClip));
 			}else {
-				container.addChild(bmp);
+				container.addChild(content);
 			}
-			TweenMax.killTweensOf(bmp);
-			TweenMax.to(bmp, (tweenMode == 0)?0:12, { alpha:1, useFrames:true, ease:Sine.easeInOut } );
-			updateArea(bmp);
+			TweenMax.killTweensOf(content);
+			TweenMax.to(content, (tweenMode == 0)?0:12, { alpha:1, useFrames:true, ease:Sine.easeInOut } );
+			updateArea(content);
 		}
 		private const LIMITWH_MAX:uint = 999999;
 		protected function updateArea(_content:*):void {
@@ -247,10 +254,12 @@
 				__loadProgress = _evt.target.progress;
 				setProgressClip(__loadProgress);
 			}
-			dispatchEvent(new ProgressEvent(ProgressEvent.PROGRESS, false, false, _evt?_evt.target.bytesLoaded:100, _evt?_evt.target.bytesTotal:100));
+			eventProgress.bytesLoaded = _evt?_evt.target.bytesLoaded:1;
+			eventProgress.bytesTotal = _evt?_evt.target.bytesTotal:1;
+			dispatchEvent(eventProgress);
 		}
 		protected function onImageLoadedHandler(_evt:*):void {
-			dispatchEvent(new Event(Event.COMPLETE));
+			
 			var _isReady:Boolean = !Boolean(bmdNow);
 			if (_evt is LoaderEvent) {
 				bmdNow = _evt.target.rawContent.bitmapData;
@@ -262,10 +271,12 @@
 				if (_isReady) {
 					setBMP(bmdNow);
 				}else {
-					hideBMP(bmp, onHideEndHandler);
+					hideBMP(content, onHideEndHandler);
 				}
 			}
 			setProgressClip(false);
+			
+			dispatchEvent(eventComplete);
 		}
 		protected function setProgressClip(_progress:*):void {
 			if (!progressClip) {
