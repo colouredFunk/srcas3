@@ -5,7 +5,7 @@ package akdcl.utils {
 	 * ...
 	 * @author Akdcl
 	 */
-	public function traceObject(...args):void {
+	public function traceObject(...args):String {
 		var _str:String = "";
 		
 		for (var _i:uint; _i < args.length; _i++ ) {
@@ -27,5 +27,6 @@ package akdcl.utils {
 			_str += _eachStr;
 		}
 		trace(_str);
+		return _str;
 	}
 }
