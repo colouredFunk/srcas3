@@ -66,6 +66,7 @@
 				throw Error("Alert.alertLayer is undefined!\nAlert.init(layer,class);");
 			}
 			var _alert:Alert;
+			var _width:uint;
 			if (_Class) {
 				_alert = new _Class();
 			}else if (AlertClass) {
@@ -77,6 +78,9 @@
 			}
 			if (_text is XML) {
 				_ctrlLabel = _text.attribute(A_LABEL)[0] || _ctrlLabel;
+				if (_text.attribute("width")[0]) {
+					_width = int(_text.attribute("width"));
+				}
 				_alert.btnY.href = _text;
 				_text = _text.attribute(A_ALERT)[0] || _text;
 			}
@@ -87,6 +91,9 @@
 			_alert.text = replaceString(_text);
 			XML.prettyIndent = _prettyIndent;
 			_alert.callBack = _callBack;
+			if (_width>0) {
+				_alert.barWidth = _width;
+			}
 			alertLayer.addChild(_alert);
 			return _alert;
 		}
