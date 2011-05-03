@@ -98,7 +98,9 @@
 		}
 		public function set areaWidth(_areaWidth:int):void {
 			__areaWidth = _areaWidth;
-			//autoFitArea.width = _areaWidth;
+			if (content) {
+				updateArea(content);
+			}
 		}
 		private var __areaHeight:int = 0;
 		public function get areaHeight():int {
@@ -106,7 +108,9 @@
 		}
 		public function set areaHeight(_areaHeight:int):void {
 			__areaHeight = _areaHeight;
-			//autoFitArea.height = _areaHeight;
+			if (content) {
+				updateArea(content);
+			}
 		}
 		protected var __source:String;
 		public function get source():String {
@@ -225,7 +229,6 @@
 			TweenMax.to(content, (tweenMode == 0)?0:12, { alpha:1, useFrames:true, ease:Sine.easeInOut } );
 			updateArea(content);
 		}
-		private const LIMITWH_MAX:uint = 999999;
 		protected function updateArea(_content:*):void {
 			if (areaWidth + areaHeight <= 0) {
 				//原始大小显示
