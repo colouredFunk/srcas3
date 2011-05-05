@@ -67,9 +67,9 @@
 			if (totalFrames > 8 || !bar) {
 				if (txt && !(txt is TextField)) {
 					if (txt.autoSize == TextFieldAutoSize.RIGHT) {
-						txt.txt.x = -int(txt.width);
+						txt.txt.x = -int(txt.txt.width);
 					} else if (txt.autoSize == TextFieldAutoSize.CENTER) {
-						txt.txt.x = -int(txt.width*0.5);
+						txt.txt.x = -int(txt.txt.width * 0.5);
 					} else {
 						txt.txt.x = 0;
 					}
