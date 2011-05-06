@@ -48,6 +48,7 @@ package zero.ui{
 		public var fileList:Vector.<FileReference>;
 		public var onLoadDatas:Function;
 		public var onSelect:Function;
+		public var onDragDrop:Function;
 		
 		public var dragDropClient:*;
 		public var cb:*;
@@ -96,6 +97,7 @@ package zero.ui{
 			fileFilterList=null;
 			onLoadDatas=null;
 			onSelect=null;
+			onDragDrop=null;
 			dataV=null;
 			fileList=null;
 			
@@ -438,6 +440,10 @@ package zero.ui{
 		public function nativeDragDrop(fileArr:Array):Boolean{
 			if(checkIsMatchType(fileArr)){
 				addFile(fileArr[0]);
+				if(onDragDrop==null){
+				}else{
+					onDragDrop();
+				}
 				return true;
 			}
 			return false;

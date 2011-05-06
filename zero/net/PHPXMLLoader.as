@@ -26,7 +26,7 @@ package zero.net{
 		}
 		public function loadPHPXMLFinished(info:String):void{
 			//trace("info="+info);
-			//trace("this.data="+this.data);
+			//trace("data="+data);
 			if(info==RequestLoader.SUCCESS){
 				try{
 					xml=new XML(this.data);
@@ -37,12 +37,19 @@ package zero.net{
 					onLoadFinished(RequestLoader.ERROR);
 					return;
 				}
-				if(xml.toXMLString().search(/<html>\s*<head>\s*<title>\s*404\s*Not\s*Found<\/title>\s*<\/head>/)==0){
-					xml=null;
-					onLoadFinished(RequestLoader.ERROR);
-					return;
+				
+				var xmlName:String;
+				try{
+					xmlName=xml.name().toString();
+				}catch(e:Error){
+					xmlName=null;
 				}
-				onLoadFinished(info);
+				
+				if(xmlName){
+					onLoadFinished(info);
+				}else{
+					onLoadFinished(RequestLoader.ERROR);
+				}
 				return;
 			}
 			onLoadFinished(info);

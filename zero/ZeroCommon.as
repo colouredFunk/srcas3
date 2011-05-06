@@ -17,6 +17,18 @@ package zero{
 	import flash.system.Security
 	
 	public class ZeroCommon{
+		public static function getStrWid(str:String):int{
+			var wid:int=0;
+			var i:int=str.length;
+			while(--i>=0){
+				if(str.charCodeAt(i)<256){
+					wid+=8;
+				}else{
+					wid+=12;
+				}
+			}
+			return wid;
+		}
 		public static function getTime():String{
 			var date:Date=new Date();
 			var month:int=date.getMonth()+1;
