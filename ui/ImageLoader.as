@@ -99,7 +99,7 @@
 		public function set areaWidth(_areaWidth:int):void {
 			__areaWidth = _areaWidth;
 			if (content) {
-				updateArea(content);
+				//updateArea(content);
 			}
 		}
 		private var __areaHeight:int = 0;
@@ -109,7 +109,7 @@
 		public function set areaHeight(_areaHeight:int):void {
 			__areaHeight = _areaHeight;
 			if (content) {
-				updateArea(content);
+				//updateArea(content);
 			}
 		}
 		protected var __source:String;
@@ -235,7 +235,7 @@
 			}else {
 				var _areaAspectRatio:Number = areaWidth / areaHeight;
 				var _contentAspectRatio:Number = _content.width / _content.height;
-				if (_areaAspectRatio>_contentAspectRatio) {
+				if (_areaAspectRatio > _contentAspectRatio) {
 					_content.height = areaHeight;
 					_content.scaleX = _content.scaleY;
 					_content.y = areaRect.y;
