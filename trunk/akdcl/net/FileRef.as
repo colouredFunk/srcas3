@@ -1,10 +1,11 @@
 ﻿package akdcl.net{
 	import flash.display.Bitmap;
 	import flash.display.Loader;
+	import flash.events.*;
 	import flash.net.FileFilter;
 	import flash.net.FileReference;
 	import flash.net.URLRequest;
-	import flash.events.*;
+	
 	import zero.FileTypes;
 	import zero.encoder.BMPEncoder;
 	
@@ -50,7 +51,7 @@
 				fileTypes = _fileTypes;
 				addEventListener(Event.SELECT, selectFile);
 				browse([new FileFilter(fileInfo, "*." + fileTypes.replace(/\,/g, ";*."))]);
-			} catch (e) {
+			} catch (e:Error) {
 				if(onFailed!=null){
 					onFailed("打开" + fileInfo + "失败!");
 				}
