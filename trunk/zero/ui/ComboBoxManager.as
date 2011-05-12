@@ -91,13 +91,17 @@ package zero.ui{
 					xml.labels=labelArr2labelsXML(dataProvider);
 				}
 				
-				cb.dataProvider=labelsXML2labelArr(xml.labels[0]);
-				cb.selectedIndex=int(xml.@currId.toString());
+				if(cb){
+					cb.dataProvider=labelsXML2labelArr(xml.labels[0]);
+					cb.selectedIndex=int(xml.@currId.toString());
+				}
 			}else{
 				//
 			}
 			
-			cb.addEventListener(FocusEvent.FOCUS_OUT,focusOut);
+			if(cb){
+				cb.addEventListener(FocusEvent.FOCUS_OUT,focusOut);
+			}
 		}
 		private function labelArr2labelsXML(labelArr:Array):XML{
 			var labelsXML:XML=<labels/>;

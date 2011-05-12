@@ -1,4 +1,4 @@
-/***
+﻿/***
 FileTypes 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
@@ -42,6 +42,23 @@ package zero{
 			_8297:RAR,
 			_7790:EXE
 		}
+		public static const contentTypeMark:Object=function():Object{
+			var contentTypeMark:Object=new Object();
+			contentTypeMark[JPG]="image/jpeg";
+			contentTypeMark[PNG]="image/png";
+			contentTypeMark[GIF]="image/gif";
+			contentTypeMark[BMP]="image/bmp";
+			contentTypeMark[SWF]="application/x-shockwave-flash";
+			contentTypeMark[MP3]="audio/mpeg";
+			contentTypeMark[FLV]="video/x-flv";
+			contentTypeMark[WAV]="audio/wav";
+			contentTypeMark[MID]="audio/mid";
+			contentTypeMark[RAR]="";//application/octet-stream
+			contentTypeMark[EXE]="";//application/octet-stream
+			return contentTypeMark;
+		}();
+		
+		public static const DEFAULT_CONTENT_TYPE:String="application/octet-stream";
 		
 		public static function getType(fileData:ByteArray,fileName:String=null,offset:int=0):String{
 			var type:String=typeMark["_"+fileData[offset]+fileData[offset+1]];
@@ -60,6 +77,10 @@ package zero{
 			
 			trace("无法获取文件类型");
 			return null;
+		}
+		
+		public static function getContentType(fileData:ByteArray,fileName:String=null,offset:int=0):String{
+			return contentTypeMark[getType(fileData,fileName,offset)]||DEFAULT_CONTENT_TYPE;
 		}
 	}
 }

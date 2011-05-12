@@ -146,18 +146,23 @@ package zero.ui{
 				browseType=_browseType;
 				
 				if(FileClass){
-					if(defaultFileURLOrFileURLArr is Array){
-						ComboBoxManager.addCb(cb,so,saveId,defaultFileURLOrFileURLArr);
-					}else if(defaultFileURLOrFileURLArr){
-						ComboBoxManager.addCb(cb,so,saveId,[decodeURI(defaultFileURLOrFileURLArr)]);
-					}else{
-						ComboBoxManager.addCb(cb,so,saveId);
+					if(cb){
+						if(defaultFileURLOrFileURLArr is Array){
+							ComboBoxManager.addCb(cb,so,saveId,defaultFileURLOrFileURLArr);
+						}else if(defaultFileURLOrFileURLArr){
+							ComboBoxManager.addCb(cb,so,saveId,[decodeURI(defaultFileURLOrFileURLArr)]);
+						}else{
+							ComboBoxManager.addCb(cb,so,saveId);
+						}
+						cb.addEventListener(Event.CHANGE,change);//20101112
 					}
-					cb.addEventListener(Event.CHANGE,change);//20101112
 					
 					//trace("cb.text="+cb.text);
 					
-					var __fileURL:String=cb.text;
+					var __fileURL:String=null;
+					if(cb){
+						__fileURL=cb.text;
+					}
 					if(!__fileURL&&lastFSMFile){
 						__fileURL=lastFSMFile.url;
 					}
@@ -177,10 +182,14 @@ package zero.ui{
 					switch(browseType){
 						case OPEN_MULTIPLE:
 							__file.addEventListener((getDefinitionByName("flash.events.FileListEvent") as Object).SELECT_MULTIPLE,selectMultiple);
-							cb.editable=false;
+							if(cb){
+								cb.editable=false;
+							}
 						break;
 						default:
-							cb.editable=true;
+							if(cb){
+								cb.editable=true;
+							}
 							__file.addEventListener(Event.SELECT,select);
 						break;
 					}
@@ -259,7 +268,7 @@ package zero.ui{
 				if(!fileURL&&lastFileURL){
 					__file.url=fileURL=normalizeFileURLByLastFSMFile(lastFileURL);
 				}
-				if(!cb.text&&lastFileURL){
+				if((!cb||!cb.text)&&lastFileURL){
 					__file.url=fileURL=normalizeFileURLByLastFSMFile(lastFileURL);
 				}
 				if(fileURL&&!__file.exists){
@@ -380,7 +389,9 @@ package zero.ui{
 			}
 		}
 		public function addURL(url:String):void{
-			ComboBoxManager.addLabel(cb,decodeURI(url));
+			if(cb){
+				ComboBoxManager.addLabel(cb,decodeURI(url));
+			}
 		}
 		public function addFile(file:*):void{
 			var FileClass:Class;
@@ -407,17 +418,14 @@ package zero.ui{
 					}
 				break;
 				case OPEN_MULTIPLE:
-					trace("暂不支持拖入");
-					return false;
-					/*
-					for each(var file:File in fileArr){
-						if(checkFileIsMatchType(fileArr[0])){
-						}else{
-							return false
+					var newFileArr:Array=new Array();
+					getFiles(fileArr,newFileArr);
+					for each(var file:* in newFileArr){
+						if(checkFileIsMatchType(file)){
+							return true;
 						}
 					}
-					return true;
-					*/
+					return false;
 				break;
 				case DIR:
 					if(fileArr.length==1&&fileArr[0].isDirectory){
@@ -426,6 +434,18 @@ package zero.ui{
 				break;
 			}
 			return false;
+		}
+		
+		private function getFiles(files:*,_fileArr:Array):void{
+			if(files is Array){
+				for each(var file:* in files){
+					getFiles(file,_fileArr);
+				}
+			}else if(files.isDirectory){
+				getFiles(files.getDirectoryListing(),_fileArr);
+			}else{
+				_fileArr.push(files);
+			}
 		}
 		private function checkFileIsMatchType(file:*):Boolean{
 			for each(var fileFilter:FileFilter in fileFilterList){
@@ -439,7 +459,26 @@ package zero.ui{
 		
 		public function nativeDragDrop(fileArr:Array):Boolean{
 			if(checkIsMatchType(fileArr)){
-				addFile(fileArr[0]);
+				switch(browseType){
+					case OPEN:
+						addFile(fileArr[0]);
+					break;
+					case OPEN_MULTIPLE:
+						var newFileArr:Array=new Array();
+						getFiles(fileArr,newFileArr);
+						fileArr=new Array();
+						for each(var file:* in newFileArr){
+							if(checkFileIsMatchType(file)){
+								fileArr.push(file);
+							}
+						}
+						fileList=Vector.<FileReference>(fileArr);
+					break;
+					case DIR:
+						addFile(fileArr[0]);
+					break;
+				}
+				
 				if(onDragDrop==null){
 				}else{
 					onDragDrop();
