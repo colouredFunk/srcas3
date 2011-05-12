@@ -13,7 +13,10 @@
 	import flash.utils.Timer;
 	import com.greensock.TweenMax;
 	import ui_2.SimpleBtn;
+	
 	import akdcl.utils.addContextMenu;
+	import akdcl.net.DataLoader;
+	import akdcl.net.gotoURL;
 	/**
 	 * ...
 	 * @author Akdcl
@@ -130,12 +133,12 @@
 			if (_xml.pic.length() > 0) {
 				xmlLoaded( { currentTarget: { data:_url }} );
 			}else {
-				Common.urlLoader(_url, xmlLoaded);
+				DataLoader.load(_url,null,xmlLoaded);
 			}
 		}
 		public function clickPic():void {
 			if (btn.userData.href) {
-				Common.getURL(btn.userData.href,btn.userData.target)
+				gotoURL(btn.userData.href,btn.userData.target);
 			}
 		}
 		private var __masked:Boolean;

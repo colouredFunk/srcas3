@@ -12,6 +12,8 @@ package zero.net{
 	import flash.events.*;
 	import flash.utils.*;
 	import flash.external.*;
+	
+	import akdcl.net.gotoURL;
 	public class GotoURL{
 		public static function goto(xml:XML,replaceStrObj:Object=null):void{
 			var jsStr:String=xml.@js.toString();
@@ -21,7 +23,7 @@ package zero.net{
 			}
 			var urlStr:String=xml.@url.toString()||xml.@href.toString();
 			if(urlStr){
-				Common.getURL(ReplaceVars.replace(urlStr,replaceStrObj),xml.@target.toString());
+				gotoURL(ReplaceVars.replace(urlStr,replaceStrObj),xml.@target.toString());
 			}
 		}
 	}
