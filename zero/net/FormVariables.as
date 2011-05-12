@@ -11,9 +11,11 @@ package zero.net{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
+	
+	import zero.FileTypes;
 
 	public class FormVariables{
-		public static var default_extName:String=null;
+		//public static var default_extName:String=null;
 		
 		private var values:Object;
 		private var filenames:Object;
@@ -26,15 +28,31 @@ package zero.net{
 		){
 			values=_values||new Object();
 			filenames=_filenames||new Object();
-			boundary="-=-=-=-=-=-=-=-=-=-"+Math.random();
+			boundary="------------------------------7m";
+			for(var i:int=0;i<11;i++){
+				boundary+=int(Math.random()*16).toString(16);
+			}
 			contentType="multipart/form-data; boundary="+boundary;//只能用户点击时上传
 			//contentType="application/octet-stream; boundary="+boundary;
 			
 		}
-		public function add(name:String,value:*,filename:String=null):void{
+		/*
+		private function add(name:String,value:*,filename:String=null):void{
 			values[name]=value;
 			if(filename){
 				filenames[name]=filename;
+			}
+		}
+		*/
+		public function addString(name:String,string:String):void{
+			values[name]=string;
+		}
+		public function addFile(name:String,fileData:ByteArray,filename:String):void{
+			values[name]=fileData;
+			if(filename){
+				filenames[name]=filename;
+			}else{
+				throw new Error("请提供 filename");
 			}
 		}
 		public function get data():ByteArray{
@@ -43,24 +61,30 @@ package zero.net{
 				var value:*=values[name];
 				data.writeUTFBytes("--" + boundary + "\r\n");
 				if(value is ByteArray){
+					
 					//trace(name+".length="+value.length);
 					//var dotId:int=name.lastIndexOf(".");
 					//if(dotId>=0){
 					//	
 					//}
+					
+					//var filename:String=filenames[name];
+					//if(filename){
+					//}else if(default_extName){
+					//	filename=name+"."+default_extName;
+					//}else{
+					//	throw new Error("请设置 default_extName");
+					//}
+					
+					var filename:String=filenames[name];
+					if(filename){
+					}else{
+						throw new Error("请提供 filename");
+					}
 					data.writeUTFBytes(
 						"Content-Disposition: form-data; name=\"" + name + 
-						"\"; filename=\"\\" + (
-							filenames[name]
-							||(
-								name+(
-									"."+default_extName
-									||
-									""
-								)
-							)
-						) +
-						"\"\r\nContent-Type: application/octet-stream\r\n\r\n"
+						"\"; filename=\"" + escapeMultiByte(filename) +
+						"\"\r\nContent-Type: "+FileTypes.getContentType(values[name],filename)+"\r\n\r\n"
 					);
 					data.writeBytes(values[name]);
 					data.writeUTFBytes("\r\n");
