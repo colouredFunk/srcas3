@@ -33,6 +33,7 @@
 package com.adobe.crypto {
 	
 	import com.adobe.utils.IntUtil;
+	
 	import flash.utils.ByteArray;	
 	/**
 	 * The MD5 Message-Digest Algorithm
@@ -286,7 +287,7 @@ package com.adobe.crypto {
 		 * Convert an array of little-endian words to a string
 		 */
 		private static var binForStr:Array;
-		private static function binl2str(bin):String{
+		private static function binl2str(bin:Array):String{
 			var str:String = "";
 			var mask:uint = 0xFF; // ignore hi byte of characters > 0xFF
 			var len:uint = bin.length * 32;
