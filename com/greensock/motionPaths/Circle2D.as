@@ -85,7 +85,7 @@ TweenLite.to(follower, 2, {progress:circle.followerTween(follower, 200, Directio
 		}
 		
 		/** @private **/
-		override protected function renderAll():void {
+		protected function renderAll():void {
 			var angle:Number, px:Number, py:Number;
 			var m:Matrix = this.transform.matrix;
 			var a:Number = m.a, b:Number = m.b, c:Number = m.c, d:Number = m.d, tx:Number = m.tx, ty:Number = m.ty;
@@ -108,7 +108,7 @@ TweenLite.to(follower, 2, {progress:circle.followerTween(follower, 200, Directio
 		}
 		
 		/** @inheritDoc **/
-		override public function renderObjectAt(target:Object, progress:Number):void {
+		override public function renderObjectAt(target:Object, progress:Number, autoRotate:Boolean=false, rotationOffset:Number=0):void {
 			var angle:Number = progress * Math.PI * 2;
 			var m:Matrix = this.transform.matrix;
 			var px:Number = Math.cos(angle) * _radius;
