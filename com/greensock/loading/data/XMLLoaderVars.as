@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.21
- * DATE: 2011-03-23
+ * VERSION: 1.22
+ * DATE: 2011-04-20
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -41,7 +41,7 @@ package com.greensock.loading.data {
  */	 
 	public class XMLLoaderVars {
 		/** @private **/
-		public static const version:Number = 1.21;
+		public static const version:Number = 1.22;
 		
 		/** @private **/
 		protected var _vars:Object;
@@ -175,6 +175,11 @@ package com.greensock.loading.data {
 			return _set("integrateProgress", value);
 		}
 		
+		/** Maximum number of simultaneous connections that should be used while loading child loaders that were parsed from the XML and had their "load" attribute set to "true" (like &lt;ImageLoader url="1.jpg" load="true" /&gt;). A higher number will generally result in faster overall load times for the group. The default is 2. Sometimes there are limits imposed by the Flash Player itself or the browser or the user's system, but LoaderMax will do its best to honor the <code>maxConnections</code> you define. **/
+		public function maxConnections(value:uint):XMLLoaderVars {
+			return _set("maxConnections", value);
+		}
+		
 		/** A handler function for <code>LoaderEvent.CHILD_OPEN</code> events which are dispatched each time any nested LoaderMax-related loaders that were defined in the XML begins loading. Make sure your onChildOpen function accepts a single parameter of type <code>LoaderEvent</code> (<code>com.greensock.events.LoaderEvent</code>). **/
 		public function onChildOpen(value:Function):XMLLoaderVars {
 			return _set("onChildOpen", value);
@@ -218,6 +223,11 @@ package com.greensock.loading.data {
 		/** A String that should be recursively prepended to all parsed LoaderMax-related loader URLs (from nodes like &lt;ImageLoader&gt;, &lt;XMLLoader&gt;, etc.). The functionality is identical to <code>prependURLs</code> except that it is recursive, affecting all parsed loaders in subloaded XMLLoaders (other XML files that this one loads too). For example, if your XML has the following node: <code>&lt;XMLLoader url="doc2.xml" /&gt;</code> and <code>recursivePrependURLs</code> is set to "../xml/", then the nested XMLLoader's URL will end up being "../xml/doc2.xml". Since it is recursive, parsed loaders inside doc2.xml <i>and</i> any other XML files that it loads will <i>all</i> have their URLs prepended. So if you load doc1.xml which loads doc2.xml which loads doc3.xml (due to <code>&lt;XMLLoader&gt;</code> nodes discovered in each XML file), <code>recursivePrependURLs</code> will affect all of the parsed LoaderMax-related URLs in all 3 documents. If you'd prefer to <i>only</i> have the URLs affected that are in the XML file that this XMLLoader is loading, use <code>prependURLs</code> instead of <code>recursivePrependURLs</code>. **/
 		public function recursivePrependURLs(value:String):XMLLoaderVars {
 			return _set("recursivePrependURLs", value);
+		}
+		
+		/** By default, XMLLoader will parse any LoaderMax-related loaders in the XML and load any that have their "load" attribute set to "true" and then if any fail to load, they will simply be skipped. But if you prefer to have the XMLLoader fail immediately if one of the parsed loaders fails to load, set <code>skipFailed</code> to <code>false</code> (it is <code>true</code> by default). **/
+		public function skipFailed(value:Boolean):XMLLoaderVars {
+			return _set("skipFailed", value);
 		}
 		
 		

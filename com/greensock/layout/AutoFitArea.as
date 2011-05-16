@@ -1,6 +1,6 @@
 /**
- * VERSION: 2.53
- * DATE: 2011-02-21
+ * VERSION: 2.54
+ * DATE: 2011-04-26
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/autofitarea/
  **/
@@ -74,7 +74,7 @@ var area:AutoFitArea = AutoFitArea.createAround(myImage);
  */	 
 	public class AutoFitArea extends Shape {
 		/** @private **/
-		public static const version:Number = 2.53;
+		public static const version:Number = 2.54;
 		
 		/** @private **/
 		private static var _bd:BitmapData;
@@ -444,7 +444,7 @@ var area:AutoFitArea = AutoFitArea.createAround(myImage);
 					tx += (x - outerBounds.x);
 				} else if (item.hAlign == AlignMode.CENTER) {
 					tx += (x - outerBounds.x) + ((width - outerBounds.width) * 0.5);
-				} else {
+				} else if (item.hAlign == AlignMode.RIGHT) {
 					tx += (x - outerBounds.x) + (width - outerBounds.width);
 				}
 				
@@ -452,7 +452,7 @@ var area:AutoFitArea = AutoFitArea.createAround(myImage);
 					ty += (y - outerBounds.y);
 				} else if (item.vAlign == AlignMode.CENTER) {
 					ty += (y - outerBounds.y) + ((height - outerBounds.height) * 0.5);
-				} else {
+				} else if (item.vAlign == AlignMode.BOTTOM) {
 					ty += (y - outerBounds.y) + (height - outerBounds.height);
 				}
 				

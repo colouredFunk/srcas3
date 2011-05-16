@@ -1,6 +1,43 @@
 CHANGE LOG : GREENSOCK LOADERMAX SYSTEM
 ----------------------------------------
 
+2011-05-11
+-------------------------------------------
+LoaderMax			1.853
+VideoLoader			1.853
+	- Minor fix that appends "purpose=audit&gsCacheID=someRandomNumber" to the file audit URL of VideoLoader which was accidentally dropped off in version 1.852 (less than 24 hours ago)
+
+2011-05-10
+-------------------------------------------
+LoaderMax			1.852
+VideoLoader			1.852
+	- Worked around a Flash bug/inconsistency that could cause a VideoLoader's file size audit to fail (only for relative URLs, not absolute). Unlike all other loaders (URLLoader, Loader, URLStream), Adobe's NetStream loads relative URLs as though they are relative to the swf file's location rather than the HTML page in which it is embedded. Another workaround is to set the "base" attribute in the object/embed code (http://kb2.adobe.com/cps/041/tn_04157.html) 
+
+2011-05-05
+--------------------------------------------
+LoaderMax			1.851
+VideoLoader			1.851
+ContentDisplay		1.851
+FlexContentDisplay	1.851
+SWFLoaderVars		1.22
+ImageLoaderVars		1.22
+VideoLoaderVars		1.22
+	- Added ability for ContentDisplay/FlexContentDisplay to recognize 3D properties z, rotationX, rotationY, and rotationZ. 
+	- Minor improvement to VideoLoader that prevents an extremely unlikely/rare issue when a VideoLoader is destroyed before it renders for the first time
+
+2011-04-26
+--------------------------------------------
+LoaderMax			1.85
+XMLLoader			1.85
+	- Added new "autoLoad" feature to LoaderMax that automatically calls load() when a new loader is appended/inserted/prepended whose status is LoaderStatus.READY.
+	- Added ability for XMLLoader to recognize skipFailed and skipPaused special properties in its vars parameter. 
+
+2011-04-20
+--------------------------------------------
+LoaderMax			1.843
+XMLLoader			1.843
+	- Added a new "maxConnections" special property to XMLLoader that controls the number of child loaders that load simultaneously (the default is 2). 
+
 2011-04-14
 --------------------------------------------
 LoaderMax			1.842
