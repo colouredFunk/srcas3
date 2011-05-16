@@ -76,6 +76,8 @@
 			_dataLoader.load(request);
 			return _dataLoader;
 		}
+		
+		
 
 		private static function onCompleteOrIOErrorHandler(_evt:Event):void {
 			var _dataLoader:DataLoader = _evt.currentTarget as DataLoader;
