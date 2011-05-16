@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.842
- * DATE: 2011-04-14
+ * VERSION: 1.853
+ * DATE: 2011-05-11
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -18,6 +18,7 @@ package com.greensock.loading {
 	import flash.media.Video;
 	import flash.net.NetConnection;
 	import flash.net.NetStream;
+	import flash.net.URLRequest;
 	import flash.utils.Timer;
 	import flash.utils.getTimer;
 	
@@ -205,6 +206,8 @@ function errorHandler(event:LoaderEvent):void {
 		protected var _ns:NetStream;
 		/** @private **/
 		protected var _nc:NetConnection;
+		/** @private **/
+		protected var _auditNS:NetStream;
 		/** @private **/
 		protected var _video:Video;
 		/** @private **/
@@ -413,6 +416,8 @@ function errorHandler(event:LoaderEvent):void {
 		/** @private scrubLevel: 0 = cancel, 1 = unload, 2 = dispose, 3 = flush **/
 		override protected function _dump(scrubLevel:int=0, newStatus:int=0, suppressEvents:Boolean=false):void {
 			_sprite.removeEventListener(Event.ENTER_FRAME, _loadingProgressCheck);
+			_sprite.removeEventListener(Event.ENTER_FRAME, _playProgressHandler);
+			_sprite.removeEventListener(Event.ENTER_FRAME, _detachNS);
 			_ns.removeEventListener(Event.RENDER, _renderHandler);
 			_timer.removeEventListener(TimerEvent.TIMER, _renderHandler);
 			_timer.stop();
@@ -857,6 +862,87 @@ function errorHandler(event:LoaderEvent):void {
 				_completeHandler(event);
 			} else if (_dispatchProgress && (_cachedBytesLoaded / _cachedBytesTotal) != (bl / bt)) {
 				dispatchEvent(new LoaderEvent(LoaderEvent.PROGRESS, this));
+			}
+		}
+		
+		/** @inheritDoc 
+		 * Flash has a bug/inconsistency that causes NetStreams to load relative URLs as being relative to the swf file itself
+		 * rather than relative to the HTML file in which it is embedded (all other loaders exhibit the opposite behavior), so 
+		 * we need to make sure the audits use NetStreams instead of URLStreams (for relative urls at least). 
+		 **/
+		override public function auditSize():void {
+			if (_url.substr(0, 4) == "http" && _url.indexOf("://") != -1) { //if the url isn't relative, use the regular URLStream to do the audit because it's faster/more efficient. 
+				super.auditSize();
+			} else if (_auditNS == null) {
+				_auditNS = new NetStream(_nc);
+				_auditNS.bufferTime = isNaN(this.vars.bufferTime) ? 5 : Number(this.vars.bufferTime);
+				_auditNS.client = {onMetaData:_auditHandler, onCuePoint:_auditHandler};
+				_auditNS.addEventListener(NetStatusEvent.NET_STATUS, _auditHandler, false, 0, true);
+				_auditNS.addEventListener("ioError", _auditHandler, false, 0, true);
+				_auditNS.addEventListener("asyncError", _auditHandler, false, 0, true);
+				_auditNS.soundTransform = new SoundTransform(0);
+				var request:URLRequest = new URLRequest();
+				request.data = _request.data;
+				_setRequestURL(request, _url, (!_isLocal || _url.substr(0, 4) == "http") ? "gsCacheBusterID=" + (_cacheID++) + "&purpose=audit" : "");
+				_auditNS.play(request.url);
+			}
+		}
+			
+		/** @private **/
+		protected function _auditHandler(event:Event=null):void {
+			var type:String = (event == null) ? "" : event.type;
+			var code:String = (event == null || !(event is NetStatusEvent)) ? "" : NetStatusEvent(event).info.code;
+			if (event != null && "duration" in event) {
+				_duration = Object(event).duration;
+			}
+			if (_auditNS != null) {
+				_cachedBytesTotal = _auditNS.bytesTotal; 
+				if (_bufferMode && _duration != 0) {
+					_cachedBytesTotal *= (_auditNS.bufferTime / _duration);
+				}
+			}
+			if (type == "ioError" ||
+				type == "asyncError" || 
+				code == "NetStream.Play.StreamNotFound" || 
+				code == "NetConnection.Connect.Failed" ||
+				code == "NetStream.Play.Failed" ||
+				code == "NetStream.Play.FileStructureInvalid" || 
+				code == "The MP4 doesn't contain any supported tracks") {
+				if (this.vars.alternateURL != undefined && this.vars.alternateURL != "" && this.vars.alternateURL != _url) {
+					_url = this.vars.alternateURL;
+					_setRequestURL(_request, _url);
+					var request:URLRequest = new URLRequest();
+					request.data = _request.data;
+					_setRequestURL(request, _url, (!_isLocal || _url.substr(0, 4) == "http") ? "gsCacheBusterID=" + (_cacheID++) + "&purpose=audit" : "");
+					_auditNS.play(request.url);
+					_errorHandler(new LoaderEvent(LoaderEvent.ERROR, this, code));
+					return;
+				} else {	
+					//note: a CANCEL event won't be dispatched because technically the loader wasn't officially loading - we were only briefly checking the bytesTotal with a NetStream.
+					super._failHandler(new LoaderEvent(LoaderEvent.ERROR, this, code));
+				}
+			}
+			_auditedSize = true;
+			_closeStream();
+			dispatchEvent(new Event("auditedSize"));
+		}
+		
+		/** @private **/
+		override protected function _closeStream():void {
+			if (_auditNS != null) {
+				_auditNS.pause();
+				try {
+					_auditNS.close();
+				} catch (error:Error) {
+					
+				}
+				_auditNS.client = {};
+				_auditNS.removeEventListener(NetStatusEvent.NET_STATUS, _auditHandler);
+				_auditNS.removeEventListener("ioError", _auditHandler);
+				_auditNS.removeEventListener("asyncError", _auditHandler);
+				_auditNS = null;
+			} else {
+				super._closeStream();
 			}
 		}
 		

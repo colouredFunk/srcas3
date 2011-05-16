@@ -1,6 +1,18 @@
 CHANGE LOG : GREENSOCK TWEENING PLATFORM
 ----------------------------------------
 
+2011-05-10
+---------------------------------------------
+TweenMax			1.68
+	- Enhanced TweenMax's updateTo() method so that it accommodates tweens that have already finished. 
+
+2011-04-20
+---------------------------------------------
+TimelineLite		1.66
+TimelineMax			1.67
+	- Fixed issue with the getChildren() method of TimelineLite and TimelineMax that could cause certain tweens/timelines to be missing in the resulting array if the TimelineLite/Max contained a nested TimelineLite/Max. 
+	- Fixed issue with TimelineMax's getActive() that incorrectly reported nested timelines that contained paused tweens/timelines as being active. 
+
 2011-04-12
 ---------------------------------------------
 TweenMax			11.67
