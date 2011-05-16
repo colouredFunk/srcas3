@@ -12,7 +12,7 @@
 	public class FileRef extends FileReference {
 		protected var fileInfo:String;
 		public var fileTypes:String;
-		public var maxSize:int = 10000;
+		public var maxSize:int = 1000000;
 		public var autoLoad:Boolean = true;
 		public var autoImage:Boolean = true;
 		
