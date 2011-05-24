@@ -49,7 +49,7 @@ package zero.swf.funs{
 		private static function load():void{
 			currFile=fileV.shift();
 			var loaderContext:LoaderContext=new LoaderContext();
-			loaderContext.allowLoadBytesCodeExecution=true;
+			loaderContext.allowCodeImport=true;
 			loader.loadBytes(ReadAndWriteFile.readDataFromFile(currFile),loaderContext);
 		}
 		private static function loadComplete(event:Event):void{

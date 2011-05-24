@@ -630,17 +630,17 @@ package zero.swf.funs{
 			swf.tagV.pop();//End
 			swf.tagV.pop();//ShowFrame
 			swf.tagV.pop();//ShowFrame
-			swf.tagV.pop();//ShowFrame
-			swf.tagV.pop();//ShowFrame
-			swf.tagV.pop();//ShowFrame
+			//swf.tagV.pop();//ShowFrame
+			//swf.tagV.pop();//ShowFrame
+			//swf.tagV.pop();//ShowFrame
 			
 			swf.tagV=swf.tagV.concat(getUsefulTags(playerVersionSWF.tagV));
 			
 			playerVersionSWF=null;
 			
-			swf.tagV.push(new Tag(TagType.ShowFrame));
-			swf.tagV.push(new Tag(TagType.ShowFrame));
-			swf.tagV.push(new Tag(TagType.ShowFrame));
+			//swf.tagV.push(new Tag(TagType.ShowFrame));
+			//swf.tagV.push(new Tag(TagType.ShowFrame));
+			//swf.tagV.push(new Tag(TagType.ShowFrame));
 			swf.tagV.push(new Tag(TagType.ShowFrame));
 			swf.tagV.push(new Tag(TagType.ShowFrame));
 			swf.tagV.push(new Tag(TagType.End));
@@ -713,6 +713,174 @@ package zero.swf.funs{
 				}
 			}
 			return defineBinaryDataTag;
+		}
+		
+		public static function addClassToMovieClip(swf:SWF2,className:String):String{
+			//给场景上放着的一个 MovieClip 绑定一个类
+			if(swf.isAS3){
+			}else{
+				return "不是 AS3 的";
+			}
+			
+			swf.tagV=getUsefulTags(swf.tagV);
+			
+			DoABCWithoutFlagsAndName.setDecodeABC(AdvanceABC);
+			
+			var classNameMark:Object=new Object();
+			var symbolClass:SymbolClass=null;
+			var clazz:AdvanceClass;
+			var spriteTagArr:Array=new Array();
+			var spriteId:int=-1;
+			
+			var tag:Tag;
+			
+			for each(tag in swf.tagV){
+				switch(tag.type){
+					case TagType.DoABCWithoutFlagsAndName:
+					case TagType.DoABC:
+						var abc:AdvanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc;
+						for each(clazz in abc.clazzV){
+							classNameMark["~"+getClassNameByMultinameInfo(clazz.name)]=clazz;
+						}
+					break;
+					case TagType.DefineSprite:
+						spriteTagArr[tag.getDefId()]=tag;
+					break;
+					case TagType.PlaceObject:
+						spriteId=(tag.getBody() as PlaceObject).CharacterId;
+					break;
+					case TagType.PlaceObject2:
+						spriteId=(tag.getBody() as PlaceObject2).CharacterId;
+					break;
+					case TagType.PlaceObject3:
+						spriteId=(tag.getBody() as PlaceObject3).CharacterId;
+					break;
+				}
+			}
+			
+			DoABCWithoutFlagsAndName.setDecodeABC(null);
+			
+			if(spriteId>0){
+			}else{
+				return "找不到 Sprite spriteId="+spriteId;
+			}
+			
+			var spriteClassName:String=null;
+			loop:for each(tag in swf.tagV){
+				if(tag.type==TagType.SymbolClass){
+					var i:int=0;
+					symbolClass=tag.getBody() as SymbolClass;
+					for each(var Name:String in symbolClass.NameV){
+						if(symbolClass.TagV[i]==spriteId){
+							spriteClassName=Name;
+							symbolClass.NameV[i]=className;
+							break loop;
+						}
+						i++;
+					}
+				}
+			}
+			
+			if(spriteClassName){
+				clazz=classNameMark["~"+spriteClassName];
+				var dotId:int=className.indexOf(".");
+				clazz.name.ns=new AdvanceNamespace_info();
+				clazz.name.ns.kind=NamespaceKind.PackageNamespace;
+				if(dotId>-1){
+					clazz.name.ns.name=className.substr(0,dotId);
+					clazz.name.name=className.substr(dotId+1);
+				}else{
+					clazz.name.ns.name="";
+					clazz.name.name=className;
+				}
+			}else{
+				swf.tagV.unshift(SimpleDoABC.getDoABCTag(className,"mc"));
+				if(symbolClass){
+				}else{
+					var symbolClassTag:Tag=new Tag();
+					symbolClassTag.setBody(symbolClass);
+					swf.tagV.push(symbolClassTag);
+				}
+				symbolClass.TagV.push(spriteId);
+				symbolClass.NameV.push(className);
+			}
+			
+			swf.tagV.push(new Tag(TagType.ShowFrame));
+			swf.tagV.push(new Tag(TagType.End));
+			
+			return "";
+		}
+		public static function addDocClass(swf:SWF2,docClassName:String):String{
+			if(swf.isAS3){
+			}else{
+				return "不是 AS3 的";
+			}
+			
+			swf.tagV=getUsefulTags(swf.tagV);
+			var logoResInserter:ResInserter=new ResInserter(swf.tagV);
+			logoResInserter.getTagVAndReset();
+			
+			var classNameMark:Object=new Object();
+			var symbolDocClassName:String=null;
+			var symbolClass:SymbolClass=null;
+			var clazz:AdvanceClass;
+			
+			DoABCWithoutFlagsAndName.setDecodeABC(AdvanceABC);
+			
+			for each(var tag:Tag in swf.tagV){
+				switch(tag.type){
+					case TagType.DoABCWithoutFlagsAndName:
+					case TagType.DoABC:
+						var abc:AdvanceABC=(tag.getBody() as DoABCWithoutFlagsAndName).abc;
+						for each(clazz in abc.clazzV){
+							classNameMark["~"+getClassNameByMultinameInfo(clazz.name)]=clazz;
+						}
+					break;
+					case TagType.SymbolClass:
+						var i:int=0;
+						symbolClass=tag.getBody() as SymbolClass;
+						for each(var Name:String in symbolClass.NameV){
+							if(symbolClass.TagV[i]==0){
+								symbolDocClassName=Name;
+								symbolClass.NameV[i]=docClassName;
+							}
+							i++;
+						}
+					break;
+				}
+			}
+			
+			DoABCWithoutFlagsAndName.setDecodeABC(null);
+			
+			//trace("symbolDocClassName="+symbolDocClassName);
+			
+			if(symbolDocClassName){
+				clazz=classNameMark["~"+symbolDocClassName];
+				var dotId:int=docClassName.indexOf(".");
+				clazz.name.ns=new AdvanceNamespace_info();
+				clazz.name.ns.kind=NamespaceKind.PackageNamespace;
+				if(dotId>-1){
+					clazz.name.ns.name=docClassName.substr(0,dotId);
+					clazz.name.name=docClassName.substr(dotId+1);
+				}else{
+					clazz.name.ns.name="";
+					clazz.name.name=docClassName;
+				}
+			}else{
+				swf.tagV.unshift(SimpleDoABC.getDoABCTag(docClassName,"mc"));
+				if(symbolClass){
+				}else{
+					var symbolClassTag:Tag=new Tag();
+					symbolClassTag.setBody(symbolClass);
+					swf.tagV.push(symbolClassTag);
+				}
+				symbolClass.TagV.push(0);
+				symbolClass.NameV.push(docClassName);
+			}
+			swf.tagV.push(new Tag(TagType.ShowFrame));
+			swf.tagV.push(new Tag(TagType.End));
+			
+			return "";
 		}
 	}
 }

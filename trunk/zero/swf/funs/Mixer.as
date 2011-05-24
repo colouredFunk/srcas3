@@ -27,13 +27,18 @@ package zero.swf.funs{
 		private static var noMixStrMark:Object;
 		private static var noMixClassMark:Object;
 		private static var replaceStrMark:Object;
+		private static var mixClassNameOnly:Boolean;//20110523
 		public static function mix(
 			swfOrSWFArr:*,
 			noMixStrArr:Array=null,
 			noMixClassArr:Array=null,
 			replaceStr0Arr:Array=null,
-			replaceStrtArr:Array=null
+			replaceStrtArr:Array=null,
+			_mixClassNameOnly:Boolean=true//只混淆类名
 		):void{
+			
+			mixClassNameOnly=_mixClassNameOnly;
+			
 			//支持关联混合（对多个swf进行混合，相同的字符串混淆后仍然相同）
 			var swf:SWF2,abcFile:ABCFile;
 			
@@ -84,6 +89,7 @@ package zero.swf.funs{
 					for(_valId in valIdMark){
 						var valId:String=_valId.substr(1);
 						obj[valId]=strMark["~"+obj[valId]];
+						//trace("obj="+obj+","+obj[valId]);
 					}
 				}
 			}
@@ -198,10 +204,16 @@ package zero.swf.funs{
 						getObjAndValIdBySymbolClass(tag.getBody() as SymbolClass);
 					break;
 					case TagType.PlaceObject2:
-						getObjAndValId(tag.getBody() as PlaceObject2,"Name");//和部分 traits_info 有关
+						if(mixClassNameOnly){
+						}else{
+							getObjAndValId(tag.getBody() as PlaceObject2,"Name");//和部分 traits_info 有关
+						}
 					break;
 					case TagType.PlaceObject2:
-						getObjAndValId(tag.getBody() as PlaceObject3,"Name");//和部分 traits_info 有关
+						if(mixClassNameOnly){
+						}else{
+							getObjAndValId(tag.getBody() as PlaceObject3,"Name");//和部分 traits_info 有关
+						}
 					break;
 					case TagType.DefineSprite:
 						getObjAndValIds((tag.getBody() as DefineSprite).dataAndTags.tagV);
@@ -252,9 +264,15 @@ package zero.swf.funs{
 				getObjAndValIdByQName(clazz.super_name,classNameMark);
 				getObjAndValId(clazz.protectedNs,"name");
 				getObjAndValIdByMethod(clazz.iinit);
-				getObjAndValIdByTraits_infoV(clazz.itraits_infoV);
+				if(mixClassNameOnly){
+				}else{
+					getObjAndValIdByTraits_infoV(clazz.itraits_infoV);
+				}
 				getObjAndValIdByMethod(clazz.cinit);
-				getObjAndValIdByTraits_infoV(clazz.ctraits_infoV);
+				if(mixClassNameOnly){
+				}else{
+					getObjAndValIdByTraits_infoV(clazz.ctraits_infoV);
+				}
 			}
 			for each(var script_info:AdvanceScript_info in advanceABC.script_infoV){
 				getObjAndValIdByMethod(script_info.init);
@@ -271,10 +289,16 @@ package zero.swf.funs{
 					case TraitTypes.Method:
 					case TraitTypes.Getter:
 					case TraitTypes.Setter:
-						getObjAndValIdByMethod(traits_info.methodi);
+						if(mixClassNameOnly){
+						}else{
+							getObjAndValIdByMethod(traits_info.methodi);
+						}
 					break;
 					case TraitTypes.Function:
-						getObjAndValIdByMethod(traits_info.functioni);
+						if(mixClassNameOnly){
+						}else{
+							getObjAndValIdByMethod(traits_info.functioni);
+						}
 					break;
 					case TraitTypes.Clazz:
 						if(checkQNameIsNoMixClass(traits_info.name)){
