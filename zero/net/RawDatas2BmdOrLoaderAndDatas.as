@@ -11,8 +11,9 @@ package zero.net{
 	
 	import flash.display.*;
 	import flash.events.*;
-	import flash.utils.*;
 	import flash.net.*;
+	import flash.system.LoaderContext;
+	import flash.utils.*;
 	
 	import mx.graphics.codec.PNGEncoder;
 	
@@ -58,7 +59,7 @@ package zero.net{
 					case FileTypes.SWF:
 						var loader:Loader=new Loader();
 						loader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadComplete);
-						loader.loadBytes(rawData);
+						loader.loadBytes(rawData,getLoaderContext());
 						rest++;
 						bmdOrLoaderArr[i]=loader;
 						
@@ -76,12 +77,18 @@ package zero.net{
 				}
 			}
 			
-			
-			
 			imgsSWFLoader=new Loader();
 			imgsSWFLoader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadComplete);
-			imgsSWFLoader.loadBytes(ImgDatas2SWFData.imgDatas2SWFData(imgDataArr,classNameArr));
+			imgsSWFLoader.loadBytes(ImgDatas2SWFData.imgDatas2SWFData(imgDataArr,classNameArr),getLoaderContext());
 			rest++;
+		}
+		private function getLoaderContext():LoaderContext{
+			var loaderContext:LoaderContext=new LoaderContext();
+			if(loaderContext.hasOwnProperty("allowCodeImport")){
+				loaderContext["allowCodeImport"]=true;
+				return loaderContext;
+			}
+			return null;
 		}
 		private function getRawDataArr(rawDatas:*):Array{
 			var rawDataArr:Array=new Array();
