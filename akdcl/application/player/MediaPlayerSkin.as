@@ -370,6 +370,7 @@ package akdcl.application.player{
 				btnPrev.visible = player.playlist.length() > 1;
 			}
 			if (btnInfo) {
+				XML.prettyIndent = -1;
 				var _info:String = String(player.playlist[player.playID].info);
 				_info=_info.split("\r\n").join("\r");
 				if (btnInfo.hasOwnProperty("label")) {
@@ -384,15 +385,28 @@ package akdcl.application.player{
 				_btnSelect = btnLabelList[player.playID];
 				if (_btnSelect) {
 					_btnSelect.selected = true;
-					var _x:int;
-					btnsContainer.mask.x = int(btnsContainer.mask.x);
-					if (btnsContainer.x + _btnSelect.x < btnsContainer.mask.x) {
-						_x = btnsContainer.mask.x - _btnSelect.x;
-						TweenMax.to(btnsContainer, 0.3, { x:_x } );
-					}else if (btnsContainer.x + _btnSelect.x + _btnSelect.width > btnsContainer.mask.x + btnsContainer.mask.width) {
-						_x = btnsContainer.mask.x + btnsContainer.mask.width - _btnSelect.width;
-						_x = _btnSelect.x - _x;
-						TweenMax.to(btnsContainer, 0.3, { x: -_x } );
+					if (horizontal) {
+						var _x:int;
+						btnsContainer.mask.x = int(btnsContainer.mask.x);
+						if (btnsContainer.x + _btnSelect.x < btnsContainer.mask.x) {
+							_x = btnsContainer.mask.x - _btnSelect.x;
+							TweenMax.to(btnsContainer, 0.3, { x:_x } );
+						}else if (btnsContainer.x + _btnSelect.x + _btnSelect.width > btnsContainer.mask.x + btnsContainer.mask.width) {
+							_x = btnsContainer.mask.x + btnsContainer.mask.width - _btnSelect.width;
+							_x = _btnSelect.x - _x;
+							TweenMax.to(btnsContainer, 0.3, { x: -_x } );
+						}
+					}else {
+						var _y:int;
+						btnsContainer.mask.y = int(btnsContainer.mask.y);
+						if (btnsContainer.y + _btnSelect.y < btnsContainer.mask.y) {
+							_y = btnsContainer.mask.y - _btnSelect.y;
+							TweenMax.to(btnsContainer, 0.3, { y:_y } );
+						}else if (btnsContainer.y + _btnSelect.y + _btnSelect.height > btnsContainer.mask.y + btnsContainer.mask.height) {
+							_y = btnsContainer.mask.y + btnsContainer.mask.height - _btnSelect.height;
+							_y = _btnSelect.y - _y;
+							TweenMax.to(btnsContainer, 0.3, { y: -_y } );
+						}
 					}
 				}
 			}else {
