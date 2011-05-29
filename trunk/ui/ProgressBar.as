@@ -115,7 +115,7 @@ package ui{
 		public function setStyle():void {
 			setClips(getClipsValue());
 			if (txt) {
-				txt.text = (labelFunction!=null)?labelFunction(value):setLabel(value);
+				txt.htmlText = (labelFunction!=null)?labelFunction(value):setLabel(value);
 			}
 		}
 		protected function setClips(_value:Number):void {
