@@ -10,6 +10,7 @@ Codes 版本:v1.0
 package zero.swf.avm2.advances{
 	import flash.utils.ByteArray;
 	
+	import zero.BytesAndStr16;
 	import zero.Outputer;
 	import zero.ZeroCommon;
 	import zero.swf.avm2.advances.AdvanceABC;
@@ -18,6 +19,9 @@ package zero.swf.avm2.advances{
 	
 
 	public class Codes extends Advance{
+		public static var outputHex:Boolean=false;//只用于 toXML 20110528
+		private var hexArr:Array;//只用于 toXML 20110528
+		
 		public var codeArr:Array;
 		public function Codes(){
 		}
@@ -30,6 +34,9 @@ package zero.swf.avm2.advances{
 			var labelId:int=0;
 			var labelMarkArr:Array=new Array();
 			var codeByOffsetArr:Array=new Array();
+			if(outputHex){
+				var hexByOffsetArr:Array=new Array();
+			}
 			var code:*;
 			
 			var offset:int=0;
@@ -126,10 +133,9 @@ package zero.swf.avm2.advances{
 									}
 								}catch(e:Error){
 									if(e is RangeError){
-										code=new Array();
-										for(i=pos;i<offset;i++){
-											code[code.length]=data[i];
-										}
+										code=new ByteArray();
+										code.writeBytes(data,pos,offset-pos);
+										Outputer.output("对未知代码使用 ByteArray 进行记录："+BytesAndStr16.bytes2str16(code,0,code.length),"brown");
 									}
 									Outputer.outputError("dataType_u8_u30 e="+e);
 								}
@@ -160,18 +166,16 @@ package zero.swf.avm2.advances{
 											//	args:u30_2
 											//});
 											Outputer.outputError("恭喜你，你发现了一个 "+Op.opNameV[op]+" 的例子！");
-											code=new Array();
-											for(i=pos;i<offset;i++){
-												code[code.length]=data[i];
-											}
+											code=new ByteArray();
+											code.writeBytes(data,pos,offset-pos);
+											Outputer.output("对未知代码使用 ByteArray 进行记录："+BytesAndStr16.bytes2str16(code,0,code.length),"brown");
 										break;
 									}
 								}catch(e:Error){
 									if(e is RangeError){
-										code=new Array();
-										for(i=pos;i<offset;i++){
-											code[code.length]=data[i];
-										}
+										code=new ByteArray();
+										code.writeBytes(data,pos,offset-pos);
+										Outputer.output("对未知代码使用 ByteArray 进行记录："+BytesAndStr16.bytes2str16(code,0,code.length),"brown");
 									}
 									Outputer.outputError("dataType_u8_u30_u30 e="+e);
 								}
@@ -304,27 +308,41 @@ package zero.swf.avm2.advances{
 						}
 						codeByOffsetArr[pos]=code;
 					}
+					if(outputHex){
+						hexByOffsetArr[pos]=BytesAndStr16.bytes2str16(data,pos,offset-pos);
+					}
 				}else{
-					throw new Error("未知 op: "+op);
+					code=new ByteArray();
+					code[0]=op;
+					codeByOffsetArr[pos]=code;
+					Outputer.output("对未知代码使用 ByteArray 进行记录："+BytesAndStr16.bytes2str16(code,0,code.length),"brown");
+					Outputer.outputError("未知 op: "+op);
 				}
 			}
 			
 			//trace("offset="+offset+",endOffset="+endOffset);
 			if(offset===endOffset){
-				
 			}else{
 				trace("offset="+offset+",endOffset="+endOffset);
 			}
 			
+			if(outputHex){
+				hexArr=new Array();
+			}
 			codeArr=new Array();
-			var codeId:int=0;
+			var codeId:int=-1;
 			//endOffset++;
 			for(offset=0;offset<=endOffset;offset++){
 				if(labelMarkArr[offset]){
-					codeArr[codeId++]=labelMarkArr[offset];
+					codeId++;
+					codeArr[codeId]=labelMarkArr[offset];
 				}
 				if(codeByOffsetArr[offset]){
-					codeArr[codeId++]=codeByOffsetArr[offset];
+					codeId++;
+					if(outputHex){
+						hexArr[codeId]=hexByOffsetArr[offset];
+					}
+					codeArr[codeId]=codeByOffsetArr[offset];
 				}
 			}
 		}
@@ -359,10 +377,11 @@ package zero.swf.avm2.advances{
 				//trace("code="+code);
 				if(code is LabelMark){
 					(code as LabelMark).pos=offset;
-				}else if(code is Array){
-					for each(var directCode:int in code){
-						data[offset++]=directCode;
-					}
+				}else if(code is ByteArray){
+					Outputer.output("使用 ByteArray 进行记录的未知代码："+BytesAndStr16.bytes2str16(code,0,code.length),"brown");
+					data.position=offset;
+					data.writeBytes(code,0,code.length);
+					offset=data.length;
 				}else{
 					if(code is int){
 						data[offset++]=code;
@@ -559,14 +578,23 @@ package zero.swf.avm2.advances{
 			
 		override public function toXMLAndMark(infoMark:InfoMark):XML{
 			var labelMark:LabelMark,infoXML:XML;
-			//var specialXMLMark:Object=new Object();//用来记录一些实在不适合在汇编码里显示的东西，例如匿名函数
 			if(codeArr.length){
 				var codesStr:String="";
+				if(outputHex){
+					var codeId:int=-1;
+				}
 				for each(var code:* in codeArr){
+					if(outputHex){
+						codeId++;
+						if(hexArr[codeId]){
+							codesStr+="\t\t\t\t\t//"+hexArr[codeId]+"\n";
+						}
+					}
 					if(code is LabelMark){
 						codesStr+="\t\t\t\tlabel"+(code as LabelMark).labelId+":\n";
-					}else if(code is Array){
-						codesStr+="\t\t\t\t\t"+code.join(" ")+"\n";
+					}else if(code is ByteArray){
+						Outputer.output("使用 ByteArray 进行记录的未知代码："+BytesAndStr16.bytes2str16(code,0,code.length),"brown");
+						codesStr+="\t\t\t\t\t"+BytesAndStr16.bytes2str16(code,0,code.length)+"\n";
 					}else{
 						if(code is int){
 							codesStr+="\t\t\t\t\t"+Op.opNameV[code];
@@ -680,7 +708,7 @@ package zero.swf.avm2.advances{
 			return <Codes/>;
 		}
 		override public function initByXMLAndMark(infoMark:InfoMark,xml:XML):void{
-			var codeStrArr:Array=xml.toString().split("\n");
+			var codeStrArr:Array=xml.toString().replace(/^\s*|\s*$/g,"").split("\n");
 			var codeId:int=-1;
 			codeArr=new Array();
 			var code:Code;
@@ -717,14 +745,9 @@ package zero.swf.avm2.advances{
 				
 				if(/^label(\d+):$/.test(codeStr)){
 					codeArr[++codeId]=labelMarkMark[codeStr];
-				}else if(codeStr.search(/(0x([0-9a-fA-F]+)|\d+)\s+/)==0){
-					var numArr:Array=new Array();
-					for each(var numStr:String in codeStr.split(/\s+/)){
-						if(numStr){
-							numArr[numArr.length]=int(numStr);
-						}
-					}
-					codeArr[++codeId]=numArr;
+				}else if((codeStr+" ").search(/[0-9a-fA-F]{2}\s+/)==0){
+					Outputer.output("使用 ByteArray 进行记录的未知代码："+codeStr,"brown");
+					codeArr[++codeId]=BytesAndStr16.str162bytes(codeStr);
 				}else{
 					var pos:int=codeStr.search(/\s+/);
 					var opStr:String;

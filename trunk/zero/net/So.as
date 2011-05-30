@@ -68,18 +68,25 @@ package zero.net{
 			}
 		}
 		
-		private function getNodeByKey(key:String):XML{
+		private function getNode(key:String):XML{
 			return xml.node.(@key==key)[0];
 		}
-		public function getXMLByKey(key:String):XML{
-			var node:XML=getNodeByKey(key);
+		public function getValue(key:String):String{
+			return xml["@"+key].toString();
+		}
+		public function setValue(key:String,value:String):void{
+			xml["@"+key]=value;
+			update();
+		}
+		public function getXML(key:String,defaultXML:XML):XML{
+			var node:XML=getNode(key);
 			if(node){
 				return node.children()[0];
 			}
-			return null;
+			return defaultXML;
 		}
-		public function setXMLByKey(key:String,newXML:XML):void{
-			var node:XML=getNodeByKey(key);
+		public function setXML(key:String,newXML:XML):void{
+			var node:XML=getNode(key);
 			if(node){
 			}else{
 				node=<node key={key}/>;

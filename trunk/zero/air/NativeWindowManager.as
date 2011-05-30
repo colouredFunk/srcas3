@@ -26,8 +26,11 @@ package zero.air{
 		private var so:So;
 		private var so_key:String;
 		
-		public function NativeWindowManager(_nativeWindow:NativeWindow,_so:So,_so_key:String=null){
+		private var onClose:Function;
+		
+		public function NativeWindowManager(_nativeWindow:NativeWindow,_so:So,_so_key:String=null,_onClose:Function=null){
 			nativeWindow=_nativeWindow;
+			onClose=_onClose;
 			initSo(_so,_so_key);
 			
 			nativeWindow.addEventListener(Event.CLOSING,closingWindow);
@@ -35,11 +38,7 @@ package zero.air{
 		public function initSo(_so:So,_so_key:String=null):void{
 			so=_so;
 			so_key=_so_key||"nativeWindow";
-			xml=so.getXMLByKey(so_key);
-			if(xml){
-			}else{
-				xml=<nativeWindow/>;
-			}
+			xml=so.getXML(so_key,<nativeWindow/>);
 			
 			var str:String;
 			
@@ -64,6 +63,13 @@ package zero.air{
 			}
 		}
 		private function closingWindow(event:Event):void{
+			
+			if(onClose==null){
+			}else{
+				onClose();
+				onClose=null;
+			}
+			
 			nativeWindow.restore();
 			nativeWindow.removeEventListener(Event.CLOSING,closingWindow);
 			xml.@x=nativeWindow.x;
@@ -71,7 +77,7 @@ package zero.air{
 			xml.@width=nativeWindow.width;
 			xml.@height=nativeWindow.height;
 			
-			so.setXMLByKey("nativeWindow",xml);
+			so.setXML("nativeWindow",xml);
 			
 			nativeWindow=null;
 			
