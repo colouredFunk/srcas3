@@ -47,11 +47,7 @@ ActionVDividedBox
 				/*
 				so=_so;
 				so_key=_so_key||this.id;
-				xml=so.getXMLByKey(so_key);
-				if(xml){
-				}else{
-					xml=<ActionVDividedBox/>;
-				}
+				xml=so.getXML(so_key,<ActionVDividedBox/>);
 				for(var i:int=0;i<this.numElements;i++){
 					var elementXML:XML;
 					if(xml.element.length()>i){
@@ -76,7 +72,7 @@ ActionVDividedBox
 						xml.element[i].@height=this.getElementAt(i).height;
 					}
 					trace(xml);
-					so.setXMLByKey(so_key,xml);
+					so.setXML(so_key,xml);
 				}
 				*/
 			}

@@ -41,7 +41,6 @@ package zero.ui{
 		private var cb:spark.components.CheckBox;
 		private var so:Object;
 		private var so_key:String;
-		private var xml:XML;
 		
 		public function CheckBoxManager(){}
 		private function clear():void{
@@ -58,18 +57,13 @@ package zero.ui{
 			so=_so;
 			so_key=_so_key;
 			
-			xml=so.getXMLByKey(so_key);
-			if(xml){
-				cb.selected=(xml.@selected.toString()=="true");
-			}else{
-				xml=<CheckBoxManager selected={cb.selected}/>;
-				so.setXMLByKey(so_key,xml);
+			if(so.getValue(so_key)=="true"){
+				cb.selected=true;
 			}
 			cb.addEventListener(Event.CHANGE,change);
 		}
 		private function change(event:Event):void{
-			xml.@selected=cb.selected;
-			so.setXMLByKey(so_key,xml);
+			so.setValue(so_key,cb.selected);
 		}
 		public static function updateByCb(cb:spark.components.CheckBox):void{
 			dict[cb].change(null);

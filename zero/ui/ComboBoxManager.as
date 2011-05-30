@@ -55,7 +55,7 @@ package zero.ui{
 		
 		public function ComboBoxManager(){}
 		private function clear():void{
-			cb.removeEventListener(FocusEvent.FOCUS_OUT,focusOut);
+			cb.removeEventListener(Event.CHANGE,change);
 			cb=null;
 		}
 		private function init(
@@ -69,15 +69,12 @@ package zero.ui{
 			so=_so;
 			so_key=_so_key;
 			if(so){
-				xml=so.getXMLByKey(so_key);
-				if(xml){
-				}else{
-					xml=<ComboBoxManager currId="0">
-							<labels/>
-						</ComboBoxManager>;
-					so.setXMLByKey(so_key,xml);
-				}
-				
+				xml=so.getXML(
+					so_key,
+					<ComboBoxManager currId="0">
+						<labels/>
+					</ComboBoxManager>
+				);
 				
 				if(
 					dataProvider
@@ -100,7 +97,7 @@ package zero.ui{
 			}
 			
 			if(cb){
-				cb.addEventListener(FocusEvent.FOCUS_OUT,focusOut);
+				cb.addEventListener(Event.CHANGE,change);
 			}
 		}
 		private function labelArr2labelsXML(labelArr:Array):XML{
@@ -119,7 +116,7 @@ package zero.ui{
 			}
 			return labelArr;
 		}
-		private function focusOut(event:FocusEvent):void{
+		private function change(event:Event):void{
 			addLabel(cb.text);
 		}
 		private function addLabel(label:String):void{
@@ -136,7 +133,7 @@ package zero.ui{
 					if(so){
 						xml.labels=labelArr2labelsXML(labelArr);
 						xml.@currId=cb.selectedIndex;
-						so.setXMLByKey(so_key,xml);
+						so.setXML(so_key,xml);
 					}
 				}
 			}

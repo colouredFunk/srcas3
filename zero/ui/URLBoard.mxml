@@ -71,15 +71,12 @@
 				var itemId:int=0;
 				var xml:XML=<urls/>;
 				while(true){
-					var txt_saveId:String=saveId+"_URLItem_"+itemId+"_txt";
-					var txtSoXML:XML=so.getXMLByKey(txt_saveId);
-					if(txtSoXML){
-						var url:String=txtSoXML.@text.toString().replace(/^\s*|\s*$/g,"");
+					var url:String=so.getValue(saveId+"_URLItem_"+itemId+"_txt");
+					if(url){
+						url=url.replace(/^\s*|\s*$/g,"");
 						if(url){
-							var cb_saveId:String=saveId+"_URLItem_"+itemId+"_cb";
 							var urlXML:XML=<url url={url}/>;
-							var cbSoXML:XML=so.getXMLByKey(saveId+"_URLItem_"+itemId+"_cb");
-							if(cbSoXML&&cbSoXML.@selected.toString()=="true"){
+							if(so.getValue(saveId+"_URLItem_"+itemId+"_cb")=="true"){
 								urlXML.@strictMatch=true;
 							}
 							xml.appendChild(urlXML);

@@ -57,20 +57,14 @@ package zero.ui
 			txt=_txt;
 			so=_so;
 			so_key=_so_key;
-			var xml:XML=so.getXMLByKey(so_key);
-			if(xml){
-				txt.text=xml.@text.toString();
-			}else{
-				xml=<TxtManager/>;
-				xml.@text=txt.text;
-				so.setXMLByKey(so_key,xml);
+			var text:String=so.getValue(so_key);
+			if(text){
+				txt.text=text;
 			}
 			txt.addEventListener(Event.CHANGE,change);
 		}
 		private function change(event:Event):void{
-			var xml:XML=so.getXMLByKey(so_key);
-			xml.@text=txt.text;
-			so.setXMLByKey(so_key,xml);
+			so.setValue(so_key,txt.text);
 		}
 	}
 }

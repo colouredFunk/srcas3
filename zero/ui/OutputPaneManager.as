@@ -120,9 +120,10 @@ package zero.ui{
 							var file:*=new FileClass(event.text.substr(id+1));
 							if(file.exists){
 								if(new FileClass(FileClass.applicationDirectory.nativePath).getRelativePath(file) is String){
-									outputError("不能打开 applicationDirectory 目录下的东西");
+									outputError("不能直接打开 applicationDirectory 目录下的东西，尝试用浏览器打开");
 									//http://help.adobe.com/en_US/as3/dev/WS5b3ccc516d4fbf351e63e3d118666ade46-7fe4.html#WS2A7C0A31-A6A9-42d2-8772-79166A98A085
 									//You cannot use the openWithDefaultApplication() method with files located in the application directory.
+									navigateToURL(new URLRequest(decodeURI(file.url)));
 								}else{
 									file.openWithDefaultApplication();
 								}
@@ -204,7 +205,7 @@ package zero.ui{
 					msg+="　"+tail;
 				}
 			}
-			if(strArr.length>100){
+			if(strArr.length>1000){
 				click(null);
 				strArr[0]="输出过多自动清除...<br>";
 			}
