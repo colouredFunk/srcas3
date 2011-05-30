@@ -8,26 +8,1260 @@ ACTIONRECORD 版本:v1.0
 */
 
 package zero.swf.avm1{
-	import flash.display.*;
-	import flash.events.*;
-	import flash.utils.*;
+	import flash.utils.ByteArray;
 	
-	import zero.swf.BytesData;
+	import zero.Outputer;
+	import zero.ZeroCommon;
+	import zero.swf.avm2.advances.Code;
 	
-	public class ACTIONRECORD extends BytesData{
-		public static var actionRecordV:Vector.<ACTIONRECORD>;
-		public static function reset():void{
-			actionRecordV=new Vector.<ACTIONRECORD>();
-		}
-		public static function clear():void{
-			actionRecordV=null;
+	public class ACTIONRECORD{
+		private static var numData:ByteArray=new ByteArray();
+		
+		public var codeArr:Array;
+		public function ACTIONRECORD(){
 		}
 		
-		public function ACTIONRECORD(){
-			if(actionRecordV){
-				actionRecordV[actionRecordV.length]=this;
+		public function initByData(data:ByteArray,offset:int,endOffset:int):int{
+			
+			var labelId:int=0;
+			var labelMarkArr:Array=new Array();
+			var codeByOffsetArr:Array=new Array();
+			var code:*;
+			
+			var labelMark:AVM1LabelMark;
+			var jumpOffset:int,jumpPos:int,i:int;
+			
+			var get_str_size:int;
+			
+			var constCode:AVM1Code;
+			
+			var flags:int;
+			
+			while(offset<endOffset){
+				var pos:int=offset;
+				var op:int=data[offset++];
+				
+				if(AVM1Op.opNameV[op]){
+					if(op<0x80){
+						codeByOffsetArr[pos]=op;
+					}else{
+						var Length:int=data[offset++]|(data[offset++]<<8);
+						
+						switch(op){
+							case AVM1Op.gotoFrame:
+								code=new AVM1Code(op,data[offset++]|(data[offset++]<<8));
+							break;
+							case AVM1Op.getURL:
+								
+								get_str_size=0;
+								while(data[offset+(get_str_size++)]){}
+								data.position=offset;
+								code=new AVM1Code(op,{UrlString:data.readUTFBytes(get_str_size)});
+								offset+=get_str_size;
+								
+								get_str_size=0;
+								while(data[offset+(get_str_size++)]){}
+								data.position=offset;
+								code.value.TargetString=data.readUTFBytes(get_str_size);
+								offset+=get_str_size;
+								
+							break;
+							case AVM1Op.setRegister:
+								code=new AVM1Code(op,data[offset++]);
+							break;
+							case AVM1Op.constants:
+								constCode=code=new AVM1Code(op,[]);
+								var Count:int=data[offset++]|(data[offset++]<<8);
+								var realCount:int=0;
+								i=0;
+								while(offset<endOffset){
+									get_str_size=0;
+									while(data[offset+(get_str_size++)]){}
+									data.position=offset;
+									code.value.push(data.readUTFBytes(get_str_size));
+									offset+=get_str_size;
+									realCount++;
+									if(++i>=Count){
+										break;
+									}
+								}
+								if(Count==realCount){
+								}else{
+									Outputer.output("Count!=realCount Count="+Count+", realCount="+realCount,"brown");
+								}
+							break;
+							case AVM1Op.ifFrameLoaded:
+								//Frame 				UI16 				Frame to wait for
+								//SkipCount 			UI8 				Number of actions to skip if frame is not loaded
+								code=new AVM1Code(op,{
+									Frame:data[offset++]|(data[offset++]<<8),
+									SkipCount:data[offset++]
+								});
+								Outputer.output("ifFrameLoaded 应该用 labelMark","brown");
+							break;
+							case AVM1Op.setTarget:
+								//TargetName 		STRING 					Target of action target
+								get_str_size=0;
+								while(data[offset+(get_str_size++)]){}
+								data.position=offset;
+								code=new AVM1Code(op,data.readUTFBytes(get_str_size));
+								offset+=get_str_size;
+							break;
+							case AVM1Op.gotoLabel:
+								get_str_size=0;
+								while(data[offset+(get_str_size++)]){}
+								data.position=offset;
+								code=new AVM1Code(op,data.readUTFBytes(get_str_size));
+								offset+=get_str_size;
+							break;
+							case AVM1Op.ifFrameLoadedExpr:
+								//SkipCount 			UI8 				The number of actions to skip
+								code=new AVM1Code(op,data[offset++]);
+								Outputer.output("ifFrameLoadedExpr 应该用 labelMark","brown");
+							break;
+							case AVM1Op.function2:
+								throw new Error("未处理");
+							break;
+							case AVM1Op.try_:
+								//Reserved 				UB[5] 								Always zero
+								//CatchInRegisterFlag 	UB[1] 								0 - Do not put caught object into register (instead, store in named variable)
+								//															1 - Put caught object into register (do not store in named variable)
+								//FinallyBlockFlag 		UB[1] 								0 - No finally block
+								//															1 - Has finally block
+								//CatchBlockFlag 		UB[1] 								0 - No catch block
+								//															1 - Has catch block
+								//TrySize 				UI16 								Length of the try block
+								//CatchSize 			UI16 								Length of the catch block
+								//FinallySize 			UI16 								Length of the finally block
+								//CatchName 			If CatchInRegisterFlag = 0, STRING 	Name of the catch variable
+								//CatchRegister 		If CatchInRegisterFlag = 1, UI8 	Register to catch into
+								//TryBody 				UI8[TrySize] 						Body of the try block
+								//CatchBody 			UI8[CatchSize] 						Body of the catch block, if any
+								//FinallyBody 			UI8[FinallySize] 					Body of the finally block, if any
+								
+								//NOTE
+								//The CatchSize and FinallySize fields always exist, whether or not the CatchBlockFlag or
+								//FinallyBlockFlag settings are 1.
+								
+								//NOTE
+								//The try, catch, and finally blocks do not use end tags to mark the end of their respective
+								//blocks. Instead, the length of a block is set by the TrySize, CatchSize, and FinallySize
+								//values.
+								
+								code=new AVM1Code(op,{});
+								flags=data[offset++];
+								//code.value.Reserved=(flags<<24)>>>27;					//11111000
+								
+								var TrySize:int=data[offset++]|(data[offset++]<<8);//其实不是 jump
+								var CatchSize:int=data[offset++]|(data[offset++]<<8);//其实不是 jump
+								var FinallySize:int=data[offset++]|(data[offset++]<<8);//其实不是 jump
+								
+								if(flags&0x04){//CatchInRegisterFlag					//00000100
+									code.value.CatchRegister=data[offset++];
+								}else{
+									get_str_size=0;
+									while(data[offset+(get_str_size++)]){}
+									data.position=offset;
+									code.value.CatchName=data.readUTFBytes(get_str_size);
+									offset+=get_str_size;
+									
+									//trace("code.value.CatchName="+code.value.CatchName);
+								}
+								
+								jumpPos=offset+TrySize;
+								if(jumpPos<0||jumpPos>endOffset){
+									jumpPos=endOffset;
+									Outputer.output("jumpPos 已修正为: "+jumpPos,"brown");
+								}
+								labelMark=labelMarkArr[jumpPos];
+								if(labelMark){
+								}else{
+									labelMarkArr[jumpPos]=labelMark=new AVM1LabelMark();
+									labelMark.labelId=labelId++;
+								}
+								code.value.TryBody=labelMark;
+								
+								if(flags&0x01){//CatchBlockFlag							//00000001
+									jumpPos=offset+TrySize+CatchSize;
+									if(jumpPos<0||jumpPos>endOffset){
+										jumpPos=endOffset;
+										Outputer.output("jumpPos 已修正为: "+jumpPos,"brown");
+									}
+									labelMark=labelMarkArr[jumpPos];
+									if(labelMark){
+									}else{
+										labelMarkArr[jumpPos]=labelMark=new AVM1LabelMark();
+										labelMark.labelId=labelId++;
+									}
+									code.value.CatchBody=labelMark;
+								}
+								
+								if(flags&0x02){//FinallyBlockFlag						//00000010
+									jumpPos=offset+TrySize+CatchSize+FinallySize;
+									if(jumpPos<0||jumpPos>endOffset){
+										jumpPos=endOffset;
+										Outputer.output("jumpPos 已修正为: "+jumpPos,"brown");
+									}
+									labelMark=labelMarkArr[jumpPos];
+									if(labelMark){
+									}else{
+										labelMarkArr[jumpPos]=labelMark=new AVM1LabelMark();
+										labelMark.labelId=labelId++;
+									}
+									code.value.FinallyBody=labelMark;
+								}
+								
+							break;
+							case AVM1Op.with_:
+								//Size 			UI16 				# of bytes of code that follow
+								jumpOffset=data[offset++]|(data[offset++]<<8);//其实不是 jump
+								jumpPos=offset+jumpOffset;//offset+Size
+								if(jumpPos<0||jumpPos>endOffset){
+									jumpPos=endOffset;
+									Outputer.output("jumpPos 已修正为: "+jumpPos,"brown");
+								}
+								labelMark=labelMarkArr[jumpPos];
+								if(labelMark){
+								}else{
+									labelMarkArr[jumpPos]=labelMark=new AVM1LabelMark();
+									labelMark.labelId=labelId++;
+								}
+								code=new AVM1Code(op,labelMark);
+							break;
+							case AVM1Op.push:
+								//Type 				UI8 					0 = string literal
+								//											1 = floating-point literal
+								//											5 and later:
+								//											2 = null
+								//											3 = undefined
+								//											4 = register
+								//											5 = Boolean
+								//											6 = double
+								//											7 = integer
+								//											8 = constant 8
+								//											9 = constant 16
+								//String 			If Type = 0, STRING 	Null-terminated character string
+								//Float 			If Type = 1, FLOAT 		32-bit IEEE single-precision little-endian floating-point value
+								//RegisterNumber 	If Type = 4, UI8 		Register number
+								//Boolean 			If Type = 5, UI8 		Boolean value
+								//Double 			If Type = 6, DOUBLE 	64-bit IEEE double-precision littleendian double value
+								//Integer 			If Type = 7, UI32 		32-bit little-endian integer
+								//Constant8 		If Type = 8, UI8 		Constant pool index (for indexes < 256) (see _constants)
+								//Constant16 		If Type = 9, UI16 		Constant pool index (for indexes >= 256) (see _constants)
+								code=new AVM1Code(op,[]);
+								while(offset<pos+3+Length){
+									switch(data[offset++]){
+										case 0:
+											get_str_size=0;
+											while(data[offset+(get_str_size++)]){}
+											data.position=offset;
+											code.value.push(data.readUTFBytes(get_str_size));
+											offset+=get_str_size;
+										break;
+										case 1:
+											//好像没见过。。。
+											numData[3]=data[offset++];
+											numData[2]=data[offset++];
+											numData[1]=data[offset++];
+											numData[0]=data[offset++];
+											numData.position=0;
+											code.value.push(numData.readFloat());
+											
+											//data.endian=Endian.LITTLE_ENDIAN;
+											//data.position=offset;
+											//code.value.push(data.readFloat());
+											//offset+=4;
+										break;
+										case 2:
+											code.value.push(null);
+										break;
+										case 3:
+											code.value.push(undefined);
+										break;
+										case 4:
+											code.value.push(new AVM1Register(data[offset++]));
+										break;
+										case 5:
+											code.value.push(data[offset++]?true:false);
+										break;
+										case 6:
+											numData[3]=data[offset++];
+											numData[2]=data[offset++];
+											numData[1]=data[offset++];
+											numData[0]=data[offset++];
+											numData[7]=data[offset++];
+											numData[6]=data[offset++];
+											numData[5]=data[offset++];
+											numData[4]=data[offset++];
+											numData.position=0;
+											code.value.push(numData.readDouble());
+											
+											//data.endian=Endian.LITTLE_ENDIAN;
+											//data.position=offset;
+											//code.value.push(data.readDouble());
+											//offset+=8;
+										break;
+										case 7:
+											code.value.push(data[offset++]|(data[offset++]<<8)|(data[offset++]<<16)|(data[offset++]<<24));
+										break;
+										case 8:
+											code.value.push(constCode.value[data[offset++]]);
+										break;
+										case 9:
+											code.value.push(constCode.value[data[offset++]|(data[offset++]<<8)]);
+										break;
+										default:
+											throw new Error("未知 pushType");
+										break;
+									}
+								}
+							break;
+							case AVM1Op.getURL2:
+								//SendVarsMethod 		UB[2] 					0 = None
+								//												1 = GET
+								//												2 = POST
+								//Reserved 				UB[4] 					Always 0
+								//LoadTargetFlag 		UB[1] 					0 = Target is a browser window
+								//												1 = Target is a path to a sprite
+								//LoadVariablesFlag 	UB[1] 					0 = No variables to load
+								//												1 = Load variables
+								
+								code=new AVM1Code(op,{});
+								flags=data[offset++];
+								code.value.SendVarsMethod=(flags<<24)>>>30;				//11000000
+								//code.value.Reserved=(flags<<26)>>>28;					//00111100
+								code.value.LoadTargetFlag=(flags<<30)>>>31;				//00000010
+								code.value.LoadVariablesFlag=flags&0x01;				//00000001
+							break;
+							case AVM1Op.function_:
+								//FunctionName 			STRING 				Function name, empty if anonymous
+								//NumParams 			UI16 				# of parameters
+								//param 1 				STRING 				Parameter name 1
+								//param 2 				STRING 				Parameter name 2
+								//...
+								//param N 				STRING 				Parameter name N
+								//codeSize 				UI16 				# of bytes of code that follow
+								
+								get_str_size=0;
+								while(data[offset+(get_str_size++)]){}
+								data.position=offset;
+								code=new AVM1Code(op,{
+									FunctionName:data.readUTFBytes(get_str_size),
+									paramArr:[]
+								});
+								offset+=get_str_size;
+								
+								var NumParams:int=data[offset++]|(data[offset++]<<8);
+								for(i=0;i<NumParams;i++){
+									get_str_size=0;
+									while(data[offset+(get_str_size++)]){}
+									data.position=offset;
+									code.value.paramArr[i]=data.readUTFBytes(get_str_size);
+									offset+=get_str_size;
+								}
+								
+								jumpOffset=data[offset++]|(data[offset++]<<8);//其实不是 jump
+								jumpPos=offset+jumpOffset;//offset+codeSize
+								if(jumpPos<0||jumpPos>endOffset){
+									jumpPos=endOffset;
+									Outputer.output("jumpPos 已修正为: "+jumpPos,"brown");
+								}
+								labelMark=labelMarkArr[jumpPos];
+								if(labelMark){
+								}else{
+									labelMarkArr[jumpPos]=labelMark=new AVM1LabelMark();
+									labelMark.labelId=labelId++;
+								}
+								code.value.endMark=labelMark;
+							break;
+							case AVM1Op.branch:
+							case AVM1Op.branchIfTrue:
+								
+								jumpOffset=data[offset++]|(data[offset++]<<8);
+								if(jumpOffset&0x00008000){jumpOffset|=0xffff0000}//最高位为1,表示负数
+								
+								jumpPos=offset+jumpOffset;
+								if(jumpPos<0||jumpPos>endOffset){
+									jumpPos=endOffset;
+									Outputer.output("jumpPos 已修正为: "+jumpPos,"brown");
+								}
+								labelMark=labelMarkArr[jumpPos];
+								if(labelMark){
+								}else{
+									labelMarkArr[jumpPos]=labelMark=new AVM1LabelMark();
+									labelMark.labelId=labelId++;
+								}
+								code=new AVM1Code(op,labelMark);
+							break;
+							case AVM1Op.callFrame:
+								code=new AVM1Code(op);
+							break;
+							case AVM1Op.gotoFrame2:
+								//Reserved 			UB[6] 						Always 0
+								//SceneBiasFlag 	UB[1] 						Scene bias flag
+								//Play flag 		UB[1] 						0 = Go to frame and stop
+								//												1 = Go to frame and play
+								//SceneBias 		If SceneBiasFlag = 1, UI16 	Number to be added to frame determined by stack argument
+								
+								code=new AVM1Code(op,{});
+								flags=data[offset++];
+								//code.value.Reserved=(flags<<24)>>>26;				//11111100
+								if(flags&0x02){//SceneBiasFlag						//00000010
+									code.value.SceneBias=data[offset++]|(data[offset++]<<8);
+								}
+								code.value.Play=flags&0x01;							//00000001
+							break;
+							default:
+								throw new Error("未知 op: "+op);
+							break;
+						}
+						
+						codeByOffsetArr[pos]=code;
+						
+						if(offset==pos+3+Length){
+						}else{
+							trace("offset 不正确, offset="+offset);
+							offset=pos+3+Length;
+							trace("已修正为: "+offset);
+						}
+					}
+				}else{
+					throw new Error("未知 op: "+op);
+				}
+			}
+			
+			//trace("offset="+offset+",endOffset="+endOffset);
+			if(offset===endOffset){
+				
+			}else{
+				trace("offset="+offset+",endOffset="+endOffset);
+			}
+			
+			codeArr=new Array();
+			var codeId:int=0;
+			//endOffset++;
+			for(offset=0;offset<=endOffset;offset++){
+				if(labelMarkArr[offset]){
+					codeArr[codeId++]=labelMarkArr[offset];
+				}
+				if(codeByOffsetArr[offset]){
+					codeArr[codeId++]=codeByOffsetArr[offset];
+				}
+			}
+			
+			return endOffset;
+		}
+		public function toData():ByteArray{
+			var data:ByteArray=new ByteArray();
+			//data.endian=Endian.LITTLE_ENDIAN;
+			
+			var posMarkArr:Array=new Array();//记录 branch, branchIfTrue, function_, function2 的位置及相关的 label 位置
+			
+			var offset:int=0,pos:int,Length:int;
+			
+			var jumpOffset:int,i:int;
+			
+			var labelMark:AVM1LabelMark;
+			
+			var subValue:*;
+			
+			var code:*;
+			
+			//统计需要放 const 里的字符串
+			var constStrMark:Object=new Object();
+			var constStrV:Vector.<String>=new Vector.<String>();
+			var constCode:AVM1Code=null;
+			loop:for each(code in codeArr){
+				if(code is AVM1Code){
+					switch(code.op){
+						case AVM1Op.constants:
+							constCode=code;
+							break loop;
+						break;
+						case AVM1Op.push:
+							for each(subValue in code.value){
+								if(subValue){//subValue==""的不需要
+									if(subValue is String){
+										if(constStrMark["~"+subValue]>0){
+											constStrMark["~"+subValue]++;
+										}else{
+											constStrMark["~"+subValue]=1;
+											constStrV.push(subValue);
+										}
+									}
+								}
+							}
+						break;
+					}
+				}
+			}
+			if(constCode){
+				//如果本来就已经有 constCode 了
+			}else{
+				constCode=new AVM1Code(AVM1Op.constants,[]);
+				for each(subValue in constStrV){
+					if(constStrMark["~"+subValue]>1){
+						constCode.value.push(subValue);
+					}
+				}
+				constStrV=null;
+			}
+			if(constCode.value.length){
+				constStrMark=new Array();
+				i=constCode.value.length;
+				while(--i>=0){
+					constStrMark["~"+constCode.value[i]]=i;
+				}
+				
+				pos=offset;
+				
+				data[offset++]=AVM1Op.constants;
+				
+				//Length
+				data[offset++]=0x00;
+				data[offset++]=0x00;
+				
+				var Count:int=constCode.value.length;
+				data[offset++]=Count;
+				data[offset++]=Count>>8;
+				data.position=offset;
+				for each(subValue in constCode.value){
+					data.writeUTFBytes(subValue+"\x00");
+				}
+				offset=data.length;
+				
+				Length=offset-pos-3;
+				data[pos+1]=Length;
+				data[pos+2]=Length>>8;
+			}else{
+				constCode=null;
+				constStrMark=null;
+			}
+			//
+			
+			for each(code in codeArr){
+				//trace("code="+code);
+				if(code is AVM1LabelMark){
+					(code as AVM1LabelMark).pos=offset;
+				}else if(code is Array){
+					for each(var directCode:int in code){
+						data[offset++]=directCode;
+					}
+				}else{
+					if(code is int){
+						data[offset++]=code;
+					}else if(code is AVM1Code){
+						if(code.op<0x80){
+							throw new Error("请直接用 int");
+						}else if(code.op==AVM1Op.constants){
+							if(constCode){
+								if(constCode==code){
+								}else{
+									throw new Error("constCode!=code");
+								}
+							}else{
+								throw new Error("constCode="+constCode);
+							}
+						}else{
+							pos=offset;
+							
+							data[offset++]=code.op;
+							
+							//Length
+							data[offset++]=0x00;
+							data[offset++]=0x00;
+							
+							switch(code.op){
+								case AVM1Op.gotoFrame:
+									data[offset++]=code.value;
+									data[offset++]=code.value>>8;
+								break;
+								case AVM1Op.getURL:
+									data.position=offset;
+									data.writeUTFBytes(code.value.UrlString+"\x00");
+									data.writeUTFBytes(code.value.TargetString+"\x00");
+									offset=data.length;
+								break;
+								case AVM1Op.setRegister:
+									data[offset++]=code.value;
+								break;
+								//case AVM1Op.constants:
+								//
+								//break;
+								case AVM1Op.ifFrameLoaded:
+									//Frame 				UI16 				Frame to wait for
+									//SkipCount 			UI8 				Number of actions to skip if frame is not loaded
+									data[offset++]=code.value.Frame;
+									data[offset++]=code.value.Frame>>8;
+									data[offset++]=code.value.SkipCount;
+									Outputer.output("ifFrameLoaded 应该用 labelMark","brown");
+								break;
+								case AVM1Op.setTarget:
+									data.position=offset;
+									data.writeUTFBytes(code.value+"\x00");
+									offset=data.length;
+								break;
+								case AVM1Op.gotoLabel:
+									data.position=offset;
+									data.writeUTFBytes(code.value+"\x00");
+									offset=data.length;
+								break;
+								case AVM1Op.ifFrameLoadedExpr:
+									//SkipCount 			UI8 				The number of actions to skip
+									data[offset++]=code.value;
+									Outputer.output("ifFrameLoadedExpr 应该用 labelMark","brown");
+								break;
+								case AVM1Op.function2:
+									throw new Error("未处理");
+								break;
+								case AVM1Op.try_:
+									//Reserved 				UB[5] 								Always zero
+									//CatchInRegisterFlag 	UB[1] 								0 - Do not put caught object into register (instead, store in named variable)
+									//															1 - Put caught object into register (do not store in named variable)
+									//FinallyBlockFlag 		UB[1] 								0 - No finally block
+									//															1 - Has finally block
+									//CatchBlockFlag 		UB[1] 								0 - No catch block
+									//															1 - Has catch block
+									//TrySize 				UI16 								Length of the try block
+									//CatchSize 			UI16 								Length of the catch block
+									//FinallySize 			UI16 								Length of the finally block
+									//CatchName 			If CatchInRegisterFlag = 0, STRING 	Name of the catch variable
+									//CatchRegister 		If CatchInRegisterFlag = 1, UI8 	Register to catch into
+									//TryBody 				UI8[TrySize] 						Body of the try block
+									//CatchBody 			UI8[CatchSize] 						Body of the catch block, if any
+									//FinallyBody 			UI8[FinallySize] 					Body of the finally block, if any
+									
+									//NOTE
+									//The CatchSize and FinallySize fields always exist, whether or not the CatchBlockFlag or
+									//FinallyBlockFlag settings are 1.
+									
+									//NOTE
+									//The try, catch, and finally blocks do not use end tags to mark the end of their respective
+									//blocks. Instead, the length of a block is set by the TrySize, CatchSize, and FinallySize
+									//values.
+									
+									var flags:int=0;
+									if(code.value.CatchRegister>-1){
+										flags|=0x04;
+									}
+									if(code.value.CatchBody){
+										flags|=0x01;
+									}
+									if(code.value.FinallyBody){
+										flags|=0x02;
+									}
+									data[offset++]=flags;
+									
+									//先用 0 占位，后面一次性写入
+									data[offset++]=0x00;
+									data[offset++]=0x00;
+									//先用 0 占位，后面一次性写入
+									data[offset++]=0x00;
+									data[offset++]=0x00;
+									//先用 0 占位，后面一次性写入
+									data[offset++]=0x00;
+									data[offset++]=0x00;
+									
+									code.value.SizePos=offset;//- -
+									
+									if(code.value.CatchRegister>-1){
+										data[offset++]=code.value.CatchRegister;
+									}else{
+										data.position=offset;
+										data.writeUTFBytes(code.value.CatchName+"\x00");
+										offset=data.length;
+									}
+									
+									posMarkArr[offset]=code;
+								break;
+								case AVM1Op.with_:
+									//先用 0 占位，后面一次性写入
+									data[offset++]=0x00;
+									data[offset++]=0x00;
+									posMarkArr[offset]=code.value;
+								break;
+								case AVM1Op.push:
+									//Type 				UI8 					0 = string literal
+									//											1 = floating-point literal
+									//											5 and later:
+									//											2 = null
+									//											3 = undefined
+									//											4 = register
+									//											5 = Boolean
+									//											6 = double
+									//											7 = integer
+									//											8 = constant 8
+									//											9 = constant 16
+									//String 			If Type = 0, STRING 	Null-terminated character string
+									//Float 			If Type = 1, FLOAT 		32-bit IEEE single-precision little-endian floating-point value
+									//RegisterNumber 	If Type = 4, UI8 		Register number
+									//Boolean 			If Type = 5, UI8 		Boolean value
+									//Double 			If Type = 6, DOUBLE 	64-bit IEEE double-precision littleendian double value
+									//Integer 			If Type = 7, UI32 		32-bit little-endian integer
+									//Constant8 		If Type = 8, UI8 		Constant pool index (for indexes < 256) (see _constants)
+									//Constant16 		If Type = 9, UI16 		Constant pool index (for indexes >= 256) (see _constants)
+									for each(subValue in code.value){
+										switch(subValue){
+											case null:
+												data[offset++]=0x02;
+											break;
+											case undefined:
+												data[offset++]=0x03;
+											break;
+											case true:
+												data[offset++]=0x05;
+												data[offset++]=0x01;
+											break;
+											case false:
+												data[offset++]=0x05;
+												data[offset++]=0x00;
+											break;
+											default:
+												if(subValue is String){
+													if(constCode&&constStrMark["~"+subValue]>-1){
+														if(constStrMark["~"+subValue]>0xff){
+															data[offset++]=0x09;
+															data[offset++]=constStrMark["~"+subValue];
+															data[offset++]=constStrMark["~"+subValue]>>8;
+														}else{
+															data[offset++]=0x08;
+															data[offset++]=constStrMark["~"+subValue];
+														}
+													}else{
+														data[offset++]=0x00;
+														data.position=offset;
+														data.writeUTFBytes(subValue+"\x00");
+														offset=data.length;
+													}
+												}else if(subValue is int){
+													data[offset++]=0x07;
+													data[offset++]=subValue;
+													data[offset++]=subValue>>8;
+													data[offset++]=subValue>>16;
+													data[offset++]=subValue>>24;
+												}else if(subValue is AVM1Register){
+													data[offset++]=0x04;
+													data[offset++]=subValue.registerId;
+												}else if(isNaN(subValue)){
+													throw new Error("未知 subValue: "+subValue);
+												}else{
+													data[offset++]=0x06;
+													numData.position=0;
+													numData.writeDouble(subValue);
+													data[offset++]=numData[3];
+													data[offset++]=numData[2];
+													data[offset++]=numData[1];
+													data[offset++]=numData[0];
+													data[offset++]=numData[7];
+													data[offset++]=numData[6];
+													data[offset++]=numData[5];
+													data[offset++]=numData[4];
+												}
+											break;
+										}
+									}
+								break;
+								case AVM1Op.getURL2:
+									//SendVarsMethod 		UB[2] 					0 = None
+									//												1 = GET
+									//												2 = POST
+									//Reserved 				UB[4] 					Always 0
+									//LoadTargetFlag 		UB[1] 					0 = Target is a browser window
+									//												1 = Target is a path to a sprite
+									//LoadVariablesFlag 	UB[1] 					0 = No variables to load
+									//												1 = Load variables
+									
+									data[offset++]=
+										(code.value.SendVarsMethod<<6)
+										|
+										(code.value.LoadTargetFlag<<1)
+										|
+										code.value.LoadVariablesFlag;
+								break;
+								case AVM1Op.function_:
+									//FunctionName 			STRING 				Function name, empty if anonymous
+									//NumParams 			UI16 				# of parameters
+									//param 1 				STRING 				Parameter name 1
+									//param 2 				STRING 				Parameter name 2
+									//...
+									//param N 				STRING 				Parameter name N
+									//codeSize 				UI16 				# of bytes of code that follow
+									
+									data.position=offset;
+									data.writeUTFBytes(code.value.FunctionName+"\x00");
+									offset=data.length;
+									data[offset++]=code.value.paramArr.length;
+									data[offset++]=code.value.paramArr.length>>8;
+									data.position=offset;
+									for each(var param:String in code.value.paramArr){
+										data.writeUTFBytes(param+"\x00");
+									}
+									offset=data.length;
+									//先用 0 占位，后面一次性写入
+									data[offset++]=0x00;
+									data[offset++]=0x00;
+									posMarkArr[offset]=code.value.endMark;
+								break;
+								case AVM1Op.branch:
+								case AVM1Op.branchIfTrue:
+									//先用 0 占位，后面一次性写入
+									data[offset++]=0x00;
+									data[offset++]=0x00;
+									posMarkArr[offset]=code.value;
+								break;
+								case AVM1Op.callFrame:
+									//
+								break;
+								case AVM1Op.gotoFrame2:
+									//Reserved 			UB[6] 						Always 0
+									//SceneBiasFlag 	UB[1] 						Scene bias flag
+									//Play flag 		UB[1] 						0 = Go to frame and stop
+									//												1 = Go to frame and play
+									//SceneBias 		If SceneBiasFlag = 1, UI16 	Number to be added to frame determined by stack argument
+									
+									if(code.value.SceneBias>-1){
+										data[offset++]=0x02|code.value.Play;	//00000011
+										data[offset++]=code.value.SceneBias;
+										data[offset++]=code.value.SceneBias>>8;
+									}else{
+										data[offset++]=code.value.Play;			//00000001
+									}
+								break;
+								default:
+									throw new Error("未知 op: "+code.op);
+								break;
+							}
+							
+							Length=offset-pos-3;
+							data[pos+1]=Length;
+							data[pos+2]=Length>>8;
+						}
+					}
+				}
+			}
+			
+			var endOffset:int=data.length;
+			for(offset=0;offset<=endOffset;offset++){
+				if(posMarkArr[offset]){
+					if(posMarkArr[offset] is AVM1LabelMark){
+						labelMark=posMarkArr[offset];
+						jumpOffset=labelMark.pos-offset;
+						data[offset-2]=jumpOffset;
+						data[offset-1]=jumpOffset>>8;
+					}else{
+						code=posMarkArr[offset];
+						if(code.op==AVM1Op.try_){
+							var TrySize:int=code.value.TryBody.pos-offset;
+							data[code.value.SizePos-6]=TrySize;
+							data[code.value.SizePos-5]=TrySize>>8;
+							if(code.value.CatchBody){
+								var CatchSize:int=code.value.CatchBody.pos-offset-TrySize;
+								data[code.value.SizePos-4]=CatchSize;
+								data[code.value.SizePos-3]=CatchSize>>8;
+							}
+							if(code.value.FinallyBody){
+								var FinallySize:int=code.value.FinallyBody.pos-offset-TrySize-CatchSize;
+								data[code.value.SizePos-2]=FinallySize;
+								data[code.value.SizePos-1]=FinallySize>>8;
+							}
+						}else{
+							throw new Error("发现 posMarkArr 里的奇怪的 code, code.op="+code.op);
+						}
+					}
+				}
+			}
+			
+			return data;
+		}
+		
+		////
+		CONFIG::toXMLAndInitByXML {
+		public function toXML(xmlName:String):XML{
+			var labelMark:AVM1LabelMark;
+			var subValue:*,subStr:String;
+			if(codeArr.length){
+				var codesStr:String="";
+				for each(var code:* in codeArr){
+					if(code is AVM1LabelMark){
+						codesStr+="\t\t\t\tlabel"+(code as AVM1LabelMark).labelId+":\n";
+					}else if(code is Array){
+						codesStr+="\t\t\t\t\t"+code.join(" ")+"\n";
+					}else{
+						if(code is int){
+							codesStr+="\t\t\t\t\t"+AVM1Op.opNameV[code];
+						}else if(code is AVM1Code){
+							if(code.op==AVM1Op.constants){
+								//codesStr+="\t\t\t\t\t//"+AVM1Op.opNameV[code.op];//- -
+								codesStr+="\t\t\t\t\t"+AVM1Op.opNameV[code.op];trace("暂时不使用自动注解");
+							}else{
+								codesStr+="\t\t\t\t\t"+AVM1Op.opNameV[code.op];
+							}
+							if(code.op<0x80){
+								throw new Error("请直接用 int");
+							}else{
+								switch(code.op){
+									case AVM1Op.gotoFrame:
+										codesStr+=" "+code.value;
+									break;
+									case AVM1Op.getURL:
+										codesStr+=" \""+ZeroCommon.esc_xattr(code.value.UrlString)+"\",\""+ZeroCommon.esc_xattr(code.value.TargetString)+"\"";
+									break;
+									case AVM1Op.setRegister:
+										codesStr+=" "+code.value;
+									break;
+									case AVM1Op.constants:
+										subStr="";
+										for each(subValue in code.value){
+											subStr+=",\""+ZeroCommon.esc_xattr(subValue)+"\"";
+										}
+										codesStr+=" "+subStr.substr(1);
+									break;
+									case AVM1Op.ifFrameLoaded:
+										codesStr+=" "+code.value.Frame+","+code.value.SkipCount;
+										Outputer.output("ifFrameLoaded 应该用 labelMark","brown");
+									break;
+									case AVM1Op.setTarget:
+										codesStr+=" \""+ZeroCommon.esc_xattr(code.value)+"\"";
+									break;
+									case AVM1Op.gotoLabel:
+										codesStr+=" \""+ZeroCommon.esc_xattr(code.value)+"\"";
+									break;
+									case AVM1Op.ifFrameLoadedExpr:
+										codesStr+=" "+code.value;
+										Outputer.output("ifFrameLoadedExpr 应该用 labelMark","brown");
+									break;
+									case AVM1Op.function2:
+										throw new Error("未处理");
+									break;
+									case AVM1Op.try_:
+										if(code.value.CatchRegister>-1){
+											codesStr+=" r:"+code.value.CatchRegister;
+										}else{
+											codesStr+=" "+code.value.CatchName;
+										}
+										codesStr+="[end try with label"+code.value.TryBody.labelId+"]";
+										if(code.value.CatchBody){
+											codesStr+="[end catch with label"+code.value.CatchBody.labelId+"]";
+										}
+										if(code.value.FinallyBody){
+											codesStr+="[end finally with label"+code.value.FinallyBody.labelId+"]";
+										}
+									break;
+									case AVM1Op.with_:
+										codesStr+=" [end with label"+code.value.labelId+"]";
+									break;
+									case AVM1Op.push:
+										subStr="";
+										for each(subValue in code.value){
+											if(subValue is String){
+												subStr+=",\""+ZeroCommon.esc_xattr(subValue)+"\"";
+											}else if(subValue is AVM1Register){
+												subStr+=",r:"+subValue.registerId;
+											}else{
+												subStr+=","+subValue;
+											}
+										}
+										codesStr+=" "+subStr.substr(1);
+									break;
+									case AVM1Op.getURL2:
+										codesStr+=" "+code.value.SendVarsMethod+","+code.value.LoadTargetFlag+","+code.value.LoadVariablesFlag;
+									break;
+									case AVM1Op.function_:
+										subStr="";
+										for each(var param:String in code.value.paramArr){
+											subStr+=","+ZeroCommon.esc_xattr(param);
+										}
+										codesStr+=" "+code.value.FunctionName+"("+subStr.substr(1)+")[end with label"+code.value.endMark.labelId+"]";
+									break;
+									case AVM1Op.branch:
+									case AVM1Op.branchIfTrue:
+										codesStr+=" label"+code.value.labelId;
+									break;
+									case AVM1Op.callFrame:
+										//
+									break;
+									case AVM1Op.gotoFrame2:
+										if(code.value.SceneBias>-1){
+											codesStr+=" "+code.value.Play+","+code.value.SceneBias;
+										}else{
+											codesStr+=" "+code.value.Play;
+										}
+									break;
+									default:
+										throw new Error("未知 op: "+code.op);
+									break;
+								}
+							}
+						}else{
+							throw new Error("未知 code: "+code);
+						}
+						codesStr+="\n";
+					}
+				}
+				
+				return new XML("<"+xmlName+"><![CDATA[\n"+
+					codesStr
+					+"\t\t\t\t]]></"+xmlName+">");
+			}
+			return <{xmlName}/>;
+		}
+		public function initByXML(xml:XML):void{
+			var codeStrArr:Array=xml.toString().split("\n");
+			var codeId:int=-1;
+			codeArr=new Array();
+			var code:AVM1Code;
+			
+			var codeStr:String;
+			var i:int=codeStrArr.length;
+			var labelMarkMark:Object=new Object();
+			var labelMark:AVM1LabelMark;
+			
+			var subStr:*;
+			
+			var execResult:Array;
+			
+			while(--i>=0){
+				codeStrArr[i]=codeStr=codeStrArr[i].replace(/^\s*|\s*$/g,"");
+				if(codeStr){
+					if(codeStr.indexOf("//")==0){
+						//注解
+						codeStrArr.splice(i,1);
+					}
+				}else{
+					//空白
+					codeStrArr.splice(i,1);
+				}
+				if(/^label(\d+):$/.test(codeStr)){
+					if(labelMarkMark[codeStr]){
+						throw new Error("重复的 labelMark: "+codeStr);
+					}
+					labelMarkMark[codeStr]=labelMark=new AVM1LabelMark();
+					labelMark.labelId=int(codeStr.replace(/label(\d+):/,"$1"));
+				}
+			}
+			for each(codeStr in codeStrArr){
+				
+				//trace("codeStr="+codeStr);
+				
+				if(/^label(\d+):$/.test(codeStr)){
+					codeArr[++codeId]=labelMarkMark[codeStr];
+				}else if(codeStr.search(/(0x([0-9a-fA-F]+)|\d+)\s+/)==0){
+					var numArr:Array=new Array();
+					for each(var numStr:String in codeStr.split(/\s+/)){
+						if(numStr){
+							numArr[numArr.length]=int(numStr);
+						}
+					}
+					codeArr[++codeId]=numArr;
+				}else{
+					var pos:int=codeStr.search(/\s+/);
+					var opStr:String;
+					if(pos==-1){
+						opStr=codeStr;
+					}else{
+						opStr=codeStr.substr(0,pos);
+					}
+					if(AVM1Op.ops[opStr]>=0){
+						var op:int=AVM1Op.ops[opStr];
+						
+						codeStr=codeStr.substr(pos).replace(/^\s*|\s*$/g,"");
+						if(op<0x80){
+							codeArr[++codeId]=op;
+						}else{
+							switch(op){
+								case AVM1Op.gotoFrame:
+									code=new AVM1Code(op,int(codeStr));
+								break;
+								case AVM1Op.getURL:
+									execResult=/"(.*?)"\s*,\s*"(.*?)"/.exec(codeStr);
+									code=new AVM1Code(op,{
+										UrlString:ZeroCommon.unesc_xattr(execResult[1]),
+										TargetString:ZeroCommon.unesc_xattr(execResult[2])
+									});
+								break;
+								case AVM1Op.setRegister:
+									code=new AVM1Code(op,int(codeStr));
+								break;
+								case AVM1Op.constants:
+									code=new AVM1Code(op,[]);
+									for each(subStr in codeStr.match(/".*?"/g)){
+										code.value.push(ZeroCommon.unesc_xattr(subStr.substr(1,subStr.length-2)));
+									}
+								break;
+								case AVM1Op.ifFrameLoaded:
+									execResult=codeStr.split(/\s*,\s*/);
+									code=new AVM1Code(op,{
+										Frame:int(execResult[0]),
+										SkipCount:int(execResult[1])
+									});
+									Outputer.output("ifFrameLoaded 应该用 labelMark","brown");
+								break;
+								case AVM1Op.setTarget:
+									code=new AVM1Code(op,ZeroCommon.unesc_xattr(codeStr.substr(1,codeStr.length-2)));
+								break;
+								case AVM1Op.gotoLabel:
+									code=new AVM1Code(op,ZeroCommon.unesc_xattr(codeStr.substr(1,codeStr.length-2)));
+								break;
+								case AVM1Op.ifFrameLoadedExpr:
+									code=new AVM1Code(op,int(codeStr));
+									Outputer.output("ifFrameLoadedExpr 应该用 labelMark","brown");
+								break;
+								case AVM1Op.function2:
+									throw new Error("未处理");
+								break;
+								case AVM1Op.try_:
+									code=new AVM1Code(op,{});
+									execResult=/(.*?)\s*\[/.exec(codeStr);
+									//trace("execResult[1]="+execResult[1]);
+									if(execResult[1].indexOf("r:")==0){
+										code.value.CatchRegister=int(execResult[1].substr(2));
+									}else{
+										code.value.CatchName=execResult[1];
+									}
+									for each(subStr in codeStr.match(/\[.*?\]/g)){
+										execResult=/\[\s*end\s+(.*?)\s+with\s+(label\d+)\s*\]/.exec(subStr);
+										labelMark=labelMarkMark[execResult[2]+":"];
+										if(labelMark){
+										}else{
+											throw new Error("找不到对应的 labelMark: "+subStr);
+										}
+										switch(execResult[1]){
+											case "try":
+												code.value.TryBody=labelMark;
+											break;
+											case "catch":
+												code.value.CatchBody=labelMark;
+											break;
+											case "finally":
+												code.value.FinallyBody=labelMark;
+											break;
+										}
+									}
+								break;
+								case AVM1Op.with_:
+									execResult=/\[\s*end\s+with\s+(label\d+)\s*\]/.exec(codeStr);
+									labelMark=labelMarkMark[execResult[1]+":"];
+									if(labelMark){
+										code=new AVM1Code(op,labelMark);
+									}else{
+										throw new Error("找不到对应的 labelMark: "+codeStr);
+									}
+								break;
+								case AVM1Op.push:
+									code=new AVM1Code(op,[]);
+									while(codeStr){
+										if(codeStr.charAt(0)=="\""){
+											var nextQuotPos:int=codeStr.indexOf("\"",1);
+											if(nextQuotPos>-1){
+												code.value.push(ZeroCommon.unesc_xattr(codeStr.substr(1,nextQuotPos-1)));
+											}else{
+												throw new Error("找不到配对的双引号");
+											}
+											codeStr=codeStr.substr(nextQuotPos+1).replace(/^\s*,\s*/,"");
+										}else{
+											var nextCommaPos:int=codeStr.search(/\s*,\s*/);
+											if(nextCommaPos>-1){
+											}else{
+												nextCommaPos=codeStr.length;
+											}
+											subStr=codeStr.substr(0,nextCommaPos);
+											switch(subStr){
+												case "null":
+													code.value.push(null);
+												break;
+												case "undefined":
+													code.value.push(undefined);
+												break;
+												case "true":
+													code.value.push(true);
+												break;
+												case "false":
+													code.value.push(false);
+												break;
+												default:
+													if(isNaN(subStr)){
+														if(subStr.indexOf("r:")==0){
+															code.value.push(new AVM1Register(int(subStr.substr(2))));
+														}else{
+															throw new Error("未知 subStr: "+subStr);
+														}
+													}else{
+														code.value.push(Number(subStr));
+													}
+												break;
+											}
+											codeStr=codeStr.substr(nextCommaPos+1).replace(/^\s*,\s*/,"");
+										}
+									}
+									//trace("code.value="+code.value.join("\n--------\n"));
+								break;
+								case AVM1Op.getURL2:
+									execResult=codeStr.split(/\s*,\s*/);
+									code=new AVM1Code(op,{
+										SendVarsMethod:int(execResult[0]),
+										LoadTargetFlag:int(execResult[1]),
+										LoadVariablesFlag:int(execResult[2])
+									});
+								break;
+								case AVM1Op.function_:
+									execResult=/(.*?)\s*\(\s*(.*?)\s*\)\s*\[\s*end\s+with\s+(label\d+)\s*\]/.exec(codeStr);
+									code=new AVM1Code(op,{
+										FunctionName:ZeroCommon.unesc_xattr(execResult[1]),
+										paramArr:[]
+									});
+									if(execResult[2]){
+										for each(var param:String in execResult[2].split(/\s*,\s*/)){
+											//trace("param="+param);
+											code.value.paramArr.push(param);
+										}
+									}
+									code.value.endMark=labelMarkMark[execResult[3]+":"];
+									if(code.value.endMark){
+									}else{
+										throw new Error("找不到对应的 endMark: "+codeStr);
+									}
+								break;
+								case AVM1Op.branch:
+								case AVM1Op.branchIfTrue:
+									labelMark=labelMarkMark[codeStr+":"];
+									if(labelMark){
+										code=new AVM1Code(op,labelMark);
+									}else{
+										throw new Error("找不到对应的 labelMark: "+codeStr);
+									}
+								break;
+								case AVM1Op.callFrame:
+									code=new AVM1Code(op);
+								break;
+								case AVM1Op.gotoFrame2:
+									execResult=codeStr.split(/\s*,\s*/);
+									if(execResult.length>1){
+										code=new AVM1Code(op,{
+											Play:int(execResult[0]),
+											SceneBias:int(execResult[1])
+										});
+									}else{
+										code=new AVM1Code(op,{
+											Play:int(execResult[0])
+										});
+									}
+								break;
+								default:
+									throw new Error("未知 op: "+op);
+								break;
+							}
+							codeArr[++codeId]=code;
+						}
+					}else{
+						throw new Error("未知 codeStr: "+codeStr);
+					}
+				}
+				
+				//trace("code="+codeArr[codeId]);
+				//trace("--------------------------------------");
 			}
 		}
+		}//end of CONFIG::toXMLAndInitByXML
 	}
 }
 

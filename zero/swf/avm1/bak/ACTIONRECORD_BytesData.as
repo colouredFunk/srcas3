@@ -1,48 +1,32 @@
 /***
-ActionRecordObj 版本:v1.0
+ACTIONRECORD 版本:v1.0
 简要说明:这家伙很懒什么都没写
 创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年12月16日 16:33:29
+创建时间:2010年8月31日 14:22:20
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
 
 package zero.swf.avm1{
-	public class ActionRecordObj{
-		public var op:int;
-		public var value:*;
-		
-		public function ActionRecordObj(_op:int,_value:*=undefined){
-			op=_op;
-			value=_value;
+	import flash.display.*;
+	import flash.events.*;
+	import flash.utils.*;
+	
+	import zero.swf.BytesData;
+	
+	public class ACTIONRECORD extends BytesData{
+		public static var actionRecordV:Vector.<ACTIONRECORD>;
+		public static function reset():void{
+			actionRecordV=new Vector.<ACTIONRECORD>();
+		}
+		public static function clear():void{
+			actionRecordV=null;
 		}
 		
-		public function toString():String{
-			var str:String;
-			if(value is String){
-				str='"'+value+'"';
-			}else if(value){
-				switch(value.constructor){
-					case Object:
-						str='';
-						for(var valueName:String in value){
-							if(value[valueName] is String){
-								str+=','+valueName+':"'+value[valueName]+'"';
-							}else{
-								str+=','+valueName+':'+value[valueName];
-							}
-						}
-						str="{"+str.substr(1)+"}";
-					break;
-					case Vector.<String>:
-						str='"'+value.join('","')+'"';
-					break;
-					default:
-						str=value;
-					break;
-				}	
+		public function ACTIONRECORD(){
+			if(actionRecordV){
+				actionRecordV[actionRecordV.length]=this;
 			}
-			return Op.opNameV[op]+"("+op+") "+str;
 		}
 	}
 }

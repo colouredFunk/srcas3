@@ -18,7 +18,7 @@ package zero.swf.funs{
 	
 	public class PutInSceneObjs{
 		private static var tagAndClassNameByDefIdArr:Array;
-		private static var putInSceneSpriteArr:Array;
+		public static var putInSceneSpriteArr:Array;
 		public static var classNameByDefIdArr:Array;
 		public static var classNameMark:Object;
 		public static function init(swf:SWF2):void{
@@ -75,7 +75,7 @@ package zero.swf.funs{
 			if(classNameByDefIdArr[0]){
 				classNameMark["~"+classNameByDefIdArr[0]]=true;//文档类
 			}
-			putInSceneSpriteArr=null;
+			//putInSceneSpriteArr=null;
 		}
 		
 		private static function getObjsPutInScene(placeObject:*):void{

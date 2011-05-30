@@ -36,7 +36,7 @@ package zero.ui{
 			_wid:int=0,
 			_hei:int=0,
 			_onShowBottomBar:Function=null
-			){
+		){
 			gameMainClassName=_gameMainClassName;
 			if(_wid>0){
 				wid=_wid;

@@ -120,7 +120,8 @@ package zero.swf.funs{
 			swf:SWF2,
 			classNameArr:Array,
 			traitsNameArr:Array,
-			fun:Function
+			fun:Function,
+			debug:Boolean=true//20110525
 		):void{
 			DoABCWithoutFlagsAndName.setDecodeABC(AdvanceABC);
 			var tag:Tag,advanceABC:AdvanceABC,clazz:AdvanceClass;
@@ -181,9 +182,16 @@ package zero.swf.funs{
 			}
 			DoABCWithoutFlagsAndName.setDecodeABC(null);
 			
-			for(className in classNameMark){
-				throw new Error("找不到 class: "+className);
-				break;
+			if(debug){
+				for(className in classNameMark){
+					throw new Error("找不到 class: "+className);
+					break;
+				}
+			}else{
+				for(className in classNameMark){
+					trace("找不到 class: "+className);
+					break;
+				}
 			}
 		}
 		

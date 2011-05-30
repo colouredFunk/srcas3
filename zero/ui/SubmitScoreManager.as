@@ -15,7 +15,7 @@ package zero.ui{
 	
 	import zero.*;
 	
-	public class SubmitScoreManager extends Loader{
+	public class SubmitScoreManager{
 		public static var loader:Loader;
 		public static var submitScore:Sprite;
 		
@@ -29,8 +29,8 @@ package zero.ui{
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,loadSubmitScoreError);
 			
 			try{
-				//loader.load(new URLRequest(ZeroCommon.path_SubmitScore));
-				loader.load(new URLRequest(ZeroCommon.path_SubmitScore+"?"+Math.random()));trace("测试，添加随机数字");
+				loader.load(new URLRequest(ZeroCommon.path_SubmitScore));
+				//loader.load(new URLRequest(ZeroCommon.path_SubmitScore+"?"+Math.random()));trace("测试，添加随机数字");
 			}catch(e:Error){}
 		}
 		private static function loadSubmitScoreComplete(event:Event):void{
