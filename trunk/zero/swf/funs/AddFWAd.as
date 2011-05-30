@@ -16,9 +16,9 @@ package zero.swf.funs{
 	
 	import zero.*;
 	import zero.swf.*;
-	import zero.swf.avm1.Op;
 	import zero.swf.avm2.*;
 	import zero.swf.avm2.advances.*;
+	import zero.swf.avm2.advances.Op;
 	import zero.swf.funs.*;
 	import zero.swf.records.MATRIX;
 	import zero.swf.tagBodys.*;
@@ -93,8 +93,6 @@ package zero.swf.funs{
 			}
 		}
 		
-		
-		
 		private static function removeTraits_infos(
 			clazz:AdvanceClass,
 			traits_infoV:Vector.<AdvanceTraits_info>,
@@ -102,6 +100,39 @@ package zero.swf.funs{
 			traitsName:String
 		):void{
 			traits_infoV.splice(id,1);
+		}
+		private static function repair_RuntimeFlash_loadInitialState(
+			clazz:AdvanceClass,
+			traits_infoV:Vector.<AdvanceTraits_info>,
+			id:int,
+			traitsName:String
+		):void{
+			try{
+				var code1:Code,code2:Code;
+				var i:int=0;
+				var codeArr:Array=traits_infoV[id].methodi.codes.codeArr;
+				for each(var code:* in codeArr){
+					if(code is Code){
+						code1=code;
+						if(code1.op==Op.getproperty&&code1.value.name=="loader"){
+							if(codeArr[i+1] is Code){
+								code2=codeArr[i+1];
+								if(code2.op==Op.getproperty&&code2.value.name=="loaderInfo"){
+									code2.value=new AdvanceMultiname_info();
+									code2.value.kind=MultinameKind.QName;
+									code2.value.ns=new AdvanceNamespace_info();
+									code2.value.ns.kind=NamespaceKind.PackageNamespace;
+									code2.value.ns.name="";
+									code2.value.name="contentLoaderInfo";
+									return;
+								}
+							}
+						}
+					}
+					i++;
+				}
+			}catch(e:Error){
+			}
 		}
 		
 		
@@ -233,7 +264,7 @@ package zero.swf.funs{
 						
 						swf.tagV.splice(insertPos++,0,defineSpriteTag);
 						
-						break;
+					break;
 					case FileTypes.JPG:
 					case FileTypes.PNG:
 					case FileTypes.GIF:
@@ -252,10 +283,10 @@ package zero.swf.funs{
 						placeObject2.CharacterId=defineShapeTag.getDefId();
 						
 						swf.tagV.splice(insertPos++,0,defineBitsJPEG2Tag);
-						break;
+					break;
 					default:
 						throw new Error("不支持的文件类型："+fileType);
-						break;
+					break;
 				}
 				
 				fwAdAS1Sprite.dataAndTags.tagV.splice(fwAdAS1Sprite.dataAndTags.tagV.length-2,0,placeBgTag);
@@ -284,7 +315,7 @@ package zero.swf.funs{
 					case TagType.ImportAssets:
 					case TagType.ImportAssets2:
 						return i;
-						break;
+					break;
 				}
 				i++;
 			}
@@ -312,7 +343,7 @@ package zero.swf.funs{
 			var resInserter:ResInserter=new ResInserter(swf.tagV);
 			
 			if(prevLoaderBgData){
-				prevLoaderBgBytesData=resInserter.insert(prevLoaderBgData,"PrevLoaderBgData",ResInserter.DATA,2);
+				prevLoaderBgBytesData=resInserter.insert(prevLoaderBgData,"PrevLoaderBgData",ResInserter.DATA,0);
 			}else{
 				prevLoaderBgBytesData=null;
 			}
@@ -326,17 +357,27 @@ package zero.swf.funs{
 				if(b_addStage){
 					Za7Za8.forEachClasses(gameSWF,PutInSceneObjs.classNameMark,addStage);
 				}
+				
+				//针对1
+				Za7Za8.forEachTraits(
+					gameSWF,
+					["RuntimeFlash"],
+					["loadInitialState"],
+					repair_RuntimeFlash_loadInitialState,
+					false
+				);
+				//
 			}
 			
-			gameBytesData=resInserter.insert(gameSWF.toSWFData(),"GameArtworksSWFData",ResInserter.DATA,4);
+			gameBytesData=resInserter.insert(gameSWF.toSWFData(),"GameArtworksSWFData",ResInserter.DATA,1);
 			
 			prevLoaderSWF=new SWF2();
 			prevLoaderSWF.initBySWFData(ReplaceStrs.replace(
-				new PrevLoaderSWFData(),
+				new PrevLoaderSWFData_AS3(),
 				["${id}","${noShowLogo}","${noShowForbidden}"],
 				[FWAd_ID,"",""]
 			));
-			prevLoaderBytesData=resInserter.insert(prevLoaderSWF.toSWFData(),"PrevLoaderSWFData",ResInserter.DATA,1);
+			prevLoaderBytesData=resInserter.insert(prevLoaderSWF.toSWFData(),"PrevLoaderSWFData",ResInserter.DATA,0);
 			
 			resInserter.getTagVAndReset();//把插入的 datas 插入到 swf.tagV 里
 			
@@ -422,26 +463,26 @@ package zero.swf.funs{
 					case TagType.DoABC:
 					case TagType.DoABCWithoutFlagsAndName:
 						for each(var clazz:AdvanceClass in ((tag.getBody() as DoABCWithoutFlagsAndName).abc as AdvanceABC).clazzV){
-						for each(traits_info in clazz.itraits_infoV){
-							//trace(TraitTypes.typeV[traits_info.kind_trait_type]);
-							switch(traits_info.kind_trait_type){
-								case TraitTypes.Slot:
-								case TraitTypes.Const:
+							for each(traits_info in clazz.itraits_infoV){
+								//trace(TraitTypes.typeV[traits_info.kind_trait_type]);
+								switch(traits_info.kind_trait_type){
+									case TraitTypes.Slot:
+									case TraitTypes.Const:
 									break;
-								case TraitTypes.Method:
-								case TraitTypes.Getter:
-								case TraitTypes.Setter:
-									//trace("----------"+traits_info.name.name);
-									traits_info.disp_id=0;//否则可能会出错
-									codeSegss.OverrideStage[traits_info.name.name]=traits_info;
+									case TraitTypes.Method:
+									case TraitTypes.Getter:
+									case TraitTypes.Setter:
+										//trace("----------"+traits_info.name.name);
+										traits_info.disp_id=0;//否则可能会出错
+										codeSegss.OverrideStage[traits_info.name.name]=traits_info;
 									break;
-								case TraitTypes.Function:
-								case TraitTypes.Clazz:
+									case TraitTypes.Function:
+									case TraitTypes.Clazz:
 									break;
+								}
 							}
 						}
-					}
-						break;
+					break;
 				}
 			}
 			DoABCWithoutFlagsAndName.setDecodeABC(null);

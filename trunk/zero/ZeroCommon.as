@@ -54,8 +54,8 @@ package zero{
 		}();
 		
 		public static const domain:String=function():String{
-			var domain:String="zero.flashwing.net";
-			//var domain:String="localhost/zero.flashwing.net";
+			//var domain:String="zero.flashwing.net";
+			var domain:String="localhost/zero.flashwing.net";
 			
 			if(FileClass){
 			}else{
@@ -69,7 +69,8 @@ package zero{
 		public static const path_common:String="http://"+domain+"/common/";
 		public static const path_ZeroPrevLoader:String=path_common+"ZeroPrevLoader.swf";
 		public static const path_BottomBar:String=path_common+"BottomBar.swf";
-		public static const path_Paihangbang:String=path_common+"Paihangbang.swf";
+		//public static const path_HighScores:String=path_common+"HighScores.swf";
+		public static const path_HighScores:String=path_common+"HighScores_encrypt.swf";
 		//public static const path_SubmitScore:String=path_common+"SubmitScore.swf";
 		public static const path_SubmitScore:String=path_common+"SubmitScore_encrypt.swf";
 		public static const path_getMsg:String=path_common+"getMsg.php";
@@ -95,6 +96,7 @@ package zero{
 		//public static const path_photodiy_album_swf_PhotoDIY_SrcGetter:String=path_photodiy_album+"swf/PhotoDIY_SrcGetter.swf";
 		
 		public static const path_photodiy_Card2011:String=path_photodiy+"Card2011/";
+		//public static const path_photodiy_Card2011_Card_encrypt:String=path_photodiy_Card2011+"Card.swf";
 		public static const path_photodiy_Card2011_Card_encrypt:String=path_photodiy_Card2011+"Card_encrypt.swf";
 		public static const path_photodiy_Card2011_motionList:String=path_photodiy_Card2011+"motionList.xml";
 		public static const path_photodiy_Card2011_uploadFiles:String=path_photodiy_Card2011+"uploadFiles.php";
@@ -222,6 +224,7 @@ package zero{
 			return str;
 		}
 		public static function unesc_xattr(str:String):String{
+			//trace("str="+str);
 			//esc_xattr 的反向操作
 			if(str){
 				return new XML("<string value=\""+str+"\"/>").@value.toString();
