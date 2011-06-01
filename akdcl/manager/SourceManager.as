@@ -17,8 +17,6 @@ package akdcl.manager {
 			return instance;
 		}
 
-		private var sourceGroup:Object;
-
 		public function SourceManager(){
 			if (instance){
 				throw new Error("ERROR:SourceManager Singleton already constructed!");
@@ -26,6 +24,8 @@ package akdcl.manager {
 			instance = this;
 			sourceGroup = {};
 		}
+
+		private var sourceGroup:Object;
 
 		public function addGroup(_groupID:String):void {
 			if (sourceGroup[_groupID]){

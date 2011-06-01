@@ -183,7 +183,8 @@
 			return labelList;
 		}
 		public function set label(_label:*):void {
-			if (_label is Number) {
+			if ((_label is Number) || !isNaN(_label)) {
+				_label = Number(_label);
 				switch(_label) {
 					case 0:
 						_label = "";
@@ -307,8 +308,8 @@
 		}
 		public function moveToCenter():void {
 			if (alertPoint) {
-				x = alertPoint.x;
-				y = alertPoint.y;
+				x = int(alertPoint.x - barWidth * 0.5);
+				y = int(alertPoint.y - barHeight * 0.5);
 			}else {
 				if (!stage) {
 					return;
