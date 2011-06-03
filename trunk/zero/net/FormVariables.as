@@ -76,8 +76,8 @@ package zero.net{
 					//	throw new Error("请设置 default_extName");
 					//}
 					
-					var filename:String=filenames[name];
 					/*
+					var filename:String=filenames[name];
 					if(filename){
 						var dotId:int=filename.lastIndexOf(".");
 						if(dotId>0){
@@ -88,6 +88,18 @@ package zero.net{
 						//throw new Error("请提供 filename");
 					}
 					*/
+					
+					var filename:String=filenames[name];
+					if(filename){
+						var dotId:int=filename.lastIndexOf(".");
+						if(dotId>0){
+							filename=filename.substr(0,dotId)+filename.substr(dotId);
+						}
+					}else{
+						filename="file_"+int(Math.random()*int.MAX_VALUE)+"."+FileTypes.getType(values[name]);
+						//throw new Error("请提供 filename");
+					}
+					
 					data.writeUTFBytes(
 						"Content-Disposition: form-data; name=\"" + name + 
 						"\"; filename=\"" + filename +
