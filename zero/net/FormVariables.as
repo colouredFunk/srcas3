@@ -77,6 +77,7 @@ package zero.net{
 					//}
 					
 					var filename:String=filenames[name];
+					/*
 					if(filename){
 						var dotId:int=filename.lastIndexOf(".");
 						if(dotId>0){
@@ -86,6 +87,7 @@ package zero.net{
 						filename=escapeMultiByte(name+int(Math.random()*int.MAX_VALUE))+"."+FileTypes.getType(values[name]);
 						//throw new Error("请提供 filename");
 					}
+					*/
 					data.writeUTFBytes(
 						"Content-Disposition: form-data; name=\"" + name + 
 						"\"; filename=\"" + filename +
