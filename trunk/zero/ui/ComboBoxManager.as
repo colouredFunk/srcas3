@@ -92,6 +92,7 @@ package zero.ui{
 					cb.dataProvider=labelsXML2labelArr(xml.labels[0]);
 					cb.selectedIndex=int(xml.@currId.toString());
 				}
+				so.setXML(so_key,xml);
 			}else{
 				//
 			}
