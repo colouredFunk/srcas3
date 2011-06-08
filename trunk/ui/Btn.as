@@ -109,6 +109,8 @@
 		public function $release():void {
 			if (href) {
 				gotoURL(href, hrefTarget);
+			}else if (eEval && ExternalInterface.available) {
+				ExternalInterface.call("eval", eEval);
 			}
 		}
 	}
