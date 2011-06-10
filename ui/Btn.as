@@ -22,6 +22,7 @@
 		public var href:*;
 		public var hrefTarget:String = "_blank";
 		public var eEval:String;
+		public var isDown:Boolean;
 
 		public function set hrefXML(_hrefXML:XML):void {
 			href = _hrefXML;
@@ -106,7 +107,12 @@
 			super.onRemoveToStageHandler();
 		}
 		
+		public function $press():void {
+			isDown = true;
+		}
+		
 		public function $release():void {
+			isDown = false;
 			if (href) {
 				gotoURL(href, hrefTarget);
 			}else if (eEval && ExternalInterface.available) {
