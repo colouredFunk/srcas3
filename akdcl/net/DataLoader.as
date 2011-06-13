@@ -1,4 +1,5 @@
 ﻿package akdcl.net {
+	import flash.net.URLStream;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.net.URLVariables;
@@ -20,7 +21,9 @@
 	 * ...
 	 * @author Akdcl
 	 */
-	public class DataLoader extends URLLoader {
+	public class DataLoader extends URLStream {
+		public static var charSet:String = "utf-8";
+		
 		public static const TYPE_URL:String = "URL";
 		public static const TYPE_FORM:String = "FORM";
 		public static const TYPE_JSON:String = "JSON";
@@ -30,7 +33,7 @@
 		//private static var listLoading:Vector.<DataLoader> = new Vector.<DataLoader>();
 
 		//返回DataLoader实例，DataLoader的原理类似工厂模式，会重复使用DataLoader，所以尽量不要保持对DataLoader实例的引用。
-		public static function load(_url:*, _onProgressHandler:Function = null, _onCompleteHandler:Function = null, _onIOErrorHandler:Function = null, _data:Object = null, _dataType:String = null, _method:String = null, _charSet:String = "utf-8"):DataLoader {		//
+		public static function load(_url:*, _onProgressHandler:Function = null, _onCompleteHandler:Function = null, _onIOErrorHandler:Function = null, _data:Object = null, _dataType:String = null, _method:String = null):DataLoader {
 			var _dataLoader:DataLoader;
 			if (listReady.length > 0){
 				_dataLoader = listReady.pop();
@@ -53,7 +56,7 @@
 				if (_data["constructor"] === Object){
 					if (_dataType == TYPE_FORM){
 						var _formVars:FormVariables = new FormVariables(_data);
-						_formVars.charSet = _charSet;
+						_formVars.charSet = charSet;
 						request.contentType = _formVars.contentType;
 						request.data = _formVars.data;
 					} else if (_dataType == TYPE_JSON){
@@ -76,8 +79,6 @@
 			_dataLoader.load(request);
 			return _dataLoader;
 		}
-		
-		
 
 		private static function onCompleteOrIOErrorHandler(_evt:Event):void {
 			var _dataLoader:DataLoader = _evt.currentTarget as DataLoader;
@@ -86,6 +87,7 @@
 					_dataLoader.onIOErrorHandler(_evt);
 				}
 			} else {
+				_dataLoader.data = _dataLoader.readMultiByte(_dataLoader.bytesAvailable, charSet);
 				if (_dataLoader.onProgressHandler != null){
 
 				}
@@ -140,6 +142,14 @@
 				default:
 					return data;
 			}
+		}
+		
+		private var __data:*;
+		public function get data():*{
+			return __data;
+		}
+		public function set data(_data:*):void{
+			__data = _data;
 		}
 
 		public function remove():void {
