@@ -19,15 +19,18 @@ package zero.net{
 		
 		private var values:Object;
 		private var filenames:Object;
+		public var charSet:String;//20110613
 		
 		public var contentType:String;
 		public var boundary:String;
 		public function FormVariables(
 			_values:Object=null,
-			_filenames:Object=null
+			_filenames:Object=null,
+			_charSet:String="utf-8"
 		){
 			values=_values||new Object();
 			filenames=_filenames||new Object();
+			charSet=_charSet;
 			boundary="------------------------------7m";
 			for(var i:int=0;i<11;i++){
 				boundary+=int(Math.random()*16).toString(16);
@@ -59,7 +62,7 @@ package zero.net{
 			var data:ByteArray=new ByteArray();
 			for(var name:String in values){
 				var value:*=values[name];
-				data.writeUTFBytes("--" + boundary + "\r\n");
+				data.writeMultiByte("--" + boundary + "\r\n",charSet);
 				if(value is ByteArray){
 					
 					//trace(name+".length="+value.length);
@@ -100,23 +103,25 @@ package zero.net{
 						//throw new Error("请提供 filename");
 					}
 					
-					data.writeUTFBytes(
+					data.writeMultiByte(
 						"Content-Disposition: form-data; name=\"" + name + 
 						"\"; filename=\"" + filename +
-						"\"\r\nContent-Type: "+FileTypes.getContentType(values[name],filename)+"\r\n\r\n"
+						"\"\r\nContent-Type: "+FileTypes.getContentType(values[name],filename)+"\r\n\r\n",
+						charSet
 					);
 					data.writeBytes(values[name]);
-					data.writeUTFBytes("\r\n");
+					data.writeMultiByte("\r\n",charSet);
 				}else{
 					//trace(name+"=\""+value+"\"");
-					data.writeUTFBytes(
+					data.writeMultiByte(
 						"Content-Disposition: form-data; name=\"" + name + 
 						"\"\r\n\r\n"+values[name]+
-						"\r\n"
+						"\r\n",
+						charSet
 					);
 				}
 			}
-			data.writeUTFBytes("--" + this.boundary + "--\r\n");
+			data.writeMultiByte("--" + this.boundary + "--\r\n",charSet);
 			return data;
 		}
 	}
