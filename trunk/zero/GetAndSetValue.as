@@ -60,6 +60,9 @@ package zero{
 				}
 				return obj;
 			}
+			if(thisObj){
+				return thisObj;
+			}
 			return null;
 		}
 	}
