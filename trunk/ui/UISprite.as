@@ -4,7 +4,6 @@
 	import flash.events.Event;
 	
 	import ui.manager.EventManager;
-	import akdcl.utils.destroyObject;
 	
 	/**
 	 * ...
@@ -40,7 +39,9 @@
 		}
 		protected function onAddedToStageHandler(_evt:Event):void {
 			removeEventListener(Event.ADDED_TO_STAGE, onAddedToStageHandler);
-			addEventListener(Event.REMOVED_FROM_STAGE, onRemoveToStageDelayHandler);
+			if (autoRemove) {
+				addEventListener(Event.REMOVED_FROM_STAGE, onRemoveToStageDelayHandler);
+			}
 		}
 		private function onRemoveToStageDelayHandler(_evt:Event):void {
 			if (stage && stage.focus == this) {
@@ -61,8 +62,7 @@
 			hitArea = null;
 			contextMenu = null;
 			EventManager.removeTargetAllEvent(this);
-			removeChildren(this);
-			destroyObject(userData);
+			removeChildren();
 			userData = null;
 		}
 		public function remove():void {
@@ -73,6 +73,22 @@
 				onRemoveToStageHandler();
 			}
 		}
+		public function removeChildren():void {
+			var _length:uint = numChildren;
+			var _children:*;
+			for (var _i:int = _length; _i >= 0; _i-- ) {
+				try {
+					_children = getChildAt(_i);
+				}catch (_ero:*) {
+				}
+				if (_children && contains(_children)) {
+					if (_children is MovieClip) {
+						_children.stop();
+					}
+					removeChild(_children);
+				}
+			}
+		}
 		override public function addEventListener(_type:String, _listener:Function, _useCapture:Boolean = false, _priority:int = 0, _useWeakReference:Boolean = false):void {
 			super.addEventListener(_type, _listener, _useCapture, _priority, false);
 			EventManager.addTargetEvent(_type, _listener, this);
@@ -80,22 +96,6 @@
 		override public function removeEventListener(_type:String, _listener:Function, _useCapture:Boolean = false):void {
 			super.removeEventListener(_type, _listener, _useCapture);
 			EventManager.removeTargetEvent(_type, _listener, this);
-		}
-		public static function removeChildren(_disObj:*):void {
-			var _length:uint = _disObj.numChildren;
-			var _children:*;
-			for (var _i:int = _length; _i >= 0; _i-- ) {
-				try {
-					_children = _disObj.getChildAt(_i);
-				}catch (_ero:*) {
-				}
-				if (_children && _disObj.contains(_children)) {
-					if (_children is MovieClip) {
-						_children.stop();
-					}
-					_disObj.removeChild(_children);
-				}
-			}
 		}
 	}
 }

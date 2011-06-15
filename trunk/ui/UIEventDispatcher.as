@@ -2,8 +2,6 @@ package ui{
 	import flash.events.EventDispatcher;
 	import flash.events.Event;
 	
-	import akdcl.utils.destroyObject;
-	
 	import ui.manager.EventManager;
 	
 	/**
@@ -17,7 +15,6 @@ package ui{
 		}
 		public function remove():void {
 			EventManager.removeTargetAllEvent(this);
-			destroyObject(userData);
 			userData = null;
 		}
 		protected function init():void {
