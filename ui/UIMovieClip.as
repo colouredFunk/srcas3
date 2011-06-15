@@ -3,7 +3,6 @@ package ui{
 	import flash.events.Event;
 	
 	import ui.manager.EventManager;
-	import akdcl.utils.destroyObject;
 	
 	/**
 	 * ...
@@ -39,7 +38,9 @@ package ui{
 		}
 		protected function onAddedToStageHandler(_evt:Event):void {
 			removeEventListener(Event.ADDED_TO_STAGE, onAddedToStageHandler);
-			addEventListener(Event.REMOVED_FROM_STAGE, onRemoveToStageDelayHandler);
+			if (autoRemove) {
+				addEventListener(Event.REMOVED_FROM_STAGE, onRemoveToStageDelayHandler);
+			}
 		}
 		private function onRemoveToStageDelayHandler(_evt:Event):void {
 			if (stage && stage.focus == this) {
@@ -61,8 +62,7 @@ package ui{
 			hitArea = null;
 			contextMenu = null;
 			EventManager.removeTargetAllEvent(this);
-			UISprite.removeChildren(this);
-			destroyObject(userData);
+			removeChildren(this);
 			userData = null;
 		}
 		public function remove():void {
@@ -71,6 +71,22 @@ package ui{
 				parent.removeChild(this);
 			}else {
 				onRemoveToStageHandler();
+			}
+		}
+		public function removeChildren():void {
+			var _length:uint = numChildren;
+			var _children:*;
+			for (var _i:int = _length; _i >= 0; _i-- ) {
+				try {
+					_children = getChildAt(_i);
+				}catch (_ero:*) {
+				}
+				if (_children && contains(_children)) {
+					if (_children is MovieClip) {
+						_children.stop();
+					}
+					removeChild(_children);
+				}
 			}
 		}
 		override public function play():void {
