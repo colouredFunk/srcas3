@@ -62,7 +62,7 @@ package ui{
 			hitArea = null;
 			contextMenu = null;
 			EventManager.removeTargetAllEvent(this);
-			removeChildren(this);
+			removeChildren();
 			userData = null;
 		}
 		public function remove():void {
