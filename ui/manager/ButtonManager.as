@@ -13,11 +13,11 @@ package ui.manager {
 	final public class ButtonManager {
 		public static var stage:Stage;
 		private static const INITIALIZE:Boolean = initializeManager();
-		private static const ROLL_OVER = "rollOver";
-		private static const ROLL_OUT = "rollOut";
-		private static const PRESS = "press";
-		private static const RELEASE = "release";
-		private static const MOUSE_WHEEL = "wheel";
+		private static const ROLL_OVER:String = "rollOver";
+		private static const ROLL_OUT:String = "rollOut";
+		private static const PRESS:String = "press";
+		private static const RELEASE:String = "release";
+		private static const MOUSE_WHEEL:String = "wheel";
 		private static var buttonDic:Dictionary;
 		private static var buttonInDic:Dictionary;
 		private static var buttonDownDic:Dictionary;
