@@ -110,7 +110,7 @@ function completeHandler(event:LoaderEvent):void {
  * property there that contains the whole XML node (including the children) so that you can easily get
  * whatever data you need like this: <br />
  * <listing version="3.0">
-function completeHandler(event:LoaderMax):void {
+function completeHandler(event:LoaderEvent):void {
 	var video:VideoLoader = LoaderMax.getLoader("video1");
 	var description:String = video.vars.description;
 	var xml:XML = video.vars.rawXML;
@@ -157,6 +157,10 @@ function completeHandler(event:LoaderMax):void {
  * <strong>Note:</strong> Using a <code><a href="data/XMLLoaderVars.html">XMLLoaderVars</a></code> instance 
  * instead of a generic object to define your <code>vars</code> is a bit more verbose but provides 
  * code hinting and improved debugging because it enforces strict data typing. Use whichever one you prefer.<br /><br />
+ * 
+ * <strong>Note:</strong> If you don't want the fancy auto-parsing capabilities of XMLLoader, you can just use a 
+ * <a href="DataLoader.html">DataLoader </a> instead of XMLLoader. Then make the content into XML like: 
+ * <code>var xml:XML = new XML(myDataLoader.content);</code><br /><br />
  * 
  * XMLLoader recognizes a few additional attributes for dynamically-created loaders that are defined in the XML:
  * <ul>

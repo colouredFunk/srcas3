@@ -1,6 +1,16 @@
 CHANGE LOG : GREENSOCK LOADERMAX SYSTEM
 ----------------------------------------
 
+2011-06-19
+-------------------------------------------
+LoaderMax			1.854
+VideoLoader			1.854
+MP3Loader			1.854
+LoaderItem			1.854
+	- Previously, if the playback device didn't have sound capabilities, MP3Loader would throw an error when playSound() was called. Implemented a workaround. 
+	- VideoLoader now delays attaching the NetStream to its Video object (the rawContent) until it is added to the stage in order to minimize memory usage. Flash doesn't fully decode the video content until it is attached, thus this technique improves memory usage especially for videos that are loading in the background (not in the display list).
+	- When a loader's url property is changed, the old content is now unloaded immediately (previously the loader was only canceled). 
+
 2011-05-11
 -------------------------------------------
 LoaderMax			1.853
