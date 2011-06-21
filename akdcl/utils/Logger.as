@@ -7,12 +7,17 @@ package akdcl.utils {
 	public class Logger {
 		public static var logList:Object = [];
 
+		public static var onLog:Function;
+
 		public static function log(_target:*, ... args):void {
-			var _log:String = logList[_target];
+			var _log:String = logList[_target] || "";
 			if (!_log || _log.length > 10000){
 				logList[_target] = args + "\n\n";
 			} else {
 				logList[_target] = args + "\n" + _log;
+			}
+			if (onLog != null) {
+				onLog(_target, args, logList[_target]);
 			}
 		}
 
@@ -23,10 +28,10 @@ package akdcl.utils {
 			}
 			return _target + " no log result!\n\n";
 		}
-		
+
 		public static function getAllLog():String {
 			var _allLog:String = "";
-			for (var _target:String in logList) {
+			for (var _target:String in logList){
 				_allLog += getLog(_target);
 			}
 			return _allLog;
