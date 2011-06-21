@@ -5,7 +5,9 @@ package akdcl.media {
 	import flash.events.Event;
 
 	import com.greensock.TweenLite;
-	import com.greensock.easing.Sine
+	import com.greensock.easing.Sine;
+
+	import akdcl.manager.ElementManager;
 
 	/**
 	 * ...
@@ -13,25 +15,22 @@ package akdcl.media {
 	 */
 
 	public class SoundItem {
-		private static function setChannelVolume(_channel:SoundChannel, _volume:Number):void {
+		public static function setChannelVolume(_channel:SoundChannel, _volume:Number):void {
 			var _soundTransform:SoundTransform = _channel.soundTransform;
 			_soundTransform.volume = _volume;
 			_channel.soundTransform = _soundTransform;
 		}
 
-		public var isMultiplePlay:Boolean = false;
 		public var maxVolume:Number = 1;
-		
+
 		private var positionLast:uint = 0;
 		private var sound:Sound;
 		private var soundTransform:SoundTransform;
 		private var channelNow:SoundChannel;
 		private var channelList:Array;
 
-		public var tweenVolume:Number = 1;
+		private var eM:ElementManager;
 
-		private var tweenVarsIn:Object;
-		private var tweenVarsOut:Object;
 
 		public function get totalTime():uint {
 			var _totalTime:uint;
@@ -75,7 +74,6 @@ package akdcl.media {
 
 		public function set position(_position:uint):void {
 			if (channelNow && sound.length > 0){
-				//removeChannel(_channel);
 				//channelNow
 				play(_position);
 			} else {
@@ -95,23 +93,22 @@ package akdcl.media {
 				_volume = 1;
 			}
 			__volume = _volume;
-			//isMultiplePlay
 			if (channelNow){
 				setChannelVolume(channelNow, __volume * maxVolume);
 			}
 
 		}
 
-		public function SoundItem(_sound:Sound, _isMultiplePlay:Boolean = false){
-			isMultiplePlay = _isMultiplePlay;
-			tweenVarsIn = {onUpdate: onTweenVolume, onUpdateParams: [], tweenVolume: 1, overwrite: 0, ease: Sine.easeInOut};
-			tweenVarsOut = {onUpdate: onTweenVolume, onUpdateParams: [], tweenVolume: 0, overwrite: 0, ease: Sine.easeInOut};
+		public function SoundItem(_sound:Sound, _maxVolume:Number = 1) {
+			maxVolume = _maxVolume;
 			channelList = [];
+			eM = ElementManager.getInstance();
+			eM.register("TweenObject", TweenObject);
 			sound = _sound;
 			soundTransform = new SoundTransform(volume, 0);
 		}
 
-		public function play(_startTime:Number = -1, _loops:uint = 0, _tweenIn:Number = 0, _tweenOut:Number = 0):SoundChannel {
+		public function play(_startTime:Number = -1, _loops:uint = 0, _tempVolume:Number = 1, _tweenIn:Number = 0, _tweenOut:Number = 0):SoundChannel {
 			if (_startTime < 0){
 				_startTime = 0;
 			} else if (_startTime <= 1){
@@ -134,43 +131,26 @@ package akdcl.media {
 			positionLast = 0;
 
 			try {
-				//soundTransform.volume = volume * _tempVolume;
+				soundTransform.volume = volume * _tempVolume;
 				var _channel:SoundChannel = sound.play(_startTime, _loops, soundTransform);
-				if (isMultiplePlay){
-					_channel.addEventListener(Event.SOUND_COMPLETE, onChannelCompleteHandler);
-					channelList.push(_channel);
-					channelNow = _channel;
-				} else {
-					if (channelNow){
-						channelNow.stop();
-					}
-					channelNow = _channel;
-				}
-				//
+				_channel.addEventListener(Event.SOUND_COMPLETE, onChannelCompleteHandler);
+				channelList.push(_channel);
+				channelNow = _channel;
+
 				if (_tweenIn == 0){
-					tweenVolume = 1;
+
 				} else if (_tweenIn <= 1){
-					tweenVolume = 0;
-					tweenVarsIn.onUpdateParams[0] = channelNow;
-					TweenLite.to(this, totalTime * _tweenIn * 0.001, tweenVarsIn);
-					onTweenVolume(_channel);
+					(eM.getElement("TweenObject") as TweenObject).tweenChannel(this, channelNow, totalTime * _tweenIn * 0.001, 0, 1, _tempVolume);
 				} else {
-					tweenVolume = 0;
-					tweenVarsIn.onUpdateParams[0] = channelNow;
-					TweenLite.to(this, _tweenIn * 0.001, tweenVarsIn);
-					onTweenVolume(_channel);
+					(eM.getElement("TweenObject") as TweenObject).tweenChannel(this, channelNow, _tweenIn * 0.001, 0, 1, _tempVolume);
 				}
 				//
 				if (_tweenOut == 0){
 
 				} else if (_tweenOut <= 1){
-					tweenVarsOut.delay = totalTime * (1 - _tweenOut) * 0.001;
-					tweenVarsOut.onUpdateParams[0] = channelNow;
-					TweenLite.to(this, totalTime * _tweenOut * 0.001, tweenVarsOut);
+					(eM.getElement("TweenObject") as TweenObject).tweenChannel(this, channelNow, totalTime * _tweenOut * 0.001, totalTime * (1 - _tweenOut) * 0.001, 0, _tempVolume);
 				} else {
-					tweenVarsOut.delay = (totalTime - _tweenOut) * 0.001;
-					tweenVarsOut.onUpdateParams[0] = channelNow;
-					TweenLite.to(this, _tweenOut * 0.001, tweenVarsOut);
+					(eM.getElement("TweenObject") as TweenObject).tweenChannel(this, channelNow, _tweenOut * 0.001, (totalTime - _tweenOut) * 0.001, 0, _tempVolume);
 				}
 			} catch (_error:*){
 
@@ -186,10 +166,6 @@ package akdcl.media {
 		public function stop():void {
 			positionLast = 0;
 			removeAllChannel();
-		}
-
-		private function onTweenVolume(_channel:SoundChannel):void {
-			setChannelVolume(_channel, volume * tweenVolume);
 		}
 
 		private function removeAllChannel():void {
@@ -212,5 +188,46 @@ package akdcl.media {
 			}
 		}
 	}
+}
+import flash.media.SoundChannel;
 
+import com.greensock.easing.Sine;
+import com.greensock.TweenLite;
+
+import akdcl.media.SoundItem;
+
+import akdcl.manager.ElementManager;
+
+class TweenObject {
+	public var volume:Number = 1;
+
+	private var soundItem:SoundItem;
+	private var channel:SoundChannel;
+	private var tempVolume:Number = 1;
+	private var tweenVars:Object = {volume: 1, overwrite: 0, delay: 0, ease: Sine.easeInOut, onUpdate: onTweenUpdate, onComplete: onTweenComplete};
+
+	public function tweenChannel(_soundItem:SoundItem, _channel:SoundChannel, _tween:Number, _delay:Number = 0, _tweenVolume:Number = 0, _tempVolume:Number = 1):void {
+		soundItem = _soundItem;
+		channel = _channel;
+		tempVolume = _tempVolume;
+		tweenVars.delay = _delay;
+		tweenVars.volume = _tweenVolume;
+		if (_tweenVolume == 1){
+			volume = 0;
+			onTweenUpdate();
+		} else {
+			volume = soundItem.volume;
+		}
+
+		TweenLite.to(this, _tween, tweenVars);
+	}
+
+	private function onTweenUpdate():void {
+		SoundItem.setChannelVolume(channel, soundItem.volume * tempVolume * volume);
+	}
+
+	private function onTweenComplete():void {
+		TweenLite.killTweensOf(this);
+		ElementManager.getInstance().recycle(this);
+	}
 }
