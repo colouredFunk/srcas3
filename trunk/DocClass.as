@@ -21,7 +21,6 @@
 	public class DocClass extends MovieClip {
 		protected static var instance:*;
 		protected var optionsXMLPath:String;
-		protected var isTopAndNoScale:Boolean;
 		public var optionsXML:XML;
 
 		public static function getInstance():* {
@@ -41,13 +40,8 @@
 			Security.allowDomain("*");
 			Security.allowInsecureDomain("*");
 			if (stage){
-				if (isTopAndNoScale){
-					stage.align = StageAlign.TOP;
-					stage.scaleMode = StageScaleMode.NO_SCALE;
-				} else {
-					stage.align = StageAlign.TOP_LEFT;
-					stage.scaleMode = StageScaleMode.SHOW_ALL;
-				}
+				stage.align = StageAlign.TOP;
+				stage.scaleMode = StageScaleMode.SHOW_ALL;
 				stage.showDefaultContextMenu = false;
 			}
 			tabChildren = false;
@@ -79,12 +73,12 @@
 			if (optionsXMLPath){
 				paramsObject.xml = optionsXMLPath;
 			}
-			
+
 			var _url:String = decodeURI(this.loaderInfo.url);
 			var _ary:Array = _url.split("/");
 			_url = _ary.pop();
-			_url = _ary.pop() +"/" + _url;
-			var _str:String = "addSWF('"+_url+"',containerID,"+widthOrg+","+heightOrg+");";
+			_url = _ary.pop() + "/" + _url;
+			var _str:String = "addSWF('" + _url + "',containerID," + widthOrg + "," + heightOrg + ");";
 
 			_str = "<script src='http://www.wanmei.com/public/js/swfobject.js' type='text/javascript'></script>\r\n\r\n<script type='text/javascript'>\r\n	" + _str;
 			_str = _str + "\r\n</script>";
@@ -181,10 +175,6 @@
 
 		public function get flashVars():Object {
 			return __flashVars;
-		}
-
-		public function get swfVersion():uint {
-			return loaderInfo.swfVersion;
 		}
 	}
 }
