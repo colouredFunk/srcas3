@@ -2,9 +2,13 @@ package akdcl.manager {
 	import flash.display.Stage;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
+	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.TimerEvent;
+	
+	import flash.geom.Point;
+	
 	import flash.utils.Timer;
 
 	/**
@@ -34,10 +38,16 @@ package akdcl.manager {
 			timer = new Timer(1000);
 			timer.addEventListener(TimerEvent.TIMER, onTimerHandler);
 			event = new Event(Event.RESIZE);
+			targetList = [];
 		}
 
+		public var maxStageWidth:int = int.MAX_VALUE;
+		public var maxStageHeight:int = int.MAX_VALUE;
+		
 		private var timer:Timer;
 		private var event:Event;
+		private var targetList:Array;
+		private var tempPoint:Point = new Point();
 
 		private var __aspectRatio:Number;
 		public function get aspectRatio():Number {
@@ -131,8 +141,8 @@ package akdcl.manager {
 				_sW = _sW * __scaleStage;
 				_sH = _sH * __scaleStage;
 				if (_sW != stageWidth || _sH != stageHeight){
-					__stageWidth = _sW;
-					__stageHeight = _sH;
+					__stageWidth = Math.min(_sW, maxStageWidth);
+					__stageHeight = Math.min(_sH, maxStageHeight);
 					
 					switch(stage.align) {
 						case StageAlign.TOP_LEFT:
@@ -169,8 +179,116 @@ package akdcl.manager {
 					__bottom = __top + __stageHeight;
 					
 					dispatchEvent(event);
+					updateTargets();
 				}
 				stage.scaleMode = StageScaleMode.SHOW_ALL;
+			}
+		}
+		
+		private function contains(_target:*):int {
+			for (var _i:String in targetList) {
+				if (targetList[_i].target == _target) {
+					return int(_i);
+				}
+			}
+			return -1;
+		}
+		
+		private function sortAlignByTargetLevel(_align_1:Object, _align_2:Object):int {
+			return getTargetLevel(_align_1.target) > getTargetLevel(_align_2.target)?1: -1;
+		}
+		
+		private function getTargetLevel(_target:*):int {
+			var _parent = _target.parent;
+			var _level:int = 0;
+			while (_parent) {
+				_parent = _parent.parent;
+				_level++;
+			}
+			return _level;
+		}
+		
+		public function register(_target:*, _x:int = 0, _y:int = 0):void {
+			var _align:Object;
+			var _alignID:int = contains(_target);
+			if (_alignID < 0) {
+				_align = { };
+				targetList.push(_align);
+			}
+			
+			tempPoint.x = 0;
+			tempPoint.y = 0;
+			tempPoint = _target.localToGlobal(tempPoint);
+			
+			if (_x == 0) {
+				_align.fixX = 0;
+			}else if (_x > 0) {
+				_align.fixX = originalWidth - tempPoint.x;
+			}else {
+				_align.fixX = 0 - tempPoint.x;
+			}
+			
+			if (_y == 0) {
+				_align.fixY = 0;
+			}else if (_y > 0) {
+				_align.fixY = originalHeight - tempPoint.y;
+			}else {
+				_align.fixY = 0 - tempPoint.y;
+			}
+			
+			_align.alignX = _x;
+			_align.alignY = _y;
+			_align.target = _target;
+			
+			targetList.sort(sortAlignByTargetLevel);
+			
+			
+			updateTarget(_align);
+		}
+		
+		private function updateTarget(_align:Object):void {
+			var _target:*= _align.target;
+			
+			if (_align.alignX == 0) {
+				tempPoint.x = 0;
+			}else if (_align.alignX > 0) {
+				tempPoint.x = right;
+			}else {
+				tempPoint.x = left;
+			}
+			
+			if (_align.alignY == 0) {
+				tempPoint.y = 0;
+			}else if (_align.alignY > 0) {
+				tempPoint.y = bottom;
+			}else {
+				tempPoint.y = top;
+			}
+			
+			if (_target.parent) {
+				tempPoint = _target.parent.globalToLocal(tempPoint);
+			}
+			
+			if (_align.alignX == 0) {
+				
+			}else if (_align.alignX > 0) {
+				_target.x = tempPoint.x - _align.fixX;
+			}else {
+				_target.x = tempPoint.x - _align.fixX;
+			}
+			
+			if (_align.alignY == 0) {
+				
+			}else if (_align.alignY > 0) {
+				_target.y = tempPoint.y - _align.fixY;
+			}else {
+				_target.y = tempPoint.y - _align.fixY;
+			}
+		}
+		
+		private function updateTargets():void {
+			for each(var _align:Object in targetList) {
+				updateTarget(_align);
 			}
 		}
 	}
