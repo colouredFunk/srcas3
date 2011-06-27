@@ -10,9 +10,9 @@ SimplePopUp 版本:v1.0
 package zero.ui{
 	import flash.display.*;
 	import flash.events.*;
-	import flash.utils.*;
-	import flash.text.*;
 	import flash.geom.*;
+	import flash.text.*;
+	import flash.utils.*;
 	
 	import ui.Btn;
 	
@@ -48,6 +48,8 @@ package zero.ui{
 		private var bBtn:Rectangle;
 		private var bTxt:Rectangle;
 		
+		public static var autoAdjustTxt:Boolean;//20110622
+		
 		public function SimplePopUp(){
 			if(instance){
 				throw new Error("只支持单例");
@@ -74,13 +76,17 @@ package zero.ui{
 			}
 			
 			bTxt=txt.getBounds(this);
+			
+			autoAdjustTxt=true;
 		}
 		
 		public function show(msg:String,labels:String=null):void{
 			txt.text=msg;
 			
-			txt.x=bTxt.x+(bTxt.width-txt.textWidth)/2;
-			txt.y=bTxt.y+(bTxt.height-txt.textHeight)/2;
+			if(autoAdjustTxt){
+				txt.x=bTxt.x+(bTxt.width-txt.textWidth)/2;
+				txt.y=bTxt.y+(bTxt.height-txt.textHeight)/2;
+			}
 			
 			var labelArr:Array;
 			if(labels){
@@ -90,7 +96,9 @@ package zero.ui{
 			}
 			var i:int=0;
 			for each(var label:String in labelArr){
-				this["btn"+i]["txt"].text=label;
+				if(this["btn"+i].hasOwnProperty("txt")){
+					this["btn"+i]["txt"].text=label;
+				}
 				i++;
 			}
 			
