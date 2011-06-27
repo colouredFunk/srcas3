@@ -364,7 +364,7 @@ class Frame{
 		var classNameArr:Array=new Array();
 		var doInitActionCodeArr:Array=new Array();
 		
-		var _initByDataOptions:zero_swf_InitByDataOptions=OptionsGetter.getInitByDataOptions({ActionsClass:ACTIONRECORD});
+		var _initByDataOptions:Object/*zero_swf_InitByDataOptions*/=OptionsGetter.getInitByDataOptions({ActionsClass:ACTIONRECORD});
 		
 		var id:int,Name:String;
 		var idV:Vector.<int>=new Vector.<int>();

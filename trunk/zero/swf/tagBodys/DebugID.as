@@ -10,10 +10,10 @@ DebugID
 package zero.swf.tagBodys{
 	import zero.BytesAndStr16;
 	import flash.utils.ByteArray;
-	public class DebugID/*{*/implements I_zero_swf_CheckCodesRight{
+	public class DebugID{//implements I_zero_swf_CheckCodesRight{
 		public var id:String;							//DebugID
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			id=
 				BytesAndStr16._16V[data[offset]]+
 				BytesAndStr16._16V[data[offset+1]]+
@@ -37,7 +37,7 @@ package zero.swf.tagBodys{
 				BytesAndStr16._16V[data[offset+15]];
 			return offset+16;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			var idStr:String=id.replace(/-/g,"");
 			data.writeUnsignedInt(uint("0x"+idStr.substr(0,8)));
@@ -49,12 +49,12 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			return <{xmlName} class="DebugID"
 				id={id}
 			/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			id=xml.@id.toString();
 		}
 		}//end of CONFIG::USE_XML

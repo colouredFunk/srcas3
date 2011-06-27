@@ -33,7 +33,7 @@ DefineVideoStream
 //											5 = VP6 video with alpha channel (SWF 8 and later only)
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class DefineVideoStream/*{*/implements I_zero_swf_CheckCodesRight{
+	public class DefineVideoStream{//implements I_zero_swf_CheckCodesRight{
 		public var id:int;								//UI16
 		public var NumFrames:int;						//UI16
 		public var Width:int;							//UI16
@@ -42,7 +42,7 @@ package zero.swf.tagBodys{
 		public var VideoFlagsSmoothing:int;
 		public var CodecID:int;							//UI8
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			id=data[offset]|(data[offset+1]<<8);
 			NumFrames=data[offset+2]|(data[offset+3]<<8);
 			Width=data[offset+4]|(data[offset+5]<<8);
@@ -54,7 +54,7 @@ package zero.swf.tagBodys{
 			CodecID=data[offset+9];
 			return offset+10;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=id;
 			data[1]=id>>8;
@@ -76,7 +76,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			return <{xmlName} class="DefineVideoStream"
 				id={id}
 				NumFrames={NumFrames}
@@ -87,7 +87,7 @@ package zero.swf.tagBodys{
 				CodecID={CodecID}
 			/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			id=int(xml.@id.toString());
 			NumFrames=int(xml.@NumFrames.toString());
 			Width=int(xml.@Width.toString());

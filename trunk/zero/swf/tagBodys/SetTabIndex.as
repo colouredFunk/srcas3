@@ -27,16 +27,16 @@ SetTabIndex
 //TabIndex 			UI16 			Tab order value
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class SetTabIndex/*{*/implements I_zero_swf_CheckCodesRight{
+	public class SetTabIndex{//implements I_zero_swf_CheckCodesRight{
 		public var Depth:int;							//UI16
 		public var TabIndex:int;						//UI16
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			Depth=data[offset]|(data[offset+1]<<8);
 			TabIndex=data[offset+2]|(data[offset+3]<<8);
 			return offset+4;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=Depth;
 			data[1]=Depth>>8;
@@ -47,13 +47,13 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			return <{xmlName} class="SetTabIndex"
 				Depth={Depth}
 				TabIndex={TabIndex}
 			/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			Depth=int(xml.@Depth.toString());
 			TabIndex=int(xml.@TabIndex.toString());
 		}

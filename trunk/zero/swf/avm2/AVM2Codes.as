@@ -30,7 +30,7 @@ package zero.swf.avm2{
 			allMultinameV:Vector.<ABCMultiname>,
 			allMethodV:Vector.<ABCMethod>,
 			classV:Vector.<ABCClass>,
-			_initByDataOptions:zero_swf_InitByDataOptions
+			_initByDataOptions:Object/*zero_swf_InitByDataOptions*/
 		):void{
 			
 			var labelId:int=0;
@@ -442,7 +442,7 @@ package zero.swf.avm2{
 				}
 			}
 		}
-		public function getInfo(productMark:ProductMark,_toDataOptions:zero_swf_ToDataOptions):Array{
+		public function getInfo(productMark:ProductMark,_toDataOptions:Object/*zero_swf_ToDataOptions*/):Array{
 			var data:ByteArray=new ByteArray();
 			
 			var posMarkArr:Array=new Array();//记录 branch, newcatch, lookupswitch 的位置及相关的 label 位置
@@ -668,7 +668,7 @@ package zero.swf.avm2{
 		}
 		////
 		CONFIG::USE_XML{
-		public function toXMLAndMark(markStrs:MarkStrs,xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXMLAndMark(markStrs:MarkStrs,xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var labelMark:AVM2LabelMark,infoXML:XML;
 			
 			var exceptionXMLDict:Dictionary=new Dictionary();
@@ -827,7 +827,7 @@ package zero.swf.avm2{
 			}
 			return <{xmlName}/>;
 		}
-		public function initByXMLAndMark(markStrs:MarkStrs,xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXMLAndMark(markStrs:MarkStrs,xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			var codeStrArr:Array=xml.toString().replace(/^\s*|\s*$/g,"").split("\n");
 			var codeId:int=-1;
 			codeArr=new Array();

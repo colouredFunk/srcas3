@@ -41,7 +41,7 @@ package zero.swf{
 			
 			__bodyData=data;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var bodyData:ByteArray;
 			if(__body){
 				bodyData=__body.toData(_toDataOptions);
@@ -119,9 +119,8 @@ package zero.swf{
 			}
 		}
 		
-		//private var __body:Object;
-		private var __body:I_zero_swf_CheckCodesRight;
-		public function getBody(_initByDataOptions:zero_swf_InitByDataOptions):I_zero_swf_CheckCodesRight{
+		private var __body:*;
+		public function getBody(_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):*{
 			if(__body){
 			}else{
 				if(__bodyData){
@@ -137,7 +136,7 @@ package zero.swf{
 			//trace("__body="+__body);
 			return __body;
 		}
-		public function setBody(_body:I_zero_swf_CheckCodesRight):void{
+		public function setBody(_body:*):void{
 			if(_body){
 				//data=null;
 				setBodyData(null);
@@ -181,7 +180,7 @@ package zero.swf{
 		}
 		
 		CONFIG::USE_XML{
-		public function toXML(_toXMLOptions:zero_swf_ToXMLOptions):XML{//如果给出 src，表示 getPositionOnly
+		public function toXML(_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{//如果给出 src，表示 getPositionOnly
 			/*
 			var xml:XML=<tag
 				typeName={TagTypes.typeNameV[type]}
@@ -219,7 +218,7 @@ package zero.swf{
 				//test_isShort={test_isShort}
 			/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			var xmlName:String=xml.name().toString();//20110618
 			var typeName:String;
 			if(TagTypes[xmlName]>-1){

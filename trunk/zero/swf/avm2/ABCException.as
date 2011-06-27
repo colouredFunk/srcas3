@@ -28,7 +28,7 @@ package zero.swf.avm2{
 		public function initByInfo(
 			exception_info:Exception_info,
 			allMultinameV:Vector.<ABCMultiname>,
-			_initByDataOptions:zero_swf_InitByDataOptions
+			_initByDataOptions:Object/*zero_swf_InitByDataOptions*/
 		):void{
 			
 			//The starting position in the code field from which the exception is enabled.
@@ -74,7 +74,7 @@ package zero.swf.avm2{
 			//文档里是错的...不是 string_v 而是 multiname_info_v
 			productMark.productMultiname(var_name);
 		}
-		public function getInfo(productMark:ProductMark,_toDataOptions:zero_swf_ToDataOptions):Exception_info{
+		public function getInfo(productMark:ProductMark,_toDataOptions:Object/*zero_swf_ToDataOptions*/):Exception_info{
 			
 			var exception_info:Exception_info=new Exception_info();
 			
@@ -105,7 +105,7 @@ package zero.swf.avm2{
 		
 		////
 		CONFIG::USE_XML{
-		public function toXMLAndMark(markStrs:MarkStrs,xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXMLAndMark(markStrs:MarkStrs,xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName}/>;
 			
 			xml.@from="label"+from.labelId;
@@ -124,7 +124,7 @@ package zero.swf.avm2{
 			
 			return xml;
 		}
-		public function initByXMLAndMark(markStrs:MarkStrs,xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXMLAndMark(markStrs:MarkStrs,xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			
 			//from=int(xml.@from.toString());
 			

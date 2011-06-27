@@ -15,7 +15,7 @@ package zero.swf.avm2{
 		public function initByInfo(
 			namespace_info:Namespace_info,
 			stringV:Vector.<String>,
-			_initByDataOptions:zero_swf_InitByDataOptions
+			_initByDataOptions:Object/*zero_swf_InitByDataOptions*/
 		):void{
 			if(NamespaceKinds.kindV[namespace_info.kind]){
 			}else{
@@ -70,7 +70,7 @@ package zero.swf.avm2{
 			//A value of zero denotes an empty string.
 			productMark.productString(name);
 		}
-		public function getInfo(productMark:ProductMark,_toDataOptions:zero_swf_ToDataOptions):Namespace_info{
+		public function getInfo(productMark:ProductMark,_toDataOptions:Object/*zero_swf_ToDataOptions*/):Namespace_info{
 			if(NamespaceKinds.kindV[kind]){
 			}else{
 				throw new Error("kind="+kind);
@@ -106,7 +106,7 @@ package zero.swf.avm2{
 		
 		////
 		CONFIG::USE_XML{
-		public function toXMLAndMark(markStrs:MarkStrs,xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXMLAndMark(markStrs:MarkStrs,xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			if(NamespaceKinds.kindV[kind]){
 			}else{
 				throw new Error("kind="+kind);
@@ -174,7 +174,7 @@ package zero.swf.avm2{
 			return markStr;
 		}
 		
-		public static function xml2ns(markStrs:MarkStrs,xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):ABCNamespace{
+		public static function xml2ns(markStrs:MarkStrs,xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):ABCNamespace{
 			return markStr2ns(markStrs,xml2markStr(xml));
 		} 
 		public static function xml2markStr(xml:XML):String{

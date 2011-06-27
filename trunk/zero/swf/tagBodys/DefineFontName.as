@@ -19,12 +19,12 @@ DefineFontName
 //FontCopyright			STRING 				Arbitrary string of copyright information
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class DefineFontName/*{*/implements I_zero_swf_CheckCodesRight{
+	public class DefineFontName{//implements I_zero_swf_CheckCodesRight{
 		public var FontID:int;							//UI16
 		public var FontName:String;						//STRING
 		public var FontCopyright:String;				//STRING
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			FontID=data[offset]|(data[offset+1]<<8);
 			offset+=2;
 			var get_str_size:int=0;
@@ -39,7 +39,7 @@ package zero.swf.tagBodys{
 			FontCopyright=data.readUTFBytes(get_str_size);
 			return offset+get_str_size;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=FontID;
 			data[1]=FontID>>8;
@@ -51,14 +51,14 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			return <{xmlName} class="DefineFontName"
 				FontID={FontID}
 				FontName={FontName}
 				FontCopyright={FontCopyright}
 			/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			FontID=int(xml.@FontID.toString());
 			FontName=xml.@FontName.toString();
 			FontCopyright=xml.@FontCopyright.toString();

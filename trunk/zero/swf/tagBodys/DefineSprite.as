@@ -41,13 +41,13 @@ package zero.swf.tagBodys{
 	import zero.Outputer;
 	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
-	public class DefineSprite/*{*/implements I_zero_swf_CheckCodesRight{
+	public class DefineSprite{//implements I_zero_swf_CheckCodesRight{
 		public var id:int;								//UI16
 		public var FrameCount:int;//帧数是一个int, 在SWF里以 UI16(Unsigned 16-bit integer value, 16位无符号整数) 的结构保存
 		public var tagV:Vector.<Tag>;
 		//
 		
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			//~~~~~
 			id=data[offset]|(data[offset+1]<<8);
 			FrameCount=data[offset+2]|(data[offset+3]<<8);//仅用于参考
@@ -75,7 +75,7 @@ package zero.swf.tagBodys{
 			return endOffset;
 		}
 		
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			//#####
 			FrameCount=Tags.getRealFrameCount(tagV);
 			
@@ -109,7 +109,7 @@ package zero.swf.tagBodys{
 		}
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			//临时变量
 			var tagsXML:XML=<tags count={tagV.length}/>;
 			var frameIdDict:Dictionary=Tags.getFrameIdDict(tagV);
@@ -141,7 +141,7 @@ package zero.swf.tagBodys{
 			xml.appendChild(tagsXML);
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			//~~~~~
 			id=int(xml.@id.toString());
 			FrameCount=int(xml.@FrameCount.toString());//仅用于参考

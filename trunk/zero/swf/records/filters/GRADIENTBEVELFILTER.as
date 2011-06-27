@@ -23,7 +23,7 @@ GRADIENTBEVELFILTER
 package zero.swf.records.filters{
 	import zero.BytesAndStr16;
 	import flash.utils.ByteArray;
-	public class GRADIENTBEVELFILTER/*{*/implements I_zero_swf_CheckCodesRight{
+	public class GRADIENTBEVELFILTER{//implements I_zero_swf_CheckCodesRight{
 		public var GradientColorV:Vector.<uint>;
 		public var GradientRatioV:Vector.<int>;
 		public var BlurX:Number;						//FIXED
@@ -37,7 +37,7 @@ package zero.swf.records.filters{
 		public var OnTop:int;
 		public var Passes:int;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			var NumColors:int=data[offset++];
 			GradientColorV=new Vector.<uint>(NumColors);
 			GradientRatioV=new Vector.<int>(NumColors);
@@ -58,7 +58,7 @@ package zero.swf.records.filters{
 			Passes=flags&0x0f;							//00001111
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			var NumColors:int=GradientColorV.length;
 			data[0]=NumColors;
@@ -102,7 +102,7 @@ package zero.swf.records.filters{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="GRADIENTBEVELFILTER"
 				BlurX={BlurX}
 				BlurY={BlurY}
@@ -127,7 +127,7 @@ package zero.swf.records.filters{
 			}
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			if(xml.GradientColorAndGradientRatioList.length()){
 				var listXML:XML=xml.GradientColorAndGradientRatioList[0];
 				var GradientColorXMLList:XMLList=listXML.GradientColor;

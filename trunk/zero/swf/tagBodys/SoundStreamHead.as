@@ -46,7 +46,7 @@ SoundStreamHead
 //only; Flash Player may ignore them.
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class SoundStreamHead/*{*/implements I_zero_swf_CheckCodesRight{
+	public class SoundStreamHead{//implements I_zero_swf_CheckCodesRight{
 		public var PlaybackSoundRate:int;
 		public var PlaybackSoundSize:int;
 		public var PlaybackSoundType:int;
@@ -57,7 +57,7 @@ package zero.swf.tagBodys{
 		public var StreamSoundSampleCount:int;			//UI16
 		public var LatencySeek:int;						//SI16
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			var flags:int=data[offset];
 			//Reserved=(flags<<24)>>>28;				//11110000
 			PlaybackSoundRate=(flags<<28)>>>30;			//00001100
@@ -76,7 +76,7 @@ package zero.swf.tagBodys{
 			}
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			var flags:int=0;
 			//flags|=Reserved<<4;						//11110000
@@ -103,7 +103,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="SoundStreamHead"
 				PlaybackSoundRate={PlaybackSoundRate}
 				PlaybackSoundSize={PlaybackSoundSize}
@@ -122,7 +122,7 @@ package zero.swf.tagBodys{
 			}
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			PlaybackSoundRate=int(xml.@PlaybackSoundRate.toString());
 			PlaybackSoundSize=int(xml.@PlaybackSoundSize.toString());
 			PlaybackSoundType=int(xml.@PlaybackSoundType.toString());

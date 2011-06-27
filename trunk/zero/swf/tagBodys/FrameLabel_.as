@@ -38,11 +38,11 @@ FrameLabel_
 //Named Anchor flag UI8 								Always 1
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class FrameLabel_/*{*/implements I_zero_swf_CheckCodesRight{
+	public class FrameLabel_{//implements I_zero_swf_CheckCodesRight{
 		public var Name:String;							//STRING
 		public var NamedAnchorflag:Boolean;				//NamedAnchorflag
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			var get_str_size:int=0;
 			while(data[offset+(get_str_size++)]){}
 			data.position=offset;
@@ -54,7 +54,7 @@ package zero.swf.tagBodys{
 			}
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data.writeUTFBytes(Name+"\x00");
 			var offset:int=data.length;
@@ -66,13 +66,13 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			return <{xmlName} class="FrameLabel_"
 				Name={Name}
 				NamedAnchorflag={NamedAnchorflag}
 			/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			Name=xml.@Name.toString();
 			NamedAnchorflag=(xml.@NamedAnchorflag.toString()=="true");
 		}

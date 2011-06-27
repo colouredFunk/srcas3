@@ -36,7 +36,7 @@ CLIPEVENTFLAGS
 //Reserved 					If SWF version >= 6, UB[8] 	Always 0
 package zero.swf.records.clips{
 	import flash.utils.ByteArray;
-	public class CLIPEVENTFLAGS/*{*/implements I_zero_swf_CheckCodesRight{
+	public class CLIPEVENTFLAGS{//implements I_zero_swf_CheckCodesRight{
 		public var ClipEventKeyUp:int;
 		public var ClipEventKeyDown:int;
 		public var ClipEventMouseUp:int;
@@ -57,7 +57,7 @@ package zero.swf.records.clips{
 		public var ClipEventKeyPress:int;
 		public var ClipEventDragOut:int;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			if(_initByDataOptions&&_initByDataOptions.swf_Version>0){
 			}else{
 				throw new Error("需要提供 swf_Version 信息");
@@ -94,7 +94,7 @@ package zero.swf.records.clips{
 			//Reserved=data[offset+3];
 			return offset+4;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			if(_toDataOptions&&_toDataOptions.swf_Version>0){
 			}else{
@@ -138,7 +138,7 @@ package zero.swf.records.clips{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="CLIPEVENTFLAGS"
 				ClipEventKeyUp={ClipEventKeyUp}
 				ClipEventKeyDown={ClipEventKeyDown}
@@ -165,7 +165,7 @@ package zero.swf.records.clips{
 			}
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			ClipEventKeyUp=int(xml.@ClipEventKeyUp.toString());
 			ClipEventKeyDown=int(xml.@ClipEventKeyDown.toString());
 			ClipEventMouseUp=int(xml.@ClipEventMouseUp.toString());

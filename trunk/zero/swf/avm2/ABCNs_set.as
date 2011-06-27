@@ -14,7 +14,7 @@ package zero.swf.avm2{
 		public function initByInfo(
 			ns_set_info:Ns_set_info,
 			allNsV:Vector.<ABCNamespace>,
-			_initByDataOptions:zero_swf_InitByDataOptions
+			_initByDataOptions:Object/*zero_swf_InitByDataOptions*/
 		):void{
 			
 			//			ns_set_info
@@ -58,7 +58,7 @@ package zero.swf.avm2{
 				}
 			}
 		}
-		public function getInfo(productMark:ProductMark,_toDataOptions:zero_swf_ToDataOptions):Ns_set_info{
+		public function getInfo(productMark:ProductMark,_toDataOptions:Object/*zero_swf_ToDataOptions*/):Ns_set_info{
 			var ns_set_info:Ns_set_info=new Ns_set_info();
 			
 			//			ns_set_info
@@ -86,7 +86,7 @@ package zero.swf.avm2{
 		
 		////
 		CONFIG::USE_XML{
-		public function toXMLAndMark(markStrs:MarkStrs,xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXMLAndMark(markStrs:MarkStrs,xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=markStrs.xmlDict[this];
 			if(xml){
 				xml=xml.copy();//保证下面的 setName 不互相影响就行
@@ -157,7 +157,7 @@ package zero.swf.avm2{
 			return markStr;
 		}
 		
-		public static function xml2ns_set(markStrs:MarkStrs,xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):ABCNs_set{
+		public static function xml2ns_set(markStrs:MarkStrs,xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):ABCNs_set{
 			return markStr2ns_set(markStrs,xml2markStr(xml));
 		} 
 		public static function xml2markStr(xml:XML):String{

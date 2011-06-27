@@ -67,7 +67,7 @@ package zero.swf{
 			tagId:int,
 			tagCount:int,
 			timeLimit:int,//20110606 主要用于 DefineSprite 和 SWF 中减少瞬时调用 initByData_step 的次数，以提高运行速度，对 SWFProgresser 基本不影响
-			_initByDataOptions:zero_swf_InitByDataOptions
+			_initByDataOptions:Object/*zero_swf_InitByDataOptions*/
 		):int{
 			if(_initByDataOptions&&_initByDataOptions.optionV){
 			}else{
@@ -106,7 +106,7 @@ package zero.swf{
 			tagId:int,
 			tagCount:int,
 			timeLimit:int,//20110606 主要用于 DefineSprite 和 SWF 中减少瞬时调用 initByData_step 的次数，以提高运行速度，对 SWFProgresser 基本不影响
-			_toDataOptions:zero_swf_ToDataOptions
+			_toDataOptions:Object/*zero_swf_ToDataOptions*/
 		):int{
 			var t:int=getTimer();
 			while(getTimer()-t<timeLimit){
@@ -145,7 +145,7 @@ package zero.swf{
 			tagId:int,
 			tagCount:int,
 			timeLimit:int,//20110606 主要用于 DefineSprite 和 SWF 中减少瞬时调用 toXML_step 的次数，以提高运行速度，对 SWFProgresser 基本不影响
-			_toXMLOptions:zero_swf_ToXMLOptions
+			_toXMLOptions:Object/*zero_swf_ToXMLOptions*/
 		):int{
 			var t:int=getTimer();
 			while(getTimer()-t<timeLimit){
@@ -265,7 +265,7 @@ package zero.swf{
 			nodeId:int,
 			nodeCount:int,
 			timeLimit:int,//20110606 主要用于 DefineSprite 和 SWF 中减少瞬时调用 initByXML_step 的次数，以提高运行速度，对 SWFProgresser 基本不影响
-			_initByXMLOptions:zero_swf_InitByXMLOptions
+			_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/
 		):int{
 			var t:int=getTimer();
 			while(getTimer()-t<timeLimit){

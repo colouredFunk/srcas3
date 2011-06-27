@@ -23,11 +23,11 @@ Script_info
 package zero.swf.avm2{
 	import zero.swf.avm2.Traits_info;
 	import flash.utils.ByteArray;
-	public class Script_info/*{*/implements I_zero_swf_CheckCodesRight{
+	public class Script_info{//implements I_zero_swf_CheckCodesRight{
 		public var init:int;							//u30
 		public var traits_infoV:Vector.<Traits_info>;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){init=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{init=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{init=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{init=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{init=data[offset++];}
 			//init
 			
@@ -42,7 +42,7 @@ package zero.swf.avm2{
 			}
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			var offset:int=0;
 			if(init>>>7){if(init>>>14){if(init>>>21){if(init>>>28){data[offset++]=(init&0x7f)|0x80;data[offset++]=((init>>>7)&0x7f)|0x80;data[offset++]=((init>>>14)&0x7f)|0x80;data[offset++]=((init>>>21)&0x7f)|0x80;data[offset++]=init>>>28;}else{data[offset++]=(init&0x7f)|0x80;data[offset++]=((init>>>7)&0x7f)|0x80;data[offset++]=((init>>>14)&0x7f)|0x80;data[offset++]=init>>>21;}}else{data[offset++]=(init&0x7f)|0x80;data[offset++]=((init>>>7)&0x7f)|0x80;data[offset++]=init>>>14;}}else{data[offset++]=(init&0x7f)|0x80;data[offset++]=init>>>7;}}else{data[offset++]=init;}
@@ -61,7 +61,7 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="Script_info"
 				init={init}
 			/>;
@@ -74,7 +74,7 @@ package zero.swf.avm2{
 			}
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			init=int(xml.@init.toString());
 			if(xml.traits_infoList.length()){
 				var listXML:XML=xml.traits_infoList[0];

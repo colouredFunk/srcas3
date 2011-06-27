@@ -131,7 +131,7 @@ package zero.swf.avm2{
 	import flash.utils.Endian;
 	import zero.Outputer;
 	import flash.utils.ByteArray;
-	public class ABCFileWithSimpleConstant_pool/*{*/implements I_zero_swf_CheckCodesRight{
+	public class ABCFileWithSimpleConstant_pool{//implements I_zero_swf_CheckCodesRight{
 		public var minor_version:int;					//UI16
 		public var major_version:int;					//UI16
 		public var integerV:Vector.<int>;
@@ -140,7 +140,7 @@ package zero.swf.avm2{
 		public var stringV:Vector.<String>;
 		public var restData:BytesData;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			data.endian=Endian.LITTLE_ENDIAN;
 			minor_version=data[offset]|(data[offset+1]<<8);
 			major_version=data[offset+2]|(data[offset+3]<<8);
@@ -217,7 +217,7 @@ package zero.swf.avm2{
 			restData=new BytesData();
 			return restData.initByData(data,offset,endOffset,_initByDataOptions);
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data.endian=Endian.LITTLE_ENDIAN;
 			data[0]=minor_version;
@@ -297,7 +297,7 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="ABCFileWithSimpleConstant_pool"
 				minor_version={minor_version}
 				major_version={major_version}
@@ -353,7 +353,7 @@ package zero.swf.avm2{
 			xml.appendChild(restData.toXML("restData",_toXMLOptions));
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			minor_version=int(xml.@minor_version.toString());
 			major_version=int(xml.@major_version.toString());
 			if(xml.integerList.length()){

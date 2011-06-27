@@ -26,12 +26,12 @@ BLURFILTER
 //Reserved 		UB[3] 		Must be 0
 package zero.swf.records.filters{
 	import flash.utils.ByteArray;
-	public class BLURFILTER/*{*/implements I_zero_swf_CheckCodesRight{
+	public class BLURFILTER{//implements I_zero_swf_CheckCodesRight{
 		public var BlurX:Number;						//FIXED
 		public var BlurY:Number;						//FIXED
 		public var Passes:int;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			BlurX=data[offset]/65536+data[offset+1]/256+data[offset+2]+(data[offset+3]<<8);
 			BlurY=data[offset+4]/65536+data[offset+5]/256+data[offset+6]+(data[offset+7]<<8);
 			var flags:int=data[offset+8];
@@ -39,7 +39,7 @@ package zero.swf.records.filters{
 			//Reserved=flags&0x07;						//00000111
 			return offset+9;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=BlurX*65536;
 			data[1]=BlurX*256;
@@ -58,14 +58,14 @@ package zero.swf.records.filters{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			return <{xmlName} class="BLURFILTER"
 				BlurX={BlurX}
 				BlurY={BlurY}
 				Passes={Passes}
 			/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			BlurX=Number(xml.@BlurX.toString());
 			BlurY=Number(xml.@BlurY.toString());
 			Passes=int(xml.@Passes.toString());

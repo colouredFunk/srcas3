@@ -20,7 +20,7 @@ MATRIX
 //TranslateY 		SB[NTranslateBits] 					y translate value in twips
 package zero.swf.records{
 	import flash.utils.ByteArray;
-	public class MATRIX/*{*/implements I_zero_swf_CheckCodesRight{
+	public class MATRIX{//implements I_zero_swf_CheckCodesRight{
 		public var HasScale:int;
 		public var NScaleBits:int;
 		public var ScaleX:int;
@@ -33,7 +33,7 @@ package zero.swf.records{
 		public var TranslateX:int;
 		public var TranslateY:int;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			var bGroupValue:int=(data[offset]<<24)|(data[offset+1]<<16)|(data[offset+2]<<8)|data[offset+3];
 			offset+=4;
 			HasScale=bGroupValue>>>31;						//10000000 00000000 00000000 00000000
@@ -130,7 +130,7 @@ package zero.swf.records{
 			
 			return offset-int(4-bGroupBitsOffset/8);
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			var bGroupValue:int=0;
 			var offset:int=0;
@@ -221,7 +221,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			return <{xmlName} class="MATRIX"
 				HasScale={HasScale}
 				NScaleBits={NScaleBits}
@@ -236,7 +236,7 @@ package zero.swf.records{
 				TranslateY={TranslateY}
 			/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			HasScale=int(xml.@HasScale.toString());
 			NScaleBits=int(xml.@NScaleBits.toString());
 			ScaleX=int(xml.@ScaleX.toString());

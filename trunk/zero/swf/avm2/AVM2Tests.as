@@ -51,7 +51,7 @@ package zero.swf.avm2{
 			check(ABCNamespace.normalizeMarkStr("[PrivateNs]\\]\\[\\)\\("),"[PrivateNs]\\]\\[\\)\\(");
 			
 			var ns:ABCNamespace;
-			var _toXMLOptions:zero_swf_ToXMLOptions;
+			var _toXMLOptions:Object/*zero_swf_ToXMLOptions*/;
 			var xml:XML;
 			var markStrs:MarkStrs;
 			var markStr:String;
@@ -172,7 +172,7 @@ package zero.swf.avm2{
 			check(ABCNs_set.normalizeMarkStr("[[PackageNamespace]flash.display,[PrivateNs]flash.events]"),"[flash.display,[PrivateNs]flash.events]");
 			
 			var ns_set:ABCNs_set,ns:ABCNamespace;
-			var _toXMLOptions:zero_swf_ToXMLOptions;
+			var _toXMLOptions:Object/*zero_swf_ToXMLOptions*/;
 			var xml:XML;
 			var markStrs:MarkStrs;
 			var markStr:String;
@@ -270,7 +270,7 @@ package zero.swf.avm2{
 			
 			var markStrs:MarkStrs;
 			var multiname:ABCMultiname;
-			var _toXMLOptions:zero_swf_ToXMLOptions;
+			var _toXMLOptions:Object/*zero_swf_ToXMLOptions*/;
 			var xml:XML;
 			
 			_toXMLOptions=new zero_swf_ToXMLOptions();
@@ -426,7 +426,7 @@ package zero.swf.avm2{
 		private function testABCMethods():void{
 			var markStrs:MarkStrs;
 			var method:ABCMethod;
-			var _toXMLOptions:zero_swf_ToXMLOptions;
+			var _toXMLOptions:Object/*zero_swf_ToXMLOptions*/;
 			var xml:XML;
 			
 			markStrs=new MarkStrs();

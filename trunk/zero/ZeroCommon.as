@@ -17,6 +17,65 @@ package zero{
 	import flash.system.Security
 	
 	public class ZeroCommon{
+		public static function getIdV(total:int,L:int):Vector.<int>{
+			var i:int;
+			
+			i=L;
+			var idArr:Array=new Array();
+			while(--i>=0){
+				idArr[i]=i;
+			}
+			
+			i=L;
+			while(--i>=0){
+				var ran:int=int(Math.random()*L);
+				var temp:int=idArr[i];
+				idArr[i]=idArr[ran];
+				idArr[ran]=temp;
+			}
+			
+			if(total>L){
+				i=L;
+			}else{
+				i=total;
+			}
+			var idV:Vector.<int>=new Vector.<int>();
+			while(--i>=0){
+				idV.push(idArr[i]);
+			}
+			
+			return idV;
+		}
+		
+		public static function getIdMarkV(total:int,L:int):Vector.<Boolean>{
+			var i:int;
+			
+			i=L;
+			var idArr:Array=new Array();
+			while(--i>=0){
+				idArr[i]=i;
+			}
+			
+			i=L;
+			while(--i>=0){
+				var ran:int=int(Math.random()*L);
+				var temp:int=idArr[i];
+				idArr[i]=idArr[ran];
+				idArr[ran]=temp;
+			}
+			
+			if(total>L){
+				i=L;
+			}else{
+				i=total;
+			}
+			var idMarkV:Vector.<Boolean>=new Vector.<Boolean>(i);
+			while(--i>=0){
+				idMarkV[idArr[i]]=true;
+			}
+			
+			return idMarkV;
+		}
 		public static function getStrWid(str:String):int{
 			var wid:int=0;
 			var i:int=str.length;

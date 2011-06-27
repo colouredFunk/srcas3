@@ -20,7 +20,7 @@ package zero.swf.avm2{
 		public function initByInfo(
 			metadata_info:Metadata_info,
 			stringV:Vector.<String>,
-			_initByDataOptions:zero_swf_InitByDataOptions
+			_initByDataOptions:Object/*zero_swf_InitByDataOptions*/
 		):void{
 			var i:int;
 			
@@ -58,7 +58,7 @@ package zero.swf.avm2{
 				item.getInfo_product(productMark);
 			}
 		}
-		public function getInfo(productMark:ProductMark,_toDataOptions:zero_swf_ToDataOptions):Metadata_info{
+		public function getInfo(productMark:ProductMark,_toDataOptions:Object/*zero_swf_ToDataOptions*/):Metadata_info{
 			var i:int;
 			var metadata_info:Metadata_info=new Metadata_info();
 			
@@ -84,7 +84,7 @@ package zero.swf.avm2{
 		
 		////
 		CONFIG::USE_XML{
-		public function toXMLAndMark(markStrs:MarkStrs,xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXMLAndMark(markStrs:MarkStrs,xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=markStrs.xmlDict[this];
 			if(xml){
 				xml=xml.copy();//保证下面的 setName 不互相影响就行
@@ -155,7 +155,7 @@ package zero.swf.avm2{
 			
 			return markStr;
 		}
-		public static function xml2metadata(markStrs:MarkStrs,xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):ABCMetadata{
+		public static function xml2metadata(markStrs:MarkStrs,xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):ABCMetadata{
 			return markStr2metadata(markStrs,xml2markStr(xml));
 		}
 		public static function xml2markStr(xml:XML):String{

@@ -130,14 +130,14 @@ package zero.swf.avm2{
 	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
 
-	public class ABCClasses/*{*/implements I_zero_swf_CheckCodesRight{
+	public class ABCClasses{//implements I_zero_swf_CheckCodesRight{
 		public var minor_version:int;					//direct
 		public var major_version:int;					//direct
 		
 		private var classV:Vector.<ABCClass>;
 		private var scriptV:Vector.<ABCScript>;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			var abcFile:ABCFile=new ABCFile();
 			offset=abcFile.initByData(data,offset,endOffset,_initByDataOptions);
 			
@@ -286,7 +286,7 @@ package zero.swf.avm2{
 			///
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var abcFile:ABCFile=new ABCFile();
 			
 			////
@@ -390,7 +390,7 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="ABCClasses"
 				minor_version={minor_version}
 				major_version={major_version}
@@ -424,7 +424,7 @@ package zero.swf.avm2{
 			
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			var i:int;
 			
 			minor_version=int(xml.@minor_version.toString());

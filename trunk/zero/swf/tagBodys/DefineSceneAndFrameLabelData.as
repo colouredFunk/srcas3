@@ -27,13 +27,13 @@ DefineSceneAndFrameLabelData
 //FrameLabelN 			STRING 				Frame label string of frame label #N
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class DefineSceneAndFrameLabelData/*{*/implements I_zero_swf_CheckCodesRight{
+	public class DefineSceneAndFrameLabelData{//implements I_zero_swf_CheckCodesRight{
 		public var OffsetV:Vector.<int>;
 		public var NameV:Vector.<String>;
 		public var FrameNumV:Vector.<int>;
 		public var FrameLabelV:Vector.<String>;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			//#offsetpp
 			
 			if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var SceneCount:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{SceneCount=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{SceneCount=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{SceneCount=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{SceneCount=data[offset++];}
@@ -70,7 +70,7 @@ package zero.swf.tagBodys{
 			}
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			var SceneCount:int=OffsetV.length;
 			var offset:int=0;
@@ -107,7 +107,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="DefineSceneAndFrameLabelData"/>;
 			if(OffsetV.length){
 				var listXML:XML=<OffsetAndNameList count={OffsetV.length}/>
@@ -131,7 +131,7 @@ package zero.swf.tagBodys{
 			}
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			if(xml.OffsetAndNameList.length()){
 				var listXML:XML=xml.OffsetAndNameList[0];
 				var OffsetXMLList:XMLList=listXML.Offset;

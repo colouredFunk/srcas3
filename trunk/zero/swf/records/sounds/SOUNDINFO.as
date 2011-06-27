@@ -28,7 +28,7 @@ SOUNDINFO
 package zero.swf.records.sounds{
 	import zero.swf.records.sounds.SOUNDENVELOPE;
 	import flash.utils.ByteArray;
-	public class SOUNDINFO/*{*/implements I_zero_swf_CheckCodesRight{
+	public class SOUNDINFO{//implements I_zero_swf_CheckCodesRight{
 		public var SyncStop:int;
 		public var SyncNoMultiple:int;
 		public var HasEnvelope:int;
@@ -40,7 +40,7 @@ package zero.swf.records.sounds{
 		public var LoopCount:int;						//UI16
 		public var EnvelopeRecordV:Vector.<SOUNDENVELOPE>;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			var flags:int=data[offset];
 			//Reserved=(flags<<24)>>>30;				//11000000
 			SyncStop=(flags<<26)>>>31;					//00100000
@@ -74,7 +74,7 @@ package zero.swf.records.sounds{
 			}
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			var flags:int=0;
 			//flags|=Reserved<<6;						//11000000
@@ -121,7 +121,7 @@ package zero.swf.records.sounds{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="SOUNDINFO"
 				SyncStop={SyncStop}
 				SyncNoMultiple={SyncNoMultiple}
@@ -159,7 +159,7 @@ package zero.swf.records.sounds{
 			}
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			SyncStop=int(xml.@SyncStop.toString());
 			SyncNoMultiple=int(xml.@SyncNoMultiple.toString());
 			HasEnvelope=int(xml.@HasEnvelope.toString());

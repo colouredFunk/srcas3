@@ -13,19 +13,19 @@ package zero.swf{
 	
 	import zero.BytesAndStr16;
 	
-	public class BytesData/*{*/implements I_zero_swf_CheckCodesRight{
+	public class BytesData{//implements I_zero_swf_CheckCodesRight{
 		public var ownData:ByteArray;
 		public var dataOffset:int;
 		public var dataLength:int;
 		public function BytesData(){
 		}
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			ownData=data;
 			dataOffset=offset;
 			dataLength=endOffset-offset;
 			return endOffset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			if(dataLength>0){
 				data.writeBytes(ownData,dataOffset,dataLength);
@@ -34,7 +34,7 @@ package zero.swf{
 		}
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			if(dataLength>0){
 				if(_toXMLOptions&&_toXMLOptions.BytesDataToXMLOption=="数据块（仅位置）"){
 					return <{xmlName} class="BytesData"
@@ -50,7 +50,7 @@ package zero.swf{
 			}
 			return <{xmlName} class="BytesData"/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			var value:String=xml.@value.toString();
 			if(value){
 				var data:ByteArray=BytesAndStr16.str162bytes(value);

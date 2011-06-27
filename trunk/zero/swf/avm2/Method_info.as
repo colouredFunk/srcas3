@@ -67,7 +67,7 @@ package zero.swf.avm2{
 	import zero.swf.avm2.MethodFlags;
 	import zero.swf.avm2.Option_detail;
 	import flash.utils.ByteArray;
-	public class Method_info/*{*/implements I_zero_swf_CheckCodesRight{
+	public class Method_info{//implements I_zero_swf_CheckCodesRight{
 		public var return_type:int;						//u30
 		public var param_typeV:Vector.<int>;
 		public var name:int;							//u30
@@ -75,7 +75,7 @@ package zero.swf.avm2{
 		public var option_detailV:Vector.<Option_detail>;
 		public var param_nameV:Vector.<int>;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var param_count:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{param_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{param_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{param_count=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{param_count=data[offset++];}
 			//param_count
 			
@@ -117,7 +117,7 @@ package zero.swf.avm2{
 			}
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			var offset:int=0;
 			var param_count:int=param_typeV.length;
@@ -163,7 +163,7 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="Method_info"
 				return_type={return_type}
 				name={name}
@@ -204,7 +204,7 @@ package zero.swf.avm2{
 			}
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			return_type=int(xml.@return_type.toString());
 			if(xml.param_typeList.length()){
 				var listXML:XML=xml.param_typeList[0];

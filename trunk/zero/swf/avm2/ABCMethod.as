@@ -80,7 +80,7 @@ package zero.swf.avm2{
 			allMethodV:Vector.<ABCMethod>,
 			allMetadataV:Vector.<ABCMetadata>,
 			classV:Vector.<ABCClass>,
-			_initByDataOptions:zero_swf_InitByDataOptions
+			_initByDataOptions:Object/*zero_swf_InitByDataOptions*/
 		):void{
 			var i:int;
 			
@@ -297,7 +297,7 @@ package zero.swf.avm2{
 				}
 			}
 		}
-		public function getInfo(productMark:ProductMark,_toDataOptions:zero_swf_ToDataOptions):Array{
+		public function getInfo(productMark:ProductMark,_toDataOptions:Object/*zero_swf_ToDataOptions*/):Array{
 			var i:int,arr:Array;
 			
 			var method_info:Method_info=new Method_info();
@@ -418,7 +418,7 @@ package zero.swf.avm2{
 		
 		////
 		CONFIG::USE_XML{
-		public function toXMLAndMark(markStrs:MarkStrs,methodNameMarkStr:String,xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXMLAndMark(markStrs:MarkStrs,methodNameMarkStr:String,xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			
 			//主要用作 AVM2Codes.toXMLAndMark() 时获取 markStr
 			if(markStrs.markStrDict[this]){
@@ -527,7 +527,7 @@ package zero.swf.avm2{
 			
 			return xml;
 		}
-		public function initByXMLAndMark(markStrs:MarkStrs,xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXMLAndMark(markStrs:MarkStrs,xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			var i:int;
 			
 			var return_typeXML:XML=xml.return_type[0];

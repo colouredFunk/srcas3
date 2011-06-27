@@ -42,7 +42,7 @@ package zero.swf.avm2{
 			allMethodV:Vector.<ABCMethod>,
 			allMetadataV:Vector.<ABCMetadata>,
 			classV:Vector.<ABCClass>,
-			_initByDataOptions:zero_swf_InitByDataOptions
+			_initByDataOptions:Object/*zero_swf_InitByDataOptions*/
 		):void{
 			var i:int;
 			
@@ -337,7 +337,7 @@ package zero.swf.avm2{
 				}
 			}
 		}
-		public function getInfo(productMark:ProductMark,_toDataOptions:zero_swf_ToDataOptions):Traits_info{
+		public function getInfo(productMark:ProductMark,_toDataOptions:Object/*zero_swf_ToDataOptions*/):Traits_info{
 			var i:int;
 			var traits_info:Traits_info=new Traits_info();
 			
@@ -505,7 +505,7 @@ package zero.swf.avm2{
 		
 		////
 		CONFIG::USE_XML{
-		public function toXMLAndMark(markStrs:MarkStrs,xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXMLAndMark(markStrs:MarkStrs,xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName}/>;
 			
 			if(name){
@@ -574,7 +574,7 @@ package zero.swf.avm2{
 			
 			return xml;
 		}
-		public function initByXMLAndMark(markStrs:MarkStrs,xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXMLAndMark(markStrs:MarkStrs,xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			var i:int;
 			
 			var nameXML:XML=xml.name[0];
