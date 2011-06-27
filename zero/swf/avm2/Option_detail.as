@@ -34,17 +34,17 @@ Option_detail
 package zero.swf.avm2{
 	import zero.swf.avm2.ConstantKinds;
 	import flash.utils.ByteArray;
-	public class Option_detail/*{*/implements I_zero_swf_CheckCodesRight{
+	public class Option_detail{//implements I_zero_swf_CheckCodesRight{
 		public var val:int;								//u30
 		public var kind:int;							//u8
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){val=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{val=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{val=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{val=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{val=data[offset++];}
 			//val
 			kind=data[offset++];
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			var offset:int=0;
 			if(val>>>7){if(val>>>14){if(val>>>21){if(val>>>28){data[offset++]=(val&0x7f)|0x80;data[offset++]=((val>>>7)&0x7f)|0x80;data[offset++]=((val>>>14)&0x7f)|0x80;data[offset++]=((val>>>21)&0x7f)|0x80;data[offset++]=val>>>28;}else{data[offset++]=(val&0x7f)|0x80;data[offset++]=((val>>>7)&0x7f)|0x80;data[offset++]=((val>>>14)&0x7f)|0x80;data[offset++]=val>>>21;}}else{data[offset++]=(val&0x7f)|0x80;data[offset++]=((val>>>7)&0x7f)|0x80;data[offset++]=val>>>14;}}else{data[offset++]=(val&0x7f)|0x80;data[offset++]=val>>>7;}}else{data[offset++]=val;}
@@ -55,13 +55,13 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			return <{xmlName} class="Option_detail"
 				val={val}
 				kind={ConstantKinds.kindV[kind]}
 			/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			val=int(xml.@val.toString());
 			kind=ConstantKinds[xml.@kind.toString()];
 		}

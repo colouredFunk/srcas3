@@ -25,7 +25,7 @@ BEVELFILTER
 package zero.swf.records.filters{
 	import zero.BytesAndStr16;
 	import flash.utils.ByteArray;
-	public class BEVELFILTER/*{*/implements I_zero_swf_CheckCodesRight{
+	public class BEVELFILTER{//implements I_zero_swf_CheckCodesRight{
 		public var ShadowColor:uint;					//RGBA
 		public var HighlightColor:uint;					//RGBA
 		public var BlurX:Number;						//FIXED
@@ -39,7 +39,7 @@ package zero.swf.records.filters{
 		public var OnTop:int;
 		public var Passes:int;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			ShadowColor=(data[offset]<<16)|(data[offset+1]<<8)|data[offset+2]|(data[offset+3]<<24);
 			HighlightColor=(data[offset+4]<<16)|(data[offset+5]<<8)|data[offset+6]|(data[offset+7]<<24);
 			BlurX=data[offset+8]/65536+data[offset+9]/256+data[offset+10]+(data[offset+11]<<8);
@@ -55,7 +55,7 @@ package zero.swf.records.filters{
 			Passes=flags&0x0f;							//00001111
 			return offset+27;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=ShadowColor>>16;
 			data[1]=ShadowColor>>8;
@@ -95,7 +95,7 @@ package zero.swf.records.filters{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			return <{xmlName} class="BEVELFILTER"
 				ShadowColor={"0x"+BytesAndStr16._16V[(ShadowColor>>24)&0xff]+BytesAndStr16._16V[(ShadowColor>>16)&0xff]+BytesAndStr16._16V[(ShadowColor>>8)&0xff]+BytesAndStr16._16V[ShadowColor&0xff]}
 				HighlightColor={"0x"+BytesAndStr16._16V[(HighlightColor>>24)&0xff]+BytesAndStr16._16V[(HighlightColor>>16)&0xff]+BytesAndStr16._16V[(HighlightColor>>8)&0xff]+BytesAndStr16._16V[HighlightColor&0xff]}
@@ -111,7 +111,7 @@ package zero.swf.records.filters{
 				Passes={Passes}
 			/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			ShadowColor=uint(xml.@ShadowColor.toString());
 			HighlightColor=uint(xml.@HighlightColor.toString());
 			BlurX=Number(xml.@BlurX.toString());

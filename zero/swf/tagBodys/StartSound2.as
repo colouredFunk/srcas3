@@ -20,11 +20,11 @@ StartSound2
 package zero.swf.tagBodys{
 	import zero.swf.BytesData;
 	import flash.utils.ByteArray;
-	public class StartSound2/*{*/implements I_zero_swf_CheckCodesRight{
+	public class StartSound2{//implements I_zero_swf_CheckCodesRight{
 		public var SoundClassName:String;				//STRING
 		public var restDatas:BytesData;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			var get_str_size:int=0;
 			while(data[offset+(get_str_size++)]){}
 			data.position=offset;
@@ -34,7 +34,7 @@ package zero.swf.tagBodys{
 			restDatas=new BytesData();
 			return restDatas.initByData(data,offset,endOffset,_initByDataOptions);
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data.writeUTFBytes(SoundClassName+"\x00");
 			data.writeBytes(restDatas.toData(_toDataOptions));
@@ -43,14 +43,14 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="StartSound2"
 				SoundClassName={SoundClassName}
 			/>;
 			xml.appendChild(restDatas.toXML("restDatas",_toXMLOptions));
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			SoundClassName=xml.@SoundClassName.toString();
 			restDatas=new BytesData();
 			restDatas.initByXML(xml.restDatas[0],_initByXMLOptions);

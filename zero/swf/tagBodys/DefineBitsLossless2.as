@@ -29,14 +29,14 @@ DefineBitsLossless2
 package zero.swf.tagBodys{
 	import zero.swf.BytesData;
 	import flash.utils.ByteArray;
-	public class DefineBitsLossless2/*{*/implements I_zero_swf_CheckCodesRight{
+	public class DefineBitsLossless2{//implements I_zero_swf_CheckCodesRight{
 		public var id:int;								//UI16
 		public var BitmapFormat:int;					//UI8
 		public var BitmapWidth:int;						//UI16
 		public var BitmapHeight:int;					//UI16
 		public var restDatas:BytesData;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			id=data[offset]|(data[offset+1]<<8);
 			BitmapFormat=data[offset+2];
 			BitmapWidth=data[offset+3]|(data[offset+4]<<8);
@@ -45,7 +45,7 @@ package zero.swf.tagBodys{
 			restDatas=new BytesData();
 			return restDatas.initByData(data,offset,endOffset,_initByDataOptions);
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=id;
 			data[1]=id>>8;
@@ -61,7 +61,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="DefineBitsLossless2"
 				id={id}
 				BitmapFormat={BitmapFormat}
@@ -71,7 +71,7 @@ package zero.swf.tagBodys{
 			xml.appendChild(restDatas.toXML("restDatas",_toXMLOptions));
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			id=int(xml.@id.toString());
 			BitmapFormat=int(xml.@BitmapFormat.toString());
 			BitmapWidth=int(xml.@BitmapWidth.toString());

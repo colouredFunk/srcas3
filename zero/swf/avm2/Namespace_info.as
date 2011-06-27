@@ -32,18 +32,18 @@ Namespace_info
 package zero.swf.avm2{
 	import zero.swf.avm2.NamespaceKinds;
 	import flash.utils.ByteArray;
-	public class Namespace_info/*{*/implements I_zero_swf_CheckCodesRight{
+	public class Namespace_info{//implements I_zero_swf_CheckCodesRight{
 		public var kind:int;							//u8
 		public var name:int;							//u30
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			kind=data[offset];
 			++offset;
 			if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){name=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{name=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{name=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{name=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{name=data[offset++];}
 			//name
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=kind;
 			var offset:int=1;
@@ -54,13 +54,13 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			return <{xmlName} class="Namespace_info"
 				kind={NamespaceKinds.kindV[kind]}
 				name={name}
 			/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			kind=NamespaceKinds[xml.@kind.toString()];
 			name=int(xml.@name.toString());
 		}

@@ -22,7 +22,7 @@ GLOWFILTER
 package zero.swf.records.filters{
 	import zero.BytesAndStr16;
 	import flash.utils.ByteArray;
-	public class GLOWFILTER/*{*/implements I_zero_swf_CheckCodesRight{
+	public class GLOWFILTER{//implements I_zero_swf_CheckCodesRight{
 		public var GlowColor:uint;						//RGBA
 		public var BlurX:Number;						//FIXED
 		public var BlurY:Number;						//FIXED
@@ -32,7 +32,7 @@ package zero.swf.records.filters{
 		public var CompositeSource:int;
 		public var Passes:int;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			GlowColor=(data[offset]<<16)|(data[offset+1]<<8)|data[offset+2]|(data[offset+3]<<24);
 			BlurX=data[offset+4]/65536+data[offset+5]/256+data[offset+6]+(data[offset+7]<<8);
 			BlurY=data[offset+8]/65536+data[offset+9]/256+data[offset+10]+(data[offset+11]<<8);
@@ -44,7 +44,7 @@ package zero.swf.records.filters{
 			Passes=flags&0x1f;							//00011111
 			return offset+15;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=GlowColor>>16;
 			data[1]=GlowColor>>8;
@@ -71,7 +71,7 @@ package zero.swf.records.filters{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			return <{xmlName} class="GLOWFILTER"
 				GlowColor={"0x"+BytesAndStr16._16V[(GlowColor>>24)&0xff]+BytesAndStr16._16V[(GlowColor>>16)&0xff]+BytesAndStr16._16V[(GlowColor>>8)&0xff]+BytesAndStr16._16V[GlowColor&0xff]}
 				BlurX={BlurX}
@@ -83,7 +83,7 @@ package zero.swf.records.filters{
 				Passes={Passes}
 			/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			GlowColor=uint(xml.@GlowColor.toString());
 			BlurX=Number(xml.@BlurX.toString());
 			BlurY=Number(xml.@BlurY.toString());

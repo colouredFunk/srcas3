@@ -19,10 +19,10 @@ Ns_set_info
 //No entry in the ns array may be zero.
 package zero.swf.avm2{
 	import flash.utils.ByteArray;
-	public class Ns_set_info/*{*/implements I_zero_swf_CheckCodesRight{
+	public class Ns_set_info{//implements I_zero_swf_CheckCodesRight{
 		public var nsV:Vector.<int>;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			//#offsetpp
 			
 			if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var integer_count:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{integer_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{integer_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{integer_count=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{integer_count=data[offset++];}
@@ -35,7 +35,7 @@ package zero.swf.avm2{
 			}
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			var integer_count:int=nsV.length;
 			var offset:int=0;
@@ -52,7 +52,7 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="Ns_set_info"/>;
 			if(nsV.length){
 				var listXML:XML=<nsList count={nsV.length}/>
@@ -63,7 +63,7 @@ package zero.swf.avm2{
 			}
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			if(xml.nsList.length()){
 				var listXML:XML=xml.nsList[0];
 				var nsXMLList:XMLList=listXML.ns;

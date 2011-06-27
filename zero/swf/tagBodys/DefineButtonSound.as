@@ -25,7 +25,7 @@ DefineButtonSound
 package zero.swf.tagBodys{
 	import zero.swf.records.sounds.SOUNDINFO;
 	import flash.utils.ByteArray;
-	public class DefineButtonSound/*{*/implements I_zero_swf_CheckCodesRight{
+	public class DefineButtonSound{//implements I_zero_swf_CheckCodesRight{
 		public var ButtonId:int;						//UI16
 		public var ButtonSoundChar0:int;				//UI16
 		public var ButtonSoundInfo0:SOUNDINFO;
@@ -36,7 +36,7 @@ package zero.swf.tagBodys{
 		public var ButtonSoundChar3:int;				//UI16
 		public var ButtonSoundInfo3:SOUNDINFO;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			ButtonId=data[offset]|(data[offset+1]<<8);
 			ButtonSoundChar0=data[offset+2]|(data[offset+3]<<8);
 			offset+=4;
@@ -68,7 +68,7 @@ package zero.swf.tagBodys{
 			}
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=ButtonId;
 			data[1]=ButtonId>>8;
@@ -109,7 +109,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="DefineButtonSound"
 				ButtonId={ButtonId}
 				ButtonSoundChar0={ButtonSoundChar0}
@@ -131,7 +131,7 @@ package zero.swf.tagBodys{
 			}
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			ButtonId=int(xml.@ButtonId.toString());
 			ButtonSoundChar0=int(xml.@ButtonSoundChar0.toString());
 			if(ButtonSoundChar0){

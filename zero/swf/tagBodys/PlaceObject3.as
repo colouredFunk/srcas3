@@ -110,7 +110,7 @@ package zero.swf.tagBodys{
 	import zero.swf.records.clips.CLIPACTIONS;
 	import flash.utils.ByteArray;
 	import flash.utils.getQualifiedClassName;
-	public class PlaceObject3/*{*/implements I_zero_swf_CheckCodesRight{
+	public class PlaceObject3{//implements I_zero_swf_CheckCodesRight{
 		public var PlaceFlagHasClipActions:int;
 		public var PlaceFlagHasClipDepth:int;
 		public var PlaceFlagHasName:int;
@@ -137,7 +137,7 @@ package zero.swf.tagBodys{
 		public var BitmapCache:int;						//UI8
 		public var ClipActions:CLIPACTIONS;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			var flags:int=data[offset];
 			PlaceFlagHasClipActions=(flags<<24)>>>31;	//10000000
 			PlaceFlagHasClipDepth=(flags<<25)>>>31;		//01000000
@@ -224,7 +224,7 @@ package zero.swf.tagBodys{
 			}
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			var flags:int=0;
 			flags|=PlaceFlagHasClipActions<<7;			//10000000
@@ -318,7 +318,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="PlaceObject3"
 				PlaceFlagHasClipActions={PlaceFlagHasClipActions}
 				PlaceFlagHasClipDepth={PlaceFlagHasClipDepth}
@@ -397,7 +397,7 @@ package zero.swf.tagBodys{
 			}
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			PlaceFlagHasClipActions=int(xml.@PlaceFlagHasClipActions.toString());
 			PlaceFlagHasClipDepth=int(xml.@PlaceFlagHasClipDepth.toString());
 			PlaceFlagHasName=int(xml.@PlaceFlagHasName.toString());

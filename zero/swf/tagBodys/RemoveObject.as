@@ -17,16 +17,16 @@ RemoveObject
 //Depth 		UI16 			Depth of character
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class RemoveObject/*{*/implements I_zero_swf_CheckCodesRight{
+	public class RemoveObject{//implements I_zero_swf_CheckCodesRight{
 		public var CharacterId:int;						//UI16
 		public var Depth:int;							//UI16
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			CharacterId=data[offset]|(data[offset+1]<<8);
 			Depth=data[offset+2]|(data[offset+3]<<8);
 			return offset+4;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=CharacterId;
 			data[1]=CharacterId>>8;
@@ -37,13 +37,13 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			return <{xmlName} class="RemoveObject"
 				CharacterId={CharacterId}
 				Depth={Depth}
 			/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			CharacterId=int(xml.@CharacterId.toString());
 			Depth=int(xml.@Depth.toString());
 		}

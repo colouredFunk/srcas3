@@ -18,7 +18,7 @@ CXFORM
 //BlueAddTerm 	If HasAddTerms = 1, SB[Nbits] 	Blue addition value
 package zero.swf.records{
 	import flash.utils.ByteArray;
-	public class CXFORM/*{*/implements I_zero_swf_CheckCodesRight{
+	public class CXFORM{//implements I_zero_swf_CheckCodesRight{
 		public var HasAddTerms:int;
 		public var HasMultTerms:int;
 		public var Nbits:int;
@@ -29,7 +29,7 @@ package zero.swf.records{
 		public var GreenAddTerm:int;
 		public var BlueAddTerm:int;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			var bGroupValue:int=(data[offset]<<24)|(data[offset+1]<<16)|(data[offset+2]<<8)|data[offset+3];
 			offset+=4;
 			HasAddTerms=bGroupValue>>>31;					//10000000 00000000 00000000 00000000
@@ -91,7 +91,7 @@ package zero.swf.records{
 			
 			return offset-int(4-bGroupBitsOffset/8);
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			var bGroupValue:int=0;
 			var offset:int=0;
@@ -152,7 +152,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			return <{xmlName} class="CXFORM"
 				HasAddTerms={HasAddTerms}
 				HasMultTerms={HasMultTerms}
@@ -165,7 +165,7 @@ package zero.swf.records{
 				BlueAddTerm={BlueAddTerm}
 			/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			HasAddTerms=int(xml.@HasAddTerms.toString());
 			HasMultTerms=int(xml.@HasMultTerms.toString());
 			Nbits=int(xml.@Nbits.toString());

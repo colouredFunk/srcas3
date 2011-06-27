@@ -53,7 +53,7 @@ package zero.swf.avm2{
 			allNsV:Vector.<ABCNamespace>,
 			allNs_setV:Vector.<ABCNs_set>,
 			allMultinameV:Vector.<ABCMultiname>,
-			_initByDataOptions:zero_swf_InitByDataOptions
+			_initByDataOptions:Object/*zero_swf_InitByDataOptions*/
 		):void{
 			kind=multiname_info.kind;
 			
@@ -260,7 +260,7 @@ package zero.swf.avm2{
 			}
 			
 		}
-		public function getInfo(productMark:ProductMark,_toDataOptions:zero_swf_ToDataOptions):Multiname_info{
+		public function getInfo(productMark:ProductMark,_toDataOptions:Object/*zero_swf_ToDataOptions*/):Multiname_info{
 			var multiname_info:Multiname_info=new Multiname_info();
 			
 			multiname_info.kind=kind;
@@ -374,7 +374,7 @@ package zero.swf.avm2{
 		
 		////
 		CONFIG::USE_XML{
-		public function toXMLAndMark(markStrs:MarkStrs,xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXMLAndMark(markStrs:MarkStrs,xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			if(MultinameKinds.kindV[kind]){
 			}else{
 				throw new Error("kind="+kind);
@@ -670,7 +670,7 @@ package zero.swf.avm2{
 			return markStr;
 		}
 		
-		public static function xml2multiname(markStrs:MarkStrs,xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):ABCMultiname{
+		public static function xml2multiname(markStrs:MarkStrs,xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):ABCMultiname{
 			return markStr2multiname(markStrs,xml2markStr(xml));
 		} 
 		public static function xml2markStr(xml:XML):String{

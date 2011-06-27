@@ -22,7 +22,7 @@ package zero.swf.avm2{
 		public function initByInfo(
 			item_info:Item_info,
 			stringV:Vector.<String>,
-			_initByDataOptions:zero_swf_InitByDataOptions
+			_initByDataOptions:Object/*zero_swf_InitByDataOptions*/
 		):void{
 			key=stringV[item_info.key];//stringV[0]==null
 			
@@ -34,7 +34,7 @@ package zero.swf.avm2{
 			
 			productMark.productString(value);
 		}
-		public function getInfo(productMark:ProductMark,_toDataOptions:zero_swf_ToDataOptions):Item_info{
+		public function getInfo(productMark:ProductMark,_toDataOptions:Object/*zero_swf_ToDataOptions*/):Item_info{
 			var item_info:Item_info=new Item_info();
 			
 			item_info.key=productMark.getStringId(key);
@@ -46,7 +46,7 @@ package zero.swf.avm2{
 		
 		////
 		CONFIG::USE_XML{
-		public function toXMLAndMark(markStrs:MarkStrs,xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXMLAndMark(markStrs:MarkStrs,xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName}/>;
 			
 			if(key is String){
@@ -59,7 +59,7 @@ package zero.swf.avm2{
 			
 			return xml;
 		}
-		public function initByXMLAndMark(markStrs:MarkStrs,xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXMLAndMark(markStrs:MarkStrs,xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			var keyXML:XML=xml.@key[0];
 			if(keyXML){
 				key=keyXML.toString();

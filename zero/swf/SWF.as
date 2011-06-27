@@ -182,7 +182,7 @@ package zero.swf{
 			return offset;
 		}
 		
-		public function initBySWFData_start(swfData:ByteArray,_initByDataOptions:zero_swf_InitByDataOptions):zero_swf_InitByDataOptions{
+		public function initBySWFData_start(swfData:ByteArray,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):Object/*zero_swf_InitByDataOptions*/{
 			//~~~~~
 			var data:ByteArray=swfData2Data(swfData);
 			var offset:int=initInfoByData(data);
@@ -197,13 +197,13 @@ package zero.swf{
 			///
 			if(_initByDataOptions){
 			}else{
-				_initByDataOptions=new zero_swf_InitByDataOptions();
+				_initByDataOptions=new Object/*zero_swf_InitByDataOptions*/();
 			}
 			_initByDataOptions.swf_Version=Version;
 			
 			return _initByDataOptions;
 		}
-		public function initBySWFData(swfData:ByteArray,_initByDataOptions:zero_swf_InitByDataOptions):void{
+		public function initBySWFData(swfData:ByteArray,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):void{
 			_initByDataOptions=initBySWFData_start(swfData,_initByDataOptions);
 			
 			//@@@@@
@@ -272,20 +272,20 @@ package zero.swf{
 			return data;
 		}
 		
-		public function toSWFData_start(_toDataOptions:zero_swf_ToDataOptions):zero_swf_ToDataOptions{
+		public function toSWFData_start(_toDataOptions:Object/*zero_swf_ToDataOptions*/):Object/*zero_swf_ToDataOptions*/{
 			//#####
 			FrameCount=Tags.getRealFrameCount(tagV);
 			
 			///
 			if(_toDataOptions){
 			}else{
-				_toDataOptions=new zero_swf_ToDataOptions();
+				_toDataOptions=new Object/*zero_swf_ToDataOptions*/();
 			}
 			_toDataOptions.swf_Version=Version;
 			
 			return _toDataOptions;
 		}
-		public function toSWFData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toSWFData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			_toDataOptions=toSWFData_start(_toDataOptions);
 			
 			//临时变量
@@ -338,10 +338,10 @@ package zero.swf{
 			return infoXML;
 		}
 		
-		public function toXML_start(_toXMLOptions:zero_swf_ToXMLOptions):zero_swf_ToXMLOptions{
+		public function toXML_start(_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):Object/*zero_swf_ToXMLOptions*/{
 			return _toXMLOptions;
 		}
-		public function toXML(_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			_toXMLOptions=toXML_start(_toXMLOptions);
 			
 			//!临时变量
@@ -387,7 +387,7 @@ package zero.swf{
 			FrameCount=int(infoXML.@FrameCount.toString());//仅用于参考
 		}
 		
-		public function initByXML_start(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):zero_swf_InitByXMLOptions{
+		public function initByXML_start(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):Object/*zero_swf_InitByXMLOptions*/{
 			//~~~~~
 			initInfoByXML(xml);
 			
@@ -396,7 +396,7 @@ package zero.swf{
 			
 			return _initByXMLOptions;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			_initByXMLOptions=initByXML_start(xml,_initByXMLOptions);
 			
 			//临时变量

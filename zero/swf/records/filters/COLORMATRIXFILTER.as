@@ -19,10 +19,10 @@ COLORMATRIXFILTER
 package zero.swf.records.filters{
 	import flash.utils.Endian;
 	import flash.utils.ByteArray;
-	public class COLORMATRIXFILTER/*{*/implements I_zero_swf_CheckCodesRight{
+	public class COLORMATRIXFILTER{//implements I_zero_swf_CheckCodesRight{
 		public var MatrixV:Vector.<Number>;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			data.endian=Endian.LITTLE_ENDIAN;
 			MatrixV=new Vector.<Number>(20);
 			MatrixV.fixed=true;
@@ -32,7 +32,7 @@ package zero.swf.records.filters{
 			}
 			return data.position;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data.endian=Endian.LITTLE_ENDIAN;
 			
@@ -44,7 +44,7 @@ package zero.swf.records.filters{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="COLORMATRIXFILTER"/>;
 			if(MatrixV.length){
 				var listXML:XML=<MatrixList count={MatrixV.length}/>
@@ -55,7 +55,7 @@ package zero.swf.records.filters{
 			}
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			if(xml.MatrixList.length()){
 				var listXML:XML=xml.MatrixList[0];
 				var MatrixXMLList:XMLList=listXML.Matrix;

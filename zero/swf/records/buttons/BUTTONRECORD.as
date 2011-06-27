@@ -56,7 +56,7 @@ package zero.swf.records.buttons{
 	import zero.swf.records.BlendModes;
 	import flash.utils.ByteArray;
 	import flash.utils.getQualifiedClassName;
-	public class BUTTONRECORD/*{*/implements I_zero_swf_CheckCodesRight{
+	public class BUTTONRECORD{//implements I_zero_swf_CheckCodesRight{
 		public var ButtonHasBlendMode:int;
 		public var ButtonHasFilterList:int;
 		public var ButtonStateHitTest:int;
@@ -70,7 +70,7 @@ package zero.swf.records.buttons{
 		public var FilterV:Vector.<Object>;
 		public var BlendMode:int;						//UI8
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			var flags:int=data[offset];
 			//Reserved=(flags<<24)>>>30;				//11000000
 			ButtonHasBlendMode=(flags<<26)>>>31;		//00100000
@@ -104,7 +104,7 @@ package zero.swf.records.buttons{
 			}
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			var flags:int=0;
 			//flags|=Reserved<<6;						//11000000
@@ -143,7 +143,7 @@ package zero.swf.records.buttons{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="BUTTONRECORD"
 				ButtonHasBlendMode={ButtonHasBlendMode}
 				ButtonHasFilterList={ButtonHasFilterList}
@@ -173,7 +173,7 @@ package zero.swf.records.buttons{
 			}
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			ButtonHasBlendMode=int(xml.@ButtonHasBlendMode.toString());
 			ButtonHasFilterList=int(xml.@ButtonHasFilterList.toString());
 			ButtonStateHitTest=int(xml.@ButtonStateHitTest.toString());

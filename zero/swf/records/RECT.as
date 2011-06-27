@@ -14,14 +14,14 @@ RECT
 //Ymax 			SB[Nbits] 	y maximum position for rectangle in twips
 package zero.swf.records{
 	import flash.utils.ByteArray;
-	public class RECT/*{*/implements I_zero_swf_CheckCodesRight{
+	public class RECT{//implements I_zero_swf_CheckCodesRight{
 		public var Nbits:int;
 		public var Xmin:int;
 		public var Xmax:int;
 		public var Ymin:int;
 		public var Ymax:int;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			var bGroupValue:int=(data[offset]<<24)|(data[offset+1]<<16)|(data[offset+2]<<8)|data[offset+3];
 			offset+=4;
 			Nbits=bGroupValue>>>27;							//11111000 00000000 00000000 00000000
@@ -61,7 +61,7 @@ package zero.swf.records{
 			
 			return offset-int(4-bGroupBitsOffset/8);
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			var bGroupValue:int=0;
 			var offset:int=0;
@@ -102,7 +102,7 @@ package zero.swf.records{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			return <{xmlName} class="RECT"
 				Nbits={Nbits}
 				Xmin={Xmin}
@@ -111,7 +111,7 @@ package zero.swf.records{
 				Ymax={Ymax}
 			/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			Nbits=int(xml.@Nbits.toString());
 			Xmin=int(xml.@Xmin.toString());
 			Xmax=int(xml.@Xmax.toString());

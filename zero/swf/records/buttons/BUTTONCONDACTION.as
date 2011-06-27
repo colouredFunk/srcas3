@@ -42,7 +42,7 @@ package zero.swf.records.buttons{
 	import zero.swf.BytesData;
 	import flash.utils.ByteArray;
 	import flash.utils.getDefinitionByName;
-	public class BUTTONCONDACTION/*{*/implements I_zero_swf_CheckCodesRight{
+	public class BUTTONCONDACTION{//implements I_zero_swf_CheckCodesRight{
 		public var CondIdleToOverDown:int;
 		public var CondOutDownToIdle:int;
 		public var CondOutDownToOverDown:int;
@@ -53,10 +53,10 @@ package zero.swf.records.buttons{
 		public var CondIdleToOverUp:int;
 		public var CondKeyPress:int;
 		public var CondOverDownToIdle:int;
-		public var Actions:I_zero_swf_CheckCodesRight;	//Actions
-		public var ActionEndFlag:int;					//UI8
+		public var Actions:*;
+		public var ActionEndFlag:int;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			var CondActionSize:int=data[offset]|(data[offset+1]<<8);
 			if(CondActionSize){
 				endOffset=offset+CondActionSize;
@@ -83,7 +83,7 @@ package zero.swf.records.buttons{
 			ActionEndFlag=data[offset++];
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=0x00;//CondActionSize
 			data[1]=0x00;//CondActionSize
@@ -111,7 +111,7 @@ package zero.swf.records.buttons{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="BUTTONCONDACTION"
 				CondIdleToOverDown={CondIdleToOverDown}
 				CondOutDownToIdle={CondOutDownToIdle}
@@ -129,7 +129,7 @@ package zero.swf.records.buttons{
 			xml.appendChild(Actions.toXML("Actions",_toXMLOptions));
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			CondIdleToOverDown=int(xml.@CondIdleToOverDown.toString());
 			CondOutDownToIdle=int(xml.@CondOutDownToIdle.toString());
 			CondOutDownToOverDown=int(xml.@CondOutDownToOverDown.toString());

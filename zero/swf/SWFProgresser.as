@@ -25,20 +25,20 @@ package zero.swf{
 		private var stepCount:int;
 		
 		//仅用于 initByData
-		private var initByDataOptions:zero_swf_InitByDataOptions;
+		private var initByDataOptions:Object/*zero_swf_InitByDataOptions*/;
 		
 		//仅用于 toData
-		private var toDataOptions:zero_swf_ToDataOptions;
+		private var toDataOptions:Object/*zero_swf_ToDataOptions*/;
 		private var tagsData:ByteArray;
 		
 		CONFIG::USE_XML{
 		//仅用于 toXML
-		private var toXMLOptions:zero_swf_ToXMLOptions;
+		private var toXMLOptions:Object/*zero_swf_ToXMLOptions*/;
 		private var tagsXML:XML;
 		private var frameIdDict:Dictionary;
 		
 		//仅用于 initByXML
-		private var initByXMLOptions:zero_swf_InitByXMLOptions;
+		private var initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/;
 		private var nodeXMLList:XMLList;
 		}//end of CONFIG::USE_XML
 		
@@ -127,7 +127,7 @@ package zero.swf{
 		public function initBySWFData(
 			_swf:SWF,
 			swfData:ByteArray,
-			_initByDataOptions:zero_swf_InitByDataOptions,
+			_initByDataOptions:Object/*zero_swf_InitByDataOptions*/,
 			_onProgress:Function,
 			_onComplete:Function
 		):void{
@@ -155,7 +155,7 @@ package zero.swf{
 			);
 		}
 		
-		public function toSWFData(_swf:SWF,_toDataOptions:zero_swf_ToDataOptions,_onProgress:Function,_onComplete:Function):void{
+		public function toSWFData(_swf:SWF,_toDataOptions:Object/*zero_swf_ToDataOptions*/,_onProgress:Function,_onComplete:Function):void{
 			clear();
 			
 			///
@@ -188,7 +188,7 @@ package zero.swf{
 		}
 		
 		CONFIG::USE_XML{
-		public function toXML(_swf:SWF,_toXMLOptions:zero_swf_ToXMLOptions,_onProgress:Function,_onComplete:Function):void{
+		public function toXML(_swf:SWF,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/,_onProgress:Function,_onComplete:Function):void{
 			clear();
 			
 			///
@@ -222,7 +222,7 @@ package zero.swf{
 			return swf.toXML_end(tagsXML);
 		}
 		
-		public function initByXML(_swf:SWF,xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions,_onProgress:Function,_onComplete:Function):void{
+		public function initByXML(_swf:SWF,xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/,_onProgress:Function,_onComplete:Function):void{
 			clear();
 			
 			///

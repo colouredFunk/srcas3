@@ -91,7 +91,7 @@ Multiname_info
 package zero.swf.avm2{
 	import zero.swf.avm2.MultinameKinds;
 	import flash.utils.ByteArray;
-	public class Multiname_info/*{*/implements I_zero_swf_CheckCodesRight{
+	public class Multiname_info{//implements I_zero_swf_CheckCodesRight{
 		public var kind:int;							//u8
 		//QName，QNameA				u30_1 表现为：ns，u30_2 表现为：name
 		//Multiname，MultinameA		u30_1 表现为：name，u30_2 表现为：ns_set
@@ -104,7 +104,7 @@ package zero.swf.avm2{
 		//ParamV 仅用于 GenericName
 		public var ParamV:Vector.<int>;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			kind=data[offset];
 			
 			++offset;
@@ -149,7 +149,7 @@ package zero.swf.avm2{
 			}
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=kind;
 			
@@ -200,7 +200,7 @@ package zero.swf.avm2{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="Multiname_info"
 				kind={MultinameKinds.kindV[kind]}
 			/>;
@@ -238,7 +238,7 @@ package zero.swf.avm2{
 			}
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			kind=MultinameKinds[xml.@kind.toString()];
 			
 			switch(kind){

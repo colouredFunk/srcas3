@@ -11,10 +11,10 @@ EnableDebugger
 //Password 		Null-terminated STRING.(0 is NULL)	MD5-encrypted password
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class EnableDebugger/*{*/implements I_zero_swf_CheckCodesRight{
+	public class EnableDebugger{//implements I_zero_swf_CheckCodesRight{
 		public var password:String;						//Password
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			if(endOffset-offset==31){
 				data.position=offset+2;
 				password=data.readUTFBytes(28);
@@ -23,7 +23,7 @@ package zero.swf.tagBodys{
 			password="";
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			if(password){
 				data.writeUTFBytes("\x00\x00"+password+"\x00");
@@ -33,12 +33,12 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			return <{xmlName} class="EnableDebugger"
 				password={password}
 			/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			password=xml.@password.toString();
 		}
 		}//end of CONFIG::USE_XML

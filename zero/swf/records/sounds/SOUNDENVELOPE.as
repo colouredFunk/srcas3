@@ -15,18 +15,18 @@ SOUNDENVELOPE
 //For mono sounds, set the LeftLevel and RightLevel fields to the same value. If the values differ, they will be averaged.
 package zero.swf.records.sounds{
 	import flash.utils.ByteArray;
-	public class SOUNDENVELOPE/*{*/implements I_zero_swf_CheckCodesRight{
+	public class SOUNDENVELOPE{//implements I_zero_swf_CheckCodesRight{
 		public var Pos44:uint;							//UI32
 		public var LeftLevel:int;						//UI16
 		public var RightLevel:int;						//UI16
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			Pos44=data[offset]|(data[offset+1]<<8)|(data[offset+2]<<16)|(data[offset+3]<<24);
 			LeftLevel=data[offset+4]|(data[offset+5]<<8);
 			RightLevel=data[offset+6]|(data[offset+7]<<8);
 			return offset+8;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=Pos44;
 			data[1]=Pos44>>8;
@@ -41,14 +41,14 @@ package zero.swf.records.sounds{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			return <{xmlName} class="SOUNDENVELOPE"
 				Pos44={Pos44}
 				LeftLevel={LeftLevel}
 				RightLevel={RightLevel}
 			/>;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			Pos44=uint(xml.@Pos44.toString());
 			LeftLevel=int(xml.@LeftLevel.toString());
 			RightLevel=int(xml.@RightLevel.toString());

@@ -28,12 +28,12 @@ ImportAssets
 //NameN 			STRING 			Identifier for last imported character
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
-	public class ImportAssets/*{*/implements I_zero_swf_CheckCodesRight{
+	public class ImportAssets{//implements I_zero_swf_CheckCodesRight{
 		public var URL:String;							//STRING
 		public var TagV:Vector.<int>;
 		public var NameV:Vector.<String>;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			var get_str_size:int=0;
 			while(data[offset+(get_str_size++)]){}
 			data.position=offset;
@@ -54,7 +54,7 @@ package zero.swf.tagBodys{
 			}
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data.writeUTFBytes(URL+"\x00");
 			var offset:int=data.length;
@@ -76,7 +76,7 @@ package zero.swf.tagBodys{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="ImportAssets"
 				URL={URL}
 			/>;
@@ -92,7 +92,7 @@ package zero.swf.tagBodys{
 			}
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			URL=xml.@URL.toString();
 			if(xml.TagAndNameList.length()){
 				var listXML:XML=xml.TagAndNameList[0];

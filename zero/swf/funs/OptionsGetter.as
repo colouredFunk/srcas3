@@ -11,8 +11,8 @@ package zero.swf.funs{
 	import flash.utils.getQualifiedClassName;
 	
 	public class OptionsGetter{
-		public static function getInitByDataOptions(_options:*=null):zero_swf_InitByDataOptions{
-			var initByDataOptions:zero_swf_InitByDataOptions=new zero_swf_InitByDataOptions();
+		public static function getInitByDataOptions(_options:*=null):Object/*zero_swf_InitByDataOptions*/{
+			var initByDataOptions:Object/*zero_swf_InitByDataOptions*/=new Object/*zero_swf_InitByDataOptions*/();
 			
 			initByDataOptions.optionV=options2OptionV(_options);
 			
@@ -48,8 +48,8 @@ package zero.swf.funs{
 			
 			return initByDataOptions;
 		}
-		public static function getToXMLOptions(_options:*=null):zero_swf_ToXMLOptions{
-			var toXMLOptions:zero_swf_ToXMLOptions=new zero_swf_ToXMLOptions();
+		public static function getToXMLOptions(_options:*=null):Object/*zero_swf_ToXMLOptions*/{
+			var toXMLOptions:Object/*zero_swf_ToXMLOptions*/=new Object/*zero_swf_ToXMLOptions*/();
 			
 			toXMLOptions.optionV=options2OptionV(_options);
 			

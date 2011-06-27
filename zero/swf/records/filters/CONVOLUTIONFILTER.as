@@ -29,7 +29,7 @@ package zero.swf.records.filters{
 	import flash.utils.Endian;
 	import zero.BytesAndStr16;
 	import flash.utils.ByteArray;
-	public class CONVOLUTIONFILTER/*{*/implements I_zero_swf_CheckCodesRight{
+	public class CONVOLUTIONFILTER{//implements I_zero_swf_CheckCodesRight{
 		public var MatrixX:int;							//UI8
 		public var MatrixY:int;							//UI8
 		public var Divisor:Number;						//FLOAT
@@ -39,7 +39,7 @@ package zero.swf.records.filters{
 		public var Clamp:int;
 		public var PreserveAlpha:int;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:zero_swf_InitByDataOptions):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			data.endian=Endian.LITTLE_ENDIAN;
 			MatrixX=data[offset];
 			MatrixY=data[offset+1];
@@ -61,7 +61,7 @@ package zero.swf.records.filters{
 			PreserveAlpha=flags&0x01;					//00000001
 			return offset;
 		}
-		public function toData(_toDataOptions:zero_swf_ToDataOptions):ByteArray{
+		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data.endian=Endian.LITTLE_ENDIAN;
 			data[0]=MatrixX;
@@ -90,7 +90,7 @@ package zero.swf.records.filters{
 
 		////
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:zero_swf_ToXMLOptions):XML{
+		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			var xml:XML=<{xmlName} class="CONVOLUTIONFILTER"
 				MatrixX={MatrixX}
 				MatrixY={MatrixY}
@@ -109,7 +109,7 @@ package zero.swf.records.filters{
 			}
 			return xml;
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:zero_swf_InitByXMLOptions):void{
+		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			MatrixX=int(xml.@MatrixX.toString());
 			MatrixY=int(xml.@MatrixY.toString());
 			Divisor=Number(xml.@Divisor.toString());
