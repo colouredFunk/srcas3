@@ -7,28 +7,19 @@ package akdcl.manager {
 	 * ...
 	 * @author Akdcl
 	 */
+
+	/// @eventType	ExternalInterfaceManager.SWF_INTERFACE
+	[Event(name = "call", type = "ExternalInterfaceManager")]
+	
 	final public class ExternalInterfaceManager extends EventDispatcher {
-		public static const ROLL_OVER:String = "rollOver";
-		public static const ROLL_OUT:String = "rollOut";
-		public static const PRESS:String = "press";
-		public static const RELEASE:String = "release";
-
-		public static const SWF_INTERFACE:String = "call";
-
-		public static const EXTERNAL_LISTENER:String = "swfEventHandler";
 		public static var instance:ExternalInterfaceManager;
 
 		public static function getInstance():ExternalInterfaceManager {
-			if (!instance){
+			if (instance){
+			}else {
 				instance = new ExternalInterfaceManager();
 			}
 			return instance;
-		}
-		public var data:*;
-		private var __isAvailable:Boolean = false;
-
-		public function get isAvailable():Boolean {
-			return __isAvailable;
 		}
 
 		public function ExternalInterfaceManager(){
@@ -41,7 +32,18 @@ package akdcl.manager {
 				ExternalInterface.addCallback(SWF_INTERFACE, swfInterface);
 			}
 		}
+		
+		public static const SWF_INTERFACE:String = "call";
 
+		public static const EXTERNAL_LISTENER:String = "swfEventHandler";
+
+		public var data:*;
+		private var __isAvailable:Boolean = false;
+
+		public function get isAvailable():Boolean {
+			return __isAvailable;
+		}
+		
 		public function hasInterface(_funName:String):Boolean {
 			if (isAvailable){
 				return ExternalInterface.call("eval", _funName + "!=" + "null");
@@ -57,7 +59,8 @@ package akdcl.manager {
 				return ExternalInterface.call(_funName);
 			}
 		}
-
+		
+		//广播js调用as的事件
 		private function swfInterface(_type:String,...args):void {
 			var _event:Event = new Event(SWF_INTERFACE);
 			if (args) {
@@ -65,6 +68,8 @@ package akdcl.manager {
 			}else {
 				data = [_type];
 			}
+			//addEventListener(ExternalInterfaceManager.SWF_INTERFACE);
+			//_type:eiM.data[0], ...args:eiM.data[1...]
 			dispatchEvent(_event);
 			//
 			_event = new Event(_type);
@@ -73,9 +78,12 @@ package akdcl.manager {
 			}else {
 				data = null;
 			}
+			//addEventListener(_type);
+			//...args:eiM.data
 			dispatchEvent(_event);
 		}
-
+		
+		//广播as调用js的事件
 		public function dispatchSWFEvent(_type:String, ... args):void {
 			if (isAvailable){
 				if (args){
@@ -86,8 +94,8 @@ package akdcl.manager {
 			}
 		}
 
-		public function debugMessage(_str:String):void {
-			callInterface("alert", "[" + ExternalInterface.objectID + "]\r\n" + _str);
+		public function debugMessage(...args):void {
+			callInterface("alert", "[" + ExternalInterface.objectID + "]\r\n" + args);
 		}
 	}
 }

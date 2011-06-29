@@ -21,6 +21,8 @@
 		
 		public var autoSize:Boolean = true;
 		
+		public var isCacheAsBitmap:Boolean;
+		
 		public function get areaHeight():int{
 			return maskArea.height;
 		}
@@ -42,18 +44,17 @@
 				__content.mask = null;
 			}
 			__content = _content;
+			__content.mask = maskArea;
 			if (__content && __content.height > maskArea.height) {
 				var _rect:Rectangle = __content.getBounds(__content.parent);
 				offX = int(x + __content.x - _rect.x);
 				offY = int(y + __content.y - _rect.y) + headerHeight;
 				__content.x = offX;
 				maskArea.width = __content.width + 5;
-				
-				__content.cacheAsBitmap = true;
-				maskArea.cacheAsBitmap = true;
-				__content.mask = maskArea;
-				
-				
+				if (isCacheAsBitmap) {
+					__content.cacheAsBitmap = true;
+					maskArea.cacheAsBitmap = true;
+				}
 				
 				maximum = __content.height - maskArea.height + headerHeight + footerHeight;
 				slider.maximum = maximum;
@@ -66,9 +67,9 @@
 				enabled = true;
 				visible = true;
 			} else {
-				if (__content) {
-					__content.mask = null;
-				}
+				//if (__content) {
+				//	__content.mask = null;
+				//}
 				enabled = false;
 				visible = false;
 			}
@@ -103,7 +104,9 @@
 			content.y = offY - value;
 		}
 		public function $wheel(_delta:int):void {
-			slider.value += (_delta > 0? -1:1) * wheelInterval;
+			if (mouseX >= maskArea.x && mouseX <= (maskArea.width + maskArea.x)&&mouseY >= maskArea.y && mouseY <= (maskArea.height + maskArea.y)) {
+				slider.value += (_delta > 0? -1:1) * wheelInterval;
+			}
 		}
 		/*
 		private function goUp():void {
