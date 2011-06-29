@@ -17,9 +17,9 @@ package akdcl.manager {
 	 */
 
 	/// @eventType	flash.events.Event.RESIZE
-	[Event(name="resize",type="flash.events.Event")]
+	[Event(name = "resize", type = "flash.events.Event")]
 
-	public class WHManager extends EventDispatcher {
+	final public class WHManager extends EventDispatcher {
 		private static var instance:WHManager;
 
 		public static function getInstance():WHManager {
