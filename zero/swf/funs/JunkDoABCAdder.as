@@ -39,7 +39,7 @@ package zero.swf.funs{
 						}
 					break;
 					case TagTypes.SymbolClass:
-						var symbolClass:SymbolClass=tag.getBody(null) as SymbolClass;
+						var symbolClass:SymbolClass=tag.getBody(SymbolClass,null);
 						i=0;
 						for each(var Name:String in symbolClass.NameV){
 							if(Name.indexOf(".")==-1){trace("未考虑 '::'");

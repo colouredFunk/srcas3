@@ -37,18 +37,18 @@ package zero.swf{
 		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			if(dataLength>0){
 				if(_toXMLOptions&&_toXMLOptions.BytesDataToXMLOption=="数据块（仅位置）"){
-					return <{xmlName} class="BytesData"
+					return <{xmlName} class="zero.swf.BytesData"
 						src={_toXMLOptions.src||_toXMLOptions.getSrcFun(ownData)}
 						offset={dataOffset}
 						length={dataLength}
 					/>;
 				}
-				return <{xmlName} class="BytesData"
+				return <{xmlName} class="zero.swf.BytesData"
 					length={dataLength}
 					value={BytesAndStr16.bytes2str16(ownData,dataOffset,dataLength)}
 				/>;
 			}
-			return <{xmlName} class="BytesData"/>;
+			return <{xmlName} class="zero.swf.BytesData"/>;
 		}
 		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
 			var value:String=xml.@value.toString();

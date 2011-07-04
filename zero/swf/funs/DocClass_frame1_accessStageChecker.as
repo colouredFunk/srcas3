@@ -16,19 +16,15 @@ package zero.swf.funs{
 		//TypeError: Error #1009: 无法访问空对象引用的属性或方法。
 		//at Tetrabreak_fla::MainTimeline/frame1()
 		public static function check(swf:SWF):Boolean{
-			
-			//引用一下以便编译进来
-			DoABC;
-			DoABCWithoutFlagsAndName;
-			//
-			
 			var tag:Tag;
 			
 			var docClassName:String=null;
 			
 			loop:for each(tag in swf.tagV){
 				if(tag.type==TagTypes.SymbolClass){
-					var symbolClass:SymbolClass=tag.getBody(null) as SymbolClass;
+					var symbolClass:SymbolClass=tag.getBody({
+						TagBodyClass:SymbolClass
+					});
 					var i:int=-1;
 					for each(var className:String in symbolClass.NameV){
 						i++;
@@ -40,12 +36,28 @@ package zero.swf.funs{
 				}
 			}
 			
+			var ABCData:ABCClasses;
 			if(docClassName){
 				for each(tag in swf.tagV){
 					switch(tag.type){
-						case TagTypes.DoABC:
-						case TagTypes.DoABCWithoutFlagsAndName:
-							var ABCData:ABCClasses=tag.getBody({ABCFileClass:ABCClasses}).ABCData;
+						switch(tag.type){
+							case TagTypes.DoABC:
+								ABCData=tag.getBody({
+									TagBodyClass:DoABC,
+									ABCFileClass:ABCClasses
+								}).ABCData;
+							break;
+							case TagTypes.DoABCWithoutFlagsAndName:
+								ABCData=tag.getBody({
+									TagBodyClass:DoABCWithoutFlagsAndName,
+									ABCFileClass:ABCClasses
+								}).ABCData;
+							break;
+							default:
+								ABCData=null;
+							break;
+						}
+						if(ABCData){
 							for each(var clazz:ABCClass in ABCData.classV){
 								if(clazz.getClassName()==docClassName){
 									i=clazz.itraitV.length;
@@ -75,7 +87,7 @@ package zero.swf.funs{
 									}
 								}
 							}
-						break;
+						}
 					}
 				}
 			}

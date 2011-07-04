@@ -21,17 +21,37 @@ package zero.swf.funs{
 			for each(var tag:Tag in tagV){
 				switch(tag.type){
 					case TagTypes.DoAction:
-						if(checkActions((tag.getBody({ActionsClass:ACTIONRECORD}) as DoAction).Actions)){
+						if(
+							checkActions(
+								tag.getBody({
+									TagBodyClass:DoAction,
+									ActionsClass:ACTIONRECORD
+								}).Actions
+							)
+						){
 							return true;
 						}
 					break;
 					case TagTypes.DoInitAction:
-						if(checkActions((tag.getBody({ActionsClass:ACTIONRECORD}) as DoInitAction).Actions)){
+						if(
+							checkActions(
+								tag.getBody({
+									TagBodyClass:DoInitAction,
+									ActionsClass:ACTIONRECORD
+								}).Actions
+							)
+						){
 							return true;
 						}
 					break;
 					case TagTypes.DefineSprite:
-						if(checkTagV((tag.getBody(null) as DefineSprite).tagV)){
+						if(
+							checkTagV(
+								tag.getBody({
+									TagBodyClass:DefineSprite
+								}).tagV
+							)
+						){
 							return true;
 						}
 					break;

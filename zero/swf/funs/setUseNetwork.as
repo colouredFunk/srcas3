@@ -15,7 +15,9 @@ package zero.swf.funs{
 		for each(var tag:Tag in swf.tagV){
 			switch(tag.type){
 				case TagTypes.FileAttributes:
-					(tag.getBody(null) as FileAttributes).UseNetwork=(UseNetwork?1:0);
+					tag.getBody({
+						TagBodyClass:FileAttributes
+					}).UseNetwork=(UseNetwork?1:0);
 					return;
 				break;
 			}

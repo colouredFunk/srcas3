@@ -120,11 +120,11 @@ package zero.swf{
 		}
 		
 		private var __body:*;
-		public function getBody(_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):*{
+		public function getBody(TagBodyClass:Class,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):*{
 			if(__body){
 			}else{
 				if(__bodyData){
-					__body=new (getDefinitionByName("zero.swf.tagBodys."+TagTypes.typeNameV[type]))();
+					__body=new TagBodyClass();
 					var endOffset:int=bodyOffset+bodyLength;
 					var offset:int=__body.initByData(__bodyData,bodyOffset,endOffset,_initByDataOptions);
 					if(offset==endOffset){
@@ -140,7 +140,7 @@ package zero.swf{
 			if(_body){
 				//data=null;
 				setBodyData(null);
-				var typeName:String=getQualifiedClassName(_body).replace("zero.swf.tagBodys::","");
+				var typeName:String=getQualifiedClassName(_body).split(/\.|\:/).pop();
 				type=TagTypes[typeName];
 				if(TagTypes.typeNameV[type]==typeName){
 					__body=_body;
@@ -236,8 +236,8 @@ package zero.swf{
 			
 			var classStr:String=xml["@class"].toString();
 			if(classStr){
-				//可考虑用户自定义 class
-				setBody(new (getDefinitionByName("zero.swf.tagBodys."+TagTypes.typeNameV[type]))());
+				//可用户自定义 class
+				setBody(new (getDefinitionByName(classStr))());
 				__body.initByXML(xml,_initByXMLOptions);
 			}else{
 				var valueStr:String=xml.@value.toString();

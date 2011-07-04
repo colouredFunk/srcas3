@@ -14,12 +14,6 @@ package zero.swf.funs{
 	
 	public class AddStage{
 		public static function add(swf:SWF,shellName:String,siageName:String):void{
-			
-			//引用一下以便编译进来
-			DoABC;
-			DoABCWithoutFlagsAndName;
-			//
-			
 			var putInSceneTagAndClassNameArr:Array=PutInSceneTagAndClassNames.getPutInSceneTagAndClassNameArr(swf);
 			var i:int=putInSceneTagAndClassNameArr.length;
 			var classNameMark:Object=new Object();
@@ -32,39 +26,55 @@ package zero.swf.funs{
 			
 			var packageNamespaceQNames:PackageNamespaceQNames=new PackageNamespaceQNames();
 			
+			var ABCData:ABCClasses;
 			for each(var tag:Tag in swf.tagV){
 				switch(tag.type){
 					case TagTypes.DoABC:
+						ABCData=tag.getBody(
+							DoABC,{
+								ABCFileClass:ABCClasses
+							}
+						).ABCData;
+					break;
 					case TagTypes.DoABCWithoutFlagsAndName:
-						var ABCData:ABCClasses=tag.getBody({ABCFileClass:ABCClasses}).ABCData;
-						for each(var clazz:ABCClass in ABCData.classV){
-							if(classNameMark["~"+clazz.getClassName()]){
-								if(
-									clazz.super_name
-									&&
-									clazz.super_name.ns
-									&&
-									clazz.super_name.ns.kind==NamespaceKinds.PackageNamespace
-									&&
-									clazz.super_name.ns.name=="flash.display"
-									&&
-									(
-										clazz.super_name.name=="Sprite"
-										||
-										clazz.super_name.name=="MovieClip"
-									)
-								){
-									//trace(clazz.getClassName());
-									_addStageToTraits(
-										packageNamespaceQNames,
-										clazz.itraitV,
-										shellName,
-										siageName
-									);
-								}
+						ABCData=tag.getBody(
+							DoABCWithoutFlagsAndName,{
+								ABCFileClass:ABCClasses
+							}
+						).ABCData;
+					break;
+					default:
+						ABCData=null;
+					break;
+				}
+				if(ABCData){
+					for each(var clazz:ABCClass in ABCData.classV){
+						if(classNameMark["~"+clazz.getClassName()]){
+							if(
+								clazz.super_name
+								&&
+								clazz.super_name.ns
+								&&
+								clazz.super_name.ns.kind==NamespaceKinds.PackageNamespace
+								&&
+								clazz.super_name.ns.name=="flash.display"
+								&&
+								(
+									clazz.super_name.name=="Sprite"
+									||
+									clazz.super_name.name=="MovieClip"
+								)
+							){
+								//trace(clazz.getClassName());
+								_addStageToTraits(
+									packageNamespaceQNames,
+									clazz.itraitV,
+									shellName,
+									siageName
+								);
 							}
 						}
-					break;
+					}
 				}
 			}
 		}

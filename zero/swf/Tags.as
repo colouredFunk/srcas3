@@ -85,7 +85,11 @@ package zero.swf{
 							//trace("忽略");
 						break;
 						case "结构":
-							tag.getBody(_initByDataOptions);
+							if(_initByDataOptions.TagBodyClassArr){
+							}else{
+								throw new Error("需要提供 TagBodyClassArr");
+							}
+							tag.getBody(_initByDataOptions.TagBodyClassArr[tag.type],_initByDataOptions);
 						break;
 						default:
 							throw new Error("未知 option："+_initByDataOptions.optionV[tag.type]);

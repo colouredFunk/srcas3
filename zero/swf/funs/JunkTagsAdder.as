@@ -66,7 +66,7 @@ package zero.swf.funs{
 							pos.id=tag.getDefId();
 							var subTagAndPosArr:Array=new Array();
 							var placeObject2:PlaceObject2=null;
-							for each(subTag in (tag.getBody(null) as DefineSprite).tagV){
+							for each(subTag in tag.getBody(DefineSprite,null).tagV){
 								switch(subTag.type){
 									case TagTypes.End:
 										//这些 tag 前面不能有 pos
@@ -85,7 +85,7 @@ package zero.swf.funs{
 										}
 										subTagAndPosArr.push(subTag);
 										if(subTag.type==TagTypes.PlaceObject2){
-											placeObject2=subTag.getBody({swf_Version:swf.Version}) as PlaceObject2;
+											placeObject2=subTag.getBody(PlaceObject2,{swf_Version:swf.Version});
 											if(placeObject2.PlaceFlagHasCharacter&&placeObject2.CharacterId){
 											}else{
 												placeObject2=null;

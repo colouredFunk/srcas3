@@ -15,7 +15,9 @@ package zero.swf.funs{
 		for each(var tag:Tag in swf.tagV){
 			switch(tag.type){
 				case TagTypes.FileAttributes:
-					return (tag.getBody(null) as FileAttributes).ActionScript3==1;
+					return tag.getBody({
+						TagBodyClass:FileAttributes
+					}).ActionScript3==1;
 				break;
 			}
 		}

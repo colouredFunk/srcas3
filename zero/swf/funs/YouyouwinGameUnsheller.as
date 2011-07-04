@@ -17,11 +17,6 @@ package zero.swf.funs{
 		public static function unshell(swfData:ByteArray):ByteArray{
 			//如果是加过壳的先解壳
 			
-			//引用一下以便编译进来
-			DoABC;
-			DoABCWithoutFlagsAndName;
-			//
-			
 			var swf:SWF=new SWF();
 			swf.initBySWFData(swfData,null);
 			
@@ -50,37 +45,51 @@ package zero.swf.funs{
 				}
 			}
 			
+			var ABCData:ABCClasses;
 			for each(var tag:Tag in swf.tagV){
 				switch(tag.type){
 					case TagTypes.DoABC:
+						ABCData=tag.getBody({
+							TagBodyClass:DoABC,
+							ABCFileClass:ABCClasses
+						}).ABCData;
+					break;
 					case TagTypes.DoABCWithoutFlagsAndName:
-						var ABCData:ABCClasses=tag.getBody({ABCFileClass:ABCClasses}).ABCData;
-						for each(var clazz:ABCClass in ABCData.classV){
-							if(classNameMark["~"+clazz.getClassName()]){
-								i=clazz.itraitV.length;
-								while(--i>=0){
-									var trait:ABCTrait=clazz.itraitV[i];
-									if(
-										trait.name.name=="stage"
-										&&
-										trait.method
-										&&
-										trait.method.codes
-									){
-										var code:AVM2Code=trait.method.codes.codeArr[2] as AVM2Code;
-										if(code&&code.op==AVM2Ops.getlex){
-											var multiname:ABCMultiname=code.value;
-											if(multiname&&multiname.name=="SWFShellAdderOnline"){
-												clazz.itraitV.splice(i,1);
-												trace("清除强制添加的 stage");
-												break;
-											}
+						ABCData=tag.getBody({
+							TagBodyClass:DoABCWithoutFlagsAndName,
+							ABCFileClass:ABCClasses
+						}).ABCData;
+					break;
+					default:
+						ABCData=null;
+					break;
+				}
+				if(ABCData){
+					for each(var clazz:ABCClass in ABCData.classV){
+						if(classNameMark["~"+clazz.getClassName()]){
+							i=clazz.itraitV.length;
+							while(--i>=0){
+								var trait:ABCTrait=clazz.itraitV[i];
+								if(
+									trait.name.name=="stage"
+									&&
+									trait.method
+									&&
+									trait.method.codes
+								){
+									var code:AVM2Code=trait.method.codes.codeArr[2] as AVM2Code;
+									if(code&&code.op==AVM2Ops.getlex){
+										var multiname:ABCMultiname=code.value;
+										if(multiname&&multiname.name=="SWFShellAdderOnline"){
+											clazz.itraitV.splice(i,1);
+											trace("清除强制添加的 stage");
+											break;
 										}
 									}
 								}
 							}
 						}
-					break;
+					}
 				}
 			}
 			
@@ -89,7 +98,9 @@ package zero.swf.funs{
 		private static function checkHasSymbolClassName_SWFShellAdderOnline(swf:SWF):Boolean{
 			for each(var tag:Tag in swf.tagV){
 				if(tag.type==TagTypes.SymbolClass){
-					var symbolClass:SymbolClass=tag.getBody(null) as SymbolClass;
+					var symbolClass:SymbolClass=tag.getBody({
+						TagBodyClass:SymbolClass
+					});
 					for each(var className:String in symbolClass.NameV){
 						if(className=="SWFShellAdderOnline"){
 							return true;
@@ -104,7 +115,9 @@ package zero.swf.funs{
 			while(--i>=0){
 				var tag:Tag=swf.tagV[i];
 				if(tag.type==TagTypes.DefineBinaryData){
-					return (tag.getBody(null) as DefineBinaryData).Data.toData(null);
+					return tag.getBody({
+						TagBodyClass:DefineBinaryData
+					}).Data.toData(null);
 				}
 			}
 			return null;
