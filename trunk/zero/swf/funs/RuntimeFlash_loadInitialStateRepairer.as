@@ -34,59 +34,68 @@ package zero.swf.funs{
 			//	at mx.preloaders::Preloader/appCreationCompleteHandler()
 			//	at flash.events::EventDispatcher/dispatchEventFunction()
 			
-			//引用一下以便编译进来
-			DoABC;
-			DoABCWithoutFlagsAndName;
-			//
-			
+			var ABCData:ABCClasses;
 			for each(var tag:Tag in swf.tagV){
 				switch(tag.type){
 					case TagTypes.DoABC:
+						ABCData=tag.getBody({
+							TagBodyClass:DoABC,
+							ABCFileClass:ABCClasses
+						}).ABCData;
+					break;
 					case TagTypes.DoABCWithoutFlagsAndName:
-						var ABCData:ABCClasses=tag.getBody({ABCFileClass:ABCClasses}).ABCData;
-						for each(var clazz:ABCClass in ABCData.classV){
-							if(clazz.getClassName()=="RuntimeFlash"){
-								for each(var trait:ABCTrait in clazz.itraitV){
-									if(
-										trait.name.name=="loadInitialState"
-										&&
-										trait.method
-										&&
-										trait.method.codes
-									){
-										var i:int=-1;
-										for each(var code:* in trait.method.codes.codeArr){
-											i++;
+						ABCData=tag.getBody({
+							TagBodyClass:DoABCWithoutFlagsAndName,
+							ABCFileClass:ABCClasses
+						}).ABCData;
+					break;
+					default:
+						ABCData=null;
+					break;
+				}
+				if(ABCData){
+					for each(var clazz:ABCClass in ABCData.classV){
+						if(clazz.getClassName()=="RuntimeFlash"){
+							for each(var trait:ABCTrait in clazz.itraitV){
+								if(
+									trait.name.name=="loadInitialState"
+									&&
+									trait.method
+									&&
+									trait.method.codes
+								){
+									var i:int=-1;
+									for each(var code:* in trait.method.codes.codeArr){
+										i++;
+										if(
+											code is AVM2Code
+											&&
+											code.op==AVM2Ops.getproperty
+											&&
+											code.value
+											&&
+											code.value.name=="loader"
+										){
+											var code2:*=trait.method.codes.codeArr[i+1] as AVM2Code;
 											if(
-												code is AVM2Code
+												code2 is AVM2Code
 												&&
-												code.op==AVM2Ops.getproperty
+												code2.op==AVM2Ops.getproperty
 												&&
 												code.value
 												&&
-												code.value.name=="loader"
+												code2.value.name=="loaderInfo"
 											){
-												var code2:*=trait.method.codes.codeArr[i+1] as AVM2Code;
-												if(
-													code2 is AVM2Code
-													&&
-													code2.op==AVM2Ops.getproperty
-													&&
-													code.value
-													&&
-													code2.value.name=="loaderInfo"
-												){
-													trace("修复 RuntimeFlash loadInitialState");
-													code2.value=new PackageNamespaceQNames().gen("contentLoaderInfo");
-													return true;
-												}
+												trace("修复 RuntimeFlash loadInitialState");
+												code2.value=new PackageNamespaceQNames().gen("contentLoaderInfo");
+												return true;
 											}
 										}
 									}
 								}
 							}
 						}
-					break;
+					}
 				}
 			}
 			

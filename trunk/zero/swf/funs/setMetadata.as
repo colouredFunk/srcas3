@@ -17,10 +17,14 @@ package zero.swf.funs{
 			for each(tag in swf.tagV){
 				switch(tag.type){
 					case TagTypes.FileAttributes:
-						(tag.getBody(null) as FileAttributes).HasMetadata=1;
+						tag.getBody({
+							TagBodyClass:FileAttributes
+						}).HasMetadata=1;
 					break;
 					case TagTypes.Metadata:
-						(tag.getBody(null) as Metadata).metadata=metadata;
+						tag.getBody({
+							TagBodyClass:Metadata
+						}).metadata=metadata;
 						metadataTag=tag;
 					break;
 				}
@@ -33,7 +37,9 @@ package zero.swf.funs{
 			for each(tag in swf.tagV){
 				switch(tag.type){
 					case TagTypes.FileAttributes:
-						(tag.getBody(null) as FileAttributes).HasMetadata=0;
+						tag.getBody({
+							TagBodyClass:FileAttributes
+						}).HasMetadata=0;
 					break;
 					case TagTypes.Metadata:
 						metadataTag=tag;

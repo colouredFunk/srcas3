@@ -21,11 +21,6 @@ package zero.swf.funs{
 		trace("未考虑非默认包下的类名的情况");
 		//把 DoABC 或 DoABCWithoutFlagsAndName 的 ABCData 里的 stringV 里的特定的字符串替换成特定的字符串
 		
-		//引用一下以便编译进来
-		DoABC;
-		DoABCWithoutFlagsAndName;
-		//
-		
 		var swf:SWF=new SWF();
 		swf.initBySWFData(swfData,null);
 		
@@ -39,25 +34,29 @@ package zero.swf.funs{
 			mark["~"+str0]=strtArr[i];
 		}
 		
-		/*
-		var symbolClassNameMark:Object;
-		if(symbolClassNameIdArr){
-			symbolClassNameMark=new Object();
-			for each(var symbolClassNameId:int in symbolClassNameIdArr){
-				symbolClassNameMark["~"+str0Arr[symbolClassNameId]]=strtArr[symbolClassNameId];
-			}
-		}else{
-			symbolClassNameMark=null;
-		}
-		*/
-		
 		var strt:String;
-		;
+		var ABCData:ABCFileWithSimpleConstant_pool;
 		for each(var tag:Tag in swf.tagV){
 			switch(tag.type){
 				case TagTypes.DoABC:
+					ABCData=tag.getBody({
+						TagBodyClass:DoABC,
+						ABCFileClass:ABCFileWithSimpleConstant_pool
+					}).ABCData;
+					i=ABCData.stringV.length;
+					while(--i>0){
+						strt=mark["~"+ABCData.stringV[i]];
+						if(strt is String){
+							//trace("strt=\""+strt+"\",strt.length="+strt.length);
+							ABCData.stringV[i]=strt;
+						}
+					}
+				break;
 				case TagTypes.DoABCWithoutFlagsAndName:
-					var ABCData:ABCFileWithSimpleConstant_pool=tag.getBody({ABCFileClass:ABCFileWithSimpleConstant_pool}).ABCData;
+					ABCData=tag.getBody({
+						TagBodyClass:DoABCWithoutFlagsAndName,
+						ABCFileClass:ABCFileWithSimpleConstant_pool
+					}).ABCData;
 					i=ABCData.stringV.length;
 					while(--i>0){
 						strt=mark["~"+ABCData.stringV[i]];
@@ -68,19 +67,9 @@ package zero.swf.funs{
 					}
 				break;
 				case TagTypes.SymbolClass:
-					/*
-					if(symbolClassNameMark){
-						var NameV:Vector.<String>=(tag.getBody() as SymbolClass).NameV;
-						i=NameV.length;
-						while(--i>=0){
-							strt=symbolClassNameMark["~"+NameV[i]];
-							if(strt){
-								NameV[i]=strt;
-							}
-						}
-					}
-					*/
-					var NameV:Vector.<String>=(tag.getBody(null) as SymbolClass).NameV;
+					var NameV:Vector.<String>=tag.getBody({
+						TagBodyClass:SymbolClass
+					}).NameV;
 					i=NameV.length;
 					while(--i>=0){
 						strt=mark["~"+NameV[i]];

@@ -14,7 +14,11 @@ package zero.swf.funs{
 		public static function getInitByDataOptions(_options:*=null):Object/*zero_swf_InitByDataOptions*/{
 			var initByDataOptions:Object/*zero_swf_InitByDataOptions*/=new Object/*zero_swf_InitByDataOptions*/();
 			
+			initByDataOptions.TagBodyClassArr=_options.TagBodyClassArr;//20110704
+			
 			initByDataOptions.optionV=options2OptionV(_options);
+			
+			
 			
 			/*
 			if(initByDataOptions.optionV.indexOf("字节码")>-1){
@@ -147,7 +151,7 @@ package zero.swf.funs{
 			}
 			
 			for each(var TagBodyClass:Class in optionsObj["结构"]){
-				var typeName:String=getQualifiedClassName(TagBodyClass).replace("zero.swf.tagBodys::","");
+				var typeName:String=getQualifiedClassName(TagBodyClass).split(/\.|\:/).pop();
 				tagType=TagTypes[typeName];
 				if(TagTypes.typeNameV[tagType]==typeName){
 					optionV[tagType]="结构";
