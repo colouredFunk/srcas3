@@ -97,8 +97,8 @@ package zero{
 			var seconds:int=date.getSeconds();
 			
 			return date.getFullYear()+"年"
-				+(month<10?"0":"")+"月"
-				+(day<10?"0":"")+"日 "
+				+(month<10?"0":"")+month+"月"
+				+(day<10?"0":"")+day+"日 "
 				+(hours<10?"0":"")+hours+":"
 				+(minutes<10?"0":"")+minutes+":"
 				+(seconds<10?"0":"")+seconds;
