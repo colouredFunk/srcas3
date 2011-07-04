@@ -18,7 +18,13 @@ package zero.swf.funs{
 		strtArr:Array//,
 		//symbolClassNameIdArr:Array=null
 	):ByteArray{
+		trace("未考虑非默认包下的类名的情况");
 		//把 DoABC 或 DoABCWithoutFlagsAndName 的 ABCData 里的 stringV 里的特定的字符串替换成特定的字符串
+		
+		//引用一下以便编译进来
+		DoABC;
+		DoABCWithoutFlagsAndName;
+		//
 		
 		var swf:SWF=new SWF();
 		swf.initBySWFData(swfData,null);
@@ -46,22 +52,12 @@ package zero.swf.funs{
 		*/
 		
 		var strt:String;
-		var ABCData:ABCFileWithSimpleConstant_pool;
+		;
 		for each(var tag:Tag in swf.tagV){
 			switch(tag.type){
 				case TagTypes.DoABC:
-					ABCData=(tag.getBody({ABCFileClass:ABCFileWithSimpleConstant_pool}) as DoABC).ABCData;
-					i=ABCData.stringV.length;
-					while(--i>0){
-						strt=mark["~"+ABCData.stringV[i]];
-						if(strt is String){
-							//trace("strt=\""+strt+"\",strt.length="+strt.length);
-							ABCData.stringV[i]=strt;
-						}
-					}
-				break;
 				case TagTypes.DoABCWithoutFlagsAndName:
-					ABCData=(tag.getBody({ABCFileClass:ABCFileWithSimpleConstant_pool}) as DoABCWithoutFlagsAndName).ABCData;
+					var ABCData:ABCFileWithSimpleConstant_pool=tag.getBody({ABCFileClass:ABCFileWithSimpleConstant_pool}).ABCData;
 					i=ABCData.stringV.length;
 					while(--i>0){
 						strt=mark["~"+ABCData.stringV[i]];

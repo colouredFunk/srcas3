@@ -42,7 +42,7 @@ package zero.swf.funs{
 						var symbolClass:SymbolClass=tag.getBody(null) as SymbolClass;
 						i=0;
 						for each(var Name:String in symbolClass.NameV){
-							if(Name.indexOf(".")==-1){
+							if(Name.indexOf(".")==-1){trace("未考虑 '::'");
 								if(symbolClass.TagV[i]==0){
 									DocClassName=Name;
 								}else{
