@@ -13,31 +13,67 @@ package zero.swf.funs{
 	import zero.swf.tagBodys.*;
 	
 	public class AddStage{
-		private var packageNamespaceQNames:PackageNamespaceQNames;
-		public function AddStage(){
-			packageNamespaceQNames=new PackageNamespaceQNames();
-		}
-		public function add(swf:SWF,shellName:String,siageName:String):void{
-			var i:int;
-			var ABCData:ABCClasses,clazz:ABCClass,trait:ABCTrait;
+		public static function add(swf:SWF,shellName:String,siageName:String):void{
+			
+			//引用一下以便编译进来
+			DoABC;
+			DoABCWithoutFlagsAndName;
+			//
+			
+			var putInSceneTagAndClassNameArr:Array=PutInSceneTagAndClassNames.getPutInSceneTagAndClassNameArr(swf);
+			var i:int=putInSceneTagAndClassNameArr.length;
+			var classNameMark:Object=new Object();
+			while(--i>=0){
+				if(putInSceneTagAndClassNameArr[i]){
+					//trace(putInSceneTagAndClassNameArr[i][1]);
+					classNameMark["~"+putInSceneTagAndClassNameArr[i][1]]=true;
+				}
+			}
+			
+			var packageNamespaceQNames:PackageNamespaceQNames=new PackageNamespaceQNames();
+			
 			for each(var tag:Tag in swf.tagV){
 				switch(tag.type){
 					case TagTypes.DoABC:
-						ABCData=(tag.getBody({ABCFileClass:ABCClasses}) as DoABC).ABCData;
-						for each(clazz in ABCData.classV){
-							_addStageToTraits(clazz.itraitV,shellName,siageName);
-						}
-					break;
 					case TagTypes.DoABCWithoutFlagsAndName:
-						ABCData=(tag.getBody({ABCFileClass:ABCClasses}) as DoABCWithoutFlagsAndName).ABCData;
-						for each(clazz in ABCData.classV){
-							_addStageToTraits(clazz.itraitV,shellName,siageName);
+						var ABCData:ABCClasses=tag.getBody({ABCFileClass:ABCClasses}).ABCData;
+						for each(var clazz:ABCClass in ABCData.classV){
+							if(classNameMark["~"+clazz.getClassName()]){
+								if(
+									clazz.super_name
+									&&
+									clazz.super_name.ns
+									&&
+									clazz.super_name.ns.kind==NamespaceKinds.PackageNamespace
+									&&
+									clazz.super_name.ns.name=="flash.display"
+									&&
+									(
+										clazz.super_name.name=="Sprite"
+										||
+										clazz.super_name.name=="MovieClip"
+									)
+								){
+									//trace(clazz.getClassName());
+									_addStageToTraits(
+										packageNamespaceQNames,
+										clazz.itraitV,
+										shellName,
+										siageName
+									);
+								}
+							}
 						}
 					break;
 				}
 			}
 		}
-		private function _addStageToTraits(traitV:Vector.<ABCTrait>,shellName:String,siageName:String):void{
+		private static function _addStageToTraits(
+			packageNamespaceQNames:PackageNamespaceQNames,
+			traitV:Vector.<ABCTrait>,
+			shellName:String,
+			siageName:String
+		):void{
 			var trait:ABCTrait;
 			for each(trait in traitV){
 				if(trait.name.name=="stage"){

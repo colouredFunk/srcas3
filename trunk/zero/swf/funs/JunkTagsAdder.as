@@ -21,7 +21,7 @@ package zero.swf.funs{
 		private static const TYPE_LoopAction:int=2;
 		private static const TYPE_EmptySoundStreamBlock:int=3;
 		
-		public static function addJunkTags(tagV:Vector.<Tag>,total:int=10):void{
+		public static function addJunkTags(swf:SWF,total:int=10):void{
 			//挂 ASV:
 			//total个插入到 JunkSprite 中的 loopPlaceObject2
 			//total个插入到正常 DefineSprite 中的 loopPlaceObject2
@@ -40,10 +40,10 @@ package zero.swf.funs{
 			var in_normal_sprite_loopPlaceObject2PosV:Vector.<Pos>=new Vector.<Pos>();
 			var in_normal_sprite_posV:Vector.<Pos>=new Vector.<Pos>();
 			
-			var avalibleDefineObjIdV:Vector.<int>=getAvalibleDefineObjIdV(tagV);
+			var avalibleDefineObjIdV:Vector.<int>=getAvalibleDefineObjIdV(swf.tagV);
 			
 			var tagAndPosArr:Array=new Array();
-			for each(tag in tagV){
+			for each(tag in swf.tagV){
 				switch(tag.type){
 					case TagTypes.FileAttributes:
 					case TagTypes.Metadata:
@@ -85,7 +85,7 @@ package zero.swf.funs{
 										}
 										subTagAndPosArr.push(subTag);
 										if(subTag.type==TagTypes.PlaceObject2){
-											placeObject2=subTag.getBody(null) as PlaceObject2;
+											placeObject2=subTag.getBody({swf_Version:swf.Version}) as PlaceObject2;
 											if(placeObject2.PlaceFlagHasCharacter&&placeObject2.CharacterId){
 											}else{
 												placeObject2=null;
@@ -168,16 +168,16 @@ package zero.swf.funs{
 			/////////////////////////////////////////////////////////////////////
 			
 			//
-			tagV.length=0;//清空 tagV
+			swf.tagV.length=0;//清空 tagV
 			for each(tagOrPos in tagAndPosArr){
 				if(tagOrPos is Tag){
 					tag=tagOrPos;
-					tagV.push(tag);
+					swf.tagV.push(tag);
 				}else{
 					pos=tagOrPos;
 					if(pos.tagV.length){
 						for each(tag in pos.tagV){
-							tagV.push(tag);
+							swf.tagV.push(tag);
 						}
 					}
 					if(pos.tagAndPosArr){
@@ -199,7 +199,7 @@ package zero.swf.funs{
 						}
 						var defineSpriteTag:Tag=new Tag();
 						defineSpriteTag.setBody(defineSprite);
-						tagV.push(defineSpriteTag);
+						swf.tagV.push(defineSpriteTag);
 					}
 				}
 			}
