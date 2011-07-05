@@ -237,7 +237,7 @@ package zero.swf{
 			var classStr:String=xml["@class"].toString();
 			if(classStr){
 				//可用户自定义 class
-				setBody(new (getDefinitionByName(classStr))());
+				setBody(new (_initByXMLOptions&&_initByXMLOptions.customClasses&&_initByXMLOptions.customClasses[classStr]||getDefinitionByName(classStr))());
 				__body.initByXML(xml,_initByXMLOptions);
 			}else{
 				var valueStr:String=xml.@value.toString();
