@@ -14,7 +14,7 @@ package zero.swf.funs{
 		public static function getInitByDataOptions(_options:*=null):Object/*zero_swf_InitByDataOptions*/{
 			var initByDataOptions:Object/*zero_swf_InitByDataOptions*/=new Object/*zero_swf_InitByDataOptions*/();
 			
-			initByDataOptions.TagBodyClassArr=_options.TagBodyClassArr;//20110704
+			initByDataOptions.classes=_options.classes;//20110705
 			
 			initByDataOptions.optionV=options2OptionV(_options);
 			

@@ -10,6 +10,7 @@ package zero.swf{
 	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
 	import flash.utils.getTimer;
+	import flash.utils.getDefinitionByName;
 	
 	import zero.Outputer;
 	public class Tags{
@@ -85,11 +86,8 @@ package zero.swf{
 							//trace("忽略");
 						break;
 						case "结构":
-							if(_initByDataOptions.TagBodyClassArr){
-							}else{
-								throw new Error("需要提供 TagBodyClassArr");
-							}
-							tag.getBody(_initByDataOptions.TagBodyClassArr[tag.type],_initByDataOptions);
+							var TagBodyClassName:String="zero.swf.tagBodys."+TagTypes.typeNameV[tag.type];
+							tag.getBody((_initByDataOptions.classes&&_initByDataOptions.classes[TagBodyClassName]||getDefinitionByName(TagBodyClassName)) as Class,_initByDataOptions);
 						break;
 						default:
 							throw new Error("未知 option："+_initByDataOptions.optionV[tag.type]);
