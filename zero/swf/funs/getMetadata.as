@@ -15,9 +15,7 @@ package zero.swf.funs{
 		for each(var tag:Tag in swf.tagV){
 			switch(tag.type){
 				case TagTypes.Metadata:
-					return  tag.getBody({
-						TagBodyClass:Metadata
-					}).metadata;
+					return tag.getBody(Metadata,null).metadata;
 				break;
 			}
 		}

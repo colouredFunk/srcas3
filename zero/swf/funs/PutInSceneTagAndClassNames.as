@@ -11,7 +11,6 @@ package zero.swf.funs{
 	import flash.utils.*;
 	
 	import zero.swf.*;
-	import zero.swf.avm2.*;
 	import zero.swf.tagBodys.*;
 	
 	public class PutInSceneTagAndClassNames{
@@ -25,8 +24,7 @@ package zero.swf.funs{
 				swf.tagV,
 				classNameArr,
 				defTagArr,
-				putInSceneTagAndClassNameArr,
-				swf.Version
+				putInSceneTagAndClassNameArr
 			);
 			if(classNameArr[0]){
 				putInSceneTagAndClassNameArr[0]=[null,classNameArr[0].replace(/\:\:/g,".")];//文档类
@@ -38,9 +36,7 @@ package zero.swf.funs{
 			for each(var tag:Tag in tagV){
 				switch(tag.type){
 					case TagTypes.SymbolClass:
-						var symbolClass:SymbolClass=tag.getBody({
-							TagBodyClass:SymbolClass
-						});
+						var symbolClass:SymbolClass=tag.getBody(SymbolClass,null);
 						var i:int=-1;
 						for each(var className:String in symbolClass.NameV){
 							i++;
@@ -48,9 +44,7 @@ package zero.swf.funs{
 						}
 					break;
 					case TagTypes.DefineSprite:
-						getClassNameArr(tag.getBody({
-							TagBodyClass:DefineSprite
-						}).tagV,classNameArr);
+						getClassNameArr(tag.getBody(DefineSprite,null).tagV,classNameArr);
 					break;
 				}
 			}
@@ -64,9 +58,7 @@ package zero.swf.funs{
 					}
 				}
 				if(tag.type==TagTypes.DefineSprite){
-					getDefTagArr(tag.getBody({
-						TagBodyClass:DefineSprite
-					}).tagV,classNameArr,defTagArr);
+					getDefTagArr(tag.getBody(DefineSprite,null).tagV,classNameArr,defTagArr);
 				}
 			}
 		}
@@ -74,47 +66,35 @@ package zero.swf.funs{
 			tagV:Vector.<Tag>,
 			classNameArr:Array,
 			defTagArr:Array,
-			putInSceneTagAndClassNameArr:Array,
-			swf_Version:int
+			putInSceneTagAndClassNameArr:Array
 		):void{
 			var CharacterId:int;
 			for each(var tag:Tag in tagV){
 				switch(tag.type){
 					case TagTypes.PlaceObject:
-						CharacterId=tag.getBody({
-							TagBodyClass:PlaceObject,
-							swf_Version:swf_Version
-						}.CharacterId;
+						CharacterId=tag.getBody(PlaceObject,null).CharacterId;
 						if(defTagArr[CharacterId]){
 							putInSceneTagAndClassNameArr[CharacterId]=[tag,classNameArr[CharacterId]];
 						}
 					break;
 					case TagTypes.PlaceObject2:
-						CharacterId=tag.getBody({
-							TagBodyClass:PlaceObject2,
-							swf_Version:swf_Version
-						}.CharacterId;
+						CharacterId=tag.getBody(PlaceObject2,null).CharacterId;
 						if(defTagArr[CharacterId]){
 							putInSceneTagAndClassNameArr[CharacterId]=[tag,classNameArr[CharacterId]];
 						}
 					break;
 					case TagTypes.PlaceObject3:
-						CharacterId=tag.getBody({
-							TagBodyClass:PlaceObject3,
-							swf_Version:swf_Version
-						}.CharacterId;
+						CharacterId=tag.getBody(PlaceObject3,null).CharacterId;
 						if(defTagArr[CharacterId]){
 							putInSceneTagAndClassNameArr[CharacterId]=[tag,classNameArr[CharacterId]];
 						}
 					break;
 					case TagTypes.DefineSprite:
 						getPutInSceneTagArr(
-							tag.getBody({
-								TagBodyClass:DefineSprite
-							}).tagV,
+							tag.getBody(DefineSprite,null).tagV,
 							classNameArr,
-							defTagArr,putInSceneTagAndClassNameArr,
-							swf_Version
+							defTagArr,
+							putInSceneTagAndClassNameArr
 						);
 					break;
 				}

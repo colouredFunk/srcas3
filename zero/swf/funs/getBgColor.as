@@ -15,9 +15,7 @@ package zero.swf.funs{
 		for each(var tag:Tag in swf.tagV){
 			switch(tag.type){
 				case TagTypes.SetBackgroundColor:
-					return tag.getBody({
-						TagBodyClass:BackgroundColor
-					}).BackgroundColor;
+					return tag.getBody(SetBackgroundColor,null).BackgroundColor;
 				break;
 			}
 		}

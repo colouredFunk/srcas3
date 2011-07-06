@@ -120,10 +120,14 @@ package zero.ui{
 							var file:*=new FileClass(event.text.substr(id+1));
 							if(file.exists){
 								if(new FileClass(FileClass.applicationDirectory.nativePath).getRelativePath(file) is String){
+									/*
 									outputError("不能直接打开 applicationDirectory 目录下的东西，尝试用浏览器打开");
 									//http://help.adobe.com/en_US/as3/dev/WS5b3ccc516d4fbf351e63e3d118666ade46-7fe4.html#WS2A7C0A31-A6A9-42d2-8772-79166A98A085
 									//You cannot use the openWithDefaultApplication() method with files located in the application directory.
-									navigateToURL(new URLRequest(decodeURI(file.url)));
+									trace(decodeURI(file.url).replace("file:///",""));
+									navigateToURL(new URLRequest(decodeURI(file.url).replace("file:///","")));
+									*/
+									outputError("不能直接打开 applicationDirectory 目录下的东西");
 								}else{
 									file.openWithDefaultApplication();
 								}
@@ -133,10 +137,10 @@ package zero.ui{
 						}else{
 							outputError("不支持 File 的使用");
 						}
-						break;
+					break;
 					default:
 						throw new Error("未处理的 link: "+event.text);
-						break;
+					break;
 				}
 			}
 		}
@@ -149,13 +153,22 @@ package zero.ui{
 				var html:XML;
 				switch(styleOrXML){
 					case "folder and file":
+					case "folder":
 						msg=encodeMsg(msg);
 						if(msg.indexOf("file:///")>-1){
-							execResult=/^(.*?)(file:\/\/\/.*\/)(.*?)$/.exec(msg);
+							execResult=/^(.*?)file:\/\/\/(.*\/)(.*?)$/.exec(msg);
+							
 							if(execResult[0]==msg){
-								msg='<span class="blue">'+execResult[1]+'</span>'+
-									'<a href="event:file:'+execResult[2]+'">'+execResult[2]+'</a>'+
-									'<a href="event:file:'+execResult[2]+execResult[3]+'">'+execResult[3]+'</a>';
+								msg='<span class="blue">'+execResult[1]+'file:///</span>';
+								var path:String="file:///";
+								for each(var subPath:String in execResult[2].match(/.*?\/+/g)){
+									path+=subPath;
+									msg+='<a href="event:file:'+path+'">'+subPath+'</a>';
+								}
+								if(execResult[3]){
+									path+=execResult[3];
+									msg+='<a href="event:file:'+path+'">'+execResult[3]+'</a>';
+								}
 							}else{
 								throw new Error("msg 格式不正确");
 							}
@@ -170,21 +183,10 @@ package zero.ui{
 						}else{
 							throw new Error("msg 格式不正确");
 						}
-						break;
-					case "folder":
-						msg=encodeMsg(msg);
-						execResult=/^(.*?)(file:\/\/\/.*\/)(.*?)$/.exec(msg);
-						if(execResult[0]==msg){
-							msg='<span class="blue">'+execResult[1]+'</span>'+
-								'<a href="event:file:'+execResult[2]+'">'+execResult[2]+'</a>'+
-								'<span class="blue">'+execResult[3]+'</span>';
-						}else{
-							throw new Error("msg 格式不正确");
-						}
-						break;
+					break;
 					case "file":
 						throw new Error("未处理");
-						break;
+					break;
 					default:
 						if(styleOrXML is XML){
 							html=styleOrXML.copy();
@@ -193,7 +195,7 @@ package zero.ui{
 						}
 						html.appendChild(msg);
 						msg=html.toXMLString();
-						break;
+					break;
 				}
 			}else{
 				msg=encodeMsg(msg);
