@@ -85,8 +85,8 @@ package zero.swf.funs{
 										}
 										subTagAndPosArr.push(subTag);
 										if(subTag.type==TagTypes.PlaceObject2){
-											placeObject2=subTag.getBody(PlaceObject2,{swf_Version:swf.Version});
-											if(placeObject2.PlaceFlagHasCharacter&&placeObject2.CharacterId){
+											placeObject2=subTag.getBody(PlaceObject2,null);
+											if(placeObject2.CharacterId>-1){
 											}else{
 												placeObject2=null;
 											}
@@ -241,7 +241,6 @@ package zero.swf.funs{
 			placeObject2=new PlaceObject2();
 			placeObject2.Depth=Depth>0?Depth:int(Math.random()*5)+1;//随便给个深度
 			
-			placeObject2.PlaceFlagHasCharacter=1;
 			placeObject2.CharacterId=CharacterId;
 			
 			var placeObjectTag:Tag=new Tag();

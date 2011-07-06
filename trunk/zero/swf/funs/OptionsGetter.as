@@ -42,11 +42,15 @@ package zero.swf.funs{
 					_options is XML
 				){
 				}else{
+					
 					initByDataOptions.ActionsClass=_options.ActionsClass;//20110609
 					initByDataOptions.ActionsGetHexArr=_options.ActionsGetHexArr;//20110609
 					
 					initByDataOptions.ABCFileClass=_options.ABCFileClass;//20110615
 					initByDataOptions.ABCFileGetHexArr=_options.ABCFileGetHexArr;//20110615
+					
+					initByDataOptions.ClipActionsClass=_options.ClipActionsClass;//20110705
+					initByDataOptions.ButtonCondActionsClass=_options.ButtonCondActionsClass;//20110706
 				}
 			}
 			
