@@ -36,12 +36,19 @@ package akdcl.manager {
 		public static const SWF_INTERFACE:String = "call";
 
 		public static const EXTERNAL_LISTENER:String = "swfEventHandler";
-
-		public var data:*;
+		
+		public var eventParams:Array;
+		
+		private var swfInterFaceEvent:Event = new Event(SWF_INTERFACE);
+		
 		private var __isAvailable:Boolean = false;
-
 		public function get isAvailable():Boolean {
 			return __isAvailable;
+		}
+		
+		private var __eventType:String = null;
+		public function get eventType():String {
+			return __eventType;
 		}
 		
 		public function hasInterface(_funName:String):Boolean {
@@ -62,24 +69,18 @@ package akdcl.manager {
 		
 		//广播js调用as的事件
 		private function swfInterface(_type:String,...args):void {
-			var _event:Event = new Event(SWF_INTERFACE);
+			__eventType = _type;
 			if (args) {
-				data = [_type].concat(args);
+				eventParams = args;
 			}else {
-				data = [_type];
+				eventParams = null;
 			}
+			
 			//addEventListener(ExternalInterfaceManager.SWF_INTERFACE);
-			//_type:eiM.data[0], ...args:eiM.data[1...]
-			dispatchEvent(_event);
-			//
-			_event = new Event(_type);
-			if (args) {
-				data = args;
-			}else {
-				data = null;
-			}
-			//addEventListener(_type);
-			//...args:eiM.data
+			dispatchEvent(swfInterFaceEvent);
+			
+			_event = new Event(__eventType);
+			//addEventListener(__eventType);
 			dispatchEvent(_event);
 		}
 		
