@@ -1,4 +1,4 @@
-package akdcl.manager {
+﻿package akdcl.manager {
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.external.ExternalInterface;
@@ -79,7 +79,7 @@ package akdcl.manager {
 			//addEventListener(ExternalInterfaceManager.SWF_INTERFACE);
 			dispatchEvent(swfInterFaceEvent);
 			
-			_event = new Event(__eventType);
+			var _event:Event = new Event(__eventType);
 			//addEventListener(__eventType);
 			dispatchEvent(_event);
 		}
