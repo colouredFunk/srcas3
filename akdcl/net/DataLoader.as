@@ -1,4 +1,5 @@
 ﻿package akdcl.net {
+	import akdcl.utils.replaceString;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.net.URLVariables;
@@ -113,6 +114,8 @@
 
 		public function get dataJSON():Object {
 			try {
+				//去掉json不支持的字符串
+				var _dataFotmat:String = data.replace(/[\x00-\x1f]/g, "");
 				var _data:Object = JSON.decode(data);
 			} catch (_error:*){
 			}
