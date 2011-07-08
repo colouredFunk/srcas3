@@ -11,8 +11,6 @@
 
 	import flash.system.Security;
 	import flash.system.System;
-
-	import zero.SWFMetadataGetter;
 	
 	import akdcl.net.DataLoader;
 	import akdcl.utils.addContextMenu;
@@ -45,11 +43,11 @@
 		protected var xmlLoadProgress:Number = 0;
 		protected var optionsXMLPath:String;
 		protected var optionsXMLPerLoad:Number = 0.1;
+		protected var modifyDate:String;
 
 		private var isLoadComplete:Boolean;
 
 		private var __flashVars:Object;
-
 		public function set flashVars(_flashVars:Object):void {
 			if (loaderInfo.parameters && __flashVars){
 				return;
@@ -103,25 +101,19 @@
 				onLoaded();
 			}
 		}
-
 		protected function onLoadedHandler():void {
-			SWFMetadataGetter.init(this.loaderInfo.bytes);
-			var _modifyDate:String = SWFMetadataGetter.getModifyDate();
-			if (_modifyDate){
-				_modifyDate = _modifyDate.split("+")[0];
-				var _ary:Array = _modifyDate.split("T");
-				_ary[0] = _ary[0].split("-");
-				_ary[1] = _ary[1].split(":");
-				_modifyDate = _ary[0][1] + _ary[0][2] + "." + (int(_ary[1][0]) * 60 + int(_ary[1][1]));
-				_modifyDate = " V:" + _ary[0][0].substr(2, 2) + "." + _modifyDate;
-			}else {
-				_modifyDate = "";
-			}
+			AuthorInformation.setFileBytes(loaderInfo.bytes);
 			
 			addContextMenu(
 				this, 
-				"S:" + loaderInfo.width + "x" + loaderInfo.height + _modifyDate,
-				onWHReleaseHandler
+				"Size: " + loaderInfo.width + " X " + loaderInfo.height,
+				onSizeMenuHandler
+			);
+			
+			addContextMenu(
+				this, 
+				AuthorInformation.getVersion(),
+				onVersionMenuHandler
 			);
 			
 			eiM.dispatchSWFEvent("LoadComplete");
@@ -157,7 +149,7 @@
 			
 		}
 
-		protected function onWHReleaseHandler(_evt:ContextMenuEvent):void {
+		protected function onSizeMenuHandler(_evt:ContextMenuEvent):void {
 			var _url:String = decodeURI(this.loaderInfo.url);
 			var _ary:Array = _url.split("/");
 			_url = _ary.pop();
@@ -166,6 +158,10 @@
 			_str = "<script src='http://www.wanmei.com/public/js/swfobject.js' type='text/javascript'></script>\r\n\r\n<script type='text/javascript'>\r\n	" + _str;
 			_str = _str + "\r\n</script>";
 			System.setClipboard(_str);
+		}
+
+		protected function onVersionMenuHandler(_evt:ContextMenuEvent):void {
+			System.setClipboard(AuthorInformation.getInformation());
 		}
 	}
 }
