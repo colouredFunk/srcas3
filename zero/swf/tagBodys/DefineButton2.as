@@ -1,4 +1,4 @@
-﻿/***
+/***
 DefineButton2
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
 创建时间：2011年7月5日 13:52:16（代码生成器 V2.0.0 F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf）
@@ -91,7 +91,7 @@ package zero.swf.tagBodys{
 			}
 			return data;
 		}
-
+		
 		////
 		CONFIG::USE_XML{
 		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
