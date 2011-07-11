@@ -35,25 +35,6 @@ package zero.swf.records.clips{
 			ClipActionRecordV=new Vector.<CLIPACTIONRECORD>();
 			while(offset<endOffset-6){
 				i++;
-				/*
-				if(_initByDataOptions.swf_Version<6){
-					if(data[offset]||data[offset+1]){
-					}else{
-						Outputer.output("i="+i+"，可能是扰码: CLIPEVENTFLAGS 所有属性为0","brown");
-						offset+=2;
-						i--;
-						continue;
-					}
-				}else{
-					if(data[offset]||data[offset+1]||data[offset+2]||data[offset+3]){
-					}else{
-						Outputer.output("i="+i+"，可能是扰码: CLIPEVENTFLAGS 所有属性为0","brown");
-						offset+=4;
-						i--;
-						continue;
-					}
-				}
-				*/
 				ClipActionRecordV[i]=new CLIPACTIONRECORD();
 				offset=ClipActionRecordV[i].initByData(data,offset,endOffset,_initByDataOptions);
 			}

@@ -131,10 +131,10 @@ package zero.swf.tagBodys{
 			var flags:int=data[offset++];
 			PlaceFlagMove=((flags&0x01)?true:false);						//00000001
 			var flags2:int=data[offset++];
-			//Reserved=flags2&0xe0;									//11100000
+			//Reserved=flags2&0xe0;											//11100000
 			PlaceFlagHasImage=((flags2&0x10)?true:false);					//00010000
 			Depth=data[offset++]|(data[offset++]<<8);
-			if(flags2&0x08){//PlaceFlagHasClassName					//00001000
+			if(flags2&0x08){//PlaceFlagHasClassName							//00001000
 				var get_str_size:int=0;
 				while(data[offset+(get_str_size++)]){}
 				data.position=offset;
@@ -143,29 +143,29 @@ package zero.swf.tagBodys{
 			}else{
 				ClassName=null;
 			}
-			if(flags&0x02){//PlaceFlagHasCharacter					//00000010
+			if(flags&0x02){//PlaceFlagHasCharacter							//00000010
 				CharacterId=data[offset++]|(data[offset++]<<8);
 			}else{
 				CharacterId=-1;
 			}
-			if(flags&0x04){//PlaceFlagHasMatrix						//00000100
+			if(flags&0x04){//PlaceFlagHasMatrix								//00000100
 				Matrix=new (_initByDataOptions&&_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.records.MATRIX"]||MATRIX)();
 				offset=Matrix.initByData(data,offset,endOffset,_initByDataOptions);
 			}else{
 				Matrix=null;
 			}
-			if(flags&0x08){//PlaceFlagHasColorTransform				//00001000
+			if(flags&0x08){//PlaceFlagHasColorTransform						//00001000
 				ColorTransform=new (_initByDataOptions&&_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.records.CXFORMWITHALPHA"]||CXFORMWITHALPHA)();
 				offset=ColorTransform.initByData(data,offset,endOffset,_initByDataOptions);
 			}else{
 				ColorTransform=null;
 			}
-			if(flags&0x10){//PlaceFlagHasRatio						//00010000
+			if(flags&0x10){//PlaceFlagHasRatio								//00010000
 				Ratio=data[offset++]|(data[offset++]<<8);
 			}else{
 				Ratio=-1;
 			}
-			if(flags&0x20){//PlaceFlagHasName						//00100000
+			if(flags&0x20){//PlaceFlagHasName								//00100000
 				get_str_size=0;
 				while(data[offset+(get_str_size++)]){}
 				data.position=offset;
@@ -174,12 +174,12 @@ package zero.swf.tagBodys{
 			}else{
 				Name=null;
 			}
-			if(flags&0x40){//PlaceFlagHasClipDepth					//01000000
+			if(flags&0x40){//PlaceFlagHasClipDepth							//01000000
 				ClipDepth=data[offset++]|(data[offset++]<<8);
 			}else{
 				ClipDepth=-1;
 			}
-			if(flags2&0x01){//PlaceFlagHasFilterList				//00000001
+			if(flags2&0x01){//PlaceFlagHasFilterList						//00000001
 				var NumberOfFilters:int=data[offset++];
 				if(NumberOfFilters){
 					SurfaceFilterV=new Vector.<*>();
@@ -193,17 +193,17 @@ package zero.swf.tagBodys{
 			}else{
 				SurfaceFilterV=null;
 			}
-			if(flags2&0x02){//PlaceFlagHasBlendMode					//00000010
+			if(flags2&0x02){//PlaceFlagHasBlendMode							//00000010
 				BlendMode=data[offset++];
 			}else{
 				BlendMode=-1;
 			}
-			if(flags2&0x04){//PlaceFlagHasCacheAsBitmap				//00000100
+			if(flags2&0x04){//PlaceFlagHasCacheAsBitmap						//00000100
 				BitmapCache=data[offset++];
 			}else{
 				BitmapCache=-1;
 			}
-			if(flags&0x80){//PlaceFlagHasClipActions				//10000000
+			if(flags&0x80){//PlaceFlagHasClipActions						//10000000
 				ClipActions=new (_initByDataOptions&&(_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.BytesData"]||_initByDataOptions.ClipActionsClass)||BytesData)();
 				offset=ClipActions.initByData(data,offset,endOffset,_initByDataOptions);
 			}else{
