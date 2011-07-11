@@ -27,9 +27,9 @@
 		
 		public function DocClass(_key:String = "main") {
 			stop();
-			if (instanceMap[_key] != null){
+			/*if (instanceMap[_key] != null){
 				throw new Error("ERROR:DocClass Singleton already constructed!");
-			}
+			}*/
 			instanceMap[_key] = this;
 			loaderInfo.addEventListener(Event.INIT, onInitHandler);
 		}
