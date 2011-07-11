@@ -1,46 +1,39 @@
 package akdcl.media {
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
+	import flash.media.SoundMixer;
 	import flash.media.SoundTransform;
 	import flash.events.Event;
+	import flash.net.URLRequest;
+	import flash.media.SoundLoaderContext;
 
 	import com.greensock.TweenLite;
 	import com.greensock.easing.Sine;
 
 	import akdcl.manager.ElementManager;
+	
+	import akdcl.interfaces.IPlaylistItem;
 
 	/**
 	 * ...
 	 * @author ...
 	 */
 
-	public class SoundItem {
+	public class SoundItem implements IPlaylistItem {
 		public static function setChannelVolume(_channel:SoundChannel, _volume:Number):void {
 			var _soundTransform:SoundTransform = _channel.soundTransform;
 			_soundTransform.volume = _volume;
 			_channel.soundTransform = _soundTransform;
 		}
 
-		public var maxVolume:Number = 1;
+		private var maxVolume:Number = 1;
 
-		private var positionLast:uint = 0;
 		private var sound:Sound;
 		private var soundTransform:SoundTransform;
 		private var channelNow:SoundChannel;
 		private var channelList:Array;
 
 		private var eM:ElementManager;
-
-
-		public function get totalTime():uint {
-			var _totalTime:uint;
-			if (sound){
-				_totalTime = sound.length / loadProgress;
-			} else {
-				_totalTime = 0;
-			}
-			return _totalTime;
-		}
 
 		public function get loadProgress():Number {
 			var _loadProgress:Number;
@@ -50,6 +43,20 @@ package akdcl.media {
 				_loadProgress = 0;
 			}
 			return _loadProgress;
+		}
+
+		public function get bufferProgress():Number {
+			return Math.min((totalTime * loadProgress - position) / SoundMixer.bufferTime, 1);
+		}
+		
+		public function get totalTime():uint {
+			var _totalTime:uint;
+			if (sound){
+				_totalTime = sound.length / loadProgress;
+			} else {
+				_totalTime = 0;
+			}
+			return _totalTime;
 		}
 
 		public function get playProgress():Number {
@@ -68,7 +75,7 @@ package akdcl.media {
 			if (channelNow && sound.length > 0){
 				return channelNow.position;
 			} else {
-				return positionLast;
+				return 0;
 			}
 		}
 
@@ -76,14 +83,12 @@ package akdcl.media {
 			if (channelNow && sound.length > 0){
 				//channelNow
 				play(_position);
-			} else {
-				positionLast = _position;
 			}
 		}
+		
 		private var __volume:Number = 1;
-
 		public function get volume():Number {
-			return __volume * maxVolume;
+			return __volume;
 		}
 
 		public function set volume(_volume:Number):void {
@@ -99,13 +104,21 @@ package akdcl.media {
 
 		}
 
-		public function SoundItem(_sound:Sound, _maxVolume:Number = 1) {
+		public function SoundItem(_sound:Sound = null, _maxVolume:Number = 1) {
 			maxVolume = _maxVolume;
 			channelList = [];
 			eM = ElementManager.getInstance();
 			eM.register("TweenObject", TweenObject);
-			sound = _sound;
 			soundTransform = new SoundTransform(volume, 0);
+			if (_sound) {
+				sound = _sound;
+			}else {
+				sound = new Sound();
+			}
+		}
+		
+		public function load(_source:String):void {
+			sound.load(new URLRequest(_source), new SoundLoaderContext(1000, true));
 		}
 
 		public function play(_startTime:Number = -1, _loops:uint = 0, _tempVolume:Number = 1, _tweenIn:Number = 0, _tweenOut:Number = 0):SoundChannel {
@@ -113,22 +126,17 @@ package akdcl.media {
 				_startTime = 0;
 			} else if (_startTime <= 1){
 				//0~1（playProgress）
-				if (_startTime > loadProgress){
+				if (_startTime >= loadProgress){
 					_startTime = loadProgress * 0.999;
 				}
 				_startTime = totalTime * _startTime;
 			} else {
 				//1~XX（playTime毫秒为单位）
 				var _loadTime:uint = totalTime * loadProgress;
-				if (_startTime > _loadTime){
+				if (_startTime >= _loadTime){
 					_startTime = _loadTime * 0.999;
 				}
 			}
-
-			if (positionLast > 0){
-				_startTime = positionLast;
-			}
-			positionLast = 0;
 
 			try {
 				soundTransform.volume = volume * _tempVolume;
@@ -136,7 +144,7 @@ package akdcl.media {
 				_channel.addEventListener(Event.SOUND_COMPLETE, onChannelCompleteHandler);
 				channelList.push(_channel);
 				channelNow = _channel;
-
+				//
 				if (_tweenIn == 0){
 
 				} else if (_tweenIn <= 1){
@@ -158,13 +166,7 @@ package akdcl.media {
 			return _channel;
 		}
 
-		public function pause():void {
-			positionLast = position;
-			removeAllChannel();
-		}
-
 		public function stop():void {
-			positionLast = 0;
 			removeAllChannel();
 		}
 
@@ -194,9 +196,9 @@ import flash.media.SoundChannel;
 import com.greensock.easing.Sine;
 import com.greensock.TweenLite;
 
-import akdcl.media.SoundItem;
-
 import akdcl.manager.ElementManager;
+
+import akdcl.media.SoundItem;
 
 class TweenObject {
 	public var volume:Number = 1;
