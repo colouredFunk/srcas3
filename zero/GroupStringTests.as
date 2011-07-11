@@ -6,7 +6,7 @@ GroupStringTests
 用法举例：这家伙还是很懒什么都没写。
 */
 
-package zero.swf.avm2{
+package zero{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.geom.*;
@@ -23,10 +23,6 @@ package zero.swf.avm2{
 			var arr:Array=GroupString.separate(GroupString.escape(str));
 			check(arr[0],"param0:[Multiname][\\x5b\\x5b\\x5b,yyy,zzz].DisplayObject");
 			check(arr[1],"param1:flash.display.DisplayObject");
-			if(this){
-				return;
-			}
-			
 			
 			str="[]<>(){}\t\\[\\]\\<\\>\\(\\)\\{\\}";
 			check(str,"[]<>(){}	\\[\\]\\<\\>\\(\\)\\{\\}");
@@ -49,6 +45,13 @@ package zero.swf.avm2{
 			check(str,"	\n\r");
 			str=GroupString.unescape(str);
 			check(str,"	\n\r");
+			
+			str="\\\\[";
+			str=GroupString.escape(str);
+			check(str,"\\\\[");
+			str="\\\\x5b";
+			str=GroupString.unescape(str);
+			check(str,"\\\\x5b");
 		}
 	}
 }

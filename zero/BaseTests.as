@@ -6,7 +6,7 @@ BaseTests
 用法举例：这家伙还是很懒什么都没写。
 */
 
-package{
+package zero{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
@@ -24,7 +24,7 @@ package{
 				trace(result1);
 				return result1;
 			}
-			throw new Error("result1="+result1+",result2="+result2);
+			throw new Error("\nresult1="+result1+"\nresult2="+result2);
 		}
 	}
 }

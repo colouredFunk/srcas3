@@ -6,7 +6,7 @@ GroupString
 用法举例：这家伙还是很懒什么都没写。
 */
 
-package zero.swf.avm2{
+package zero{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.geom.*;
@@ -59,7 +59,10 @@ package zero.swf.avm2{
 					var c:String=cArr[i];
 					if(c=="\\"){
 						c=cArr[i+1];
-						if(escape_mark[c]){
+						if(c=="\\"){
+							str+="\\\\";
+							i++;
+						}else if(escape_mark[c]){
 							str+=escape_mark[c];
 							i++;
 						}else{
@@ -81,11 +84,19 @@ package zero.swf.avm2{
 				var i:int=-1;
 				while(++i<L){
 					var c:String=cArr[i];
-					if(c=="\\"&&cArr[i+1]=="x"){
-						c=cArr[i+2]+cArr[i+3];
-						if(unescape_mark[c]){
-							str+=unescape_mark[c];
-							i+=3;
+					if(c=="\\"){
+						c=cArr[i+1];
+						if(c=="\\"){
+							str+="\\\\";
+							i++;
+						}else if(c=="x"){
+							c=cArr[i+2]+cArr[i+3];
+							if(unescape_mark[c]){
+								str+=unescape_mark[c];
+								i+=3;
+							}else{
+								str+="\\";
+							}
 						}else{
 							str+="\\";
 						}

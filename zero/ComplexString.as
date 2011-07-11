@@ -6,7 +6,7 @@ ComplexString
 用法举例：这家伙还是很懒什么都没写。
 */
 
-package zero.swf.avm2{
+package zero{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.geom.*;
@@ -92,7 +92,7 @@ package zero.swf.avm2{
 			mark[""]="\\x1f";
 			//mark[" "]="\\x20";
 			//mark["!"]="\\x21";
-			//mark["\"]="\\x22";
+			//mark["\""]="\\x22";
 			//mark["#"]="\\x23";
 			//mark["$"]="\\x24";
 			//mark["%"]="\\x25";
@@ -323,11 +323,7 @@ package zero.swf.avm2{
 				var cArr:Array=str.split("");
 				str="";
 				for each(var c:String in cArr){
-					if(mark[c]){
-						str+=mark[c];
-					}else{
-						str+=c;
-					}
+					str+=(mark[c]||c);
 				}
 			}
 			return str;
@@ -340,37 +336,31 @@ package zero.swf.avm2{
 				var L:int=cArr.length;
 				var i:int=-1;
 				while(++i<L){
-					var c1:String=cArr[i];
-					if(c1=="\\"){
+					if(cArr[i]=="\\"){
 						if(i+1>=L){
 							str+="\\";
-						}else{
-							var c2:String=cArr[i+1];
-							if(c2=="x"){
-								if(i+3>=L){
-									str+="x";
-									i++;
-								}else{
-									var c3:String=cArr[i+2]+cArr[i+3];
-									if(/[0-9A-Fa-f]{2}/.test(c3)){
-										str+=String.fromCharCode(int("0x"+c3));
-										i+=3;
-									}else{
-										str+="x";
-										i++;
-									}
-								}
+							break;
+						}
+						var c2:String=cArr[i+1];
+						if(c2=="x"){
+							if(i+3>=L){
+								str+="x"+cArr[i+2];
+								break;
+							}
+							var c3:String=cArr[i+2]+cArr[i+3];
+							if(/[0-9A-Fa-f]{2}/.test(c3)){
+								str+=String.fromCharCode(int("0x"+c3));
+								i+=3;
 							}else{
-								if(mark[c1+c2]){
-									str+=mark[c1+c2];
-								}else{
-									str+=c2;
-								}
+								str+="x";
 								i++;
 							}
+						}else{
+							str+=(mark["\\"+c2]||c2);
+							i++;
 						}
 					}else{
-						str+=c1;
+						str+=cArr[i];
 					}
 				}
 			}
