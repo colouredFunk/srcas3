@@ -44,7 +44,9 @@
 				__content.mask = null;
 			}
 			__content = _content;
-			__content.mask = maskArea;
+			if (__content) {
+				__content.mask = maskArea;
+			}
 			if (__content && __content.height > maskArea.height) {
 				var _rect:Rectangle = __content.getBounds(__content.parent);
 				offX = int(x + __content.x - _rect.x);
