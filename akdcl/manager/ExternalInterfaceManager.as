@@ -2,6 +2,8 @@
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.external.ExternalInterface;
+	import flash.system.Security;
+	
 
 	/**
 	 * ...
@@ -27,7 +29,18 @@
 				throw new Error("ERROR:ExternalInterfaceManager Singleton already constructed!");
 			}
 			instance = this;
-			__isAvailable = ExternalInterface.available && ExternalInterface.objectID;
+			
+			if (Security.sandboxType == Security.LOCAL_WITH_FILE) {
+				__isAvailable = false;
+			}else {
+				try {
+					ExternalInterface.call("window.location.href.toString");
+					__isAvailable = true;
+				}catch (_e:Error) {
+					__isAvailable = false;
+				}
+			}
+			
 			if (isAvailable){
 				ExternalInterface.addCallback(SWF_INTERFACE, swfInterface);
 			}
