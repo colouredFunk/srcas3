@@ -15,5 +15,10 @@ package akdcl.interfaces {
 
 		function next():Boolean;
 		function prev():Boolean;
+
+		function get playState():String;
+		
+		function playOrPause():Boolean;
+		function playOrStop():Boolean;
 	}
 }
