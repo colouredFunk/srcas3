@@ -17,18 +17,20 @@
 	import akdcl.manager.ExternalInterfaceManager;
 
 	public class DocClass extends MovieClip {
-		protected static var instance:*;
+		protected static var instanceMap:Object = { };
 
-		public static function getInstance():* {
-			return instance;
+		public static function getInstance(_key:String = "main"):DocClass {
+			var _instance:DocClass;
+			_instance = instanceMap[_key];
+			return _instance;
 		}
-
-		public function DocClass(){
+		
+		public function DocClass(_key:String = "main") {
 			stop();
-			if (instance != null){
+			if (instanceMap[_key] != null){
 				throw new Error("ERROR:DocClass Singleton already constructed!");
 			}
-			instance = this;
+			instanceMap[_key] = this;
 			loaderInfo.addEventListener(Event.INIT, onInitHandler);
 		}
 
