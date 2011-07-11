@@ -2656,8 +2656,8 @@
 				//Usage 2 Sets a variable with a given FunctionName and a given function definition. This is
 				//the more conventional function definition. For example, in ActionScript:
 				//function Circle(radius) {
-				//this.radius = radius;
-				//this.area = Math.PI * radius * radius;
+				//	this.radius = radius;
+				//	this.area = Math.PI * radius * radius;
 				//}
 		]]></description>
 		<samples>
