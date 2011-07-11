@@ -20,22 +20,24 @@ package zero{
 		//trace(str);/*
 		//
 		//*/
-		//str=ComplexString.escape(str);
+		//str=complexString.escape(str);
 		//trace(str);//\b\f\n\r\t\v
-		//str=ComplexString.escape(str);
+		//str=complexString.escape(str);
 		//trace(str);//\\b\\f\\n\\r\\t\\v	//反复 escape() 会继续引起变化
-		//str=ComplexString.unescape(str);
+		//str=complexString.unescape(str);
 		//trace(str);//\b\f\n\r\t\v
-		//str=ComplexString.unescape(str);
+		//str=complexString.unescape(str);
 		//trace(str);/*
 		//
 		//*/								//反复 unescape() 会继续引起变化
 		
-		public static const extendsCArr:Array=["[","]","<",">","(",")","{","}",",",":","\"","'","="];//扩展转义
-		//public static const extendsCArr:Array=[];//普通转义
+		public static const normal:ComplexString=new ComplexString(["\"","'"]);
+		public static const ext:ComplexString=new ComplexString(["[","]","<",">","(",")","{","}",",",":","\"","'","="]);
 		
-		private static const mark:Object=function():Object{
-			var mark:Object=new Object();
+		private var mark:Object;
+		public function ComplexString(extendsCArr:Array=null){
+			
+			mark=new Object();
 			
 			mark["\\b"]="\b";
 			mark["\\f"]="\f";
@@ -314,11 +316,9 @@ package zero{
 			mark["ý"]="\\xfd";
 			mark["þ"]="\\xfe";
 			mark["ÿ"]="\\xff";
-			
-			return mark;
-		}();
+		}
 
-		public static function escape(str:String):String{
+		public function escape(str:String):String{
 			if(str){
 				var cArr:Array=str.split("");
 				str="";
@@ -329,7 +329,7 @@ package zero{
 			return str;
 		}
 		
-		public static function unescape(str:String):String{
+		public function unescape(str:String):String{
 			if(str){
 				var cArr:Array=str.split("");
 				str="";
