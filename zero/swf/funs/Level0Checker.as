@@ -9,7 +9,8 @@ Level0Checker
 package zero.swf.funs{
 	
 	import zero.swf.*;
-	import zero.swf.avm1.ACTIONRECORD;
+	import zero.swf.codes.*;
+	import zero.swf.avm1.ACTIONRECORDs;
 	import zero.swf.avm1.*;
 	import zero.swf.tagBodys.*;
 	
@@ -23,10 +24,7 @@ package zero.swf.funs{
 					case TagTypes.DoAction:
 						if(
 							checkActions(
-								tag.getBody({
-									TagBodyClass:DoAction,
-									ActionsClass:ACTIONRECORD
-								}).Actions
+								tag.getBody(DoAction,{ActionsClass:ACTIONRECORDs}).Actions
 							)
 						){
 							return true;
@@ -35,10 +33,7 @@ package zero.swf.funs{
 					case TagTypes.DoInitAction:
 						if(
 							checkActions(
-								tag.getBody({
-									TagBodyClass:DoInitAction,
-									ActionsClass:ACTIONRECORD
-								}).Actions
+								tag.getBody(DoInitAction,{ActionsClass:ACTIONRECORDs}).Actions
 							)
 						){
 							return true;
@@ -47,9 +42,7 @@ package zero.swf.funs{
 					case TagTypes.DefineSprite:
 						if(
 							checkTagV(
-								tag.getBody({
-									TagBodyClass:DefineSprite
-								}).tagV
+								tag.getBody(DefineSprite,null).tagV
 							)
 						){
 							return true;
@@ -60,10 +53,10 @@ package zero.swf.funs{
 			
 			return false;
 		}
-		private static function checkActions(Actions:ACTIONRECORD):Boolean{
+		private static function checkActions(Actions:ACTIONRECORDs):Boolean{
 			for each(var code:* in Actions.codeArr){
 				if(
-					code is AVM1Code
+					code is Code
 					&&
 					code.op==AVM1Ops.push
 				){

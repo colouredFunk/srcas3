@@ -9,6 +9,7 @@ RuntimeFlash_loadInitialStateRepairer
 package zero.swf.funs{
 	
 	import zero.swf.*;
+	import zero.swf.codes.*;
 	import zero.swf.avm2.*;
 	import zero.swf.tagBodys.*;
 	
@@ -38,16 +39,10 @@ package zero.swf.funs{
 			for each(var tag:Tag in swf.tagV){
 				switch(tag.type){
 					case TagTypes.DoABC:
-						ABCData=tag.getBody({
-							TagBodyClass:DoABC,
-							ABCDataClass:ABCClasses
-						}).ABCData;
+						ABCData=tag.getBody(DoABC,{ABCDataClass:ABCClasses}).ABCData;
 					break;
 					case TagTypes.DoABCWithoutFlagsAndName:
-						ABCData=tag.getBody({
-							TagBodyClass:DoABCWithoutFlagsAndName,
-							ABCDataClass:ABCClasses
-						}).ABCData;
+						ABCData=tag.getBody(DoABCWithoutFlagsAndName,{ABCDataClass:ABCClasses}).ABCData;
 					break;
 					default:
 						ABCData=null;
@@ -68,7 +63,7 @@ package zero.swf.funs{
 									for each(var code:* in trait.method.codes.codeArr){
 										i++;
 										if(
-											code is AVM2Code
+											code is Code
 											&&
 											code.op==AVM2Ops.getproperty
 											&&
@@ -76,9 +71,9 @@ package zero.swf.funs{
 											&&
 											code.value.name=="loader"
 										){
-											var code2:*=trait.method.codes.codeArr[i+1] as AVM2Code;
+											var code2:*=trait.method.codes.codeArr[i+1] as Code;
 											if(
-												code2 is AVM2Code
+												code2 is Code
 												&&
 												code2.op==AVM2Ops.getproperty
 												&&

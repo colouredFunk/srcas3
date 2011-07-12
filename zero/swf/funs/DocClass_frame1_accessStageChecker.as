@@ -9,6 +9,7 @@ MainTimeline_frame1_accessStageChecker
 package zero.swf.funs{
 	
 	import zero.swf.*;
+	import zero.swf.codes.*;
 	import zero.swf.avm2.*;
 	import zero.swf.tagBodys.*;
 	
@@ -22,9 +23,7 @@ package zero.swf.funs{
 			
 			loop:for each(tag in swf.tagV){
 				if(tag.type==TagTypes.SymbolClass){
-					var symbolClass:SymbolClass=tag.getBody({
-						TagBodyClass:SymbolClass
-					});
+					var symbolClass:SymbolClass=tag.getBody(SymbolClass,null);
 					var i:int=-1;
 					for each(var className:String in symbolClass.NameV){
 						i++;
@@ -40,47 +39,39 @@ package zero.swf.funs{
 			if(docClassName){
 				for each(tag in swf.tagV){
 					switch(tag.type){
-						switch(tag.type){
-							case TagTypes.DoABC:
-								ABCData=tag.getBody({
-									TagBodyClass:DoABC,
-									ABCDataClass:ABCClasses
-								}).ABCData;
-							break;
-							case TagTypes.DoABCWithoutFlagsAndName:
-								ABCData=tag.getBody({
-									TagBodyClass:DoABCWithoutFlagsAndName,
-									ABCDataClass:ABCClasses
-								}).ABCData;
-							break;
-							default:
-								ABCData=null;
-							break;
-						}
-						if(ABCData){
-							for each(var clazz:ABCClass in ABCData.classV){
-								if(clazz.getClassName()==docClassName){
-									i=clazz.itraitV.length;
-									while(--i>=0){
-										var trait:ABCTrait=clazz.itraitV[i];
-										if(
-											trait.name.name=="frame1"
-											&&
-											trait.method
-											&&
-											trait.method.codes
-										){
-											for each(var code:* in trait.method.codes.codeArr){
-												if(
-													code is AVM2Code
-													&&
-													code.op==AVM2Ops.getlex
-												){
-													var multiname:ABCMultiname=code.value;
-													if(multiname&&multiname.name=="stage"){
-														trace("xxx::MainTimeline/frame1() 访问 stage 的");
-														return true;
-													}
+						case TagTypes.DoABC:
+							ABCData=tag.getBody(DoABC,{ABCDataClass:ABCClasses}).ABCData;
+						break;
+						case TagTypes.DoABCWithoutFlagsAndName:
+							ABCData=tag.getBody(DoABCWithoutFlagsAndName,{ABCDataClass:ABCClasses}).ABCData;
+						break;
+						default:
+							ABCData=null;
+						break;
+					}
+					if(ABCData){
+						for each(var clazz:ABCClass in ABCData.classV){
+							if(clazz.getClassName()==docClassName){
+								i=clazz.itraitV.length;
+								while(--i>=0){
+									var trait:ABCTrait=clazz.itraitV[i];
+									if(
+										trait.name.name=="frame1"
+										&&
+										trait.method
+										&&
+										trait.method.codes
+									){
+										for each(var code:* in trait.method.codes.codeArr){
+											if(
+												code is Code
+												&&
+												code.op==AVM2Ops.getlex
+											){
+												var multiname:ABCMultiname=code.value;
+												if(multiname&&multiname.name=="stage"){
+													trace("xxx::XXX/frame1() 访问 stage 的");
+													return true;
 												}
 											}
 										}

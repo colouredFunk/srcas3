@@ -27,13 +27,17 @@ package zero{
 		//str=GroupString.unescape(str);
 		//trace(str);//	\[\]\(\)			//反复 unescape() 不会继续引起变化
 		
-		private static var escape_mark:Object;
-		private static const unescape_mark:Object=function():Object{
+		public static const ext:GroupString=new GroupString(ComplexString.ext.extendsCArr);
+		
+		private var escape_mark:Object;
+		private var unescape_mark:Object;
+		public var extendsCArr:Array;
+		public function GroupString(_extendsCArr:Array=null){
+			extendsCArr=_extendsCArr;
 			
 			escape_mark=new Object();
-			var unescape_mark:Object=new Object();
-			
-			for each(var extendsC:String in ComplexString.extendsCArr){
+			unescape_mark=new Object();
+			for each(var extendsC:String in ComplexString.ext.extendsCArr){
 				var cCodeStr:String=extendsC.charCodeAt(0).toString(16);
 				if(cCodeStr.length<0){
 					cCodeStr="0"+cCodeStr;
@@ -45,11 +49,9 @@ package zero{
 				unescape_mark[cCodeStr.toUpperCase()]=
 				"\\"+extendsC;
 			}
-			
-			return unescape_mark;
-		}();
+		};
 		
-		public static function escape(str:String):String{
+		public function escape(str:String):String{
 			if(str){
 				var cArr:Array=str.split("");
 				str="";
@@ -76,7 +78,7 @@ package zero{
 			return str;
 		}
 		
-		public static function unescape(str:String):String{
+		public function unescape(str:String):String{
 			if(str){
 				var cArr:Array=str.split("");
 				str="";
@@ -108,7 +110,7 @@ package zero{
 			return str;
 		}
 		
-		public static function separate(escapeStr:String):Array{
+		public function separate(escapeStr:String):Array{
 			//"param0:[Multiname][xxx,yyy,zzz].DisplayObject,param1:flash.display.DisplayObject" ==> ["param0:[Multiname][xxx,yyy,zzz].DisplayObject","param1:flash.display.DisplayObject"]
 			if(escapeStr){
 				var cArr:Array=escapeStr.split("");

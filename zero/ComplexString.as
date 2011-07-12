@@ -34,288 +34,285 @@ package zero{
 		public static const normal:ComplexString=new ComplexString(["\"","'"]);
 		public static const ext:ComplexString=new ComplexString(["[","]","<",">","(",")","{","}",",",":","\"","'","="]);
 		
-		private var mark:Object;
-		public function ComplexString(extendsCArr:Array=null){
+		private var escapeV:Vector.<String>;
+		private var unescape_mark:Object;
+		public var extendsCArr:Array;
+		public function ComplexString(_extendsCArr:Array=null){
+			extendsCArr=_extendsCArr;
 			
-			mark=new Object();
+			escapeV=Vector.<String>([
+				"\\x00",//\x00
+				"\\x01",//
+				"\\x02",//
+				"\\x03",//
+				"\\x04",//
+				"\\x05",//
+				"\\x06",//
+				"\\x07",//
+				"\\b",//\b,\x08
+				"\\t",//\t,\x09
+				"\\n",//\n,\x0a
+				"\\v",//\v,\x0b
+				"\\f",//\f,\x0c
+				"\\r",//\r,\x0d
+				"\\x0e",//
+				"\\x0f",//
+				"\\x10",//
+				"\\x11",//
+				"\\x12",//
+				"\\x13",//
+				"\\x14",//
+				"\\x15",//
+				"\\x16",//
+				"\\x17",//
+				"\\x18",//
+				"\\x19",//
+				"\\x1a",//
+				"\\x1b",//
+				"\\x1c",//
+				"\\x1d",//
+				"\\x1e",//
+				"\\x1f",//
+				" ",//\x20
+				"!",//\x21
+				"\"",//\x22
+				"#",//\x23
+				"$",//\x24
+				"%",//\x25
+				"&",//\x26
+				"'",//\x27
+				"(",//\x28
+				")",//\x29
+				"*",//\x2a
+				"+",//\x2b
+				",",//\x2c
+				"-",//\x2d
+				".",//\x2e
+				"/",//\x2f
+				"0",//\x30
+				"1",//\x31
+				"2",//\x32
+				"3",//\x33
+				"4",//\x34
+				"5",//\x35
+				"6",//\x36
+				"7",//\x37
+				"8",//\x38
+				"9",//\x39
+				":",//\x3a
+				";",//\x3b
+				"<",//\x3c
+				"=",//\x3d
+				">",//\x3e
+				"?",//\x3f
+				"@",//\x40
+				"A",//\x41
+				"B",//\x42
+				"C",//\x43
+				"D",//\x44
+				"E",//\x45
+				"F",//\x46
+				"G",//\x47
+				"H",//\x48
+				"I",//\x49
+				"J",//\x4a
+				"K",//\x4b
+				"L",//\x4c
+				"M",//\x4d
+				"N",//\x4e
+				"O",//\x4f
+				"P",//\x50
+				"Q",//\x51
+				"R",//\x52
+				"S",//\x53
+				"T",//\x54
+				"U",//\x55
+				"V",//\x56
+				"W",//\x57
+				"X",//\x58
+				"Y",//\x59
+				"Z",//\x5a
+				"[",//\x5b
+				"\\\\",//\\,x5c
+				"]",//\x5d
+				"^",//\x5e
+				"_",//\x5f
+				"`",//\x60
+				"a",//\x61
+				"b",//\x62
+				"c",//\x63
+				"d",//\x64
+				"e",//\x65
+				"f",//\x66
+				"g",//\x67
+				"h",//\x68
+				"i",//\x69
+				"j",//\x6a
+				"k",//\x6b
+				"l",//\x6c
+				"m",//\x6d
+				"n",//\x6e
+				"o",//\x6f
+				"p",//\x70
+				"q",//\x71
+				"r",//\x72
+				"s",//\x73
+				"t",//\x74
+				"u",//\x75
+				"v",//\x76
+				"w",//\x77
+				"x",//\x78
+				"y",//\x79
+				"z",//\x7a
+				"{",//\x7b
+				"|",//\x7c
+				"}",//\x7d
+				"~",//\x7e
+				"\\x7f",//
+				"\\x80",//
+				"\\x81",//
+				"\\x82",//
+				"\\x83",//
+				"\\x84",//
+				"\\x85",//
+				"\\x86",//
+				"\\x87",//
+				"\\x88",//
+				"\\x89",//
+				"\\x8a",//
+				"\\x8b",//
+				"\\x8c",//
+				"\\x8d",//
+				"\\x8e",//
+				"\\x8f",//
+				"\\x90",//
+				"\\x91",//
+				"\\x92",//
+				"\\x93",//
+				"\\x94",//
+				"\\x95",//
+				"\\x96",//
+				"\\x97",//
+				"\\x98",//
+				"\\x99",//
+				"\\x9a",//
+				"\\x9b",//
+				"\\x9c",//
+				"\\x9d",//
+				"\\x9e",//
+				"\\x9f",//
+				"\\xa0",// 
+				"\\xa1",//¡
+				"\\xa2",//¢
+				"\\xa3",//£
+				"\\xa4",//¤
+				"\\xa5",//¥
+				"\\xa6",//¦
+				"\\xa7",//§
+				"\\xa8",//¨
+				"\\xa9",//©
+				"\\xaa",//ª
+				"\\xab",//«
+				"\\xac",//¬
+				"\\xad",//­
+				"\\xae",//®
+				"\\xaf",//¯
+				"\\xb0",//°
+				"\\xb1",//±
+				"\\xb2",//²
+				"\\xb3",//³
+				"\\xb4",//´
+				"\\xb5",//µ
+				"\\xb6",//¶
+				"\\xb7",//·
+				"\\xb8",//¸
+				"\\xb9",//¹
+				"\\xba",//º
+				"\\xbb",//»
+				"\\xbc",//¼
+				"\\xbd",//½
+				"\\xbe",//¾
+				"\\xbf",//¿
+				"\\xc0",//À
+				"\\xc1",//Á
+				"\\xc2",//Â
+				"\\xc3",//Ã
+				"\\xc4",//Ä
+				"\\xc5",//Å
+				"\\xc6",//Æ
+				"\\xc7",//Ç
+				"\\xc8",//È
+				"\\xc9",//É
+				"\\xca",//Ê
+				"\\xcb",//Ë
+				"\\xcc",//Ì
+				"\\xcd",//Í
+				"\\xce",//Î
+				"\\xcf",//Ï
+				"\\xd0",//Ð
+				"\\xd1",//Ñ
+				"\\xd2",//Ò
+				"\\xd3",//Ó
+				"\\xd4",//Ô
+				"\\xd5",//Õ
+				"\\xd6",//Ö
+				"\\xd7",//×
+				"\\xd8",//Ø
+				"\\xd9",//Ù
+				"\\xda",//Ú
+				"\\xdb",//Û
+				"\\xdc",//Ü
+				"\\xdd",//Ý
+				"\\xde",//Þ
+				"\\xdf",//ß
+				"\\xe0",//à
+				"\\xe1",//á
+				"\\xe2",//â
+				"\\xe3",//ã
+				"\\xe4",//ä
+				"\\xe5",//å
+				"\\xe6",//æ
+				"\\xe7",//ç
+				"\\xe8",//è
+				"\\xe9",//é
+				"\\xea",//ê
+				"\\xeb",//ë
+				"\\xec",//ì
+				"\\xed",//í
+				"\\xee",//î
+				"\\xef",//ï
+				"\\xf0",//ð
+				"\\xf1",//ñ
+				"\\xf2",//ò
+				"\\xf3",//ó
+				"\\xf4",//ô
+				"\\xf5",//õ
+				"\\xf6",//ö
+				"\\xf7",//÷
+				"\\xf8",//ø
+				"\\xf9",//ù
+				"\\xfa",//ú
+				"\\xfb",//û
+				"\\xfc",//ü
+				"\\xfd",//ý
+				"\\xfe",//þ
+				"\\xff"//ÿ
+			]);
+
+			unescape_mark=new Object();
 			
-			mark["\\b"]="\b";
-			mark["\\f"]="\f";
-			mark["\\n"]="\n";
-			mark["\\r"]="\r";
-			mark["\\t"]="\t";
-			mark["\\v"]="\v";
-			mark["\\\\"]="\\";
-			
-			mark["\b"]="\\b";
-			mark["\f"]="\\f";
-			mark["\n"]="\\n";
-			mark["\r"]="\\r";
-			mark["\t"]="\\t";
-			mark["\v"]="\\v";
-			mark["\\"]="\\\\";
+			unescape_mark["\\b"]="\b";
+			unescape_mark["\\t"]="\t";
+			unescape_mark["\\n"]="\n";
+			unescape_mark["\\v"]="\v";
+			unescape_mark["\\f"]="\f";
+			unescape_mark["\\r"]="\r";
+			unescape_mark["\\\\"]="\\";
 			
 			for each(var extendsC:String in extendsCArr){
-				mark["\\"+extendsC]=extendsC;
-				mark[extendsC]="\\"+extendsC;
+				escapeV[extendsC.charCodeAt(0)]="\\"+extendsC;
+				unescape_mark["\\"+extendsC]=extendsC;
 			}
-			
-			mark["\x00"]="\\x00";
-			mark[""]="\\x01";
-			mark[""]="\\x02";
-			mark[""]="\\x03";
-			mark[""]="\\x04";
-			mark[""]="\\x05";
-			mark[""]="\\x06";
-			mark[""]="\\x07";
-			//mark[""]="\\x08";//\b
-			//mark["	"]="\\x09";//\t
-			//mark["\n"]="\\n";
-			//mark[""]="\\x0b";//\v
-			//mark[""]="\\x0c";//\f
-			//mark["\r"]="\\r";
-			mark[""]="\\x0e";
-			mark[""]="\\x0f";
-			mark[""]="\\x10";
-			mark[""]="\\x11";
-			mark[""]="\\x12";
-			mark[""]="\\x13";
-			mark[""]="\\x14";
-			mark[""]="\\x15";
-			mark[""]="\\x16";
-			mark[""]="\\x17";
-			mark[""]="\\x18";
-			mark[""]="\\x19";
-			mark[""]="\\x1a";
-			mark[""]="\\x1b";
-			mark[""]="\\x1c";
-			mark[""]="\\x1d";
-			mark[""]="\\x1e";
-			mark[""]="\\x1f";
-			//mark[" "]="\\x20";
-			//mark["!"]="\\x21";
-			//mark["\""]="\\x22";
-			//mark["#"]="\\x23";
-			//mark["$"]="\\x24";
-			//mark["%"]="\\x25";
-			//mark["&"]="\\x26";
-			//mark["'"]="\\x27";
-			//mark["("]="\\x28";
-			//mark[")"]="\\x29";
-			//mark["*"]="\\x2a";
-			//mark["+"]="\\x2b";
-			//mark[","]="\\x2c";
-			//mark["-"]="\\x2d";
-			//mark["."]="\\x2e";
-			//mark["/"]="\\x2f";
-			//mark["0"]="\\x30";
-			//mark["1"]="\\x31";
-			//mark["2"]="\\x32";
-			//mark["3"]="\\x33";
-			//mark["4"]="\\x34";
-			//mark["5"]="\\x35";
-			//mark["6"]="\\x36";
-			//mark["7"]="\\x37";
-			//mark["8"]="\\x38";
-			//mark["9"]="\\x39";
-			//mark[":"]="\\x3a";
-			//mark[";"]="\\x3b";
-			//mark["<"]="\\x3c";
-			//mark["="]="\\x3d";
-			//mark[">"]="\\x3e";
-			//mark["?"]="\\x3f";
-			//mark["@"]="\\x40";
-			//mark["A"]="\\x41";
-			//mark["B"]="\\x42";
-			//mark["C"]="\\x43";
-			//mark["D"]="\\x44";
-			//mark["E"]="\\x45";
-			//mark["F"]="\\x46";
-			//mark["G"]="\\x47";
-			//mark["H"]="\\x48";
-			//mark["I"]="\\x49";
-			//mark["J"]="\\x4a";
-			//mark["K"]="\\x4b";
-			//mark["L"]="\\x4c";
-			//mark["M"]="\\x4d";
-			//mark["N"]="\\x4e";
-			//mark["O"]="\\x4f";
-			//mark["P"]="\\x50";
-			//mark["Q"]="\\x51";
-			//mark["R"]="\\x52";
-			//mark["S"]="\\x53";
-			//mark["T"]="\\x54";
-			//mark["U"]="\\x55";
-			//mark["V"]="\\x56";
-			//mark["W"]="\\x57";
-			//mark["X"]="\\x58";
-			//mark["Y"]="\\x59";
-			//mark["Z"]="\\x5a";
-			//mark["["]="\\x5b";
-			//mark["\\"]="\\x5c";
-			//mark["]"]="\\x5d";
-			//mark["^"]="\\x5e";
-			//mark["_"]="\\x5f";
-			//mark["`"]="\\x60";
-			//mark["a"]="\\x61";
-			//mark["b"]="\\x62";
-			//mark["c"]="\\x63";
-			//mark["d"]="\\x64";
-			//mark["e"]="\\x65";
-			//mark["f"]="\\x66";
-			//mark["g"]="\\x67";
-			//mark["h"]="\\x68";
-			//mark["i"]="\\x69";
-			//mark["j"]="\\x6a";
-			//mark["k"]="\\x6b";
-			//mark["l"]="\\x6c";
-			//mark["m"]="\\x6d";
-			//mark["n"]="\\x6e";
-			//mark["o"]="\\x6f";
-			//mark["p"]="\\x70";
-			//mark["q"]="\\x71";
-			//mark["r"]="\\x72";
-			//mark["s"]="\\x73";
-			//mark["t"]="\\x74";
-			//mark["u"]="\\x75";
-			//mark["v"]="\\x76";
-			//mark["w"]="\\x77";
-			//mark["x"]="\\x78";
-			//mark["y"]="\\x79";
-			//mark["z"]="\\x7a";
-			//mark["{"]="\\x7b";
-			//mark["|"]="\\x7c";
-			//mark["}"]="\\x7d";
-			//mark["~"]="\\x7e";
-			mark[""]="\\x7f";
-			mark[""]="\\x80";
-			mark[""]="\\x81";
-			mark[""]="\\x82";
-			mark[""]="\\x83";
-			mark[""]="\\x84";
-			mark[""]="\\x85";
-			mark[""]="\\x86";
-			mark[""]="\\x87";
-			mark[""]="\\x88";
-			mark[""]="\\x89";
-			mark[""]="\\x8a";
-			mark[""]="\\x8b";
-			mark[""]="\\x8c";
-			mark[""]="\\x8d";
-			mark[""]="\\x8e";
-			mark[""]="\\x8f";
-			mark[""]="\\x90";
-			mark[""]="\\x91";
-			mark[""]="\\x92";
-			mark[""]="\\x93";
-			mark[""]="\\x94";
-			mark[""]="\\x95";
-			mark[""]="\\x96";
-			mark[""]="\\x97";
-			mark[""]="\\x98";
-			mark[""]="\\x99";
-			mark[""]="\\x9a";
-			mark[""]="\\x9b";
-			mark[""]="\\x9c";
-			mark[""]="\\x9d";
-			mark[""]="\\x9e";
-			mark[""]="\\x9f";
-			mark[" "]="\\xa0";
-			mark["¡"]="\\xa1";
-			mark["¢"]="\\xa2";
-			mark["£"]="\\xa3";
-			mark["¤"]="\\xa4";
-			mark["¥"]="\\xa5";
-			mark["¦"]="\\xa6";
-			mark["§"]="\\xa7";
-			mark["¨"]="\\xa8";
-			mark["©"]="\\xa9";
-			mark["ª"]="\\xaa";
-			mark["«"]="\\xab";
-			mark["¬"]="\\xac";
-			mark["­"]="\\xad";
-			mark["®"]="\\xae";
-			mark["¯"]="\\xaf";
-			mark["°"]="\\xb0";
-			mark["±"]="\\xb1";
-			mark["²"]="\\xb2";
-			mark["³"]="\\xb3";
-			mark["´"]="\\xb4";
-			mark["µ"]="\\xb5";
-			mark["¶"]="\\xb6";
-			mark["·"]="\\xb7";
-			mark["¸"]="\\xb8";
-			mark["¹"]="\\xb9";
-			mark["º"]="\\xba";
-			mark["»"]="\\xbb";
-			mark["¼"]="\\xbc";
-			mark["½"]="\\xbd";
-			mark["¾"]="\\xbe";
-			mark["¿"]="\\xbf";
-			mark["À"]="\\xc0";
-			mark["Á"]="\\xc1";
-			mark["Â"]="\\xc2";
-			mark["Ã"]="\\xc3";
-			mark["Ä"]="\\xc4";
-			mark["Å"]="\\xc5";
-			mark["Æ"]="\\xc6";
-			mark["Ç"]="\\xc7";
-			mark["È"]="\\xc8";
-			mark["É"]="\\xc9";
-			mark["Ê"]="\\xca";
-			mark["Ë"]="\\xcb";
-			mark["Ì"]="\\xcc";
-			mark["Í"]="\\xcd";
-			mark["Î"]="\\xce";
-			mark["Ï"]="\\xcf";
-			mark["Ð"]="\\xd0";
-			mark["Ñ"]="\\xd1";
-			mark["Ò"]="\\xd2";
-			mark["Ó"]="\\xd3";
-			mark["Ô"]="\\xd4";
-			mark["Õ"]="\\xd5";
-			mark["Ö"]="\\xd6";
-			mark["×"]="\\xd7";
-			mark["Ø"]="\\xd8";
-			mark["Ù"]="\\xd9";
-			mark["Ú"]="\\xda";
-			mark["Û"]="\\xdb";
-			mark["Ü"]="\\xdc";
-			mark["Ý"]="\\xdd";
-			mark["Þ"]="\\xde";
-			mark["ß"]="\\xdf";
-			mark["à"]="\\xe0";
-			mark["á"]="\\xe1";
-			mark["â"]="\\xe2";
-			mark["ã"]="\\xe3";
-			mark["ä"]="\\xe4";
-			mark["å"]="\\xe5";
-			mark["æ"]="\\xe6";
-			mark["ç"]="\\xe7";
-			mark["è"]="\\xe8";
-			mark["é"]="\\xe9";
-			mark["ê"]="\\xea";
-			mark["ë"]="\\xeb";
-			mark["ì"]="\\xec";
-			mark["í"]="\\xed";
-			mark["î"]="\\xee";
-			mark["ï"]="\\xef";
-			mark["ð"]="\\xf0";
-			mark["ñ"]="\\xf1";
-			mark["ò"]="\\xf2";
-			mark["ó"]="\\xf3";
-			mark["ô"]="\\xf4";
-			mark["õ"]="\\xf5";
-			mark["ö"]="\\xf6";
-			mark["÷"]="\\xf7";
-			mark["ø"]="\\xf8";
-			mark["ù"]="\\xf9";
-			mark["ú"]="\\xfa";
-			mark["û"]="\\xfb";
-			mark["ü"]="\\xfc";
-			mark["ý"]="\\xfd";
-			mark["þ"]="\\xfe";
-			mark["ÿ"]="\\xff";
 		}
 
 		public function escape(str:String):String{
@@ -323,7 +320,22 @@ package zero{
 				var cArr:Array=str.split("");
 				str="";
 				for each(var c:String in cArr){
-					str+=(mark[c]||c);
+					var cCode:int=c.charCodeAt(0);
+					if(cCode<0x100){
+						//0x00~0xff
+						str+=escapeV[cCode];
+					}/*else if(cCode>=0x3000){
+						//0x3000~0xffff
+						str+=c;
+					}else if(cCode<0x1000){
+						//0x0100~0x0fff
+						str+="\\u0"+cCode.toString(16);
+					}else{
+						//0x1000~0x2fff
+						str+="\\u"+cCode.toString(16);
+					}*/else{
+						str+=c;
+					}
 				}
 			}
 			return str;
@@ -335,32 +347,37 @@ package zero{
 				str="";
 				var L:int=cArr.length;
 				var i:int=-1;
+				var cCodeStr:String;
 				while(++i<L){
-					if(cArr[i]=="\\"){
-						if(i+1>=L){
-							str+="\\";
-							break;
-						}
+					var c1:String=cArr[i];
+					if(c1=="\\"){
 						var c2:String=cArr[i+1];
 						if(c2=="x"){
-							if(i+3>=L){
-								str+="x"+cArr[i+2];
-								break;
-							}
-							var c3:String=cArr[i+2]+cArr[i+3];
-							if(/[0-9A-Fa-f]{2}/.test(c3)){
-								str+=String.fromCharCode(int("0x"+c3));
+							cCodeStr=cArr[i+2]+cArr[i+3];
+							if(/^[0-9A-Fa-f]{2}$/.test(cCodeStr)){
+								str+=String.fromCharCode(int("0x"+cCodeStr));
 								i+=3;
 							}else{
 								str+="x";
 								i++;
 							}
-						}else{
-							str+=(mark["\\"+c2]||c2);
+						}else if(c2=="u"){
+							cCodeStr=cArr[i+2]+cArr[i+3]+cArr[i+4]+cArr[i+5];
+							if(/^[0-9A-Fa-f]{4}$/.test(cCodeStr)){
+								str+=String.fromCharCode(int("0x"+cCodeStr));
+								i+=5;
+							}else{
+								str+="u";
+								i++;
+							}
+						}else if(c2){
+							str+=(unescape_mark["\\"+c2]||c2);
 							i++;
+						}else{
+							str+="\\";
 						}
 					}else{
-						str+=cArr[i];
+						str+=c1;
 					}
 				}
 			}
