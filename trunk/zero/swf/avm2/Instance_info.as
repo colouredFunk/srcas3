@@ -171,7 +171,6 @@ package zero.swf.avm2{
 			if(protectedNs>-1){
 				xml.@protectedNs=protectedNs;
 			}
-			xml.@iinit=iinit;
 			if(intrfV.length){
 				var intrfListXML:XML=<intrfList count={intrfV.length}/>
 				for each(var intrf:int in intrfV){
@@ -179,6 +178,7 @@ package zero.swf.avm2{
 				}
 				xml.appendChild(intrfListXML);
 			}
+			xml.@iinit=iinit;
 			if(itraits_infoV.length){
 				var itraits_infoListXML:XML=<itraits_infoList count={itraits_infoV.length}/>
 				for each(var itraits_info:Traits_info in itraits_infoV){

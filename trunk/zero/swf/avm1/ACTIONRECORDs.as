@@ -36,7 +36,6 @@ ACTIONRECORDs 版本:v1.0
 //Length 			If code >= 0x80, UI16 	The number of bytes in the ACTIONRECORDHEADER, not counting the ActionCode and Length fields.
 package zero.swf.avm1{
 	import flash.utils.ByteArray;
-	
 	import zero.BytesAndStr16;
 	import zero.ComplexString;
 	import zero.Outputer;

@@ -20,7 +20,8 @@ package zero.swf.avm2{
 	import flash.utils.Dictionary;
 	public class ABCTrait{
 		public var name:ABCMultiname;
-		public var kind_attributes:int;
+		public var ATTR_Final:Boolean;
+		public var ATTR_Override:Boolean;
 		public var kind_trait_type:int;
 		public var slot_id:int;
 		public var type_name:ABCMultiname;
@@ -83,7 +84,8 @@ package zero.swf.avm2{
 			//ATTR_Override 	0x2 	Is used with Trait_Method, Trait_Getter and Trait_Setter. It marks a method that has been overridden in this class
 			//ATTR_Metadata 	0x4 	Is used to signal that the fields metadata_count and metadata follow the data field in the traits_info entry
 			
-			kind_attributes=traits_info.kind_attributes;
+			ATTR_Final=traits_info.ATTR_Final;
+			ATTR_Override=traits_info.ATTR_Override;
 			
 			kind_trait_type=traits_info.kind_trait_type;
 			
@@ -131,6 +133,8 @@ package zero.swf.avm2{
 							allNsV,
 							_initByDataOptions
 						);
+					}else{
+						vkindAndVIndex=null;
 					}
 				break;
 				case TraitTypeAndAttributes.Method:
@@ -196,13 +200,19 @@ package zero.swf.avm2{
 			//These fields are present only if ATTR_Metadata is present in the upper four bits of the kind field.
 			//The value of the metadata_count field is the number of entries in the metadata array. That array
 			//contains indices into the metadata array of the abcFile.
-			if(kind_attributes&TraitTypeAndAttributes.Metadata){
-				i=-1;
-				metadataV=new Vector.<ABCMetadata>();
-				for each(var metadata:int in traits_info.metadataV){
-					i++;
-					metadataV[i]=allMetadataV[metadata];
+			if(traits_info.metadataV){
+				if(traits_info.metadataV.length){
+					i=-1;
+					metadataV=new Vector.<ABCMetadata>();
+					for each(var metadata:int in traits_info.metadataV){
+						i++;
+						metadataV[i]=allMetadataV[metadata];
+					}
+				}else{
+					metadataV=null;
 				}
+			}else{
+				metadataV=null;
 			}
 		}
 		public function getInfo_product(productMark:ProductMark):void{
@@ -331,7 +341,7 @@ package zero.swf.avm2{
 			//These fields are present only if ATTR_Metadata is present in the upper four bits of the kind field.
 			//The value of the metadata_count field is the number of entries in the metadata array. That array
 			//contains indices into the metadata array of the abcFile.
-			if(kind_attributes&TraitTypeAndAttributes.Metadata){
+			if(metadataV){
 				for each(var metadata:ABCMetadata in metadataV){
 					productMark.productMetadata(metadata);
 				}
@@ -378,7 +388,8 @@ package zero.swf.avm2{
 			//ATTR_Override 	0x2 	Is used with Trait_Method, Trait_Getter and Trait_Setter. It marks a method that has been overridden in this class
 			//ATTR_Metadata 	0x4 	Is used to signal that the fields metadata_count and metadata follow the data field in the traits_info entry
 			
-			traits_info.kind_attributes=kind_attributes;
+			traits_info.ATTR_Final=ATTR_Final;
+			traits_info.ATTR_Override=ATTR_Override;
 			
 			traits_info.kind_trait_type=kind_trait_type;
 			
@@ -491,13 +502,19 @@ package zero.swf.avm2{
 			//These fields are present only if ATTR_Metadata is present in the upper four bits of the kind field.
 			//The value of the metadata_count field is the number of entries in the metadata array. That array
 			//contains indices into the metadata array of the abcFile.
-			if(kind_attributes&TraitTypeAndAttributes.Metadata){
-				i=-1;
-				traits_info.metadataV=new Vector.<int>();
-				for each(var metadata:ABCMetadata in metadataV){
-					i++;
-					traits_info.metadataV[i]=productMark.getMetadataId(metadata);
+			if(metadataV){
+				if(metadataV.length){
+					i=-1;
+					traits_info.metadataV=new Vector.<int>();
+					for each(var metadata:ABCMetadata in metadataV){
+						i++;
+						traits_info.metadataV[i]=productMark.getMetadataId(metadata);
+					}
+				}else{
+					traits_info.metadataV=null;
 				}
+			}else{
+				traits_info.metadataV=null;
 			}
 			
 			return traits_info;
@@ -518,11 +535,8 @@ package zero.swf.avm2{
 				throw new Error("name="+name);
 			}
 			
-			xml.@kind_attributes=(
-				"|"+TraitTypeAndAttributes.flagV[kind_attributes&TraitTypeAndAttributes.Final]+
-				"|"+TraitTypeAndAttributes.flagV[kind_attributes&TraitTypeAndAttributes.Override]+
-				"|"+TraitTypeAndAttributes.flagV[kind_attributes&TraitTypeAndAttributes.Metadata]
-			).replace(/\|null/g,"").substr(1);
+			xml.@ATTR_Final=ATTR_Final;
+			xml.@ATTR_Override=ATTR_Override;
 			
 			xml.@kind_trait_type=TraitTypeAndAttributes.typeV[kind_trait_type];
 				
@@ -562,7 +576,7 @@ package zero.swf.avm2{
 				break;
 			}
 			
-			if(kind_attributes&TraitTypeAndAttributes.Metadata){
+			if(metadataV){
 				if(metadataV.length){
 					var metadataListXML:XML=<metadataList count={metadataV.length}/>
 					for each(var metadata:ABCMetadata in metadataV){
@@ -588,10 +602,8 @@ package zero.swf.avm2{
 				throw new Error("nameXML="+nameXML);
 			}
 			
-			kind_attributes=0;
-			for each(var kind_attributesStr:String in xml.@kind_attributes.toString().split("|")){
-				kind_attributes|=TraitTypeAndAttributes[kind_attributesStr];
-			}
+			ATTR_Final=(xml.@ATTR_Final.toString()=="true");
+			ATTR_Override=(xml.@ATTR_Override.toString()=="true");
 			
 			kind_trait_type=TraitTypeAndAttributes[xml.@kind_trait_type.toString()];
 			
@@ -645,10 +657,11 @@ package zero.swf.avm2{
 				break;
 			}
 			
-			if(kind_attributes&TraitTypeAndAttributes.Metadata){
+			var metadataXMLList:XMLList=xml.metadataList.metadata;
+			if(metadataXMLList.length()){
 				i=-1;
 				metadataV=new Vector.<ABCMetadata>();
-				for each(var metadataXML:XML in xml.metadataList.metadata){
+				for each(var metadataXML:XML in metadataXMLList){
 					i++;
 					metadataV[i]=ABCMetadata.xml2metadata(markStrs,metadataXML,_initByXMLOptions);
 				}

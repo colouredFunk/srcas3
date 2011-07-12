@@ -171,28 +171,16 @@ package zero.swf.avm2{
 		public function toXMLAndMark(markStrs:MarkStrs,xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
 			switch(kind){
 				case ConstantKinds.Int:
-					return <{xmlName} kind={ConstantKinds.kindV[ConstantKinds.Int]} value={value}/>;
-				break;
 				case ConstantKinds.UInt:
-					return <{xmlName} kind={ConstantKinds.kindV[ConstantKinds.UInt]} value={value}/>;
-				break;
 				case ConstantKinds.Double:
-					return <{xmlName} kind={ConstantKinds.kindV[ConstantKinds.Double]} value={value}/>;
-				break;
 				case ConstantKinds.Utf8:
-					return <{xmlName} kind={ConstantKinds.kindV[ConstantKinds.Utf8]} value={value}/>;
+					return <{xmlName} kind={ConstantKinds.kindV[kind]} value={value}/>;
 				break;
 				case ConstantKinds.True:
-					return <{xmlName} kind={ConstantKinds.kindV[ConstantKinds.True]}/>;
-				break;
 				case ConstantKinds.False:
-					return <{xmlName} kind={ConstantKinds.kindV[ConstantKinds.False]}/>;
-				break;
 				case ConstantKinds.Null:
-					return <{xmlName} kind={ConstantKinds.kindV[ConstantKinds.Null]}/>;
-				break;
 				case ConstantKinds.Undefined:
-					return <{xmlName} kind={ConstantKinds.kindV[ConstantKinds.Undefined]}/>;
+					return <{xmlName} kind={ConstantKinds.kindV[kind]}/>;
 				break;
 				case ConstantKinds.Namespace:
 				case ConstantKinds.PackageNamespace:
@@ -201,7 +189,9 @@ package zero.swf.avm2{
 				case ConstantKinds.ExplicitNamespace:
 				case ConstantKinds.StaticProtectedNs:
 				case ConstantKinds.PrivateNs:
-					return (value as ABCNamespace).toXMLAndMark(markStrs,xmlName,_toXMLOptions);
+					var xml:XML=<{xmlName} kind={ConstantKinds.kindV[kind]}/>;
+					xml.appendChild((value as ABCNamespace).toXMLAndMark(markStrs,"ns",_toXMLOptions));
+					return xml;
 				break;
 				default:
 					throw new Error("未知 kind: "+kind);
@@ -243,7 +233,7 @@ package zero.swf.avm2{
 				case ConstantKinds.ExplicitNamespace:
 				case ConstantKinds.StaticProtectedNs:
 				case ConstantKinds.PrivateNs:
-					value=ABCNamespace.xml2ns(markStrs,xml,_initByXMLOptions);
+					value=ABCNamespace.xml2ns(markStrs,xml.ns[0],_initByXMLOptions);
 				break;
 				default:
 					throw new Error("未知 kind: "+kind);

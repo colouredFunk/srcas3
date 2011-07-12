@@ -1,4 +1,4 @@
-/***
+﻿/***
 ABCMetadata
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
 创建时间：2011年6月26日 17:49:10
@@ -12,6 +12,8 @@ ABCMetadata
 //	item_info items[item_count]
 //}
 package zero.swf.avm2{
+	import zero.ComplexString;
+	import zero.GroupString;
 	import flash.utils.Dictionary;
 	public class ABCMetadata{
 		public var name:String;
@@ -110,9 +112,12 @@ package zero.swf.avm2{
 						xml.appendChild(itemListXML);
 					}
 					
-					var copyId:int=int(markStr.replace(/^[\s\S]*\((\d+)\)$/,"$1"));
-					if(copyId>1){
-						xml.@copyId=copyId;
+					var execResult:Array=/^[\s\S]*\((\d+)\)$/.exec(markStr);
+					if(execResult){
+						var copyId:int=int(execResult[1]);
+						if(copyId>1){
+							xml.@copyId=copyId;
+						}
 					}
 				}
 				markStrs.xmlDict[this]=xml;
@@ -120,7 +125,9 @@ package zero.swf.avm2{
 			return xml;
 		}
 		public function toMarkStrAndMark(markStrs:MarkStrs):String{
+			
 			//获取 metadata 的最简 markStr(自动计算 copyId)
+			
 			var markStr:String=markStrs.markStrDict[this];
 			if(markStr is String){
 				return markStr;
@@ -129,18 +136,15 @@ package zero.swf.avm2{
 			//计算 markStr
 			markStr="";
 			for each(var item:ABCItem in itemV){
-				markStr+=",["+ComplexString.escape(item.key)+","+ComplexString.escape(item.value)+"]";
+				markStr+=",["+ComplexString.ext.escape(item.key)+","+ComplexString.ext.escape(item.value)+"]";
 			}
 			markStr="["+markStr.substr(1)+"]";
 			
 			if(name is String){
-				markStr=ComplexString.escape(name)+markStr;
+				markStr=ComplexString.ext.escape(name)+markStr;
 			}else{
 				throw new Error("name="+name);
 			}
-			
-			//标准化不带 copyId 的 markStr
-			markStr=normalizeMarkStr(markStr);
 			
 			//计算 copyId
 			if(markStrs.metadataMark["~"+markStr]){
@@ -162,6 +166,7 @@ package zero.swf.avm2{
 			var i:int;
 			
 			//获取 metadata 的 xml 的最简 markStr
+			
 			if(/^<\w+ markStr=".*?"\/>$/.test(xml.toXMLString())){
 				return normalizeMarkStr(xml.@markStr.toString());
 			}
@@ -170,20 +175,23 @@ package zero.swf.avm2{
 			var markStr:String="";
 			for each(var itemXML:XML in xml.itemList.item){
 				i++;
-				markStr+=",["+ComplexString.escape(itemXML.@key.toString())+","+ComplexString.escape(itemXML.@value.toString())+"]";
+				markStr+=",["+ComplexString.ext.escape(itemXML.@key.toString())+","+ComplexString.ext.escape(itemXML.@value.toString())+"]";
 			}
 			markStr="["+markStr.substr(1)+"]";
 			
 			var nameXML:XML=xml.@name[0];
 			if(nameXML){
-				markStr=ComplexString.escape(nameXML.toString())+markStr;
+				markStr=ComplexString.ext.escape(nameXML.toString())+markStr;
 			}else{
 				throw new Error("nameXML="+nameXML);
 			}
 			
-			markStr+="("+int(xml.@copyId.toString())+")";
+			var copyId:int=int(xml.@copyId.toString());
+			if(copyId>1){
+				markStr+="("+copyId+")";
+			}
 			
-			return normalizeMarkStr(markStr);//标准化带 copyId 的 markStr
+			return markStr;
 		}
 		public static function markStr2metadata(markStrs:MarkStrs,markStr0:String):ABCMetadata{
 			var i:int;
@@ -197,9 +205,9 @@ package zero.swf.avm2{
 				}else{
 					metadata=new ABCMetadata();
 					
-					var execResult:Array=execEscapeMarkStr(GroupString.escape(markStr));
+					var execResult:Array=/^([\s\S]*?)\[([\s\S]*)\](?:\((\d+)\))?$/.exec(GroupString.escape(markStr));
 					
-					metadata.name=ComplexString.unescape(execResult[1]);
+					metadata.name=ComplexString.ext.unescape(execResult[1]);
 					
 					i=-1;
 					metadata.itemV=new Vector.<ABCItem>();
@@ -208,8 +216,8 @@ package zero.swf.avm2{
 							i++;
 							var arr:Array=/^\[([\s\S]*),([\s\S]*)\]$/.exec(itemEscapeMarkStr);
 							metadata.itemV[i]=new ABCItem();
-							metadata.itemV[i].key=ComplexString.unescape(arr[1]);
-							metadata.itemV[i].value=ComplexString.unescape(arr[2]);
+							metadata.itemV[i].key=ComplexString.ext.unescape(arr[1]);
+							metadata.itemV[i].value=ComplexString.ext.unescape(arr[2]);
 						}
 					}
 					
@@ -221,9 +229,10 @@ package zero.swf.avm2{
 			return metadata;
 		}
 		public static function normalizeMarkStr(markStr:String):String{
+			
 			//获取最简 markStr
 			
-			var execResult:Array=execEscapeMarkStr(GroupString.escape(markStr));
+			var execResult:Array=/^([\s\S]*?)\[([\s\S]*)\](?:\((\d+)\))?$/.exec(GroupString.escape(markStr));
 			
 			markStr=GroupString.unescape(execResult[1])+"["+GroupString.unescape(execResult[2])+"]";
 			
@@ -233,13 +242,6 @@ package zero.swf.avm2{
 			}
 			
 			return markStr;
-		}
-		private static function execEscapeMarkStr(escapeMarkStr:String):Array{
-			var execResult:Array=/^([\s\S]*?)\[([\s\S]*)\](?:\((\d+)\))?$/.exec(escapeMarkStr);
-			if(execResult[0]==escapeMarkStr){
-				return execResult;
-			}
-			throw new Error("不合法的 escapeMarkStr："+escapeMarkStr);
 		}
 		}//end of CONFIG::USE_XML
 	}

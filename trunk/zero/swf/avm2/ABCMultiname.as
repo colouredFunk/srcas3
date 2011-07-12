@@ -30,6 +30,8 @@ ABCMultiname
 //Those constants ending in "A" (such as CONSTANT_QNameA) represent the names of attributes.
 
 package zero.swf.avm2{
+	import zero.ComplexString;
+	import zero.GroupString;
 	import flash.utils.Dictionary;
 	public class ABCMultiname{
 		public var kind:int;							//direct_int
@@ -491,24 +493,27 @@ package zero.swf.avm2{
 								xml.appendChild(TypeDefinition.toXMLAndMark(markStrs,"TypeDefinition",_toXMLOptions));
 							}
 							if(ParamV.length){
-								var listXML:XML=<ParamList count={ParamV.length}/>
+								var ParamListXML:XML=<ParamList count={ParamV.length}/>
 								for each(var Param:ABCMultiname in ParamV){
 									if(Param){
-										listXML.appendChild(Param.toXMLAndMark(markStrs,"Param",_toXMLOptions));
+										ParamListXML.appendChild(Param.toXMLAndMark(markStrs,"Param",_toXMLOptions));
 									}else{
-										listXML.appendChild(<Param/>);
+										ParamListXML.appendChild(<Param/>);
 									}
 								}
-								xml.appendChild(listXML);
+								xml.appendChild(ParamListXML);
 							}else{
 								throw new Error("ParamV.length="+ParamV.length);
 							}
 						break;
 					}
 					
-					var copyId:int=int(markStr.replace(/^[\s\S]*\((\d+)\)$/,"$1"));
-					if(copyId>1){
-						xml.@copyId=copyId;
+					var execResult:Array=/^[\s\S]*\((\d+)\)$/.exec(markStr);
+					if(execResult){
+						var copyId:int=int(execResult[1]);
+						if(copyId>1){
+							xml.@copyId=copyId;
+						}
 					}
 				}
 				markStrs.xmlDict[this]=xml;
@@ -522,12 +527,11 @@ package zero.swf.avm2{
 			}
 			
 			//获取 multiname 的最简 markStr(自动计算 copyId)
+			
 			var markStr:String=markStrs.markStrDict[this];
 			if(markStr is String){
 				return markStr;
 			}
-			
-			markStr="["+MultinameKinds.kindV[kind]+"]";
 			
 			switch(kind){
 				case MultinameKinds.QName:
@@ -545,13 +549,22 @@ package zero.swf.avm2{
 					//name是在 constant_pool.string_v 中的id
 					//ns或name如果是 0 则表示 "*"
 					
+					if(kind==MultinameKinds.QName){
+						markStr="";
+					}else{
+						markStr="["+MultinameKinds.kindV[kind]+"]";
+					}
+					
 					if(ns){
-						markStr+=ns.toMarkStrAndMark(markStrs)+".";
+						markStr+=ns.toMarkStrAndMark(markStrs);
+						if(markStr){
+							markStr+=".";
+						}
 					}else{
 						markStr+="(ns=undefined)";
 					}
 					if(name is String){
-						markStr+=ComplexString.escape(name);
+						markStr+=ComplexString.ext.escape(name);
 					}else{
 						markStr+="(name=undefined)";
 					}
@@ -571,13 +584,15 @@ package zero.swf.avm2{
 					//name如果是 0 则表示 "*"
 					//ns_set不能是 0
 					
+					markStr="["+MultinameKinds.kindV[kind]+"]";
+					
 					if(ns_set){
 						markStr+=ns_set.toMarkStrAndMark(markStrs)+".";
 					}else{
 						throw new Error("ns_set="+ns_set);
 					}
 					if(name is String){
-						markStr+=ComplexString.escape(name);
+						markStr+=ComplexString.ext.escape(name);
 					}else{
 						markStr+="(name=undefined)";
 					}
@@ -592,8 +607,11 @@ package zero.swf.avm2{
 					//The single field, name, is an index into the string array of the constant pool. A value of zero indicates the any ("*") name.
 					//name是在 constant_pool.string_v 中的id
 					//name如果是 0 则表示 "*"
+					
+					markStr="["+MultinameKinds.kindV[kind]+"]";
+					
 					if(name is String){
-						markStr+=ComplexString.escape(name);
+						markStr+=ComplexString.ext.escape(name);
 					}else{
 						markStr+="(name=undefined)";
 					}
@@ -606,6 +624,9 @@ package zero.swf.avm2{
 					
 					//This kind has no associated data.
 					//什么都没有...
+					
+					markStr="["+MultinameKinds.kindV[kind]+"]";
+					
 				break;
 				case MultinameKinds.MultinameL:
 				case MultinameKinds.MultinameLA:
@@ -617,6 +638,9 @@ package zero.swf.avm2{
 					//The ns_set field is an index into the ns_set array of the constant pool. The value of ns_set cannot be zero.
 					//ns_set是在 constant_pool.ns_set_info_v 中的id
 					//ns_set不能是 0
+					
+					markStr="["+MultinameKinds.kindV[kind]+"]";
+					
 					if(ns_set){
 						markStr+=ns_set.toMarkStrAndMark(markStrs)+".";
 					}else{
@@ -632,6 +656,9 @@ package zero.swf.avm2{
 					//[TypeDefinition] is a U30 into the multiname table 
 					//[ParamCount] is a U8 (U30?) of how many parameters there are 
 					//[ParamX] is a U30 into the multiname table. 
+					
+					markStr="["+MultinameKinds.kindV[kind]+"]";
+					
 					if(TypeDefinition){
 						markStr+=TypeDefinition.toMarkStrAndMark(markStrs)+".";
 					}else{
@@ -653,9 +680,6 @@ package zero.swf.avm2{
 				break;
 			}
 			
-			//标准化不带 copyId 的 markStr
-			markStr=normalizeMarkStr(markStr);
-			
 			//计算 copyId
 			if(markStrs.multinameMark["~"+markStr]){
 				var copyId:int=1;
@@ -674,23 +698,31 @@ package zero.swf.avm2{
 			return markStr2multiname(markStrs,xml2markStr(xml));
 		} 
 		public static function xml2markStr(xml:XML):String{
+			
 			//获取 multiname 的 xml 的最简 markStr
+			
 			if(/^<\w+ markStr=".*?"\/>$/.test(xml.toXMLString())){
 				return normalizeMarkStr(xml.@markStr.toString());
 			}
 			
-			var kindStr:String=xml.@kind.toString();
-			
-			var markStr:String="["+kindStr+"]";
-			var nameXMLList:XMLList,ns_setXMLList:XMLList,ns_setXML:XML;
-			switch(MultinameKinds[kindStr]){
+			var markStr:String;
+			var nameXML:XML,ns_setXML:XML;
+			var kind:int=MultinameKinds[xml.@kind.toString()];
+			switch(kind){
 				case MultinameKinds.QName:
 				case MultinameKinds.QNameA:
-					var nsXMLList:XMLList=xml.@ns;
-					if(nsXMLList.length()){
-						markStr+=nsXMLList.toString()+".";
+					
+					if(kind==MultinameKinds.QName){
+						markStr="";
 					}else{
-						var nsXML:XML=xml.ns[0];
+						markStr="["+MultinameKinds.kindV[kind]+"]";
+					}
+					
+					var nsXML:XML=xml.@ns[0];
+					if(nsXML){
+						markStr+=ABCNamespace.normalizeMarkStr(nsXML.toString())+".";
+					}else{
+						nsXML=xml.ns[0];
 						if(nsXML){
 							markStr+=ABCNamespace.xml2markStr(nsXML)+".";
 						}else{
@@ -698,18 +730,21 @@ package zero.swf.avm2{
 						}
 					}
 					
-					nameXMLList=xml.@name;
-					if(nameXMLList.length()){
-						markStr+=ComplexString.escape(nameXMLList.toString());
+					nameXML=xml.@name[0];
+					if(nameXML){
+						markStr+=ComplexString.ext.escape(nameXML.toString());
 					}else{
 						markStr+="(name=undefined)";
 					}
 				break;
 				case MultinameKinds.Multiname:
 				case MultinameKinds.MultinameA:
-					ns_setXMLList=xml.@ns_set;
-					if(ns_setXMLList.length()){
-						markStr+=ns_setXMLList.toString()+".";
+					
+					markStr="["+MultinameKinds.kindV[kind]+"]";
+					
+					ns_setXML=xml.@ns_set[0];
+					if(ns_setXML){
+						markStr+=ABCNs_set.normalizeMarkStr(ns_setXML.toString())+".";
 					}else{
 						ns_setXML=xml.ns_set[0];
 						if(ns_setXML){
@@ -719,18 +754,21 @@ package zero.swf.avm2{
 						}
 					}
 					
-					nameXMLList=xml.@name;
-					if(nameXMLList.length()){
-						markStr+=ComplexString.escape(nameXMLList.toString());
+					nameXML=xml.@name[0];
+					if(nameXML){
+						markStr+=ComplexString.ext.escape(nameXML.toString());
 					}else{
 						markStr+="(name=undefined)";
 					}
 				break;
 				case MultinameKinds.RTQName:
 				case MultinameKinds.RTQNameA:
-					nameXMLList=xml.@name;
-					if(nameXMLList.length()){
-						markStr+=ComplexString.escape(nameXMLList.toString());
+					
+					markStr="["+MultinameKinds.kindV[kind]+"]";
+					
+					nameXML=xml.@name[0];
+					if(nameXML){
+						markStr+=ComplexString.ext.escape(nameXML.toString());
 					}else{
 						markStr+="(name=undefined)";
 					}
@@ -738,12 +776,18 @@ package zero.swf.avm2{
 				case MultinameKinds.RTQNameL:
 				case MultinameKinds.RTQNameLA:
 					//什么都不用干...
+					
+					markStr="["+MultinameKinds.kindV[kind]+"]";
+					
 				break;
 				case MultinameKinds.MultinameL:
 				case MultinameKinds.MultinameLA:
-					ns_setXMLList=xml.@ns_set;
-					if(ns_setXMLList.length()){
-						markStr+=ns_setXMLList.toString()+".";
+					
+					markStr="["+MultinameKinds.kindV[kind]+"]";
+					
+					ns_setXML=xml.@ns_set[0];
+					if(ns_setXML){
+						markStr+=ABCNs_set.normalizeMarkStr(ns_setXML.toString())+".";
 					}else{
 						ns_setXML=xml.ns_set[0];
 						if(ns_setXML){
@@ -754,11 +798,14 @@ package zero.swf.avm2{
 					}
 				break;
 				case MultinameKinds.GenericName:
-					var TypeDefinitionXMLList:XMLList=xml.@TypeDefinition;
-					if(TypeDefinitionXMLList.length()){
-						markStr+=TypeDefinitionXMLList.toString()+".";
+					
+					markStr="["+MultinameKinds.kindV[kind]+"]";
+					
+					var TypeDefinitionXML:XML=xml.@TypeDefinition[0];
+					if(TypeDefinitionXML){
+						markStr+=normalizeMarkStr(TypeDefinitionXML.toString())+".";
 					}else{
-						var TypeDefinitionXML:XML=xml.TypeDefinition[0];
+						TypeDefinitionXML=xml.TypeDefinition[0];
 						if(TypeDefinitionXML){
 							markStr+=xml2markStr(TypeDefinitionXML)+".";
 						}else{
@@ -787,13 +834,16 @@ package zero.swf.avm2{
 					}
 				break;
 				default:
-					throw new Error("kindStr="+kindStr);
+					throw new Error("不合法的 kindStr："+xml.@kind.toString());
 				break;
 			}
 			
-			markStr+="("+int(xml.@copyId.toString())+")";
+			var copyId:int=int(xml.@copyId.toString());
+			if(copyId>1){
+				markStr+="("+copyId+")";
+			}
 			
-			return normalizeMarkStr(markStr);//标准化带 copyId 的 markStr
+			return markStr;
 		}
 		public static function markStr2multiname(markStrs:MarkStrs,markStr0:String):ABCMultiname{
 			var multiname:ABCMultiname=markStrs.multinameMark["~"+markStr0];
@@ -843,7 +893,7 @@ package zero.swf.avm2{
 							if(execResult[1]=="(name=undefined)"){
 								multiname.name=null;
 							}else{
-								multiname.name=ComplexString.unescape(execResult[1]);
+								multiname.name=ComplexString.ext.unescape(execResult[1]);
 							}
 							//copyId=int(execResult[2]);
 						break;
@@ -860,7 +910,7 @@ package zero.swf.avm2{
 							if(execResult[1]=="(name=undefined)"){
 								multiname.name=null;
 							}else{
-								multiname.name=ComplexString.unescape(execResult[1]);
+								multiname.name=ComplexString.ext.unescape(execResult[1]);
 							}
 							//copyId=int(execResult[2]);
 						break;
@@ -870,7 +920,7 @@ package zero.swf.avm2{
 							if(execResult[1]=="(name=undefined)"){
 								multiname.name=null;
 							}else{
-								multiname.name=ComplexString.unescape(execResult[1]);
+								multiname.name=ComplexString.ext.unescape(execResult[1]);
 							}
 							//copyId=int(execResult[2]);
 						break;
@@ -921,22 +971,23 @@ package zero.swf.avm2{
 			return multiname;
 		}
 		public static function normalizeMarkStr(markStr:String):String{
+			
 			//获取最简 markStr
 			
-			var multinameKind:int;
+			var kind:int;
 			var id:int,escapeMarkStr:String;
 			if(markStr.indexOf("[")==0){
 				//可能是 multinameKind，也可能是 QName 的 ns.kind
 				id=markStr.indexOf("]");
-				multinameKind=MultinameKinds[markStr.substr(1,id-1)];
-				if(multinameKind>0){
+				kind=MultinameKinds[markStr.substr(1,id-1)];
+				if(kind>0){
 					escapeMarkStr=GroupString.escape(markStr.substr(id+1));
 				}else{
-					multinameKind=MultinameKinds.QName;
+					kind=MultinameKinds.QName;
 					escapeMarkStr=GroupString.escape(markStr);
 				}
 			}else{
-				multinameKind=MultinameKinds.QName;
+				kind=MultinameKinds.QName;
 				escapeMarkStr=GroupString.escape(markStr);
 			}
 			
@@ -944,13 +995,13 @@ package zero.swf.avm2{
 			var dotId:int;
 			var copyId:int;
 			
-			switch(multinameKind){
+			switch(kind){
 				case MultinameKinds.QName:
 				case MultinameKinds.QNameA:
-					if(multinameKind==MultinameKinds.QName){
+					if(kind==MultinameKinds.QName){
 						markStr="";
 					}else{
-						markStr="[QNameA]";
+						markStr="["+MultinameKinds.kindV[kind]+"]";
 					}
 					if(escapeMarkStr.indexOf("(ns=undefined)")==0){
 						markStr+="(ns=undefined)";
@@ -976,7 +1027,7 @@ package zero.swf.avm2{
 				break;
 				case MultinameKinds.Multiname:
 				case MultinameKinds.MultinameA:
-					markStr="["+MultinameKinds.kindV[multinameKind]+"]";
+					markStr="["+MultinameKinds.kindV[kind]+"]";
 					dotId=escapeMarkStr.lastIndexOf(".");
 					if(dotId==-1){
 						throw new Error("dotId="+dotId);
@@ -994,7 +1045,7 @@ package zero.swf.avm2{
 				break;
 				case MultinameKinds.RTQName:
 				case MultinameKinds.RTQNameA:
-					markStr="["+MultinameKinds.kindV[multinameKind]+"]";
+					markStr="["+MultinameKinds.kindV[kind]+"]";
 					execResult=/^([\s\S]*?)(?:\((\d+)\))?$/.exec(escapeMarkStr);
 					if(execResult[1]=="(name=undefined)"){
 						markStr+="(name=undefined)";
@@ -1005,13 +1056,13 @@ package zero.swf.avm2{
 				break;
 				case MultinameKinds.RTQNameL:
 				case MultinameKinds.RTQNameLA:
-					markStr="["+MultinameKinds.kindV[multinameKind]+"]";
+					markStr="["+MultinameKinds.kindV[kind]+"]";
 					execResult=/^(?:\((\d+)\))?$/.exec(escapeMarkStr);
 					copyId=int(execResult[1]);
 				break;
 				case MultinameKinds.MultinameL:
 				case MultinameKinds.MultinameLA:
-					markStr="["+MultinameKinds.kindV[multinameKind]+"]";
+					markStr="["+MultinameKinds.kindV[kind]+"]";
 					dotId=escapeMarkStr.lastIndexOf(".");
 					if(dotId==-1){
 						throw new Error("dotId="+dotId);
@@ -1023,7 +1074,7 @@ package zero.swf.avm2{
 					copyId=int(execResult[1]);
 				break;
 				case MultinameKinds.GenericName:
-					markStr="["+MultinameKinds.kindV[multinameKind]+"]";
+					markStr="["+MultinameKinds.kindV[kind]+"]";
 					execResult=/^([\s\S]*?)\.?<([\s\S]*)>(?:\((\d+)\))?$/.exec(escapeMarkStr);
 					if(execResult[1]=="(TypeDefinition=undefined)"){
 						markStr+="(TypeDefinition=undefined)";
@@ -1042,7 +1093,7 @@ package zero.swf.avm2{
 					copyId=int(execResult[3]);
 				break;
 				default:
-					throw new Error("multinameKind="+multinameKind);
+					throw new Error("kind="+kind);
 				break;
 			}
 			

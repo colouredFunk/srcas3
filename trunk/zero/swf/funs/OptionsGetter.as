@@ -47,7 +47,7 @@ package zero.swf.funs{
 					initByDataOptions.ActionsGetHexArr=_options.ActionsGetHexArr;//20110609
 					
 					initByDataOptions.ABCDataClass=_options.ABCDataClass;//20110615
-					initByDataOptions.ABCFileGetHexArr=_options.ABCFileGetHexArr;//20110615
+					initByDataOptions.ABCDataGetHexArr=_options.ABCDataGetHexArr;//20110615
 					
 					initByDataOptions.ClipActionsClass=_options.ClipActionsClass;//20110705
 					initByDataOptions.ButtonCondActionsClass=_options.ButtonCondActionsClass;//20110706

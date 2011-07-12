@@ -7,6 +7,7 @@ ABCNs_set
 */
 
 package zero.swf.avm2{
+	import zero.GroupString;
 	import flash.utils.Dictionary;
 	public class ABCNs_set{
 		public var nsV:Vector.<ABCNamespace>;
@@ -98,20 +99,23 @@ package zero.swf.avm2{
 				}else{
 					xml=<{xmlName}/>;
 					if(nsV.length){
-						var listXML:XML=<nsList count={nsV.length}/>
+						var nsListXML:XML=<nsList count={nsV.length}/>
 						for each(var ns:ABCNamespace in nsV){
 							if(ns){
-								listXML.appendChild(ns.toXMLAndMark(markStrs,"ns",_toXMLOptions));
+								nsListXML.appendChild(ns.toXMLAndMark(markStrs,"ns",_toXMLOptions));
 							}else{
 								throw new Error("ns="+ns);
 							}
 						}
-						xml.appendChild(listXML);
+						xml.appendChild(nsListXML);
 					}
 					
-					var copyId:int=int(markStr.replace(/^[\s\S]*\((\d+)\)$/,"$1"));
-					if(copyId>1){
-						xml.@copyId=copyId;
+					var execResult:Array=/^[\s\S]*\((\d+)\)$/.exec(markStr);
+					if(execResult){
+						var copyId:int=int(execResult[1]);
+						if(copyId>1){
+							xml.@copyId=copyId;
+						}
 					}
 				}
 				markStrs.xmlDict[this]=xml;
@@ -119,7 +123,9 @@ package zero.swf.avm2{
 			return xml;
 		}
 		public function toMarkStrAndMark(markStrs:MarkStrs):String{
+			
 			//获取 ns_set 的最简 markStr(自动计算 copyId)
+			
 			var markStr:String=markStrs.markStrDict[this];
 			if(markStr is String){
 				return markStr;
@@ -140,9 +146,6 @@ package zero.swf.avm2{
 				markStr="[](length=0)";
 			}
 			
-			//标准化不带 copyId 的 markStr
-			markStr=normalizeMarkStr(markStr);
-			
 			//计算 copyId
 			if(markStrs.ns_setMark["~"+markStr]){
 				var copyId:int=1;
@@ -161,16 +164,18 @@ package zero.swf.avm2{
 			return markStr2ns_set(markStrs,xml2markStr(xml));
 		} 
 		public static function xml2markStr(xml:XML):String{
+			
 			//获取 ns_set 的 xml 的最简 markStr
+			
 			if(/^<\w+ markStr=".*?"\/>$/.test(xml.toXMLString())){
 				return normalizeMarkStr(xml.@markStr.toString());
 			}
 			
 			var markStr:String;
-			var nsListXML:XML=xml.nsList[0];
-			if(nsListXML){
+			var nsXMLList:XML=xml.nsList.ns;
+			if(nsXMLList.length()){
 				markStr="";
-				for each(var nsXML:XML in nsListXML.ns){
+				for each(var nsXML:XML in nsXMLList){
 					markStr+=","+ABCNamespace.xml2markStr(nsXML);
 				}
 				markStr="["+markStr.substr(1)+"]";
@@ -178,9 +183,12 @@ package zero.swf.avm2{
 				markStr="[](length=0)";
 			}
 			
-			markStr+="("+int(xml.@copyId.toString())+")";
+			var copyId:int=int(xml.@copyId.toString());
+			if(copyId>1){
+				markStr+="("+copyId+")";
+			}
 			
-			return normalizeMarkStr(markStr);//标准化带 copyId 的 markStr
+			return markStr;
 		}
 		public static function markStr2ns_set(markStrs:MarkStrs,markStr0:String):ABCNs_set{
 			var ns_set:ABCNs_set=markStrs.ns_setMark["~"+markStr0];
@@ -192,7 +200,7 @@ package zero.swf.avm2{
 				}else{
 					ns_set=new ABCNs_set();
 					
-					var execResult:Array=execEscapeMarkStr(GroupString.escape(markStr));
+					var execResult:Array=/^\[([\s\S]*?)\](?:\((length=0)\))?(?:\((\d+)\))?$/.exec(GroupString.escape(markStr));
 					
 					ns_set.nsV=new Vector.<ABCNamespace>();
 					if(execResult[2]){//"length=0"
@@ -210,9 +218,10 @@ package zero.swf.avm2{
 			return ns_set;
 		}
 		public static function normalizeMarkStr(markStr:String):String{
+			
 			//获取最简 markStr
 			
-			var execResult:Array=execEscapeMarkStr(GroupString.escape(markStr));
+			var execResult:Array=/^\[([\s\S]*?)\](?:\((length=0)\))?(?:\((\d+)\))?$/.exec(GroupString.escape(markStr));
 			
 			if(execResult[2]){//"length=0"
 				markStr="[](length=0)";
@@ -230,13 +239,6 @@ package zero.swf.avm2{
 			}
 			
 			return markStr;
-		}
-		private static function execEscapeMarkStr(escapeMarkStr:String):Array{
-			var execResult:Array=/^\[([\s\S]*?)\](?:\((length=0)\))?(?:\((\d+)\))?$/.exec(escapeMarkStr);
-			if(execResult[0]==escapeMarkStr){
-				return execResult;
-			}
-			throw new Error("不合法的 escapeMarkStr："+escapeMarkStr);
 		}
 		}//end of CONFIG::USE_XML
 	}

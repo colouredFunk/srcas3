@@ -16,12 +16,13 @@ ABCException
 //	u30 var_name
 //}
 package zero.swf.avm2{
+	import zero.swf.codes.LabelMark;
 	import flash.utils.Dictionary;
 	
 	public class ABCException{
-		public var from:AVM2LabelMark;
-		public var to:AVM2LabelMark;
-		public var target:AVM2LabelMark;
+		public var from:LabelMark;
+		public var to:LabelMark;
+		public var target:LabelMark;
 		public var exc_type:ABCMultiname;
 		public var var_name:ABCMultiname;
 		//
