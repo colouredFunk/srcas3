@@ -167,7 +167,7 @@ package zero.swf.avm2{
 			
 			//获取 metadata 的 xml 的最简 markStr
 			
-			if(/^<\w+ markStr=".*?"\/>$/.test(xml.toXMLString())){
+			if(/^<\w+ markStr="[\s\S]*?"\/>$/.test(xml.toXMLString())){
 				return normalizeMarkStr(xml.@markStr.toString());
 			}
 			
@@ -205,14 +205,14 @@ package zero.swf.avm2{
 				}else{
 					metadata=new ABCMetadata();
 					
-					var execResult:Array=/^([\s\S]*?)\[([\s\S]*)\](?:\((\d+)\))?$/.exec(GroupString.escape(markStr));
+					var execResult:Array=/^([\s\S]*?)\[([\s\S]*)\](?:\((\d+)\))?$/.exec(GroupString.ext.escape(markStr));
 					
 					metadata.name=ComplexString.ext.unescape(execResult[1]);
 					
 					i=-1;
 					metadata.itemV=new Vector.<ABCItem>();
 					if(execResult[2]){
-						for each(var itemEscapeMarkStr:String in GroupString.separate(execResult[2])){
+						for each(var itemEscapeMarkStr:String in GroupString.ext.separate(execResult[2])){
 							i++;
 							var arr:Array=/^\[([\s\S]*),([\s\S]*)\]$/.exec(itemEscapeMarkStr);
 							metadata.itemV[i]=new ABCItem();
@@ -232,9 +232,9 @@ package zero.swf.avm2{
 			
 			//获取最简 markStr
 			
-			var execResult:Array=/^([\s\S]*?)\[([\s\S]*)\](?:\((\d+)\))?$/.exec(GroupString.escape(markStr));
+			var execResult:Array=/^([\s\S]*?)\[([\s\S]*)\](?:\((\d+)\))?$/.exec(GroupString.ext.escape(markStr));
 			
-			markStr=GroupString.unescape(execResult[1])+"["+GroupString.unescape(execResult[2])+"]";
+			markStr=GroupString.ext.unescape(execResult[1])+"["+GroupString.ext.unescape(execResult[2])+"]";
 			
 			var copyId:int=int(execResult[3]);
 			if(copyId>1){

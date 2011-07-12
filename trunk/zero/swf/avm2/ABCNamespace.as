@@ -189,7 +189,7 @@ package zero.swf.avm2{
 			
 			//获取 ns 的 xml 的最简 markStr
 			
-			if(/^<\w+ markStr=".*?"\/>$/.test(xml.toXMLString())){
+			if(/^<\w+ markStr="[\s\S]*?"\/>$/.test(xml.toXMLString())){
 				return normalizeMarkStr(xml.@markStr.toString());
 			}
 			
@@ -229,7 +229,7 @@ package zero.swf.avm2{
 				}else{
 					ns=new ABCNamespace();
 					
-					var execResult:Array=/^(?:\[([\s\S]*?)\])?([\s\S]*?)(?:\((name=undefined)\))?(?:\((\d+)\))?$/.exec(GroupString.escape(markStr));
+					var execResult:Array=/^(?:\[([\s\S]*?)\])?([\s\S]*?)(?:\((name=undefined)\))?(?:\((\d+)\))?$/.exec(GroupString.ext.escape(markStr));
 					
 					if(execResult[1]){
 						ns.kind=NamespaceKinds[execResult[1]];
@@ -259,7 +259,7 @@ package zero.swf.avm2{
 			
 			//获取最简 markStr
 			
-			var execResult:Array=/^(?:\[([\s\S]*?)\])?([\s\S]*?)(?:\((name=undefined)\))?(?:\((\d+)\))?$/.exec(GroupString.escape(markStr));
+			var execResult:Array=/^(?:\[([\s\S]*?)\])?([\s\S]*?)(?:\((name=undefined)\))?(?:\((\d+)\))?$/.exec(GroupString.ext.escape(markStr));
 			
 			if(execResult[1]){
 				var kind:int=NamespaceKinds[execResult[1]];
@@ -279,7 +279,7 @@ package zero.swf.avm2{
 			if(execResult[3]){//"name=undefined"
 				markStr+="(name=undefined)";
 			}else{
-				markStr+=GroupString.unescape(execResult[2]);
+				markStr+=GroupString.ext.unescape(execResult[2]);
 			}
 			
 			var copyId:int=int(execResult[4]);
