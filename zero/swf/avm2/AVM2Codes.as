@@ -914,7 +914,7 @@ package zero.swf.avm2{
 				}
 				
 				return new XML("<"+xmlName+"><![CDATA[\n"+
-					codesStr
+					codesStr.replace(/\]\]\>/g,"\\]\\]\\>")
 					+"\t\t\t\t]]></"+xmlName+">");
 			}
 			return <{xmlName}/>;
@@ -954,7 +954,7 @@ package zero.swf.avm2{
 					Outputer.output("使用 ByteArray 进行记录的未知代码："+codeStr,"brown");
 					codeArr[codeId]=BytesAndStr16.str162bytes(codeStr);
 				}else{
-					execResult=/^(\w+)\s*(.*?)$/.exec(codeStr);
+					execResult=/^(\w+)\s*([\s\S]*?)$/.exec(codeStr);
 					if(AVM2Ops[execResult[1]]>=0){
 						var op:int=AVM2Ops[execResult[1]];
 						switch(op){
@@ -1090,11 +1090,11 @@ package zero.swf.avm2{
 							case AVM2Ops.dxns://0x06	//u8_u30__string
 							case AVM2Ops.pushstring://0x2c	//u8_u30__string
 							case AVM2Ops.debugfile://0xf1	//u8_u30__string
-								execResult=/^("|')(.*)\1$/.exec(execResult[2]);
+								execResult=/^("|')([\s\S]*)\1$/.exec(execResult[2]);
 								codeArr[codeId]=new Code(op,ComplexString.normal.unescape(execResult[2]));
 							break;
 							case AVM2Ops.pushnamespace://0x31	//u8_u30__namespace_info
-								if(/^<.*>$/.test(execResult[2])){
+								if(/^<[\s\S]*>$/.test(execResult[2])){
 									codeArr[codeId]=new Code(op,ABCNamespace.xml2ns(markStrs,new XML(execResult[2]),_initByXMLOptions));
 								}else{
 									codeArr[codeId]=new Code(op,ABCNamespace.markStr2ns(markStrs,execResult[2]));
@@ -1113,7 +1113,7 @@ package zero.swf.avm2{
 							case AVM2Ops.coerce://0x80	//u8_u30__multiname_info
 							case AVM2Ops.astype://0x86	//u8_u30__multiname_info
 							case AVM2Ops.istype://0xb2	//u8_u30__multiname_info
-								if(/^<.*>$/.test(execResult[2])){
+								if(/^<[\s\S]*>$/.test(execResult[2])){
 									codeArr[codeId]=new Code(op,ABCMultiname.xml2multiname(markStrs,new XML(execResult[2]),_initByXMLOptions));
 								}else{
 									codeArr[codeId]=new Code(op,ABCMultiname.markStr2multiname(markStrs,execResult[2]));
@@ -1124,7 +1124,7 @@ package zero.swf.avm2{
 							break;
 							case AVM2Ops.newclass://0x58	//u8_u30__class
 								var class_name:ABCMultiname;
-								if(/^<.*>$/.test(execResult[2])){
+								if(/^<[\s\S]*>$/.test(execResult[2])){
 									class_name=ABCMultiname.xml2multiname(markStrs,new XML(execResult[2]),_initByXMLOptions);
 								}else{
 									class_name=ABCMultiname.markStr2multiname(markStrs,execResult[2]);
@@ -1184,11 +1184,11 @@ package zero.swf.avm2{
 							case AVM2Ops.callproplex://0x4c	//u8_u30_u30__multiname_info_args
 							case AVM2Ops.callsupervoid://0x4e	//u8_u30_u30__multiname_info_args
 							case AVM2Ops.callpropvoid://0x4f	//u8_u30_u30__multiname_info_args
-								execResult=/^(.*)\s+(\w+)$/.exec(execResult[2]);
+								execResult=/^([\s\S]*)\s+(\w+)$/.exec(execResult[2]);
 								codeArr[codeId]=new Code(op,{
 									args:int(execResult[2])
 								});
-								if(/^<.*>$/.test(execResult[1])){
+								if(/^<[\s\S]*>$/.test(execResult[1])){
 									codeArr[codeId].value.multiname=ABCMultiname.xml2multiname(markStrs,new XML(execResult[1]),_initByXMLOptions);
 								}else{
 									codeArr[codeId].value.multiname=ABCMultiname.markStr2multiname(markStrs,execResult[1]);
@@ -1237,9 +1237,13 @@ package zero.swf.avm2{
 										throw new Error("找不到对应的 labelMark: "+matchStr);
 									}
 								}
+								codeArr[codeId]=new Code(op,{
+									default_offset:default_offset,
+									case_offsetV:case_offsetV
+								});
 							break;
 							case AVM2Ops.debug://0xef	//u8_u8_u30_u8_u30__debug
-								execResult=/^(\w+)\s+("|')(.*)\2\s+(\w+)\s+(\w+)$/.exec(execResult[2]);
+								execResult=/^(\w+)\s+("|')([\s\S]*)\2\s+(\w+)\s+(\w+)$/.exec(execResult[2]);
 								codeArr[codeId]=new Code(op,{
 									debug_type:int(execResult[1]),
 									index:ComplexString.normal.unescape(execResult[3]),

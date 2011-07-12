@@ -701,7 +701,7 @@ package zero.swf.avm2{
 			
 			//获取 multiname 的 xml 的最简 markStr
 			
-			if(/^<\w+ markStr=".*?"\/>$/.test(xml.toXMLString())){
+			if(/^<\w+ markStr="[\s\S]*?"\/>$/.test(xml.toXMLString())){
 				return normalizeMarkStr(xml.@markStr.toString());
 			}
 			
@@ -861,14 +861,14 @@ package zero.swf.avm2{
 						id=markStr.indexOf("]");
 						multiname.kind=MultinameKinds[markStr.substr(1,id-1)];
 						if(multiname.kind>0){
-							escapeMarkStr=GroupString.escape(markStr.substr(id+1));
+							escapeMarkStr=GroupString.ext.escape(markStr.substr(id+1));
 						}else{
 							multiname.kind=MultinameKinds.QName;
-							escapeMarkStr=GroupString.escape(markStr);
+							escapeMarkStr=GroupString.ext.escape(markStr);
 						}
 					}else{
 						multiname.kind=MultinameKinds.QName;
-						escapeMarkStr=GroupString.escape(markStr);
+						escapeMarkStr=GroupString.ext.escape(markStr);
 					}
 					
 					var execResult:Array;
@@ -945,7 +945,7 @@ package zero.swf.avm2{
 								multiname.TypeDefinition=markStr2multiname(markStrs,execResult[1]);
 							}
 							multiname.ParamV=new Vector.<ABCMultiname>();
-							for each(var ParamMarkStr:String in GroupString.separate(execResult[2])){
+							for each(var ParamMarkStr:String in GroupString.ext.separate(execResult[2])){
 								if(ParamMarkStr=="(Param=undefined)"){
 									multiname.ParamV.push(null);
 								}else{
@@ -981,14 +981,14 @@ package zero.swf.avm2{
 				id=markStr.indexOf("]");
 				kind=MultinameKinds[markStr.substr(1,id-1)];
 				if(kind>0){
-					escapeMarkStr=GroupString.escape(markStr.substr(id+1));
+					escapeMarkStr=GroupString.ext.escape(markStr.substr(id+1));
 				}else{
 					kind=MultinameKinds.QName;
-					escapeMarkStr=GroupString.escape(markStr);
+					escapeMarkStr=GroupString.ext.escape(markStr);
 				}
 			}else{
 				kind=MultinameKinds.QName;
-				escapeMarkStr=GroupString.escape(markStr);
+				escapeMarkStr=GroupString.ext.escape(markStr);
 			}
 			
 			var execResult:Array;
@@ -1021,7 +1021,7 @@ package zero.swf.avm2{
 					if(execResult[1]=="(name=undefined)"){
 						markStr+="(name=undefined)";
 					}else{
-						markStr+=GroupString.unescape(execResult[1]);
+						markStr+=GroupString.ext.unescape(execResult[1]);
 					}
 					copyId=int(execResult[2]);
 				break;
@@ -1039,7 +1039,7 @@ package zero.swf.avm2{
 					if(execResult[1]=="(name=undefined)"){
 						markStr+="(name=undefined)";
 					}else{
-						markStr+=GroupString.unescape(execResult[1]);
+						markStr+=GroupString.ext.unescape(execResult[1]);
 					}
 					copyId=int(execResult[2]);
 				break;
@@ -1050,7 +1050,7 @@ package zero.swf.avm2{
 					if(execResult[1]=="(name=undefined)"){
 						markStr+="(name=undefined)";
 					}else{
-						markStr+=GroupString.unescape(execResult[1]);
+						markStr+=GroupString.ext.unescape(execResult[1]);
 					}
 					copyId=int(execResult[2]);
 				break;
@@ -1082,7 +1082,7 @@ package zero.swf.avm2{
 						markStr+=normalizeMarkStr(execResult[1])+".";
 					}
 					var ParamMarkStrs:String="";
-					for each(var ParamMarkStr:String in GroupString.separate(execResult[2])){
+					for each(var ParamMarkStr:String in GroupString.ext.separate(execResult[2])){
 						if(ParamMarkStr=="(Param=undefined)"){
 							ParamMarkStrs+="(Param=undefined)";
 						}else{

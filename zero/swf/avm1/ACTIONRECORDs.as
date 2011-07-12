@@ -2470,7 +2470,7 @@ package zero.swf.avm1{
 				}
 				
 				return new XML("<"+xmlName+" class=\"zero.swf.avm1.ACTIONRECORDs\"><![CDATA[\n"+
-					codesStr
+					codesStr.replace(/\]\]\>/g,"\\]\\]\\>")
 					+"\t\t\t\t]]></"+xmlName+">");
 			}
 			return <{xmlName}/>;
@@ -2511,7 +2511,7 @@ package zero.swf.avm1{
 					Outputer.output("使用 ByteArray 进行记录的未知代码："+codeStr,"brown");
 					codeArr[codeId]=BytesAndStr16.str162bytes(codeStr);
 				}else{
-					execResult=/^(\w+)\s*(.*?)$/.exec(codeStr);
+					execResult=/^(\w+)\s*([\s\S]*?)$/.exec(codeStr);
 					if(AVM1Ops[execResult[1]]>=0){
 						var op:int=AVM1Ops[execResult[1]];
 						if(op<0x80){
@@ -2577,7 +2577,7 @@ package zero.swf.avm1{
 									//3. If the Play flag is set, the action goes to the specified frame and begins playing the enclosing
 									//movie clip. Otherwise, the action goes to the specified frame and stops.
 									
-									execResult=/^(PLAY|STOP)(?:\s*,\s*(.*?))?$/.exec(execResult[2]);
+									execResult=/^(PLAY|STOP)(?:\s*,\s*([\s\S]*?))?$/.exec(execResult[2]);
 									code_value={
 										Play:execResult[1]=="PLAY"
 									};
@@ -2611,7 +2611,7 @@ package zero.swf.avm1{
 									//ActionGoToLabel 		ACTIONRECORDHEADER 		ActionCode = 0x8C
 									//Label 				STRING 					Frame label
 									
-									execResult=/^("|')(.*)\1$/.exec(execResult[2]);
+									execResult=/^("|')([\s\S]*)\1$/.exec(execResult[2]);
 									codeArr[codeId]=new Code(op,ComplexString.normal.unescape(execResult[2]));
 								break;
 								
@@ -2624,7 +2624,7 @@ package zero.swf.avm1{
 									//Frame 				UI16 					Frame to wait for
 									//SkipCount 			UI8 					Number of actions to skip if frame is not loaded
 									
-									execResult=/^(.*?)\s*,\s*(label\d+)$/.exec(execResult[2]);
+									execResult=/^([\s\S]*?)\s*,\s*(label\d+)$/.exec(execResult[2]);
 									code_value={
 										Frame:int(execResult[1]),
 										label:labelMarkMark[execResult[2]+":"]
@@ -2708,9 +2708,9 @@ package zero.swf.avm1{
 									//UrlString 			STRING 					Target URL string
 									//TargetString 			STRING 					Target string
 									
-									//execResult=/^("|')(.*)\1\s*,\s*("|')(.*)\3$/.exec(codeStr);//直接操作将对 codeStr="'\"'"+","+'"\\\',"xx"' 出错
+									//execResult=/^("|')([\s\S]*)\1\s*,\s*("|')([\s\S]*)\3$/.exec(codeStr);//直接操作将对 codeStr="'\"'"+","+'"\\\',"xx"' 出错
 									
-									execResult=/^("|')(.*)\1\s*,\s*("|')(.*)\3$/.exec(execResult[2].replace(/\\\\/g,"\\x5c").replace(/\\"/g,"\\x22").replace(/\\'/g,"\\x27"));
+									execResult=/^("|')([\s\S]*)\1\s*,\s*("|')([\s\S]*)\3$/.exec(execResult[2].replace(/\\\\/g,"\\x5c").replace(/\\"/g,"\\x22").replace(/\\'/g,"\\x27"));
 									codeArr[codeId]=new Code(op,{
 										UrlString:ComplexString.normal.unescape(execResult[2]),
 										TargetString:ComplexString.normal.unescape(execResult[4])
@@ -2804,7 +2804,7 @@ package zero.swf.avm1{
 									//Count 				UI16 					Number of constants to follow
 									//ConstantPool 			STRING[Count] 			String constants
 									
-									execResult=execResult[2].replace(/\\\\/g,"\\x5c").replace(/\\"/g,"\\x22").replace(/\\'/g,"\\x27").match(/("|').*?\1/g);
+									execResult=execResult[2].replace(/\\\\/g,"\\x5c").replace(/\\"/g,"\\x22").replace(/\\'/g,"\\x27").match(/("|')[\s\S]*?\1/g);
 									i=-1;
 									code_value=new Vector.<String>();
 									for each(subStr in execResult){
@@ -2854,7 +2854,7 @@ package zero.swf.avm1{
 									//in ACTIONRECORD specifies.
 									//ActionPush 可能会 push 一个或多个值，直到到达这个 ActionPush ACTIONRECORD 的结尾。
 									
-									execResult=(execResult[2].replace(/\\\\/g,"\\x5c").replace(/\\"/g,"\\x22").replace(/\\'/g,"\\x27")+",").match(/("|').*?\1,|[^,]*?,/g);
+									execResult=(execResult[2].replace(/\\\\/g,"\\x5c").replace(/\\"/g,"\\x22").replace(/\\'/g,"\\x27")+",").match(/("|')[\s\S]*?\1,|[^,]*?,/g);
 									i=-1;
 									code_value=new Vector.<*>();
 									for each(subStr in execResult){
@@ -2877,7 +2877,7 @@ package zero.swf.avm1{
 												code_value[i]=NaN;//Number
 											break;
 											default:
-												if(/^("|').*\1$/.test(codeStr)){
+												if(/^("|')[\s\S]*\1$/.test(codeStr)){
 													code_value[i]=ComplexString.normal.unescape(codeStr.substr(1,codeStr.length-2));
 												}else if(codeStr.indexOf("r:")==0){
 													code_value[i]={r:int(codeStr.substr(2))};
@@ -2921,7 +2921,7 @@ package zero.swf.avm1{
 									//blocks. Instead, the length of a block is set by the TrySize, CatchSize, and FinallySize
 									//values.
 									
-									execResult=/^(.*?)\s*\(\s*try\s+end\s+(label\d+)\s*\)\s*(?:\(\s*catch\s+end\s+(label\d+)\s*\))?\s*(?:\(\s*finally\s+end\s+(label\d+)\s*\))?$/.exec(execResult[2]);
+									execResult=/^([\s\S]*?)\s*\(\s*try\s+end\s+(label\d+)\s*\)\s*(?:\(\s*catch\s+end\s+(label\d+)\s*\))?\s*(?:\(\s*finally\s+end\s+(label\d+)\s*\))?$/.exec(execResult[2]);
 									if(execResult[1].indexOf("r:")==0){
 										code_value={
 											CatchRegister:int(execResult[1].substr(2)),
@@ -2990,7 +2990,7 @@ package zero.swf.avm1{
 									//	this.area = Math.PI * radius * radius;
 									//}
 									
-									execResult=/^(.*?)\s*\(\s*(.*)\s*\)\s*\(\s*end\s+(label\d+)\s*\)$/.exec(execResult[2]);
+									execResult=/^([\s\S]*?)\s*\(\s*([\s\S]*)\s*\)\s*\(\s*end\s+(label\d+)\s*\)$/.exec(execResult[2]);
 									code_value={
 										FunctionName:ComplexString.normal.unescape(execResult[1]),
 										paramV:new Vector.<String>(),
@@ -3081,7 +3081,7 @@ package zero.swf.avm1{
 									//Register 1 will be this, register 2 will be _root, registers 3 and 4 will be the first and second
 									//parameters, and registers 5 and 6 will be for local variables.
 									
-									execResult=/^(.*?)\s*\(\s*RegisterCount\s*=\s*(\d+)\s*\)\(\s*flags\s*=\s*(.*?)\s*\)\s*\(\s*(.*)\s*\)\s*\(\s*end\s+(label\d+)\s*\)$/.exec(execResult[2]);
+									execResult=/^([\s\S]*?)\s*\(\s*RegisterCount\s*=\s*(\d+)\s*\)\(\s*flags\s*=\s*([\s\S]*?)\s*\)\s*\(\s*([\s\S]*)\s*\)\s*\(\s*end\s+(label\d+)\s*\)$/.exec(execResult[2]);
 									
 									code_value={
 										FunctionName:ComplexString.normal.unescape(execResult[1]),
@@ -3131,8 +3131,8 @@ package zero.swf.avm1{
 									
 									if(execResult[4]){
 										i=-1;
-										for each(var ParameterStr:String in execResult[4].replace(/\\\\/g,"\\x5c").replace(/\\"/g,"\\x22").replace(/\\'/g,"\\x27").match(/r\:\d+\s*=\s*("|').*?\1/g)){
-											execResult=/^r\:(\d+)\s*=\s*("|')(.*)\2$/.exec(ParameterStr);
+										for each(var ParameterStr:String in execResult[4].replace(/\\\\/g,"\\x5c").replace(/\\"/g,"\\x22").replace(/\\'/g,"\\x27").match(/r\:\d+\s*=\s*("|')[\s\S]*?\1/g)){
+											execResult=/^r\:(\d+)\s*=\s*("|')([\s\S]*)\2$/.exec(ParameterStr);
 											i++;
 											code_value.Parameters[i]={
 												Register:int(execResult[1]),

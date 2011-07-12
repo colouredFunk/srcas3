@@ -167,12 +167,12 @@ package zero.swf.avm2{
 			
 			//获取 ns_set 的 xml 的最简 markStr
 			
-			if(/^<\w+ markStr=".*?"\/>$/.test(xml.toXMLString())){
+			if(/^<\w+ markStr="[\s\S]*?"\/>$/.test(xml.toXMLString())){
 				return normalizeMarkStr(xml.@markStr.toString());
 			}
 			
 			var markStr:String;
-			var nsXMLList:XML=xml.nsList.ns;
+			var nsXMLList:XMLList=xml.nsList.ns;
 			if(nsXMLList.length()){
 				markStr="";
 				for each(var nsXML:XML in nsXMLList){
@@ -200,12 +200,12 @@ package zero.swf.avm2{
 				}else{
 					ns_set=new ABCNs_set();
 					
-					var execResult:Array=/^\[([\s\S]*?)\](?:\((length=0)\))?(?:\((\d+)\))?$/.exec(GroupString.escape(markStr));
+					var execResult:Array=/^\[([\s\S]*?)\](?:\((length=0)\))?(?:\((\d+)\))?$/.exec(GroupString.ext.escape(markStr));
 					
 					ns_set.nsV=new Vector.<ABCNamespace>();
 					if(execResult[2]){//"length=0"
 					}else{
-						for each(var escapeNsMarkStr:String in GroupString.separate(execResult[1])){
+						for each(var escapeNsMarkStr:String in GroupString.ext.separate(execResult[1])){
 							ns_set.nsV.push(ABCNamespace.markStr2ns(markStrs,escapeNsMarkStr));
 						}
 					}
@@ -221,13 +221,13 @@ package zero.swf.avm2{
 			
 			//获取最简 markStr
 			
-			var execResult:Array=/^\[([\s\S]*?)\](?:\((length=0)\))?(?:\((\d+)\))?$/.exec(GroupString.escape(markStr));
+			var execResult:Array=/^\[([\s\S]*?)\](?:\((length=0)\))?(?:\((\d+)\))?$/.exec(GroupString.ext.escape(markStr));
 			
 			if(execResult[2]){//"length=0"
 				markStr="[](length=0)";
 			}else{
 				markStr="";
-				for each(var escapeNsMarkStr:String in GroupString.separate(execResult[1])){
+				for each(var escapeNsMarkStr:String in GroupString.ext.separate(execResult[1])){
 					markStr+=","+ABCNamespace.normalizeMarkStr(escapeNsMarkStr);
 				}
 				markStr="["+markStr.substr(1)+"]";
