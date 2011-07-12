@@ -85,6 +85,8 @@
 				DataLoader.load(optionsXMLPath, onXMLLoadingHandler, onXMLLoadedHandler, onXMLErrorHandler);
 			}
 			addEventListener(Event.ENTER_FRAME, onLoadingHandler);
+			
+			eiM.dispatchSWFEvent("load");
 		}
 
 		protected function onLoadingHandler(_evt:*):void {
@@ -118,7 +120,7 @@
 				onVersionMenuHandler
 			);
 			
-			eiM.dispatchSWFEvent("LoadComplete");
+			eiM.dispatchSWFEvent("loadComplete");
 		}
 
 		protected function onLoadingStepFix(_loaded:Number):void {
