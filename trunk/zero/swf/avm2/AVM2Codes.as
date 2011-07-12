@@ -476,12 +476,9 @@ package zero.swf.avm2{
 			for each(var code:* in codeArr){
 				if(code is LabelMark){
 					(code as LabelMark).pos=offset;
-				}/*else if(code is ByteArray){
-					Outputer.output("使用 ByteArray 进行记录的未知代码："+BytesAndStr16.bytes2str16(code,0,code.length),"brown");
-					data.position=offset;
-					data.writeBytes(code,0,code.length);
-					offset=data.length;
-				}*/else if(code is int){
+				}else if(code is ByteArray){
+					//Outputer.output("使用 ByteArray 进行记录的未知代码："+BytesAndStr16.bytes2str16(code,0,code.length),"brown");
+				}else if(code is int){
 					data[offset++]=code;
 				}else if(code is Code){
 					data[offset++]=code.op;
@@ -733,10 +730,10 @@ package zero.swf.avm2{
 					}
 					if(code is LabelMark){
 						codesStr+="\t\t\t\tlabel"+(code as LabelMark).labelId+":\n";
-					}/*else if(code is ByteArray){
+					}else if(code is ByteArray){
 						Outputer.output("使用 ByteArray 进行记录的未知代码："+BytesAndStr16.bytes2str16(code,0,code.length),"brown");
 						codesStr+="\t\t\t\t\t"+BytesAndStr16.bytes2str16(code,0,code.length)+"\n";
-					}*/else{
+					}else{
 						if(code is int){
 							codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code]+"\n";
 						}else if(code is Code){
@@ -920,6 +917,8 @@ package zero.swf.avm2{
 			return <{xmlName}/>;
 		}
 		public function initByXMLAndMark(markStrs:MarkStrs,xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
+			//CONFIG::USE_XML=false 的情况下由 SimpleCompilation 提供部分功能
+			
 			var codeStrArr:Array=xml.toString().replace(/^\s*|\s*$/g,"").split(/\s*\n\s*/);
 			var codeId:int=-1;
 			codeArr=new Array();

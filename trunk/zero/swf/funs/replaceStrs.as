@@ -39,10 +39,7 @@ package zero.swf.funs{
 		for each(var tag:Tag in swf.tagV){
 			switch(tag.type){
 				case TagTypes.DoABC:
-					ABCData=tag.getBody({
-						TagBodyClass:DoABC,
-						ABCDataClass:ABCFileWithSimpleConstant_pool
-					}).ABCData;
+					ABCData=tag.getBody(DoABC,{ABCDataClass:ABCFileWithSimpleConstant_pool}).ABCData;
 					i=ABCData.stringV.length;
 					while(--i>0){
 						strt=mark["~"+ABCData.stringV[i]];
@@ -53,10 +50,7 @@ package zero.swf.funs{
 					}
 				break;
 				case TagTypes.DoABCWithoutFlagsAndName:
-					ABCData=tag.getBody({
-						TagBodyClass:DoABCWithoutFlagsAndName,
-						ABCDataClass:ABCFileWithSimpleConstant_pool
-					}).ABCData;
+					ABCData=tag.getBody(DoABCWithoutFlagsAndName,{ABCDataClass:ABCFileWithSimpleConstant_pool}).ABCData;
 					i=ABCData.stringV.length;
 					while(--i>0){
 						strt=mark["~"+ABCData.stringV[i]];
@@ -67,9 +61,7 @@ package zero.swf.funs{
 					}
 				break;
 				case TagTypes.SymbolClass:
-					var NameV:Vector.<String>=tag.getBody({
-						TagBodyClass:SymbolClass
-					}).NameV;
+					var NameV:Vector.<String>=tag.getBody(SymbolClass,null).NameV;
 					i=NameV.length;
 					while(--i>=0){
 						strt=mark["~"+NameV[i]];

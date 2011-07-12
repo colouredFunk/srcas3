@@ -10,6 +10,7 @@ package zero.swf.funs{
 	import flash.utils.ByteArray;
 	
 	import zero.swf.*;
+	import zero.swf.codes.*;
 	import zero.swf.avm2.*;
 	import zero.swf.tagBodys.*;
 	
@@ -49,16 +50,10 @@ package zero.swf.funs{
 			for each(var tag:Tag in swf.tagV){
 				switch(tag.type){
 					case TagTypes.DoABC:
-						ABCData=tag.getBody({
-							TagBodyClass:DoABC,
-							ABCDataClass:ABCClasses
-						}).ABCData;
+						ABCData=tag.getBody(DoABC,{ABCDataClass:ABCClasses}).ABCData;
 					break;
 					case TagTypes.DoABCWithoutFlagsAndName:
-						ABCData=tag.getBody({
-							TagBodyClass:DoABCWithoutFlagsAndName,
-							ABCDataClass:ABCClasses
-						}).ABCData;
+						ABCData=tag.getBody(DoABCWithoutFlagsAndName,{ABCDataClass:ABCClasses}).ABCData;
 					break;
 					default:
 						ABCData=null;
@@ -77,7 +72,7 @@ package zero.swf.funs{
 									&&
 									trait.method.codes
 								){
-									var code:AVM2Code=trait.method.codes.codeArr[2] as AVM2Code;
+									var code:Code=trait.method.codes.codeArr[2] as Code;
 									if(code&&code.op==AVM2Ops.getlex){
 										var multiname:ABCMultiname=code.value;
 										if(multiname&&multiname.name=="SWFShellAdderOnline"){
@@ -98,9 +93,7 @@ package zero.swf.funs{
 		private static function checkHasSymbolClassName_SWFShellAdderOnline(swf:SWF):Boolean{
 			for each(var tag:Tag in swf.tagV){
 				if(tag.type==TagTypes.SymbolClass){
-					var symbolClass:SymbolClass=tag.getBody({
-						TagBodyClass:SymbolClass
-					});
+					var symbolClass:SymbolClass=tag.getBody(SymbolClass,null);
 					for each(var className:String in symbolClass.NameV){
 						if(className=="SWFShellAdderOnline"){
 							return true;
@@ -115,9 +108,7 @@ package zero.swf.funs{
 			while(--i>=0){
 				var tag:Tag=swf.tagV[i];
 				if(tag.type==TagTypes.DefineBinaryData){
-					return tag.getBody({
-						TagBodyClass:DefineBinaryData
-					}).Data.toData(null);
+					return tag.getBody(DefineBinaryData,null).Data.toData(null);
 				}
 			}
 			return null;

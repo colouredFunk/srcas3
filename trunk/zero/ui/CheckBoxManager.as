@@ -39,7 +39,7 @@ package zero.ui{
 		
 		
 		private var cb:spark.components.CheckBox;
-		private var so:Object;
+		private var so:So;
 		private var so_key:String;
 		
 		public function CheckBoxManager(){}
@@ -57,13 +57,16 @@ package zero.ui{
 			so=_so;
 			so_key=_so_key;
 			
-			if(so.getValue(so_key)=="true"){
-				cb.selected=true;
+			var value:String=so.getValue(so_key);
+			if(value){
+				cb.selected=(value=="true");
+			}else{
+				so.setValue(so_key,cb.selected?"true":"false");
 			}
 			cb.addEventListener(Event.CHANGE,change);
 		}
 		private function change(event:Event):void{
-			so.setValue(so_key,cb.selected);
+			so.setValue(so_key,cb.selected?"true":"false");
 		}
 		public static function updateByCb(cb:spark.components.CheckBox):void{
 			dict[cb].change(null);

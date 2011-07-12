@@ -94,24 +94,31 @@ package zero.swf.funs{
 			var method:ABCMethod=new ABCMethod();
 			method.return_type=packageNamespaceQNames.gen("flash.display.Stage");
 			//method.name="";
-			method.flags=0;
+			//method.NeedArguments=false;
+			//method.NeedActivation=false;
+			//method.NeedRest=false;
+			//method.SetDxns=false;
 			method.max_stack=2;
 			method.local_count=1;
 			method.init_scope_depth=0;//9
 			method.max_scope_depth=1;//10
 			method.codes=new AVM2Codes();
-			method.codes.codeArr=[
-				AVM2Ops.getlocal0,
-				AVM2Ops.pushscope,
-				new AVM2Code(AVM2Ops.getlex,packageNamespaceQNames.gen(shellName)),
-				new AVM2Code(AVM2Ops.getproperty,packageNamespaceQNames.gen(siageName)),
-				new AVM2Code(AVM2Ops.coerce,packageNamespaceQNames.gen("flash.display.Stage")),
-				AVM2Ops.returnvalue
-			];
+			method.codes.codeArr=SimpleCompilation.com(
+				<codes><![CDATA[
+					getlocal0
+					pushscope
+					getlex
+					getproperty
+					coerce flash.display.Stage
+					returnvalue
+				]]></codes>.toString(),
+				packageNamespaceQNames
+			);
 			
 			trait=new ABCTrait();
 			trait.name=packageNamespaceQNames.gen("stage");
-			trait.kind_attributes=TraitTypeAndAttributes.Override;
+			//trait.ATTR_Final=false;
+			trait.ATTR_Override=true;
 			trait.kind_trait_type=TraitTypeAndAttributes.Getter;
 			trait.disp_id=0;
 			trait.method=method;
