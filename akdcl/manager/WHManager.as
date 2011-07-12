@@ -125,6 +125,52 @@ package akdcl.manager {
 				timer.stop();
 			}
 		}
+		
+		public function register(_target:*, _x:int = 0, _y:int = 0):void {
+			var _align:Object;
+			var _alignID:int = contains(_target);
+			if (_alignID < 0) {
+				_align = { };
+				targetList.push(_align);
+			}
+			
+			tempPoint.x = 0;
+			tempPoint.y = 0;
+			tempPoint = _target.localToGlobal(tempPoint);
+			
+			if (_x == 0) {
+				_align.fixX = 0;
+			}else if (_x > 0) {
+				_align.fixX = originalWidth - tempPoint.x;
+			}else {
+				_align.fixX = 0 - tempPoint.x;
+			}
+			
+			if (_y == 0) {
+				_align.fixY = 0;
+			}else if (_y > 0) {
+				_align.fixY = originalHeight - tempPoint.y;
+			}else {
+				_align.fixY = 0 - tempPoint.y;
+			}
+			
+			_align.alignX = _x;
+			_align.alignY = _y;
+			_align.target = _target;
+			
+			targetList.sort(sortAlignByTargetLevel);
+			
+			
+			updateTarget(_align);
+		}
+		
+		public function unregister(_target:*):void {
+			var _alignID:int = contains(_target);
+			if (_alignID >= 0) {
+				var _align:Object = targetList.splice(_alignID, 1);
+				_align.target == null;
+			}
+		}
 
 		private function onTimerHandler(e:TimerEvent):void {
 			if (stage.scaleMode == StageScaleMode.SHOW_ALL){
@@ -206,44 +252,6 @@ package akdcl.manager {
 				_level++;
 			}
 			return _level;
-		}
-		
-		public function register(_target:*, _x:int = 0, _y:int = 0):void {
-			var _align:Object;
-			var _alignID:int = contains(_target);
-			if (_alignID < 0) {
-				_align = { };
-				targetList.push(_align);
-			}
-			
-			tempPoint.x = 0;
-			tempPoint.y = 0;
-			tempPoint = _target.localToGlobal(tempPoint);
-			
-			if (_x == 0) {
-				_align.fixX = 0;
-			}else if (_x > 0) {
-				_align.fixX = originalWidth - tempPoint.x;
-			}else {
-				_align.fixX = 0 - tempPoint.x;
-			}
-			
-			if (_y == 0) {
-				_align.fixY = 0;
-			}else if (_y > 0) {
-				_align.fixY = originalHeight - tempPoint.y;
-			}else {
-				_align.fixY = 0 - tempPoint.y;
-			}
-			
-			_align.alignX = _x;
-			_align.alignY = _y;
-			_align.target = _target;
-			
-			targetList.sort(sortAlignByTargetLevel);
-			
-			
-			updateTarget(_align);
 		}
 		
 		private function updateTarget(_align:Object):void {
