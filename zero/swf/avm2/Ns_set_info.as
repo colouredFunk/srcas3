@@ -25,10 +25,10 @@ package zero.swf.avm2{
 		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			//#offsetpp
 			
-			if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var integer_count:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{integer_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{integer_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{integer_count=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{integer_count=data[offset++];}
-			//integer_count
+			if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var ns_count:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{ns_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{ns_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{ns_count=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{ns_count=data[offset++];}
+			//ns_count
 			nsV=new Vector.<int>();
-			for(var i:int=0;i<integer_count;i++){
+			for(var i:int=0;i<ns_count;i++){
 			
 				if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){nsV[i]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{nsV[i]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{nsV[i]=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{nsV[i]=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{nsV[i]=data[offset++];}
 				//nsV[i]
@@ -37,10 +37,10 @@ package zero.swf.avm2{
 		}
 		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
 			var data:ByteArray=new ByteArray();
-			var integer_count:int=nsV.length;
+			var ns_count:int=nsV.length;
 			var offset:int=0;
-			if(integer_count>>>7){if(integer_count>>>14){if(integer_count>>>21){if(integer_count>>>28){data[offset++]=(integer_count&0x7f)|0x80;data[offset++]=((integer_count>>>7)&0x7f)|0x80;data[offset++]=((integer_count>>>14)&0x7f)|0x80;data[offset++]=((integer_count>>>21)&0x7f)|0x80;data[offset++]=integer_count>>>28;}else{data[offset++]=(integer_count&0x7f)|0x80;data[offset++]=((integer_count>>>7)&0x7f)|0x80;data[offset++]=((integer_count>>>14)&0x7f)|0x80;data[offset++]=integer_count>>>21;}}else{data[offset++]=(integer_count&0x7f)|0x80;data[offset++]=((integer_count>>>7)&0x7f)|0x80;data[offset++]=integer_count>>>14;}}else{data[offset++]=(integer_count&0x7f)|0x80;data[offset++]=integer_count>>>7;}}else{data[offset++]=integer_count;}
-			//integer_count
+			if(ns_count>>>7){if(ns_count>>>14){if(ns_count>>>21){if(ns_count>>>28){data[offset++]=(ns_count&0x7f)|0x80;data[offset++]=((ns_count>>>7)&0x7f)|0x80;data[offset++]=((ns_count>>>14)&0x7f)|0x80;data[offset++]=((ns_count>>>21)&0x7f)|0x80;data[offset++]=ns_count>>>28;}else{data[offset++]=(ns_count&0x7f)|0x80;data[offset++]=((ns_count>>>7)&0x7f)|0x80;data[offset++]=((ns_count>>>14)&0x7f)|0x80;data[offset++]=ns_count>>>21;}}else{data[offset++]=(ns_count&0x7f)|0x80;data[offset++]=((ns_count>>>7)&0x7f)|0x80;data[offset++]=ns_count>>>14;}}else{data[offset++]=(ns_count&0x7f)|0x80;data[offset++]=ns_count>>>7;}}else{data[offset++]=ns_count;}
+			//ns_count
 			
 			for each(var ns:int in nsV){
 			

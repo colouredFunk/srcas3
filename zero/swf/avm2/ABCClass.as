@@ -33,7 +33,9 @@ package zero.swf.avm2{
 	public class ABCClass{
 		public var name:ABCMultiname;
 		public var super_name:ABCMultiname;
-		public var flags:int;
+		public var ClassSealed:Boolean;
+		public var ClassFinal:Boolean;
+		public var ClassInterface:Boolean;
 		public var protectedNs:ABCNamespace;
 		public var intrfV:Vector.<ABCMultiname>;
 		public var iinit:ABCMethod;
@@ -105,13 +107,17 @@ package zero.swf.avm2{
 			//CONSTANT_ClassFinal 			0x02 	The class is final: it cannot be a base class for any other class.
 			//CONSTANT_ClassInterface 		0x04 	The class is an interface.
 			//CONSTANT_ClassProtectedNs 	0x08 	The class uses its protected namespace and the protectedNs field is present in the interface_info structure.
-			flags=instance_info.flags;
+			ClassSealed=instance_info.ClassSealed;
+			ClassFinal=instance_info.ClassFinal;
+			ClassInterface=instance_info.ClassInterface;
 			
 			//This field is present only if the CONSTANT_ProtectedNs bit of flags is set. It is an index into the
 			//namespace array of the constant pool and identifies the namespace that serves as the protected namespace
 			//for this class.
-			if(flags&InstanceFlags.ClassProtectedNs){
-				protectedNs=allNsV[instance_info.protectedNs];//allNs[0]==null;
+			if(instance_info.protectedNs>-1){
+				protectedNs=allNsV[instance_info.protectedNs];
+			}else{
+				protectedNs=null;
 			}
 			
 			//The value of the intrf_count field is the number of entries in the interface array. The interface array
@@ -201,7 +207,7 @@ package zero.swf.avm2{
 			//This field is present only if the CONSTANT_ProtectedNs bit of flags is set. It is an index into the
 			//namespace array of the constant pool and identifies the namespace that serves as the protected namespace
 			//for this class.
-			if(flags&InstanceFlags.ClassProtectedNs){
+			if(protectedNs){
 				productMark.productNs(protectedNs);
 			}
 			
@@ -260,13 +266,17 @@ package zero.swf.avm2{
 			//CONSTANT_ClassFinal 			0x02 	The class is final: it cannot be a base class for any other class.
 			//CONSTANT_ClassInterface 		0x04 	The class is an interface.
 			//CONSTANT_ClassProtectedNs 	0x08 	The class uses its protected namespace and the protectedNs field is present in the interface_info structure.
-			instance_info.flags=flags;
+			instance_info.ClassSealed=ClassSealed;
+			instance_info.ClassFinal=ClassFinal;
+			instance_info.ClassInterface=ClassInterface;
 			
 			//This field is present only if the CONSTANT_ProtectedNs bit of flags is set. It is an index into the
 			//namespace array of the constant pool and identifies the namespace that serves as the protected namespace
 			//for this class.
-			if(flags&InstanceFlags.ClassProtectedNs){
+			if(protectedNs){
 				instance_info.protectedNs=productMark.getNsId(protectedNs);
+			}else{
+				instance_info.protectedNs=-1;
 			}
 			
 			//The value of the intrf_count field is the number of entries in the interface array. The interface array
@@ -333,17 +343,12 @@ package zero.swf.avm2{
 				xml.appendChild(super_name.toXMLAndMark(markStrs,"super_name",_toXMLOptions));
 			}
 			
-			xml.@flags=(
-				"|"+InstanceFlags.flagV[flags&InstanceFlags.ClassSealed]+
-				"|"+InstanceFlags.flagV[flags&InstanceFlags.ClassFinal]+
-				"|"+InstanceFlags.flagV[flags&InstanceFlags.ClassInterface]+
-				"|"+InstanceFlags.flagV[flags&InstanceFlags.ClassProtectedNs]
-			).replace(/\|null/g,"").substr(1);
+			xml.@ClassSealed=ClassSealed;
+			xml.@ClassFinal=ClassFinal;
+			xml.@ClassInterface=ClassInterface;
 			
-			if(flags&InstanceFlags.ClassProtectedNs){
-				if(protectedNs){
-					xml.appendChild(protectedNs.toXMLAndMark(markStrs,"protectedNs",_toXMLOptions));
-				}
+			if(protectedNs){
+				xml.appendChild(protectedNs.toXMLAndMark(markStrs,"protectedNs",_toXMLOptions));
 			}
 			
 			if(intrfV.length){
@@ -401,18 +406,15 @@ package zero.swf.avm2{
 				super_name=null;
 			}
 			
-			flags=0;
-			for each(var flagsStr:String in xml.@flags.toString().split("|")){
-				flags|=InstanceFlags[flagsStr];
-			}
+			ClassSealed=(xml.@ClassSealed.toString()=="true");
+			ClassFinal=(xml.@ClassFinal.toString()=="true");
+			ClassInterface=(xml.@ClassInterface.toString()=="true");
 			
-			if(flags&InstanceFlags.ClassProtectedNs){
-				var protectedNsXML:XML=xml.protectedNs[0];
-				if(protectedNsXML){
-					protectedNs=ABCNamespace.xml2ns(markStrs,protectedNsXML,_initByXMLOptions);
-				}else{
-					protectedNs=null;
-				}
+			var protectedNsXML:XML=xml.protectedNs[0];
+			if(protectedNsXML){
+				protectedNs=ABCNamespace.xml2ns(markStrs,protectedNsXML,_initByXMLOptions);
+			}else{
+				protectedNs=null;
 			}
 			
 			i=-1;

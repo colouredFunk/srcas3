@@ -8,6 +8,9 @@ ABCNamespace
 
 package zero.swf.avm2{
 	import flash.utils.Dictionary;
+	
+	import zero.ComplexString;
+	import zero.GroupString;
 	public class ABCNamespace{
 		public var kind:int;							//direct_int
 		public var name:String;							//string
@@ -128,9 +131,12 @@ package zero.swf.avm2{
 						xml.@name=name;
 					}
 					
-					var copyId:int=int(markStr.replace(/^[\s\S]*\((\d+)\)$/,"$1"));
-					if(copyId>1){
-						xml.@copyId=copyId;
+					var execResult:Array=/^[\s\S]*\((\d+)\)$/.exec(markStr);
+					if(execResult){
+						var copyId:int=int(execResult[1]);
+						if(copyId>1){
+							xml.@copyId=copyId;
+						}
 					}
 				}
 				markStrs.xmlDict[this]=xml;
@@ -144,21 +150,23 @@ package zero.swf.avm2{
 			}
 			
 			//获取 ns 的最简 markStr(自动计算 copyId)
+			
 			var markStr:String=markStrs.markStrDict[this];
 			if(markStr is String){
 				return markStr;
 			}
 			
 			//计算 markStr
-			markStr="["+NamespaceKinds.kindV[kind]+"]";
+			if(kind==NamespaceKinds.PackageNamespace){
+				markStr="";
+			}else{
+				markStr="["+NamespaceKinds.kindV[kind]+"]";
+			}
 			if(name is String){
-				markStr+=ComplexString.escape(name);
+				markStr+=ComplexString.ext.escape(name);
 			}else{
 				markStr+="(name=undefined)";
 			}
-			
-			//标准化不带 copyId 的 markStr
-			markStr=normalizeMarkStr(markStr);
 			
 			//计算 copyId
 			if(markStrs.nsMark["~"+markStr]){
@@ -178,28 +186,38 @@ package zero.swf.avm2{
 			return markStr2ns(markStrs,xml2markStr(xml));
 		} 
 		public static function xml2markStr(xml:XML):String{
+			
 			//获取 ns 的 xml 的最简 markStr
+			
 			if(/^<\w+ markStr=".*?"\/>$/.test(xml.toXMLString())){
 				return normalizeMarkStr(xml.@markStr.toString());
 			}
 			
-			var markStr:String=xml.@kind.toString();
-			if(NamespaceKinds[markStr]>0){
-				markStr="["+markStr+"]";
+			var markStr:String;
+			var kind:int=NamespaceKinds[xml.@kind.toString()];
+			if(kind>0){
+				if(kind==NamespaceKinds.PackageNamespace){
+					markStr="";
+				}else{
+					markStr="["+NamespaceKinds.kindV[kind]+"]";
+				}
 			}else{
-				throw new Error("kindStr="+markStr);
+				throw new Error("不合法的 kindStr："+xml.@kind.toString());
 			}
 			
-			var nameXMLList:XMLList=xml.@name;
-			if(nameXMLList.length()){
-				markStr+=ComplexString.escape(nameXMLList.toString());
+			var nameXML:XML=xml.@name[0];
+			if(nameXML){
+				markStr+=ComplexString.ext.escape(nameXML.toString());
 			}else{
 				markStr+="(name=undefined)";
 			}
 			
-			markStr+="("+int(xml.@copyId.toString())+")";
+			var copyId:int=int(xml.@copyId.toString());
+			if(copyId>1){
+				markStr+="("+copyId+")";
+			}
 			
-			return normalizeMarkStr(markStr);//标准化带 copyId 的 markStr
+			return markStr;
 		}
 		public static function markStr2ns(markStrs:MarkStrs,markStr0:String):ABCNamespace{
 			var ns:ABCNamespace=markStrs.nsMark["~"+markStr0];
@@ -211,7 +229,7 @@ package zero.swf.avm2{
 				}else{
 					ns=new ABCNamespace();
 					
-					var execResult:Array=execEscapeMarkStr(GroupString.escape(markStr));
+					var execResult:Array=/^(?:\[([\s\S]*?)\])?([\s\S]*?)(?:\((name=undefined)\))?(?:\((\d+)\))?$/.exec(GroupString.escape(markStr));
 					
 					if(execResult[1]){
 						ns.kind=NamespaceKinds[execResult[1]];
@@ -227,7 +245,7 @@ package zero.swf.avm2{
 					if(execResult[3]){//"name=undefined"
 						ns.name=null;
 					}else{
-						ns.name=ComplexString.unescape(execResult[2]);
+						ns.name=ComplexString.ext.unescape(execResult[2]);
 					}
 					
 					markStrs.markStrDict[ns]=markStr;
@@ -238,9 +256,10 @@ package zero.swf.avm2{
 			return ns;
 		}
 		public static function normalizeMarkStr(markStr:String):String{
+			
 			//获取最简 markStr
 			
-			var execResult:Array=execEscapeMarkStr(GroupString.escape(markStr));
+			var execResult:Array=/^(?:\[([\s\S]*?)\])?([\s\S]*?)(?:\((name=undefined)\))?(?:\((\d+)\))?$/.exec(GroupString.escape(markStr));
 			
 			if(execResult[1]){
 				var kind:int=NamespaceKinds[execResult[1]];
@@ -269,13 +288,6 @@ package zero.swf.avm2{
 			}
 			
 			return markStr;
-		}
-		private static function execEscapeMarkStr(escapeMarkStr:String):Array{
-			var execResult:Array=/^(?:\[([\s\S]*?)\])?([\s\S]*?)(?:\((name=undefined)\))?(?:\((\d+)\))?$/.exec(escapeMarkStr);
-			if(execResult[0]==escapeMarkStr){
-				return execResult;
-			}
-			throw new Error("不合法的 escapeMarkStr："+escapeMarkStr);
 		}
 		}//end of CONFIG::USE_XML
 	}

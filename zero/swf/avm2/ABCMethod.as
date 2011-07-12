@@ -50,6 +50,7 @@ ABCMethod
 //which this body is to be associated.
 
 package zero.swf.avm2{
+	import zero.ComplexString;
 	import flash.utils.Dictionary;
 	
 	import zero.swf.BytesData;
@@ -58,7 +59,10 @@ package zero.swf.avm2{
 		public var return_type:ABCMultiname;
 		public var param_typeV:Vector.<ABCMultiname>;
 		public var name:String;
-		public var flags:int;
+		public var NeedArguments:Boolean;
+		public var NeedActivation:Boolean;
+		public var NeedRest:Boolean;
+		public var SetDxns:Boolean;
 		public var optionV:Vector.<ABCConstantItem>;
 		public var param_nameV:Vector.<String>;
 		public var max_stack:int;
@@ -116,7 +120,10 @@ package zero.swf.avm2{
 			//HAS_OPTIONAL 		0x08 	Must be set if this method has optional parameters and the options field is present in this method_info structure.
 			//SET_DXNS 			0x40 	Must be set if this method uses the dxns or dxnslate opcodes.
 			//HAS_PARAM_NAMES 	0x80 	Must be set when the param_names field is present in this method_info structure.
-			flags=method_info.flags;
+			NeedArguments=method_info.NeedArguments;
+			NeedActivation=method_info.NeedActivation;
+			NeedRest=method_info.NeedRest;
+			SetDxns=method_info.SetDxns;
 			
 			//This entry may be present only if the HAS_OPTIONAL flag is set in flags.
 			//The option_info entry is used to define the default values for the optional parameters of the method. The
@@ -130,35 +137,45 @@ package zero.swf.avm2{
 			//	u30 option_count
 			//	option_detail option[option_count]
 			//}
-			if(flags&MethodFlags.HAS_OPTIONAL){
-				i=-1;
-				optionV=new Vector.<ABCConstantItem>();
-				for each(var option_detail:Option_detail in method_info.option_detailV){
-					i++;
-					optionV[i]=new ABCConstantItem();
-					optionV[i].initByInfo(
-						option_detail.kind,
-						option_detail.val,
-						integerV,
-						uintegerV,
-						doubleV,
-						stringV,
-						allNsV,
-						_initByDataOptions
-					);
+			if(method_info.option_detailV){
+				if(method_info.option_detailV.length){
+					i=-1;
+					optionV=new Vector.<ABCConstantItem>();
+					for each(var option_detail:Option_detail in method_info.option_detailV){
+						i++;
+						optionV[i]=new ABCConstantItem();
+						optionV[i].initByInfo(
+							option_detail.kind,
+							option_detail.val,
+							integerV,
+							uintegerV,
+							doubleV,
+							stringV,
+							allNsV,
+							_initByDataOptions
+						);
+					}
+				}else{
+					optionV=null;
 				}
+			}else{
+				optionV=null;
 			}
 			
 			//The param_names entry is available only when the HAS_PARAM_NAMES bit is set in the flags. Each param_info
 			//element of the array is an index into the constant pool's string array. The parameter name entry exists solely
 			//for external tool use and is not used by the AVM2.
-			if(flags&MethodFlags.HAS_PARAM_NAMES){
-				i=-1;
-				param_nameV=new Vector.<String>();
-				for each(var param_name:int in method_info.param_nameV){
-					i++;
-					param_nameV[i]=stringV[param_name];//stringV[0]==null
+			if(method_info.param_nameV){
+				if(method_info.param_nameV.length){
+					i=-1;
+					param_nameV=new Vector.<String>();
+					for each(var param_name:int in method_info.param_nameV){
+						i++;
+						param_nameV[i]=stringV[param_name];//stringV[0]==null
+					}
 				}
+			}else{
+				param_nameV=null;
 			}
 			
 			if(method_body_info){
@@ -255,7 +272,7 @@ package zero.swf.avm2{
 			//	u30 option_count
 			//	option_detail option[option_count]
 			//}
-			if(flags&MethodFlags.HAS_OPTIONAL){
+			if(optionV){
 				for each(var option:ABCConstantItem in optionV){
 					option.getInfo_product(productMark);
 				}
@@ -264,7 +281,7 @@ package zero.swf.avm2{
 			//The param_names entry is available only when the HAS_PARAM_NAMES bit is set in the flags. Each param_info
 			//element of the array is an index into the constant pool's string array. The parameter name entry exists solely
 			//for external tool use and is not used by the AVM2.
-			if(flags&MethodFlags.HAS_PARAM_NAMES){
+			if(param_nameV){
 				for each(var param_name:String in param_nameV){
 					productMark.productString(param_name);
 				}
@@ -334,7 +351,10 @@ package zero.swf.avm2{
 			//HAS_OPTIONAL 		0x08 	Must be set if this method has optional parameters and the options field is present in this method_info structure.
 			//SET_DXNS 			0x40 	Must be set if this method uses the dxns or dxnslate opcodes.
 			//HAS_PARAM_NAMES 	0x80 	Must be set when the param_names field is present in this method_info structure.
-			method_info.flags=flags;
+			method_info.NeedArguments=NeedArguments;
+			method_info.NeedActivation=NeedActivation;
+			method_info.NeedRest=NeedRest;
+			method_info.SetDxns=SetDxns;
 			
 			//This entry may be present only if the HAS_OPTIONAL flag is set in flags.
 			//The option_info entry is used to define the default values for the optional parameters of the method. The
@@ -348,28 +368,40 @@ package zero.swf.avm2{
 			//	u30 option_count
 			//	option_detail option[option_count]
 			//}
-			if(flags&MethodFlags.HAS_OPTIONAL){
-				i=-1;
-				method_info.option_detailV=new Vector.<Option_detail>();
-				for each(var option:ABCConstantItem in optionV){
-					i++;
-					method_info.option_detailV[i]=new Option_detail();
-					arr=option.getInfo(productMark,_toDataOptions);
-					method_info.option_detailV[i].val=arr[1];
-					method_info.option_detailV[i].kind=arr[0];
+			if(optionV){
+				if(optionV.length){
+					i=-1;
+					method_info.option_detailV=new Vector.<Option_detail>();
+					for each(var option:ABCConstantItem in optionV){
+						i++;
+						method_info.option_detailV[i]=new Option_detail();
+						arr=option.getInfo(productMark,_toDataOptions);
+						method_info.option_detailV[i].val=arr[1];
+						method_info.option_detailV[i].kind=arr[0];
+					}
+				}else{
+					method_info.option_detailV=null;
 				}
+			}else{
+				method_info.option_detailV=null;
 			}
 			
 			//The param_names entry is available only when the HAS_PARAM_NAMES bit is set in the flags. Each param_info
 			//element of the array is an index into the constant pool's string array. The parameter name entry exists solely
 			//for external tool use and is not used by the AVM2.
-			if(flags&MethodFlags.HAS_PARAM_NAMES){
-				i=-1;
-				method_info.param_nameV=new Vector.<int>();
-				for each(var param_name:String in param_nameV){
-					i++;
-					method_info.param_nameV[i]=productMark.getStringId(param_name);
+			if(param_nameV){
+				if(param_nameV.length){
+					i=-1;
+					method_info.param_nameV=new Vector.<int>();
+					for each(var param_name:String in param_nameV){
+						i++;
+						method_info.param_nameV[i]=productMark.getStringId(param_name);
+					}
+				}else{
+					method_info.param_nameV=null;
 				}
+			}else{
+				method_info.param_nameV=null;
 			}
 			
 			var method_body_info:Method_body_info;
@@ -434,7 +466,7 @@ package zero.swf.avm2{
 				
 				if(name is String){
 					if(name){
-						methodMarkStr+=" "+ComplexString.escape(name);
+						methodMarkStr+=" "+ComplexString.ext.escape(name);
 					}
 				}else{
 					methodMarkStr+="(name=undefined)";
@@ -474,17 +506,13 @@ package zero.swf.avm2{
 			if(name is String){
 				xml.@name=name;
 			}
+			
+			xml.@NeedArguments=NeedArguments;
+			xml.@NeedActivation=NeedActivation;
+			xml.@NeedRest=NeedRest;
+			xml.@v=SetDxns;
 					
-			xml.@flags=(
-				"|"+MethodFlags.flagV[flags&MethodFlags.NEED_ARGUMENTS]+
-				"|"+MethodFlags.flagV[flags&MethodFlags.NEED_ACTIVATION]+
-				"|"+MethodFlags.flagV[flags&MethodFlags.NEED_REST]+
-				"|"+MethodFlags.flagV[flags&MethodFlags.HAS_OPTIONAL]+
-				"|"+MethodFlags.flagV[flags&MethodFlags.SET_DXNS]+
-				"|"+MethodFlags.flagV[flags&MethodFlags.HAS_PARAM_NAMES]
-			).replace(/\|null/g,"").substr(1);
-					
-			if(flags&MethodFlags.HAS_OPTIONAL){
+			if(optionV){
 				if(optionV.length){
 					var optionListXML:XML=<optionList count={optionV.length}/>
 					for each(var option:ABCConstantItem in optionV){
@@ -494,7 +522,7 @@ package zero.swf.avm2{
 				}
 			}
 			
-			if(flags&MethodFlags.HAS_PARAM_NAMES){
+			if(param_nameV){
 				if(param_nameV.length){
 					var param_nameListXML:XML=<param_nameList count={param_nameV.length}/>
 					for each(var param_name:String in param_nameV){
@@ -558,25 +586,29 @@ package zero.swf.avm2{
 				name=null;
 			}
 			
-			flags=0;
-			for each(var flagsStr:String in xml.@flags.toString().split("|")){
-				flags|=MethodFlags[flagsStr];
-			}
+			NeedArguments=(xml.@NeedArguments.toString()=="true");
+			NeedActivation=(xml.@NeedActivation.toString()=="true");
+			NeedActivation=(xml.@NeedActivation.toString()=="true");
+			NeedRest=(xml.@NeedRest.toString()=="true");
 			
-			if(flags&MethodFlags.HAS_OPTIONAL){
+			var optionXMLList:XMLList=xml.optionList.option;
+			if(optionXMLList.length()){
 				i=-1;
 				optionV=new Vector.<ABCConstantItem>();
-				for each(var optionXML:XML in xml.optionList.option){
+				for each(var optionXML:XML in optionXMLList){
 					i++;
 					optionV[i]=new ABCConstantItem();
 					optionV[i].initByXMLAndMark(markStrs,optionXML,_initByXMLOptions);
 				}
+			}else{
+				optionV=null;
 			}
 			
-			if(flags&MethodFlags.HAS_PARAM_NAMES){
+			var param_nameXMLList:XMLList=xml.param_nameList.param_name;
+			if(param_nameXMLList.length()){
 				i=-1;
 				param_nameV=new Vector.<String>();
-				for each(var param_nameXML:XML in xml.param_nameList.param_name){
+				for each(var param_nameXML:XML in param_nameXMLList){
 					i++;
 					if(param_nameXML.toXMLString()=="<param_name/>"){
 						param_nameV[i]=null;
@@ -584,6 +616,8 @@ package zero.swf.avm2{
 						param_nameV[i]=param_nameXML.@value.toString();
 					}
 				}
+			}else{
+				param_nameV=null;
 			}
 			
 			var codesXML:XML=xml.codes[0];
