@@ -73,6 +73,16 @@ package akdcl.application.player{
 		override public function get content():* {
 			return video?video.content:null;
 		}
+		
+		override public function set container(value:*):void {
+			super.container = value;
+			if (container && content) {
+				container.addChild(content);
+				content.fitWidth = contentWidth;
+				content.fitHeight = contentHeight;
+			}
+		}
+		
 		protected var video:VideoLoader;
 		protected var videoParams:Object;
 		override public function remove():void {
