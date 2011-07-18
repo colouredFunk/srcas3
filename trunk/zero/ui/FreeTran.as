@@ -489,6 +489,11 @@ package zero.ui{
 			typeDict[target]=type;
 		}
 		private function mouseMove(event:MouseEvent):void{
+			if(__pic){
+			}else{
+				return;
+			}
+			
 			if(currTarget){
 				switch(typeDict[currTarget]){
 					case TYPE_ROTATE:

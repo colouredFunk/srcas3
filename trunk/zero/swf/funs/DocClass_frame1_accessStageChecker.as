@@ -7,16 +7,19 @@ MainTimeline_frame1_accessStageChecker
 */
 
 package zero.swf.funs{
+	import flash.utils.getTimer;
 	
 	import zero.swf.*;
-	import zero.swf.codes.*;
 	import zero.swf.avm2.*;
+	import zero.swf.codes.*;
 	import zero.swf.tagBodys.*;
 	
 	public class DocClass_frame1_accessStageChecker{
 		//TypeError: Error #1009: 无法访问空对象引用的属性或方法。
 		//at Tetrabreak_fla::MainTimeline/frame1()
 		public static function check(swf:SWF):Boolean{
+			var t:int=getTimer();
+			
 			var tag:Tag;
 			
 			var docClassName:String=null;
@@ -71,6 +74,7 @@ package zero.swf.funs{
 												var multiname:ABCMultiname=code.value;
 												if(multiname&&multiname.name=="stage"){
 													trace("xxx::XXX/frame1() 访问 stage 的");
+													trace("检查是否 frame1() 访问 stage 耗时："+(getTimer()-t)+" 毫秒");
 													return true;
 												}
 											}
@@ -83,6 +87,7 @@ package zero.swf.funs{
 				}
 			}
 			
+			trace("检查是否 frame1() 访问 stage 耗时："+(getTimer()-t)+" 毫秒");
 			return false;
 		}
 	}

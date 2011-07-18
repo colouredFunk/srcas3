@@ -7,6 +7,7 @@ Level0Checker
 */
 
 package zero.swf.funs{
+	import flash.utils.getTimer;
 	
 	import zero.swf.*;
 	import zero.swf.codes.*;
@@ -16,7 +17,10 @@ package zero.swf.funs{
 	
 	public class Level0Checker{
 		public static function check(swf:SWF):Boolean{
-			return checkTagV(swf.tagV);
+			var t:int=getTimer();
+			var checkResult:Boolean=checkTagV(swf.tagV);
+			trace("检查是否带 _level0 耗时："+(getTimer()-t)+" 毫秒");
+			return checkResult;
 		}
 		private static function checkTagV(tagV:Vector.<Tag>):Boolean{
 			for each(var tag:Tag in tagV){

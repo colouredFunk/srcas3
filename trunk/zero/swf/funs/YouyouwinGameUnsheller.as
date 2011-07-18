@@ -21,7 +21,9 @@ package zero.swf.funs{
 			var swf:SWF=new SWF();
 			swf.initBySWFData(swfData,null);
 			
-			if(checkHasSymbolClassName_SWFShellAdderOnline(swf)){
+			var youyouwinShellClassName:String=getYouyouwinShellClassName(swf);
+			trace("youyouwinShellClassName="+youyouwinShellClassName);
+			if(youyouwinShellClassName){
 				var lastDefineBinaryDataData:ByteArray=getLastDefineBinaryDataData(swf);
 				if(lastDefineBinaryDataData){
 					return _unshell(lastDefineBinaryDataData);
@@ -31,6 +33,7 @@ package zero.swf.funs{
 			return swfData;
 		}
 		private static function _unshell(swfData:ByteArray):ByteArray{
+			trace("_unshell swf.length="+swfData.length);
 			var i:int;
 			
 			var swf:SWF=new SWF();
@@ -75,7 +78,15 @@ package zero.swf.funs{
 									var code:Code=trait.method.codes.codeArr[2] as Code;
 									if(code&&code.op==AVM2Ops.getlex){
 										var multiname:ABCMultiname=code.value;
-										if(multiname&&multiname.name=="SWFShellAdderOnline"){
+										if(
+											multiname
+											&&
+											(
+												multiname.name=="SWFShellAdderOnline"
+												||
+												multiname.name.indexOf("@youyouwin")==0
+											)
+										){
 											clazz.itraitV.splice(i,1);
 											trace("清除强制添加的 stage");
 											break;
@@ -89,19 +100,6 @@ package zero.swf.funs{
 			}
 			
 			return swf.toSWFData(null);
-		}
-		private static function checkHasSymbolClassName_SWFShellAdderOnline(swf:SWF):Boolean{
-			for each(var tag:Tag in swf.tagV){
-				if(tag.type==TagTypes.SymbolClass){
-					var symbolClass:SymbolClass=tag.getBody(SymbolClass,null);
-					for each(var className:String in symbolClass.NameV){
-						if(className=="SWFShellAdderOnline"){
-							return true;
-						}
-					}
-				}
-			}
-			return false;
 		}
 		private static function getLastDefineBinaryDataData(swf:SWF):ByteArray{
 			var i:int=swf.tagV.length;
