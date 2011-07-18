@@ -7,6 +7,7 @@ RuntimeFlash_loadInitialStateRepairer
 */
 
 package zero.swf.funs{
+	import flash.utils.getTimer;
 	
 	import zero.swf.*;
 	import zero.swf.codes.*;
@@ -14,26 +15,27 @@ package zero.swf.funs{
 	import zero.swf.tagBodys.*;
 	
 	public class RuntimeFlash_loadInitialStateRepairer{
+		//TypeError: Error #1009: 无法访问空对象引用的属性或方法。
+		//	at RuntimeFlash/loadInitialState()
+		//	at RuntimeFlash/___RuntimeFlash_Application1_applicationComplete()
+		//	at flash.events::EventDispatcher/dispatchEventFunction()
+		//	at flash.events::EventDispatcher/dispatchEvent()
+		//	at mx.core::UIComponent/dispatchEvent()
+		//	at mx.managers::SystemManager/preloader_preloaderDoneHandler()
+		//	at flash.events::EventDispatcher/dispatchEventFunction()
+		//	at flash.events::EventDispatcher/dispatchEvent()
+		//	at mx.preloaders::Preloader/displayClassCompleteHandler()
+		//	at flash.events::EventDispatcher/dispatchEventFunction()
+		//	at flash.events::EventDispatcher/dispatchEvent()
+		//	at mx.preloaders::DownloadProgressBar/timerHandler()
+		//	at mx.preloaders::DownloadProgressBar/initCompleteHandler()
+		//	at flash.events::EventDispatcher/dispatchEventFunction()
+		//	at flash.events::EventDispatcher/dispatchEvent()
+		//	at mx.preloaders::Preloader/dispatchAppEndEvent()
+		//	at mx.preloaders::Preloader/appCreationCompleteHandler()
+		//	at flash.events::EventDispatcher/dispatchEventFunction()
 		public static function repair(swf:SWF):Boolean{
-			//TypeError: Error #1009: 无法访问空对象引用的属性或方法。
-			//	at RuntimeFlash/loadInitialState()
-			//	at RuntimeFlash/___RuntimeFlash_Application1_applicationComplete()
-			//	at flash.events::EventDispatcher/dispatchEventFunction()
-			//	at flash.events::EventDispatcher/dispatchEvent()
-			//	at mx.core::UIComponent/dispatchEvent()
-			//	at mx.managers::SystemManager/preloader_preloaderDoneHandler()
-			//	at flash.events::EventDispatcher/dispatchEventFunction()
-			//	at flash.events::EventDispatcher/dispatchEvent()
-			//	at mx.preloaders::Preloader/displayClassCompleteHandler()
-			//	at flash.events::EventDispatcher/dispatchEventFunction()
-			//	at flash.events::EventDispatcher/dispatchEvent()
-			//	at mx.preloaders::DownloadProgressBar/timerHandler()
-			//	at mx.preloaders::DownloadProgressBar/initCompleteHandler()
-			//	at flash.events::EventDispatcher/dispatchEventFunction()
-			//	at flash.events::EventDispatcher/dispatchEvent()
-			//	at mx.preloaders::Preloader/dispatchAppEndEvent()
-			//	at mx.preloaders::Preloader/appCreationCompleteHandler()
-			//	at flash.events::EventDispatcher/dispatchEventFunction()
+			var t:int=getTimer();
 			
 			var ABCData:ABCClasses;
 			for each(var tag:Tag in swf.tagV){
@@ -81,8 +83,9 @@ package zero.swf.funs{
 												&&
 												code2.value.name=="loaderInfo"
 											){
-												trace("修复 RuntimeFlash loadInitialState");
 												code2.value=new PackageNamespaceQNames().gen("contentLoaderInfo");
+												trace("修复 RuntimeFlash loadInitialState");
+												trace("修复 RuntimeFlash loadInitialState 耗时："+(getTimer()-t)+" 毫秒");
 												return true;
 											}
 										}
@@ -94,6 +97,7 @@ package zero.swf.funs{
 				}
 			}
 			
+			trace("修复 RuntimeFlash loadInitialState 耗时："+(getTimer()-t)+" 毫秒");
 			return false;
 		}
 	}

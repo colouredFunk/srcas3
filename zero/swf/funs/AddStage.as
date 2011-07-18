@@ -7,7 +7,7 @@ AddStage
 */
 
 package zero.swf.funs{
-	
+	import zero.*;
 	import zero.swf.*;
 	import zero.swf.avm2.*;
 	import zero.swf.tagBodys.*;
@@ -81,7 +81,7 @@ package zero.swf.funs{
 		private static function _addStageToTraits(
 			packageNamespaceQNames:PackageNamespaceQNames,
 			traitV:Vector.<ABCTrait>,
-			shellName:String,
+			ShellName:String,
 			siageName:String
 		):void{
 			var trait:ABCTrait;
@@ -107,11 +107,13 @@ package zero.swf.funs{
 				<codes><![CDATA[
 					getlocal0
 					pushscope
-					getlex
-					getproperty
+					getlex ${Shell}
+					getproperty ${siage}
 					coerce flash.display.Stage
 					returnvalue
-				]]></codes>.toString(),
+				]]></codes>.toString()
+				.replace(/\$\{Shell\}/g,ComplexString.normal.escape(ShellName))
+				.replace(/\$\{siage\}/g,ComplexString.normal.escape(siageName)),
 				packageNamespaceQNames
 			);
 			
