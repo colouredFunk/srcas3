@@ -10,18 +10,14 @@ package zero.swf.funs{
 	import zero.swf.*;
 	import zero.swf.tagBodys.*;
 	public function getYouyouwinShellClassName(swf:SWF):String{
-		for each(var tag:Tag in swf.tagV){
-			if(tag.type==TagTypes.SymbolClass){
-				var symbolClass:SymbolClass=tag.getBody(SymbolClass,null);
-				for each(var className:String in symbolClass.NameV){
-					if(
-						className=="SWFShellAdderOnline"
-						||
-						className.indexOf("@youyouwin")==0
-					){
-						return className;
-					}
-				}
+		var docClassName:String=getDocClassName(swf);
+		if(docClassName){
+			if(
+				docClassName=="SWFShellAdderOnline"
+				||
+				docClassName.indexOf("@youyouwin")==0
+			){
+				return docClassName;
 			}
 		}
 		return null;

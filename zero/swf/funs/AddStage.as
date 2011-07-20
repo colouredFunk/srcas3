@@ -10,10 +10,11 @@ package zero.swf.funs{
 	import zero.*;
 	import zero.swf.*;
 	import zero.swf.avm2.*;
+	import zero.swf.codes.Code;
 	import zero.swf.tagBodys.*;
 	
 	public class AddStage{
-		public static function add(swf:SWF,shellName:String,siageName:String):void{
+		public static function add(swf:SWF,ShellQName:ABCMultiname,siageQName:ABCMultiname,StageQName:ABCMultiname,stageQName:ABCMultiname):void{
 			var putInSceneTagAndClassNameArr:Array=PutInSceneTagAndClassNames.getPutInSceneTagAndClassNameArr(swf);
 			var i:int=putInSceneTagAndClassNameArr.length;
 			var classNameMark:Object=new Object();
@@ -24,24 +25,14 @@ package zero.swf.funs{
 				}
 			}
 			
-			var packageNamespaceQNames:PackageNamespaceQNames=new PackageNamespaceQNames();
-			
 			var ABCData:ABCClasses;
 			for each(var tag:Tag in swf.tagV){
 				switch(tag.type){
 					case TagTypes.DoABC:
-						ABCData=tag.getBody(
-							DoABC,{
-								ABCDataClass:ABCClasses
-							}
-						).ABCData;
+						ABCData=tag.getBody(DoABC,{ABCDataClass:ABCClasses}).ABCData;
 					break;
 					case TagTypes.DoABCWithoutFlagsAndName:
-						ABCData=tag.getBody(
-							DoABCWithoutFlagsAndName,{
-								ABCDataClass:ABCClasses
-							}
-						).ABCData;
+						ABCData=tag.getBody(DoABCWithoutFlagsAndName,{ABCDataClass:ABCClasses}).ABCData;
 					break;
 					default:
 						ABCData=null;
@@ -65,67 +56,53 @@ package zero.swf.funs{
 									clazz.super_name.name=="MovieClip"
 								)
 							){
-								//trace(clazz.getClassName());
-								_addStageToTraits(
-									packageNamespaceQNames,
-									clazz.itraitV,
-									shellName,
-									siageName
-								);
+								var trait:ABCTrait;
+								
+								var hasStage:Boolean=false;
+								for each(trait in clazz.itraitV){
+									if(trait.name.name=="stage"){
+										hasStage=true;
+									}
+								}
+								
+								if(hasStage){
+								}else{
+									var method:ABCMethod=new ABCMethod();
+									method.return_type=StageQName;
+									//method.name="";
+									//method.NeedArguments=false;
+									//method.NeedActivation=false;
+									//method.NeedRest=false;
+									//method.SetDxns=false;
+									method.max_stack=2;
+									method.local_count=1;
+									method.init_scope_depth=0;//9
+									method.max_scope_depth=1;//10
+									method.codes=new AVM2Codes();
+									method.codes.codeArr=[
+										AVM2Ops.getlocal0,
+										AVM2Ops.pushscope,
+										new Code(AVM2Ops.getlex,ShellQName),
+										new Code(AVM2Ops.getproperty,siageQName),
+										new Code(AVM2Ops.coerce,StageQName),
+										AVM2Ops.returnvalue
+									];
+									
+									trait=new ABCTrait();
+									trait.name=stageQName;
+									//trait.ATTR_Final=false;
+									trait.ATTR_Override=true;
+									trait.kind_trait_type=TraitTypeAndAttributes.Getter;
+									trait.disp_id=0;
+									trait.method=method;
+									
+									clazz.itraitV.push(trait);
+								}
 							}
 						}
 					}
 				}
 			}
-		}
-		private static function _addStageToTraits(
-			packageNamespaceQNames:PackageNamespaceQNames,
-			traitV:Vector.<ABCTrait>,
-			ShellName:String,
-			siageName:String
-		):void{
-			var trait:ABCTrait;
-			for each(trait in traitV){
-				if(trait.name.name=="stage"){
-					return;
-				}
-			}
-			
-			var method:ABCMethod=new ABCMethod();
-			method.return_type=packageNamespaceQNames.gen("flash.display.Stage");
-			//method.name="";
-			//method.NeedArguments=false;
-			//method.NeedActivation=false;
-			//method.NeedRest=false;
-			//method.SetDxns=false;
-			method.max_stack=2;
-			method.local_count=1;
-			method.init_scope_depth=0;//9
-			method.max_scope_depth=1;//10
-			method.codes=new AVM2Codes();
-			method.codes.codeArr=SimpleCompilation.com(
-				<codes><![CDATA[
-					getlocal0
-					pushscope
-					getlex ${Shell}
-					getproperty ${siage}
-					coerce flash.display.Stage
-					returnvalue
-				]]></codes>.toString()
-				.replace(/\$\{Shell\}/g,ComplexString.normal.escape(ShellName))
-				.replace(/\$\{siage\}/g,ComplexString.normal.escape(siageName)),
-				packageNamespaceQNames
-			);
-			
-			trait=new ABCTrait();
-			trait.name=packageNamespaceQNames.gen("stage");
-			//trait.ATTR_Final=false;
-			trait.ATTR_Override=true;
-			trait.kind_trait_type=TraitTypeAndAttributes.Getter;
-			trait.disp_id=0;
-			trait.method=method;
-			
-			traitV.push(trait);
 		}
 	}
 }

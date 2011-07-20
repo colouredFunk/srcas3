@@ -290,5 +290,9 @@ package zero.swf.avm2{
 			return markStr;
 		}
 		}//end of CONFIG::USE_XML
+		
+		public function toString():String{
+			return "["+NamespaceKinds.kindV[kind]+"]"+name;
+		}
 	}
 }

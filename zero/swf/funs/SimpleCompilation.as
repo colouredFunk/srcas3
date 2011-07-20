@@ -11,7 +11,7 @@ package zero.swf.funs{
 	import zero.swf.avm2.*;
 	import zero.swf.codes.*;
 	public class SimpleCompilation{
-		public static function com(codesStr:String,packageNamespaceQNames:PackageNamespaceQNames):Array{
+		public static function com(codesStr:String,simpleMultinames:SimpleMultinames):Array{
 			//CONFIG::USE_XML=false 的情况下由 SimpleCompilation 提供部分功能
 			
 			var codeStrArr:Array=codesStr.replace(/^\s*|\s*$/g,"").split(/\s*\n\s*/);
@@ -200,7 +200,7 @@ package zero.swf.funs{
 							case AVM2Ops.coerce://0x80	//u8_u30__multiname_info
 							case AVM2Ops.astype://0x86	//u8_u30__multiname_info
 							case AVM2Ops.istype://0xb2	//u8_u30__multiname_info
-								codeArr[codeId]=new Code(op,packageNamespaceQNames.gen(ComplexString.normal.unescape(execResult[2])));
+								codeArr[codeId]=new Code(op,simpleMultinames.gen(ComplexString.normal.unescape(execResult[2])));
 							break;
 							case AVM2Ops.newfunction://0x40	//u8_u30__method
 								throw new Error("SimpleCompilation 不支持 "+AVM2Ops.opNameV[op]);
@@ -231,7 +231,7 @@ package zero.swf.funs{
 								execResult=/^([\s\S]*)\s+(\w+)$/.exec(execResult[2]);
 								codeArr[codeId]=new Code(op,{
 									args:int(execResult[2]),
-									multiname:packageNamespaceQNames.gen(ComplexString.normal.unescape(execResult[1]))
+									multiname:simpleMultinames.gen(ComplexString.normal.unescape(execResult[1]))
 								});
 							break;
 							case AVM2Ops.callmethod://0x43	//u8_u30_u30__method_args

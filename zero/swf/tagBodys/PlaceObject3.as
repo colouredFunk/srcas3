@@ -7,13 +7,13 @@ PlaceObject3
 */
 //The PlaceObject3 tag extends the functionality of the PlaceObject3 tag. PlaceObject3 adds
 //the following new features:
-//■ The PlaceFlagHasClassName field indicates that a class name will be specified, indicating
+//. The PlaceFlagHasClassName field indicates that a class name will be specified, indicating
 //the type of object to place. Because we no longer use ImportAssets2 in ActionScript 3.0,
 //there needed to be some way to place a Timeline object using a class imported from
 //another SWF, which does not have a 16-bit character ID in the instantiating SWF.
 //Supported in Flash Player 9.0.45.0 and later.
 
-//■ The PlaceFlagHasImage field indicates the creation of native Bitmap objects on the display list.
+//. The PlaceFlagHasImage field indicates the creation of native Bitmap objects on the display list.
 //PlaceFlagHasImage 字段表示在显示列表上放置(创建)(native 本机)位图对象.
 
 //When PlaceFlagHasClassName and PlaceFlagHasImage are both defined, this indicates a Bitmap class to be loaded from another SWF.
@@ -38,12 +38,12 @@ PlaceObject3
 //If there is no class associated with the BitmapData, DefineShape should be used with a Bitmap fill.
 //Supported in Flash Player 9.0.45.0 and later.
 
-//■ The PlaceFlagHasCacheAsBitmap field specifies whether Flash Player should internally
+//. The PlaceFlagHasCacheAsBitmap field specifies whether Flash Player should internally
 //cache a display object as a bitmap. Caching can speed up rendering when the object does
 //not change frequently.
-//■ A number of different blend modes can be specified as an alternative to normal alpha
+//. A number of different blend modes can be specified as an alternative to normal alpha
 //compositing. The following blend modes are supported:
-//■ A number of bitmap filters can be applied to the display object. Adding filters implies that
+//. A number of bitmap filters can be applied to the display object. Adding filters implies that
 //the display object will be cached as a bitmap. The following bitmap filters are supported:
 //Add Layer
 //Alpha Lighten

@@ -20,27 +20,11 @@ package zero.swf.funs{
 		public static function check(swf:SWF):Boolean{
 			var t:int=getTimer();
 			
-			var tag:Tag;
+			var docClassName:String=getDocClassName(swf);
 			
-			var docClassName:String=null;
-			
-			loop:for each(tag in swf.tagV){
-				if(tag.type==TagTypes.SymbolClass){
-					var symbolClass:SymbolClass=tag.getBody(SymbolClass,null);
-					var i:int=-1;
-					for each(var className:String in symbolClass.NameV){
-						i++;
-						if(symbolClass.TagV[i]==0){
-							docClassName=className.replace(/\:\:/g,".");
-							break loop;
-						}
-					}
-				}
-			}
-			
-			var ABCData:ABCClasses;
 			if(docClassName){
-				for each(tag in swf.tagV){
+				var ABCData:ABCClasses;
+				for each(var tag:Tag in swf.tagV){
 					switch(tag.type){
 						case TagTypes.DoABC:
 							ABCData=tag.getBody(DoABC,{ABCDataClass:ABCClasses}).ABCData;
@@ -55,7 +39,7 @@ package zero.swf.funs{
 					if(ABCData){
 						for each(var clazz:ABCClass in ABCData.classV){
 							if(clazz.getClassName()==docClassName){
-								i=clazz.itraitV.length;
+								var i:int=clazz.itraitV.length;
 								while(--i>=0){
 									var trait:ABCTrait=clazz.itraitV[i];
 									if(

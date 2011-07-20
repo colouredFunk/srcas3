@@ -83,7 +83,7 @@ package zero.swf.funs{
 												&&
 												code2.value.name=="loaderInfo"
 											){
-												code2.value=new PackageNamespaceQNames().gen("contentLoaderInfo");
+												code2.value=new SimpleMultinames().gen("contentLoaderInfo");
 												trace("修复 RuntimeFlash loadInitialState");
 												trace("修复 RuntimeFlash loadInitialState 耗时："+(getTimer()-t)+" 毫秒");
 												return true;

@@ -21,7 +21,7 @@ package zero.swf.funs{
 		private static const TYPE_LoopAction:int=2;
 		private static const TYPE_EmptySoundStreamBlock:int=3;
 		
-		public static function addJunkTags(swf:SWF,total:int=10):void{
+		public static function add(swf:SWF,total:int=10):void{
 			//挂 ASV:
 			//total个插入到 JunkSprite 中的 loopPlaceObject2
 			//total个插入到正常 DefineSprite 中的 loopPlaceObject2

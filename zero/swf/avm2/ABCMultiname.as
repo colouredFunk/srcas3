@@ -1104,5 +1104,9 @@ package zero.swf.avm2{
 			return markStr;
 		}
 		}//end of CONFIG::USE_XML
+		
+		public function toString():String{
+			return "["+MultinameKinds.kindV[kind]+"]"+(ns?ns.toString()+".":"")+name;
+		}
 	}
 }

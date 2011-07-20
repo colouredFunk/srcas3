@@ -18,7 +18,6 @@ package zero.swf.funs{
 		strtArr:Array//,
 		//symbolClassNameIdArr:Array=null
 	):ByteArray{
-		trace("未考虑非默认包下的类名的情况");
 		//把 DoABC 或 DoABCWithoutFlagsAndName 的 ABCData 里的 stringV 里的特定的字符串替换成特定的字符串
 		
 		var swf:SWF=new SWF();
@@ -64,9 +63,25 @@ package zero.swf.funs{
 					var NameV:Vector.<String>=tag.getBody(SymbolClass,null).NameV;
 					i=NameV.length;
 					while(--i>=0){
-						strt=mark["~"+NameV[i]];
-						if(strt is String){
-							NameV[i]=strt;
+						var Name:String=NameV[i].replace(/\:\:/g,".");
+						var dotId:int=Name.lastIndexOf(".");
+						if(dotId>-1){
+							var nsName:String=Name.substr(0,dotId);
+							var name:String=Name.substr(dotId+1);
+							strt=mark["~"+nsName];
+							if(strt is String){
+								nsName=strt;
+							}
+							strt=mark["~"+name];
+							if(strt is String){
+								name=strt;
+							}
+							NameV[i]=nsName+"."+name;
+						}else{
+							strt=mark["~"+NameV[i]];
+							if(strt is String){
+								NameV[i]=strt;
+							}
 						}
 					}
 				break;
