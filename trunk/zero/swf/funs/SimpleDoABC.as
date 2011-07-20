@@ -54,6 +54,9 @@ package zero.swf.funs{
 			return classData;
 		}
 		public static function getDoABCTag(className:String,classDataOrTypeOrStr16:*):Tag{
+			if(className.search(/\:\:|\./)>-1){
+				throw new Error("暂不支持的 className："+className);
+			}
 			var classData:ByteArray;
 			if(classDataOrTypeOrStr16 is ByteArray){
 				classData=classDataOrTypeOrStr16;

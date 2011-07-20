@@ -14,7 +14,7 @@ package zero.swf.funs{
 	import zero.swf.tagBodys.*;
 	
 	public class JunkDoABCAdder{
-		public static function addJunkDoABC(tagV:Vector.<Tag>):Boolean{
+		public static function add(swf:SWF):Boolean{
 			//添加坏掉但不会被播放器运行到的 DoABC tag
 			//如果是文档类可直接挂 ASV
 			//如果是非文档类在点击查看代码时挂 ASV 和闪客精灵
@@ -29,7 +29,7 @@ package zero.swf.funs{
 			var DocClassName:String=null;
 			var classNameV:Vector.<String>=new Vector.<String>();
 			
-			for each(tag in tagV){
+			for each(tag in swf.tagV){
 				switch(tag.type){
 					case TagTypes.DoABC:
 					case TagTypes.DoABCWithoutFlagsAndName:
@@ -42,7 +42,7 @@ package zero.swf.funs{
 						var symbolClass:SymbolClass=tag.getBody(SymbolClass,null);
 						i=0;
 						for each(var Name:String in symbolClass.NameV){
-							if(Name.indexOf(".")==-1){trace("未考虑 '::'");
+							if(Name.search(/\:\:|\./)==-1){
 								if(symbolClass.TagV[i]==0){
 									DocClassName=Name;
 								}else{
@@ -76,13 +76,13 @@ package zero.swf.funs{
 				}
 				
 				if(frontNameV.length&&backNameV.length){
-					trace("frontNameV="+frontNameV);
-					trace("backNameV="+backNameV);
+					//trace("frontNameV="+frontNameV);
+					//trace("backNameV="+backNameV);
 					
-					var avalibleDefineObjIdV:Vector.<int>=getAvalibleDefineObjIdV(tagV);
+					var avalibleDefineObjIdV:Vector.<int>=getAvalibleDefineObjIdV(swf.tagV);
 					
-					var firstDoABCTagPos:int=tagV.indexOf(firstDoABCTag);
-					tagV.splice(firstDoABCTagPos,1);
+					var firstDoABCTagPos:int=swf.tagV.indexOf(firstDoABCTag);
+					swf.tagV.splice(firstDoABCTagPos,1);
 					
 					var className:String;
 					
@@ -90,14 +90,14 @@ package zero.swf.funs{
 					
 					for each(className in frontNameV){
 						//放前面
-						tagV.splice(i++,0,getJunkDoABCSpriteTag(avalibleDefineObjIdV.shift(),className));
+						swf.tagV.splice(i++,0,getJunkDoABCSpriteTag(avalibleDefineObjIdV.shift(),className));
 					}
 					
-					tagV.splice(i++,0,firstDoABCTag);
+					swf.tagV.splice(i++,0,firstDoABCTag);
 					
 					for each(className in backNameV){
 						//放后面
-						tagV.splice(i++,0,getJunkDoABCSpriteTag(avalibleDefineObjIdV.shift(),className));
+						swf.tagV.splice(i++,0,getJunkDoABCSpriteTag(avalibleDefineObjIdV.shift(),className));
 					}
 					
 					return true;

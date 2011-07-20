@@ -1078,6 +1078,11 @@ package zero.swf.avm1{
 				//trace("code="+code);
 				if(code is LabelMark){
 					code.pos=offset;
+				}else if(code is Array){
+					//Outputer.output("使用 Array 进行记录的未知代码："+code,"brown");
+					for each(var num:int in code){
+						data[offset++]=num;
+					}
 				}else if(code is ByteArray){
 					Outputer.output("使用 ByteArray 进行记录的未知代码："+BytesAndStr16.bytes2str16(code,0,code.length),"brown");
 					data.position=offset;
@@ -1961,6 +1966,13 @@ package zero.swf.avm1{
 					}
 					if(code is LabelMark){
 						codesStr+="\t\t\t\tlabel"+code.labelId+":\n";
+					}else if(code is Array){
+						Outputer.output("使用 Array 进行记录的未知代码："+code,"brown");
+						var numStr:String="";
+						for each(var num:int in code){
+							numStr+=" "+BytesAndStr16._16V[num&0xff];
+						}
+						codesStr+="\t\t\t\t\t"+numStr.substr(1)+"\n";
 					}else if(code is ByteArray){
 						Outputer.output("使用 ByteArray 进行记录的未知代码："+BytesAndStr16.bytes2str16(code,0,code.length),"brown");
 						codesStr+="\t\t\t\t\t"+BytesAndStr16.bytes2str16(code,0,code.length)+"\n";

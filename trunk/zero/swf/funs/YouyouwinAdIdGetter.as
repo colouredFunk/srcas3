@@ -47,7 +47,7 @@ package zero.swf.funs{
 				}
 				if(ABCData){
 					for each(var clazz:ABCClass in ABCData.classV){
-						if(clazz.name.name=="FWAd"){
+						if(clazz.getClassName()=="FWAd"){
 							for each(var trait:ABCTrait in clazz.itraitV){
 								if(
 									trait.name.name=="init"

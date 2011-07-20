@@ -20,6 +20,10 @@ package zero{
 		public static function getIdV(total:int,L:int):Vector.<int>{
 			var i:int;
 			
+			if(total>L){
+				total=L;
+			}
+			
 			i=L;
 			var idArr:Array=new Array();
 			while(--i>=0){
@@ -34,11 +38,7 @@ package zero{
 				idArr[ran]=temp;
 			}
 			
-			if(total>L){
-				i=L;
-			}else{
-				i=total;
-			}
+			i=total;
 			var idV:Vector.<int>=new Vector.<int>();
 			while(--i>=0){
 				idV.push(idArr[i]);
@@ -50,6 +50,10 @@ package zero{
 		public static function getIdMarkV(total:int,L:int):Vector.<Boolean>{
 			var i:int;
 			
+			if(total>L){
+				total=L;
+			}
+			
 			i=L;
 			var idArr:Array=new Array();
 			while(--i>=0){
@@ -64,12 +68,8 @@ package zero{
 				idArr[ran]=temp;
 			}
 			
-			if(total>L){
-				i=L;
-			}else{
-				i=total;
-			}
-			var idMarkV:Vector.<Boolean>=new Vector.<Boolean>(i);
+			i=total;
+			var idMarkV:Vector.<Boolean>=new Vector.<Boolean>(L);
 			while(--i>=0){
 				idMarkV[idArr[i]]=true;
 			}
