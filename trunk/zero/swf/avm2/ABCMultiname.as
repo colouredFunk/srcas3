@@ -1105,8 +1105,8 @@ package zero.swf.avm2{
 		}
 		}//end of CONFIG::USE_XML
 		
-		public function toString():String{
-			return "["+MultinameKinds.kindV[kind]+"]"+(ns?ns.toString()+".":"")+name;
-		}
+		//public function toString():String{
+		//	return "["+MultinameKinds.kindV[kind]+"]"+(ns?ns.toString()+".":"")+name;
+		//}
 	}
 }

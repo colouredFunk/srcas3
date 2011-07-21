@@ -187,25 +187,62 @@ package zero.swf.avm2{
 				idDict["~"+string]=++id;
 			}
 			
+			
 			nsV.sort(sortNs);
+			/*
 			id=0;
 			for each(var ns:ABCNamespace in nsV){
 				//trace("countDict[ns]="+countDict[ns]);
 				idDict[ns]=++id;
 			}
+			*/
+			var nssArr:Array=getNssArr();
+			nsV=new Vector.<ABCNamespace>();
+			id=0;
+			for each(var nss:Array in nssArr){
+				id++;
+				for each(var ns:ABCNamespace in nss){
+					idDict[ns]=id;
+				}
+				nsV.push(ns);
+			}
 			
 			ns_setV.sort(sortNs_set);
+			/*
 			id=0;
 			for each(var ns_set:ABCNs_set in ns_setV){
 				//trace("countDict[ns_set]="+countDict[ns_set]);
 				idDict[ns_set]=++id;
 			}
+			*/
+			var ns_setsArr:Array=getNs_setsArr();
+			ns_setV=new Vector.<ABCNs_set>();
+			id=0;
+			for each(var ns_sets:Array in ns_setsArr){
+				id++;
+				for each(var ns_set:ABCNs_set in ns_sets){
+					idDict[ns_set]=id;
+				}
+				ns_setV.push(ns_set);
+			}
 			
 			multinameV.sort(sortMultiname);
+			/*
 			id=0;
 			for each(var multiname:ABCMultiname in multinameV){
 				//trace("countDict[multiname]="+countDict[multiname]);
 				idDict[multiname]=++id;
+			}
+			*/
+			var multinamesArr:Array=getMultinamesArr();
+			multinameV=new Vector.<ABCMultiname>();
+			id=0;
+			for each(var multinames:Array in multinamesArr){
+				id++;
+				for each(var multiname:ABCMultiname in multinames){
+					idDict[multiname]=id;
+				}
+				multinameV.push(multiname);
 			}
 			
 			//methodV.sort(sortMethod);
@@ -381,7 +418,19 @@ package zero.swf.avm2{
 					
 					if(multiname1.ns==multiname2.ns){
 					}else{
-						return sortNs(multiname1.ns,multiname2.ns);
+						if(
+							multiname1.ns
+							&&
+							multiname2.ns
+						){
+							return sortNs(multiname1.ns,multiname2.ns);
+						}
+						if(multiname1.ns){
+							return -1;
+						}
+						if(multiname2.ns){
+							return 1;
+						}
 					}
 					
 					if(
@@ -584,6 +633,209 @@ package zero.swf.avm2{
 				return idDict[clazz];
 			//}
 			//return 0;
+		}
+		
+		//20110721
+		private function isSameNs(ns1:ABCNamespace,ns2:ABCNamespace):Boolean{
+			if(ns1==ns2){
+				return true;
+			}
+			/*
+			if(
+				ns1.kind==ns2.kind
+				&&
+				ns1.name==ns2.name
+			){
+				return true;
+			}
+			*/
+			if(
+				(
+					ns1.kind==NamespaceKinds.PackageNamespace
+					||
+					ns1.kind==NamespaceKinds.Namespace
+				)
+				&&
+				ns1.kind==ns2.kind
+				&&
+				ns1.name==ns2.name
+			){
+				return true;
+			}
+			return false;
+		}
+		private function isSameNs_set(ns_set1:ABCNs_set,ns_set2:ABCNs_set):Boolean{
+			if(ns_set1==ns_set2){
+				return true;
+			}
+			if(ns_set1.nsV.length==ns_set2.nsV.length){
+				var i:int=-1;
+				for each(var ns:ABCNamespace in ns_set1.nsV){
+					i++;
+					if(isSameNs(ns,ns_set2.nsV[i])){
+					}else{
+						return false;
+					}
+				}
+				return true;
+			}
+			return false;
+		}
+		private function isSameMultiname(multiname1:ABCMultiname,multiname2:ABCMultiname):Boolean{
+			if(multiname1==multiname2){
+				return true;
+			}
+			if(multiname1.kind==multiname2.kind){
+				switch(multiname1.kind){
+					case MultinameKinds.QName:
+					case MultinameKinds.QNameA:
+						if(multiname1.ns&&multiname2.ns){
+							if(
+								isSameNs(multiname1.ns,multiname2.ns)
+								&&
+								multiname1.name==multiname2.name
+							){
+								return true;
+							}
+							return false;
+						}
+						if(multiname1.ns||multiname2.ns){
+							return false;
+						}
+						return true;
+					break;
+					case MultinameKinds.Multiname:
+					case MultinameKinds.MultinameA:
+						if(
+							multiname1.name==multiname2.name
+							&&
+							isSameNs_set(multiname1.ns_set,multiname2.ns_set)
+						){
+							return true;
+						}
+					break;
+					case MultinameKinds.RTQName:
+					case MultinameKinds.RTQNameA:
+						if(
+							multiname1.name==multiname2.name
+						){
+							return true;
+						}
+					break;
+					case MultinameKinds.RTQNameL:
+					case MultinameKinds.RTQNameLA:
+						return true;
+					break;
+					case MultinameKinds.MultinameL:
+					case MultinameKinds.MultinameLA:
+						if(
+							isSameNs_set(multiname1.ns_set,multiname2.ns_set)
+						){
+							return true;
+						}
+					break;
+					case MultinameKinds.GenericName:
+						if(isSameMultiname(multiname1.TypeDefinition,multiname2.TypeDefinition)){
+							if(multiname1.ParamV.length==multiname2.ParamV.length){
+								var i:int=-1;
+								for each(var multiname:ABCMultiname in multiname1.ParamV){
+									i++;
+									if(isSameMultiname(multiname,multiname2.ParamV[i])){
+									}else{
+										return false;
+									}
+								}
+								return true;
+							}
+						}
+					break;
+				}
+			}
+			return false;
+		}
+		private function getNssArr():Array{
+			//合并可合并的 ns
+			var arr:Array=new Array();
+			var dict:Dictionary=new Dictionary();
+			//trace("nsV="+nsV);
+			for each(var ns1:ABCNamespace in nsV){
+				if(dict[ns1]){
+					continue;
+				}
+				dict[ns1]=true;
+				var subArr:Array=[ns1];
+				for each(var ns2:ABCNamespace in nsV){
+					if(dict[ns2]){
+						continue;
+					}
+					if(isSameNs(ns1,ns2)){
+						dict[ns2]=true;
+						subArr.push(ns2);
+					}
+				}
+				//if(subArr.length>1){
+				//	trace("合并："+subArr);
+				//}
+				arr.push(subArr);
+			}
+			//trace("arr="+arr);
+			return arr;
+		}
+		private function getNs_setsArr():Array{
+			//合并可合并的 ns_set
+			var arr:Array=new Array();
+			var dict:Dictionary=new Dictionary();
+			//trace("ns_setV="+ns_setV);
+			for each(var ns_set1:ABCNs_set in ns_setV){
+				if(dict[ns_set1]){
+					continue;
+				}
+				dict[ns_set1]=true;
+				var subArr:Array=[ns_set1];
+				for each(var ns_set2:ABCNs_set in ns_setV){
+					if(dict[ns_set2]){
+						continue;
+					}
+					if(isSameNs_set(ns_set1,ns_set2)){
+						dict[ns_set2]=true;
+						subArr.push(ns_set2);
+					}
+				}
+				//if(subArr.length>1){
+				//	trace("合并："+subArr);
+				//}
+				arr.push(subArr);
+			}
+			//trace("arr="+arr);
+			return arr;
+		}
+		private function getMultinamesArr():Array{
+			//合并可合并的 multiname
+			var arr:Array=new Array();
+			var dict:Dictionary=new Dictionary();
+			//trace("multinameV="+multinameV);
+			for each(var multiname1:ABCMultiname in multinameV){
+				if(dict[multiname1]){
+					continue;
+				}
+				dict[multiname1]=true;
+				var subArr:Array=[multiname1];
+				for each(var multiname2:ABCMultiname in multinameV){
+					if(dict[multiname2]){
+						continue;
+					}
+					if(isSameMultiname(multiname1,multiname2)){
+						dict[multiname2]=true;
+						subArr.push(multiname2);
+					}
+				}
+				//if(subArr.length>1){
+				//	trace("合并："+subArr);
+				//}
+				arr.push(subArr);
+			}
+			//trace("arr="+arr);
+			return arr;
 		}
 	}
 }

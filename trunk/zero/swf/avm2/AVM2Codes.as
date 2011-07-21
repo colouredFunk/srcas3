@@ -150,6 +150,7 @@ package zero.swf.avm2{
 					break;
 					case AVM2Ops.pushbyte://0x24	//u8_u8
 						codeByPosArr[pos]=new Code(op,data[offset++]);
+						if(codeByPosArr[pos].value&0x80){codeByPosArr[pos].value|=0xffffff00}//最高位为1,表示负数
 					break;
 					case AVM2Ops.pushshort://0x25	//u8_u30__value_int
 					case AVM2Ops.debugline://0xf0	//u8_u30__value_int
