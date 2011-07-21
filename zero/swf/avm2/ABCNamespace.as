@@ -291,8 +291,8 @@ package zero.swf.avm2{
 		}
 		}//end of CONFIG::USE_XML
 		
-		public function toString():String{
-			return "["+NamespaceKinds.kindV[kind]+"]"+name;
-		}
+		//public function toString():String{
+		//	return "["+NamespaceKinds.kindV[kind]+"]"+name;
+		//}
 	}
 }

@@ -8,6 +8,7 @@ ZeroCommon 版本:v1.0
 */
 
 package zero{
+	
 	import flash.display.*;
 	import flash.events.*;;
 	import flash.utils.*;
