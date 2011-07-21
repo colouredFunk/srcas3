@@ -3,6 +3,7 @@ package akdcl.application.player{
 	import flash.events.Event;
 	import flash.events.FullScreenEvent;
 	import flash.display.StageDisplayState;
+	import ui.manager.ButtonManager;
 	import ui.UISprite;
 	import ui.SimpleBtn;
 	import ui.ImageLoader;
@@ -112,7 +113,7 @@ package akdcl.application.player{
 		}
 		override protected function onRemoveToStageHandler():void {
 			setPlayer(null);
-			stage.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullSreenHandler);
+			ButtonManager.stage.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullSreenHandler);
 			super.onRemoveToStageHandler();
 		}
 		public function changeFullScreen(_evt:* = null):void {

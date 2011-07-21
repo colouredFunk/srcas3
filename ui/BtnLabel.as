@@ -23,6 +23,7 @@
 			__widthMax = _widthMax;
 			$setStyle(false);
 		}
+		
 		/*
 		protected var __heightMax:int;
 		[Inspectable(defaultValue=0,type="int",name="0_固定高")]

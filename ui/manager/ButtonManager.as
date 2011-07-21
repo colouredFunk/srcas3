@@ -113,7 +113,7 @@ package ui.manager {
 			}
 		}
 		private static function onStageMouseWheelHandler(_evt:MouseEvent):void {
-			for each(buttonTarget in buttonInDic) {
+			for each(buttonTarget in buttonDic) {
 				if (!buttonTarget) {
 					continue;
 				}
