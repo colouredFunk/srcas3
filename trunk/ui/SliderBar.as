@@ -6,7 +6,7 @@
 	 * @author Akdcl
 	 */
 	public class SliderBar extends SimpleBtn {
-		private var offY:int;
+		public var offY:int;
 		private var offX:int;
 		private var maximum:int;
 		
@@ -78,7 +78,7 @@
 		}
 		override protected function init():void {
 			super.init();
-			slider.mouseWheelEnabled = false;
+			//slider.mouseWheelEnabled = false;
 			slider.change = function(_value:Number):void {
 				setStyle();
 			};

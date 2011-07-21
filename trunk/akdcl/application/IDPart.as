@@ -16,7 +16,7 @@ package akdcl.application
 		public function set length(_length:uint):void{
 			__length=_length;
 		}
-		private var __id:int;
+		private var __id:int = -1;
 		public function get id():int{
 			return __id;
 		}
