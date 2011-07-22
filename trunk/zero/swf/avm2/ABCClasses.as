@@ -137,6 +137,12 @@ package zero.swf.avm2{
 		public var classV:Vector.<ABCClass>;
 		public var scriptV:Vector.<ABCScript>;
 		//
+		//public function ABCClasses(){
+		//	minor_version=16;
+		//	major_version=46;
+		//	classV=new Vector.<ABCClass>();
+		//	scriptV=new Vector.<ABCScript>();
+		//}
 		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			var abcFile:ABCFile=new ABCFile();
 			offset=abcFile.initByData(data,offset,endOffset,_initByDataOptions);
