@@ -518,7 +518,19 @@ package zero.swf.avm2{
 				
 				break;
 				case MultinameKinds.GenericName:
-					
+					if(
+						multiname1.TypeDefinition==multiname1
+						&&
+						multiname2.TypeDefinition==multiname2
+					){
+						return 0;
+					}
+					if(multiname1.TypeDefinition==multiname1){
+						return -1;
+					}
+					if(multiname2.TypeDefinition==multiname2){
+						return 1;
+					}
 					if(multiname1.TypeDefinition==multiname2.TypeDefinition){
 					}else{
 						return sortMultiname(multiname1.TypeDefinition,multiname2.TypeDefinition);
@@ -535,6 +547,20 @@ package zero.swf.avm2{
 					var i:int=-1;
 					for each(var Param:ABCMultiname in multiname1.ParamV){
 						i++;
+						if(
+							Param==multiname1
+							&&
+							multiname2.ParamV[i]==multiname2
+						){
+							return 0;
+						}
+						if(Param==multiname1){
+							return -1;
+						}
+						if(multiname2.ParamV[i]==multiname2){
+							return 1;
+						}
+							
 						if(Param==multiname2.ParamV[i]){
 						}else{
 							return sortMultiname(Param,multiname2.ParamV[i]);
@@ -735,6 +761,12 @@ package zero.swf.avm2{
 						}
 					break;
 					case MultinameKinds.GenericName:
+						if(multiname1.TypeDefinition==multiname1){
+							return false;
+						}
+						if(multiname2.TypeDefinition==multiname2){
+							return false;
+						}
 						if(isSameMultiname(multiname1.TypeDefinition,multiname2.TypeDefinition)){
 							if(multiname1.ParamV.length==multiname2.ParamV.length){
 								var i:int=-1;

@@ -1,107 +1,11 @@
 /***
 PlaceObject3
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
-创建时间：2011年7月5日 13:52:16（代码生成器 V2.0.0 F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf）
+创建时间：2011年7月22日 16:42:10
 简要说明：这家伙很懒什么都没写。
 用法举例：这家伙还是很懒什么都没写。
 */
-//The PlaceObject3 tag extends the functionality of the PlaceObject3 tag. PlaceObject3 adds
-//the following new features:
-//. The PlaceFlagHasClassName field indicates that a class name will be specified, indicating
-//the type of object to place. Because we no longer use ImportAssets2 in ActionScript 3.0,
-//there needed to be some way to place a Timeline object using a class imported from
-//another SWF, which does not have a 16-bit character ID in the instantiating SWF.
-//Supported in Flash Player 9.0.45.0 and later.
 
-//. The PlaceFlagHasImage field indicates the creation of native Bitmap objects on the display list.
-//PlaceFlagHasImage 字段表示在显示列表上放置(创建)(native 本机)位图对象.
-
-//When PlaceFlagHasClassName and PlaceFlagHasImage are both defined, this indicates a Bitmap class to be loaded from another SWF.
-//如果 PlaceFlagHasClassName 和 PlaceFlagHasImage 同时为 1, 表示从另一个SWF加载一个位图类.
-
-//Immediately following the flags is the class name (as above) for the BitmapData class in the loaded SWF.
-//A Bitmap object will be placed with the named BitmapData class as it's internal data.
-
-//When PlaceFlagHasCharacter and PlaceFlagHasImage are both defined, this indicates a Bitmap from the current SWF.
-//如果 PlaceFlagHasCharacter 和 PlaceFlagHasImage 同时为 1, 表示(从当前SWF加载)一个位图.
-
-//The BitmapData to be used as its internal data will be defined by the following characterID.
-
-//This only occurs when the BitmapData has a class associated with it.
-//这个位图必须得有链接类名.
-
-//好像描述的不太正确...
-//具体试验:
-//打开flash cs4，新建一fla，导入一张位图，设置类名为 "Img"，拖位图到场景上，导出，查看结构，发现生成了 PlaceFlagHasImage=1 的 PlaceObject3，但是 ClassName=null
-//所以这里设置类名只是为了在拖放位图元件到场景时能生成 PlaceObject3(如果不设置类名，将生成一个 DefineShape2，然后生成一个 PlaceObject2)
-
-//If there is no class associated with the BitmapData, DefineShape should be used with a Bitmap fill.
-//Supported in Flash Player 9.0.45.0 and later.
-
-//. The PlaceFlagHasCacheAsBitmap field specifies whether Flash Player should internally
-//cache a display object as a bitmap. Caching can speed up rendering when the object does
-//not change frequently.
-//. A number of different blend modes can be specified as an alternative to normal alpha
-//compositing. The following blend modes are supported:
-//. A number of bitmap filters can be applied to the display object. Adding filters implies that
-//the display object will be cached as a bitmap. The following bitmap filters are supported:
-//Add Layer
-//Alpha Lighten
-//Darken Overlay
-//Difference Multiply
-//Erase Screen
-//Hardlight Subtract
-//Invert
-//Bevel Drop shadow
-//Blur Glow
-//Color matrix Gradient bevel
-//Convolution Gradient glow
-
-//Field 							Type 																					Comment
-//Header 							RECORDHEADER 																			Tag type = 70
-//PlaceFlagHasClipActions 			UB[1] 																					SWF 5 and later: has clip actions (sprite characters only) Otherwise: always 0
-//PlaceFlagHasClipDepth 			UB[1] 																					Has clip depth
-//PlaceFlagHasName 					UB[1] 																					Has name
-//PlaceFlagHasRatio 				UB[1] 																					Has ratio
-//PlaceFlagHasColorTransform		UB[1] 																					Has color transform
-//PlaceFlagHasMatrix 				UB[1] 																					Has matrix
-//PlaceFlagHasCharacter 			UB[1] 																					Places a character
-//PlaceFlagMove 					UB[1] 																					Defines a character to be moved
-
-//Reserved 							UB[3] 																					Must be 0
-//PlaceFlagHasImage 				UB[1] 																					Has class name or character ID of bitmap to place. If PlaceFlagHasClassName, use ClassName. If PlaceFlagHasCharacter, use CharacterId
-//PlaceFlagHasClassName 			UB[1] 																					Has class name of object to place
-//PlaceFlagHasCacheAsBitmap			UB[1] 																					Enables bitmap caching
-//PlaceFlagHasBlendMode 			UB[1] 																					Has blend mode
-//PlaceFlagHasFilterList 			UB[1] 																					Has filter list
-
-//Depth 							UI16 																					Depth of character
-//ClassName 						If PlaceFlagHasClassName or (PlaceFlagHasImage and PlaceFlagHasCharacter 描述的不正确), String		Name of the class to place
-//CharacterId 						If PlaceFlagHasCharacter, UI16 															ID of character to place
-//Matrix 							If PlaceFlagHasMatrix, MATRIX 															Transform matrix data
-//ColorTransform 					If PlaceFlagHasColorTransform, CXFORMWITHALPHA											Color transform data
-//Ratio 							If PlaceFlagHasRatio, UI16
-//Name 								If PlaceFlagHasName, 																	STRING Name of character
-//ClipDepth 						If PlaceFlagHasClipDepth, UI16 															Clip depth (see Clipping layers)
-//SurfaceFilterList 				If PlaceFlagHasFilterList, FILTERLIST													List of filters on this object
-//BlendMode 						If PlaceFlagHasBlendMode, UI8 															0 or 1 = normal
-//																															2 = layer
-//																															3 = multiply
-//																															4 = screen
-//																															5 = lighten
-//																															6 = darken
-//																															7 = difference
-//																															8 = add
-//																															9 = subtract
-//																															10 = invert
-//																															11 = alpha
-//																															12 = erase
-//																															13 = overlay
-//																															14 = hardlight
-//																															Values 15 to 255 are reserved.
-//BitmapCache 						If PlaceFlagHasCacheAsBitmap, UI8														0 = Bitmap cache disabled
-//																															1-255 = Bitmap cache enabled
-//ClipActions 						If PlaceFlagHasClipActions, CLIPACTIONS	
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
 	import flash.utils.getDefinitionByName;
