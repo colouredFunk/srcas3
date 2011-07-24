@@ -7,6 +7,7 @@ package akdcl.manager {
 	 * @author ...
 	 */
 	public class SourceManager {
+		public static const SOUND_GROUP:String = "Sound";
 		private static var instance:SourceManager;
 
 		public static function getInstance():SourceManager {
@@ -29,7 +30,7 @@ package akdcl.manager {
 
 		public function addGroup(_groupID:String):void {
 			if (sourceGroup[_groupID]){
-
+				
 			} else {
 				sourceGroup[_groupID] = {};
 			}
