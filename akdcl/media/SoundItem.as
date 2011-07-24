@@ -3,37 +3,45 @@ package akdcl.media {
 	import flash.media.SoundChannel;
 	import flash.media.SoundMixer;
 	import flash.media.SoundTransform;
+	import flash.media.SoundLoaderContext;
+	
 	import flash.events.Event;
 	import flash.net.URLRequest;
-	import flash.media.SoundLoaderContext;
 
 	import com.greensock.TweenLite;
 	import com.greensock.easing.Sine;
 
 	import akdcl.manager.ElementManager;
+	import akdcl.manager.SourceManager;
 	
 	import akdcl.interfaces.IPlaylistItem;
+	import akdcl.interfaces.IVolume;
 
 	/**
 	 * ...
 	 * @author ...
 	 */
 
-	public class SoundItem implements IPlaylistItem {
+	public class SoundItem implements IPlaylistItem, IVolume {
+		private static const ELEMENT_ID:String = "TweenObject_SoundItem";
+		
+		private static var eM:ElementManager = ElementManager.getInstance();
+		private static var sM:SourceManager = SourceManager.getInstance();
+		eM.register(ELEMENT_ID, TweenObject);
+		
 		public static function setChannelVolume(_channel:SoundChannel, _volume:Number):void {
 			var _soundTransform:SoundTransform = _channel.soundTransform;
 			_soundTransform.volume = _volume;
 			_channel.soundTransform = _soundTransform;
 		}
-
+		
 		private var maxVolume:Number = 1;
-
-		private var sound:Sound;
-		private var soundTransform:SoundTransform;
-		private var channelNow:SoundChannel;
+		
 		private var channelList:Array;
-
-		private var eM:ElementManager;
+		
+		private var sound:Sound;
+		private var channelNow:SoundChannel;
+		private var soundTransform:SoundTransform;
 
 		public function get loadProgress():Number {
 			var _loadProgress:Number;
@@ -107,18 +115,21 @@ package akdcl.media {
 		public function SoundItem(_sound:Sound = null, _maxVolume:Number = 1) {
 			maxVolume = _maxVolume;
 			channelList = [];
-			eM = ElementManager.getInstance();
-			eM.register("TweenObject", TweenObject);
+			
 			soundTransform = new SoundTransform(volume, 0);
 			if (_sound) {
 				sound = _sound;
-			}else {
-				sound = new Sound();
 			}
 		}
 		
 		public function load(_source:String):void {
+			sound = sM.getSource(SourceManager.SOUND_GROUP, _source);
+			if (!sound) {
+				sound = new Sound();
+				sM.addSource(SourceManager.SOUND_GROUP, _source, sound);
+			}
 			sound.load(new URLRequest(_source), new SoundLoaderContext(1000, true));
+			
 		}
 
 		public function play(_startTime:Number = -1, _loops:uint = 0, _tempVolume:Number = 1, _tweenIn:Number = 0, _tweenOut:Number = 0):SoundChannel {
@@ -144,21 +155,21 @@ package akdcl.media {
 				_channel.addEventListener(Event.SOUND_COMPLETE, onChannelCompleteHandler);
 				channelList.push(_channel);
 				channelNow = _channel;
-				//
+				//volume淡入
 				if (_tweenIn == 0){
 
 				} else if (_tweenIn <= 1){
-					(eM.getElement("TweenObject") as TweenObject).tweenChannel(this, channelNow, totalTime * _tweenIn * 0.001, 0, 1, _tempVolume);
+					(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, totalTime * _tweenIn * 0.001, 0, 1, _tempVolume);
 				} else {
-					(eM.getElement("TweenObject") as TweenObject).tweenChannel(this, channelNow, _tweenIn * 0.001, 0, 1, _tempVolume);
+					(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, _tweenIn * 0.001, 0, 1, _tempVolume);
 				}
-				//
+				//volume淡出
 				if (_tweenOut == 0){
 
 				} else if (_tweenOut <= 1){
-					(eM.getElement("TweenObject") as TweenObject).tweenChannel(this, channelNow, totalTime * _tweenOut * 0.001, totalTime * (1 - _tweenOut) * 0.001, 0, _tempVolume);
+					(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, totalTime * _tweenOut * 0.001, totalTime * (1 - _tweenOut) * 0.001, 0, _tempVolume);
 				} else {
-					(eM.getElement("TweenObject") as TweenObject).tweenChannel(this, channelNow, _tweenOut * 0.001, (totalTime - _tweenOut) * 0.001, 0, _tempVolume);
+					(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, _tweenOut * 0.001, (totalTime - _tweenOut) * 0.001, 0, _tempVolume);
 				}
 			} catch (_error:*){
 
@@ -168,6 +179,14 @@ package akdcl.media {
 
 		public function stop():void {
 			removeAllChannel();
+		}
+		
+		public function remove():void {
+			stop();
+			sound = null;
+			soundTransform = null;
+			channelNow = null;
+			channelList = null;
 		}
 
 		private function removeAllChannel():void {
