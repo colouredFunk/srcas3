@@ -3,7 +3,6 @@ package akdcl.media {
 	import flash.media.Video;
 	import flash.net.NetStream;
 	import flash.net.NetConnection;
-	import fl.video.ConnectClient;
 	
 	import flash.media.SoundTransform;
 	
@@ -28,16 +27,17 @@ package akdcl.media {
 		private static var sM:SourceManager = SourceManager.getInstance();
 		//eM.register(ELEMENT_ID, TweenObject);
 		
-		private var video:Video;
 		private var netConnection:NetConnection;
 		private var netStream:NetStream;
+		
 		private var soundTransform:SoundTransform;
+		
+		public var metaData:Object;
 
 		public function get loadProgress():Number {
 			var _loadProgress:Number;
 			if (sound){
-				_loadProgress = video.
-				//.bytesLoaded / sound.bytesTotal;
+				_loadProgress = netStream.bytesLoaded / netStream.bytesTotal;
 			} else {
 				_loadProgress = 0;
 			}
@@ -50,8 +50,8 @@ package akdcl.media {
 		
 		public function get totalTime():uint {
 			var _totalTime:uint;
-			if (sound){
-				_totalTime = sound.length / loadProgress;
+			if (metaData){
+				_totalTime = metaData.duration * 1000 / loadProgress;
 			} else {
 				_totalTime = 0;
 			}
@@ -97,30 +97,31 @@ package akdcl.media {
 				_volume = 1;
 			}
 			__volume = _volume;
-			if (channelNow){
+			/*if (channelNow){
 				setChannelVolume(channelNow, __volume * maxVolume);
-			}
+			}*/
 		}
 
 		public function VideoItem() {
-			netConnection = new NetConnection();
+            soundTransform = new SoundTransform();
 			
+			
+			netConnection = new NetConnection();
 			netConnection.connect(null);
 			
 			netStream = new NetStream(netConnection);
 			//netStream.addEventListener(NetStatusEvent.NET_STATUS
 			//netStream.addEventListener(IOErrorEvent.IO_ERROR
 			//netStream.addEventListener(AsyncErrorEvent.ASYNC_ERROR
-			
 			netStream.bufferTime = 2000;
 			
+			//netStream.client
 			
-            this._stream.bufferTime = config.bufferlength;
-            this._stream.client = new NetClient(this);
-            this._transformer = new SoundTransform();
-            this._video = new Video(320, 240);
-            this._video.smoothing = config.smoothing;
-            this._video.attachNetStream(this._stream);
+			/*if (_video) {
+				video = _video;
+				video.smoothing = config.smoothing;
+			}
+			video.attachNetStream(netStream);*/
 		}
 	}
 
