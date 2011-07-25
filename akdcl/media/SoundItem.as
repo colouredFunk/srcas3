@@ -129,10 +129,12 @@ package akdcl.media {
 				sM.addSource(SourceManager.SOUND_GROUP, _source, sound);
 			}
 			sound.load(new URLRequest(_source), new SoundLoaderContext(1000, true));
-			
 		}
 
 		public function play(_startTime:Number = -1, _loops:uint = 0, _tempVolume:Number = 1, _tweenIn:Number = 0, _tweenOut:Number = 0):SoundChannel {
+			if (!sound) {
+				return;
+			}
 			if (_startTime < 0){
 				_startTime = 0;
 			} else if (_startTime <= 1){
@@ -172,7 +174,7 @@ package akdcl.media {
 					(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, _tweenOut * 0.001, (totalTime - _tweenOut) * 0.001, 0, _tempVolume);
 				}
 			} catch (_error:*){
-
+				
 			}
 			return _channel;
 		}
