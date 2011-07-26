@@ -29,6 +29,8 @@ package zero.swf.funs{
 			
 			var docClassName:String=getDocClassName(swf);
 			
+			trace("docClassName="+docClassName);
+			
 			var ABCData:ABCClasses;
 			var frontPos:int=-1,backPos:int=-1;
 			var i:int=-1;
@@ -57,8 +59,10 @@ package zero.swf.funs{
 							||
 							Math.random()<0.5
 						){
+							trace("frontClass="+clazz.getClassName());
 							frontClassV.push(clazz);
 						}else{
+							trace("backClass="+clazz.getClassName());
 							backClassV.push(clazz);
 						}
 					}
@@ -73,8 +77,12 @@ package zero.swf.funs{
 			}
 			
 			var avalibleDefineObjIdV:Vector.<int>=getAvalibleDefineObjIdV(swf.tagV);
-			swf.tagV.splice(frontPos,0,getJunkDoABCSpriteTag(avalibleDefineObjIdV.shift(),frontClassV,frontScriptV));
-			swf.tagV.splice(backPos+2,0,getJunkDoABCSpriteTag(avalibleDefineObjIdV.shift(),backClassV,backScriptV));
+			if(frontClassV.length>0||frontScriptV.length>0){
+				swf.tagV.splice(frontPos,0,getJunkDoABCSpriteTag(avalibleDefineObjIdV.shift(),frontClassV,frontScriptV));
+			}
+			if(backClassV.length>0||backScriptV.length>0){
+				swf.tagV.splice(backPos+2,0,getJunkDoABCSpriteTag(avalibleDefineObjIdV.shift(),backClassV,backScriptV));
+			}
 		}
 		
 		private static function getJunkDoABCSpriteTag(

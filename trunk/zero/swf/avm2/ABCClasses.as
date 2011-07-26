@@ -127,8 +127,7 @@ ABCClasses
 //entry consists of a variable length method_body_info structure which contains the instructions for an
 //individual method or function.
 package zero.swf.avm2{
-	import flash.utils.ByteArray;
-	import flash.utils.Dictionary;
+	import flash.utils.*;
 
 	public class ABCClasses{//implements I_zero_swf_CheckCodesRight{
 		public var minor_version:int;					//direct
@@ -319,6 +318,8 @@ package zero.swf.avm2{
 			//-----
 			var productMark:ProductMark=new ProductMark();
 			
+			var t:int=getTimer();
+			
 			i=-1;
 			for each(clazz in classV){
 				i++;
@@ -328,7 +329,15 @@ package zero.swf.avm2{
 				script.getInfo_product(productMark);
 			}
 			
+			trace("productMark.product 耗时："+(getTimer()-t)+" 毫秒");
+			
+			t=getTimer();
+			
 			productMark.calIds();
+			
+			trace("productMark.calIds 耗时："+(getTimer()-t)+" 毫秒");
+			
+			//t=getTimer();
 			
 			//-----
 			i=0;
@@ -366,6 +375,11 @@ package zero.swf.avm2{
 				i++;
 				abcFile.multiname_infoV[i]=multiname.getInfo(productMark,_toDataOptions);
 			}
+			
+			//trace("1 耗时："+(getTimer()-t)+" 毫秒");
+			
+			//t=getTimer();
+			
 			i=-1;
 			for each(var method:ABCMethod in productMark.methodV){
 				i++;
@@ -376,6 +390,11 @@ package zero.swf.avm2{
 				}
 			}
 			i=-1;
+			
+			//trace("2 耗时："+(getTimer()-t)+" 毫秒");
+			
+			//t=getTimer();
+			
 			for each(var metadata:ABCMetadata in productMark.metadataV){
 				i++;
 				abcFile.metadata_infoV[i]=metadata.getInfo(productMark,_toDataOptions);
@@ -392,6 +411,11 @@ package zero.swf.avm2{
 				i++;
 				abcFile.script_infoV[i]=script.getInfo(productMark,_toDataOptions);
 			}
+			
+			
+			//trace("3 耗时："+(getTimer()-t)+" 毫秒");
+			
+			//t=getTimer();
 			
 			return abcFile.toData(_toDataOptions);
 		}

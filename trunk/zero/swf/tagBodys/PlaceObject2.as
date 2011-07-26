@@ -60,13 +60,25 @@ package zero.swf.tagBodys{
 				CharacterId=-1;
 			}
 			if(flags&0x04){//PlaceFlagHasMatrix						//00000100
-				Matrix=new (_initByDataOptions&&_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.records.MATRIX"]||MATRIX)();
+				var MatrixClass:Class;
+				if(_initByDataOptions){
+					if(_initByDataOptions.classes){
+						MatrixClass=_initByDataOptions.classes["zero.swf.records.MATRIX"];
+					}
+				}
+				Matrix=new (MatrixClass||MATRIX)();
 				offset=Matrix.initByData(data,offset,endOffset,_initByDataOptions);
 			}else{
 				Matrix=null;
 			}
 			if(flags&0x08){//PlaceFlagHasColorTransform				//00001000
-				ColorTransform=new (_initByDataOptions&&_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.records.CXFORMWITHALPHA"]||CXFORMWITHALPHA)();
+				var ColorTransformClass:Class;
+				if(_initByDataOptions){
+					if(_initByDataOptions.classes){
+						ColorTransformClass=_initByDataOptions.classes["zero.swf.records.CXFORMWITHALPHA"];
+					}
+				}
+				ColorTransform=new (ColorTransformClass||CXFORMWITHALPHA)();
 				offset=ColorTransform.initByData(data,offset,endOffset,_initByDataOptions);
 			}else{
 				ColorTransform=null;
@@ -91,7 +103,17 @@ package zero.swf.tagBodys{
 				ClipDepth=-1;
 			}
 			if(flags&0x80){//PlaceFlagHasClipActions				//10000000
-				ClipActions=new (_initByDataOptions&&(_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.BytesData"]||_initByDataOptions.ClipActionsClass)||BytesData)();
+				var ClipActionsClass:Class;
+				if(_initByDataOptions){
+					if(_initByDataOptions.classes){
+						ClipActionsClass=_initByDataOptions.classes["zero.swf.BytesData"];
+					}
+					if(ClipActionsClass){
+					}else{
+						ClipActionsClass=_initByDataOptions.ClipActionsClass;
+					}
+				}
+				ClipActions=new (ClipActionsClass||BytesData)();
 				offset=ClipActions.initByData(data,offset,endOffset,_initByDataOptions);
 			}else{
 				ClipActions=null;

@@ -1,11 +1,3 @@
-/***
-PlaceObject3
-创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
-创建时间：2011年7月22日 16:42:10
-简要说明：这家伙很懒什么都没写。
-用法举例：这家伙还是很懒什么都没写。
-*/
-
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
 	import flash.utils.getDefinitionByName;
@@ -15,19 +7,19 @@ package zero.swf.tagBodys{
 	import zero.swf.records.MATRIX;
 	import zero.swf.records.Filter;
 	import zero.swf.records.FilterIDs;
-	public class PlaceObject3{//implements I_zero_swf_CheckCodesRight{
+	public class PlaceObject3{
 		public var PlaceFlagMove:Boolean;
 		public var PlaceFlagHasImage:Boolean;
-		public var Depth:int;							//UI16
-		public var ClassName:String;					//STRING
+		public var Depth:int;								//UI16
+		public var ClassName:String;						//STRING
 		public var CharacterId:int;						//UI16
 		public var Matrix:*;
 		public var ColorTransform:*;
-		public var Ratio:int;							//UI16
+		public var Ratio:int;								//UI16
 		public var Name:String;							//STRING
-		public var ClipDepth:int;						//UI16
+		public var ClipDepth:int;							//UI16
 		public var SurfaceFilterV:Vector.<*>;
-		public var BlendMode:int;						//UI8
+		public var BlendMode:int;							//UI8
 		public var BitmapCache:int;						//UI8
 		public var ClipActions:*;
 		//
@@ -53,13 +45,25 @@ package zero.swf.tagBodys{
 				CharacterId=-1;
 			}
 			if(flags&0x04){//PlaceFlagHasMatrix								//00000100
-				Matrix=new (_initByDataOptions&&_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.records.MATRIX"]||MATRIX)();
+				var MatrixClass:Class;
+				if(_initByDataOptions){
+					if(_initByDataOptions.classes){
+						MatrixClass=_initByDataOptions.classes["zero.swf.records.MATRIX"];
+					}
+				}
+				Matrix=new (MatrixClass||MATRIX)();
 				offset=Matrix.initByData(data,offset,endOffset,_initByDataOptions);
 			}else{
 				Matrix=null;
 			}
 			if(flags&0x08){//PlaceFlagHasColorTransform						//00001000
-				ColorTransform=new (_initByDataOptions&&_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.records.CXFORMWITHALPHA"]||CXFORMWITHALPHA)();
+				var ColorTransformClass:Class;
+				if(_initByDataOptions){
+					if(_initByDataOptions.classes){
+						ColorTransformClass=_initByDataOptions.classes["zero.swf.records.CXFORMWITHALPHA"];
+					}
+				}
+				ColorTransform=new (ColorTransformClass||CXFORMWITHALPHA)();
 				offset=ColorTransform.initByData(data,offset,endOffset,_initByDataOptions);
 			}else{
 				ColorTransform=null;
@@ -88,7 +92,13 @@ package zero.swf.tagBodys{
 				if(NumberOfFilters){
 					SurfaceFilterV=new Vector.<*>();
 					for(var i:int=0;i<NumberOfFilters;i++){
-						SurfaceFilterV[i]=new (_initByDataOptions&&_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.records.Filter"]||Filter)();
+						var SurfaceFilterClass:Class;
+						if(_initByDataOptions){
+							if(_initByDataOptions.classes){
+								SurfaceFilterClass=_initByDataOptions.classes["zero.swf.records.Filter"];
+							}
+						}
+						SurfaceFilterV[i]=new (SurfaceFilterClass||Filter)();
 						offset=SurfaceFilterV[i].initByData(data,offset,endOffset,_initByDataOptions);
 					}
 				}else{
@@ -108,7 +118,17 @@ package zero.swf.tagBodys{
 				BitmapCache=-1;
 			}
 			if(flags&0x80){//PlaceFlagHasClipActions						//10000000
-				ClipActions=new (_initByDataOptions&&(_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.BytesData"]||_initByDataOptions.ClipActionsClass)||BytesData)();
+				var ClipActionsClass:Class;
+				if(_initByDataOptions){
+					if(_initByDataOptions.classes){
+						ClipActionsClass=_initByDataOptions.classes["zero.swf.BytesData"];
+					}
+					if(ClipActionsClass){
+					}else{
+						ClipActionsClass=_initByDataOptions.ClipActionsClass;
+					}
+				}
+				ClipActions=new (ClipActionsClass||BytesData)();
 				offset=ClipActions.initByData(data,offset,endOffset,_initByDataOptions);
 			}else{
 				ClipActions=null;

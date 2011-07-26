@@ -32,7 +32,13 @@ package zero.swf.tagBodys{
 			id=data[offset++]|(data[offset++]<<8);
 			//Reserved=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16)|(data[offset++]<<24);
 			offset+=4;
-			Data=new (_initByDataOptions&&_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.BytesData"]||BytesData)();
+			var DataClass:Class;
+			if(_initByDataOptions){
+				if(_initByDataOptions.classes){
+					DataClass=_initByDataOptions.classes["zero.swf.BytesData"];
+				}
+			}
+			Data=new (DataClass||BytesData)();
 			return Data.initByData(data,offset,endOffset,_initByDataOptions);
 		}
 		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{

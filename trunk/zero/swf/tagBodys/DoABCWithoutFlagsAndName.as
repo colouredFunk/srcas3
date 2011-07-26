@@ -13,11 +13,21 @@ package zero.swf.tagBodys{
 	import zero.swf.avm2.ABCFile;
 	import flash.utils.ByteArray;
 	import flash.utils.getDefinitionByName;
-	public class DoABCWithoutFlagsAndName{//implements I_zero_swf_CheckCodesRight{
+	public class DoABCWithoutFlagsAndName{
 		public var ABCData:*;							//ABCFile
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
-			ABCData=new (_initByDataOptions&&(_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.avm2.ABCFile"]||_initByDataOptions.ABCDataClass)||ABCFile)();
+			var ABCDataClass:Class;
+			if(_initByDataOptions){
+				if(_initByDataOptions.classes){
+					ABCDataClass=_initByDataOptions.classes["zero.swf.avm2.ABCFile"];
+				}
+				if(ABCDataClass){
+				}else{
+					ABCDataClass=_initByDataOptions.ABCDataClass;
+				}
+			}
+			ABCData=new (ABCDataClass||ABCFile)();
 			return ABCData.initByData(data,offset,endOffset,_initByDataOptions);
 		}
 		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{

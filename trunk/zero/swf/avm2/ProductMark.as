@@ -189,13 +189,14 @@ package zero.swf.avm2{
 			
 			
 			nsV.sort(sortNs);
-			/*
+			///*不合并 ns 们 {
 			id=0;
 			for each(var ns:ABCNamespace in nsV){
 				//trace("countDict[ns]="+countDict[ns]);
 				idDict[ns]=++id;
 			}
-			*/
+			//}*/
+			/*合并 ns 们 {
 			var nssArr:Array=getNssArr();
 			nsV=new Vector.<ABCNamespace>();
 			id=0;
@@ -206,15 +207,17 @@ package zero.swf.avm2{
 				}
 				nsV.push(ns);
 			}
+			//}*/
 			
 			ns_setV.sort(sortNs_set);
-			/*
+			///*不合并 ns_set 们 {
 			id=0;
 			for each(var ns_set:ABCNs_set in ns_setV){
 				//trace("countDict[ns_set]="+countDict[ns_set]);
 				idDict[ns_set]=++id;
 			}
-			*/
+			//}*/
+			/*合并 ns_set 们 {
 			var ns_setsArr:Array=getNs_setsArr();
 			ns_setV=new Vector.<ABCNs_set>();
 			id=0;
@@ -225,15 +228,17 @@ package zero.swf.avm2{
 				}
 				ns_setV.push(ns_set);
 			}
+			//}*/
 			
 			multinameV.sort(sortMultiname);
-			/*
+			///*不合并 multiname 们 {
 			id=0;
 			for each(var multiname:ABCMultiname in multinameV){
 				//trace("countDict[multiname]="+countDict[multiname]);
 				idDict[multiname]=++id;
 			}
-			*/
+			//}*/
+			/*合并 multiname 们 {
 			var multinamesArr:Array=getMultinamesArr();
 			multinameV=new Vector.<ABCMultiname>();
 			id=0;
@@ -244,6 +249,7 @@ package zero.swf.avm2{
 				}
 				multinameV.push(multiname);
 			}
+			//}*/
 			
 			//methodV.sort(sortMethod);
 			id=-1;

@@ -7,7 +7,7 @@ LabelMark
 */
 
 package zero.swf.codes{
-	public class LabelMark{
+	public final class LabelMark{
 		public var labelId:int;
 		public var pos:int;
 		public function LabelMark(_labelId:int):void{

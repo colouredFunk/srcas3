@@ -76,7 +76,17 @@ package zero.swf.records.buttons{
 			CondKeyPress=(flags<<24)>>>25;					//11111110
 			CondOverDownToIdle=((flags&0x01)?true:false);			//00000001
 			
-			Actions=new (_initByDataOptions&&(_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.avm1.ACTIONRECORDs"]||_initByDataOptions.ActionsClass)||ACTIONRECORDs)();
+			var ActionsClass:Class;
+			if(_initByDataOptions){
+				if(_initByDataOptions.classes){
+					ActionsClass=_initByDataOptions.classes["zero.swf.avm1.ACTIONRECORDs"];
+				}
+				if(ActionsClass){
+				}else{
+					ActionsClass=_initByDataOptions.ActionsClass;
+				}
+			}
+			Actions=new (ActionsClass||ACTIONRECORDs)();
 			return Actions.initByData(data,offset,endOffset,_initByDataOptions);
 		}
 		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
