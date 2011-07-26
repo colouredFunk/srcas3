@@ -33,6 +33,7 @@ package zero.swf.avm2{
 			classV:Vector.<ABCClass>,
 			_initByDataOptions:Object/*zero_swf_InitByDataOptions*/
 		):void{
+			
 			var labelId:int=-1;
 			var labelByPosArr:Array=new Array();
 			var codeByPosArr:Array=new Array();
@@ -51,178 +52,190 @@ package zero.swf.avm2{
 				var pos:int=offset;
 				var op:int=data[offset++];
 				
-				switch(op){
-					case AVM2Ops.bkpt://0x01	//u8
-					case AVM2Ops.nop://0x02	//u8
-					case AVM2Ops.throw_://0x03	//u8
-					case AVM2Ops.dxnslate://0x07	//u8
-					case AVM2Ops.label://0x09	//u8
-					case AVM2Ops.pushwith://0x1c	//u8
-					case AVM2Ops.popscope://0x1d	//u8
-					case AVM2Ops.nextname://0x1e	//u8
-					case AVM2Ops.hasnext://0x1f	//u8
-					case AVM2Ops.pushnull://0x20	//u8
-					case AVM2Ops.pushundefined://0x21	//u8
-					case AVM2Ops.nextvalue://0x23	//u8
-					case AVM2Ops.pushtrue://0x26	//u8
-					case AVM2Ops.pushfalse://0x27	//u8
-					case AVM2Ops.pushnan://0x28	//u8
-					case AVM2Ops.pop://0x29	//u8
-					case AVM2Ops.dup://0x2a	//u8
-					case AVM2Ops.swap://0x2b	//u8
-					case AVM2Ops.pushscope://0x30	//u8
-					case AVM2Ops.li8://0x35	//u8
-					case AVM2Ops.li16://0x36	//u8
-					case AVM2Ops.li32://0x37	//u8
-					case AVM2Ops.lf32://0x38	//u8
-					case AVM2Ops.lf64://0x39	//u8
-					case AVM2Ops.si8://0x3a	//u8
-					case AVM2Ops.si16://0x3b	//u8
-					case AVM2Ops.si32://0x3c	//u8
-					case AVM2Ops.sf32://0x3d	//u8
-					case AVM2Ops.sf64://0x3e	//u8
-					case AVM2Ops.returnvoid://0x47	//u8
-					case AVM2Ops.returnvalue://0x48	//u8
-					case AVM2Ops.sxi1://0x50	//u8
-					case AVM2Ops.sxi8://0x51	//u8
-					case AVM2Ops.sxi16://0x52	//u8
-					case AVM2Ops.newactivation://0x57	//u8
-					case AVM2Ops.getglobalscope://0x64	//u8
-					case AVM2Ops.convert_s://0x70	//u8
-					case AVM2Ops.esc_xelem://0x71	//u8
-					case AVM2Ops.esc_xattr://0x72	//u8
-					case AVM2Ops.convert_i://0x73	//u8
-					case AVM2Ops.convert_u://0x74	//u8
-					case AVM2Ops.convert_d://0x75	//u8
-					case AVM2Ops.convert_b://0x76	//u8
-					case AVM2Ops.convert_o://0x77	//u8
-					case AVM2Ops.checkfilter://0x78	//u8
-					case AVM2Ops.coerce_b://0x81	//u8
-					case AVM2Ops.coerce_a://0x82	//u8
-					case AVM2Ops.coerce_i://0x83	//u8
-					case AVM2Ops.coerce_d://0x84	//u8
-					case AVM2Ops.coerce_s://0x85	//u8
-					case AVM2Ops.astypelate://0x87	//u8
-					case AVM2Ops.coerce_u://0x88	//u8
-					case AVM2Ops.coerce_o://0x89	//u8
-					case AVM2Ops.negate://0x90	//u8
-					case AVM2Ops.increment://0x91	//u8
-					case AVM2Ops.decrement://0x93	//u8
-					case AVM2Ops.typeof_://0x95	//u8
-					case AVM2Ops.not://0x96	//u8
-					case AVM2Ops.bitnot://0x97	//u8
-					case AVM2Ops.add://0xa0	//u8
-					case AVM2Ops.subtract://0xa1	//u8
-					case AVM2Ops.multiply://0xa2	//u8
-					case AVM2Ops.divide://0xa3	//u8
-					case AVM2Ops.modulo://0xa4	//u8
-					case AVM2Ops.lshift://0xa5	//u8
-					case AVM2Ops.rshift://0xa6	//u8
-					case AVM2Ops.urshift://0xa7	//u8
-					case AVM2Ops.bitand://0xa8	//u8
-					case AVM2Ops.bitor://0xa9	//u8
-					case AVM2Ops.bitxor://0xaa	//u8
-					case AVM2Ops.equals://0xab	//u8
-					case AVM2Ops.strictequals://0xac	//u8
-					case AVM2Ops.lessthan://0xad	//u8
-					case AVM2Ops.lessequals://0xae	//u8
-					case AVM2Ops.greaterthan://0xaf	//u8
-					case AVM2Ops.greaterequals://0xb0	//u8
-					case AVM2Ops.instanceof_://0xb1	//u8
-					case AVM2Ops.istypelate://0xb3	//u8
-					case AVM2Ops.in_://0xb4	//u8
-					case AVM2Ops.increment_i://0xc0	//u8
-					case AVM2Ops.decrement_i://0xc1	//u8
-					case AVM2Ops.negate_i://0xc4	//u8
-					case AVM2Ops.add_i://0xc5	//u8
-					case AVM2Ops.subtract_i://0xc6	//u8
-					case AVM2Ops.multiply_i://0xc7	//u8
-					case AVM2Ops.getlocal0://0xd0	//u8
-					case AVM2Ops.getlocal1://0xd1	//u8
-					case AVM2Ops.getlocal2://0xd2	//u8
-					case AVM2Ops.getlocal3://0xd3	//u8
-					case AVM2Ops.setlocal0://0xd4	//u8
-					case AVM2Ops.setlocal1://0xd5	//u8
-					case AVM2Ops.setlocal2://0xd6	//u8
-					case AVM2Ops.setlocal3://0xd7	//u8
-					case AVM2Ops.timestamp://0xf3	//u8
+				switch(AVM2Ops.opTypeV[op]){
+					//case 0x01://AVM2Ops.bkpt	//u8
+					//case 0x02://AVM2Ops.nop	//u8
+					//case 0x03://AVM2Ops.throw_	//u8
+					//case 0x07://AVM2Ops.dxnslate	//u8
+					//case 0x09://AVM2Ops.label	//u8
+					//case 0x1c://AVM2Ops.pushwith	//u8
+					//case 0x1d://AVM2Ops.popscope	//u8
+					//case 0x1e://AVM2Ops.nextname	//u8
+					//case 0x1f://AVM2Ops.hasnext	//u8
+					//case 0x20://AVM2Ops.pushnull	//u8
+					//case 0x21://AVM2Ops.pushundefined	//u8
+					//case 0x23://AVM2Ops.nextvalue	//u8
+					//case 0x26://AVM2Ops.pushtrue	//u8
+					//case 0x27://AVM2Ops.pushfalse	//u8
+					//case 0x28://AVM2Ops.pushnan	//u8
+					//case 0x29://AVM2Ops.pop	//u8
+					//case 0x2a://AVM2Ops.dup	//u8
+					//case 0x2b://AVM2Ops.swap	//u8
+					//case 0x30://AVM2Ops.pushscope	//u8
+					//case 0x35://AVM2Ops.li8	//u8
+					//case 0x36://AVM2Ops.li16	//u8
+					//case 0x37://AVM2Ops.li32	//u8
+					//case 0x38://AVM2Ops.lf32	//u8
+					//case 0x39://AVM2Ops.lf64	//u8
+					//case 0x3a://AVM2Ops.si8	//u8
+					//case 0x3b://AVM2Ops.si16	//u8
+					//case 0x3c://AVM2Ops.si32	//u8
+					//case 0x3d://AVM2Ops.sf32	//u8
+					//case 0x3e://AVM2Ops.sf64	//u8
+					//case 0x47://AVM2Ops.returnvoid	//u8
+					//case 0x48://AVM2Ops.returnvalue	//u8
+					//case 0x50://AVM2Ops.sxi1	//u8
+					//case 0x51://AVM2Ops.sxi8	//u8
+					//case 0x52://AVM2Ops.sxi16	//u8
+					//case 0x57://AVM2Ops.newactivation	//u8
+					//case 0x64://AVM2Ops.getglobalscope	//u8
+					//case 0x70://AVM2Ops.convert_s	//u8
+					//case 0x71://AVM2Ops.esc_xelem	//u8
+					//case 0x72://AVM2Ops.esc_xattr	//u8
+					//case 0x73://AVM2Ops.convert_i	//u8
+					//case 0x74://AVM2Ops.convert_u	//u8
+					//case 0x75://AVM2Ops.convert_d	//u8
+					//case 0x76://AVM2Ops.convert_b	//u8
+					//case 0x77://AVM2Ops.convert_o	//u8
+					//case 0x78://AVM2Ops.checkfilter	//u8
+					//case 0x81://AVM2Ops.coerce_b	//u8
+					//case 0x82://AVM2Ops.coerce_a	//u8
+					//case 0x83://AVM2Ops.coerce_i	//u8
+					//case 0x84://AVM2Ops.coerce_d	//u8
+					//case 0x85://AVM2Ops.coerce_s	//u8
+					//case 0x87://AVM2Ops.astypelate	//u8
+					//case 0x88://AVM2Ops.coerce_u	//u8
+					//case 0x89://AVM2Ops.coerce_o	//u8
+					//case 0x90://AVM2Ops.negate	//u8
+					//case 0x91://AVM2Ops.increment	//u8
+					//case 0x93://AVM2Ops.decrement	//u8
+					//case 0x95://AVM2Ops.typeof_	//u8
+					//case 0x96://AVM2Ops.not	//u8
+					//case 0x97://AVM2Ops.bitnot	//u8
+					//case 0xa0://AVM2Ops.add	//u8
+					//case 0xa1://AVM2Ops.subtract	//u8
+					//case 0xa2://AVM2Ops.multiply	//u8
+					//case 0xa3://AVM2Ops.divide	//u8
+					//case 0xa4://AVM2Ops.modulo	//u8
+					//case 0xa5://AVM2Ops.lshift	//u8
+					//case 0xa6://AVM2Ops.rshift	//u8
+					//case 0xa7://AVM2Ops.urshift	//u8
+					//case 0xa8://AVM2Ops.bitand	//u8
+					//case 0xa9://AVM2Ops.bitor	//u8
+					//case 0xaa://AVM2Ops.bitxor	//u8
+					//case 0xab://AVM2Ops.equals	//u8
+					//case 0xac://AVM2Ops.strictequals	//u8
+					//case 0xad://AVM2Ops.lessthan	//u8
+					//case 0xae://AVM2Ops.lessequals	//u8
+					//case 0xaf://AVM2Ops.greaterthan	//u8
+					//case 0xb0://AVM2Ops.greaterequals	//u8
+					//case 0xb1://AVM2Ops.instanceof_	//u8
+					//case 0xb3://AVM2Ops.istypelate	//u8
+					//case 0xb4://AVM2Ops.in_	//u8
+					//case 0xc0://AVM2Ops.increment_i	//u8
+					//case 0xc1://AVM2Ops.decrement_i	//u8
+					//case 0xc4://AVM2Ops.negate_i	//u8
+					//case 0xc5://AVM2Ops.add_i	//u8
+					//case 0xc6://AVM2Ops.subtract_i	//u8
+					//case 0xc7://AVM2Ops.multiply_i	//u8
+					//case 0xd0://AVM2Ops.getlocal0	//u8
+					//case 0xd1://AVM2Ops.getlocal1	//u8
+					//case 0xd2://AVM2Ops.getlocal2	//u8
+					//case 0xd3://AVM2Ops.getlocal3	//u8
+					//case 0xd4://AVM2Ops.setlocal0	//u8
+					//case 0xd5://AVM2Ops.setlocal1	//u8
+					//case 0xd6://AVM2Ops.setlocal2	//u8
+					//case 0xd7://AVM2Ops.setlocal3	//u8
+					//case 0xf3://AVM2Ops.timestamp	//u8
+					case "op":
 						codeByPosArr[pos]=op;
 					break;
-					case AVM2Ops.pushbyte://0x24	//u8_u8
+					//case 0x24://AVM2Ops.pushbyte	//u8_u8
+					case "pushbyte":
 						codeByPosArr[pos]=new Code(op,data[offset++]);
 						if(codeByPosArr[pos].value&0x80){codeByPosArr[pos].value|=0xffffff00}//最高位为1,表示负数
 					break;
-					case AVM2Ops.pushshort://0x25	//u8_u30__value_int
-					case AVM2Ops.debugline://0xf0	//u8_u30__value_int
-					case AVM2Ops.bkptline://0xf2	//u8_u30__value_int
-					case AVM2Ops.getscopeobject://0x65	//u8_u30__scope
-					case AVM2Ops.getslot://0x6c	//u8_u30__slot
-					case AVM2Ops.setslot://0x6d	//u8_u30__slot
-					case AVM2Ops.getglobalslot://0x6e	//u8_u30__slot
-					case AVM2Ops.setglobalslot://0x6f	//u8_u30__slot
-					case AVM2Ops.kill://0x08	//u8_u30__register
-					case AVM2Ops.getlocal://0x62	//u8_u30__register
-					case AVM2Ops.setlocal://0x63	//u8_u30__register
-					case AVM2Ops.inclocal://0x92	//u8_u30__register
-					case AVM2Ops.declocal://0x94	//u8_u30__register
-					case AVM2Ops.inclocal_i://0xc2	//u8_u30__register
-					case AVM2Ops.declocal_i://0xc3	//u8_u30__register
-					case AVM2Ops.call://0x41	//u8_u30__args
-					case AVM2Ops.construct://0x42	//u8_u30__args
-					case AVM2Ops.constructsuper://0x49	//u8_u30__args
-					case AVM2Ops.applytype://0x53	//u8_u30__args
-					case AVM2Ops.newobject://0x55	//u8_u30__args
-					case AVM2Ops.newarray://0x56	//u8_u30__args
+					//case 0x25://AVM2Ops.pushshort	//u8_u30__value_int
+					//case 0xf0://AVM2Ops.debugline	//u8_u30__value_int
+					//case 0xf2://AVM2Ops.bkptline	//u8_u30__value_int
+					//case 0x65://AVM2Ops.getscopeobject	//u8_u30__scope
+					//case 0x6c://AVM2Ops.getslot	//u8_u30__slot
+					//case 0x6d://AVM2Ops.setslot	//u8_u30__slot
+					//case 0x6e://AVM2Ops.getglobalslot	//u8_u30__slot
+					//case 0x6f://AVM2Ops.setglobalslot	//u8_u30__slot
+					//case 0x08://AVM2Ops.kill	//u8_u30__register
+					//case 0x62://AVM2Ops.getlocal	//u8_u30__register
+					//case 0x63://AVM2Ops.setlocal	//u8_u30__register
+					//case 0x92://AVM2Ops.inclocal	//u8_u30__register
+					//case 0x94://AVM2Ops.declocal	//u8_u30__register
+					//case 0xc2://AVM2Ops.inclocal_i	//u8_u30__register
+					//case 0xc3://AVM2Ops.declocal_i	//u8_u30__register
+					//case 0x41://AVM2Ops.call	//u8_u30__args
+					//case 0x42://AVM2Ops.construct	//u8_u30__args
+					//case 0x49://AVM2Ops.constructsuper	//u8_u30__args
+					//case 0x53://AVM2Ops.applytype	//u8_u30__args
+					//case 0x55://AVM2Ops.newobject	//u8_u30__args
+					//case 0x56://AVM2Ops.newarray	//u8_u30__args
+					case "int":
 						if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){codeByPosArr[pos]=new Code(op,(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28));}else{codeByPosArr[pos]=new Code(op,(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21));}}else{codeByPosArr[pos]=new Code(op,(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14));}}else{codeByPosArr[pos]=new Code(op,(data[offset++]&0x7f)|(data[offset++]<<7));}}else{codeByPosArr[pos]=new Code(op,data[offset++]);}
 						//codeByPosArr[pos]=new Code(op,u30_1);
 					break;
-					case AVM2Ops.pushint://0x2d	//u8_u30__int
+					//case 0x2d://AVM2Ops.pushint	//u8_u30__int
+					case "pushint":
 						if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){codeByPosArr[pos]=new Code(op,integerV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28)]);}else{codeByPosArr[pos]=new Code(op,integerV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21)]);}}else{codeByPosArr[pos]=new Code(op,integerV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14)]);}}else{codeByPosArr[pos]=new Code(op,integerV[(data[offset++]&0x7f)|(data[offset++]<<7)]);}}else{codeByPosArr[pos]=new Code(op,integerV[data[offset++]]);}
 						//codeByPosArr[pos]=new Code(op,integerV[u30_1]);
 					break;
-					case AVM2Ops.pushuint://0x2e	//u8_u30__uint
+					//case 0x2e://AVM2Ops.pushuint	//u8_u30__uint
+					case "pushuint":
 						if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){codeByPosArr[pos]=new Code(op,uintegerV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28)]);}else{codeByPosArr[pos]=new Code(op,uintegerV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21)]);}}else{codeByPosArr[pos]=new Code(op,uintegerV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14)]);}}else{codeByPosArr[pos]=new Code(op,uintegerV[(data[offset++]&0x7f)|(data[offset++]<<7)]);}}else{codeByPosArr[pos]=new Code(op,uintegerV[data[offset++]]);}
 						//codeByPosArr[pos]=new Code(op,uintegerV[u30_1]);
 					break;
-					case AVM2Ops.pushdouble://0x2f	//u8_u30__double
+					//case 0x2f://AVM2Ops.pushdouble	//u8_u30__double
+					case "pushdouble":
 						if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){codeByPosArr[pos]=new Code(op,doubleV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28)]);}else{codeByPosArr[pos]=new Code(op,doubleV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21)]);}}else{codeByPosArr[pos]=new Code(op,doubleV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14)]);}}else{codeByPosArr[pos]=new Code(op,doubleV[(data[offset++]&0x7f)|(data[offset++]<<7)]);}}else{codeByPosArr[pos]=new Code(op,doubleV[data[offset++]]);}
 						//codeByPosArr[pos]=new Code(op,doubleV[u30_1]);
 					break;
-					case AVM2Ops.dxns://0x06	//u8_u30__string
-					case AVM2Ops.pushstring://0x2c	//u8_u30__string
-					case AVM2Ops.debugfile://0xf1	//u8_u30__string
+					//case 0x06://AVM2Ops.dxns	//u8_u30__string
+					//case 0x2c://AVM2Ops.pushstring	//u8_u30__string
+					//case 0xf1://AVM2Ops.debugfile	//u8_u30__string
+					case "string":
 						if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){codeByPosArr[pos]=new Code(op,stringV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28)]);}else{codeByPosArr[pos]=new Code(op,stringV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21)]);}}else{codeByPosArr[pos]=new Code(op,stringV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14)]);}}else{codeByPosArr[pos]=new Code(op,stringV[(data[offset++]&0x7f)|(data[offset++]<<7)]);}}else{codeByPosArr[pos]=new Code(op,stringV[data[offset++]]);}
 						//codeByPosArr[pos]=new Code(op,stringV[u30_1]);
 					break;
-					case AVM2Ops.pushnamespace://0x31	//u8_u30__namespace_info
+					//case 0x31://AVM2Ops.pushnamespace	//u8_u30__namespace_info
+					case "pushnamespace":
 						if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){codeByPosArr[pos]=new Code(op,allNsV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28)]);}else{codeByPosArr[pos]=new Code(op,allNsV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21)]);}}else{codeByPosArr[pos]=new Code(op,allNsV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14)]);}}else{codeByPosArr[pos]=new Code(op,allNsV[(data[offset++]&0x7f)|(data[offset++]<<7)]);}}else{codeByPosArr[pos]=new Code(op,allNsV[data[offset++]]);}
 						//codeByPosArr[pos]=new Code(op,allNsV[u30_1]);
 					break;
-					case AVM2Ops.getsuper://0x04	//u8_u30__multiname_info
-					case AVM2Ops.setsuper://0x05	//u8_u30__multiname_info
-					case AVM2Ops.getdescendants://0x59	//u8_u30__multiname_info
-					case AVM2Ops.findpropstrict://0x5d	//u8_u30__multiname_info
-					case AVM2Ops.findproperty://0x5e	//u8_u30__multiname_info
-					case AVM2Ops.getlex://0x60	//u8_u30__multiname_info
-					case AVM2Ops.setproperty://0x61	//u8_u30__multiname_info
-					case AVM2Ops.getproperty://0x66	//u8_u30__multiname_info
-					case AVM2Ops.initproperty://0x68	//u8_u30__multiname_info
-					case AVM2Ops.deleteproperty://0x6a	//u8_u30__multiname_info
-					case AVM2Ops.coerce://0x80	//u8_u30__multiname_info
-					case AVM2Ops.astype://0x86	//u8_u30__multiname_info
-					case AVM2Ops.istype://0xb2	//u8_u30__multiname_info
+					//case 0x04://AVM2Ops.getsuper	//u8_u30__multiname_info
+					//case 0x05://AVM2Ops.setsuper	//u8_u30__multiname_info
+					//case 0x59://AVM2Ops.getdescendants	//u8_u30__multiname_info
+					//case 0x5d://AVM2Ops.findpropstrict	//u8_u30__multiname_info
+					//case 0x5e://AVM2Ops.findproperty	//u8_u30__multiname_info
+					//case 0x60://AVM2Ops.getlex	//u8_u30__multiname_info
+					//case 0x61://AVM2Ops.setproperty	//u8_u30__multiname_info
+					//case 0x66://AVM2Ops.getproperty	//u8_u30__multiname_info
+					//case 0x68://AVM2Ops.initproperty	//u8_u30__multiname_info
+					//case 0x6a://AVM2Ops.deleteproperty	//u8_u30__multiname_info
+					//case 0x80://AVM2Ops.coerce	//u8_u30__multiname_info
+					//case 0x86://AVM2Ops.astype	//u8_u30__multiname_info
+					//case 0xb2://AVM2Ops.istype	//u8_u30__multiname_info
+					case "multiname":
 						if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){codeByPosArr[pos]=new Code(op,allMultinameV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28)]);}else{codeByPosArr[pos]=new Code(op,allMultinameV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21)]);}}else{codeByPosArr[pos]=new Code(op,allMultinameV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14)]);}}else{codeByPosArr[pos]=new Code(op,allMultinameV[(data[offset++]&0x7f)|(data[offset++]<<7)]);}}else{codeByPosArr[pos]=new Code(op,allMultinameV[data[offset++]]);}
 						//codeByPosArr[pos]=new Code(op,allMultinameV[u30_1]);
 					break;
-					case AVM2Ops.newfunction://0x40	//u8_u30__method
+					//case 0x40://AVM2Ops.newfunction	//u8_u30__method
+					case "newfunction":
 						if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){codeByPosArr[pos]=new Code(op,allMethodV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28)]);}else{codeByPosArr[pos]=new Code(op,allMethodV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21)]);}}else{codeByPosArr[pos]=new Code(op,allMethodV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14)]);}}else{codeByPosArr[pos]=new Code(op,allMethodV[(data[offset++]&0x7f)|(data[offset++]<<7)]);}}else{codeByPosArr[pos]=new Code(op,allMethodV[data[offset++]]);}
 						//codeByPosArr[pos]=new Code(op,allMethodV[u30_1]);
 					break;
-					case AVM2Ops.newclass://0x58	//u8_u30__class
+					//case 0x58://AVM2Ops.newclass	//u8_u30__class
+					case "newclass":
 						if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){codeByPosArr[pos]=new Code(op,classV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28)]);}else{codeByPosArr[pos]=new Code(op,classV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21)]);}}else{codeByPosArr[pos]=new Code(op,classV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14)]);}}else{codeByPosArr[pos]=new Code(op,classV[(data[offset++]&0x7f)|(data[offset++]<<7)]);}}else{codeByPosArr[pos]=new Code(op,classV[data[offset++]]);}
 						//codeByPosArr[pos]=new Code(op,classV[u30_1]);
 					break;
-					case AVM2Ops.newcatch://0x5a	//u8_u30__exception_info
+					//case 0x5a://AVM2Ops.newcatch	//u8_u30__exception_info
+					case "newcatch":
 						if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){u30_1=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{u30_1=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{u30_1=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{u30_1=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{u30_1=data[offset++];}
 						//u30_1
 						var exception:ABCException=exceptionArr[u30_1];
@@ -242,10 +255,12 @@ package zero.swf.avm2{
 						}
 						codeByPosArr[pos]=new Code(op,exception);
 					break;
-					case AVM2Ops.finddef://0x5f	//u8_u30__finddef
+					//case 0x5f://AVM2Ops.finddef	//u8_u30__finddef
+					case "finddef":
 						throw new Error("恭喜你，你发现了一个 "+AVM2Ops.opNameV[op]+" 的例子！");
 					break;
-					case AVM2Ops.hasnext2://0x32	//u8_u30_u30__register_register
+					//case 0x32://AVM2Ops.hasnext2	//u8_u30_u30__register_register
+					case "hasnext2":
 						if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){u30_1=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{u30_1=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{u30_1=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{u30_1=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{u30_1=data[offset++];}
 						//u30_1
 						
@@ -257,12 +272,13 @@ package zero.swf.avm2{
 							register2:u30_2
 						});
 					break;
-					case AVM2Ops.callsuper://0x45	//u8_u30_u30__multiname_info_args
-					case AVM2Ops.callproperty://0x46	//u8_u30_u30__multiname_info_args
-					case AVM2Ops.constructprop://0x4a	//u8_u30_u30__multiname_info_args
-					case AVM2Ops.callproplex://0x4c	//u8_u30_u30__multiname_info_args
-					case AVM2Ops.callsupervoid://0x4e	//u8_u30_u30__multiname_info_args
-					case AVM2Ops.callpropvoid://0x4f	//u8_u30_u30__multiname_info_args
+					//case 0x45://AVM2Ops.callsuper	//u8_u30_u30__multiname_info_args
+					//case 0x46://AVM2Ops.callproperty	//u8_u30_u30__multiname_info_args
+					//case 0x4a://AVM2Ops.constructprop	//u8_u30_u30__multiname_info_args
+					//case 0x4c://AVM2Ops.callproplex	//u8_u30_u30__multiname_info_args
+					//case 0x4e://AVM2Ops.callsupervoid	//u8_u30_u30__multiname_info_args
+					//case 0x4f://AVM2Ops.callpropvoid	//u8_u30_u30__multiname_info_args
+					case "multiname args":
 						if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){u30_1=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{u30_1=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{u30_1=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{u30_1=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{u30_1=data[offset++];}
 						//u30_1
 						
@@ -274,29 +290,31 @@ package zero.swf.avm2{
 							args:u30_2
 						});
 					break;
-					case AVM2Ops.callmethod://0x43	//u8_u30_u30__method_args
-					case AVM2Ops.callstatic://0x44	//u8_u30_u30__method_args
+					//case 0x43://AVM2Ops.callmethod	//u8_u30_u30__method_args
+					//case 0x44://AVM2Ops.callstatic	//u8_u30_u30__method_args
+					case "method args":
 						//codeByPosArr[pos]=new Code(op,{
 						//	method:allMethod(u30_1),
 						//	args:u30_2
 						//});
 						throw new Error("恭喜你，你发现了一个 "+AVM2Ops.opNameV[op]+" 的例子！");
 					break;
-					case AVM2Ops.ifnlt://0x0c	//u8_s24__branch
-					case AVM2Ops.ifnle://0x0d	//u8_s24__branch
-					case AVM2Ops.ifngt://0x0e	//u8_s24__branch
-					case AVM2Ops.ifnge://0x0f	//u8_s24__branch
-					case AVM2Ops.jump://0x10	//u8_s24__branch
-					case AVM2Ops.iftrue://0x11	//u8_s24__branch
-					case AVM2Ops.iffalse://0x12	//u8_s24__branch
-					case AVM2Ops.ifeq://0x13	//u8_s24__branch
-					case AVM2Ops.ifne://0x14	//u8_s24__branch
-					case AVM2Ops.iflt://0x15	//u8_s24__branch
-					case AVM2Ops.ifle://0x16	//u8_s24__branch
-					case AVM2Ops.ifgt://0x17	//u8_s24__branch
-					case AVM2Ops.ifge://0x18	//u8_s24__branch
-					case AVM2Ops.ifstricteq://0x19	//u8_s24__branch
-					case AVM2Ops.ifstrictne://0x1a	//u8_s24__branch
+					//case 0x0c://AVM2Ops.ifnlt	//u8_s24__branch
+					//case 0x0d://AVM2Ops.ifnle	//u8_s24__branch
+					//case 0x0e://AVM2Ops.ifngt	//u8_s24__branch
+					//case 0x0f://AVM2Ops.ifnge	//u8_s24__branch
+					//case 0x10://AVM2Ops.jump	//u8_s24__branch
+					//case 0x11://AVM2Ops.iftrue	//u8_s24__branch
+					//case 0x12://AVM2Ops.iffalse	//u8_s24__branch
+					//case 0x13://AVM2Ops.ifeq	//u8_s24__branch
+					//case 0x14://AVM2Ops.ifne	//u8_s24__branch
+					//case 0x15://AVM2Ops.iflt	//u8_s24__branch
+					//case 0x16://AVM2Ops.ifle	//u8_s24__branch
+					//case 0x17://AVM2Ops.ifgt	//u8_s24__branch
+					//case 0x18://AVM2Ops.ifge	//u8_s24__branch
+					//case 0x19://AVM2Ops.ifstricteq	//u8_s24__branch
+					//case 0x1a://AVM2Ops.ifstrictne	//u8_s24__branch
+					case "branch":
 						jumpOffset=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16);
 						if(jumpOffset&0x00800000){jumpOffset|=0xff000000}//最高位为1,表示负数
 						jumpPos=offset+jumpOffset;
@@ -306,7 +324,8 @@ package zero.swf.avm2{
 						}
 						codeByPosArr[pos]=new Code(op,labelByPosArr[jumpPos]||(labelByPosArr[jumpPos]=new LabelMark(++labelId)));
 					break;
-					case AVM2Ops.lookupswitch://0x1b	//u8_s24_u30_s24List__lookupswitch
+					//case 0x1b://AVM2Ops.lookupswitch	//u8_s24_u30_s24List__lookupswitch
+					case "lookupswitch":
 						//The base location is the address of the lookupswitch instruction itself.
 						var lookupswitch_startOffset:int=offset-1;
 						
@@ -339,7 +358,8 @@ package zero.swf.avm2{
 							case_offsetV:case_offsetV
 						});
 					break;
-					case AVM2Ops.debug://0xef	//u8_u8_u30_u8_u30__debug
+					//case 0xef://AVM2Ops.debug	//u8_u8_u30_u8_u30__debug
+					case "debug":
 						var debug_type:int=data[offset++];
 						if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var index:String=stringV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28)];}else{index=stringV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21)];}}else{index=stringV[(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14)];}}else{index=stringV[(data[offset++]&0x7f)|(data[offset++]<<7)];}}else{index=stringV[data[offset++]];}
 						//index=stringV[u30_1];
@@ -393,65 +413,78 @@ package zero.swf.avm2{
 		}
 		public function getInfo_product(productMark:ProductMark):void{
 			for each(var code:* in codeArr){
-				if(code is Code){
-					switch(code.op){
-						case AVM2Ops.pushint://0x2d	//u8_u30__int
+				if(code.constructor==Code){
+					switch(AVM2Ops.opTypeV[code.op]){
+						//case 0x2d://AVM2Ops.pushint	//u8_u30__int
+						case "pushint":
 							productMark.productInteger(code.value);
 						break;
-						case AVM2Ops.pushuint://0x2e	//u8_u30__uint
+						//case 0x2e://AVM2Ops.pushuint	//u8_u30__uint
+						case "pushuint":
 							productMark.productUinteger(code.value);
 						break;
-						case AVM2Ops.pushdouble://0x2f	//u8_u30__double
+						//case 0x2f://AVM2Ops.pushdouble	//u8_u30__double
+						case "pushdouble":
 							productMark.productDouble(code.value);
 						break;
-						case AVM2Ops.dxns://0x06	//u8_u30__string
-						case AVM2Ops.pushstring://0x2c	//u8_u30__string
-						case AVM2Ops.debugfile://0xf1	//u8_u30__string
+						//case 0x06://AVM2Ops.dxns	//u8_u30__string
+						//case 0x2c://AVM2Ops.pushstring	//u8_u30__string
+						//case 0xf1://AVM2Ops.debugfile	//u8_u30__string
+						case "string":
 							productMark.productString(code.value);
 						break;
-						case AVM2Ops.pushnamespace://0x31	//u8_u30__namespace_info
+						//case 0x31://AVM2Ops.pushnamespace	//u8_u30__namespace_info
+						case "pushnamespace":
 							productMark.productNs(code.value);
 						break;
-						case AVM2Ops.getsuper://0x04	//u8_u30__multiname_info
-						case AVM2Ops.setsuper://0x05	//u8_u30__multiname_info
-						case AVM2Ops.getdescendants://0x59	//u8_u30__multiname_info
-						case AVM2Ops.findpropstrict://0x5d	//u8_u30__multiname_info
-						case AVM2Ops.findproperty://0x5e	//u8_u30__multiname_info
-						case AVM2Ops.getlex://0x60	//u8_u30__multiname_info
-						case AVM2Ops.setproperty://0x61	//u8_u30__multiname_info
-						case AVM2Ops.getproperty://0x66	//u8_u30__multiname_info
-						case AVM2Ops.initproperty://0x68	//u8_u30__multiname_info
-						case AVM2Ops.deleteproperty://0x6a	//u8_u30__multiname_info
-						case AVM2Ops.coerce://0x80	//u8_u30__multiname_info
-						case AVM2Ops.astype://0x86	//u8_u30__multiname_info
-						case AVM2Ops.istype://0xb2	//u8_u30__multiname_info
+						//case 0x04://AVM2Ops.getsuper	//u8_u30__multiname_info
+						//case 0x05://AVM2Ops.setsuper	//u8_u30__multiname_info
+						//case 0x59://AVM2Ops.getdescendants	//u8_u30__multiname_info
+						//case 0x5d://AVM2Ops.findpropstrict	//u8_u30__multiname_info
+						//case 0x5e://AVM2Ops.findproperty	//u8_u30__multiname_info
+						//case 0x60://AVM2Ops.getlex	//u8_u30__multiname_info
+						//case 0x61://AVM2Ops.setproperty	//u8_u30__multiname_info
+						//case 0x66://AVM2Ops.getproperty	//u8_u30__multiname_info
+						//case 0x68://AVM2Ops.initproperty	//u8_u30__multiname_info
+						//case 0x6a://AVM2Ops.deleteproperty	//u8_u30__multiname_info
+						//case 0x80://AVM2Ops.coerce	//u8_u30__multiname_info
+						//case 0x86://AVM2Ops.astype	//u8_u30__multiname_info
+						//case 0xb2://AVM2Ops.istype	//u8_u30__multiname_info
+						case "multiname":
 							productMark.productMultiname(code.value);
 						break;
-						case AVM2Ops.newfunction://0x40	//u8_u30__method
+						//case 0x40://AVM2Ops.newfunction	//u8_u30__method
+						case "newfunction":
 							productMark.productMethod(code.value);
 						break;
-						case AVM2Ops.newclass://0x58	//u8_u30__class
+						//case 0x58://AVM2Ops.newclass	//u8_u30__class
+						//case "newclass":
 							//已在 ABCClasses.toData 里 product 过了
+						//break;
+						//case 0x5a://AVM2Ops.newcatch	//u8_u30__exception_info
+						case "newcatch":
+							code.value.getInfo_product(productMark);
 						break;
-						case AVM2Ops.newcatch://0x5a	//u8_u30__exception_info
-							(code.value as ABCException).getInfo_product(productMark);
-						break;
-						case AVM2Ops.finddef://0x5f	//u8_u30__finddef
+						//case 0x5f://AVM2Ops.finddef	//u8_u30__finddef
+						//case "finddef":
 							//throw new Error("恭喜你，你发现了一个 "+AVM2Ops.opNameV[code.op]+" 的例子！");
-						break;
-						case AVM2Ops.callsuper://0x45	//u8_u30_u30__multiname_info_args
-						case AVM2Ops.callproperty://0x46	//u8_u30_u30__multiname_info_args
-						case AVM2Ops.constructprop://0x4a	//u8_u30_u30__multiname_info_args
-						case AVM2Ops.callproplex://0x4c	//u8_u30_u30__multiname_info_args
-						case AVM2Ops.callsupervoid://0x4e	//u8_u30_u30__multiname_info_args
-						case AVM2Ops.callpropvoid://0x4f	//u8_u30_u30__multiname_info_args
+						//break;
+						//case 0x45://AVM2Ops.callsuper	//u8_u30_u30__multiname_info_args
+						//case 0x46://AVM2Ops.callproperty	//u8_u30_u30__multiname_info_args
+						//case 0x4a://AVM2Ops.constructprop	//u8_u30_u30__multiname_info_args
+						//case 0x4c://AVM2Ops.callproplex	//u8_u30_u30__multiname_info_args
+						//case 0x4e://AVM2Ops.callsupervoid	//u8_u30_u30__multiname_info_args
+						//case 0x4f://AVM2Ops.callpropvoid	//u8_u30_u30__multiname_info_args
+						case "multiname args":
 							productMark.productMultiname(code.value.multiname);
 						break;
-						case AVM2Ops.callmethod://0x43	//u8_u30_u30__method_args
-						case AVM2Ops.callstatic://0x44	//u8_u30_u30__method_args
+						//case 0x43://AVM2Ops.callmethod	//u8_u30_u30__method_args
+						//case 0x44://AVM2Ops.callstatic	//u8_u30_u30__method_args
+						//case "method args":
 							//Outputer.outputError("恭喜你，你发现了一个 "+AVM2Ops.opNameV[code.op]+" 的例子！");
-						break;
-						case AVM2Ops.debug://0xef	//u8_u8_u30_u8_u30__debug
+						//break;
+						//case 0xef://AVM2Ops.debug	//u8_u8_u30_u8_u30__debug
+						case "debug":
 							productMark.productString(code.value.index);
 						break;
 					}
@@ -475,200 +508,222 @@ package zero.swf.avm2{
 			var exception_infoV:Vector.<Exception_info>=new Vector.<Exception_info>();
 			
 			for each(var code:* in codeArr){
-				if(code is LabelMark){
-					(code as LabelMark).pos=offset;
-				}else if(code is Array){
-					//Outputer.output("使用 Array 进行记录的未知代码："+code,"brown");
-					for each(var num:int in code){
-						data[offset++]=num;
-					}
-				}else if(code is ByteArray){
-					Outputer.output("使用 ByteArray 进行记录的未知代码："+BytesAndStr16.bytes2str16(code,0,code.length),"brown");
-					data.position=offset;
-					data.writeBytes(code,0,code.length);
-					offset=data.length;
-				}else if(code is int){
-					data[offset++]=code;
-				}else if(code is Code){
-					data[offset++]=code.op;
-					switch(code.op){
-						case AVM2Ops.pushbyte://0x24	//u8_u8
-							data[offset++]=code.value;
-						break;
-						case AVM2Ops.pushshort://0x25	//u8_u30__value_int
-						case AVM2Ops.debugline://0xf0	//u8_u30__value_int
-						case AVM2Ops.bkptline://0xf2	//u8_u30__value_int
-						case AVM2Ops.getscopeobject://0x65	//u8_u30__scope
-						case AVM2Ops.getslot://0x6c	//u8_u30__slot
-						case AVM2Ops.setslot://0x6d	//u8_u30__slot
-						case AVM2Ops.getglobalslot://0x6e	//u8_u30__slot
-						case AVM2Ops.setglobalslot://0x6f	//u8_u30__slot
-						case AVM2Ops.kill://0x08	//u8_u30__register
-						case AVM2Ops.getlocal://0x62	//u8_u30__register
-						case AVM2Ops.setlocal://0x63	//u8_u30__register
-						case AVM2Ops.inclocal://0x92	//u8_u30__register
-						case AVM2Ops.declocal://0x94	//u8_u30__register
-						case AVM2Ops.inclocal_i://0xc2	//u8_u30__register
-						case AVM2Ops.declocal_i://0xc3	//u8_u30__register
-						case AVM2Ops.call://0x41	//u8_u30__args
-						case AVM2Ops.construct://0x42	//u8_u30__args
-						case AVM2Ops.constructsuper://0x49	//u8_u30__args
-						case AVM2Ops.applytype://0x53	//u8_u30__args
-						case AVM2Ops.newobject://0x55	//u8_u30__args
-						case AVM2Ops.newarray://0x56	//u8_u30__args
-							u30_1=code.value;
-							if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
-							//u30_1
-						break;
-						case AVM2Ops.pushint://0x2d	//u8_u30__int
-							u30_1=productMark.getIntegerId(code.value);
-							if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
-							//u30_1
-						break;
-						case AVM2Ops.pushuint://0x2e	//u8_u30__uint
-							u30_1=productMark.getUintegerId(code.value);
-							if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
-							//u30_1
-						break;
-						case AVM2Ops.pushdouble://0x2f	//u8_u30__double
-							u30_1=productMark.getDoubleId(code.value);
-							if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
-							//u30_1
-						break;
-						case AVM2Ops.dxns://0x06	//u8_u30__string
-						case AVM2Ops.pushstring://0x2c	//u8_u30__string
-						case AVM2Ops.debugfile://0xf1	//u8_u30__string
-							u30_1=productMark.getStringId(code.value);
-							if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
-							//u30_1
-						break;
-						case AVM2Ops.pushnamespace://0x31	//u8_u30__namespace_info
-							u30_1=productMark.getNsId(code.value);
-							if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
-							//u30_1
-						break;
-						case AVM2Ops.getsuper://0x04	//u8_u30__multiname_info
-						case AVM2Ops.setsuper://0x05	//u8_u30__multiname_info
-						case AVM2Ops.getdescendants://0x59	//u8_u30__multiname_info
-						case AVM2Ops.findpropstrict://0x5d	//u8_u30__multiname_info
-						case AVM2Ops.findproperty://0x5e	//u8_u30__multiname_info
-						case AVM2Ops.getlex://0x60	//u8_u30__multiname_info
-						case AVM2Ops.setproperty://0x61	//u8_u30__multiname_info
-						case AVM2Ops.getproperty://0x66	//u8_u30__multiname_info
-						case AVM2Ops.initproperty://0x68	//u8_u30__multiname_info
-						case AVM2Ops.deleteproperty://0x6a	//u8_u30__multiname_info
-						case AVM2Ops.coerce://0x80	//u8_u30__multiname_info
-						case AVM2Ops.astype://0x86	//u8_u30__multiname_info
-						case AVM2Ops.istype://0xb2	//u8_u30__multiname_info
-							u30_1=productMark.getMultinameId(code.value);
-							if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
-							//u30_1
-						break;
-						case AVM2Ops.newfunction://0x40	//u8_u30__method
-							u30_1=productMark.getMethodId(code.value);
-							if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
-							//u30_1
-						break;
-						case AVM2Ops.newclass://0x58	//u8_u30__class
-							u30_1=productMark.getClassId(code.value);
-							if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
-							//u30_1
-						break;
-						case AVM2Ops.newcatch://0x5a	//u8_u30__exception_info
-							exception=code.value;
-							if(exceptionIdDict[exception]>-1){
-								Outputer.output("重复使用的 exception","brown");
-							}else{
-								exceptionIdDict[exception]=exception_infoV.length;
-								exception_infoV[exception_infoV.length]=exception.getInfo(productMark,_toDataOptions);
-							}
-							u30_1=exceptionIdDict[exception];
-							if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
-							//u30_1
-							posMarkArr[offset]=code;
-						break;
-						case AVM2Ops.finddef://0x5f	//u8_u30__finddef
-							throw new Error("恭喜你，你发现了一个 "+AVM2Ops.opNameV[code.op]+" 的例子！");
-						break;
-						case AVM2Ops.hasnext2://0x32	//u8_u30_u30__register_register
-							u30_1=code.value.register1;
-							u30_2=code.value.register2;
-							if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
-							//u30_1
-							
-							if(u30_2>>>7){if(u30_2>>>14){if(u30_2>>>21){if(u30_2>>>28){data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=((u30_2>>>7)&0x7f)|0x80;data[offset++]=((u30_2>>>14)&0x7f)|0x80;data[offset++]=((u30_2>>>21)&0x7f)|0x80;data[offset++]=u30_2>>>28;}else{data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=((u30_2>>>7)&0x7f)|0x80;data[offset++]=((u30_2>>>14)&0x7f)|0x80;data[offset++]=u30_2>>>21;}}else{data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=((u30_2>>>7)&0x7f)|0x80;data[offset++]=u30_2>>>14;}}else{data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=u30_2>>>7;}}else{data[offset++]=u30_2;}
-							//u30_2
-						break;
-						case AVM2Ops.callsuper://0x45	//u8_u30_u30__multiname_info_args
-						case AVM2Ops.callproperty://0x46	//u8_u30_u30__multiname_info_args
-						case AVM2Ops.constructprop://0x4a	//u8_u30_u30__multiname_info_args
-						case AVM2Ops.callproplex://0x4c	//u8_u30_u30__multiname_info_args
-						case AVM2Ops.callsupervoid://0x4e	//u8_u30_u30__multiname_info_args
-						case AVM2Ops.callpropvoid://0x4f	//u8_u30_u30__multiname_info_args
-							u30_1=productMark.getMultinameId(code.value.multiname),
-							u30_2=code.value.args;
-							if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
-							//u30_1
-							
-							if(u30_2>>>7){if(u30_2>>>14){if(u30_2>>>21){if(u30_2>>>28){data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=((u30_2>>>7)&0x7f)|0x80;data[offset++]=((u30_2>>>14)&0x7f)|0x80;data[offset++]=((u30_2>>>21)&0x7f)|0x80;data[offset++]=u30_2>>>28;}else{data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=((u30_2>>>7)&0x7f)|0x80;data[offset++]=((u30_2>>>14)&0x7f)|0x80;data[offset++]=u30_2>>>21;}}else{data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=((u30_2>>>7)&0x7f)|0x80;data[offset++]=u30_2>>>14;}}else{data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=u30_2>>>7;}}else{data[offset++]=u30_2;}
-							//u30_2
-						break;
-						case AVM2Ops.callmethod://0x43	//u8_u30_u30__method_args
-						case AVM2Ops.callstatic://0x44	//u8_u30_u30__method_args
-							Outputer.outputError("恭喜你，你发现了一个 "+AVM2Ops.opNameV[code.op]+" 的例子！");
-						break;
-						case AVM2Ops.ifnlt://0x0c	//u8_s24__branch
-						case AVM2Ops.ifnle://0x0d	//u8_s24__branch
-						case AVM2Ops.ifngt://0x0e	//u8_s24__branch
-						case AVM2Ops.ifnge://0x0f	//u8_s24__branch
-						case AVM2Ops.jump://0x10	//u8_s24__branch
-						case AVM2Ops.iftrue://0x11	//u8_s24__branch
-						case AVM2Ops.iffalse://0x12	//u8_s24__branch
-						case AVM2Ops.ifeq://0x13	//u8_s24__branch
-						case AVM2Ops.ifne://0x14	//u8_s24__branch
-						case AVM2Ops.iflt://0x15	//u8_s24__branch
-						case AVM2Ops.ifle://0x16	//u8_s24__branch
-						case AVM2Ops.ifgt://0x17	//u8_s24__branch
-						case AVM2Ops.ifge://0x18	//u8_s24__branch
-						case AVM2Ops.ifstricteq://0x19	//u8_s24__branch
-						case AVM2Ops.ifstrictne://0x1a	//u8_s24__branch
-							offset+=3;
-							posMarkArr[offset]=code.value;
-						break;
-						case AVM2Ops.lookupswitch://0x1b	//u8_s24_u30_s24List__lookupswitch
-							//The base location is the address of the lookupswitch instruction itself.
-							posMarkArr[offset-1]=code;
-							
-							code.value.default_offset_startPos=offset;//- -
-							
-							offset+=3;
-							
-							var case_count:int=code.value.case_offsetV.length-1;
-							if(case_count>>>7){if(case_count>>>14){if(case_count>>>21){if(case_count>>>28){data[offset++]=(case_count&0x7f)|0x80;data[offset++]=((case_count>>>7)&0x7f)|0x80;data[offset++]=((case_count>>>14)&0x7f)|0x80;data[offset++]=((case_count>>>21)&0x7f)|0x80;data[offset++]=case_count>>>28;}else{data[offset++]=(case_count&0x7f)|0x80;data[offset++]=((case_count>>>7)&0x7f)|0x80;data[offset++]=((case_count>>>14)&0x7f)|0x80;data[offset++]=case_count>>>21;}}else{data[offset++]=(case_count&0x7f)|0x80;data[offset++]=((case_count>>>7)&0x7f)|0x80;data[offset++]=case_count>>>14;}}else{data[offset++]=(case_count&0x7f)|0x80;data[offset++]=case_count>>>7;}}else{data[offset++]=case_count;}
-							//case_count
-							
-							code.value.case_offset_startPos=offset;//- -
-							offset+=3*(case_count+1);
-						break;
-						case AVM2Ops.debug://0xef	//u8_u8_u30_u8_u30__debug
-							data[offset++]=code.value.debug_type;
-							
-							var debug_index:int=productMark.getStringId(code.value.index);
-							
-							if(debug_index>>>7){if(debug_index>>>14){if(debug_index>>>21){if(debug_index>>>28){data[offset++]=(debug_index&0x7f)|0x80;data[offset++]=((debug_index>>>7)&0x7f)|0x80;data[offset++]=((debug_index>>>14)&0x7f)|0x80;data[offset++]=((debug_index>>>21)&0x7f)|0x80;data[offset++]=debug_index>>>28;}else{data[offset++]=(debug_index&0x7f)|0x80;data[offset++]=((debug_index>>>7)&0x7f)|0x80;data[offset++]=((debug_index>>>14)&0x7f)|0x80;data[offset++]=debug_index>>>21;}}else{data[offset++]=(debug_index&0x7f)|0x80;data[offset++]=((debug_index>>>7)&0x7f)|0x80;data[offset++]=debug_index>>>14;}}else{data[offset++]=(debug_index&0x7f)|0x80;data[offset++]=debug_index>>>7;}}else{data[offset++]=debug_index;}
-							//debug_index
-							
-							data[offset++]=code.value.reg;
-							
-							if(code.value.extra>>>7){if(code.value.extra>>>14){if(code.value.extra>>>21){if(code.value.extra>>>28){data[offset++]=(code.value.extra&0x7f)|0x80;data[offset++]=((code.value.extra>>>7)&0x7f)|0x80;data[offset++]=((code.value.extra>>>14)&0x7f)|0x80;data[offset++]=((code.value.extra>>>21)&0x7f)|0x80;data[offset++]=code.value.extra>>>28;}else{data[offset++]=(code.value.extra&0x7f)|0x80;data[offset++]=((code.value.extra>>>7)&0x7f)|0x80;data[offset++]=((code.value.extra>>>14)&0x7f)|0x80;data[offset++]=code.value.extra>>>21;}}else{data[offset++]=(code.value.extra&0x7f)|0x80;data[offset++]=((code.value.extra>>>7)&0x7f)|0x80;data[offset++]=code.value.extra>>>14;}}else{data[offset++]=(code.value.extra&0x7f)|0x80;data[offset++]=code.value.extra>>>7;}}else{data[offset++]=code.value.extra;}
-							//code.value.extra
-						break;
-						default:
-							Outputer.outputError("未知 op: "+code.op);
-						break;
-					}
-				}else{
-					throw new Error("未知 code: "+code);
+				switch(code.constructor){
+					case LabelMark:
+						code.pos=offset;
+					break;
+					case Array:
+						//Outputer.output("使用 Array 进行记录的未知代码："+code,"brown");
+						for each(var num:int in code){
+							data[offset++]=num;
+						}
+					break;
+					case ByteArray:
+						Outputer.output("使用 ByteArray 进行记录的未知代码："+BytesAndStr16.bytes2str16(code,0,code.length),"brown");
+						data.position=offset;
+						data.writeBytes(code,0,code.length);
+						offset=data.length;
+					break;
+					case Code:
+						data[offset++]=code.op;
+						switch(AVM2Ops.opTypeV[code.op]){
+							//case 0x24://AVM2Ops.pushbyte	//u8_u8
+							case "pushbyte":
+								data[offset++]=code.value;
+							break;
+							//case 0x25://AVM2Ops.pushshort	//u8_u30__value_int
+							//case 0xf0://AVM2Ops.debugline	//u8_u30__value_int
+							//case 0xf2://AVM2Ops.bkptline	//u8_u30__value_int
+							//case 0x65://AVM2Ops.getscopeobject	//u8_u30__scope
+							//case 0x6c://AVM2Ops.getslot	//u8_u30__slot
+							//case 0x6d://AVM2Ops.setslot	//u8_u30__slot
+							//case 0x6e://AVM2Ops.getglobalslot	//u8_u30__slot
+							//case 0x6f://AVM2Ops.setglobalslot	//u8_u30__slot
+							//case 0x08://AVM2Ops.kill	//u8_u30__register
+							//case 0x62://AVM2Ops.getlocal	//u8_u30__register
+							//case 0x63://AVM2Ops.setlocal	//u8_u30__register
+							//case 0x92://AVM2Ops.inclocal	//u8_u30__register
+							//case 0x94://AVM2Ops.declocal	//u8_u30__register
+							//case 0xc2://AVM2Ops.inclocal_i	//u8_u30__register
+							//case 0xc3://AVM2Ops.declocal_i	//u8_u30__register
+							//case 0x41://AVM2Ops.call	//u8_u30__args
+							//case 0x42://AVM2Ops.construct	//u8_u30__args
+							//case 0x49://AVM2Ops.constructsuper	//u8_u30__args
+							//case 0x53://AVM2Ops.applytype	//u8_u30__args
+							//case 0x55://AVM2Ops.newobject	//u8_u30__args
+							//case 0x56://AVM2Ops.newarray	//u8_u30__args
+							case "int":
+								u30_1=code.value;
+								if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
+								//u30_1
+							break;
+							//case 0x2d://AVM2Ops.pushint	//u8_u30__int
+							case "pushint":
+								u30_1=productMark.getIntegerId(code.value);
+								if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
+								//u30_1
+							break;
+							//case 0x2e://AVM2Ops.pushuint	//u8_u30__uint
+							case "pushuint":
+								u30_1=productMark.getUintegerId(code.value);
+								if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
+								//u30_1
+							break;
+							//case 0x2f://AVM2Ops.pushdouble	//u8_u30__double
+							case "pushdouble":
+								u30_1=productMark.getDoubleId(code.value);
+								if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
+								//u30_1
+							break;
+							//case 0x06://AVM2Ops.dxns	//u8_u30__string
+							//case 0x2c://AVM2Ops.pushstring	//u8_u30__string
+							//case 0xf1://AVM2Ops.debugfile	//u8_u30__string
+							case "string":
+								u30_1=productMark.getStringId(code.value);
+								if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
+								//u30_1
+							break;
+							//case 0x31://AVM2Ops.pushnamespace	//u8_u30__namespace_info
+							case "pushnamespace":
+								u30_1=productMark.getNsId(code.value);
+								if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
+								//u30_1
+							break;
+							//case 0x04://AVM2Ops.getsuper	//u8_u30__multiname_info
+							//case 0x05://AVM2Ops.setsuper	//u8_u30__multiname_info
+							//case 0x59://AVM2Ops.getdescendants	//u8_u30__multiname_info
+							//case 0x5d://AVM2Ops.findpropstrict	//u8_u30__multiname_info
+							//case 0x5e://AVM2Ops.findproperty	//u8_u30__multiname_info
+							//case 0x60://AVM2Ops.getlex	//u8_u30__multiname_info
+							//case 0x61://AVM2Ops.setproperty	//u8_u30__multiname_info
+							//case 0x66://AVM2Ops.getproperty	//u8_u30__multiname_info
+							//case 0x68://AVM2Ops.initproperty	//u8_u30__multiname_info
+							//case 0x6a://AVM2Ops.deleteproperty	//u8_u30__multiname_info
+							//case 0x80://AVM2Ops.coerce	//u8_u30__multiname_info
+							//case 0x86://AVM2Ops.astype	//u8_u30__multiname_info
+							//case 0xb2://AVM2Ops.istype	//u8_u30__multiname_info
+							case "multiname":
+								u30_1=productMark.getMultinameId(code.value);
+								if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
+								//u30_1
+							break;
+							//case 0x40://AVM2Ops.newfunction	//u8_u30__method
+							case "newfunction":
+								u30_1=productMark.getMethodId(code.value);
+								if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
+								//u30_1
+							break;
+							//case 0x58://AVM2Ops.newclass	//u8_u30__class
+							case "newclass":
+								u30_1=productMark.getClassId(code.value);
+								if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
+								//u30_1
+							break;
+							//case 0x5a://AVM2Ops.newcatch	//u8_u30__exception_info
+							case "newcatch":
+								exception=code.value;
+								if(exceptionIdDict[exception]>-1){
+									Outputer.output("重复使用的 exception","brown");
+								}else{
+									exceptionIdDict[exception]=exception_infoV.length;
+									exception_infoV[exception_infoV.length]=exception.getInfo(productMark,_toDataOptions);
+								}
+								u30_1=exceptionIdDict[exception];
+								if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
+								//u30_1
+								posMarkArr[offset]=code;
+							break;
+							//case 0x5f://AVM2Ops.finddef	//u8_u30__finddef
+							case "finddef":
+								throw new Error("恭喜你，你发现了一个 "+AVM2Ops.opNameV[code.op]+" 的例子！");
+							break;
+							//case 0x32://AVM2Ops.hasnext2	//u8_u30_u30__register_register
+							case "hasnext2":
+								u30_1=code.value.register1;
+								u30_2=code.value.register2;
+								if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
+								//u30_1
+								
+								if(u30_2>>>7){if(u30_2>>>14){if(u30_2>>>21){if(u30_2>>>28){data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=((u30_2>>>7)&0x7f)|0x80;data[offset++]=((u30_2>>>14)&0x7f)|0x80;data[offset++]=((u30_2>>>21)&0x7f)|0x80;data[offset++]=u30_2>>>28;}else{data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=((u30_2>>>7)&0x7f)|0x80;data[offset++]=((u30_2>>>14)&0x7f)|0x80;data[offset++]=u30_2>>>21;}}else{data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=((u30_2>>>7)&0x7f)|0x80;data[offset++]=u30_2>>>14;}}else{data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=u30_2>>>7;}}else{data[offset++]=u30_2;}
+								//u30_2
+							break;
+							//case 0x45://AVM2Ops.callsuper	//u8_u30_u30__multiname_info_args
+							//case 0x46://AVM2Ops.callproperty	//u8_u30_u30__multiname_info_args
+							//case 0x4a://AVM2Ops.constructprop	//u8_u30_u30__multiname_info_args
+							//case 0x4c://AVM2Ops.callproplex	//u8_u30_u30__multiname_info_args
+							//case 0x4e://AVM2Ops.callsupervoid	//u8_u30_u30__multiname_info_args
+							//case 0x4f://AVM2Ops.callpropvoid	//u8_u30_u30__multiname_info_args
+							case "multiname args":
+								u30_1=productMark.getMultinameId(code.value.multiname),
+								u30_2=code.value.args;
+								if(u30_1>>>7){if(u30_1>>>14){if(u30_1>>>21){if(u30_1>>>28){data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=((u30_1>>>21)&0x7f)|0x80;data[offset++]=u30_1>>>28;}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=((u30_1>>>14)&0x7f)|0x80;data[offset++]=u30_1>>>21;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=((u30_1>>>7)&0x7f)|0x80;data[offset++]=u30_1>>>14;}}else{data[offset++]=(u30_1&0x7f)|0x80;data[offset++]=u30_1>>>7;}}else{data[offset++]=u30_1;}
+								//u30_1
+								
+								if(u30_2>>>7){if(u30_2>>>14){if(u30_2>>>21){if(u30_2>>>28){data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=((u30_2>>>7)&0x7f)|0x80;data[offset++]=((u30_2>>>14)&0x7f)|0x80;data[offset++]=((u30_2>>>21)&0x7f)|0x80;data[offset++]=u30_2>>>28;}else{data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=((u30_2>>>7)&0x7f)|0x80;data[offset++]=((u30_2>>>14)&0x7f)|0x80;data[offset++]=u30_2>>>21;}}else{data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=((u30_2>>>7)&0x7f)|0x80;data[offset++]=u30_2>>>14;}}else{data[offset++]=(u30_2&0x7f)|0x80;data[offset++]=u30_2>>>7;}}else{data[offset++]=u30_2;}
+								//u30_2
+							break;
+							//case 0x43://AVM2Ops.callmethod	//u8_u30_u30__method_args
+							//case 0x44://AVM2Ops.callstatic	//u8_u30_u30__method_args
+							case "method args":
+								Outputer.outputError("恭喜你，你发现了一个 "+AVM2Ops.opNameV[code.op]+" 的例子！");
+							break;
+							//case 0x0c://AVM2Ops.ifnlt	//u8_s24__branch
+							//case 0x0d://AVM2Ops.ifnle	//u8_s24__branch
+							//case 0x0e://AVM2Ops.ifngt	//u8_s24__branch
+							//case 0x0f://AVM2Ops.ifnge	//u8_s24__branch
+							//case 0x10://AVM2Ops.jump	//u8_s24__branch
+							//case 0x11://AVM2Ops.iftrue	//u8_s24__branch
+							//case 0x12://AVM2Ops.iffalse	//u8_s24__branch
+							//case 0x13://AVM2Ops.ifeq	//u8_s24__branch
+							//case 0x14://AVM2Ops.ifne	//u8_s24__branch
+							//case 0x15://AVM2Ops.iflt	//u8_s24__branch
+							//case 0x16://AVM2Ops.ifle	//u8_s24__branch
+							//case 0x17://AVM2Ops.ifgt	//u8_s24__branch
+							//case 0x18://AVM2Ops.ifge	//u8_s24__branch
+							//case 0x19://AVM2Ops.ifstricteq	//u8_s24__branch
+							//case 0x1a://AVM2Ops.ifstrictne	//u8_s24__branch
+							case "branch":
+								offset+=3;
+								posMarkArr[offset]=code.value;
+							break;
+							//case 0x1b://AVM2Ops.lookupswitch	//u8_s24_u30_s24List__lookupswitch
+							case "lookupswitch":
+								//The base location is the address of the lookupswitch instruction itself.
+								posMarkArr[offset-1]=code;
+								
+								code.value.default_offset_startPos=offset;//- -
+								
+								offset+=3;
+								
+								var case_count:int=code.value.case_offsetV.length-1;
+								if(case_count>>>7){if(case_count>>>14){if(case_count>>>21){if(case_count>>>28){data[offset++]=(case_count&0x7f)|0x80;data[offset++]=((case_count>>>7)&0x7f)|0x80;data[offset++]=((case_count>>>14)&0x7f)|0x80;data[offset++]=((case_count>>>21)&0x7f)|0x80;data[offset++]=case_count>>>28;}else{data[offset++]=(case_count&0x7f)|0x80;data[offset++]=((case_count>>>7)&0x7f)|0x80;data[offset++]=((case_count>>>14)&0x7f)|0x80;data[offset++]=case_count>>>21;}}else{data[offset++]=(case_count&0x7f)|0x80;data[offset++]=((case_count>>>7)&0x7f)|0x80;data[offset++]=case_count>>>14;}}else{data[offset++]=(case_count&0x7f)|0x80;data[offset++]=case_count>>>7;}}else{data[offset++]=case_count;}
+								//case_count
+								
+								code.value.case_offset_startPos=offset;//- -
+								offset+=3*(case_count+1);
+							break;
+							//case 0xef://AVM2Ops.debug	//u8_u8_u30_u8_u30__debug
+							case "debug":
+								data[offset++]=code.value.debug_type;
+								
+								var debug_index:int=productMark.getStringId(code.value.index);
+								
+								if(debug_index>>>7){if(debug_index>>>14){if(debug_index>>>21){if(debug_index>>>28){data[offset++]=(debug_index&0x7f)|0x80;data[offset++]=((debug_index>>>7)&0x7f)|0x80;data[offset++]=((debug_index>>>14)&0x7f)|0x80;data[offset++]=((debug_index>>>21)&0x7f)|0x80;data[offset++]=debug_index>>>28;}else{data[offset++]=(debug_index&0x7f)|0x80;data[offset++]=((debug_index>>>7)&0x7f)|0x80;data[offset++]=((debug_index>>>14)&0x7f)|0x80;data[offset++]=debug_index>>>21;}}else{data[offset++]=(debug_index&0x7f)|0x80;data[offset++]=((debug_index>>>7)&0x7f)|0x80;data[offset++]=debug_index>>>14;}}else{data[offset++]=(debug_index&0x7f)|0x80;data[offset++]=debug_index>>>7;}}else{data[offset++]=debug_index;}
+								//debug_index
+								
+								data[offset++]=code.value.reg;
+								
+								if(code.value.extra>>>7){if(code.value.extra>>>14){if(code.value.extra>>>21){if(code.value.extra>>>28){data[offset++]=(code.value.extra&0x7f)|0x80;data[offset++]=((code.value.extra>>>7)&0x7f)|0x80;data[offset++]=((code.value.extra>>>14)&0x7f)|0x80;data[offset++]=((code.value.extra>>>21)&0x7f)|0x80;data[offset++]=code.value.extra>>>28;}else{data[offset++]=(code.value.extra&0x7f)|0x80;data[offset++]=((code.value.extra>>>7)&0x7f)|0x80;data[offset++]=((code.value.extra>>>14)&0x7f)|0x80;data[offset++]=code.value.extra>>>21;}}else{data[offset++]=(code.value.extra&0x7f)|0x80;data[offset++]=((code.value.extra>>>7)&0x7f)|0x80;data[offset++]=code.value.extra>>>14;}}else{data[offset++]=(code.value.extra&0x7f)|0x80;data[offset++]=code.value.extra>>>7;}}else{data[offset++]=code.value.extra;}
+								//code.value.extra
+							break;
+							default:
+								Outputer.outputError("未知 op: "+code.op);
+							break;
+						}
+					break;
+					default://int
+						data[offset++]=code;
+					break;
 				}
 			}
 			
@@ -676,7 +731,7 @@ package zero.swf.avm2{
 			for(offset=0;offset<=endOffset;offset++){
 				code=posMarkArr[offset];
 				if(code){
-					if(code is LabelMark){
+					if(code.constructor==LabelMark){
 						jumpOffset=code.pos-offset;
 						data[offset-3]=jumpOffset;
 						data[offset-2]=jumpOffset>>8;
@@ -737,87 +792,101 @@ package zero.swf.avm2{
 							codesStr+="\t\t\t\t\t//"+hexArr[codeId]+"\n";
 						}
 					}
-					if(code is LabelMark){
-						codesStr+="\t\t\t\tlabel"+(code as LabelMark).labelId+":\n";
-					}else if(code is Array){
-						Outputer.output("使用 Array 进行记录的未知代码："+code,"brown");
-						var numStr:String="";
-						for each(var num:int in code){
-							numStr+=" "+BytesAndStr16._16V[num&0xff];
-						}
-						codesStr+="\t\t\t\t\t"+numStr.substr(1)+"\n";
-					}else if(code is ByteArray){
-						Outputer.output("使用 ByteArray 进行记录的未知代码："+BytesAndStr16.bytes2str16(code,0,code.length),"brown");
-						codesStr+="\t\t\t\t\t"+BytesAndStr16.bytes2str16(code,0,code.length)+"\n";
-					}else{
-						if(code is int){
-							codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code]+"\n";
-						}else if(code is Code){
-							switch(code.op){
-								case AVM2Ops.pushbyte://0x24	//u8_u8
+					switch(code.constructor){
+						case LabelMark:
+							codesStr+="\t\t\t\tlabel"+code.labelId+":\n";
+						break;
+						case Array:
+							Outputer.output("使用 Array 进行记录的未知代码："+code,"brown");
+							var numStr:String="";
+							for each(var num:int in code){
+								numStr+=" "+BytesAndStr16._16V[num&0xff];
+							}
+							codesStr+="\t\t\t\t\t"+numStr.substr(1)+"\n";
+						break;
+						case ByteArray:
+							Outputer.output("使用 ByteArray 进行记录的未知代码："+BytesAndStr16.bytes2str16(code,0,code.length),"brown");
+							codesStr+="\t\t\t\t\t"+BytesAndStr16.bytes2str16(code,0,code.length)+"\n";
+						break;
+						case Code:
+							switch(AVM2Ops.opTypeV[code.op]){
+								//case 0x24://AVM2Ops.pushbyte	//u8_u8
+								case "pushbyte":
 									
-								case AVM2Ops.pushshort://0x25	//u8_u30__value_int
-								case AVM2Ops.debugline://0xf0	//u8_u30__value_int
-								case AVM2Ops.bkptline://0xf2	//u8_u30__value_int
-								case AVM2Ops.getscopeobject://0x65	//u8_u30__scope
-								case AVM2Ops.getslot://0x6c	//u8_u30__slot
-								case AVM2Ops.setslot://0x6d	//u8_u30__slot
-								case AVM2Ops.getglobalslot://0x6e	//u8_u30__slot
-								case AVM2Ops.setglobalslot://0x6f	//u8_u30__slot
-								case AVM2Ops.kill://0x08	//u8_u30__register
-								case AVM2Ops.getlocal://0x62	//u8_u30__register
-								case AVM2Ops.setlocal://0x63	//u8_u30__register
-								case AVM2Ops.inclocal://0x92	//u8_u30__register
-								case AVM2Ops.declocal://0x94	//u8_u30__register
-								case AVM2Ops.inclocal_i://0xc2	//u8_u30__register
-								case AVM2Ops.declocal_i://0xc3	//u8_u30__register
-								case AVM2Ops.call://0x41	//u8_u30__args
-								case AVM2Ops.construct://0x42	//u8_u30__args
-								case AVM2Ops.constructsuper://0x49	//u8_u30__args
-								case AVM2Ops.applytype://0x53	//u8_u30__args
-								case AVM2Ops.newobject://0x55	//u8_u30__args
-								case AVM2Ops.newarray://0x56	//u8_u30__args
+								//case 0x25://AVM2Ops.pushshort	//u8_u30__value_int
+								//case 0xf0://AVM2Ops.debugline	//u8_u30__value_int
+								//case 0xf2://AVM2Ops.bkptline	//u8_u30__value_int
+								//case 0x65://AVM2Ops.getscopeobject	//u8_u30__scope
+								//case 0x6c://AVM2Ops.getslot	//u8_u30__slot
+								//case 0x6d://AVM2Ops.setslot	//u8_u30__slot
+								//case 0x6e://AVM2Ops.getglobalslot	//u8_u30__slot
+								//case 0x6f://AVM2Ops.setglobalslot	//u8_u30__slot
+								//case 0x08://AVM2Ops.kill	//u8_u30__register
+								//case 0x62://AVM2Ops.getlocal	//u8_u30__register
+								//case 0x63://AVM2Ops.setlocal	//u8_u30__register
+								//case 0x92://AVM2Ops.inclocal	//u8_u30__register
+								//case 0x94://AVM2Ops.declocal	//u8_u30__register
+								//case 0xc2://AVM2Ops.inclocal_i	//u8_u30__register
+								//case 0xc3://AVM2Ops.declocal_i	//u8_u30__register
+								//case 0x41://AVM2Ops.call	//u8_u30__args
+								//case 0x42://AVM2Ops.construct	//u8_u30__args
+								//case 0x49://AVM2Ops.constructsuper	//u8_u30__args
+								//case 0x53://AVM2Ops.applytype	//u8_u30__args
+								//case 0x55://AVM2Ops.newobject	//u8_u30__args
+								//case 0x56://AVM2Ops.newarray	//u8_u30__args
+								case "int":
 									
-								case AVM2Ops.pushint://0x2d	//u8_u30__int
+								//case 0x2d://AVM2Ops.pushint	//u8_u30__int
+								case "pushint":
 									
-								case AVM2Ops.pushuint://0x2e	//u8_u30__uint
+								//case 0x2e://AVM2Ops.pushuint	//u8_u30__uint
+								case "pushuint":
 									
-								case AVM2Ops.pushdouble://0x2f	//u8_u30__double
+								//case 0x2f://AVM2Ops.pushdouble	//u8_u30__double
+								case "pushdouble":
 									
 									codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+code.value+"\n";
 								break;
-								case AVM2Ops.dxns://0x06	//u8_u30__string
-								case AVM2Ops.pushstring://0x2c	//u8_u30__string
-								case AVM2Ops.debugfile://0xf1	//u8_u30__string
+								
+								//case 0x06://AVM2Ops.dxns	//u8_u30__string
+								//case 0x2c://AVM2Ops.pushstring	//u8_u30__string
+								//case 0xf1://AVM2Ops.debugfile	//u8_u30__string
+								case "string":
 									codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" \""+ComplexString.normal.escape(code.value)+"\"\n";
 								break;
-								case AVM2Ops.pushnamespace://0x31	//u8_u30__namespace_info
+								
+								//case 0x31://AVM2Ops.pushnamespace	//u8_u30__namespace_info
+								case "pushnamespace":
 									if(_toXMLOptions.AVM2UseMarkStr){
-										codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+(code.value as ABCNamespace).toMarkStrAndMark(markStrs)+"\n";
+										codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+code.value.toMarkStrAndMark(markStrs)+"\n";
 									}else{
-										codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+(code.value as ABCNamespace).toXMLAndMark(markStrs,"ns",_toXMLOptions).toXMLString().replace(/\s*\n\s*/g,"")+"\n";
+										codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+code.value.toXMLAndMark(markStrs,"ns",_toXMLOptions).toXMLString().replace(/\s*\n\s*/g,"")+"\n";
 									}
 								break;
-								case AVM2Ops.getsuper://0x04	//u8_u30__multiname_info
-								case AVM2Ops.setsuper://0x05	//u8_u30__multiname_info
-								case AVM2Ops.getdescendants://0x59	//u8_u30__multiname_info
-								case AVM2Ops.findpropstrict://0x5d	//u8_u30__multiname_info
-								case AVM2Ops.findproperty://0x5e	//u8_u30__multiname_info
-								case AVM2Ops.getlex://0x60	//u8_u30__multiname_info
-								case AVM2Ops.setproperty://0x61	//u8_u30__multiname_info
-								case AVM2Ops.getproperty://0x66	//u8_u30__multiname_info
-								case AVM2Ops.initproperty://0x68	//u8_u30__multiname_info
-								case AVM2Ops.deleteproperty://0x6a	//u8_u30__multiname_info
-								case AVM2Ops.coerce://0x80	//u8_u30__multiname_info
-								case AVM2Ops.astype://0x86	//u8_u30__multiname_info
-								case AVM2Ops.istype://0xb2	//u8_u30__multiname_info
+								
+								//case 0x04://AVM2Ops.getsuper	//u8_u30__multiname_info
+								//case 0x05://AVM2Ops.setsuper	//u8_u30__multiname_info
+								//case 0x59://AVM2Ops.getdescendants	//u8_u30__multiname_info
+								//case 0x5d://AVM2Ops.findpropstrict	//u8_u30__multiname_info
+								//case 0x5e://AVM2Ops.findproperty	//u8_u30__multiname_info
+								//case 0x60://AVM2Ops.getlex	//u8_u30__multiname_info
+								//case 0x61://AVM2Ops.setproperty	//u8_u30__multiname_info
+								//case 0x66://AVM2Ops.getproperty	//u8_u30__multiname_info
+								//case 0x68://AVM2Ops.initproperty	//u8_u30__multiname_info
+								//case 0x6a://AVM2Ops.deleteproperty	//u8_u30__multiname_info
+								//case 0x80://AVM2Ops.coerce	//u8_u30__multiname_info
+								//case 0x86://AVM2Ops.astype	//u8_u30__multiname_info
+								//case 0xb2://AVM2Ops.istype	//u8_u30__multiname_info
+								case "multiname":
 									if(_toXMLOptions.AVM2UseMarkStr){
-										codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+(code.value as ABCMultiname).toMarkStrAndMark(markStrs)+"\n";
+										codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+code.value.toMarkStrAndMark(markStrs)+"\n";
 									}else{
-										codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+(code.value as ABCMultiname).toXMLAndMark(markStrs,"multiname",_toXMLOptions).toXMLString().replace(/\s*\n\s*/g,"")+"\n";
+										codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+code.value.toXMLAndMark(markStrs,"multiname",_toXMLOptions).toXMLString().replace(/\s*\n\s*/g,"")+"\n";
 									}
 								break;
-								case AVM2Ops.newfunction://0x40	//u8_u30__method
+								
+								//case 0x40://AVM2Ops.newfunction	//u8_u30__method
+								case "newfunction":
 									var method:ABCMethod=code.value;
 									if(markStrs.markStrDict[method]){
 										Outputer.output("重复使用的 method","brown");
@@ -829,15 +898,19 @@ package zero.swf.avm2{
 									methodXML.@methodMarkStr=methodMarkStr;
 									markStrs.newfunctionXMLV.push(methodXML);
 								break;
-								case AVM2Ops.newclass://0x58	//u8_u30__class
-									var class_name:ABCMultiname=(code.value as ABCClass).name;
+								
+								//case 0x58://AVM2Ops.newclass	//u8_u30__class
+								case "newclass":
+									var class_name:ABCMultiname=code.value.name;
 									if(_toXMLOptions.AVM2UseMarkStr){
 										codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+class_name.toMarkStrAndMark(markStrs)+"\n";
 									}else{
 										codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+class_name.toXMLAndMark(markStrs,"class_name",_toXMLOptions).toXMLString().replace(/\s*\n\s*/g,"")+"\n";
 									}
 								break;
-								case AVM2Ops.newcatch://0x5a	//u8_u30__exception_info
+								
+								//case 0x5a://AVM2Ops.newcatch	//u8_u30__exception_info
+								case "newcatch":
 									var exception:ABCException=code.value;
 									var exceptionXML:XML=exceptionXMLDict[exception];
 									if(exceptionXML){
@@ -862,49 +935,58 @@ package zero.swf.avm2{
 									}
 									codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+exceptionXML.toXMLString().replace(/\s*\n\s*/g,"")+"\n";
 								break;
-								case AVM2Ops.finddef://0x5f	//u8_u30__finddef
+								
+								//case 0x5f://AVM2Ops.finddef	//u8_u30__finddef
+								case "finddef":
 									throw new Error("恭喜你，你发现了一个 "+AVM2Ops.opNameV[code.op]+" 的例子！");
 								break;
 									
-								case AVM2Ops.hasnext2://0x32	//u8_u30_u30__register_register
+								//case 0x32://AVM2Ops.hasnext2	//u8_u30_u30__register_register
+								case "hasnext2":
 									codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+code.value.register1+" "+code.value.register2+"\n";
 								break;
-								case AVM2Ops.callsuper://0x45	//u8_u30_u30__multiname_info_args
-								case AVM2Ops.callproperty://0x46	//u8_u30_u30__multiname_info_args
-								case AVM2Ops.constructprop://0x4a	//u8_u30_u30__multiname_info_args
-								case AVM2Ops.callproplex://0x4c	//u8_u30_u30__multiname_info_args
-								case AVM2Ops.callsupervoid://0x4e	//u8_u30_u30__multiname_info_args
-								case AVM2Ops.callpropvoid://0x4f	//u8_u30_u30__multiname_info_args
+								
+								//case 0x45://AVM2Ops.callsuper	//u8_u30_u30__multiname_info_args
+								//case 0x46://AVM2Ops.callproperty	//u8_u30_u30__multiname_info_args
+								//case 0x4a://AVM2Ops.constructprop	//u8_u30_u30__multiname_info_args
+								//case 0x4c://AVM2Ops.callproplex	//u8_u30_u30__multiname_info_args
+								//case 0x4e://AVM2Ops.callsupervoid	//u8_u30_u30__multiname_info_args
+								//case 0x4f://AVM2Ops.callpropvoid	//u8_u30_u30__multiname_info_args
+								case "multiname args":
 									if(_toXMLOptions.AVM2UseMarkStr){
-										codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+(code.value.multiname as ABCMultiname).toMarkStrAndMark(markStrs)+" "+code.value.args+"\n";
+										codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+code.value.multiname.toMarkStrAndMark(markStrs)+" "+code.value.args+"\n";
 									}else{
-										codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+(code.value.multiname as ABCMultiname).toXMLAndMark(markStrs,"multiname",_toXMLOptions).toXMLString().replace(/\s*\n\s*/g,"")+" "+code.value.args+"\n";
+										codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+code.value.multiname.toXMLAndMark(markStrs,"multiname",_toXMLOptions).toXMLString().replace(/\s*\n\s*/g,"")+" "+code.value.args+"\n";
 									}
 								break;
-								case AVM2Ops.callmethod://0x43	//u8_u30_u30__method_args
-								case AVM2Ops.callstatic://0x44	//u8_u30_u30__method_args
+								
+								//case 0x43://AVM2Ops.callmethod	//u8_u30_u30__method_args
+								//case 0x44://AVM2Ops.callstatic	//u8_u30_u30__method_args
+								case "method args":
 									Outputer.outputError("恭喜你，你发现了一个 "+AVM2Ops.opNameV[code.op]+" 的例子！");
 								break;
 									
-								case AVM2Ops.ifnlt://0x0c	//u8_s24__branch
-								case AVM2Ops.ifnle://0x0d	//u8_s24__branch
-								case AVM2Ops.ifngt://0x0e	//u8_s24__branch
-								case AVM2Ops.ifnge://0x0f	//u8_s24__branch
-								case AVM2Ops.jump://0x10	//u8_s24__branch
-								case AVM2Ops.iftrue://0x11	//u8_s24__branch
-								case AVM2Ops.iffalse://0x12	//u8_s24__branch
-								case AVM2Ops.ifeq://0x13	//u8_s24__branch
-								case AVM2Ops.ifne://0x14	//u8_s24__branch
-								case AVM2Ops.iflt://0x15	//u8_s24__branch
-								case AVM2Ops.ifle://0x16	//u8_s24__branch
-								case AVM2Ops.ifgt://0x17	//u8_s24__branch
-								case AVM2Ops.ifge://0x18	//u8_s24__branch
-								case AVM2Ops.ifstricteq://0x19	//u8_s24__branch
-								case AVM2Ops.ifstrictne://0x1a	//u8_s24__branch
+								//case 0x0c://AVM2Ops.ifnlt	//u8_s24__branch
+								//case 0x0d://AVM2Ops.ifnle	//u8_s24__branch
+								//case 0x0e://AVM2Ops.ifngt	//u8_s24__branch
+								//case 0x0f://AVM2Ops.ifnge	//u8_s24__branch
+								//case 0x10://AVM2Ops.jump	//u8_s24__branch
+								//case 0x11://AVM2Ops.iftrue	//u8_s24__branch
+								//case 0x12://AVM2Ops.iffalse	//u8_s24__branch
+								//case 0x13://AVM2Ops.ifeq	//u8_s24__branch
+								//case 0x14://AVM2Ops.ifne	//u8_s24__branch
+								//case 0x15://AVM2Ops.iflt	//u8_s24__branch
+								//case 0x16://AVM2Ops.ifle	//u8_s24__branch
+								//case 0x17://AVM2Ops.ifgt	//u8_s24__branch
+								//case 0x18://AVM2Ops.ifge	//u8_s24__branch
+								//case 0x19://AVM2Ops.ifstricteq	//u8_s24__branch
+								//case 0x1a://AVM2Ops.ifstrictne	//u8_s24__branch
+								case "branch":
 									codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" label"+code.value.labelId+"\n";
 								break;
 									
-								case AVM2Ops.lookupswitch://0x1b	//u8_s24_u30_s24List__lookupswitch
+								//case 0x1b://AVM2Ops.lookupswitch	//u8_s24_u30_s24List__lookupswitch
+								case "lookupswitch":
 									codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" label"+code.value.default_offset.labelId;
 									for each(labelMark in code.value.case_offsetV){
 										codesStr+=" label"+labelMark.labelId;
@@ -912,7 +994,8 @@ package zero.swf.avm2{
 									codesStr+="\n";
 								break;
 									
-								case AVM2Ops.debug://0xef	//u8_u8_u30_u8_u30__debug
+								//case 0xef://AVM2Ops.debug	//u8_u8_u30_u8_u30__debug
+								case "debug":
 									codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code.op]+" "+code.value.debug_type+" \""+ComplexString.normal.escape(code.value.index)+"\" "+code.value.reg+" "+code.value.extra+"\n";
 								break;
 								
@@ -920,9 +1003,10 @@ package zero.swf.avm2{
 									Outputer.outputError("未知 op: "+code.op);
 								break;
 							}
-						}else{
-							throw new Error("未知 code: "+code);
-						}
+						break;
+						default:
+							codesStr+="\t\t\t\t\t"+AVM2Ops.opNameV[code]+"\n";
+						break;
 					}
 				}
 				
@@ -972,172 +1056,190 @@ package zero.swf.avm2{
 					execResult=/^(\w+)\s*([\s\S]*?)$/.exec(codeStr);
 					if(AVM2Ops[execResult[1]]>=0){
 						var op:int=AVM2Ops[execResult[1]];
-						switch(op){
-							case AVM2Ops.bkpt://0x01	//u8
-							case AVM2Ops.nop://0x02	//u8
-							case AVM2Ops.throw_://0x03	//u8
-							case AVM2Ops.dxnslate://0x07	//u8
-							case AVM2Ops.label://0x09	//u8
-							case AVM2Ops.pushwith://0x1c	//u8
-							case AVM2Ops.popscope://0x1d	//u8
-							case AVM2Ops.nextname://0x1e	//u8
-							case AVM2Ops.hasnext://0x1f	//u8
-							case AVM2Ops.pushnull://0x20	//u8
-							case AVM2Ops.pushundefined://0x21	//u8
-							case AVM2Ops.nextvalue://0x23	//u8
-							case AVM2Ops.pushtrue://0x26	//u8
-							case AVM2Ops.pushfalse://0x27	//u8
-							case AVM2Ops.pushnan://0x28	//u8
-							case AVM2Ops.pop://0x29	//u8
-							case AVM2Ops.dup://0x2a	//u8
-							case AVM2Ops.swap://0x2b	//u8
-							case AVM2Ops.pushscope://0x30	//u8
-							case AVM2Ops.li8://0x35	//u8
-							case AVM2Ops.li16://0x36	//u8
-							case AVM2Ops.li32://0x37	//u8
-							case AVM2Ops.lf32://0x38	//u8
-							case AVM2Ops.lf64://0x39	//u8
-							case AVM2Ops.si8://0x3a	//u8
-							case AVM2Ops.si16://0x3b	//u8
-							case AVM2Ops.si32://0x3c	//u8
-							case AVM2Ops.sf32://0x3d	//u8
-							case AVM2Ops.sf64://0x3e	//u8
-							case AVM2Ops.returnvoid://0x47	//u8
-							case AVM2Ops.returnvalue://0x48	//u8
-							case AVM2Ops.sxi1://0x50	//u8
-							case AVM2Ops.sxi8://0x51	//u8
-							case AVM2Ops.sxi16://0x52	//u8
-							case AVM2Ops.newactivation://0x57	//u8
-							case AVM2Ops.getglobalscope://0x64	//u8
-							case AVM2Ops.convert_s://0x70	//u8
-							case AVM2Ops.esc_xelem://0x71	//u8
-							case AVM2Ops.esc_xattr://0x72	//u8
-							case AVM2Ops.convert_i://0x73	//u8
-							case AVM2Ops.convert_u://0x74	//u8
-							case AVM2Ops.convert_d://0x75	//u8
-							case AVM2Ops.convert_b://0x76	//u8
-							case AVM2Ops.convert_o://0x77	//u8
-							case AVM2Ops.checkfilter://0x78	//u8
-							case AVM2Ops.coerce_b://0x81	//u8
-							case AVM2Ops.coerce_a://0x82	//u8
-							case AVM2Ops.coerce_i://0x83	//u8
-							case AVM2Ops.coerce_d://0x84	//u8
-							case AVM2Ops.coerce_s://0x85	//u8
-							case AVM2Ops.astypelate://0x87	//u8
-							case AVM2Ops.coerce_u://0x88	//u8
-							case AVM2Ops.coerce_o://0x89	//u8
-							case AVM2Ops.negate://0x90	//u8
-							case AVM2Ops.increment://0x91	//u8
-							case AVM2Ops.decrement://0x93	//u8
-							case AVM2Ops.typeof_://0x95	//u8
-							case AVM2Ops.not://0x96	//u8
-							case AVM2Ops.bitnot://0x97	//u8
-							case AVM2Ops.add://0xa0	//u8
-							case AVM2Ops.subtract://0xa1	//u8
-							case AVM2Ops.multiply://0xa2	//u8
-							case AVM2Ops.divide://0xa3	//u8
-							case AVM2Ops.modulo://0xa4	//u8
-							case AVM2Ops.lshift://0xa5	//u8
-							case AVM2Ops.rshift://0xa6	//u8
-							case AVM2Ops.urshift://0xa7	//u8
-							case AVM2Ops.bitand://0xa8	//u8
-							case AVM2Ops.bitor://0xa9	//u8
-							case AVM2Ops.bitxor://0xaa	//u8
-							case AVM2Ops.equals://0xab	//u8
-							case AVM2Ops.strictequals://0xac	//u8
-							case AVM2Ops.lessthan://0xad	//u8
-							case AVM2Ops.lessequals://0xae	//u8
-							case AVM2Ops.greaterthan://0xaf	//u8
-							case AVM2Ops.greaterequals://0xb0	//u8
-							case AVM2Ops.instanceof_://0xb1	//u8
-							case AVM2Ops.istypelate://0xb3	//u8
-							case AVM2Ops.in_://0xb4	//u8
-							case AVM2Ops.increment_i://0xc0	//u8
-							case AVM2Ops.decrement_i://0xc1	//u8
-							case AVM2Ops.negate_i://0xc4	//u8
-							case AVM2Ops.add_i://0xc5	//u8
-							case AVM2Ops.subtract_i://0xc6	//u8
-							case AVM2Ops.multiply_i://0xc7	//u8
-							case AVM2Ops.getlocal0://0xd0	//u8
-							case AVM2Ops.getlocal1://0xd1	//u8
-							case AVM2Ops.getlocal2://0xd2	//u8
-							case AVM2Ops.getlocal3://0xd3	//u8
-							case AVM2Ops.setlocal0://0xd4	//u8
-							case AVM2Ops.setlocal1://0xd5	//u8
-							case AVM2Ops.setlocal2://0xd6	//u8
-							case AVM2Ops.setlocal3://0xd7	//u8
-							case AVM2Ops.timestamp://0xf3	//u8
+						switch(AVM2Ops.opTypeV[op]){
+							//case 0x01://AVM2Ops.bkpt	//u8
+							//case 0x02://AVM2Ops.nop	//u8
+							//case 0x03://AVM2Ops.throw_	//u8
+							//case 0x07://AVM2Ops.dxnslate	//u8
+							//case 0x09://AVM2Ops.label	//u8
+							//case 0x1c://AVM2Ops.pushwith	//u8
+							//case 0x1d://AVM2Ops.popscope	//u8
+							//case 0x1e://AVM2Ops.nextname	//u8
+							//case 0x1f://AVM2Ops.hasnext	//u8
+							//case 0x20://AVM2Ops.pushnull	//u8
+							//case 0x21://AVM2Ops.pushundefined	//u8
+							//case 0x23://AVM2Ops.nextvalue	//u8
+							//case 0x26://AVM2Ops.pushtrue	//u8
+							//case 0x27://AVM2Ops.pushfalse	//u8
+							//case 0x28://AVM2Ops.pushnan	//u8
+							//case 0x29://AVM2Ops.pop	//u8
+							//case 0x2a://AVM2Ops.dup	//u8
+							//case 0x2b://AVM2Ops.swap	//u8
+							//case 0x30://AVM2Ops.pushscope	//u8
+							//case 0x35://AVM2Ops.li8	//u8
+							//case 0x36://AVM2Ops.li16	//u8
+							//case 0x37://AVM2Ops.li32	//u8
+							//case 0x38://AVM2Ops.lf32	//u8
+							//case 0x39://AVM2Ops.lf64	//u8
+							//case 0x3a://AVM2Ops.si8	//u8
+							//case 0x3b://AVM2Ops.si16	//u8
+							//case 0x3c://AVM2Ops.si32	//u8
+							//case 0x3d://AVM2Ops.sf32	//u8
+							//case 0x3e://AVM2Ops.sf64	//u8
+							//case 0x47://AVM2Ops.returnvoid	//u8
+							//case 0x48://AVM2Ops.returnvalue	//u8
+							//case 0x50://AVM2Ops.sxi1	//u8
+							//case 0x51://AVM2Ops.sxi8	//u8
+							//case 0x52://AVM2Ops.sxi16	//u8
+							//case 0x57://AVM2Ops.newactivation	//u8
+							//case 0x64://AVM2Ops.getglobalscope	//u8
+							//case 0x70://AVM2Ops.convert_s	//u8
+							//case 0x71://AVM2Ops.esc_xelem	//u8
+							//case 0x72://AVM2Ops.esc_xattr	//u8
+							//case 0x73://AVM2Ops.convert_i	//u8
+							//case 0x74://AVM2Ops.convert_u	//u8
+							//case 0x75://AVM2Ops.convert_d	//u8
+							//case 0x76://AVM2Ops.convert_b	//u8
+							//case 0x77://AVM2Ops.convert_o	//u8
+							//case 0x78://AVM2Ops.checkfilter	//u8
+							//case 0x81://AVM2Ops.coerce_b	//u8
+							//case 0x82://AVM2Ops.coerce_a	//u8
+							//case 0x83://AVM2Ops.coerce_i	//u8
+							//case 0x84://AVM2Ops.coerce_d	//u8
+							//case 0x85://AVM2Ops.coerce_s	//u8
+							//case 0x87://AVM2Ops.astypelate	//u8
+							//case 0x88://AVM2Ops.coerce_u	//u8
+							//case 0x89://AVM2Ops.coerce_o	//u8
+							//case 0x90://AVM2Ops.negate	//u8
+							//case 0x91://AVM2Ops.increment	//u8
+							//case 0x93://AVM2Ops.decrement	//u8
+							//case 0x95://AVM2Ops.typeof_	//u8
+							//case 0x96://AVM2Ops.not	//u8
+							//case 0x97://AVM2Ops.bitnot	//u8
+							//case 0xa0://AVM2Ops.add	//u8
+							//case 0xa1://AVM2Ops.subtract	//u8
+							//case 0xa2://AVM2Ops.multiply	//u8
+							//case 0xa3://AVM2Ops.divide	//u8
+							//case 0xa4://AVM2Ops.modulo	//u8
+							//case 0xa5://AVM2Ops.lshift	//u8
+							//case 0xa6://AVM2Ops.rshift	//u8
+							//case 0xa7://AVM2Ops.urshift	//u8
+							//case 0xa8://AVM2Ops.bitand	//u8
+							//case 0xa9://AVM2Ops.bitor	//u8
+							//case 0xaa://AVM2Ops.bitxor	//u8
+							//case 0xab://AVM2Ops.equals	//u8
+							//case 0xac://AVM2Ops.strictequals	//u8
+							//case 0xad://AVM2Ops.lessthan	//u8
+							//case 0xae://AVM2Ops.lessequals	//u8
+							//case 0xaf://AVM2Ops.greaterthan	//u8
+							//case 0xb0://AVM2Ops.greaterequals	//u8
+							//case 0xb1://AVM2Ops.instanceof_	//u8
+							//case 0xb3://AVM2Ops.istypelate	//u8
+							//case 0xb4://AVM2Ops.in_	//u8
+							//case 0xc0://AVM2Ops.increment_i	//u8
+							//case 0xc1://AVM2Ops.decrement_i	//u8
+							//case 0xc4://AVM2Ops.negate_i	//u8
+							//case 0xc5://AVM2Ops.add_i	//u8
+							//case 0xc6://AVM2Ops.subtract_i	//u8
+							//case 0xc7://AVM2Ops.multiply_i	//u8
+							//case 0xd0://AVM2Ops.getlocal0	//u8
+							//case 0xd1://AVM2Ops.getlocal1	//u8
+							//case 0xd2://AVM2Ops.getlocal2	//u8
+							//case 0xd3://AVM2Ops.getlocal3	//u8
+							//case 0xd4://AVM2Ops.setlocal0	//u8
+							//case 0xd5://AVM2Ops.setlocal1	//u8
+							//case 0xd6://AVM2Ops.setlocal2	//u8
+							//case 0xd7://AVM2Ops.setlocal3	//u8
+							//case 0xf3://AVM2Ops.timestamp	//u8
+							case "op":
 								codeArr[codeId]=op;
 							break;
-							case AVM2Ops.pushbyte://0x24	//u8_u8
+							
+							//case 0x24://AVM2Ops.pushbyte	//u8_u8
+							case "pushbyte":
 								
-							case AVM2Ops.pushshort://0x25	//u8_u30__value_int
-							case AVM2Ops.debugline://0xf0	//u8_u30__value_int
-							case AVM2Ops.bkptline://0xf2	//u8_u30__value_int
-							case AVM2Ops.getscopeobject://0x65	//u8_u30__scope
-							case AVM2Ops.getslot://0x6c	//u8_u30__slot
-							case AVM2Ops.setslot://0x6d	//u8_u30__slot
-							case AVM2Ops.getglobalslot://0x6e	//u8_u30__slot
-							case AVM2Ops.setglobalslot://0x6f	//u8_u30__slot
-							case AVM2Ops.kill://0x08	//u8_u30__register
-							case AVM2Ops.getlocal://0x62	//u8_u30__register
-							case AVM2Ops.setlocal://0x63	//u8_u30__register
-							case AVM2Ops.inclocal://0x92	//u8_u30__register
-							case AVM2Ops.declocal://0x94	//u8_u30__register
-							case AVM2Ops.inclocal_i://0xc2	//u8_u30__register
-							case AVM2Ops.declocal_i://0xc3	//u8_u30__register
-							case AVM2Ops.call://0x41	//u8_u30__args
-							case AVM2Ops.construct://0x42	//u8_u30__args
-							case AVM2Ops.constructsuper://0x49	//u8_u30__args
-							case AVM2Ops.applytype://0x53	//u8_u30__args
-							case AVM2Ops.newobject://0x55	//u8_u30__args
-							case AVM2Ops.newarray://0x56	//u8_u30__args
+							//case 0x25://AVM2Ops.pushshort	//u8_u30__value_int
+							//case 0xf0://AVM2Ops.debugline	//u8_u30__value_int
+							//case 0xf2://AVM2Ops.bkptline	//u8_u30__value_int
+							//case 0x65://AVM2Ops.getscopeobject	//u8_u30__scope
+							//case 0x6c://AVM2Ops.getslot	//u8_u30__slot
+							//case 0x6d://AVM2Ops.setslot	//u8_u30__slot
+							//case 0x6e://AVM2Ops.getglobalslot	//u8_u30__slot
+							//case 0x6f://AVM2Ops.setglobalslot	//u8_u30__slot
+							//case 0x08://AVM2Ops.kill	//u8_u30__register
+							//case 0x62://AVM2Ops.getlocal	//u8_u30__register
+							//case 0x63://AVM2Ops.setlocal	//u8_u30__register
+							//case 0x92://AVM2Ops.inclocal	//u8_u30__register
+							//case 0x94://AVM2Ops.declocal	//u8_u30__register
+							//case 0xc2://AVM2Ops.inclocal_i	//u8_u30__register
+							//case 0xc3://AVM2Ops.declocal_i	//u8_u30__register
+							//case 0x41://AVM2Ops.call	//u8_u30__args
+							//case 0x42://AVM2Ops.construct	//u8_u30__args
+							//case 0x49://AVM2Ops.constructsuper	//u8_u30__args
+							//case 0x53://AVM2Ops.applytype	//u8_u30__args
+							//case 0x55://AVM2Ops.newobject	//u8_u30__args
+							//case 0x56://AVM2Ops.newarray	//u8_u30__args
+							case "int":
 								
-							case AVM2Ops.pushint://0x2d	//u8_u30__int
+							//case 0x2d://AVM2Ops.pushint	//u8_u30__int
+							case "pushint":
 								
-							case AVM2Ops.pushuint://0x2e	//u8_u30__uint
+							//case 0x2e://AVM2Ops.pushuint	//u8_u30__uint
+							case "pushuint":
 								
 								codeArr[codeId]=new Code(op,int(execResult[2]));
 							break;
-							case AVM2Ops.pushdouble://0x2f	//u8_u30__double
+							
+							//case 0x2f://AVM2Ops.pushdouble	//u8_u30__double
+							case "pushdouble":
 								codeArr[codeId]=new Code(op,Number(execResult[2]));
 							break;
-							case AVM2Ops.dxns://0x06	//u8_u30__string
-							case AVM2Ops.pushstring://0x2c	//u8_u30__string
-							case AVM2Ops.debugfile://0xf1	//u8_u30__string
+							
+							//case 0x06://AVM2Ops.dxns	//u8_u30__string
+							//case 0x2c://AVM2Ops.pushstring	//u8_u30__string
+							//case 0xf1://AVM2Ops.debugfile	//u8_u30__string
+							case "string":
 								execResult=/^("|')([\s\S]*)\1$/.exec(execResult[2]);
 								codeArr[codeId]=new Code(op,ComplexString.normal.unescape(execResult[2]));
 							break;
-							case AVM2Ops.pushnamespace://0x31	//u8_u30__namespace_info
+							
+							//case 0x31://AVM2Ops.pushnamespace	//u8_u30__namespace_info
+							case "pushnamespace":
 								if(/^<[\s\S]*>$/.test(execResult[2])){
 									codeArr[codeId]=new Code(op,ABCNamespace.xml2ns(markStrs,new XML(execResult[2]),_initByXMLOptions));
 								}else{
 									codeArr[codeId]=new Code(op,ABCNamespace.markStr2ns(markStrs,execResult[2]));
 								}
 							break;
-							case AVM2Ops.getsuper://0x04	//u8_u30__multiname_info
-							case AVM2Ops.setsuper://0x05	//u8_u30__multiname_info
-							case AVM2Ops.getdescendants://0x59	//u8_u30__multiname_info
-							case AVM2Ops.findpropstrict://0x5d	//u8_u30__multiname_info
-							case AVM2Ops.findproperty://0x5e	//u8_u30__multiname_info
-							case AVM2Ops.getlex://0x60	//u8_u30__multiname_info
-							case AVM2Ops.setproperty://0x61	//u8_u30__multiname_info
-							case AVM2Ops.getproperty://0x66	//u8_u30__multiname_info
-							case AVM2Ops.initproperty://0x68	//u8_u30__multiname_info
-							case AVM2Ops.deleteproperty://0x6a	//u8_u30__multiname_info
-							case AVM2Ops.coerce://0x80	//u8_u30__multiname_info
-							case AVM2Ops.astype://0x86	//u8_u30__multiname_info
-							case AVM2Ops.istype://0xb2	//u8_u30__multiname_info
+							
+							//case 0x04://AVM2Ops.getsuper	//u8_u30__multiname_info
+							//case 0x05://AVM2Ops.setsuper	//u8_u30__multiname_info
+							//case 0x59://AVM2Ops.getdescendants	//u8_u30__multiname_info
+							//case 0x5d://AVM2Ops.findpropstrict	//u8_u30__multiname_info
+							//case 0x5e://AVM2Ops.findproperty	//u8_u30__multiname_info
+							//case 0x60://AVM2Ops.getlex	//u8_u30__multiname_info
+							//case 0x61://AVM2Ops.setproperty	//u8_u30__multiname_info
+							//case 0x66://AVM2Ops.getproperty	//u8_u30__multiname_info
+							//case 0x68://AVM2Ops.initproperty	//u8_u30__multiname_info
+							//case 0x6a://AVM2Ops.deleteproperty	//u8_u30__multiname_info
+							//case 0x80://AVM2Ops.coerce	//u8_u30__multiname_info
+							//case 0x86://AVM2Ops.astype	//u8_u30__multiname_info
+							//case 0xb2://AVM2Ops.istype	//u8_u30__multiname_info
+							case "multiname":
 								if(/^<[\s\S]*>$/.test(execResult[2])){
 									codeArr[codeId]=new Code(op,ABCMultiname.xml2multiname(markStrs,new XML(execResult[2]),_initByXMLOptions));
 								}else{
 									codeArr[codeId]=new Code(op,ABCMultiname.markStr2multiname(markStrs,execResult[2]));
 								}
 							break;
-							case AVM2Ops.newfunction://0x40	//u8_u30__method
+							
+							//case 0x40://AVM2Ops.newfunction	//u8_u30__method
+							case "newfunction":
 								codeArr[codeId]=new Code(op,markStrs.methodMark["~"+execResult[2]]);
 							break;
-							case AVM2Ops.newclass://0x58	//u8_u30__class
+							
+							//case 0x58://AVM2Ops.newclass	//u8_u30__class
+							case "newclass":
 								var class_name:ABCMultiname;
 								if(/^<[\s\S]*>$/.test(execResult[2])){
 									class_name=ABCMultiname.xml2multiname(markStrs,new XML(execResult[2]),_initByXMLOptions);
@@ -1150,7 +1252,9 @@ package zero.swf.avm2{
 									throw new Error("找不到 "+class_name.toMarkStrAndMark(markStrs)+" 对应的 ABCClass，请检查 ABCClasses.initByXML()");
 								}
 							break;
-							case AVM2Ops.newcatch://0x5a	//u8_u30__exception_info
+							
+							//case 0x5a://AVM2Ops.newcatch	//u8_u30__exception_info
+							case "newcatch":
 								var exceptionXML:XML=new XML(execResult[2]);
 								
 								var exceptionMarkStr:String=exceptionXML.toXMLString().replace(/\s*\n\s*/g,"");
@@ -1182,23 +1286,28 @@ package zero.swf.avm2{
 								}
 								codeArr[codeId]=new Code(op,exception);
 							break;
-							case AVM2Ops.finddef://0x5f	//u8_u30__finddef
+							
+							//case 0x5f://AVM2Ops.finddef	//u8_u30__finddef
+							case "finddef":
 								throw new Error("恭喜你，你发现了一个 "+AVM2Ops.opNameV[op]+" 的例子！");
 							break;
 								
-							case AVM2Ops.hasnext2://0x32	//u8_u30_u30__register_register
+							//case 0x32://AVM2Ops.hasnext2	//u8_u30_u30__register_register
+							case "hasnext2":
 								execResult=/^(\w+)\s+(\w+)$/.exec(execResult[2]);
 								codeArr[codeId]=new Code(op,{
 									register1:int(execResult[1]),
 									register2:int(execResult[2])
 								});
 							break;
-							case AVM2Ops.callsuper://0x45	//u8_u30_u30__multiname_info_args
-							case AVM2Ops.callproperty://0x46	//u8_u30_u30__multiname_info_args
-							case AVM2Ops.constructprop://0x4a	//u8_u30_u30__multiname_info_args
-							case AVM2Ops.callproplex://0x4c	//u8_u30_u30__multiname_info_args
-							case AVM2Ops.callsupervoid://0x4e	//u8_u30_u30__multiname_info_args
-							case AVM2Ops.callpropvoid://0x4f	//u8_u30_u30__multiname_info_args
+							
+							//case 0x45://AVM2Ops.callsuper	//u8_u30_u30__multiname_info_args
+							//case 0x46://AVM2Ops.callproperty	//u8_u30_u30__multiname_info_args
+							//case 0x4a://AVM2Ops.constructprop	//u8_u30_u30__multiname_info_args
+							//case 0x4c://AVM2Ops.callproplex	//u8_u30_u30__multiname_info_args
+							//case 0x4e://AVM2Ops.callsupervoid	//u8_u30_u30__multiname_info_args
+							//case 0x4f://AVM2Ops.callpropvoid	//u8_u30_u30__multiname_info_args
+							case "multiname args":
 								execResult=/^([\s\S]*)\s+(\w+)$/.exec(execResult[2]);
 								codeArr[codeId]=new Code(op,{
 									args:int(execResult[2])
@@ -1209,32 +1318,38 @@ package zero.swf.avm2{
 									codeArr[codeId].value.multiname=ABCMultiname.markStr2multiname(markStrs,execResult[1]);
 								}
 							break;
-							case AVM2Ops.callmethod://0x43	//u8_u30_u30__method_args
-							case AVM2Ops.callstatic://0x44	//u8_u30_u30__method_args
+							
+							//case 0x43://AVM2Ops.callmethod	//u8_u30_u30__method_args
+							//case 0x44://AVM2Ops.callstatic	//u8_u30_u30__method_args
+							case "method args":
 								Outputer.outputError("恭喜你，你发现了一个 "+AVM2Ops.opNameV[op]+" 的例子！");
 							break;
-							case AVM2Ops.ifnlt://0x0c	//u8_s24__branch
-							case AVM2Ops.ifnle://0x0d	//u8_s24__branch
-							case AVM2Ops.ifngt://0x0e	//u8_s24__branch
-							case AVM2Ops.ifnge://0x0f	//u8_s24__branch
-							case AVM2Ops.jump://0x10	//u8_s24__branch
-							case AVM2Ops.iftrue://0x11	//u8_s24__branch
-							case AVM2Ops.iffalse://0x12	//u8_s24__branch
-							case AVM2Ops.ifeq://0x13	//u8_s24__branch
-							case AVM2Ops.ifne://0x14	//u8_s24__branch
-							case AVM2Ops.iflt://0x15	//u8_s24__branch
-							case AVM2Ops.ifle://0x16	//u8_s24__branch
-							case AVM2Ops.ifgt://0x17	//u8_s24__branch
-							case AVM2Ops.ifge://0x18	//u8_s24__branch
-							case AVM2Ops.ifstricteq://0x19	//u8_s24__branch
-							case AVM2Ops.ifstrictne://0x1a	//u8_s24__branch
+							
+							//case 0x0c://AVM2Ops.ifnlt	//u8_s24__branch
+							//case 0x0d://AVM2Ops.ifnle	//u8_s24__branch
+							//case 0x0e://AVM2Ops.ifngt	//u8_s24__branch
+							//case 0x0f://AVM2Ops.ifnge	//u8_s24__branch
+							//case 0x10://AVM2Ops.jump	//u8_s24__branch
+							//case 0x11://AVM2Ops.iftrue	//u8_s24__branch
+							//case 0x12://AVM2Ops.iffalse	//u8_s24__branch
+							//case 0x13://AVM2Ops.ifeq	//u8_s24__branch
+							//case 0x14://AVM2Ops.ifne	//u8_s24__branch
+							//case 0x15://AVM2Ops.iflt	//u8_s24__branch
+							//case 0x16://AVM2Ops.ifle	//u8_s24__branch
+							//case 0x17://AVM2Ops.ifgt	//u8_s24__branch
+							//case 0x18://AVM2Ops.ifge	//u8_s24__branch
+							//case 0x19://AVM2Ops.ifstricteq	//u8_s24__branch
+							//case 0x1a://AVM2Ops.ifstrictne	//u8_s24__branch
+							case "branch":
 								codeArr[codeId]=new Code(op,labelMarkMark[execResult[2]+":"]);
 								if(codeArr[codeId].value){
 								}else{
 									throw new Error("找不到对应的 labelMark: "+codeStr);
 								}
 							break;
-							case AVM2Ops.lookupswitch://0x1b	//u8_s24_u30_s24List__lookupswitch
+							
+							//case 0x1b://AVM2Ops.lookupswitch	//u8_s24_u30_s24List__lookupswitch
+							case "lookupswitch":
 								execResult=execResult[2].match(/label\d+/g);
 								var matchStr:String=execResult.shift();
 								var default_offset:LabelMark=labelMarkMark[matchStr+":"];
@@ -1257,7 +1372,9 @@ package zero.swf.avm2{
 									case_offsetV:case_offsetV
 								});
 							break;
-							case AVM2Ops.debug://0xef	//u8_u8_u30_u8_u30__debug
+							
+							//case 0xef://AVM2Ops.debug	//u8_u8_u30_u8_u30__debug
+							case "debug":
 								execResult=/^(\w+)\s+("|')([\s\S]*)\2\s+(\w+)\s+(\w+)$/.exec(execResult[2]);
 								codeArr[codeId]=new Code(op,{
 									debug_type:int(execResult[1]),

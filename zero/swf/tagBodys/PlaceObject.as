@@ -42,10 +42,23 @@ package zero.swf.tagBodys{
 		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			CharacterId=data[offset++]|(data[offset++]<<8);
 			Depth=data[offset++]|(data[offset++]<<8);
-			Matrix=new (_initByDataOptions&&_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.records.MATRIX"]||MATRIX)();
+			
+			var MatrixClass:Class;
+			if(_initByDataOptions){
+				if(_initByDataOptions.classes){
+					MatrixClass=_initByDataOptions.classes["zero.swf.records.MATRIX"];
+				}
+			}
+			Matrix=new (MatrixClass||MATRIX)();
 			offset=Matrix.initByData(data,offset,endOffset,_initByDataOptions);
 			if(offset<endOffset){
-				ColorTransform=new (_initByDataOptions&&_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.records.CXFORM"]||CXFORM)();
+				var ColorTransformClass:Class;
+				if(_initByDataOptions){
+					if(_initByDataOptions.classes){
+						ColorTransformClass=_initByDataOptions.classes["zero.swf.records.CXFORM"];
+					}
+				}
+				ColorTransform=new (ColorTransformClass||CXFORM)();
 				offset=ColorTransform.initByData(data,offset,endOffset,_initByDataOptions);
 			}else{
 				ColorTransform=null;

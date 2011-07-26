@@ -60,6 +60,8 @@ package zero.ui
 			var text:String=so.getValue(so_key);
 			if(text){
 				txt.text=text;
+			}else if(txt.text){
+				so.setValue(so_key,txt.text);
 			}
 			txt.addEventListener(Event.CHANGE,change);
 		}

@@ -89,6 +89,7 @@
 				if(xml.url.length()==0){
 					xml.appendChild(<url url="${当前地址}" strictMatch="true"/>);
 				}
+				//trace("xml="+xml);
 				return xml;
 			}
 		]]>

@@ -127,6 +127,7 @@ package zero.ui{
 			saveId:String=null,
 			defaultFileURLOrFileURLArr:*=null
 		):void{
+			trace("FileSelecterManager 考虑简化");
 			//init("图片","jpg,png,gif,bmp");
 			if(btn){
 				btn.addEventListener(MouseEvent.CLICK,browse);
@@ -386,6 +387,8 @@ package zero.ui{
 					return;
 				}
 				select(null);
+			}else{
+				(onSelect==null)||onSelect();//- -
 			}
 		}
 		public function addURL(url:String):void{

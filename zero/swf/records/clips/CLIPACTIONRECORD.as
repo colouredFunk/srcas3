@@ -30,7 +30,17 @@ package zero.swf.records.clips{
 			if(EventFlags.ClipEventKeyPress>0){
 				KeyCode=data[offset++];
 			}
-			Actions=new (_initByDataOptions&&(_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.avm1.ACTIONRECORDs"]||_initByDataOptions.ActionsClass)||ACTIONRECORDs)();
+			var ActionsClass:Class;
+			if(_initByDataOptions){
+				if(_initByDataOptions.classes){
+					ActionsClass=_initByDataOptions.classes["zero.swf.avm1.ACTIONRECORDs"];
+				}
+				if(ActionsClass){
+				}else{
+					ActionsClass=_initByDataOptions.ActionsClass;
+				}
+			}
+			Actions=new (ActionsClass||ACTIONRECORDs)();
 			return Actions.initByData(data,offset,endOffset,_initByDataOptions);
 		}
 		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{

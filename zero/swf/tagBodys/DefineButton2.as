@@ -1,36 +1,9 @@
-/***
-DefineButton2
-创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
-创建时间：2011年7月5日 13:52:16（代码生成器 V2.0.0 F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf）
-简要说明：这家伙很懒什么都没写。
-用法举例：这家伙还是很懒什么都没写。
-*/
-//DefineButton2
-//DefineButton2 extends the capabilities of DefineButton by allowing any state transition to
-//trigger actions.
-//The minimum file format version is SWF 3:
-//Starting with SWF 9, if the ActionScript3 field of the FileAttributes tag is 1, there must be no
-//BUTTONCONDACTION fields in the DefineButton2 tag. ActionOffset must be 0. This
-//structure is not supported because it is not permitted to mix ActionScript 1/2 and
-//ActionScript 3.0 code within the same SWF file.
-
-
-//Field 							Type 							Comment
-//Header 							RECORDHEADER 					Tag type = 34
-//ButtonId 							UI16 							ID for this character
-//ReservedFlags 					UB[7] 							Always 0
-//TrackAsMenu 						UB[1] 							0 = track as normal button
-//																	1 = track as menu button
-//ActionOffset 						UI16 							Offset in bytes from start of this
-//Characters 						BUTTONRECORD[one or more]		Characters that make up the button
-//CharacterEndFlag 					UI8 							Must be 0
-//Actions 							BUTTONCONDACTION[zero or more]	Actions to execute at particular button events field to the first BUTTONCONDACTION, or 0 if no actions occur
 package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
 	import flash.utils.getDefinitionByName;
 	import zero.swf.BytesData;
 	import zero.swf.records.buttons.BUTTONRECORD;
-	public class DefineButton2{//implements I_zero_swf_CheckCodesRight{
+	public class DefineButton2{
 		public var id:int;								//UI16
 		public var TrackAsMenu:Boolean;
 		public var CharacterV:Vector.<*>;
@@ -47,13 +20,25 @@ package zero.swf.tagBodys{
 			CharacterV=new Vector.<*>();
 			while(data[offset]){//CharacterEndFlag
 				i++;
-				CharacterV[i]=new (_initByDataOptions&&_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.records.buttons.BUTTONRECORD"]||BUTTONRECORD)();
+				var CharacterClass:Class;
+				if(_initByDataOptions){
+					if(_initByDataOptions.classes){
+						CharacterClass=_initByDataOptions.classes["zero.swf.records.buttons.BUTTONRECORD"];
+					}
+				}
+				CharacterV[i]=new (CharacterClass||BUTTONRECORD)();
 				offset=CharacterV[i].initByData(data,offset,endOffset,_initByDataOptions);
 			}
 			//var CharacterEndFlag:int=data[offset++];
 			offset++;
 			if(ActionOffset&&(offset<endOffset)){
-				ButtonCondActions=new (_initByDataOptions&&(_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.BytesData"]||_initByDataOptions.ButtonCondActionsClass)||BytesData)();
+				var ButtonCondActionsClass:Class;
+				if(_initByDataOptions){
+					if(_initByDataOptions.classes){
+						ButtonCondActionsClass=_initByDataOptions.classes["zero.swf.BytesData"];
+					}
+				}
+				ButtonCondActions=new (ButtonCondActionsClass||BytesData)();
 				return ButtonCondActions.initByData(data,offset,endOffset,_initByDataOptions);
 			}else{
 				ButtonCondActions=null;

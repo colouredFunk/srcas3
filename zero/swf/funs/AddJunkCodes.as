@@ -8,7 +8,7 @@ AddJunkCodes 版本:v1.0
 */
 
 package zero.swf.funs{
-	import flash.utils.Dictionary;
+	import flash.utils.*;
 	
 	import zero.*;
 	import zero.swf.*;
@@ -102,6 +102,8 @@ package zero.swf.funs{
 			dict=new Dictionary();
 		}
 		public function add(swf:SWF):void{
+			var methodV:Vector.<ABCMethod>=new Vector.<ABCMethod>();
+			
 			var ABCData:ABCClasses;
 			for each(var tag:Tag in swf.tagV){
 				switch(tag.type){
@@ -116,333 +118,421 @@ package zero.swf.funs{
 					break;
 				}
 				if(ABCData){
+					var trait:ABCTrait;
 					for each(var clazz:ABCClass in ABCData.classV){
-						addJunkCodesToCodeV(clazz.iinit);
-						addJunkCodesToTraits(clazz.itraitV);
-						addJunkCodesToCodeV(clazz.cinit);
-						addJunkCodesToTraits(clazz.ctraitV);
+						if(clazz.iinit.codes){
+							if(dict[clazz.iinit.codes]){
+								trace("重复添加垃圾代码");
+							}else{
+								methodV.push(clazz.iinit);
+								dict[clazz.iinit.codes]=true;
+							}
+						}
+						for each(trait in clazz.itraitV){
+							//trace(TraitTypes.typeV[traits_info.kind_trait_type]);
+							switch(trait.kind_trait_type){
+								case TraitTypeAndAttributes.Slot:
+								case TraitTypeAndAttributes.Const:
+								break;
+								case TraitTypeAndAttributes.Method:
+								case TraitTypeAndAttributes.Getter:
+								case TraitTypeAndAttributes.Setter:
+									if(trait.method.codes){
+										if(dict[trait.method.codes]){
+											trace("重复添加垃圾代码");
+										}else{
+											methodV.push(trait.method);
+											dict[trait.method.codes]=true;
+										}
+									}
+								break;
+								case TraitTypeAndAttributes.Function_:
+									if(trait.function_.codes){
+										if(dict[trait.function_.codes]){
+											trace("重复添加垃圾代码");
+										}else{
+											methodV.push(trait.function_);
+											dict[trait.method.codes]=true;
+										}
+									}
+								break;
+								case TraitTypeAndAttributes.Class_:
+								break;
+							}
+						}
+						if(clazz.cinit.codes){
+							if(dict[clazz.cinit.codes]){
+								trace("重复添加垃圾代码");
+							}else{
+								methodV.push(clazz.cinit);
+								dict[clazz.cinit.codes]=true;
+							}
+						}
+						
+						for each(trait in clazz.ctraitV){
+							//trace(TraitTypes.typeV[traits_info.kind_trait_type]);
+							switch(trait.kind_trait_type){
+								case TraitTypeAndAttributes.Slot:
+								case TraitTypeAndAttributes.Const:
+								break;
+								case TraitTypeAndAttributes.Method:
+								case TraitTypeAndAttributes.Getter:
+								case TraitTypeAndAttributes.Setter:
+									if(trait.method.codes){
+										if(dict[trait.method.codes]){
+											trace("重复添加垃圾代码");
+										}else{
+											methodV.push(trait.method);
+											dict[trait.method.codes]=true;
+										}
+									}
+								break;
+								case TraitTypeAndAttributes.Function_:
+									if(trait.function_.codes){
+										if(dict[trait.function_.codes]){
+											trace("重复添加垃圾代码");
+										}else{
+											methodV.push(trait.function_);
+											dict[trait.method.codes]=true;
+										}
+									}
+								break;
+								case TraitTypeAndAttributes.Class_:
+								break;
+							}
+						}
 					}
 					for each(var script:ABCScript in ABCData.scriptV){
-						addJunkCodesToCodeV(script.init);
-						addJunkCodesToTraits(script.traitV);
+						if(script.init.codes){
+							if(dict[script.init.codes]){
+								trace("重复添加垃圾代码");
+							}else{
+								methodV.push(script.init);
+								dict[script.init.codes]=true;
+							}
+						}
+						for each(trait in script.traitV){
+							//trace(TraitTypes.typeV[traits_info.kind_trait_type]);
+							switch(trait.kind_trait_type){
+								case TraitTypeAndAttributes.Slot:
+								case TraitTypeAndAttributes.Const:
+								break;
+								case TraitTypeAndAttributes.Method:
+								case TraitTypeAndAttributes.Getter:
+								case TraitTypeAndAttributes.Setter:
+									if(trait.method.codes){
+										if(dict[trait.method.codes]){
+											trace("重复添加垃圾代码");
+										}else{
+											methodV.push(trait.method);
+											dict[trait.method.codes]=true;
+										}
+									}
+								break;
+								case TraitTypeAndAttributes.Function_:
+									if(trait.function_.codes){
+										if(dict[trait.function_.codes]){
+											trace("重复添加垃圾代码");
+										}else{
+											methodV.push(trait.function_);
+											dict[trait.method.codes]=true;
+										}
+									}
+								break;
+								case TraitTypeAndAttributes.Class_:
+								break;
+							}
+						}
 					}
 				}
 			}
-		}
-		private function addJunkCodesToTraits(traitV:Vector.<ABCTrait>):void{
-			for each(var trait:ABCTrait in traitV){
-				//trace(TraitTypes.typeV[traits_info.kind_trait_type]);
-				switch(trait.kind_trait_type){
-					case TraitTypeAndAttributes.Slot:
-					case TraitTypeAndAttributes.Const:
-					break;
-					case TraitTypeAndAttributes.Method:
-					case TraitTypeAndAttributes.Getter:
-					case TraitTypeAndAttributes.Setter:
-						addJunkCodesToCodeV(trait.method);
-					break;
-					case TraitTypeAndAttributes.Function_:
-						addJunkCodesToCodeV(trait.function_);
-					break;
-					case TraitTypeAndAttributes.Class_:
-					break;
-				}
-			}
-		}
-		
-		private function addJunkCodesToCodeV(method:ABCMethod):void{
-			if(method.codes){
+			
+			var t:int=getTimer();
+			
+			for each(var method:ABCMethod in methodV){
+				var codeArr:Array=method.codes.codeArr;
 				
-			}else{
-				return;
-			}
-			
-			var codeArr:Array=method.codes.codeArr;
-			
-			var L:int=codeArr.length;
-			if(L<7){
-				return;
-			}
-			
-			if(dict[method.codes]){
-				trace("重复添加垃圾代码");
-				return;
-			}
-			dict[method.codes]=true;
-			
-			var i:int=L-1;//不能 jump 到句子后面，否则播放器报错：VerifyError: Error #1020: 代码不能超出方法结尾。
-			
-			var idMarkV:Vector.<Boolean>=ZeroCommon.getIdMarkV(5,i);
-			
-			//trace("codes.codeArr.length="+codes.codeArr.length);
-			
-			var ran:int;
-			
-			while(--i>0){
-				if(idMarkV[i]){
-					if(codeArr[i]===AVM2Ops.label){
-						continue;
-					}
-					var j:int=i;
-					
-					var jumpCode:Code;
-					
-					switch(int(Math.random()*4)){
-						case 0:
-						case 1:
-						case 2:
-							//pushtrue
-							codeArr.splice(j++,0,getPushTrue());
-							
-							//执行一个操作，但维持为true
-							switch(int(Math.random()*4)){
-								case 0:
-								break;
-								case 1:
-									//typeof(任何值)==一个有效的字符串
-									codeArr.splice(j++,0,AVM2Ops.typeof_);
-								break;
-								case 2:
-									codeArr.splice(j++,0,AVM2Ops.convert_b);
-								break;
-								case 3:
-									codeArr.splice(j++,0,AVM2Ops.coerce_b);
-								break;
-							}
-							
-							//iftrue
-							switch(int(Math.random()*2)){
-								case 0:
-									jumpCode=new Code(AVM2Ops.iftrue);
-								break;
-								case 1:
-									codeArr.splice(j++,0,AVM2Ops.not);
-									jumpCode=new Code(AVM2Ops.iffalse);
-								break;
+				var L:int=codeArr.length;
+				if(L<7){
+					continue;
+				}
+				
+				var i:int=L-1;//不能 jump 到句子后面，否则播放器报错：VerifyError: Error #1020: 代码不能超出方法结尾。
+				
+				var idMarkV:Vector.<Boolean>=ZeroCommon.getIdMarkV(5,i);
+				
+				//trace("codes.codeArr.length="+codes.codeArr.length);
+				
+				var ran:int;
+				
+				while(--i>0){
+					if(idMarkV[i]){
+						if(codeArr[i]===AVM2Ops.label){
+							continue;
+						}
+						var j:int=i;
+						
+						var jumpCode:Code;
+						
+						switch(int(Math.random()*4)){
+							case 0:
+							case 1:
+							case 2:
+								//pushtrue
+								codeArr.splice(j++,0,getPushTrue());
 								
-							}
-							codeArr.splice(j++,0,jumpCode);
-							
-							//扰码
-							ran=(Math.random()*3)+1;
-							while(--ran>=0){
-								switch(int(Math.random()*3)){
-								//switch(2){
+								//执行一个操作，但维持为true
+								switch(int(Math.random()*4)){
 									case 0:
-										codeArr.splice(j++,0,getPushTrue());
-										codeArr.splice(j++,0,getPop());
 									break;
 									case 1:
-										codeArr.splice(
-											j++,
-											0,
-											getLookUpSwitch()
-										);
+										//typeof(任何值)==一个有效的字符串
+										codeArr.splice(j++,0,AVM2Ops.typeof_);
 									break;
 									case 2:
-										var junkLabelMark:LabelMark=new LabelMark(0);
-										//codeArr.splice(j++,0,junkLabelMark);
-										//codeArr.splice(j++,0,AVM2Ops.label);
-										var junkJumpCode:Code;
-										if(Math.random()<0.1){
-											junkJumpCode=new Code(AVM2Ops.jump,junkLabelMark);
-											codeArr.splice(j++,0,junkJumpCode);
-										}else{
+										codeArr.splice(j++,0,AVM2Ops.convert_b);
+									break;
+									case 3:
+										codeArr.splice(j++,0,AVM2Ops.coerce_b);
+									break;
+								}
+								
+								//iftrue
+								switch(int(Math.random()*2)){
+									case 0:
+										jumpCode=new Code(AVM2Ops.iftrue);
+									break;
+									case 1:
+										codeArr.splice(j++,0,AVM2Ops.not);
+										jumpCode=new Code(AVM2Ops.iffalse);
+									break;
+									
+								}
+								codeArr.splice(j++,0,jumpCode);
+								
+								//扰码
+								ran=(Math.random()*3)+1;
+								while(--ran>=0){
+									switch(int(Math.random()*3)){
+									//switch(2){
+										case 0:
 											codeArr.splice(j++,0,getPushTrue());
-											codeArr.splice(j++,0,getPushTrue());
-											junkJumpCode=new Code(
-												ifCodeArr[int(Math.random()*ifCodeArr.length)],
-												junkLabelMark
+											codeArr.splice(j++,0,getPop());
+										break;
+										case 1:
+											codeArr.splice(
+												j++,
+												0,
+												getLookUpSwitch()
 											);
-											codeArr.splice(j++,0,junkJumpCode);
-										}
-										codeArr.splice(j++,0,junkLabelMark);
-									break;
+										break;
+										case 2:
+											var junkLabelMark:LabelMark=new LabelMark(0);
+											//codeArr.splice(j++,0,junkLabelMark);
+											//codeArr.splice(j++,0,AVM2Ops.label);
+											var junkJumpCode:Code;
+											if(Math.random()<0.1){
+												junkJumpCode=new Code(AVM2Ops.jump,junkLabelMark);
+												codeArr.splice(j++,0,junkJumpCode);
+											}else{
+												codeArr.splice(j++,0,getPushTrue());
+												codeArr.splice(j++,0,getPushTrue());
+												junkJumpCode=new Code(
+													ifCodeArr[int(Math.random()*ifCodeArr.length)],
+													junkLabelMark
+												);
+												codeArr.splice(j++,0,junkJumpCode);
+											}
+											codeArr.splice(j++,0,junkLabelMark);
+										break;
+									}
 								}
-							}
-							
-							jumpCode.value=new LabelMark(0);
-							codeArr.splice(j++,0,jumpCode.value);
-
-						break;
-						case 3:
-							jumpCode=new Code(AVM2Ops.jump);
-							codeArr.splice(j++,0,jumpCode);
-							ran=(Math.random()*3)+1;
-							while(--ran>=0){
-								var option:Array=options[int(Math.random()*options.length)];
-								switch(option[0]){
-									case "index u30":
-									case "args u30":
-										option=option[1];
-										option=option[int(Math.random()*option.length)];
-										
+								
+								jumpCode.value=new LabelMark(0);
+								codeArr.splice(j++,0,jumpCode.value);
+	
+							break;
+							case 3:
+								jumpCode=new Code(AVM2Ops.jump);
+								codeArr.splice(j++,0,jumpCode);
+								ran=(Math.random()*3)+1;
+								while(--ran>=0){
+									var option:Array=options[int(Math.random()*options.length)];
+									switch(option[0]){
+										case "index u30":
+										case "args u30":
+											option=option[1];
+											option=option[int(Math.random()*option.length)];
+											
+											/*
+											directCode=new DirectCode(option[0]);
+											codes.codeArr.splice(j++,0,directCode);
+											switch(option[1]){
+												case 0:
+													directCode.value=0;
+												break;
+												case 1:
+													directCode.value=int(Math.random()*0xffff)+1;//uint(Math.random()*0x40000000);最大可以到 (0x3f ff ff ff)
+												break;
+												case 2:
+													directCode.value=0x3fffffff;
+												break;
+											}
+											*/
+											
+											codeArr.splice(
+												j++,
+												0,
+												[option[0],int(0x80*Math.random())]
+											);
+										break;
+										case "branch":
+											option=option[1];
+											option=option[int(Math.random()*option.length)];
+											
+											/*
+											directCode=new DirectCode(option[0]);
+											codes.codeArr.splice(j++,0,directCode);
+											switch(option[1]){
+												case 0:
+													directCode.value=0;//仅乱码
+												break;
+												case 1:
+													directCode.value=(int(Math.random()*0x7fffff)+1);//精灵挂掉
+												break;
+												case 2:
+													directCode.value=-(int(Math.random()*0x800000)+1);//较大机率精灵挂掉
+												break;
+											}
+											*/
+											
+											codeArr.splice(
+												j++,
+												0,
+												[option[0],int(0x80*Math.random()),int(0x100*Math.random()),int(0x100*Math.random())]
+											);
+										break;
+										case "index u30 args u30":
+											option=option[1];
+											option=option[int(Math.random()*option.length)];
+											
+											/*
+											directCode=new DirectCode(option[0]);
+											codes.codeArr.splice(j++,0,directCode);
+											directCode.value={};
+											switch(option[1]){
+												case 0:
+													directCode.value.u30_1=0;
+												break;
+												case 1:
+													directCode.value.u30_1=int(Math.random()*0xffff)+1;//uint(Math.random()*0x40000000);最大可以到 (0x3f ff ff ff)
+												break;
+												case 2:
+													directCode.value.u30_1=0x3fffffff;
+												break;
+											}
+											switch(option[2]){
+												case 0:
+													directCode.value.u30_2=0;
+												break;
+												case 1:
+													directCode.value.u30_2=int(Math.random()*0xffff)+1;//uint(Math.random()*0x40000000);最大可以到 (0x3f ff ff ff)
+												break;
+												case 2:
+													directCode.value.u30_2=0x3fffffff;
+												break;
+											}
+											*/
+											
+											codeArr.splice(
+												j++,
+												0,
+												[option[0],int(0x80*Math.random()),int(0x80*Math.random())]
+											);
+										break;
+										case "op":
+											option=option[1];
+											
+											/*
+											directCode=new DirectCode(option[int(Math.random()*option.length)]);
+											codes.codeArr.splice(j++,0,directCode);
+											*/
+											
+											codeArr.splice(
+												j++,
+												0,
+												option[int(Math.random()*option.length)]
+											);
+											
+										break;
 										/*
-										directCode=new DirectCode(option[0]);
-										codes.codeArr.splice(j++,0,directCode);
-										switch(option[1]){
-											case 0:
-												directCode.value=0;
-											break;
-											case 1:
-												directCode.value=int(Math.random()*0xffff)+1;//uint(Math.random()*0x40000000);最大可以到 (0x3f ff ff ff)
-											break;
-											case 2:
-												directCode.value=0x3fffffff;
-											break;
-										}
-										*/
-										
-										codeArr.splice(
-											j++,
-											0,
-											[option[0],int(0x80*Math.random())]
-										);
-									break;
-									case "branch":
-										option=option[1];
-										option=option[int(Math.random()*option.length)];
-										
-										/*
-										directCode=new DirectCode(option[0]);
-										codes.codeArr.splice(j++,0,directCode);
-										switch(option[1]){
-											case 0:
-												directCode.value=0;//仅乱码
-											break;
-											case 1:
-												directCode.value=(int(Math.random()*0x7fffff)+1);//精灵挂掉
-											break;
-											case 2:
-												directCode.value=-(int(Math.random()*0x800000)+1);//较大机率精灵挂掉
-											break;
-										}
-										*/
-										
-										codeArr.splice(
-											j++,
-											0,
-											[option[0],int(0x80*Math.random()),int(0x100*Math.random()),int(0x100*Math.random())]
-										);
-									break;
-									case "index u30 args u30":
-										option=option[1];
-										option=option[int(Math.random()*option.length)];
-										
-										/*
-										directCode=new DirectCode(option[0]);
-										codes.codeArr.splice(j++,0,directCode);
-										directCode.value={};
-										switch(option[1]){
-											case 0:
-												directCode.value.u30_1=0;
-											break;
-											case 1:
-												directCode.value.u30_1=int(Math.random()*0xffff)+1;//uint(Math.random()*0x40000000);最大可以到 (0x3f ff ff ff)
-											break;
-											case 2:
-												directCode.value.u30_1=0x3fffffff;
-											break;
-										}
-										switch(option[2]){
-											case 0:
-												directCode.value.u30_2=0;
-											break;
-											case 1:
-												directCode.value.u30_2=int(Math.random()*0xffff)+1;//uint(Math.random()*0x40000000);最大可以到 (0x3f ff ff ff)
-											break;
-											case 2:
-												directCode.value.u30_2=0x3fffffff;
-											break;
-										}
-										*/
-										
-										codeArr.splice(
-											j++,
-											0,
-											[option[0],int(0x80*Math.random()),int(0x80*Math.random())]
-										);
-									break;
-									case "op":
-										option=option[1];
-										
-										/*
-										directCode=new DirectCode(option[int(Math.random()*option.length)]);
-										codes.codeArr.splice(j++,0,directCode);
-										*/
-										
-										codeArr.splice(
-											j++,
-											0,
-											option[int(Math.random()*option.length)]
-										);
-										
-									break;
-									/*
-									case "special":
-										option=option[1];
-										var op:int=option[int(Math.random()*option.length)];
-										switch(op){
-											case AVM2Ops.op_pushbyte:
-												var code_byte:Code_Byte=new Code_Byte(int(Math.random()*0x100)-0x80);
-												code_byte.op=op;
-												codeArr[codeArr.length]=code_byte;
-											break;
-											case AVM2Ops.op_pushshort:
-											case AVM2Ops.op_debugline:
-											case AVM2Ops.op_bkptline:
-												code_u30_direct=new Code_u30_Direct();
-												code_u30_direct.op=op;
-												//code_u30_direct.u30=0;
-												//code_u30_direct.u30=int(Math.random()*0xffff)+1;//uint(Math.random()*0x40000000);最大可以到 (0x3f ff ff ff)
-												//code_u30_direct.u30=0x3fffffff;
-												code_u30_direct.u30=int(Math.random()*0x10000);
-												codeArr[codeArr.length]=code_u30_direct;
-											break;
-											case AVM2Ops.op_lookupswitch:
-												//没测试
-											break;
-											case AVM2Ops.op_hasnext2:
-												code_u30_u30_direct=new Code_u30_u30_Direct();
-												code_u30_u30_direct.op=op;
-												
-												//code_u30_u30_direct.u30_1=0;
-												//code_u30_u30_direct.u30_1=int(Math.random()*0xffff)+1;//uint(Math.random()*0x40000000);最大可以到 (0x3f ff ff ff)
-												//code_u30_u30_direct.u30_1=0x3fffffff;
-												code_u30_u30_direct.u30_1=int(Math.random()*0x10000);
-												
-												//code_u30_u30_direct.u30_2=0;
-												//code_u30_u30_direct.u30_2=int(Math.random()*0xffff)+1;//uint(Math.random()*0x40000000);最大可以到 (0x3f ff ff ff)
-												//code_u30_u30_direct.u30_2=0x3fffffff;
-												code_u30_u30_direct.u30_2=int(Math.random()*0x10000);
-												
-												codeArr[codeArr.length]=code_u30_u30_direct;
-											break;
-											case AVM2Ops.op_debug:
-												var code_debug:Code_Debug=new Code_Debug();
-												code_debug.op=op;
-												code_debug.debug_type=int(Math.random()*0x100);
-												//code_debug.string="";
-												code_debug.reg=int(Math.random()*0x100);
-												code_debug.extra=int(Math.random()*0x10000);
-												codeArr[codeArr.length]=code_debug;
-											break;
-										}
-									break;
-									//*/
+										case "special":
+											option=option[1];
+											var op:int=option[int(Math.random()*option.length)];
+											switch(op){
+												case AVM2Ops.op_pushbyte:
+													var code_byte:Code_Byte=new Code_Byte(int(Math.random()*0x100)-0x80);
+													code_byte.op=op;
+													codeArr[codeArr.length]=code_byte;
+												break;
+												case AVM2Ops.op_pushshort:
+												case AVM2Ops.op_debugline:
+												case AVM2Ops.op_bkptline:
+													code_u30_direct=new Code_u30_Direct();
+													code_u30_direct.op=op;
+													//code_u30_direct.u30=0;
+													//code_u30_direct.u30=int(Math.random()*0xffff)+1;//uint(Math.random()*0x40000000);最大可以到 (0x3f ff ff ff)
+													//code_u30_direct.u30=0x3fffffff;
+													code_u30_direct.u30=int(Math.random()*0x10000);
+													codeArr[codeArr.length]=code_u30_direct;
+												break;
+												case AVM2Ops.op_lookupswitch:
+													//没测试
+												break;
+												case AVM2Ops.op_hasnext2:
+													code_u30_u30_direct=new Code_u30_u30_Direct();
+													code_u30_u30_direct.op=op;
+													
+													//code_u30_u30_direct.u30_1=0;
+													//code_u30_u30_direct.u30_1=int(Math.random()*0xffff)+1;//uint(Math.random()*0x40000000);最大可以到 (0x3f ff ff ff)
+													//code_u30_u30_direct.u30_1=0x3fffffff;
+													code_u30_u30_direct.u30_1=int(Math.random()*0x10000);
+													
+													//code_u30_u30_direct.u30_2=0;
+													//code_u30_u30_direct.u30_2=int(Math.random()*0xffff)+1;//uint(Math.random()*0x40000000);最大可以到 (0x3f ff ff ff)
+													//code_u30_u30_direct.u30_2=0x3fffffff;
+													code_u30_u30_direct.u30_2=int(Math.random()*0x10000);
+													
+													codeArr[codeArr.length]=code_u30_u30_direct;
+												break;
+												case AVM2Ops.op_debug:
+													var code_debug:Code_Debug=new Code_Debug();
+													code_debug.op=op;
+													code_debug.debug_type=int(Math.random()*0x100);
+													//code_debug.string="";
+													code_debug.reg=int(Math.random()*0x100);
+													code_debug.extra=int(Math.random()*0x10000);
+													codeArr[codeArr.length]=code_debug;
+												break;
+											}
+										break;
+										//*/
+									}
 								}
-							}
-							
-							jumpCode.value=new LabelMark(0);
-							codeArr.splice(j++,0,jumpCode.value);
-						break;
+								
+								jumpCode.value=new LabelMark(0);
+								codeArr.splice(j++,0,jumpCode.value);
+							break;
+						}
 					}
 				}
+				
+				//trace("codes.codeArr.length="+codes.codeArr.length+"---------");
+				
+				method.max_stack+=4;
 			}
 			
-			//trace("codes.codeArr.length="+codes.codeArr.length+"---------");
-			
-			method.max_stack+=4;
+			trace("addJunkCodes 耗时："+(getTimer()-t)+" 毫秒");
 		}
 		private function getPushTrue():*{
 			var num1:int,num2:int;

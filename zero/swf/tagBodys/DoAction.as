@@ -24,7 +24,17 @@ package zero.swf.tagBodys{
 		//public var ActionEndFlag:int;//经测试这是会被播放器执行的（把 ActionEndFlag 设置为 8（toggleQuality）然后执行帧动作，将发现播放质量发生变化，所以 ActionEndFlag 应是 Actions 的一部分）
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
-			Actions=new (_initByDataOptions&&(_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.avm1.ACTIONRECORDs"]||_initByDataOptions.ActionsClass)||ACTIONRECORDs)();
+			var ActionsClass:Class;
+			if(_initByDataOptions){
+				if(_initByDataOptions.classes){
+					ActionsClass=_initByDataOptions.classes["zero.swf.avm1.ACTIONRECORDs"];
+				}
+				if(ActionsClass){
+				}else{
+					ActionsClass=_initByDataOptions.ActionsClass;
+				}
+			}
+			Actions=new (ActionsClass||ACTIONRECORDs)();
 			return Actions.initByData(data,offset,endOffset,_initByDataOptions);
 		}
 		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{

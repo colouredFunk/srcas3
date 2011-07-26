@@ -39,27 +39,12 @@ package zero.swf.funs{
 			switch(tag.type){
 				case TagTypes.DoABC:
 					ABCData=tag.getBody(DoABC,{ABCDataClass:ABCFileWithSimpleConstant_pool}).ABCData;
-					i=ABCData.stringV.length;
-					while(--i>0){
-						strt=mark["~"+ABCData.stringV[i]];
-						if(strt is String){
-							//trace("strt=\""+strt+"\",strt.length="+strt.length);
-							ABCData.stringV[i]=strt;
-						}
-					}
 				break;
 				case TagTypes.DoABCWithoutFlagsAndName:
 					ABCData=tag.getBody(DoABCWithoutFlagsAndName,{ABCDataClass:ABCFileWithSimpleConstant_pool}).ABCData;
-					i=ABCData.stringV.length;
-					while(--i>0){
-						strt=mark["~"+ABCData.stringV[i]];
-						if(strt is String){
-							//trace("strt=\""+strt+"\",strt.length="+strt.length);
-							ABCData.stringV[i]=strt;
-						}
-					}
 				break;
 				case TagTypes.SymbolClass:
+					ABCData=null;
 					var NameV:Vector.<String>=tag.getBody(SymbolClass,null).NameV;
 					i=NameV.length;
 					while(--i>=0){
@@ -85,6 +70,19 @@ package zero.swf.funs{
 						}
 					}
 				break;
+				default:
+					ABCData=null;
+				break;
+			}
+			if(ABCData){
+				i=ABCData.stringV.length;
+				while(--i>0){
+					strt=mark["~"+ABCData.stringV[i]];
+					if(strt is String){
+						//trace("strt=\""+strt+"\",strt.length="+strt.length);
+						ABCData.stringV[i]=strt;
+					}
+				}
 			}
 		}
 		

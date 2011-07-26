@@ -15,7 +15,7 @@ package zero.swf.tagBodys{
 	import zero.swf.avm2.ABCFile;
 	import flash.utils.ByteArray;
 	import flash.utils.getDefinitionByName;
-	public class DoABC{//implements I_zero_swf_CheckCodesRight{
+	public class DoABC{
 		public var Flags:uint;							//UI32
 		public var Name:String;							//STRING
 		public var ABCData:*;							//ABCFile
@@ -28,7 +28,17 @@ package zero.swf.tagBodys{
 			Name=data.readUTFBytes(get_str_size);
 			offset+=get_str_size;
 			
-			ABCData=new (_initByDataOptions&&(_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.avm2.ABCFile"]||_initByDataOptions.ABCDataClass)||ABCFile)();
+			var ABCDataClass:Class;
+			if(_initByDataOptions){
+				if(_initByDataOptions.classes){
+					ABCDataClass=_initByDataOptions.classes["zero.swf.avm2.ABCFile"];
+				}
+				if(ABCDataClass){
+				}else{
+					ABCDataClass=_initByDataOptions.ABCDataClass;
+				}
+			}
+			ABCData=new (ABCDataClass||ABCFile)();
 			return ABCData.initByData(data,offset,endOffset,_initByDataOptions);
 		}
 		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{

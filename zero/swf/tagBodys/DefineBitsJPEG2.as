@@ -35,7 +35,13 @@ package zero.swf.tagBodys{
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
 			id=data[offset++]|(data[offset++]<<8);
-			ImageData=new (_initByDataOptions&&_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.BytesData"]||BytesData)();
+			var ImageDataClass:Class;
+			if(_initByDataOptions){
+				if(_initByDataOptions.classes){
+					ImageDataClass=_initByDataOptions.classes["zero.swf.BytesData"];
+				}
+			}
+			ImageData=new (ImageDataClass||BytesData)();
 			return ImageData.initByData(data,offset,endOffset,_initByDataOptions);
 		}
 		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
