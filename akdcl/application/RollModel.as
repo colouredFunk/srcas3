@@ -79,7 +79,7 @@
 			return rollDic[getRoll(_id)];
 		}
 		public function addRoll(_roll:*, _id:uint, _list:Array=null, _radian:Number = NaN):void {
-			rollDic[_roll]=_radian||radianFloor(rotatePer*_id);
+			rollDic[_roll]=_radian||radianFloor(-rotatePer*_id);
 			rollList.push(_roll);
 			rollDepth.push(_roll);
 		}

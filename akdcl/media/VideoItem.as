@@ -45,7 +45,7 @@ package akdcl.media {
 		}
 
 		public function get bufferProgress():Number {
-			return Math.min((totalTime * loadProgress - position) / SoundMixer.bufferTime, 1);
+			return netStream.;
 		}
 		
 		public function get totalTime():uint {

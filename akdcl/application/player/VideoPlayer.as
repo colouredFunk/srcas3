@@ -10,19 +10,19 @@ package akdcl.application.player{
 	 * @author Akdcl
 	 */
 	public class VideoPlayer extends MediaPlayer {
-		protected static const defaultParams:Object = { autoPlay:false, scaleMode:ScaleMode.PROPORTIONAL_INSIDE, bgColor:0x000000 };
+		protected static const DEFAULT_PARAMS:Object = { autoPlay:false, scaleMode:ScaleMode.PROPORTIONAL_INSIDE, bgColor:0x000000 };
 		protected static var videoDic:Object = { };
 		protected static function loadVideo(_source:String, _params:Object = null):VideoLoader {
 			var _video:VideoLoader = videoDic[_source];
 			if (!_video) {
 				if (_params) {
-					for (var _i:String in defaultParams) {
+					for (var _i:String in DEFAULT_PARAMS) {
 						if (!_params.hasOwnProperty(_i)) {
-							_params[_i] = defaultParams[_i];
+							_params[_i] = DEFAULT_PARAMS[_i];
 						}
 					}
 				}
-				_video = new VideoLoader(_source, _params || defaultParams);
+				_video = new VideoLoader(_source, _params || DEFAULT_PARAMS);
 			}
 			return _video;
 		}
@@ -84,7 +84,7 @@ package akdcl.application.player{
 		}
 		
 		protected var video:VideoLoader;
-		protected var videoParams:Object;
+		public var videoParams:Object;
 		override public function remove():void {
 			hideContent();
 			video.cancel();

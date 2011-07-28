@@ -111,6 +111,7 @@ package akdcl.manager {
 
 		public function set stage(_stage:Stage):void {
 			if (__stage == _stage) {
+				onTimerHandler(null);
 				return;
 			}
 			__stage = _stage;

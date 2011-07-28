@@ -128,7 +128,7 @@
 				_loaded = _loaded * (1 - optionsXMLPerLoad) + xmlLoadProgress * optionsXMLPerLoad;
 			}
 			var _dV:Number = _loaded - loadProgress;
-			if (_dV > 0.01){
+			if (_dV > 0.01) {
 				loadProgress += _dV * loadDelay;
 			} else {
 				loadProgress = _loaded;

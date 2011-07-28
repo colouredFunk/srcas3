@@ -116,7 +116,7 @@
 			try {
 				//去掉json不支持的字符串
 				var _dataFotmat:String = data.replace(/[\x00-\x1f]/g, "");
-				var _data:Object = JSON.decode(data);
+				var _data:Object = JSON.decode(_dataFotmat);
 			} catch (_error:*){
 			}
 			return _data;
