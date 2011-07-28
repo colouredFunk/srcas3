@@ -72,17 +72,22 @@ package zero.air{
 			
 			nativeWindow.restore();
 			nativeWindow.removeEventListener(Event.CLOSING,closingWindow);
+			
+			save();
+			
+			nativeWindow=null;
+			
+			so=null;
+			xml=null;
+		}
+		
+		public function save():void{
 			xml.@x=nativeWindow.x;
 			xml.@y=nativeWindow.y;
 			xml.@width=nativeWindow.width;
 			xml.@height=nativeWindow.height;
 			
 			so.setXML("nativeWindow",xml);
-			
-			nativeWindow=null;
-			
-			so=null;
-			xml=null;
 		}
 	}
 }

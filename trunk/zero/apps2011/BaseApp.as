@@ -91,6 +91,7 @@ package zero.apps2011{
 					}else{
 						throw new Error("key="+key+", 找不到 btn");
 					}
+					trace("key="+key);
 					if(statusMcs[key]){
 						statusMcs[key].gotoAndStop(btnXML.@status.toString());
 					}

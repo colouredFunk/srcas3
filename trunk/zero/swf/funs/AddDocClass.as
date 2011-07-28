@@ -105,7 +105,17 @@ package zero.swf.funs{
 					case TagTypes.SymbolClass:
 					case TagTypes.ShowFrame:
 						insertPos=swf.tagV.indexOf(tag);
-						swf.tagV.splice(insertPos,0,SimpleDoABC.getDoABCTag(newDocClassName,"mc"));
+						var symbolClass:SymbolClass=new SymbolClass();
+						symbolClass.TagV=Vector.<int>([0]);
+						symbolClass.NameV=Vector.<String>([newDocClassName]);
+						var symbolClassTag:Tag=new Tag();
+						symbolClassTag.setBody(symbolClass);
+						swf.tagV.splice(
+							insertPos,
+							0,
+							SimpleDoABC.getDoABCTag(newDocClassName,"mc"),
+							symbolClassTag
+						);
 						return;
 					break;
 				}

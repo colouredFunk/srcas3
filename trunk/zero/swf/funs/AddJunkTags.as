@@ -63,7 +63,7 @@ package zero.swf.funs{
 						posV.push(pos);
 						tagAndPosArr.push(pos);
 						if(tag.type==TagTypes.DefineSprite){
-							pos.id=tag.getDefId();
+							pos.id=tag.UI16Id;
 							var subTagAndPosArr:Array=new Array();
 							var placeObject2:PlaceObject2=null;
 							for each(subTag in tag.getBody(DefineSprite,null).tagV){

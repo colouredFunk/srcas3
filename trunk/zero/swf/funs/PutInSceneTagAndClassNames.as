@@ -52,7 +52,7 @@ package zero.swf.funs{
 		private static function getDefTagArr(tagV:Vector.<Tag>,classNameArr:Array,defTagArr:Array):void{
 			for each(var tag:Tag in tagV){
 				if(DefineObjs[TagTypes.typeNameV[tag.type]]){
-					var defId:int=tag.getDefId();
+					var defId:int=tag.UI16Id;
 					if(classNameArr[defId]){
 						defTagArr[defId]=tag;
 					}
