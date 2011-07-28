@@ -47,7 +47,7 @@ package zero.swf{
 		public static const DefineShape4:String=SWF;
 		public static const DefineMorphShape2:String=DAT;
 		public static const DefineBinaryData:String=DAT;
-			//DefineFontName:String=DAT;//FontID UI16 ID for this font to which this refers 
+			//public static const DefineFontName:String=DAT;//FontID UI16 ID for this font to which this refers 
 		public static const DefineBitsJPEG4:String=IMG;
 		public static const DefineFont4:String=DAT;
 	}

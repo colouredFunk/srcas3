@@ -19,7 +19,7 @@ package zero.swf.funs{
 		//如果是非文档类在点击查看代码时挂 ASV 和闪客精灵
 		public static function add(swf:SWF):void{
 			
-			trace("目前只有 loopGenericName");
+			//trace("目前只有 loopGenericName");
 			
 			var frontClassV:Vector.<ABCClass>=new Vector.<ABCClass>();
 			var frontScriptV:Vector.<ABCScript>=new Vector.<ABCScript>();
@@ -29,7 +29,7 @@ package zero.swf.funs{
 			
 			var docClassName:String=getDocClassName(swf);
 			
-			trace("docClassName="+docClassName);
+			//trace("docClassName="+docClassName);
 			
 			var ABCData:ABCClasses;
 			var frontPos:int=-1,backPos:int=-1;
@@ -59,10 +59,10 @@ package zero.swf.funs{
 							||
 							Math.random()<0.5
 						){
-							trace("frontClass="+clazz.getClassName());
+							//trace("frontClass="+clazz.getClassName());
 							frontClassV.push(clazz);
 						}else{
-							trace("backClass="+clazz.getClassName());
+							//trace("backClass="+clazz.getClassName());
 							backClassV.push(clazz);
 						}
 					}

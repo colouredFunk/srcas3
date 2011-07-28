@@ -17,16 +17,14 @@ package zero.net{
 		
 		private var so:SharedObject;
 		private var soXMLFile:*;
-		private var name:String;
-		private var xml:XML;
+		public var xml:XML;
+		public var onUpdate:Function;
 		
 		public function So(
-			_name:String,
+			nameOrSoXMLFile:*,
 			_so_version:String,
 			_xml:XML=null
 		){
-			
-			name=_name;
 			
 			var FileClass:Class;
 			try{
@@ -35,9 +33,8 @@ package zero.net{
 				FileClass=null;
 			}
 			
-			
 			if(FileClass){
-				soXMLFile=new FileClass(FileClass.applicationDirectory.nativePath+"/so.xml");
+				soXMLFile=nameOrSoXMLFile;
 				if(soXMLFile.exists){
 					xml=readXMLFromFile(soXMLFile);
 				}else{
@@ -46,7 +43,7 @@ package zero.net{
 				}
 				
 			}else{
-				so=SharedObject.getLocal(name,"/");
+				so=SharedObject.getLocal(nameOrSoXMLFile,"/");
 				if(so.data.xml){
 					xml=new XML(so.data.xml);
 				}else{
@@ -66,6 +63,12 @@ package zero.net{
 				
 				trace("重置 so, xml="+xml.toXMLString());
 			}
+		}
+		public function clear():void{
+			so=null;
+			soXMLFile=null;
+			xml=null;
+			onUpdate=null;
 		}
 		
 		private function getNode(key:String):XML{
@@ -119,6 +122,10 @@ package zero.net{
 				writeXMLToFile(xml,soXMLFile);
 			}else{
 				so.data.xml=xml.toXMLString();
+			}
+			if(onUpdate==null){
+			}else{
+				onUpdate();
 			}
 		}
 		private function readXMLFromFile(file:*):XML{

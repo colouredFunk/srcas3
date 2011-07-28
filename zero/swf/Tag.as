@@ -152,7 +152,7 @@ package zero.swf{
 			}
 		}
 		
-		public function getDefId():int{
+		public function get UI16Id():int{//头两个字节组成的 UI16，例如 DefineButton2 的 id，或 DefineButtonSound 的 ButtonId
 			if(__body){
 				return __body["id"];
 			}
@@ -165,15 +165,15 @@ package zero.swf{
 			throw new Error("未处理");
 			return -1;
 		}
-		public function setDefId(defId:int):void{
+		public function set UI16Id(id:int):void{//头两个字节组成的 UI16，例如 DefineButton2 的 id，或 DefineButtonSound 的 ButtonId
 			if(__body){
-				__body["id"]=defId;
+				__body["id"]=id;
 			}else if(__bodyData){
 				if(bodyLength<2){
 					throw new Error("bodyLength="+bodyLength);
 				}
-				__bodyData[bodyOffset]=defId;
-				__bodyData[bodyOffset+1]=defId>>8;
+				__bodyData[bodyOffset]=id;
+				__bodyData[bodyOffset+1]=id>>8;
 			}else{
 				throw new Error("未处理");
 			}

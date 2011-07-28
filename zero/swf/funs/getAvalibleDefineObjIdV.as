@@ -21,7 +21,7 @@ package zero.swf.funs{
 			var typeName:String=TagTypes.typeNameV[tag.type];
 			if(typeName){
 				if(DefineObjs[typeName]){
-					id=tag.getDefId();
+					id=tag.UI16Id;
 					
 					if(avalibleDefineObjIdArr[id]){
 						throw new Error("发现重复的 id:"+id+"，typeName="+typeName);
