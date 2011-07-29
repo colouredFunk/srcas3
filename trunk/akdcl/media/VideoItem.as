@@ -45,7 +45,9 @@ package akdcl.media {
 		}
 
 		public function get bufferProgress():Number {
-			return netStream.;
+			//Math.min((totalTime * loadProgress - position) / netStream.bufferTime, 1);
+			
+			return netStream.bufferLength / netStream.bufferTime;
 		}
 		
 		public function get totalTime():uint {
@@ -71,16 +73,15 @@ package akdcl.media {
 		}
 
 		public function get position():uint {
-			if (channelNow && sound.length > 0){
-				return channelNow.position;
+			if (netStream > 0) {
+				return netStream.time * 1000;
 			} else {
 				return 0;
 			}
 		}
 
 		public function set position(_position:uint):void {
-			if (channelNow && sound.length > 0){
-				//channelNow
+			if (netStream) {
 				play(_position);
 			}
 		}
@@ -117,11 +118,75 @@ package akdcl.media {
 			
 			//netStream.client
 			
-			/*if (_video) {
-				video = _video;
-				video.smoothing = config.smoothing;
+		}
+		
+		public function load(_source:String):void {
+			netStream = sM.getSource(SourceManager.NETSTREAM_GROUP, _source);
+			if (!sound) {
+				sound = new Sound();
+				sM.addSource(SourceManager.SOUND_GROUP, _source, sound);
 			}
-			video.attachNetStream(netStream);*/
+			sound.load(new URLRequest(_source), new SoundLoaderContext(1000, true));
+		}
+
+		public function play(_startTime:Number = -1, _loops:uint = 0, _tempVolume:Number = 1, _tweenIn:Number = 0, _tweenOut:Number = 0):SoundChannel {
+			if (!sound) {
+				return;
+			}
+			if (_startTime < 0){
+				_startTime = 0;
+			} else if (_startTime <= 1){
+				//0~1（playProgress）
+				if (_startTime >= loadProgress){
+					_startTime = loadProgress * 0.999;
+				}
+				_startTime = totalTime * _startTime;
+			} else {
+				//1~XX（playTime毫秒为单位）
+				var _loadTime:uint = totalTime * loadProgress;
+				if (_startTime >= _loadTime){
+					_startTime = _loadTime * 0.999;
+				}
+			}
+
+			try {
+				soundTransform.volume = volume * _tempVolume;
+				var _channel:SoundChannel = sound.play(_startTime, _loops, soundTransform);
+				_channel.addEventListener(Event.SOUND_COMPLETE, onChannelCompleteHandler);
+				channelList.push(_channel);
+				channelNow = _channel;
+				//volume淡入
+				if (_tweenIn == 0){
+
+				} else if (_tweenIn <= 1){
+					(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, totalTime * _tweenIn * 0.001, 0, 1, _tempVolume);
+				} else {
+					(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, _tweenIn * 0.001, 0, 1, _tempVolume);
+				}
+				//volume淡出
+				if (_tweenOut == 0){
+
+				} else if (_tweenOut <= 1){
+					(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, totalTime * _tweenOut * 0.001, totalTime * (1 - _tweenOut) * 0.001, 0, _tempVolume);
+				} else {
+					(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, _tweenOut * 0.001, (totalTime - _tweenOut) * 0.001, 0, _tempVolume);
+				}
+			} catch (_error:*){
+				
+			}
+			return _channel;
+		}
+
+		public function stop():void {
+			removeAllChannel();
+		}
+		
+		public function remove():void {
+			stop();
+			sound = null;
+			soundTransform = null;
+			channelNow = null;
+			channelList = null;
 		}
 	}
 
