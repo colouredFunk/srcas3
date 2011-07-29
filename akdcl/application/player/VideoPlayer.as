@@ -10,7 +10,7 @@ package akdcl.application.player{
 	 * @author Akdcl
 	 */
 	public class VideoPlayer extends MediaPlayer {
-		protected static const DEFAULT_PARAMS:Object = { autoPlay:false, scaleMode:ScaleMode.PROPORTIONAL_INSIDE, bgColor:0x000000 };
+		protected static const DEFAULT_PARAMS:Object = { autoPlay:false, scaleMode:ScaleMode.PROPORTIONAL_INSIDE, bgColor:0x000000, bufferMode:true };
 		protected static var videoDic:Object = { };
 		protected static function loadVideo(_source:String, _params:Object = null):VideoLoader {
 			var _video:VideoLoader = videoDic[_source];
