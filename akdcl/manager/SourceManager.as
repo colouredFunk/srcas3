@@ -8,6 +8,7 @@ package akdcl.manager {
 	 */
 	public class SourceManager {
 		public static const SOUND_GROUP:String = "Sound";
+		public static const NETSTREAM_GROUP:String = "NetStream";
 		private static var instance:SourceManager;
 
 		public static function getInstance():SourceManager {
