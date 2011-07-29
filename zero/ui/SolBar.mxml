@@ -19,12 +19,13 @@ SolBar
 	xmlns:ui="zero.ui.*" width="280"
 >
 	<s:Label x="5" y="5" id="txt" text="配置："/>
-	<mx:ComboBox id="cb" left="45" right="75" rowCount="20"/>
+	<mx:ComboBox id="cb" left="45" right="75" rowCount="20" change="change()"/>
 	<mx:Button id="btn" right="0" label="保存配置" click="save()"/>
 	<fx:Script>
 		<![CDATA[
 			import mx.controls.Alert;
 			import mx.events.CloseEvent;
+			import mx.events.ListEvent;
 			
 			import zero.net.*;
 			import zero.ui.*;
@@ -88,6 +89,13 @@ SolBar
 				cb.dataProvider=settingNameArr;
 				cb.selectedItem=normalsol.currSettingXML.@name.toString();
 			}
+			
+			protected function cb_changeHandler(event:ListEvent):void
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			
 		]]>
 	</fx:Script>
 </s:Group>
