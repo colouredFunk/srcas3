@@ -176,7 +176,6 @@ package akdcl.manager {
 		private function onTimerHandler(e:TimerEvent):void {
 			if (stage.scaleMode == StageScaleMode.SHOW_ALL){
 				stage.scaleMode = StageScaleMode.NO_SCALE;
-				
 				var _sW:uint = stage.stageWidth;
 				var _sH:uint = stage.stageHeight;
 				__aspectRatio = _sW / _sH;

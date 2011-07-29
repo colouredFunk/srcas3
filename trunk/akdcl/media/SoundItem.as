@@ -41,7 +41,6 @@ package akdcl.media {
 		
 		private var sound:Sound;
 		private var channelNow:SoundChannel;
-		private var soundTransform:SoundTransform;
 
 		public function get loadProgress():Number {
 			var _loadProgress:Number;
@@ -116,7 +115,6 @@ package akdcl.media {
 			maxVolume = _maxVolume;
 			channelList = [];
 			
-			soundTransform = new SoundTransform(volume, 0);
 			if (_sound) {
 				sound = _sound;
 			}
@@ -152,8 +150,9 @@ package akdcl.media {
 			}
 
 			try {
-				soundTransform.volume = volume * _tempVolume;
-				var _channel:SoundChannel = sound.play(_startTime, _loops, soundTransform);
+				var _channel:SoundChannel = sound.play(_startTime, _loops);
+				setChannelVolume(_channel, volume * _tempVolume);
+				
 				_channel.addEventListener(Event.SOUND_COMPLETE, onChannelCompleteHandler);
 				channelList.push(_channel);
 				channelNow = _channel;
@@ -186,7 +185,6 @@ package akdcl.media {
 		public function remove():void {
 			stop();
 			sound = null;
-			soundTransform = null;
 			channelNow = null;
 			channelList = null;
 		}

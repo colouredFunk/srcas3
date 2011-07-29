@@ -30,13 +30,11 @@ package akdcl.media {
 		private var netConnection:NetConnection;
 		private var netStream:NetStream;
 		
-		private var soundTransform:SoundTransform;
-		
 		public var metaData:Object;
 
 		public function get loadProgress():Number {
 			var _loadProgress:Number;
-			if (sound){
+			if (netStream){
 				_loadProgress = netStream.bytesLoaded / netStream.bytesTotal;
 			} else {
 				_loadProgress = 0;
@@ -46,8 +44,10 @@ package akdcl.media {
 
 		public function get bufferProgress():Number {
 			//Math.min((totalTime * loadProgress - position) / netStream.bufferTime, 1);
-			
-			return netStream.bufferLength / netStream.bufferTime;
+			if (!netStream || uint(netStream.bytesTotal) < 5) {
+				return 0;
+			}
+			return (netStream.bufferLength > netStream.bufferTime) ? 1 : netStream.bufferLength / netStream.bufferTime;
 		}
 		
 		public function get totalTime():uint {
@@ -104,13 +104,9 @@ package akdcl.media {
 		}
 
 		public function VideoItem() {
-            soundTransform = new SoundTransform();
-			
-			
 			netConnection = new NetConnection();
 			netConnection.connect(null);
 			
-			netStream = new NetStream(netConnection);
 			//netStream.addEventListener(NetStatusEvent.NET_STATUS
 			//netStream.addEventListener(IOErrorEvent.IO_ERROR
 			//netStream.addEventListener(AsyncErrorEvent.ASYNC_ERROR
@@ -122,11 +118,12 @@ package akdcl.media {
 		
 		public function load(_source:String):void {
 			netStream = sM.getSource(SourceManager.NETSTREAM_GROUP, _source);
-			if (!sound) {
-				sound = new Sound();
-				sM.addSource(SourceManager.SOUND_GROUP, _source, sound);
+			if (!netStream) {
+				netStream = new NetStream(netConnection);
+				sM.addSource(SourceManager.NETSTREAM_GROUP, _source, netStream);
 			}
-			sound.load(new URLRequest(_source), new SoundLoaderContext(1000, true));
+			netStream.play(_source);
+			netStream.pause();
 		}
 
 		public function play(_startTime:Number = -1, _loops:uint = 0, _tempVolume:Number = 1, _tweenIn:Number = 0, _tweenOut:Number = 0):SoundChannel {
@@ -150,7 +147,6 @@ package akdcl.media {
 			}
 
 			try {
-				soundTransform.volume = volume * _tempVolume;
 				var _channel:SoundChannel = sound.play(_startTime, _loops, soundTransform);
 				_channel.addEventListener(Event.SOUND_COMPLETE, onChannelCompleteHandler);
 				channelList.push(_channel);
@@ -184,7 +180,6 @@ package akdcl.media {
 		public function remove():void {
 			stop();
 			sound = null;
-			soundTransform = null;
 			channelNow = null;
 			channelList = null;
 		}
