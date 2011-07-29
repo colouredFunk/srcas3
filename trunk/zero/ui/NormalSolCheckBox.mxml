@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+/***
+NormalSolCheckBox
+创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
+创建时间：2011年7月29日 07:12:59
+简要说明：这家伙很懒什么都没写。
+用法举例：这家伙还是很懒什么都没写。
+*/
+
+-->
+
+<s:CheckBox
+	xmlns:fx="http://ns.adobe.com/mxml/2009"
+	xmlns:s="library://ns.adobe.com/flex/spark"
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	xmlns:ui="zero.ui.*"
+	change="change()"
+>
+	<fx:Script>
+		<![CDATA[
+			import zero.net.normalsol;
+			public var sol_key:String;
+			private var defaultValue:Boolean;
+			public function resetByNormalSol():void{
+				if(sol_key){
+				}else{
+					sol_key=this.id;
+				}
+				if(normalsol[sol_key] is Boolean){
+					this.selected=normalsol[sol_key];
+				}else{
+					if(defaultValue){
+						this.selected=defaultValue;
+					}else{
+						defaultValue=this.selected;
+					}
+					normalsol[sol_key]=defaultValue;
+				}
+			}
+			private function change():void{
+				if(sol_key){
+					normalsol[sol_key]=this.selected;
+				}
+			}
+		]]>
+	</fx:Script>
+</s:CheckBox>

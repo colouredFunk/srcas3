@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+/***
+SolBar
+创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
+创建时间：2011年7月28日 14:28:01
+简要说明：这家伙很懒什么都没写。
+用法举例：这家伙还是很懒什么都没写。
+*/
+
+-->
+
+<s:Group
+	xmlns:fx="http://ns.adobe.com/mxml/2009"
+	xmlns:s="library://ns.adobe.com/flex/spark"
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	xmlns:ui="zero.ui.*" width="280"
+>
+	<s:Label x="5" y="5" id="txt" text="配置："/>
+	<mx:ComboBox id="cb" left="45" right="75" rowCount="20"/>
+	<mx:Button id="btn" right="0" label="保存配置" click="save()"/>
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			
+			import zero.net.*;
+			import zero.ui.*;
+			public function set title(_title:String):void{
+				txt.text=_title+"：";
+			}
+			public function set btnLabel(_btnLabel:String):void{
+				btn.label=_btnLabel;
+			}
+			
+			public function init(pojName:String):void{
+				normalsol=new Sol(pojName);
+				updateCb();
+				//resetNormalSolUIs(this.parentDocument);
+				//normalsol.saveDefault();
+			}
+			
+			public function clear():void{
+				normalsol.clear();
+				normalsol=null;
+			}
+			
+			private function save():void{
+				var settingName:String=normalsol.currSettingXML.@name.toString();
+				switch(settingName){
+					case "默认":
+					case "当前":
+						settingName="";
+					break;
+				}
+				SolBarPrompt.show(this,settingName,confirmSave);
+			}
+			
+			private var newSettingName:String;
+			private function confirmSave(_newSettingName:String):void{
+				newSettingName=_newSettingName;
+				for each(var settingXML:XML in normalsol.xml.setting){
+					if(newSettingName==settingXML.@name.toString()){
+						Alert.show("“"+newSettingName+"”已存在，是否覆盖？","",Alert.YES|Alert.NO,null,confirmConfirmSave);
+						return;
+					}
+				}
+				_save();
+			}
+			private function confirmConfirmSave(event:CloseEvent):void{
+				if(event.detail==Alert.YES){
+					_save();
+				}
+			}
+			private function _save():void{
+				var newSettingXML:XML=normalsol.currSettingXML.copy();
+				newSettingXML.@name=newSettingName;
+				normalsol.addSetting(newSettingXML);
+				updateCb();
+			}
+			private function updateCb():void{
+				var settingNameArr:Array=new Array();
+				for each(var settingXML:XML in normalsol.xml.setting){
+					settingNameArr.push(settingXML.@name.toString());
+				}
+				cb.dataProvider=settingNameArr;
+				cb.selectedItem=normalsol.currSettingXML.@name.toString();
+			}
+		]]>
+	</fx:Script>
+</s:Group>
