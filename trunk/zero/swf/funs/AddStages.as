@@ -14,7 +14,7 @@ package zero.swf.funs{
 	import zero.swf.tagBodys.*;
 	
 	public class AddStages{
-		public static function add(swf:SWF,ShellQName:ABCMultiname,siageQName:ABCMultiname,StageQName:ABCMultiname,stageQName:ABCMultiname):void{
+		public static function add(swf:SWF,MainQName:ABCMultiname,siageQName:ABCMultiname,StageQName:ABCMultiname,stageQName:ABCMultiname):void{
 			var putInSceneTagAndClassNameArr:Array=PutInSceneTagAndClassNames.getPutInSceneTagAndClassNameArr(swf);
 			var i:int=putInSceneTagAndClassNameArr.length;
 			var classNameMark:Object=new Object();
@@ -82,7 +82,7 @@ package zero.swf.funs{
 									method.codes.codeArr=[
 										AVM2Ops.getlocal0,
 										AVM2Ops.pushscope,
-										new Code(AVM2Ops.getlex,ShellQName),
+										new Code(AVM2Ops.getlex,MainQName),
 										new Code(AVM2Ops.getproperty,siageQName),
 										new Code(AVM2Ops.coerce,StageQName),
 										AVM2Ops.returnvalue
