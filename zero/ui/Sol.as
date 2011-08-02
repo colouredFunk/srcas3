@@ -29,7 +29,7 @@ package zero.ui{
 		private var onChangeSetting:Function;
 		private var onChangeValue:Function;
 		
-		public function Sol(nameOrSoXMLFile:*,_onChangeSetting:Function,_onChangeValue:Function){
+		public function Sol(nameOrSoXMLFile:*,_onChangeSetting:Function=null,_onChangeValue:Function=null){
 			if(nameOrSoXMLFile){
 				enabledCopyToCurr=true;//当任意值改变时自动复制当前配置为“当前”
 				
