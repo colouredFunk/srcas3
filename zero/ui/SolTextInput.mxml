@@ -78,7 +78,7 @@ SolTextInput
 					}
 				}
 				
-				sol.setValue(sol_key,defaultValues.text);
+				sol.setValue(sol_key,this.text);
 				
 				if(oldText==this.text){
 				}else{
