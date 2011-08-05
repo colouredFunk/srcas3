@@ -64,7 +64,7 @@
 		public static function show(_text:*, _ctrlLabel:* = "确定", _callBack:Function = null, _Class:Class=null):Alert {
 			if (!alertLayer||(!AlertClass&&!_Class)) {
 				trace("Alert.alertLayer is undefined!\nAlert.init(layer,class);");
-				return;
+				return null;
 			}
 			var _alert:Alert;
 			var _width:uint;
