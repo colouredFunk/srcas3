@@ -1,4 +1,4 @@
-package com.greensock.loading {
+package akdcl.media {
 	import com.greensock.events.LoaderEvent;
 	import com.greensock.loading.core.LoaderItem;
 	import com.greensock.loading.display.ContentDisplay;
