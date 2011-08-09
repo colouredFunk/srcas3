@@ -8,7 +8,7 @@ disorder
 
 package zero.utils{
 	public function disorder(v:*):void{
-		//打乱 Array 或 Vector
+		//打乱 Array 或 Vector 或 ByteArray
 		var L:int=v.length;
 		var i:int=L;
 		while(--i>=0){

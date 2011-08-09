@@ -729,6 +729,9 @@ package zero.swf.avm2{
 			}
 			
 			var endOffset:int=data.length;
+			if(endOffset<posMarkArr.length){
+				endOffset=posMarkArr.length;
+			}
 			for(offset=0;offset<=endOffset;offset++){
 				code=posMarkArr[offset];
 				if(code){

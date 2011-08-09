@@ -29,10 +29,13 @@ package zero.ui{
 		private var onChangeSetting:Function;
 		private var onChangeValue:Function;
 		
-		public function Sol(nameOrSoXMLFile:*,_onChangeSetting:Function=null,_onChangeValue:Function=null){
+		private var version:String;
+		
+		public function Sol(nameOrSoXMLFile:*,_version:String,_onChangeSetting:Function=null,_onChangeValue:Function=null){
 			if(nameOrSoXMLFile){
 				enabledCopyToCurr=true;//当任意值改变时自动复制当前配置为“当前”
 				
+				version=_version;
 				onChangeSetting=_onChangeSetting;
 				onChangeValue=_onChangeValue;
 				
@@ -77,13 +80,18 @@ package zero.ui{
 							}
 						}
 						_settingXMLArr.sortOn("@name",Array.CASEINSENSITIVE);
-						xml=<sol currSettingName={xml.@currSettingName.toString()}/>
+						xml=<sol version={version} currSettingName={xml.@currSettingName.toString()}/>
 						for each(_settingXML in _settingXMLArr){
 							xml.appendChild(_settingXML);
 						}
 					}else{
 						reset();
 					}
+				}else{
+					reset();
+				}
+				
+				if(xml.@version.toString()==version){
 				}else{
 					reset();
 				}
@@ -121,7 +129,7 @@ package zero.ui{
 				}
 			}
 			
-			xml=<sol currSettingName="默认"/>
+			xml=<sol version={version} currSettingName="默认"/>
 		}
 		
 		public function getValue(name:String):*{

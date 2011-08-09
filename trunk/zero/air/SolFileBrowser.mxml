@@ -50,6 +50,10 @@ SolFileBrowser
 			public var onChange:Function;
 			
 			public function clear():void{
+				if(sol){
+					sol.clear();
+					sol=null;
+				}
 				if(__file){
 					__file.removeEventListener(Event.SELECT,select);
 					__file=null;
@@ -61,46 +65,35 @@ SolFileBrowser
 					dragDropClient=null;
 				}
 				dragDropClient=null;
-				sol=null;
 				onDragDrop=null;
 				onChange=null;
 			}
-			public function resetBySol(_sol:Sol,solParentDocument:*=null):void{
-				if(sol){
+			
+			public function init():void{
+				sol=new Sol(new File(File.applicationDirectory.nativePath+"/../"+extension.replace(/[\*\.]/g,"")+".xml"),"");
+				
+				if(sol_key){
 				}else{
-					sol=_sol;
+					sol_key=this.id;
 					if(sol_key){
 					}else{
-						sol_key=this.id;
-						if(sol_key){
-						}else{
-							throw new Error("sol_key="+sol_key);
-						}
-						if(solParentDocument){
-						}else{
-							solParentDocument=this.parentDocument;
-						}
-						var parentDocument:*=this.parentDocument;
-						while(parentDocument&&parentDocument.id&&parentDocument!=solParentDocument){
-							sol_key=parentDocument.id+"."+sol_key;
-							parentDocument=parentDocument.parentDocument;
-						}
+						throw new Error("sol_key="+sol_key);
 					}
-					
-					__file=new File();
-					__file.addEventListener(Event.SELECT,select);
-					
-					if(dragDropClient){
-					}else{
-						dragDropClient=this.parentApplication as InteractiveObject;
-					}
-					dragDropClient.addEventListener(NativeDragEvent.NATIVE_DRAG_ENTER,nativeDragEnter);
-					dragDropClient.addEventListener(NativeDragEvent.NATIVE_DRAG_DROP,nativeDragDrop);
-					
-					txt.text=description+"：";
-					btn.label=btnLabel;
-					cb.left=txt.text.length*10;
 				}
+				
+				__file=new File();
+				__file.addEventListener(Event.SELECT,select);
+				
+				if(dragDropClient){
+				}else{
+					dragDropClient=this.parentApplication as InteractiveObject;
+				}
+				dragDropClient.addEventListener(NativeDragEvent.NATIVE_DRAG_ENTER,nativeDragEnter);
+				dragDropClient.addEventListener(NativeDragEvent.NATIVE_DRAG_DROP,nativeDragDrop);
+				
+				txt.text=description+"：";
+				btn.label=btnLabel;
+				cb.left=txt.text.length*10;
 				
 				var oldFileURL:String;
 				if(cb.selectedItem){
@@ -149,6 +142,7 @@ SolFileBrowser
 					}
 				}
 			}
+			
 			private function nativeDragEnter(event:NativeDragEvent):void{
 				var fileArr:Array=event.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT) as Array;
 				if(fileArr){
@@ -187,7 +181,7 @@ SolFileBrowser
 				addFile(__file);
 			}
 			
-			private function addFile(_file:File):void{
+			public function addFile(_file:File):void{
 				__file.url=_file.url;
 				var oldFileURL:String;
 				if(cb.selectedItem){
@@ -201,11 +195,11 @@ SolFileBrowser
 					fileURLArr.sort(Array.CASEINSENSITIVE);
 					cb.dataProvider=fileURLArr;
 				}
-				if(oldFileURL==fileURL){
-				}else{
+				//if(oldFileURL==fileURL){
+				//}else{
 					cb.selectedItem=fileURL;
 					_change(fileURL);
-				}
+				//}
 			}
 			private function change():void{
 				__file.url=cb.selectedItem.toString();
