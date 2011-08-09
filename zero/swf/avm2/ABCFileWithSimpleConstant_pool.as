@@ -129,6 +129,7 @@ ABCFileWithSimpleConstant_pool
 package zero.swf.avm2{
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
+	
 	import zero.output;
 	import zero.swf.BytesData;
 	public class ABCFileWithSimpleConstant_pool{//implements I_zero_swf_CheckCodesRight{
@@ -138,6 +139,7 @@ package zero.swf.avm2{
 		public var uintegerV:Vector.<int>;
 		public var doubleV:Vector.<Number>;
 		public var stringV:Vector.<String>;
+		public var stringPosV:Vector.<int>;//20110806
 		public var restData:BytesData;
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
@@ -178,11 +180,17 @@ package zero.swf.avm2{
 			if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var string_count:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{string_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{string_count=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{string_count=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{string_count=data[offset++];}
 			//string_count
 			stringV=new Vector.<String>(1);
+			if(_initByDataOptions&&_initByDataOptions.ABCFileGetStringPoss){
+				stringPosV=new Vector.<int>(1);
+			}
 			for(i=1;i<string_count;i++){
 			
 				if(data[offset]>>>7){if(data[offset+1]>>>7){if(data[offset+2]>>>7){if(data[offset+3]>>>7){var get_str_size:int=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|((data[offset++]&0x7f)<<21)|(data[offset++]<<28);}else{get_str_size=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|((data[offset++]&0x7f)<<14)|(data[offset++]<<21);}}else{get_str_size=(data[offset++]&0x7f)|((data[offset++]&0x7f)<<7)|(data[offset++]<<14);}}else{get_str_size=(data[offset++]&0x7f)|(data[offset++]<<7);}}else{get_str_size=data[offset++];}
 				//get_str_size
 				
+				if(stringPosV){
+					stringPosV[i]=offset;
+				}
 				if(get_str_size){
 					//处理 "\x00"
 					var get_str_end_offset:int=offset+get_str_size;

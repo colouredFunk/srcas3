@@ -8,7 +8,8 @@ AddJunkCodes 版本:v1.0
 */
 
 package zero.swf.funs{
-	import flash.utils.*;
+	import flash.utils.ByteArray;
+	import flash.utils.Dictionary;
 	
 	import zero.utils.getIdMarkV;
 	
@@ -533,8 +534,6 @@ package zero.swf.funs{
 				
 				method.max_stack+=4;
 			}
-			
-			trace("addJunkCodes 耗时："+(getTimer()-t)+" 毫秒");
 		}
 		private function getPushTrue():*{
 			var num1:int,num2:int;

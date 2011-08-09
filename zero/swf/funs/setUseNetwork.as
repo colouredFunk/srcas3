@@ -8,8 +8,8 @@ setUseNetwork
 
 package zero.swf.funs{
 	
-	import zero.swf.tagBodys.*;
 	import zero.swf.*;
+	import zero.swf.tagBodys.*;
 	
 	public function setUseNetwork(swf:SWF,UseNetwork:Boolean):void{
 		for each(var tag:Tag in swf.tagV){
@@ -20,7 +20,12 @@ package zero.swf.funs{
 				break;
 			}
 		}
-		trace("木找到 FileAttributes，可考虑自动插入一个");
+		trace("木找到 FileAttributes，自动插入一个");
+		tag=new Tag();
+		var fileAttributes:FileAttributes=new FileAttributes();
+		fileAttributes.UseNetwork=UseNetwork;
+		tag.setBody(fileAttributes);
+		swf.tagV.unshift(tag);
 	}
 }
 		

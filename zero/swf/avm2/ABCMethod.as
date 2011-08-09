@@ -510,7 +510,7 @@ package zero.swf.avm2{
 			xml.@NeedArguments=NeedArguments;
 			xml.@NeedActivation=NeedActivation;
 			xml.@NeedRest=NeedRest;
-			xml.@v=SetDxns;
+			xml.@SetDxns=SetDxns;
 					
 			if(optionV){
 				if(optionV.length){

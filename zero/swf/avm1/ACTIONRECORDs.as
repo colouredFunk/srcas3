@@ -241,7 +241,7 @@ package zero.swf.avm1{
 									jumpPos+=skipLength;
 								}
 							}
-							trace("data="+BytesAndStr16.bytes2str16(data,offset,jumpPos-offset));
+							//trace("data="+BytesAndStr16.bytes2str16(data,offset,jumpPos-offset));
 							if(jumpPos<0||jumpPos>endOffset){
 								jumpPos=endOffset;
 								output("jumpPos 已修正为: "+jumpPos,"brown");
@@ -1888,6 +1888,9 @@ package zero.swf.avm1{
 			var skipId:int,jumpPos:int;
 			
 			var endOffset:int=data.length;
+			if(endOffset<posMarkArr.length){
+				endOffset=posMarkArr.length;
+			}
 			for(offset=0;offset<=endOffset;offset++){
 				code=posMarkArr[offset];
 				if(code){

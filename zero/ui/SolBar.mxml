@@ -34,7 +34,7 @@ SolBar
 			
 			private var onChangeSetting:Function;
 			
-			public function init(nameOrSoXMLFile:*=null,_onChangeSetting:Function=null,onChangeValue:Function=null):void{
+			public function init(nameOrSoXMLFile:*=null,_version:String="",_onChangeSetting:Function=null,onChangeValue:Function=null):void{
 				
 				onChangeSetting=_onChangeSetting;
 				
@@ -44,7 +44,7 @@ SolBar
 				btn.label=btnLabel;
 				
 				if(nameOrSoXMLFile){
-					sol=new Sol(nameOrSoXMLFile,sol_changeSetting,onChangeValue);
+					sol=new Sol(nameOrSoXMLFile,_version,sol_changeSetting,onChangeValue);
 				}else{
 					
 					var FileClass:Class;
@@ -55,7 +55,7 @@ SolBar
 					}
 				
 					if(FileClass){
-						sol=new Sol(new FileClass(new FileClass(FileClass.applicationDirectory.nativePath).parent.url+"/sol.xml"),sol_changeSetting,onChangeValue);
+						sol=new Sol(new FileClass(FileClass.applicationDirectory.nativePath+"/../sol.xml"),_version,sol_changeSetting,onChangeValue);
 					}else{
 						var pojName:String;
 						var parent:*=this.parent;
@@ -73,7 +73,7 @@ SolBar
 							throw new Error("pojName="+pojName);
 						}
 						
-						sol=new Sol(pojName,sol_changeSetting,onChangeValue);
+						sol=new Sol(pojName,_version,sol_changeSetting,onChangeValue);
 					}
 				}
 				

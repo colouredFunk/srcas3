@@ -94,14 +94,19 @@ SolRadioButton
 				
 				var selectedValue:String;
 				if(sol.xml.@currSettingName.toString()=="默认"){
-					if(selectedValues.selected0){
-						selectedValue=this.label;
-					}else{
-						selectedValue=null;
-					}
 				}else{
 					selectedValue=sol.getValue(sol_key);
 				}
+				if(selectedValue is String){
+				}else{
+					if(selectedValues.selected0){
+						selectedValue=this.label;
+						sol.setValue(sol_key,selectedValue);
+					}else{
+						selectedValue=null;
+					}
+				}
+				
 				if(selectedValue){
 					sol.setValue(sol_key,selectedValue);
 					group.selectedValue=selectedValue;
@@ -141,6 +146,7 @@ SolRadioButton
 			}
 			
 			private function change(event:Event):void{
+				trace("group.selectedValue="+group.selectedValue);
 				sol.setValue(sol_key,group.selectedValue);
 				if(onChange==null){
 				}else{

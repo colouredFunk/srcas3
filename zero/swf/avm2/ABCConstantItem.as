@@ -126,28 +126,28 @@ package zero.swf.avm2{
 		public function getInfo(productMark:ProductMark,_toDataOptions:Object/*zero_swf_ToDataOptions*/):Array{
 			switch(kind){
 				case ConstantKinds.Int:
-					return [ConstantKinds.Int,productMark.getIntegerId(value)];
+					return [kind,productMark.getIntegerId(value)];
 				break;
 				case ConstantKinds.UInt:
-					return [ConstantKinds.UInt,productMark.getUintegerId(value)];
+					return [kind,productMark.getUintegerId(value)];
 				break;
 				case ConstantKinds.Double:
-					return [ConstantKinds.Double,productMark.getDoubleId(value)];
+					return [kind,productMark.getDoubleId(value)];
 				break;
 				case ConstantKinds.Utf8:
-					return [ConstantKinds.Utf8,productMark.getStringId(value)];
+					return [kind,productMark.getStringId(value)];
 				break;
 				case ConstantKinds.True:
-					return [ConstantKinds.True,ConstantKinds.True];
+					return [kind,ConstantKinds.True];
 				break;
 				case ConstantKinds.False:
-					return [ConstantKinds.False,ConstantKinds.False];
+					return [kind,ConstantKinds.False];
 				break;
 				case ConstantKinds.Null:
-					return [ConstantKinds.Null,ConstantKinds.Null];
+					return [kind,ConstantKinds.Null];
 				break;
 				case ConstantKinds.Undefined:
-					return [ConstantKinds.Undefined,ConstantKinds.Undefined];
+					return [kind,ConstantKinds.Undefined];
 				break;
 				case ConstantKinds.Namespace:
 				case ConstantKinds.PackageNamespace:
@@ -156,8 +156,7 @@ package zero.swf.avm2{
 				case ConstantKinds.ExplicitNamespace:
 				case ConstantKinds.StaticProtectedNs:
 				case ConstantKinds.PrivateNs:
-					var ns:ABCNamespace=value;
-					return [ns.kind,productMark.getNsId(ns)];
+					return [kind,productMark.getNsId(value)];
 				break;
 				default:
 					throw new Error("未知 kind: "+kind);
