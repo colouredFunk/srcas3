@@ -250,7 +250,7 @@
 		}
 		protected function onImageErrorHandler(_evt:*):void {
 			setProgressClip(false);
-			dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR));
+			//dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR));
 		}
 		protected function onImageLoadingHandler(_evt:*):void {
 			if (_evt) {
