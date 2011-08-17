@@ -24,17 +24,21 @@ package zero.swf.tagBodys{
 			//Reserved=flags&0xfe;							//11111110
 			TrackAsMenu=((flags&0x01)?true:false);			//00000001
 			var ActionOffset:int=data[offset++]|(data[offset++]<<8);
+			var CharacterClass:Class;
+			if(_initByDataOptions){
+				if(_initByDataOptions.classes){
+					CharacterClass=_initByDataOptions.classes["zero.swf.records.buttons.BUTTONRECORD"];
+				}
+			}
+			if(CharacterClass){
+			}else{
+				CharacterClass=BUTTONRECORD;
+			}
 			var i:int=-1;
 			CharacterV=new Vector.<*>();
 			while(data[offset]){//CharacterEndFlag
 				i++;
-				var CharacterClass:Class;
-				if(_initByDataOptions){
-					if(_initByDataOptions.classes){
-						CharacterClass=_initByDataOptions.classes["zero.swf.records.buttons.BUTTONRECORD"];
-					}
-				}
-				CharacterV[i]=new (CharacterClass||BUTTONRECORD)();
+				CharacterV[i]=new CharacterClass();
 				offset=CharacterV[i].initByData(data,offset,endOffset,_initByDataOptions);
 			}
 			//var CharacterEndFlag:int=data[offset++];
@@ -43,7 +47,11 @@ package zero.swf.tagBodys{
 				var ButtonCondActionsClass:Class;
 				if(_initByDataOptions){
 					if(_initByDataOptions.classes){
-						ButtonCondActionsClass=_initByDataOptions.classes["zero.swf.BytesData"];
+						ButtonCondActionsClass=_initByDataOptions.classes["zero.swf.records.buttons.BUTTONCONDACTIONs"];
+					}
+					if(ButtonCondActionsClass){
+					}else{
+						ButtonCondActionsClass=_initByDataOptions.ButtonCondActionsClass;
 					}
 				}
 				ButtonCondActions=new (ButtonCondActionsClass||BytesData)();

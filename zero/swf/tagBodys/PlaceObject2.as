@@ -106,7 +106,7 @@ package zero.swf.tagBodys{
 				var ClipActionsClass:Class;
 				if(_initByDataOptions){
 					if(_initByDataOptions.classes){
-						ClipActionsClass=_initByDataOptions.classes["zero.swf.BytesData"];
+						ClipActionsClass=_initByDataOptions.classes["zero.swf.records.clips.CLIPACTIONs"];
 					}
 					if(ClipActionsClass){
 					}else{

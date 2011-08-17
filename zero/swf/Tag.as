@@ -199,15 +199,33 @@ package zero.swf{
 			}
 			if(__bodyData){
 				if(bodyLength){
+					var typeName:String=TagTypes.typeNameV[type];
 					if(_toXMLOptions&&_toXMLOptions.optionV[type]=="仅位置"){
-						return <{TagTypes.typeNameV[type]}
+						if(typeName){
+							return <{typeName}
+								src={_toXMLOptions.src||_toXMLOptions.getSrcFun(__bodyData)}
+								offset={bodyOffset}
+								length={bodyLength}
+								//test_isShort={test_isShort}
+							/>
+						}
+						return <tag
+							type={type}
 							src={_toXMLOptions.src||_toXMLOptions.getSrcFun(__bodyData)}
 							offset={bodyOffset}
 							length={bodyLength}
 							//test_isShort={test_isShort}
 						/>
 					}
-					return <{TagTypes.typeNameV[type]}
+					if(typeName){
+						return <{typeName}
+							length={bodyLength}
+							value={BytesAndStr16.bytes2str16(__bodyData,bodyOffset,bodyLength)}
+							//test_isShort={test_isShort}
+						/>
+					}
+					return <tag
+						type={type}
 						length={bodyLength}
 						value={BytesAndStr16.bytes2str16(__bodyData,bodyOffset,bodyLength)}
 						//test_isShort={test_isShort}

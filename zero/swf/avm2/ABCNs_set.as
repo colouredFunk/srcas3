@@ -191,16 +191,17 @@ package zero.swf.avm2{
 			return markStr;
 		}
 		public static function markStr2ns_set(markStrs:MarkStrs,markStr0:String):ABCNs_set{
+			markStr0=GroupString.ext.escape(markStr0);
 			var ns_set:ABCNs_set=markStrs.ns_setMark["~"+markStr0];
 			if(ns_set){
 			}else{
-				var markStr:String=normalizeMarkStr(markStr0);
+				var markStr:String=GroupString.ext.escape(normalizeMarkStr(markStr0));
 				ns_set=markStrs.ns_setMark["~"+markStr];
 				if(ns_set){
 				}else{
 					ns_set=new ABCNs_set();
 					
-					var execResult:Array=/^\[([\s\S]*?)\](?:\((length=0)\))?(?:\((\d+)\))?$/.exec(GroupString.ext.escape(markStr));
+					var execResult:Array=/^\[([\s\S]*?)\](?:\((length=0)\))?(?:\((\d+)\))?$/.exec(markStr);
 					
 					ns_set.nsV=new Vector.<ABCNamespace>();
 					if(execResult[2]){//"length=0"
@@ -221,7 +222,9 @@ package zero.swf.avm2{
 			
 			//获取最简 markStr
 			
-			var execResult:Array=/^\[([\s\S]*?)\](?:\((length=0)\))?(?:\((\d+)\))?$/.exec(GroupString.ext.escape(markStr));
+			markStr=GroupString.ext.escape(markStr);
+			
+			var execResult:Array=/^\[([\s\S]*?)\](?:\((length=0)\))?(?:\((\d+)\))?$/.exec(markStr);
 			
 			if(execResult[2]){//"length=0"
 				markStr="[](length=0)";

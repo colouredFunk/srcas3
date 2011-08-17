@@ -14,8 +14,8 @@ package zero.swf.funs{
 	public class GenMultiname{
 		
 		public var mark:Object;
-		private var genNamespace:GenNamespace;
-		private var genNs_set:GenNs_set;
+		public var genNamespace:GenNamespace;
+		public var genNs_set:GenNs_set;
 		
 		public function GenMultiname(
 			_genNamespace:GenNamespace=null,
@@ -26,6 +26,7 @@ package zero.swf.funs{
 			genNs_set=_genNs_set||new GenNs_set(genNamespace);
 		}
 		public function gen(markStr:String):ABCMultiname{
+			markStr=GroupString.ext.escape(markStr);
 			var multiname:ABCMultiname=mark["~"+markStr];
 			if(multiname){
 			}else{
@@ -37,14 +38,14 @@ package zero.swf.funs{
 					id=markStr.indexOf("]");
 					multiname.kind=MultinameKinds[markStr.substr(1,id-1)];
 					if(multiname.kind>0){
-						escapeMarkStr=GroupString.ext.escape(markStr.substr(id+1));
+						escapeMarkStr=markStr.substr(id+1);
 					}else{
 						multiname.kind=MultinameKinds.QName;
-						escapeMarkStr=GroupString.ext.escape(markStr);
+						escapeMarkStr=markStr;
 					}
 				}else{
 					multiname.kind=MultinameKinds.QName;
-					escapeMarkStr=GroupString.ext.escape(markStr);
+					escapeMarkStr=markStr;
 				}
 				
 				var execResult:Array;

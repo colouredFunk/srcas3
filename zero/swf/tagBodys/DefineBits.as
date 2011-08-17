@@ -29,9 +29,14 @@ package zero.swf.tagBodys{
 		public var JPEGData:*;
 		//
 		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
-			id=data[offset]|(data[offset+1]<<8);
-			offset+=2;
-			JPEGData=new (_initByDataOptions&&_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.BytesData"]||BytesData)();
+			id=data[offset++]|(data[offset++]<<8);
+			var JPEGDataClass:Class;
+			if(_initByDataOptions){
+				if(_initByDataOptions.classes){
+					JPEGDataClass=_initByDataOptions.classes["zero.swf.BytesData"];
+				}
+			}
+			JPEGData=new (JPEGDataClass||BytesData)();
 			return JPEGData.initByData(data,offset,endOffset,_initByDataOptions);
 		}
 		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{

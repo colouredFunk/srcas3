@@ -8,8 +8,6 @@ BUTTONCONDACTIONs
 //Actions 							BUTTONCONDACTION[zero or more]	Actions to execute at particular button events field to the first BUTTONCONDACTION, or 0 if no actions occur
 package zero.swf.records.buttons{
 	import flash.utils.ByteArray;
-	
-	import zero.swf.records.buttons.BUTTONCONDACTION;
 	public class BUTTONCONDACTIONs{//implements I_zero_swf_CheckCodesRight{
 		public var ButtonCondActionV:Vector.<BUTTONCONDACTION>;
 		//

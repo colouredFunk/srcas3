@@ -190,8 +190,7 @@ package zero.swf.avm2{
 			///
 			var dumpSameInfos:Boolean=false;
 			
-			//var dumpSameInfos:Boolean=true;
-			//trace("合并 info 们");
+			//var dumpSameInfos:Boolean=true;trace("合并 info 们");
 			///
 			
 			nsV.sort(sortNs);
@@ -612,13 +611,45 @@ package zero.swf.avm2{
 			var i:int=-1;
 			for each(var item:ABCItem in metadata1.itemV){
 				i++;
-				if(item.key==metadata2.itemV[i].key){
-				}else{
-					return sortString(item.key,metadata2.itemV[i].key);
+				
+				var item2:ABCItem=metadata2.itemV[i];
+				
+				if(
+					item.key is String
+					&&
+					item2.key is String
+				){
+					if(item.key==item2.key){
+					}else{
+						return sortString(item.key,item2.key);
+					}
+					
+					if(
+						item.value is String
+						&&
+						item2.value is String
+					){
+						if(item.value==item2.value){
+						}else{
+							return sortString(item.value,item2.value);
+						}
+					}
+					
+					if(item.value is String){
+						return -1;
+					}
+					
+					if(item2.value is String){
+						return 1;
+					}
 				}
-				if(item.value==metadata2.itemV[i].value){
-				}else{
-					return sortString(item.value,metadata2.itemV[i].value);
+				
+				if(item.key is String){
+					return -1;
+				}
+				
+				if(item2.key is String){
+					return 1;
 				}
 			}
 			

@@ -19,12 +19,13 @@ package zero.swf.funs{
 			mark=new Object();
 		}
 		public function gen(markStr:String):ABCNamespace{
+			markStr=GroupString.ext.escape(markStr);
 			var ns:ABCNamespace=mark["~"+markStr];
 			if(ns){
 			}else{
 				ns=new ABCNamespace();
 				
-				var execResult:Array=/^(?:\[([\s\S]*?)\])?([\s\S]*?)(?:\((name=undefined)\))?(?:\((\d+)\))?$/.exec(GroupString.ext.escape(markStr));
+				var execResult:Array=/^(?:\[([\s\S]*?)\])?([\s\S]*?)(?:\((name=undefined)\))?(?:\((\d+)\))?$/.exec(markStr);
 				
 				if(execResult[1]){
 					ns.kind=NamespaceKinds[execResult[1]];
@@ -42,6 +43,19 @@ package zero.swf.funs{
 				}else{
 					ns.name=ComplexString.ext.unescape(execResult[2]);
 				}
+				
+				/*
+				if(ns.kind==NamespaceKinds.PackageNamespace){
+				}else{
+					trace("markStr="+markStr);
+					trace("ns.kind="+NamespaceKinds.kindV[ns.kind]);
+					if(ns.name is String){
+						trace('ns.name="'+ns.name+'"');
+					}else{
+						trace('ns.name='+ns.name);
+					}
+				}
+				*/
 				
 				mark["~"+markStr]=ns;
 			}

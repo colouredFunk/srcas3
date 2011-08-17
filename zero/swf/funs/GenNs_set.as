@@ -14,19 +14,20 @@ package zero.swf.funs{
 	public class GenNs_set{
 		
 		public var mark:Object;
-		private var genNamespace:GenNamespace;
+		public var genNamespace:GenNamespace;
 		
 		public function GenNs_set(_genNamespace:GenNamespace=null){
 			mark=new Object();
 			genNamespace=_genNamespace||new GenNamespace();
 		}
 		public function gen(markStr:String):ABCNs_set{
+			markStr=GroupString.ext.escape(markStr);
 			var ns_set:ABCNs_set=mark["~"+markStr];
 			if(ns_set){
 			}else{
 				ns_set=new ABCNs_set();
 				
-				var execResult:Array=/^\[([\s\S]*?)\](?:\((length=0)\))?(?:\((\d+)\))?$/.exec(GroupString.ext.escape(markStr));
+				var execResult:Array=/^\[([\s\S]*?)\](?:\((length=0)\))?(?:\((\d+)\))?$/.exec(markStr);
 				
 				ns_set.nsV=new Vector.<ABCNamespace>();
 				if(execResult[2]){//"length=0"
