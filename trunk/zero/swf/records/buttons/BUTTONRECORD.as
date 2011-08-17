@@ -53,15 +53,19 @@ package zero.swf.records.buttons{
 			if(flags&0x10){//ButtonHasFilterList				//00010000
 				var NumberOfFilters:int=data[offset++];
 				if(NumberOfFilters){
+					var FilterClass:Class;
+					if(_initByDataOptions){
+						if(_initByDataOptions.classes){
+							FilterClass=_initByDataOptions.classes["zero.swf.records.Filter"];
+						}
+					}
+					if(FilterClass){
+					}else{
+						FilterClass=Filter;
+					}
 					FilterV=new Vector.<*>();
 					for(var i:int=0;i<NumberOfFilters;i++){
-						var FilterClass:Class;
-						if(_initByDataOptions){
-							if(_initByDataOptions.classes){
-								FilterClass=_initByDataOptions.classes["zero.swf.records.Filter"];
-							}
-						}
-						FilterV[i]=new (FilterClass||Filter)();
+						FilterV[i]=new FilterClass();
 						offset=FilterV[i].initByData(data,offset,endOffset,_initByDataOptions);
 					}
 				}else{
@@ -161,10 +165,10 @@ package zero.swf.records.buttons{
 			CharacterID=int(xml.@CharacterID.toString());
 			PlaceDepth=int(xml.@PlaceDepth.toString());
 			var PlaceMatrixXML:XML=xml.PlaceMatrix[0];
-			PlaceMatrix=new (_initByXMLOptions&&_initByXMLOptions.customClasses&&_initByXMLOptions.customClasses[PlaceMatrixXML["@class"].toString()]||MATRIX)();
+			PlaceMatrix=new MATRIX();
 			PlaceMatrix.initByXML(PlaceMatrixXML,_initByXMLOptions);
 			var ColorTransformXML:XML=xml.ColorTransform[0];
-			ColorTransform=new (_initByXMLOptions&&_initByXMLOptions.customClasses&&_initByXMLOptions.customClasses[ColorTransformXML["@class"].toString()]||CXFORMWITHALPHA)();
+			ColorTransform=new CXFORMWITHALPHA();
 			ColorTransform.initByXML(ColorTransformXML,_initByXMLOptions);
 			var FilterXMLList:XMLList=xml.FilterList.Filter;
 			if(FilterXMLList.length()){
@@ -172,7 +176,7 @@ package zero.swf.records.buttons{
 				FilterV=new Vector.<*>();
 				for each(var FilterXML:XML in FilterXMLList){
 					i++;
-					FilterV[i]=new (_initByXMLOptions&&_initByXMLOptions.customClasses&&_initByXMLOptions.customClasses[FilterXML["@class"].toString()]||Filter)();
+					FilterV[i]=new Filter();
 					FilterV[i].initByXML(FilterXML,_initByXMLOptions);
 				}
 			}else{

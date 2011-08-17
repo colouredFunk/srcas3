@@ -194,18 +194,20 @@ package zero.swf.avm2{
 			return markStr;
 		}
 		public static function markStr2metadata(markStrs:MarkStrs,markStr0:String):ABCMetadata{
+			markStr0=GroupString.ext.escape(markStr0);
+			
 			var i:int;
 			
 			var metadata:ABCMetadata=markStrs.metadataMark["~"+markStr0];
 			if(metadata){
 			}else{
-				var markStr:String=normalizeMarkStr(markStr0);
+				var markStr:String=GroupString.ext.escape(normalizeMarkStr(markStr0));
 				metadata=markStrs.metadataMark["~"+markStr];
 				if(metadata){
 				}else{
 					metadata=new ABCMetadata();
 					
-					var execResult:Array=/^([\s\S]*?)\[([\s\S]*)\](?:\((\d+)\))?$/.exec(GroupString.ext.escape(markStr));
+					var execResult:Array=/^([\s\S]*?)\[([\s\S]*)\](?:\((\d+)\))?$/.exec(markStr);
 					
 					metadata.name=ComplexString.ext.unescape(execResult[1]);
 					
@@ -214,7 +216,7 @@ package zero.swf.avm2{
 					if(execResult[2]){
 						for each(var itemEscapeMarkStr:String in GroupString.ext.separate(execResult[2])){
 							i++;
-							var arr:Array=/^\[([\s\S]*),([\s\S]*)\]$/.exec(itemEscapeMarkStr);
+							var arr:Array=/^\[([\s\S]*?),([\s\S]*)\]$/.exec(itemEscapeMarkStr);
 							metadata.itemV[i]=new ABCItem();
 							metadata.itemV[i].key=ComplexString.ext.unescape(arr[1]);
 							metadata.itemV[i].value=ComplexString.ext.unescape(arr[2]);
@@ -232,7 +234,9 @@ package zero.swf.avm2{
 			
 			//获取最简 markStr
 			
-			var execResult:Array=/^([\s\S]*?)\[([\s\S]*)\](?:\((\d+)\))?$/.exec(GroupString.ext.escape(markStr));
+			markStr=GroupString.ext.escape(markStr);
+			
+			var execResult:Array=/^([\s\S]*?)\[([\s\S]*)\](?:\((\d+)\))?$/.exec(markStr);
 			
 			markStr=GroupString.ext.unescape(execResult[1])+"["+GroupString.ext.unescape(execResult[2])+"]";
 			

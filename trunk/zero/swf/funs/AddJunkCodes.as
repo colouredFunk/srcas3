@@ -250,8 +250,6 @@ package zero.swf.funs{
 				}
 			}
 			
-			var t:int=getTimer();
-			
 			for each(var method:ABCMethod in methodV){
 				var codeArr:Array=method.codes.codeArr;
 				
@@ -270,7 +268,7 @@ package zero.swf.funs{
 				
 				while(--i>0){
 					if(idMarkV[i]){
-						if(codeArr[i]===AVM2Ops.label){
+						if(codeArr[i]==AVM2Ops.label){
 							continue;
 						}
 						var j:int=i;

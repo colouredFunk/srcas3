@@ -846,10 +846,13 @@ package zero.swf.avm2{
 			return markStr;
 		}
 		public static function markStr2multiname(markStrs:MarkStrs,markStr0:String):ABCMultiname{
+			
+			markStr0=GroupString.ext.escape(markStr0);
+			
 			var multiname:ABCMultiname=markStrs.multinameMark["~"+markStr0];
 			if(multiname){
 			}else{
-				var markStr:String=normalizeMarkStr(markStr0);
+				var markStr:String=GroupString.ext.escape(normalizeMarkStr(markStr0));
 				multiname=markStrs.multinameMark["~"+markStr];
 				if(multiname){
 				}else{
@@ -861,14 +864,14 @@ package zero.swf.avm2{
 						id=markStr.indexOf("]");
 						multiname.kind=MultinameKinds[markStr.substr(1,id-1)];
 						if(multiname.kind>0){
-							escapeMarkStr=GroupString.ext.escape(markStr.substr(id+1));
+							escapeMarkStr=markStr.substr(id+1);
 						}else{
 							multiname.kind=MultinameKinds.QName;
-							escapeMarkStr=GroupString.ext.escape(markStr);
+							escapeMarkStr=markStr;
 						}
 					}else{
 						multiname.kind=MultinameKinds.QName;
-						escapeMarkStr=GroupString.ext.escape(markStr);
+						escapeMarkStr=markStr;
 					}
 					
 					var execResult:Array;
@@ -974,6 +977,8 @@ package zero.swf.avm2{
 			
 			//获取最简 markStr
 			
+			markStr=GroupString.ext.escape(markStr);
+			
 			var kind:int;
 			var id:int,escapeMarkStr:String;
 			if(markStr.indexOf("[")==0){
@@ -981,14 +986,14 @@ package zero.swf.avm2{
 				id=markStr.indexOf("]");
 				kind=MultinameKinds[markStr.substr(1,id-1)];
 				if(kind>0){
-					escapeMarkStr=GroupString.ext.escape(markStr.substr(id+1));
+					escapeMarkStr=markStr.substr(id+1);
 				}else{
 					kind=MultinameKinds.QName;
-					escapeMarkStr=GroupString.ext.escape(markStr);
+					escapeMarkStr=markStr;
 				}
 			}else{
 				kind=MultinameKinds.QName;
-				escapeMarkStr=GroupString.ext.escape(markStr);
+				escapeMarkStr=markStr;
 			}
 			
 			var execResult:Array;

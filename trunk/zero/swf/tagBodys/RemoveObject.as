@@ -39,7 +39,7 @@ package zero.swf.tagBodys{
 		////
 		CONFIG::USE_XML{
 		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
-			var xml:XML=<{xmlName} class="zero.swf.tagBodys.RemoveObject"
+			return <{xmlName} class="zero.swf.tagBodys.RemoveObject"
 				CharacterId={CharacterId}
 				Depth={Depth}
 			/>;

@@ -220,16 +220,19 @@ package zero.swf.avm2{
 			return markStr;
 		}
 		public static function markStr2ns(markStrs:MarkStrs,markStr0:String):ABCNamespace{
+			
+			markStr0=GroupString.ext.escape(markStr0)
+				
 			var ns:ABCNamespace=markStrs.nsMark["~"+markStr0];
 			if(ns){
 			}else{
-				var markStr:String=normalizeMarkStr(markStr0);
+				var markStr:String=GroupString.ext.escape(normalizeMarkStr(markStr0));
 				ns=markStrs.nsMark["~"+markStr];
 				if(ns){
 				}else{
 					ns=new ABCNamespace();
 					
-					var execResult:Array=/^(?:\[([\s\S]*?)\])?([\s\S]*?)(?:\((name=undefined)\))?(?:\((\d+)\))?$/.exec(GroupString.ext.escape(markStr));
+					var execResult:Array=/^(?:\[([\s\S]*?)\])?([\s\S]*?)(?:\((name=undefined)\))?(?:\((\d+)\))?$/.exec(markStr);
 					
 					if(execResult[1]){
 						ns.kind=NamespaceKinds[execResult[1]];
@@ -259,7 +262,9 @@ package zero.swf.avm2{
 			
 			//获取最简 markStr
 			
-			var execResult:Array=/^(?:\[([\s\S]*?)\])?([\s\S]*?)(?:\((name=undefined)\))?(?:\((\d+)\))?$/.exec(GroupString.ext.escape(markStr));
+			markStr=GroupString.ext.escape(markStr);
+			
+			var execResult:Array=/^(?:\[([\s\S]*?)\])?([\s\S]*?)(?:\((name=undefined)\))?(?:\((\d+)\))?$/.exec(markStr);
 			
 			if(execResult[1]){
 				var kind:int=NamespaceKinds[execResult[1]];

@@ -1,4 +1,4 @@
-/***
+﻿/***
 NumIncreaser
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
 创建时间：2011年8月2日 09:48:40
@@ -18,40 +18,32 @@ package zero.works{
 	public class NumIncreaser extends Sprite{
 		
 		public function NumIncreaser(){
+		}
+		public function init(numIncreaserXML:XML):void{
 			
 			var ranArr:Array=[1,2,1,1,1,1,1,3,2,3,1,1,2,1,2,1,1,2,2,1,3,2,2,2,2,2,1,2,1,2,2,2,1,2,1,2,1,2,1,1,2,1,1,2,1,1,1,2,1,2,2,2,2,1,2,3,1,1,2,1,2,2,2,1,1,1,2,2,2,1,1,1,2,2,2,2,2,2,1,2,2,2,2,2,1,1,2,2,2,1,2,2,2,1,1,2,1,2,1,1];
-			
-			var xml:XML;
-			try{
-				xml=getDefinitionByName("zero.works.BaseLoadURLPoj").xml;
-			}catch(e:Error){
-				xml=null;
-			}
 			
 			var startNum:int=int(this.loaderInfo.parameters.startNum);
 			var startTimeStr:String=this.loaderInfo.parameters.startTime;
 			var endTimeStr:String=this.loaderInfo.parameters.endTime;
 			var k:Number=Number(this.loaderInfo.parameters.k);
 			
-			if(xml){
-				var numIncreaserXML:XML=xml.numIncreaser[0];
-				if(numIncreaserXML){
-					if(startNum>0){
-					}else{
-						startNum=int(numIncreaserXML.@startNum.toString());
-					}
-					if(startTimeStr){
-					}else{
-						startTimeStr=numIncreaserXML.@startTime.toString();
-					}
-					if(endTimeStr){
-					}else{
-						endTimeStr=numIncreaserXML.@endTime.toString();
-					}
-					if(k>0){
-					}else{
-						k=Number(numIncreaserXML.@k.toString());
-					}
+			if(numIncreaserXML){
+				if(startNum>0){
+				}else{
+					startNum=int(numIncreaserXML.@startNum.toString());
+				}
+				if(startTimeStr){
+				}else{
+					startTimeStr=numIncreaserXML.@startTime.toString();
+				}
+				if(endTimeStr){
+				}else{
+					endTimeStr=numIncreaserXML.@endTime.toString();
+				}
+				if(k>0){
+				}else{
+					k=Number(numIncreaserXML.@k.toString());
 				}
 			}
 			
@@ -73,7 +65,7 @@ package zero.works{
 			}
 			
 			//trace("startTimeStr="+startTimeStr);
-			//trace("endTimeStr="+endTimeStr);
+			trace("endTimeStr="+endTimeStr);
 			
 			var startTime:int=getTimeByDateStr(startTimeStr);
 			var endTime:int=getTimeByDateStr(endTimeStr);

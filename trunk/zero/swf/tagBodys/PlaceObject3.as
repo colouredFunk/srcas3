@@ -98,15 +98,19 @@ package zero.swf.tagBodys{
 			if(flags2&0x01){//PlaceFlagHasFilterList						//00000001
 				var NumberOfFilters:int=data[offset++];
 				if(NumberOfFilters){
+					var SurfaceFilterClass:Class;
+					if(_initByDataOptions){
+						if(_initByDataOptions.classes){
+							SurfaceFilterClass=_initByDataOptions.classes["zero.swf.records.Filter"];
+						}
+					}
+					if(SurfaceFilterClass){
+					}else{
+						SurfaceFilterClass=Filter;
+					}
 					SurfaceFilterV=new Vector.<*>();
 					for(var i:int=0;i<NumberOfFilters;i++){
-						var SurfaceFilterClass:Class;
-						if(_initByDataOptions){
-							if(_initByDataOptions.classes){
-								SurfaceFilterClass=_initByDataOptions.classes["zero.swf.records.Filter"];
-							}
-						}
-						SurfaceFilterV[i]=new (SurfaceFilterClass||Filter)();
+						SurfaceFilterV[i]=new SurfaceFilterClass();
 						offset=SurfaceFilterV[i].initByData(data,offset,endOffset,_initByDataOptions);
 					}
 				}else{
@@ -129,7 +133,7 @@ package zero.swf.tagBodys{
 				var ClipActionsClass:Class;
 				if(_initByDataOptions){
 					if(_initByDataOptions.classes){
-						ClipActionsClass=_initByDataOptions.classes["zero.swf.BytesData"];
+						ClipActionsClass=_initByDataOptions.classes["zero.swf.records.clips.CLIPACTIONs"];
 					}
 					if(ClipActionsClass){
 					}else{
