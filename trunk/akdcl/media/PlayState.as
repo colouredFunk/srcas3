@@ -8,24 +8,21 @@ package akdcl.media{
 		public static const PLAY:String = "play";
 		public static const PAUSE:String = "pause";
 		public static const STOP:String = "stop";
+		public static const READY:String = "ready";
 		public static const CONNECT:String = "connect";
 		public static const WAIT:String = "wait";
 		public static const BUFFER:String = "buffer";
-		public static const READY:String = "ready";
 		public static const RECONNECT:String = "reconnect";
 		
-		private static const NAME_LIST:Object = function():Object {
-			var _obj:Object = { };
-			_obj[PLAY] = "播放";
-			_obj[PAUSE] = "暂停";
-			_obj[STOP] = "停止";
-			_obj[CONNECT] = "连接";
-			_obj[WAIT] = "等待";
-			_obj[BUFFER] = "缓冲";
-			_obj[READY] = "就绪";
-			_obj[RECONNECT] = "重新连接";
-			return _obj;
-		}();
+		private static const NAME_LIST:Object = { };
+		NAME_LIST[PLAY] = "播放";
+		NAME_LIST[PAUSE] = "暂停";
+		NAME_LIST[STOP] = "停止";
+		NAME_LIST[READY] = "就绪";
+		NAME_LIST[CONNECT] = "连接";
+		NAME_LIST[WAIT] = "等待";
+		NAME_LIST[BUFFER] = "缓冲";
+		NAME_LIST[RECONNECT] = "重新连接";
 		
 		public static function getStateName(_state:String):String {
 			return NAME_LIST[_state] || _state;

@@ -1,5 +1,4 @@
 package akdcl.utils {
-
 	dynamic public class NetClient {
 		public static const CUE_POINT:String = "cuePoint";
 		public static const IMAGE_DATA:String = "imageData";
@@ -24,24 +23,24 @@ package akdcl.utils {
 			callback = _callback;
 		}
 
-		private function forward(_event:Object, _type:String):void {
+		private function forward(_type:String, _event:Object):void {
 			var _eventCopy:Object = {};
 			for (var _i:String in _event){
 				_eventCopy[_i] = _event[_i];
 			}
 			if (callback != null){
-				callback(_eventCopy, _type);
+				callback(_type, _eventCopy);
 			}
 		}
 
 		//name:String,parameters:Array,time:uint(second),type:String
 		public function onCuePoint(_event:Object):void {
-			forward(_event, CUE_POINT);
+			forward(CUE_POINT, _event);
 		}
 
 		//data:ByteArray
 		public function onImageData(_event:Object):void {
-			forward(_event, IMAGE_DATA);
+			forward(IMAGE_DATA, _event);
 		}
 
 		/*
@@ -61,9 +60,10 @@ package akdcl.utils {
 		   trackinfo:Array,
 		   language:String,
 		   length:uint
-		 */
+		*/
+
 		public function onMetaData(_event:Object):void {
-			forward(_event, META_DATA);
+			forward(META_DATA, _event);
 		}
 
 		//code:String
@@ -71,24 +71,24 @@ package akdcl.utils {
 			for each (var _arg:*in args){
 				if (_arg && _arg.hasOwnProperty("code")){
 					if (_arg.code == CODE_COMPLETE){
-						forward(_arg, COMPLETE);
+						forward(COMPLETE, _arg);
 						continue;
 					}
-					forward(_arg, PLAY_STATUS);
+					forward(PLAY_STATUS, _arg);
 				}
 			}
 		}
 
 		public function onSeekPoint(... args):void {
-			forward(args[0], SEEK_POINT);
+			forward(SEEK_POINT, args[0]);
 		}
 
 		public function onTextData(_event:Object):void {
-			forward(_event, TEXT_DATA);
+			forward(TEXT_DATA, _event);
 		}
 
 		public function onXMPData(... args):void {
-			forward(args[0], XMP_DATA);
+			forward(XMP_DATA, args[0]);
 		}
 	}
 }

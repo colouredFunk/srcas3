@@ -1,63 +1,36 @@
 package akdcl.media {
-	
-	import flash.media.Video;
-	import flash.net.NetStream;
-	import flash.net.NetConnection;
-	
-	import flash.media.SoundTransform;
-	
 	import flash.events.Event;
-
-	import com.greensock.TweenLite;
-	import com.greensock.easing.Sine;
-
 	import akdcl.manager.SourceManager;
 
 	import akdcl.interfaces.IPlaylistItem;
 	import akdcl.interfaces.IVolume;
+
+	import com.greensock.loading.VideoLoader;
+	import com.greensock.events.LoaderEvent;
+	import com.greensock.layout.ScaleMode;
 
 	/**
 	 * ...
 	 * @author akdcl
 	 */
 	public class VideoItem implements IPlaylistItem, IVolume {
-		//private static const ELEMENT_ID:String = "TweenObject_SoundItem";
+		private static const DEFAULT_PARAMS:Object = {autoPlay: false, scaleMode: ScaleMode.PROPORTIONAL_INSIDE, bgColor: 0x000000};
+		private static const VIDEOLOADER_GROUP:String = "VideoLoader";
 		
-		//private static var eM:ElementManager = ElementManager.getInstance();
 		private static var sM:SourceManager = SourceManager.getInstance();
-		//eM.register(ELEMENT_ID, TweenObject);
-		
-		private var netConnection:NetConnection;
-		private var netStream:NetStream;
-		
-		public var metaData:Object;
+
+		private var videoLoader:VideoLoader;
 
 		public function get loadProgress():Number {
-			var _loadProgress:Number;
-			if (netStream){
-				_loadProgress = netStream.bytesLoaded / netStream.bytesTotal;
-			} else {
-				_loadProgress = 0;
-			}
-			return _loadProgress;
+			return videoLoader ? videoLoader.progress : 0;
 		}
 
 		public function get bufferProgress():Number {
-			//Math.min((totalTime * loadProgress - position) / netStream.bufferTime, 1);
-			if (!netStream || uint(netStream.bytesTotal) < 5) {
-				return 0;
-			}
-			return (netStream.bufferLength > netStream.bufferTime) ? 1 : netStream.bufferLength / netStream.bufferTime;
+			return videoLoader ? videoLoader.bufferProgress : 0;
 		}
-		
+
 		public function get totalTime():uint {
-			var _totalTime:uint;
-			if (metaData){
-				_totalTime = metaData.duration * 1000 / loadProgress;
-			} else {
-				_totalTime = 0;
-			}
-			return _totalTime;
+			return videoLoader ? (videoLoader.duration * 1000) : 0;
 		}
 
 		public function get playProgress():Number {
@@ -73,20 +46,17 @@ package akdcl.media {
 		}
 
 		public function get position():uint {
-			if (netStream > 0) {
-				return netStream.time * 1000;
-			} else {
-				return 0;
-			}
+			return videoLoader ? (videoLoader.videoTime * 1000) : 0;
 		}
 
 		public function set position(_position:uint):void {
-			if (netStream) {
-				play(_position);
+			if (videoLoader){
+				videoLoader.videoTime = Math.min(_position, totalTime * videoLoader.progress * 0.99) * 0.001;
 			}
 		}
-		
+
 		private var __volume:Number = 1;
+
 		public function get volume():Number {
 			return __volume;
 		}
@@ -97,91 +67,87 @@ package akdcl.media {
 			} else if (_volume > 1){
 				_volume = 1;
 			}
-			__volume = _volume;
-			/*if (channelNow){
-				setChannelVolume(channelNow, __volume * maxVolume);
-			}*/
-		}
-
-		public function VideoItem() {
-			netConnection = new NetConnection();
-			netConnection.connect(null);
-			
-			//netStream.addEventListener(NetStatusEvent.NET_STATUS
-			//netStream.addEventListener(IOErrorEvent.IO_ERROR
-			//netStream.addEventListener(AsyncErrorEvent.ASYNC_ERROR
-			netStream.bufferTime = 2000;
-			
-			//netStream.client
-			
-		}
-		
-		public function load(_source:String):void {
-			netStream = sM.getSource(SourceManager.NETSTREAM_GROUP, _source);
-			if (!netStream) {
-				netStream = new NetStream(netConnection);
-				sM.addSource(SourceManager.NETSTREAM_GROUP, _source, netStream);
-			}
-			netStream.play(_source);
-			netStream.pause();
-		}
-
-		public function play(_startTime:Number = -1, _loops:uint = 0, _tempVolume:Number = 1, _tweenIn:Number = 0, _tweenOut:Number = 0):SoundChannel {
-			if (!sound) {
+			if (__volume == _volume){
 				return;
 			}
-			if (_startTime < 0){
-				_startTime = 0;
-			} else if (_startTime <= 1){
-				//0~1（playProgress）
-				if (_startTime >= loadProgress){
-					_startTime = loadProgress * 0.999;
+			__volume = _volume;
+			if (videoLoader){
+				videoLoader.volume = volume;
+			}
+		}
+
+		public function VideoItem(_source:String=null, _params:Object = null){
+			if (_source){
+				load(_source, _params);
+			}
+		}
+
+		public function load(_source:String, _params:Object = null):void {
+			removeFixVideo(videoLoader);
+			videoLoader = sM.getSource(VIDEOLOADER_GROUP, _source);
+			if (!videoLoader){
+				if (_params){
+					for (var _i:String in DEFAULT_PARAMS){
+						if (!_params.hasOwnProperty(_i)){
+							_params[_i] = DEFAULT_PARAMS[_i];
+						}
+					}
 				}
-				_startTime = totalTime * _startTime;
-			} else {
-				//1~XX（playTime毫秒为单位）
-				var _loadTime:uint = totalTime * loadProgress;
-				if (_startTime >= _loadTime){
-					_startTime = _loadTime * 0.999;
-				}
+				videoLoader = new VideoLoader(_source, _params || DEFAULT_PARAMS);
+				sM.addSource(VIDEOLOADER_GROUP, _source, videoLoader);
 			}
 
-			try {
-				var _channel:SoundChannel = sound.play(_startTime, _loops, soundTransform);
-				_channel.addEventListener(Event.SOUND_COMPLETE, onChannelCompleteHandler);
-				channelList.push(_channel);
-				channelNow = _channel;
-				//volume淡入
-				if (_tweenIn == 0){
-
-				} else if (_tweenIn <= 1){
-					(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, totalTime * _tweenIn * 0.001, 0, 1, _tempVolume);
-				} else {
-					(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, _tweenIn * 0.001, 0, 1, _tempVolume);
-				}
-				//volume淡出
-				if (_tweenOut == 0){
-
-				} else if (_tweenOut <= 1){
-					(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, totalTime * _tweenOut * 0.001, totalTime * (1 - _tweenOut) * 0.001, 0, _tempVolume);
-				} else {
-					(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, _tweenOut * 0.001, (totalTime - _tweenOut) * 0.001, 0, _tempVolume);
-				}
-			} catch (_error:*){
-				
+			videoLoader.addEventListener(LoaderEvent.ERROR, onVideoLoaderHandler);
+			videoLoader.addEventListener(LoaderEvent.PROGRESS, onVideoLoaderHandler);
+			videoLoader.addEventListener(LoaderEvent.COMPLETE, onVideoLoaderHandler);
+			videoLoader.addEventListener(VideoLoader.VIDEO_COMPLETE, onVideoLoaderHandler);
+			videoLoader.load();
+		}
+		
+		private function removeFixVideo(_video:VideoLoader):void {
+			if (_video){
+				_video.removeEventListener(LoaderEvent.ERROR, onVideoLoaderHandler);
+				_video.removeEventListener(LoaderEvent.PROGRESS, onVideoLoaderHandler);
+				_video.removeEventListener(LoaderEvent.COMPLETE, onVideoLoaderHandler);
+				_video.removeEventListener(VideoLoader.VIDEO_COMPLETE, onVideoLoaderHandler);
 			}
-			return _channel;
+		}
+
+		private function onVideoLoaderHandler(_e:LoaderEvent):void {
+			switch(_e.type) {
+				case LoaderEvent.ERROR:
+					removeFixVideo(videoLoader);
+					sM.removeSourceInstance(VIDEOLOADER_GROUP, videoLoader);
+					videoLoader.dispose();
+					videoLoader = null;
+					break;
+				case LoaderEvent.PROGRESS:
+					break;
+				case LoaderEvent.COMPLETE:
+					break;
+				case VideoLoader.VIDEO_COMPLETE:
+					break;
+			}
+		}
+
+		public function play():void {
+			if (videoLoader && !videoLoader.paused){
+				videoLoader.playVideo();
+			}
 		}
 
 		public function stop():void {
-			removeAllChannel();
+			if (videoLoader){
+				/*if (autoRewind && videoLoader.videoTime != 0){
+					videoLoader.videoTime = 0;
+				}*/
+				videoLoader.pauseVideo();
+			}
 		}
-		
+
 		public function remove():void {
-			stop();
-			sound = null;
-			channelNow = null;
-			channelList = null;
+			videoLoader.cancel();
+			videoLoader = null;
 		}
 	}
 
