@@ -9,6 +9,9 @@ package akdcl.media{
 		public function MediaProvider() {
 			
 		}
+		
+		public function 
+		
 		public function play():Boolean {
 			return false;
 		}

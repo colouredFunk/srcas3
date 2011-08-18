@@ -38,6 +38,7 @@ package akdcl.manager {
 		}
 
 		public function getGroup(_groupID:String):Object {
+			addGroup(_groupID);
 			return sourceGroup[_groupID];
 		}
 
@@ -74,6 +75,16 @@ package akdcl.manager {
 					}
 				}
 				delete _group[_sourceID];
+			}
+		}
+		
+		public function removeSourceInstance(_groupID:String, _source:*):void {
+			var _group:Object = getGroup(_groupID);
+			for (var _sourceID:String in _group) {
+				if (_group[_sourceID] == _source) {
+					removeSource(_groupID, _sourceID);
+					break;
+				}
 			}
 		}
 	}

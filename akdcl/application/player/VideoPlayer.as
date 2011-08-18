@@ -23,6 +23,7 @@ package akdcl.application.player{
 					}
 				}
 				_video = new VideoLoader(_source, _params || DEFAULT_PARAMS);
+				videoDic[_source] = _video;
 			}
 			return _video;
 		}

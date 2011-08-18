@@ -29,6 +29,9 @@ package akdcl.media {
 		private static var sM:SourceManager = SourceManager.getInstance();
 		eM.register(ELEMENT_ID, TweenObject);
 		
+		private static var REQUEST:URLRequest = new URLRequest();
+		private static var SOUND_LC:SoundLoaderContext = new SoundLoaderContext(1000, true);
+		
 		public static function setChannelVolume(_channel:SoundChannel, _volume:Number):void {
 			var _soundTransform:SoundTransform = _channel.soundTransform;
 			_soundTransform.volume = _volume;
@@ -126,7 +129,9 @@ package akdcl.media {
 				sound = new Sound();
 				sM.addSource(SourceManager.SOUND_GROUP, _source, sound);
 			}
-			sound.load(new URLRequest(_source), new SoundLoaderContext(1000, true));
+			
+			REQUEST.url = _source;
+			sound.load(REQUEST, SOUND_LC);
 		}
 
 		public function play(_startTime:Number = -1, _loops:uint = 0, _tempVolume:Number = 1, _tweenIn:Number = 0, _tweenOut:Number = 0):SoundChannel {
@@ -153,7 +158,7 @@ package akdcl.media {
 				var _channel:SoundChannel = sound.play(_startTime, _loops);
 				setChannelVolume(_channel, volume * _tempVolume);
 				
-				_channel.addEventListener(Event.SOUND_COMPLETE, onChannelCompleteHandler);
+				_channel.addEventListener(Event.SOUND_COMPLETE, onSoundItemEventHandler);
 				channelList.push(_channel);
 				channelNow = _channel;
 				//volume淡入
@@ -192,7 +197,7 @@ package akdcl.media {
 		private function removeAllChannel():void {
 			for each (var _channel:SoundChannel in channelList){
 				_channel.stop();
-				_channel.removeEventListener(Event.SOUND_COMPLETE, onChannelCompleteHandler);
+				_channel.removeEventListener(Event.SOUND_COMPLETE, onSoundItemEventHandler);
 			}
 			channelList = [];
 			if (channelNow){
@@ -200,12 +205,16 @@ package akdcl.media {
 			}
 		}
 
-		private function onChannelCompleteHandler(_evt:Event):void {
-			var _channel:SoundChannel = _evt.currentTarget as SoundChannel;
-			_channel.removeEventListener(Event.SOUND_COMPLETE, onChannelCompleteHandler);
-			var _id:int = channelList.indexOf(_channel);
-			if (_id >= 0){
-				channelList.splice(_id, 1);
+		private function onSoundItemEventHandler(_evt:Event):void {
+			switch(_evt.type) {
+				case Event.SOUND_COMPLETE:
+					var _channel:SoundChannel = _evt.currentTarget as SoundChannel;
+					_channel.removeEventListener(Event.SOUND_COMPLETE, onSoundItemEventHandler);
+					var _id:int = channelList.indexOf(_channel);
+					if (_id >= 0){
+						channelList.splice(_id, 1);
+					}
+					break;
 			}
 		}
 	}

@@ -7,7 +7,7 @@ package akdcl.media {
 	 * @author Akdcl
 	 */
 	public class SoundProvider extends MediaProvider implements IVolume {
-
+		
 	}
 
 }
