@@ -340,6 +340,17 @@
 				return 0;
 			}
 		}
+		public static function getBMD(_source:String):BitmapData {
+			imageLoader = imageLoaderDic[_source];
+			if (imageLoader) {
+				if (imageLoader.progress == 1 && imageLoader.rawContent && imageLoader.rawContent.bitmapData) {
+					//已经加载完图片
+					return imageLoader.rawContent.bitmapData;
+				}
+			}
+			return null;
+		}
+		
 		protected static function loadBMD(_source:String, _imageLoader:ui.ImageLoader, _index:uint = 0):void {
 			imageLoader = imageLoaderDic[_source];
 			if (imageLoader) {
