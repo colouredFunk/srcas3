@@ -7,8 +7,6 @@ package akdcl.manager {
 	 * @author ...
 	 */
 	public class SourceManager {
-		public static const SOUND_GROUP:String = "Sound";
-		public static const NETSTREAM_GROUP:String = "NetStream";
 		private static var instance:SourceManager;
 
 		public static function getInstance():SourceManager {
@@ -27,11 +25,14 @@ package akdcl.manager {
 			sourceGroup = {};
 		}
 
+		public static const SOUND_GROUP:String = "Sound";
+		public static const NETSTREAM_GROUP:String = "NetStream";
+
 		private var sourceGroup:Object;
 
 		public function addGroup(_groupID:String):void {
 			if (sourceGroup[_groupID]){
-				
+
 			} else {
 				sourceGroup[_groupID] = {};
 			}
@@ -51,7 +52,6 @@ package akdcl.manager {
 		}
 
 		public function addSource(_groupID:String, _sourceID:String, _source:*):void {
-			addGroup(_groupID);
 			var _group:Object = getGroup(_groupID);
 			if (_group[_sourceID]){
 
@@ -77,11 +77,11 @@ package akdcl.manager {
 				delete _group[_sourceID];
 			}
 		}
-		
-		public function removeSourceInstance(_groupID:String, _source:*):void {
+
+		public function removeSourceByInstance(_groupID:String, _source:*):void {
 			var _group:Object = getGroup(_groupID);
-			for (var _sourceID:String in _group) {
-				if (_group[_sourceID] == _source) {
+			for (var _sourceID:String in _group){
+				if (_group[_sourceID] == _source){
 					removeSource(_groupID, _sourceID);
 					break;
 				}

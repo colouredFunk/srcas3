@@ -59,6 +59,11 @@ package akdcl.application.player{
 			musicPlayer.repeat = 0;
 			videoPlayer.repeat = 0;
 			wmpPlayer.repeat = 0;
+			//?
+			imagePlayer.autoPlay = false;
+			musicPlayer.autoPlay = false;
+			videoPlayer.autoPlay = false;
+			wmpPlayer.autoPlay = false;
 		}
 		override public function remove():void {
 			imagePlayer.remove();

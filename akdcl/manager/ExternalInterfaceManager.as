@@ -40,7 +40,6 @@
 					__isAvailable = false;
 				}
 			}
-			
 			if (isAvailable){
 				ExternalInterface.addCallback(SWF_INTERFACE, swfInterface);
 			}
