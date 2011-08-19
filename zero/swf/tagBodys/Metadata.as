@@ -1,10 +1,11 @@
 /***
 Metadata
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
-创建时间：2011年7月5日 13:52:16（代码生成器 V2.0.0 F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf）
+创建时间：2011年08月17日 20:27:49（代码生成器 V2.0.0 F:/airs/program files2/CodesGenerater2/bin-debug/CodesGenerater2.swf）
 简要说明：这家伙很懒什么都没写。
 用法举例：这家伙还是很懒什么都没写。
 */
+
 //The Metadata tag is an optional tag to describe the SWF file to an external process. The tag
 //embeds XML metadata in the SWF file so that, for example, a search engine can locate this
 //tag, access a title for the SWF file, and display that title in search results. Flash Player always
@@ -68,34 +69,49 @@ Metadata
 //Field 	Type 			Comment
 //Header 	RECORDHEADER 	Tag type = 77
 //Metadata 	STRING 			XML Metadata
+
 package zero.swf.tagBodys{
+	
 	import flash.utils.ByteArray;
-	public class Metadata{//implements I_zero_swf_CheckCodesRight{
-		public var metadata:String;						//STRING
-		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
+	
+	public class Metadata{
+		
+		public var metadata:String;//STRING
+		
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
+			
 			var get_str_size:int=0;
 			while(data[offset+(get_str_size++)]){}
 			data.position=offset;
 			metadata=data.readUTFBytes(get_str_size);
-			return offset+get_str_size;
+			offset+=get_str_size;
+			
+			return offset;
+			
 		}
-		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toData(_toDataOptions:Object):ByteArray{
+			
 			var data:ByteArray=new ByteArray();
+			
 			data.writeUTFBytes(metadata+"\x00");
+			
 			return data;
+			
 		}
-
-		////
+		
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
-			return <{xmlName} class="zero.swf.tagBodys.Metadata"
-				metadata={metadata}
-			/>;
+			public function toXML(xmlName:String,_toXMLOptions:Object):XML{
+				
+				return <{xmlName} class="zero.swf.tagBodys.Metadata"
+					metadata={metadata}
+				/>
+				
+			}
+			public function initByXML(xml:XML,_initByXMLOptions:Object):void{
+				
+				metadata=xml.@metadata.toString();
+				
+			}
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
-			metadata=xml.@metadata.toString();
-		}
-		}//end of CONFIG::USE_XML
 	}
 }
