@@ -45,26 +45,25 @@ package akdcl.application.player{
 		public static const STATE_PLAY:String = "play";
 		public static const STATE_PAUSE:String = "pause";
 		public static const STATE_STOP:String = "stop";
+		public static const STATE_READY:String = "ready";
 		public static const STATE_CONNECT:String = "connect";
 		public static const STATE_WAIT:String = "wait";
 		public static const STATE_BUFFER:String = "buffer";
-		public static const STATE_READY:String = "ready";
 		public static const STATE_RECONNECT:String = "reconnect";
 		
-		public static const STATE_NAMELIST:Object = function():Object {
-			var _obj:Object = { };
-			_obj[STATE_STOP] = "停止";
-			_obj[STATE_PAUSE] = "暂停";
-			_obj[STATE_PLAY] = "播放";
-			_obj[STATE_BUFFER] = "缓冲";
-			_obj[STATE_WAIT] = "等待";
-			_obj[STATE_CONNECT] = "连接";
-			_obj[STATE_READY] = "就绪";
-			_obj[STATE_RECONNECT] = "重新连接";
-			return _obj;
-		}();
+		private static const NAME_LIST:Object = { };
+		NAME_LIST[STATE_PLAY] = "播放";
+		NAME_LIST[STATE_PAUSE] = "暂停";
+		NAME_LIST[STATE_STOP] = "停止";
+		NAME_LIST[STATE_READY] = "就绪";
+		NAME_LIST[STATE_CONNECT] = "连接";
+		NAME_LIST[STATE_WAIT] = "等待";
+		NAME_LIST[STATE_BUFFER] = "缓冲";
+		NAME_LIST[STATE_RECONNECT] = "重新连接";
 		
-		
+		public static function getStateName(_state:String):String {
+			return NAME_LIST[_state] || _state;
+		}
 		
 		public static const VALUE_PERCENTAGE:Number = 0.004;
 		public static const VOLUME_DEFAULT:Number = 0.8;

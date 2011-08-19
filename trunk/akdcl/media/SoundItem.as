@@ -23,11 +23,8 @@ package akdcl.media {
 	 */
 
 	public class SoundItem implements IPlaylistItem, IVolume {
-		private static const ELEMENT_ID:String = "TweenObject_SoundItem";
 		
-		private static var eM:ElementManager = ElementManager.getInstance();
 		private static var sM:SourceManager = SourceManager.getInstance();
-		eM.register(ELEMENT_ID, TweenObject);
 		
 		private static var REQUEST:URLRequest = new URLRequest();
 		private static var SOUND_LC:SoundLoaderContext = new SoundLoaderContext(1000, true);
@@ -165,17 +162,17 @@ package akdcl.media {
 				if (_tweenIn == 0){
 
 				} else if (_tweenIn <= 1){
-					(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, totalTime * _tweenIn * 0.001, 0, 1, _tempVolume);
+					//(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, totalTime * _tweenIn * 0.001, 0, 1, _tempVolume);
 				} else {
-					(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, _tweenIn * 0.001, 0, 1, _tempVolume);
+					//(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, _tweenIn * 0.001, 0, 1, _tempVolume);
 				}
 				//volume淡出
 				if (_tweenOut == 0){
 
 				} else if (_tweenOut <= 1){
-					(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, totalTime * _tweenOut * 0.001, totalTime * (1 - _tweenOut) * 0.001, 0, _tempVolume);
+					//(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, totalTime * _tweenOut * 0.001, totalTime * (1 - _tweenOut) * 0.001, 0, _tempVolume);
 				} else {
-					(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, _tweenOut * 0.001, (totalTime - _tweenOut) * 0.001, 0, _tempVolume);
+					//(eM.getElement(ELEMENT_ID) as TweenObject).tweenChannel(this, channelNow, _tweenOut * 0.001, (totalTime - _tweenOut) * 0.001, 0, _tempVolume);
 				}
 			} catch (_error:*){
 				
@@ -217,47 +214,5 @@ package akdcl.media {
 					break;
 			}
 		}
-	}
-}
-import flash.media.SoundChannel;
-
-import com.greensock.easing.Sine;
-import com.greensock.TweenLite;
-
-import akdcl.manager.ElementManager;
-
-import akdcl.media.SoundItem;
-
-class TweenObject {
-	public var volume:Number = 1;
-
-	private var soundItem:SoundItem;
-	private var channel:SoundChannel;
-	private var tempVolume:Number = 1;
-	private var tweenVars:Object = {volume: 1, overwrite: 0, delay: 0, ease: Sine.easeInOut, onUpdate: onTweenUpdate, onComplete: onTweenComplete};
-
-	public function tweenChannel(_soundItem:SoundItem, _channel:SoundChannel, _tween:Number, _delay:Number = 0, _tweenVolume:Number = 0, _tempVolume:Number = 1):void {
-		soundItem = _soundItem;
-		channel = _channel;
-		tempVolume = _tempVolume;
-		tweenVars.delay = _delay;
-		tweenVars.volume = _tweenVolume;
-		if (_tweenVolume == 1){
-			volume = 0;
-			onTweenUpdate();
-		} else {
-			volume = soundItem.volume;
-		}
-
-		TweenLite.to(this, _tween, tweenVars);
-	}
-
-	private function onTweenUpdate():void {
-		SoundItem.setChannelVolume(channel, soundItem.volume * tempVolume * volume);
-	}
-
-	private function onTweenComplete():void {
-		TweenLite.killTweensOf(this);
-		ElementManager.getInstance().recycle(this);
 	}
 }

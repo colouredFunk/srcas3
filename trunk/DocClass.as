@@ -150,7 +150,6 @@
 			}else {
 				throw new Error("ERROR:未读取到XML，请检查是否配置正确!");
 			}
-			
 		}
 
 		protected function onSizeMenuHandler(_evt:ContextMenuEvent):void {

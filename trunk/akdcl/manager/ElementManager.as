@@ -1,5 +1,7 @@
 package akdcl.manager {
 
+	import akdcl.manager.SourceManager;
+
 	public class ElementManager {
 		private static var instance:ElementManager;
 
@@ -16,13 +18,14 @@ package akdcl.manager {
 				throw new Error("ERROR:ElementManager Singleton already constructed!");
 			}
 			instance = this;
-			elementsGroup = {};
 		}
 
-		private var elementsGroup:Object;
+		private static const ELEMENTS_GROUP:String = "Elements";
+
+		private static var sM:SourceManager = SourceManager.getInstance();
 
 		public function recycle(_element:*):void {
-			for each (var _elements:Elements in elementsGroup){
+			for each (var _elements:Elements in sM.getGroup(ELEMENTS_GROUP)){
 				if (_elements.recycle(_element)){
 					return;
 				}
@@ -30,14 +33,18 @@ package akdcl.manager {
 		}
 
 		public function register(_elementID:String, _ElementClass:Class):void {
-			if (elementsGroup[_elementID]){
+			if (sM.getSource(ELEMENTS_GROUP, _elementID)){
 				return;
 			}
-			elementsGroup[_elementID] = new Elements(_ElementClass);
+			if (_ElementClass){
+				sM.addSource(ELEMENTS_GROUP, _elementID, new Elements(_ElementClass));
+			} else {
+				trace("WARNNING:" + _elementID + " class is null!");
+			}
 		}
 
 		public function getElement(_elementID:String):* {
-			var _elements:Elements = elementsGroup[_elementID];
+			var _elements:Elements = sM.getSource(ELEMENTS_GROUP, _elementID);
 			if (_elements){
 				return _elements.getElement();
 			}
@@ -69,6 +76,5 @@ class Elements extends Object {
 		}
 		return false;
 	}
-
 }
 
