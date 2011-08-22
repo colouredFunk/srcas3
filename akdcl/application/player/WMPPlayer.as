@@ -39,24 +39,7 @@ package akdcl.application.player{
 					pwrd.wmpPlayer.listener[_swfID]=_listener;
 				}
 				switch(pwrd.getBrowserName()){
-					case "Firefox":
-						pwrd.wmpPlayer.isWMPNow=false;
-						if (_mediaSource) {
-							_object.id=_wmpPlayerID;
-							_object.name=_wmpPlayerID;
-							_object.pluginspage="http://microsoft.com/windows/mediaplayer/en/download/";
-							_object.type="application/x-mplayer2";
-							//_object.type="application/x-ms-wmp";
-							_object.showControls=false;
-							_object.showstatusbar=false;
-							_object.width=0;
-							_object.height=0;
-							_object.src=_mediaSource;
-							pwrd.wmpPlayer.playerContainer.innerHTML=pwrd.createItem("embed",_object);
-							_player = document.getElementById(_wmpPlayerID);
-						}
-					break;
-					default:
+					case "IE":
 						pwrd.wmpPlayer.isWMPNow=true;
 						_object.id=_wmpPlayerID;
 						_object.width=0;
@@ -77,6 +60,23 @@ package akdcl.application.player{
 							}else{
 								_player.PlayStateChange=_listener;
 							}
+						}
+					break;
+					default:
+						pwrd.wmpPlayer.isWMPNow=false;
+						if (_mediaSource) {
+							_object.id=_wmpPlayerID;
+							_object.name=_wmpPlayerID;
+							_object.pluginspage="http://microsoft.com/windows/mediaplayer/en/download/";
+							_object.type="application/x-mplayer2";
+							//_object.type="application/x-ms-wmp";
+							_object.showControls=false;
+							_object.showstatusbar=false;
+							_object.width=0;
+							_object.height=0;
+							_object.src=_mediaSource;
+							pwrd.wmpPlayer.playerContainer.innerHTML=pwrd.createItem("embed",_object);
+							_player = document.getElementById(_wmpPlayerID);
 						}
 					break;
 				}
