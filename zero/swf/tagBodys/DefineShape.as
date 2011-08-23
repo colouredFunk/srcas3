@@ -1,7 +1,7 @@
 /***
 DefineShape
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
-创建时间：2011年08月18日 01:29:23（代码生成器 V2.0.0 F:/airs/program files2/CodesGenerater2/bin-debug/CodesGenerater2.swf）
+创建时间：2011年08月19日 22:35:58（代码生成器 V2.0.0 F:/airs/program files2/CodesGenerater2/bin-debug/CodesGenerater2.swf）
 简要说明：这家伙很懒什么都没写。
 用法举例：这家伙还是很懒什么都没写。
 */
@@ -47,9 +47,7 @@ package zero.swf.tagBodys{
 			offset=ShapeBounds.initByData(data,offset,endOffset,_initByDataOptions);
 			
 			Shapes=new SHAPEWITHSTYLE();
-			offset=Shapes.initByData(data,offset,endOffset,_initByDataOptions);
-			
-			return offset;
+			return Shapes.initByData(data,offset,endOffset,_initByDataOptions);
 			
 		}
 		public function toData(_toDataOptions:Object):ByteArray{
@@ -65,10 +63,9 @@ package zero.swf.tagBodys{
 			data[0]=id;
 			data[1]=id>>8;
 			
-			data.position=data.length;
+			data.position=2;
 			data.writeBytes(ShapeBounds.toData(_toDataOptions));
 			
-			data.position=data.length;
 			data.writeBytes(Shapes.toData(_toDataOptions));
 			
 			return data;
