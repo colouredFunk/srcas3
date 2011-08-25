@@ -61,6 +61,9 @@ package zero.works{
 					container.y=-container.height/2;
 				break;
 			}
+			if(xml.@smoothing.toString()=="true"){
+				(loader.content as Bitmap).smoothing=true;
+			}
 			TweenMax.to(container,0.5,{alpha:1,onComplete:initComplete});
 		}
 		private function initComplete():void{
