@@ -295,7 +295,6 @@ package zero.swf.avm2{
 				data.position=offset;
 				data.writeBytes(set_str_data);
 				offset=data.length;
-				set_str_size
 			}
 			data.position=offset;
 			data.writeBytes(restData.toData(_toDataOptions));

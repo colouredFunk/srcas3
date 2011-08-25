@@ -389,7 +389,6 @@ package zero.swf.avm2{
 				data.position=offset;
 				data.writeBytes(set_str_data);
 				offset=data.length;
-				set_str_size
 			}
 			var namespace_info_count:int=namespace_infoV.length;
 			
