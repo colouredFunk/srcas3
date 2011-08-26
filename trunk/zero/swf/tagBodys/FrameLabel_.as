@@ -1,10 +1,11 @@
 /***
 FrameLabel_
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
-创建时间：2011年7月5日 13:52:16（代码生成器 V2.0.0 F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf）
+创建时间：2011年08月26日 07:06:33（代码生成器 V2.0.0 F:/airs/program files2/CodesGenerater2/bin-debug/CodesGenerater2.swf）
 简要说明：这家伙很懒什么都没写。
 用法举例：这家伙还是很懒什么都没写。
 */
+
 //FrameLabel
 //The FrameLabel tag gives the specified Name to the current frame. ActionGoToLabel uses
 //this name to identify the frame.
@@ -36,48 +37,65 @@ FrameLabel_
 //Header 			RECORDHEADER 						Tag type = 43
 //Name 				Null-terminated STRING.(0 is NULL)	Label for frame.
 //Named Anchor flag UI8 								Always 1
+
 package zero.swf.tagBodys{
+	
 	import flash.utils.ByteArray;
-	public class FrameLabel_{//implements I_zero_swf_CheckCodesRight{
-		public var Name:String;							//STRING
-		public var NamedAnchorflag:Boolean;				//NamedAnchorflag
-		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
-			var get_str_size:int=0;
+	
+	public class FrameLabel_{
+		
+		public var Name:String;//STRING
+		public var NamedAnchorflag:Boolean;//NamedAnchorflag
+		
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
+			
+			var get_str_size:int;
+			
+			get_str_size=0;
 			while(data[offset+(get_str_size++)]){}
 			data.position=offset;
 			Name=data.readUTFBytes(get_str_size);
 			offset+=get_str_size;
+			
 			if(offset<endOffset){
-				offset++;
 				NamedAnchorflag=true;
-			}else{
-				NamedAnchorflag=false;
+				return offset+1;
 			}
+			NamedAnchorflag=false;
+			
 			return offset;
+			
 		}
-		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toData(_toDataOptions:Object):ByteArray{
+			
 			var data:ByteArray=new ByteArray();
+			
 			data.writeUTFBytes(Name+"\x00");
-			var offset:int=data.length;
+			
 			if(NamedAnchorflag){
 				data[data.length]=0x01;
 			}
+			
 			return data;
+			
 		}
-
-		////
+		
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
-			return <{xmlName} class="zero.swf.tagBodys.FrameLabel_"
-				Name={Name}
-				NamedAnchorflag={NamedAnchorflag}
-			/>;
+			public function toXML(xmlName:String,_toXMLOptions:Object):XML{
+				
+				return <{xmlName} class="zero.swf.tagBodys.FrameLabel_"
+					Name={Name}
+					NamedAnchorflag={NamedAnchorflag}
+				/>;
+				
+			}
+			public function initByXML(xml:XML,_initByXMLOptions:Object):void{
+				
+				Name=xml.@Name.toString();
+				
+				NamedAnchorflag=(xml.@NamedAnchorflag.toString()=="true");
+				
+			}
 		}
-		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
-			Name=xml.@Name.toString();
-			NamedAnchorflag=(xml.@NamedAnchorflag.toString()=="true");
-		}
-		}//end of CONFIG::USE_XML
 	}
 }
