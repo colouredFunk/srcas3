@@ -44,6 +44,7 @@
 			}
 			return contextMenuImageLoader;
 		}
+		
 		private static function onImageMenuShowHandler(_evt:ContextMenuEvent):void {
 			var _imageLoader:*=_evt.contextMenuOwner as ImageLoader;
 			var _source:String = _imageLoader.source;
