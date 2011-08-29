@@ -37,18 +37,6 @@ package akdcl.media {
 			super.load(_source);
 			playContent.load(_source);
 		}
-
-		override public function play(_startTime:int = -1):void {
-			super.play(_startTime);
-		}
-
-		override public function pause():void {
-			super.pause();
-		}
-
-		override public function stop():void {
-			super.stop();
-		}
 	}
 
 }

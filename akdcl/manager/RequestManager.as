@@ -56,7 +56,7 @@ package akdcl.manager {
 		private var loaderDic:Object;
 		private var urlLoaderDic:Object;
 
-		public function loadImage(_url:String, _onCompleteHandler:Function = null, _onErrorHandler:Function = null, _onProgressHandler:Function = null, ... args):void {
+		public function loadDisplay(_url:String, _onCompleteHandler:Function = null, _onErrorHandler:Function = null, _onProgressHandler:Function = null, ... args):void {
 			if (!_url){
 				trace("[WARNNING]:RequestManager.loadImage(_url), _url is null!!!");
 				return;
@@ -98,12 +98,15 @@ package akdcl.manager {
 				var _bmd:BitmapData = (_loader.content as Bitmap).bitmapData;
 				if (_bmd){
 					sM.addSource(SourceManager.BITMAPDATA_GROUP, _loader.url, _bmd);
+				}else {
+					//swf
 				}
-				_loader.onCompleteHandler(_bmd);
+				_loader.onCompleteHandler();
 			}
 			delete loaderDic[_loader.url];
-			_loader.clear();
-			eM.recycle(_loader);
+			if (_loader.clear()) {
+				eM.recycle(_loader);
+			}
 		}
 
 		public function load(_url:*, _onCompleteHandler:Function = null, _onErrorHandler:Function = null, _onProgressHandler:Function = null, ... args):void {
@@ -165,6 +168,7 @@ package akdcl.manager {
 
 }
 
+import flash.display.AVM1Movie;
 import flash.display.BitmapData;
 import flash.display.Loader;
 import flash.events.Event;
@@ -195,8 +199,7 @@ class RequestLoader extends Loader {
 		super.load(request, context);
 	}
 
-	public function clear():void {
-		url = null;
+	public function clear():Boolean {
 		var _fun:Function;
 		for each (_fun in errorHandlers){
 			delete errorHandlers[_fun];
@@ -208,7 +211,13 @@ class RequestLoader extends Loader {
 		for each (_fun in completeHandlers){
 			delete completeHandlers[_fun];
 		}
+		if (content is AVM1Movie) {
+			return false;
+		}
+		url = null;
 		unload();
+		unloadAndStop();
+		return true;
 	}
 
 	public function addEvents(_onProgressHandler:Function, _onErrorHandler:Function, _onCompleteHandler:Function):void {
@@ -254,18 +263,19 @@ class RequestLoader extends Loader {
 		}
 	}
 
-	public function onCompleteHandler(_bmd:BitmapData):void {
+	public function onCompleteHandler():void {
+		var _content:*= content is AVM1Movie?this:content;
 		for each (var _onComplete:Function in completeHandlers){
 			switch (_onComplete.length){
 				case 0:
 					_onComplete();
 					break;
 				case 2:
-					_onComplete(_bmd, url);
+					_onComplete(_content, url);
 					break;
 				case 1:
 				default:
-					_onComplete(_bmd);
+					_onComplete(_content);
 					break;
 			}
 		}

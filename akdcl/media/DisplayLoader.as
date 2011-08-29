@@ -1,4 +1,5 @@
 package akdcl.media {
+	import flash.display.Loader;
 	import flash.display.MovieClip;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -74,10 +75,10 @@ package akdcl.media {
 			return __loadProgress;
 		}
 
-		protected var __bitmapData:BitmapData = null;
+		protected var __content:* = null;
 
-		public function get bitmapData():BitmapData {
-			return __bitmapData;
+		public function get content():* {
+			return __content;
 		}
 		//0:等比内部填充,(0~1]:限制缩放比，-1:等比外部填充
 		private var __scaleMode:Number = 0;
@@ -95,18 +96,19 @@ package akdcl.media {
 
 		override protected function init():void {
 			super.init();
+			bitmap = new Bitmap();
 			if (container){
 				areaRect = getBounds(container);
+				container.addChild(bitmap);
 			} else {
 				container = this;
-				if (progressClip && contains(progressClip) && numChildren == 1){
-
+				if (progressClip && contains(progressClip)) {
+					container.addChildAt(bitmap, getChildIndex(progressClip));
 				} else {
 					areaRect = getBounds(this);
+					container.addChild(bitmap);
 				}
 			}
-			bitmap = new Bitmap();
-			container.addChild(bitmap);
 			setProgressClip(false);
 			contextMenu = createMenu(this);
 		}
@@ -122,8 +124,8 @@ package akdcl.media {
 
 		public function load(_url:String, _tweenMode:int = 2):void {
 			tweenMode = _tweenMode;
-			hideContent(__bitmapData && tweenMode == 2 ? true : false);
-			rM.loadImage(_url, onImageHandler, onImageHandler, onImageHandler);
+			hideContent(__content && tweenMode == 2 ? true : false);
+			rM.loadDisplay(_url, onImageHandler, onImageHandler, onImageHandler);
 		}
 
 		public function unload():void {
@@ -131,7 +133,7 @@ package akdcl.media {
 			TweenNano.killTweensOf(bitmap);
 			bitmap.bitmapData = null;
 			__source = null;
-			__bitmapData = null;
+			__content = null;
 		}
 
 		protected function hideContent(_isTween:Boolean):void {
@@ -139,7 +141,7 @@ package akdcl.media {
 				return;
 			}
 			__source = null;
-			__bitmapData = null;
+			__content = null;
 			TweenNano.killTweensOf(bitmap);
 			TweenNano.to(bitmap, _isTween ? 12 : 0, {alpha: 0, useFrames: true, onComplete: showContent});
 		}
@@ -162,7 +164,7 @@ package akdcl.media {
 			} else {
 				setProgressClip(false);
 				__source = _url;
-				__bitmapData = _p;
+				__content = _p;
 				showContent(true);
 				
 				dispatchEvent(completeEvent);
@@ -170,41 +172,64 @@ package akdcl.media {
 		}
 
 		protected function showContent(_isTween:Boolean = true):void {
-			if (!__bitmapData){
+			if (!__content){
 				return;
 			}
-			bitmap.bitmapData = __bitmapData;
-			bitmap.smoothing = true;
-			updateArea();
-			if (container == this && progressClip && contains(progressClip)){
-				container.addChildAt(bitmap, getChildIndex(progressClip));
-			} else {
-				container.addChild(bitmap);
-			}
-
-			isTweenning = false;
 			TweenNano.killTweensOf(bitmap);
-			TweenNano.to(bitmap, (_isTween && tweenMode > 0) ? 12 : 0, {alpha: 1, useFrames: true});
+			if (__content is BitmapData) {
+				bitmap.bitmapData = __content;
+				bitmap.smoothing = true;
+				TweenNano.to(bitmap, (_isTween && tweenMode > 0) ? 12 : 0, {alpha: 1, useFrames: true});
+			}else {
+				container.addChildAt(__content, container.getChildIndex(bitmap));
+				__content.alpha = 0;
+				TweenNano.to(__content, (_isTween && tweenMode > 0) ? 12 : 0, {alpha: 1, useFrames: true});
+			}
+			updateArea();
+			isTweenning = false;
 		}
 
 		protected function updateArea():void {
-			bitmap.scaleX = bitmap.scaleY = 1;
-			if (areaRect.width + areaRect.height <= 0){
-				//原始大小显示
-				bitmap.x = bitmap.y = 0;
-			} else {
-				var _areaAspectRatio:Number = areaRect.width / areaRect.height;
-				var _contentAspectRatio:Number = bitmap.width / bitmap.height;
-				if (scaleMode >= 0 ? (_areaAspectRatio > _contentAspectRatio) : (_areaAspectRatio < _contentAspectRatio)){
-					bitmap.height = areaRect.height;
-					bitmap.scaleX = bitmap.scaleY;
-					bitmap.y = areaRect.y;
-					bitmap.x = areaRect.x + (areaRect.width - bitmap.width) * 0.5;
+			var _areaAspectRatio:Number = areaRect.width / areaRect.height;
+			var _contentAspectRatio:Number;
+			if (__content is BitmapData) {
+				bitmap.scaleX = bitmap.scaleY = 1;
+				if (areaRect.width + areaRect.height <= 0){
+					//原始大小显示
+					bitmap.x = bitmap.y = 0;
 				} else {
-					bitmap.width = areaRect.width;
-					bitmap.scaleY = bitmap.scaleX;
-					bitmap.x = areaRect.x;
-					bitmap.y = areaRect.y + (areaRect.height - bitmap.height) * 0.5;
+					_contentAspectRatio = bitmap.width / bitmap.height;
+					if (scaleMode >= 0 ? (_areaAspectRatio > _contentAspectRatio) : (_areaAspectRatio < _contentAspectRatio)){
+						bitmap.height = areaRect.height;
+						bitmap.scaleX = bitmap.scaleY;
+						bitmap.y = areaRect.y;
+						bitmap.x = areaRect.x + (areaRect.width - bitmap.width) * 0.5;
+					} else {
+						bitmap.width = areaRect.width;
+						bitmap.scaleY = bitmap.scaleX;
+						bitmap.x = areaRect.x;
+						bitmap.y = areaRect.y + (areaRect.height - bitmap.height) * 0.5;
+					}
+				}
+			}else {
+				if (areaRect.width + areaRect.height <= 0){
+				} else {
+					if (__content is Loader) {
+						_contentAspectRatio = __content.contentLoaderInfo.width / __content.contentLoaderInfo.height;
+					}else {
+						_contentAspectRatio = __content.parent.contentLoaderInfo.width / __content.parent.contentLoaderInfo.height;
+					}
+					if (scaleMode >= 0 ? (_areaAspectRatio > _contentAspectRatio) : (_areaAspectRatio < _contentAspectRatio)){
+						__content.height = areaRect.height;
+						__content.scaleX = bitmap.scaleY;
+						__content.y = areaRect.y;
+						__content.x = areaRect.x + (areaRect.width - __content.width) * 0.5;
+					} else {
+						__content.width = areaRect.width;
+						__content.scaleY = bitmap.scaleX;
+						__content.x = areaRect.x;
+						__content.y = areaRect.y + (areaRect.height - __content.height) * 0.5;
+					}
 				}
 			}
 		}
