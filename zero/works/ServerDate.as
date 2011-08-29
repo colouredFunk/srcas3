@@ -1,5 +1,5 @@
 /***
-ServerTime
+ServerDate
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
 创建时间：2011年8月6日 13:19:41
 简要说明：这家伙很懒什么都没写。
@@ -15,7 +15,7 @@ package zero.works{
 	import flash.text.*;
 	import flash.utils.*;
 	
-	public class ServerTime{
+	public class ServerDate{
 		
 		////===
 		//加载 getTime
@@ -24,7 +24,9 @@ package zero.works{
 		
 		private var onGetTimeComplete:Function;
 		
-		public function ServerTime(_onGetTimeComplete:Function){
+		public function ServerDate(){
+		}
+		public function init(_onGetTimeComplete:Function):void{
 			
 			onGetTimeComplete=_onGetTimeComplete;
 			
@@ -39,7 +41,6 @@ package zero.works{
 			try{
 				getTimeLoader.load(new URLRequest("http://event21.wanmei.com/demo/flash/systime.jsp?"+Math.random()));
 			}catch(e:Error){
-				onGetTimeComplete(new Date());
 				
 				//getTimeLoader.removeEventListener(ProgressEvent.PROGRESS,getTimeLoadProgress);
 				getTimeLoader.removeEventListener(Event.COMPLETE,getTimeLoadComplete);
@@ -47,7 +48,7 @@ package zero.works{
 				getTimeLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,getTimeLoadError);
 				getTimeLoader=null;
 				
-				onGetTimeComplete=null;
+				getTimeComplete(new Date());
 			}
 			////===
 		}
@@ -68,7 +69,7 @@ package zero.works{
 			getTimeLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,getTimeLoadError);
 			getTimeLoader=null;
 			
-			onGetTimeComplete(new Date(
+			getTimeComplete(new Date(
 				int(execResult[1]),
 				int(execResult[2])-1,
 				int(execResult[3]),
@@ -76,8 +77,6 @@ package zero.works{
 				int(execResult[5]),
 				int(execResult[6])
 			));
-			
-			onGetTimeComplete=null;
 		}
 		private function getTimeLoadError(event:Event):void{
 			trace("加载 getTime 失败");
@@ -87,10 +86,30 @@ package zero.works{
 			getTimeLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,getTimeLoadError);
 			getTimeLoader=null;
 			
-			onGetTimeComplete(new Date());
-			
-			onGetTimeComplete=null;
+			getTimeComplete(new Date());
 		}
 		////===
+		
+		private var startDateTime:Number;
+		private var startTime:Number;//
+		private function getTimeComplete(date:Date):void{
+			
+			startDateTime=date.time;
+			startTime=getTimer();
+			
+			if(onGetTimeComplete==null){
+			}else{
+				onGetTimeComplete();
+				onGetTimeComplete=null;
+			}
+		}
+		
+		public function getDate():Date{
+			//获取和服务器同步的 Date
+			if(startDateTime>0){
+				return new Date((getTimer()-startTime)+startDateTime);
+			}
+			throw new Error("ServerDate 尚未初始化完毕");
+		}
 	}
 }
