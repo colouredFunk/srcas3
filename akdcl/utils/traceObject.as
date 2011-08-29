@@ -1,6 +1,7 @@
 package akdcl.utils {
 	import com.adobe.serialization.json.JSON;
 	import akdcl.utils.replaceString;
+	import flash.utils.Dictionary;
 	/**
 	 * ...
 	 * @author Akdcl
@@ -13,6 +14,7 @@ package akdcl.utils {
 			var _obj:*= args[_i];
 			switch(_obj?_obj["constructor"]:_obj) {
 				case Object:
+				case Dictionary:
 				case Array:
 					_eachStr = replaceString(JSON.encode(_obj),",{",",\n{");
 					break;
