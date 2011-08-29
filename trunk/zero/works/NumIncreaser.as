@@ -16,74 +16,99 @@ package zero.works{
 	import flash.utils.*;
 	
 	public class NumIncreaser extends Sprite{
+		private static const ranArr:Array=[1,2,1,1,1,1,1,3,2,3,1,1,2,1,2,1,1,2,2,1,3,2,2,2,2,2,1,2,1,2,2,2,1,2,1,2,1,2,1,1,2,1,1,2,1,1,1,2,1,2,2,2,2,1,2,3,1,1,2,1,2,2,2,1,1,1,2,2,2,1,1,1,2,2,2,2,2,2,1,2,2,2,2,2,1,1,2,2,2,1,2,2,2,1,1,2,1,2,1,1];
+		
+		private static function getDateByDateStr(dateStr:String):Date{
+			var timeArr:Array=dateStr.replace(/^\s*|\s*$/g,"").split(/\D+/g);
+			return new Date(int(timeArr[0]),int(timeArr[1])-1,int(timeArr[2]),int(timeArr[3]),int(timeArr[4]),int(timeArr[5]));
+		}
+		
+		private var serverDate:ServerDate;
+		private var startDate:Date;
+		private var timeUpDate:Date;
+		public var startNum:int;
+		public var k:Number;
+		
+		public var txt:*;
 		
 		public function NumIncreaser(){
-		}
-		public function init(numIncreaserXML:XML):void{
 			
-			var ranArr:Array=[1,2,1,1,1,1,1,3,2,3,1,1,2,1,2,1,1,2,2,1,3,2,2,2,2,2,1,2,1,2,2,2,1,2,1,2,1,2,1,1,2,1,1,2,1,1,1,2,1,2,2,2,2,1,2,3,1,1,2,1,2,2,2,1,1,1,2,2,2,1,1,1,2,2,2,2,2,2,1,2,2,2,2,2,1,1,2,2,2,1,2,2,2,1,1,2,1,2,1,1];
+			startNum=0;
+			k=0.2;
 			
-			var startNum:int=int(this.loaderInfo.parameters.startNum);
-			var startTimeStr:String=this.loaderInfo.parameters.startTime;
-			var endTimeStr:String=this.loaderInfo.parameters.endTime;
-			var k:Number=Number(this.loaderInfo.parameters.k);
+			if(txt){
+				return;
+			}
 			
-			if(numIncreaserXML){
-				if(startNum>0){
-				}else{
-					startNum=int(numIncreaserXML.@startNum.toString());
-				}
-				if(startTimeStr){
-				}else{
-					startTimeStr=numIncreaserXML.@startTime.toString();
-				}
-				if(endTimeStr){
-				}else{
-					endTimeStr=numIncreaserXML.@endTime.toString();
-				}
-				if(k>0){
-				}else{
-					k=Number(numIncreaserXML.@k.toString());
+			var i:int;
+			var _txt:*;
+			
+			i=this.numChildren;
+			while(--i>=0){
+				_txt=this.getChildAt(i);
+				if(
+					_txt is TextField
+					||
+					getQualifiedClassName(_txt).indexOf("TxtEffects")>-1
+				){
+					txt=_txt;
+					break;;
 				}
 			}
+			
+			if(txt){
+			}else{
+				throw new Error("找不到 txt");
+			}
+			
+			if(
+				this.loaderInfo.parameters.startTime//"2011-08-02 10:00:00";
+				&&
+				this.loaderInfo.parameters.endTime//"2011-08-09 12:00:00";
+			){
+				
+				serverDate=new ServerDate();
+				serverDate.init(initServerDateComplete);
+			}
+		}
+		private function initServerDateComplete():void{
+			
+			startNum=int(this.loaderInfo.parameters.startNum)||startNum;
+			k=Number(this.loaderInfo.parameters.k)||k;
 			
 			if(startNum>0){
 			}else{
 				startNum=0;
-			}
-			if(startTimeStr){
-			}else{
-				startTimeStr="2011-08-02 10:00:00";
-			}
-			if(endTimeStr){
-			}else{
-				endTimeStr="2011-08-09 12:00:00";
 			}
 			if(k>0){
 			}else{
 				k=0.2;
 			}
 			
-			//trace("startTimeStr="+startTimeStr);
-			trace("endTimeStr="+endTimeStr);
+			start(
+				serverDate,
+				getDateByDateStr(this.loaderInfo.parameters.startTime),
+				getDateByDateStr(this.loaderInfo.parameters.endTime)
+			);
+		}
+		
+		public function start(_serverDate:ServerDate,_startDate:Date,_timeUpDate:Date):void{
+			serverDate=_serverDate;
+			startDate=_startDate;
+			timeUpDate=_timeUpDate;
+			this.addEventListener(Event.ENTER_FRAME,enterFrame);
+		}
+		private function enterFrame(event:Event):void{
 			
-			var startTime:int=getTimeByDateStr(startTimeStr);
-			var endTime:int=getTimeByDateStr(endTimeStr);
+			var currTime:int=serverDate.getDate().time/1000;
 			
-			//trace("startTime="+startTime);
-			//trace("endTime="+endTime);
-			
-			var currTime:int=new Date().time/1000;
-			//trace("currTime="+currTime);
-			
-			if(currTime<startTime){
-				currTime=startTime;
-			}else if(currTime>endTime){
-				currTime=endTime;
+			if(currTime<startDate.time/1000){
+				currTime=startDate.time/1000;
+			}else if(currTime>timeUpDate.time/1000){
+				currTime=timeUpDate.time/1000;
 			}
-			//trace("currTime="+currTime);
 			
-			var dTime:int=currTime-startTime;
+			var dTime:int=currTime-startDate.time/1000;
 			if(dTime>0){
 			}else{
 				dTime=0;
@@ -104,25 +129,11 @@ package zero.works{
 				totalPeople+=ranArr[i];
 			}
 			
-			i=this.numChildren;
-			while(--i>=0){
-				var txt:TextField=this.getChildAt(i) as TextField;
-				if(txt){
-					
-					//trace("totalPeople="+totalPeople);
-					//trace("k="+k);
-					//trace("totalPeople*k="+totalPeople*k);
-					//trace("startNum="+startNum);
-					
-					txt.text=int(startNum+totalPeople*k).toString();
-					return;
-				}
+			if(txt is TextField){
+				txt.text=int(startNum+totalPeople*k);
+			}else{
+				txt.value=int(startNum+totalPeople*k);
 			}
-			throw new Error("找不到 txt");
-		}
-		private static function getTimeByDateStr(dateStr:String):int{
-			var timeArr:Array=dateStr.replace(/^\s*|\s*$/g,"").split(/\D+/g);
-			return new Date(int(timeArr[0]),int(timeArr[1])-1,int(timeArr[2]),int(timeArr[3]),int(timeArr[4]),int(timeArr[5])).time/1000;
 		}
 	}
 }

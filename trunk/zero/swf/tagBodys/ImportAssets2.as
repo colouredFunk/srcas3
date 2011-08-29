@@ -1,11 +1,11 @@
-﻿/***
-ImportAssets2 版本:v1.0
-简要说明:这家伙很懒什么都没写
-创建人:ZЁЯ¤  身高:168cm+;体重:57kg+;未婚(已有女友);最爱的运动:睡觉;格言:路见不平,拔腿就跑;QQ:358315553
-创建时间:2010年11月1日 16:45:36 (代码生成器: F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf) 
-历次修改:未有修改
-用法举例:这家伙很懒什么都没写
+/***
+ImportAssets2
+创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
+创建时间：2011年08月26日 20:49:14（代码生成器 V2.0.0 F:/airs/program files2/CodesGenerater2/bin-debug/CodesGenerater2.swf）
+简要说明：这家伙很懒什么都没写。
+用法举例：这家伙还是很懒什么都没写。
 */
+
 //The ImportAssets2 tag replaces the ImportAssets tag for SWF 8 and later. ImportAssets2
 //currently mirrors the ImportAssets tag's functionality.
 //The ImportAssets2 tag imports characters from another SWF file. The importing SWF file
@@ -29,88 +29,133 @@ ImportAssets2 版本:v1.0
 //...
 //TagN 				UI16 			Character ID to use for last imported character in importing SWF file
 //NameN 			STRING 			Identifier for last imported character
+
 package zero.swf.tagBodys{
+	
 	import flash.utils.ByteArray;
-	public class ImportAssets2{//implements I_zero_swf_CheckCodesRight{
-		public var URL:String;							//STRING
-		public var ReservedUI16:int;					//UI16
-		public var TagV:Vector.<int>;
-		public var NameV:Vector.<String>;
-		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
-			var get_str_size:int=0;
+	
+	public class ImportAssets2{
+		
+		public var URL:String;//STRING
+		//public var Reserved:int;//UI8
+		//public var Reserved:int;//UI8
+		public var TagV:Vector.<int>;//UI16
+		public var NameV:Vector.<String>;//STRING
+		
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
+			
+			var get_str_size:int;
+			var i:int;
+			
+			get_str_size=0;
 			while(data[offset+(get_str_size++)]){}
 			data.position=offset;
 			URL=data.readUTFBytes(get_str_size);
 			offset+=get_str_size;
-			ReservedUI16=data[offset++]|(data[offset++]<<8);
+			
+			//Reserved=data[offset++];
+			offset++;
+			
+			//Reserved=data[offset++];
+			offset++;
 			
 			var Count:int=data[offset++]|(data[offset++]<<8);
+			
 			TagV=new Vector.<int>();
 			NameV=new Vector.<String>();
-			for(var i:int=0;i<Count;i++){
+			for(i=0;i<Count;i++){
+				
 				TagV[i]=data[offset++]|(data[offset++]<<8);
+				
 				get_str_size=0;
 				while(data[offset+(get_str_size++)]){}
 				data.position=offset;
 				NameV[i]=data.readUTFBytes(get_str_size);
 				offset+=get_str_size;
+				
 			}
+			
 			return offset;
+			
 		}
-		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toData(_toDataOptions:Object):ByteArray{
+			
+			var i:int;
+			
 			var data:ByteArray=new ByteArray();
+			
 			data.writeUTFBytes(URL+"\x00");
-			var offset:int=data.length;
-			data[offset++]=ReservedUI16;
-			data[offset++]=ReservedUI16>>8;
+			
+			data[data.length]=0x01;
+			
+			data[data.length]=0x00;
+			
 			var Count:int=TagV.length;
-			data[offset++]=Count;
-			data[offset++]=Count>>8;
-			var i:int=-1;
+			data[data.length]=Count;
+			data[data.length]=Count>>8;
+			
+			i=-1;
 			for each(var Tag:int in TagV){
 				i++;
-				data[offset++]=Tag;
-				data[offset++]=Tag>>8;
-				data.position=offset;
+				
+				data[data.length]=Tag;
+				data[data.length]=Tag>>8;
+				
+				data.position=data.length;
 				data.writeUTFBytes(NameV[i]+"\x00");
-				offset=data.length;
+				
 			}
+			
 			return data;
+			
 		}
-
-		////
+		
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
-			var xml:XML=<{xmlName} class="zero.swf.tagBodys.ImportAssets2"
-				URL={URL}
-				ReservedUI16={ReservedUI16}
-			/>;
-			if(TagV.length){
-				var TagAndNameListXML:XML=<TagAndNameList count={TagV.length}/>
-				var i:int=-1;
-				for each(var Tag:int in TagV){
-					i++;
-					TagAndNameListXML.appendChild(<Tag value={Tag}/>);
-					TagAndNameListXML.appendChild(<Name value={NameV[i]}/>);
+			public function toXML(xmlName:String,_toXMLOptions:Object):XML{
+				
+				var i:int;
+				
+				var xml:XML=<{xmlName} class="zero.swf.tagBodys.ImportAssets2"
+					URL={URL}
+				/>;
+				
+				if(TagV.length){
+					i=-1;
+					var TagAndNameListXML:XML=<TagAndNameList count={TagV.length}/>;
+					for each(var Tag:int in TagV){
+						i++;
+						
+						TagAndNameListXML.appendChild(<Tag value={Tag}/>);
+						
+						TagAndNameListXML.appendChild(<Name value={NameV[i]}/>);
+						
+					}
+					xml.appendChild(TagAndNameListXML);
 				}
-				xml.appendChild(TagAndNameListXML);
+				
+				return xml;
+				
 			}
-			return xml;
-		}
-		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
-			URL=xml.@URL.toString();
-			ReservedUI16=int(xml.@ReservedUI16.toString());
-			var NameXMLList:XMLList=xml.TagAndNameList.Name;
-			var i:int=-1;
-			TagV=new Vector.<int>();
-			NameV=new Vector.<String>();
-			for each(var TagXML:XML in xml.TagAndNameList.Tag){
-				i++;
-				TagV[i]=int(TagXML.@value.toString());
-				NameV[i]=NameXMLList[i].@value.toString();
+			public function initByXML(xml:XML,_initByXMLOptions:Object):void{
+				
+				var i:int;
+				
+				URL=xml.@URL.toString();
+				
+				i=-1;
+				var NameXMLList:XMLList=xml.TagAndNameList.Name;
+				TagV=new Vector.<int>();
+				NameV=new Vector.<String>();
+				for each(var TagXML:XML in xml.TagAndNameList.Tag){
+					i++;
+					
+					TagV[i]=int(TagXML.@value.toString());
+					
+					NameV[i]=NameXMLList[i].@value.toString();
+					
+				}
+				
 			}
 		}
-		}//end of CONFIG::USE_XML
 	}
 }

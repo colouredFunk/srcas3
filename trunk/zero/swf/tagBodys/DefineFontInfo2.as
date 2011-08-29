@@ -1,7 +1,7 @@
 /***
 DefineFontInfo2
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
-创建时间：2011年08月25日 15:02:54（代码生成器 V2.0.0 F:/airs/program files2/CodesGenerater2/bin-debug/CodesGenerater2.swf）
+创建时间：2011年08月26日 10:34:42（代码生成器 V2.0.0 F:/airs/program files2/CodesGenerater2/bin-debug/CodesGenerater2.swf）
 简要说明：这家伙很懒什么都没写。
 用法举例：这家伙还是很懒什么都没写。
 */
@@ -121,9 +121,9 @@ package zero.swf.tagBodys{
 				flags|=0x02;//00000010
 			}
 			flags|=0x01;//00000001
-			data[2]=flags;
+			data[data.length]=flags;
 			
-			data[3]=LanguageCode;
+			data[data.length]=LanguageCode;
 			
 			for each(var Code:int in CodeV){
 				
