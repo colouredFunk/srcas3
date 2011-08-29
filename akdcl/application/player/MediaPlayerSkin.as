@@ -14,6 +14,7 @@ package akdcl.application.player{
 	 * @author Akdcl
 	 */
 	public class MediaPlayerSkin extends SimpleBtn {
+		public static var labelAutoSize:String = "center";
 		protected static function complexTime(_position:uint, _totalTime:uint):String {
 			var _timePlayed:String;
 			var _timeTotal:String;
@@ -60,6 +61,8 @@ package akdcl.application.player{
 		protected var startXBtn:int;
 		protected var startYBtn:int;
 		protected var formatBtnXY:Boolean;
+		
+		public var everyNumBtn:Function;
 		
 		//
 		private var __against:Boolean = false;
@@ -307,7 +310,7 @@ package akdcl.application.player{
 			}
 			try {
 				var _label:String = String(player.playlist[_offID].@label);
-				_btn.autoSize = "center";
+				_btn.autoSize = labelAutoSize;
 				_btn.label = _label || String(_offID + 1);
 			}catch (_ero:*) {
 				
@@ -323,6 +326,9 @@ package akdcl.application.player{
 					}
 					_btn.icon.load(_icon, _id);
 				}
+			}
+			if (everyNumBtn!=null) {
+				everyNumBtn(_btn, player.playlist[_offID]);
 			}
 		}
 		//
