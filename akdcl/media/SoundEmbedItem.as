@@ -196,7 +196,7 @@ import akdcl.manager.ElementManager;
 import akdcl.media.SoundEmbedItem;
 
 class TweenObject {
-	public static const ELEMENT_ID:String = "TweenObject_SoundItem";
+	public static const ELEMENT_ID:String = "TweenObject_SoundEmbedItem";
 	ElementManager.getInstance().register(ELEMENT_ID, TweenObject);
 
 	public var volume:Number = 1;

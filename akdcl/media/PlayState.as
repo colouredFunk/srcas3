@@ -8,6 +8,7 @@ package akdcl.media{
 		public static const PLAY:String = "play";
 		public static const PAUSE:String = "pause";
 		public static const STOP:String = "stop";
+		public static const COMPLETE:String = "complete";
 		public static const READY:String = "ready";
 		public static const CONNECT:String = "connect";
 		public static const WAIT:String = "wait";
@@ -18,6 +19,7 @@ package akdcl.media{
 		NAME_LIST[PLAY] = "播放";
 		NAME_LIST[PAUSE] = "暂停";
 		NAME_LIST[STOP] = "停止";
+		NAME_LIST[COMPLETE] = "结束";
 		NAME_LIST[READY] = "就绪";
 		NAME_LIST[CONNECT] = "连接";
 		NAME_LIST[WAIT] = "等待";
