@@ -26,6 +26,7 @@ package akdcl.manager {
 		}
 
 		public static const SOUND_GROUP:String = "Sound";
+		public static const BITMAPDATA_GROUP:String = "BitmapData";
 		public static const NETSTREAM_GROUP:String = "NetStream";
 
 		private var sourceGroup:Object;
@@ -46,7 +47,7 @@ package akdcl.manager {
 		public function removeGroup(_groupID:String):void {
 			var _group:Object = getGroup[_groupID];
 			for (var _i:String in _group){
-				removeSource(_groupID, _i);
+				removeSourceByID(_groupID, _i);
 			}
 			delete sourceGroup[_groupID];
 		}
@@ -62,8 +63,28 @@ package akdcl.manager {
 		public function getSource(_groupID:String, _sourceID:String):* {
 			return getGroup(_groupID)[_sourceID];
 		}
+		
+		public function getSourceID(_groupID:String, _source:*):String {
+			var _group:Object = getGroup(_groupID);
+			for (var _sourceID:String in _group){
+				if (_group[_sourceID] == _source){
+					return _sourceID;
+				}
+			}
+			return null;
+		}
 
-		public function removeSource(_groupID:String, _sourceID:String):void {
+		public function removeSource(_groupID:String, _source:*):void {
+			var _group:Object = getGroup(_groupID);
+			for (var _sourceID:String in _group){
+				if (_group[_sourceID] == _source){
+					removeSourceByID(_groupID, _sourceID);
+					break;
+				}
+			}
+		}
+
+		public function removeSourceByID(_groupID:String, _sourceID:String):void {
 			var _group:Object = getGroup(_groupID);
 			var _source:* = _group[_sourceID];
 			if (_source){
@@ -75,16 +96,6 @@ package akdcl.manager {
 					}
 				}
 				delete _group[_sourceID];
-			}
-		}
-
-		public function removeSourceByInstance(_groupID:String, _source:*):void {
-			var _group:Object = getGroup(_groupID);
-			for (var _sourceID:String in _group){
-				if (_group[_sourceID] == _source){
-					removeSource(_groupID, _sourceID);
-					break;
-				}
 			}
 		}
 	}

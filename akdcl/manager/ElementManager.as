@@ -50,6 +50,14 @@ package akdcl.manager {
 			}
 			throw new Error("ERROR:" + _elementID + " has not yet registered!");
 		}
+
+		public function getElementsLength(_elementID:String):uint {
+			var _elements:Elements = sM.getSource(ELEMENTS_GROUP, _elementID);
+			if (_elements){
+				return _elements.getElementsLength();
+			}
+			return 0;
+		}
 	}
 }
 
@@ -67,6 +75,10 @@ class Elements extends Object {
 			return elementPrepared.pop();
 		}
 		return new ElementClass();
+	}
+
+	public function getElementsLength():uint {
+		return elementPrepared.length;
 	}
 
 	public function recycle(_element:*):Boolean {
