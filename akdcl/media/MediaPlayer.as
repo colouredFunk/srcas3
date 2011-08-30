@@ -6,52 +6,29 @@ package akdcl.media {
 	 * @author ...
 	 */
 	public class MediaPlayer extends MediaProvider {
-		//格式化播放列表
-		public static var SOURCE_ID:String = "source";
-
-		public static function createList(_list:*):XMLList {
-			var _xml:XML;
-			if ((_list is String) || (_list is Array)){
-				if (_list is String){
-					//将字符串按"|"格式成数组
-					_list = _list.split("|");
-				}
-				_xml =    <root/>;
-				for each (var _each:String in _list){
-					_xml.appendChild(<list source={_each}/>);
-				}
-				_list = _xml.list;
-			} else if (_list is XMLList || _list is XML){
-				if (_list is XML){
-					//取XML中的"list"列表
-					_list = _list.list;
-				}
-				if (_list.attribute(SOURCE_ID).length() == 0){
-					return null;
-				}
-			} else {
-				return null;
-			}
-			return _list;
-		}
+		private var imagePD:ImageProvider;
+		private var soundPD:SoundProvider;
+		private var videoPD:VideoProvider;
+		private var wmpPD:WMPProvider;
 
 		private var pageID:PageID;
+		private var contentPDList:Array;
 
 		//播放列表
-		private var __playlist:XMLList;
+		private var __playlist:Playlist;
 
-		public function get playlist():XMLList {
+		public function get playlist():Playlist {
 			return __playlist;
 		}
 
 		public function set playlist(_playlist:*):void {
-			_playlist = createList(_playlist);
+			_playlist = Playlist.createList(_playlist);
 			if (!_playlist){
 				return;
 			}
 			stop();
 			__playlist = _playlist;
-			pageID.length = __playlist.length();
+			pageID.length = __playlist.length;
 			//dispatchEvent(new MediaEvent(MediaEvent.LIST_CHANGE));
 		}
 
@@ -76,35 +53,146 @@ package akdcl.media {
 
 		override protected function init():void {
 			super.init();
+			contentPDList = [];
+			imagePD = new ImageProvider();
+			soundPD = new SoundProvider();
+			videoPD = new VideoProvider();
+			wmpPD = new WMPProvider();
 			pageID = new PageID();
 			pageID.onIDChange = onPlayIDChangeHandler;
 		}
 
 		private function onPlayIDChangeHandler(_id:uint):void {
 			stop();
-			var _source:String = getMediaByID(_id);
+			var _content:MediaProvider;
+			for each (_content in contentPDList){
+				_content.removeEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
+				_content.removeEventListener(MediaEvent.LOAD_ERROR, onLoadErrorHandler);
+				_content.removeEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
+				_content.removeEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
+				_content.removeEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);
+			}
+
+			var _item:PlayItem = playlist.getItem(_id);
+			var _source:String = _item.source;
 			var _type:String = _source.split("?")[0];
 			_type = String(_type.split(".").pop()).toLowerCase();
-			switch(_type) {
-				case "mp3":
-				case "wav":
-					break;
+			switch (_type){
 				case "gif":
 				case "jpg":
 				case "png":
+				case "swf":
+					imagePD.load(_source);
+					contentPDList[0] = imagePD;
+					break;
+				case "mp3":
+				case "wav":
+					soundPD.load(_source);
+					contentPDList[0] = soundPD;
 					break;
 				case "flv":
 				case "mov":
 				case "mp4":
 				case "f4v":
+					videoPD.load(_source);
+					contentPDList[0] = videoPD;
 					break;
 				case "wma":
 				case "wmv":
 				case "mms":
+					wmpPD.load(_source);
+					contentPDList[0] = wmpPD;
 				default:
 					break;
 			}
+			for each (_content in contentPDList){
+				_content.addEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
+				_content.addEventListener(MediaEvent.LOAD_ERROR, onLoadErrorHandler);
+				_content.addEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
+				_content.addEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
+				_content.addEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);
+			}
 			play();
+		}
+
+		override public function load(_source:String):void {
+			playlist = _source;
+		}
+
+		override public function play(_startTime:int = -1):void {
+			if (playID < 0){
+				playID = 0;
+				return;
+			}
+			for each (var _content:MediaProvider in contentPDList){
+				_content.play(_startTime);
+			}
+			super.play(_startTime);
+		}
+
+		override public function pause():void {
+			for each (var _content:MediaProvider in contentPDList){
+				_content.pause();
+			}
+			super.pause();
+		}
+
+		override public function stop():void {
+			for each (var _content:MediaProvider in contentPDList){
+				_content.stop();
+			}
+			super.stop();
+		}
+
+		public function next():void {
+			playID++;
+		}
+
+		public function prev():void {
+			playID--;
+		}
+
+		override protected function onLoadErrorHandler(_evt:* = null):void {
+			if (playlist.length() == 1){
+				//如果播放列表只有一个源，则停止播放
+				stop();
+			} else {
+				//根据repeat的值执行下一步
+				onPlayCompleteHandler();
+			}
+			super.onLoadErrorHandler(_evt);
+		}
+
+		override protected function onPlayCompleteHandler(_evt:* = null):void {
+			switch (repeat){
+				case 0:
+					stop();
+					break;
+				case 1:
+					stop();
+					play();
+					break;
+				case 2:
+					if (playID == playlist.length - 1){
+						stop();
+					} else {
+						next();
+					}
+					break;
+				case 3:
+					if (playlist.length == 1){
+						stop();
+						play();
+					} else {
+						next();
+					}
+					break;
+				case 4:
+					//待完善
+					stop();
+					break;
+			}
+			super.onPlayCompleteHandler(_evt);
 		}
 	}
 

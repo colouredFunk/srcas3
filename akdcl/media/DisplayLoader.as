@@ -86,7 +86,7 @@ package akdcl.media {
 			return __content;
 		}
 		//0:等比内部填充,(0~1]:限制缩放比，-1:等比外部填充
-		private var __scaleMode:Number = -1;
+		private var __scaleMode:Number = 0;
 
 		public function get scaleMode():Number {
 			return __scaleMode;

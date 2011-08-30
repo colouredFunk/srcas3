@@ -98,24 +98,24 @@ package akdcl.media {
 		//
 		protected function onLoadErrorHandler(_evt:*= null):void {
 			stop();
-			//dispatchEvent(new MediaEvent(MediaEvent.LOAD_ERROR));
+			dispatchEvent(new MediaEvent(MediaEvent.LOAD_ERROR));
 		}
 		protected function onLoadProgressHandler(_evt:*= null):void {
-			//dispatchEvent(new MediaEvent(MediaEvent.LOAD_PROGRESS));
+			dispatchEvent(new MediaEvent(MediaEvent.LOAD_PROGRESS));
 		}
 		protected function onLoadCompleteHandler(_evt:*= null):void {
-			//dispatchEvent(new MediaEvent(MediaEvent.LOAD_COMPLETE));
+			dispatchEvent(new MediaEvent(MediaEvent.LOAD_COMPLETE));
 		}
 		protected function onPlayProgressHander(_evt:*= null):void {
-			//dispatchEvent(new MediaEvent(MediaEvent.PLAY_PROGRESS));
+			dispatchEvent(new MediaEvent(MediaEvent.PLAY_PROGRESS));
 		}
 		protected function onBufferProgressHandler(_evt:*= null):void {
 			setPlayState(PlayState.BUFFER);
-			//dispatchEvent(new MediaEvent(MediaEvent.BUFFER_PROGRESS));
+			dispatchEvent(new MediaEvent(MediaEvent.BUFFER_PROGRESS));
 		}
 		protected function onPlayCompleteHandler(_evt:*= null):void {
 			setPlayState(PlayState.COMPLETE);
-			//dispatchEvent(new MediaEvent(MediaEvent.PLAY_COMPLETE));
+			dispatchEvent(new MediaEvent(MediaEvent.PLAY_COMPLETE));
 		}
 	}
 

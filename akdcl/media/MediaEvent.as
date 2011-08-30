@@ -14,8 +14,8 @@ package akdcl.media {
 	/// @eventType	akdcl.application.player.MediaEvent.STATE_CHANGE
 	[Event(name="stateChange",type="akdcl.application.player.MediaEvent")]
 
-	/// @eventType	akdcl.application.player.MediaEvent.PLAY_ID_CHANGE
-	[Event(name="playIDChange",type="akdcl.application.player.MediaEvent")]
+	/// @eventType	akdcl.application.player.MediaEvent.PLAY_ITEM_CHANGE
+	[Event(name="playItemChange",type="akdcl.application.player.MediaEvent")]
 
 	/// @eventType	akdcl.application.player.MediaEvent.PLAY_PROGRESS
 	[Event(name="playProgress",type="akdcl.application.player.MediaEvent")]
@@ -39,7 +39,7 @@ package akdcl.media {
 		public static const LIST_CHANGE:String = "listChange";
 		public static const VOLUME_CHANGE:String = "volumeChange";
 		public static const STATE_CHANGE:String = "stateChange";
-		public static const PLAY_ID_CHANGE:String = "playIDChange";
+		public static const PLAY_ITEM_CHANGE:String = "playItemChange";
 		public static const PLAY_PROGRESS:String = "playProgress";
 		public static const PLAY_COMPLETE:String = "playComplete";
 		public static const LOAD_ERROR:String = "loadError";
