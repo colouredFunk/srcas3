@@ -93,11 +93,7 @@ package zero.swf.records.clips{
 					ActionsClass=null;
 				}
 			}
-			if(ActionsClass){
-			}else{
-				ActionsClass=ACTIONRECORDs;
-			}
-			Actions=new ActionsClass();
+			Actions=new (ActionsClass||ACTIONRECORDs)();
 			Actions.initByXML(ActionsXML,_initByXMLOptions);
 		}
 		}//end of CONFIG::USE_XML
