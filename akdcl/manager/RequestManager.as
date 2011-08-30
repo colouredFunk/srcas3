@@ -95,9 +95,8 @@ package akdcl.manager {
 			if (_evt is IOErrorEvent){
 				_loader.onErrorHandler(_evt);
 			} else {
-				var _bmd:BitmapData = (_loader.content as Bitmap).bitmapData;
-				if (_bmd){
-					sM.addSource(SourceManager.BITMAPDATA_GROUP, _loader.url, _bmd);
+				if (_loader.content is Bitmap){
+					sM.addSource(SourceManager.BITMAPDATA_GROUP, _loader.url, (_loader.content as Bitmap).bitmapData);
 				}else {
 					//swf
 				}
@@ -169,6 +168,7 @@ package akdcl.manager {
 }
 
 import flash.display.AVM1Movie;
+import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.Loader;
 import flash.events.Event;
@@ -264,7 +264,14 @@ class RequestLoader extends Loader {
 	}
 
 	public function onCompleteHandler():void {
-		var _content:*= content is AVM1Movie?this:content;
+		var _content:*;
+		if (content is AVM1Movie) {
+			_content = this;
+		}else if (content is Bitmap) {
+			_content = (content as Bitmap).bitmapData;
+		}else {
+			_content = content;
+		}
 		for each (var _onComplete:Function in completeHandlers){
 			switch (_onComplete.length){
 				case 0:
