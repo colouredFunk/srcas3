@@ -53,111 +53,136 @@ MORPHLINESTYLE2
 //FillType 			If HasFillFlag = 1, MORPHFILLSTYLE	Fill style.
 
 package zero.swf.records.shapes{
-	import flash.utils.ByteArray;
 	
+	import flash.utils.ByteArray;
 	import zero.BytesAndStr16;
+	
 	public class MORPHLINESTYLE2{
+		
 		public var StartWidth:int;//UI16
 		public var EndWidth:int;//UI16
-		public var StartCapStyle:int;
-		public var JoinStyle:int;
-		public var NoHScaleFlag:Boolean;
-		public var NoVScaleFlag:Boolean;
-		public var PixelHintingFlag:Boolean;
-		public var NoClose:Boolean;
-		public var EndCapStyle:int;
-		public var MiterLimitFactor:int;				//UI16
+		public var StartCapStyle:int;//11000000
+		public var JoinStyle:int;//00110000
+		public var NoHScaleFlag:Boolean;//00000100
+		public var NoVScaleFlag:Boolean;//00000010
+		public var PixelHintingFlag:Boolean;//00000001
+		//public var Reserved:int;//11111000
+		public var NoClose:Boolean;//00000100
+		public var EndCapStyle:int;//00000011
+		public var MiterLimitFactor:int;//UI16
 		public var StartColor:uint;//RGBA
 		public var EndColor:uint;//RGBA
-		public var FillType:FILLSTYLE;
-		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
+		public var FillType:MORPHFILLSTYLE;
+		
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
+			
+			var flags:int;
+			
 			StartWidth=data[offset++]|(data[offset++]<<8);
+			
 			EndWidth=data[offset++]|(data[offset++]<<8);
-			var flags:int=data[offset++];
-			StartCapStyle=(flags<<24)>>>30;					//11000000
-			JoinStyle=(flags<<26)>>>30;						//00110000
-			NoHScaleFlag=((flags&0x04)?true:false);		//00000100
-			NoVScaleFlag=((flags&0x02)?true:false);		//00000010
-			PixelHintingFlag=((flags&0x01)?true:false);	//00000001
-			var flags2:int=data[offset++];
-			//Reserved=(flags2<<24)>>>27;					//11111000
-			NoClose=((flags2&0x04)?true:false);			//00000100
-			EndCapStyle=flags2&0x03;						//00000011
+			
+			flags=data[offset++];
+			StartCapStyle=(flags&0xc0)>>>6;//11000000
+			JoinStyle=(flags&0x30)>>>4;//00110000
+			var HasFillFlag:Boolean=((flags&0x08)?true:false);//00001000
+			NoHScaleFlag=((flags&0x04)?true:false);//00000100
+			NoVScaleFlag=((flags&0x02)?true:false);//00000010
+			PixelHintingFlag=((flags&0x01)?true:false);//00000001
+			
+			flags=data[offset++];
+			//Reserved=flags&0xf8;//11111000
+			NoClose=((flags&0x04)?true:false);//00000100
+			EndCapStyle=flags&0x03;//00000011
 			
 			if(JoinStyle==2){
 				MiterLimitFactor=data[offset++]|(data[offset++]<<8);
 			}
 			
-			if(flags&0x08){//HasFillFlag				//00001000
-				FillType=new FILLSTYLE();
+			if(HasFillFlag){
+				
+				FillType=new MORPHFILLSTYLE();
 				offset=FillType.initByData(data,offset,endOffset,_initByDataOptions);
+				
 			}else{
+				
 				StartColor=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++]|(data[offset++]<<24);
+				
 				EndColor=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++]|(data[offset++]<<24);
+				
 			}
 			
 			return offset;
+			
 		}
-		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toData(_toDataOptions:Object):ByteArray{
+			
+			var flags:int;
+			
 			var data:ByteArray=new ByteArray();
 			
 			data[0]=StartWidth;
 			data[1]=StartWidth>>8;
+			
 			data[2]=EndWidth;
 			data[3]=EndWidth>>8;
 			
-			var flags:int=0;
-			flags|=StartCapStyle<<6;					//11000000
-			flags|=JoinStyle<<4;						//00110000
+			flags=0;
+			flags|=StartCapStyle<<6;//11000000
+			flags|=JoinStyle<<4;//00110000
 			if(FillType){
-				flags|=0x08;							//00001000
-			}	
+				flags|=0x08;//HasFillFlag//00001000
+			}
 			if(NoHScaleFlag){
-				flags|=0x04;							//00000100
+				flags|=0x04;//00000100
 			}
 			if(NoVScaleFlag){
-				flags|=0x02;							//00000010
+				flags|=0x02;//00000010
 			}
 			if(PixelHintingFlag){
-				flags|=0x01;							//00000001
+				flags|=0x01;//00000001
 			}
 			data[4]=flags;
 			
-			var flags2:int=0;
-			//flags2|=Reserved<<3;						//11111000
+			flags=0;
+			//flags|=Reserved;//11111000
 			if(NoClose){
-				flags2|=0x04;							//00000100
+				flags|=0x04;//00000100
 			}
-			flags2|=EndCapStyle;							//00000011
-			data[5]=flags2;
-			
-			var offset:int=6;
+			flags|=EndCapStyle;//00000011
+			data[5]=flags;
 			
 			if(JoinStyle==2){
-				data[offset++]=MiterLimitFactor;
-				data[offset++]=MiterLimitFactor>>8;
+				data[6]=MiterLimitFactor;
+				data[7]=MiterLimitFactor>>8;
 			}
 			
 			if(FillType){
-				data.position=offset;
+				
+				data.position=data.length;
 				data.writeBytes(FillType.toData(_toDataOptions));
+				
 			}else{
-				data[offset++]=StartColor>>16;
-				data[offset++]=StartColor>>8;
-				data[offset++]=StartColor;
-				data[offset++]=StartColor>>24;
-				data[offset++]=EndColor>>16;
-				data[offset++]=EndColor>>8;
-				data[offset++]=EndColor;
-				data[offset++]=EndColor>>24;
+				
+				data[data.length]=StartColor>>16;
+				data[data.length]=StartColor>>8;
+				data[data.length]=StartColor;
+				data[data.length]=StartColor>>24;
+				
+				data[data.length]=EndColor>>16;
+				data[data.length]=EndColor>>8;
+				data[data.length]=EndColor;
+				data[data.length]=EndColor>>24;
+				
 			}
+			
 			return data;
+			
 		}
 		
-		////
 		CONFIG::USE_XML{
-			public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
+			public function toXML(xmlName:String,_toXMLOptions:Object):XML{
+				
 				var xml:XML=<{xmlName} class="zero.swf.records.shapes.MORPHLINESTYLE2"
 					StartWidth={StartWidth}
 					EndWidth={EndWidth}
@@ -169,39 +194,60 @@ package zero.swf.records.shapes{
 					NoClose={NoClose}
 					EndCapStyle={EndCapStyle}
 				/>;
+				
 				if(JoinStyle==2){
 					xml.@MiterLimitFactor=MiterLimitFactor;
 				}
+				
 				if(FillType){
+					
 					xml.appendChild(FillType.toXML("FillType",_toXMLOptions));
+					
 				}else{
+					
 					xml.@StartColor="0x"+BytesAndStr16._16V[(StartColor>>24)&0xff]+BytesAndStr16._16V[(StartColor>>16)&0xff]+BytesAndStr16._16V[(StartColor>>8)&0xff]+BytesAndStr16._16V[StartColor&0xff];
+					
 					xml.@EndColor="0x"+BytesAndStr16._16V[(EndColor>>24)&0xff]+BytesAndStr16._16V[(EndColor>>16)&0xff]+BytesAndStr16._16V[(EndColor>>8)&0xff]+BytesAndStr16._16V[EndColor&0xff];
+					
 				}
+				
 				return xml;
+				
 			}
-			public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
+			public function initByXML(xml:XML,_initByXMLOptions:Object):void{
+				
 				StartWidth=int(xml.@StartWidth.toString());
+				
 				EndWidth=int(xml.@EndWidth.toString());
+				
 				StartCapStyle=int(xml.@StartCapStyle.toString());
 				JoinStyle=int(xml.@JoinStyle.toString());
 				NoHScaleFlag=(xml.@NoHScaleFlag.toString()=="true");
 				NoVScaleFlag=(xml.@NoVScaleFlag.toString()=="true");
 				PixelHintingFlag=(xml.@PixelHintingFlag.toString()=="true");
+				
 				NoClose=(xml.@NoClose.toString()=="true");
 				EndCapStyle=int(xml.@EndCapStyle.toString());
+				
 				if(JoinStyle==2){
 					MiterLimitFactor=int(xml.@MiterLimitFactor.toString());
 				}
+				
 				var FillTypeXML:XML=xml.FillType[0];
 				if(FillTypeXML){
-					FillType=new FILLSTYLE();
+					
+					FillType=new MORPHFILLSTYLE();
 					FillType.initByXML(FillTypeXML,_initByXMLOptions);
+					
 				}else{
+					
 					StartColor=uint(xml.@StartColor.toString());
+					
 					EndColor=uint(xml.@EndColor.toString());
+					
 				}
+				
 			}
-		}//end of CONFIG::USE_XML
+		}
 	}
 }

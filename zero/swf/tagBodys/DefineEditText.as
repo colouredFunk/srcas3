@@ -1,10 +1,11 @@
 /***
 DefineEditText
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
-创建时间：2011年7月5日 13:52:16（代码生成器 V2.0.0 F:/airs/program files2/CodesGenerater/bin-debug/CodesGenerater.swf）
+创建时间：2011年08月27日 11:27:36（代码生成器 V2.0.0 F:/airs/program files2/CodesGenerater2/bin-debug/CodesGenerater2.swf）
 简要说明：这家伙很懒什么都没写。
 用法举例：这家伙还是很懒什么都没写。
 */
+
 //The DefineEditText tag defines a dynamic text object, or text field.
 //A text field is associated with an ActionScript variable name where the contents of the text
 //field are stored. The SWF file can read and write the contents of the variable, which is always
@@ -62,81 +63,88 @@ DefineEditText
 //Leading 			If HasLayout, SI16 			Leading in twips (vertical distance between bottom of descender of one line and top of ascender of the next).
 //VariableName 		STRING 						Name of the variable where the contents of the text field are stored. May be qualified with dot syntax or slash syntax for non-global variables.
 //InitialText 		If HasText STRING 			Text that is initially displayed.
+
 package zero.swf.tagBodys{
-	import zero.swf.records.RECT;
-	import zero.BytesAndStr16;
+	
 	import flash.utils.ByteArray;
-	public class DefineEditText{//implements I_zero_swf_CheckCodesRight{
-		public var id:int;								//UI16
-		public var Bounds:*;
-		public var HasText:int;
-		public var WordWrap:int;
-		public var Multiline:int;
-		public var Password:int;
-		public var ReadOnly:int;
-		public var HasTextColor:int;
-		public var HasMaxLength:int;
-		public var HasFont:int;
-		public var HasFontClass:int;
-		public var AutoSize:int;
-		public var HasLayout:int;
-		public var NoSelect:int;
-		public var Border:int;
-		public var WasStatic:int;
-		public var HTML:int;
-		public var UseOutlines:int;
-		public var FontID:int;							//UI16
-		public var FontClass:String;					//STRING
-		public var FontHeight:int;						//UI16
-		public var TextColor:uint;						//RGBA
-		public var MaxLength:int;						//UI16
-		public var Align:int;							//UI8
-		public var LeftMargin:int;						//UI16
-		public var RightMargin:int;						//UI16
-		public var Indent:int;							//UI16
-		public var Leading:int;							//SI16
-		public var VariableName:String;					//STRING
-		public var InitialText:String;					//STRING
-		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
-			id=data[offset]|(data[offset+1]<<8);
-			offset+=2;
-			Bounds=new (_initByDataOptions&&_initByDataOptions.classes&&_initByDataOptions.classes["zero.swf.records.RECT"]||RECT)();
+	import zero.swf.records.RECT;
+	import zero.swf.records.texts.TEXTLAYOUT;
+	import zero.BytesAndStr16;
+	
+	public class DefineEditText{
+		
+		public var id:int;//UI16
+		public var Bounds:RECT;
+		public var WordWrap:Boolean;//01000000
+		public var Multiline:Boolean;//00100000
+		public var Password:Boolean;//00010000
+		public var ReadOnly:Boolean;//00001000
+		public var HasTextColor:Boolean;//00000100
+		public var AutoSize:Boolean;//01000000
+		public var NoSelect:Boolean;//00010000
+		public var Border:Boolean;//00001000
+		public var WasStatic:Boolean;//00000100
+		public var HTML:Boolean;//00000010
+		public var UseOutlines:Boolean;//00000001
+		public var FontID:int;//UI16
+		public var FontClass:String;//STRING
+		public var FontHeight:int;//UI16
+		public var TextColor:uint;//RGBA
+		public var MaxLength:int;//UI16
+		public var textLayout:TEXTLAYOUT;
+		public var VariableName:String;//STRING
+		public var InitialText:String;//STRING
+		
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
+			
+			var flags:int;
+			var get_str_size:int;
+			
+			id=data[offset++]|(data[offset++]<<8);
+			
+			Bounds=new RECT();
 			offset=Bounds.initByData(data,offset,endOffset,_initByDataOptions);
-			var flags:int=data[offset++];
-			HasText=(flags<<24)>>>31;					//10000000
-			WordWrap=(flags<<25)>>>31;					//01000000
-			Multiline=(flags<<26)>>>31;					//00100000
-			Password=(flags<<27)>>>31;					//00010000
-			ReadOnly=(flags<<28)>>>31;					//00001000
-			HasTextColor=(flags<<29)>>>31;				//00000100
-			HasMaxLength=(flags<<30)>>>31;				//00000010
-			HasFont=flags&0x01;							//00000001
+			
 			flags=data[offset++];
-			HasFontClass=(flags<<24)>>>31;				//10000000
-			AutoSize=(flags<<25)>>>31;					//01000000
-			HasLayout=(flags<<26)>>>31;					//00100000
-			NoSelect=(flags<<27)>>>31;					//00010000
-			Border=(flags<<28)>>>31;					//00001000
-			WasStatic=(flags<<29)>>>31;					//00000100
-			HTML=(flags<<30)>>>31;						//00000010
-			UseOutlines=flags&0x01;						//00000001
+			var HasText:Boolean=((flags&0x80)?true:false);//10000000
+			WordWrap=((flags&0x40)?true:false);//01000000
+			Multiline=((flags&0x20)?true:false);//00100000
+			Password=((flags&0x10)?true:false);//00010000
+			ReadOnly=((flags&0x08)?true:false);//00001000
+			HasTextColor=((flags&0x04)?true:false);//00000100
+			var HasMaxLength:Boolean=((flags&0x02)?true:false);//00000010
+			var HasFont:Boolean=((flags&0x01)?true:false);//00000001
+			
+			flags=data[offset++];
+			var HasFontClass:Boolean=((flags&0x80)?true:false);//10000000
+			AutoSize=((flags&0x40)?true:false);//01000000
+			var HasLayout:Boolean=((flags&0x20)?true:false);//00100000
+			NoSelect=((flags&0x10)?true:false);//00010000
+			Border=((flags&0x08)?true:false);//00001000
+			WasStatic=((flags&0x04)?true:false);//00000100
+			HTML=((flags&0x02)?true:false);//00000010
+			UseOutlines=((flags&0x01)?true:false);//00000001
 			
 			if(HasFont){
 				FontID=data[offset++]|(data[offset++]<<8);
+			}else{
+				FontID=-1;
 			}
 			
 			if(HasFontClass){
-			
-				var get_str_size:int=0;
+				get_str_size=0;
 				while(data[offset+(get_str_size++)]){}
 				data.position=offset;
 				FontClass=data.readUTFBytes(get_str_size);
 				offset+=get_str_size;
+			}else{
+				FontClass=null;
 			}
 			
 			if(HasFont){
 				FontHeight=data[offset++]|(data[offset++]<<8);
+			}else{
+				FontHeight=-1;
 			}
 			
 			if(HasTextColor){
@@ -145,27 +153,15 @@ package zero.swf.tagBodys{
 			
 			if(HasMaxLength){
 				MaxLength=data[offset++]|(data[offset++]<<8);
+			}else{
+				MaxLength=-1;
 			}
 			
 			if(HasLayout){
-				Align=data[offset++];
-			}
-			
-			if(HasLayout){
-				LeftMargin=data[offset++]|(data[offset++]<<8);
-			}
-			
-			if(HasLayout){
-				RightMargin=data[offset++]|(data[offset++]<<8);
-			}
-			
-			if(HasLayout){
-				Indent=data[offset++]|(data[offset++]<<8);
-			}
-			
-			if(HasLayout){
-				Leading=data[offset++]|(data[offset++]<<8);
-				if(Leading&0x00008000){Leading|=0xffff0000}//最高位为1,表示负数
+				textLayout=new TEXTLAYOUT();
+				offset=textLayout.initByData(data,offset,endOffset,_initByDataOptions);
+			}else{
+				textLayout=null;
 			}
 			
 			get_str_size=0;
@@ -175,254 +171,251 @@ package zero.swf.tagBodys{
 			offset+=get_str_size;
 			
 			if(HasText){
-			
 				get_str_size=0;
 				while(data[offset+(get_str_size++)]){}
 				data.position=offset;
 				InitialText=data.readUTFBytes(get_str_size);
 				offset+=get_str_size;
+			}else{
+				InitialText=null;
 			}
+			
 			return offset;
+			
 		}
-		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toData(_toDataOptions:Object):ByteArray{
+			
+			var flags:int;
+			
 			var data:ByteArray=new ByteArray();
+			
 			data[0]=id;
 			data[1]=id>>8;
+			
 			data.position=2;
 			data.writeBytes(Bounds.toData(_toDataOptions));
-			var offset:int=data.length;
-			var flags:int=0;
-			flags|=HasText<<7;							//10000000
-			flags|=WordWrap<<6;							//01000000
-			flags|=Multiline<<5;						//00100000
-			flags|=Password<<4;							//00010000
-			flags|=ReadOnly<<3;							//00001000
-			flags|=HasTextColor<<2;						//00000100
-			flags|=HasMaxLength<<1;						//00000010
-			flags|=HasFont;								//00000001
-			data[offset]=flags;
 			
 			flags=0;
-			flags|=HasFontClass<<7;						//10000000
-			flags|=AutoSize<<6;							//01000000
-			flags|=HasLayout<<5;						//00100000
-			flags|=NoSelect<<4;							//00010000
-			flags|=Border<<3;							//00001000
-			flags|=WasStatic<<2;						//00000100
-			flags|=HTML<<1;								//00000010
-			flags|=UseOutlines;							//00000001
-			data[offset+1]=flags;
+			if(InitialText is String){
+				flags|=0x80;//HasText//10000000
+			}
+			if(WordWrap){
+				flags|=0x40;//01000000
+			}
+			if(Multiline){
+				flags|=0x20;//00100000
+			}
+			if(Password){
+				flags|=0x10;//00010000
+			}
+			if(ReadOnly){
+				flags|=0x08;//00001000
+			}
+			if(HasTextColor){
+				flags|=0x04;//00000100
+			}
+			if(MaxLength>-1){
+				flags|=0x02;//HasMaxLength//00000010
+			}
+			if(FontID>-1){
+				flags|=0x01;//HasFont//00000001
+			}
+			data[data.length]=flags;
 			
-			offset+=2;
-			if(HasFont){
-				data[offset++]=FontID;
-				data[offset++]=FontID>>8;
+			flags=0;
+			if(FontClass is String){
+				flags|=0x80;//HasFontClass//10000000
+			}
+			if(AutoSize){
+				flags|=0x40;//01000000
+			}
+			if(textLayout){
+				flags|=0x20;//HasLayout//00100000
+			}
+			if(NoSelect){
+				flags|=0x10;//00010000
+			}
+			if(Border){
+				flags|=0x08;//00001000
+			}
+			if(WasStatic){
+				flags|=0x04;//00000100
+			}
+			if(HTML){
+				flags|=0x02;//00000010
+			}
+			if(UseOutlines){
+				flags|=0x01;//00000001
+			}
+			data[data.length]=flags;
+			
+			if(FontID>-1){
+				data[data.length]=FontID;
+				data[data.length]=FontID>>8;
 			}
 			
-			if(HasFontClass){
-				data.position=offset;
+			if(FontClass is String){
+				data.position=data.length;
 				data.writeUTFBytes(FontClass+"\x00");
-				offset=data.length;
 			}
 			
-			if(HasFont){
-				data[offset++]=FontHeight;
-				data[offset++]=FontHeight>>8;
+			if(FontHeight>-1){
+				data[data.length]=FontHeight;
+				data[data.length]=FontHeight>>8;
 			}
 			
 			if(HasTextColor){
-				data[offset++]=TextColor>>16;
-				data[offset++]=TextColor>>8;
-				data[offset++]=TextColor;
-				data[offset++]=TextColor>>24;
+				data[data.length]=TextColor>>16;
+				data[data.length]=TextColor>>8;
+				data[data.length]=TextColor;
+				data[data.length]=TextColor>>24;
 			}
 			
-			if(HasMaxLength){
-				data[offset++]=MaxLength;
-				data[offset++]=MaxLength>>8;
+			if(MaxLength>-1){
+				data[data.length]=MaxLength;
+				data[data.length]=MaxLength>>8;
 			}
 			
-			if(HasLayout){
-				data[offset++]=Align;
+			if(textLayout){
+				data.position=data.length;
+				data.writeBytes(textLayout.toData(_toDataOptions));
 			}
 			
-			if(HasLayout){
-				data[offset++]=LeftMargin;
-				data[offset++]=LeftMargin>>8;
-			}
-			
-			if(HasLayout){
-				data[offset++]=RightMargin;
-				data[offset++]=RightMargin>>8;
-			}
-			
-			if(HasLayout){
-				data[offset++]=Indent;
-				data[offset++]=Indent>>8;
-			}
-			
-			if(HasLayout){
-				data[offset++]=Leading;
-				data[offset++]=Leading>>8;
-			}
-			data.position=offset;
+			data.position=data.length;
 			data.writeUTFBytes(VariableName+"\x00");
-			offset=data.length;
-			if(HasText){
-				data.position=offset;
+			
+			if(InitialText is String){
 				data.writeUTFBytes(InitialText+"\x00");
-				offset=data.length;
 			}
+			
 			return data;
+			
 		}
-
-		////
+		
 		CONFIG::USE_XML{
-		public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
-			var xml:XML=<{xmlName} class="zero.swf.tagBodys.DefineEditText"
-				id={id}
-				HasText={HasText}
-				WordWrap={WordWrap}
-				Multiline={Multiline}
-				Password={Password}
-				ReadOnly={ReadOnly}
-				HasTextColor={HasTextColor}
-				HasMaxLength={HasMaxLength}
-				HasFont={HasFont}
-				HasFontClass={HasFontClass}
-				AutoSize={AutoSize}
-				HasLayout={HasLayout}
-				NoSelect={NoSelect}
-				Border={Border}
-				WasStatic={WasStatic}
-				HTML={HTML}
-				UseOutlines={UseOutlines}
-				FontID={FontID}
-				FontClass={FontClass}
-				FontHeight={FontHeight}
-				TextColor={"0x"+BytesAndStr16._16V[(TextColor>>24)&0xff]+BytesAndStr16._16V[(TextColor>>16)&0xff]+BytesAndStr16._16V[(TextColor>>8)&0xff]+BytesAndStr16._16V[TextColor&0xff]}
-				MaxLength={MaxLength}
-				Align={Align}
-				LeftMargin={LeftMargin}
-				RightMargin={RightMargin}
-				Indent={Indent}
-				Leading={Leading}
-				VariableName={VariableName}
-				InitialText={InitialText}
-			/>;
-			xml.appendChild(Bounds.toXML("Bounds",_toXMLOptions));
-			if(HasFont){
+			public function toXML(xmlName:String,_toXMLOptions:Object):XML{
 				
-			}else{
-				delete xml.@FontID;
-			}
-			if(HasFontClass){
+				var xml:XML=<{xmlName} class="zero.swf.tagBodys.DefineEditText"
+					id={id}
+					WordWrap={WordWrap}
+					Multiline={Multiline}
+					Password={Password}
+					ReadOnly={ReadOnly}
+					AutoSize={AutoSize}
+					NoSelect={NoSelect}
+					Border={Border}
+					WasStatic={WasStatic}
+					HTML={HTML}
+					UseOutlines={UseOutlines}
+					VariableName={VariableName}
+				/>;
 				
-			}else{
-				delete xml.@FontClass;
-			}
-			if(HasFont){
+				xml.appendChild(Bounds.toXML("Bounds",_toXMLOptions));
 				
-			}else{
-				delete xml.@FontHeight;
-			}
-			if(HasTextColor){
+				if(FontID>-1){
+					xml.@FontID=FontID;
+				}
 				
-			}else{
-				delete xml.@TextColor;
-			}
-			if(HasMaxLength){
+				if(FontClass is String){
+					xml.@FontClass=FontClass;
+				}
 				
-			}else{
-				delete xml.@MaxLength;
-			}
-			if(HasLayout){
+				if(FontHeight>-1){
+					xml.@FontHeight=FontHeight;
+				}
 				
-			}else{
-				delete xml.@Align;
-			}
-			if(HasLayout){
+				if(HasTextColor){
+					xml.@TextColor="0x"+BytesAndStr16._16V[(TextColor>>24)&0xff]+BytesAndStr16._16V[(TextColor>>16)&0xff]+BytesAndStr16._16V[(TextColor>>8)&0xff]+BytesAndStr16._16V[TextColor&0xff];
+				}
 				
-			}else{
-				delete xml.@LeftMargin;
-			}
-			if(HasLayout){
+				if(MaxLength>-1){
+					xml.@MaxLength=MaxLength;
+				}
 				
-			}else{
-				delete xml.@RightMargin;
-			}
-			if(HasLayout){
+				if(textLayout){
+					xml.appendChild(textLayout.toXML("textLayout",_toXMLOptions));
+				}
 				
-			}else{
-				delete xml.@Indent;
-			}
-			if(HasLayout){
+				if(InitialText is String){
+					xml.@InitialText=InitialText;
+				}
 				
-			}else{
-				delete xml.@Leading;
-			}
-			if(HasText){
+				return xml;
 				
-			}else{
-				delete xml.@InitialText;
 			}
-			return xml;
-		}
-		public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
-			id=int(xml.@id.toString());
-			Bounds=new (_initByXMLOptions&&_initByXMLOptions.customClasses&&_initByXMLOptions.customClasses[xml.Bounds[0]["@class"].toString()]||RECT)();
-			Bounds.initByXML(xml.Bounds[0],_initByXMLOptions);
-			HasText=int(xml.@HasText.toString());
-			WordWrap=int(xml.@WordWrap.toString());
-			Multiline=int(xml.@Multiline.toString());
-			Password=int(xml.@Password.toString());
-			ReadOnly=int(xml.@ReadOnly.toString());
-			HasTextColor=int(xml.@HasTextColor.toString());
-			HasMaxLength=int(xml.@HasMaxLength.toString());
-			HasFont=int(xml.@HasFont.toString());
-			HasFontClass=int(xml.@HasFontClass.toString());
-			AutoSize=int(xml.@AutoSize.toString());
-			HasLayout=int(xml.@HasLayout.toString());
-			NoSelect=int(xml.@NoSelect.toString());
-			Border=int(xml.@Border.toString());
-			WasStatic=int(xml.@WasStatic.toString());
-			HTML=int(xml.@HTML.toString());
-			UseOutlines=int(xml.@UseOutlines.toString());
-			if(HasFont){
-				FontID=int(xml.@FontID.toString());
-			}
-			if(HasFontClass){
-				FontClass=xml.@FontClass.toString();
-			}
-			if(HasFont){
-				FontHeight=int(xml.@FontHeight.toString());
-			}
-			if(HasTextColor){
-				TextColor=uint(xml.@TextColor.toString());
-			}
-			if(HasMaxLength){
-				MaxLength=int(xml.@MaxLength.toString());
-			}
-			if(HasLayout){
-				Align=int(xml.@Align.toString());
-			}
-			if(HasLayout){
-				LeftMargin=int(xml.@LeftMargin.toString());
-			}
-			if(HasLayout){
-				RightMargin=int(xml.@RightMargin.toString());
-			}
-			if(HasLayout){
-				Indent=int(xml.@Indent.toString());
-			}
-			if(HasLayout){
-				Leading=int(xml.@Leading.toString());
-			}
-			VariableName=xml.@VariableName.toString();
-			if(HasText){
-				InitialText=xml.@InitialText.toString();
+			public function initByXML(xml:XML,_initByXMLOptions:Object):void{
+				
+				id=int(xml.@id.toString());
+				
+				Bounds=new RECT();
+				Bounds.initByXML(xml.Bounds[0],_initByXMLOptions);
+				
+				WordWrap=(xml.@WordWrap.toString()=="true");
+				Multiline=(xml.@Multiline.toString()=="true");
+				Password=(xml.@Password.toString()=="true");
+				ReadOnly=(xml.@ReadOnly.toString()=="true");
+				
+				AutoSize=(xml.@AutoSize.toString()=="true");
+				NoSelect=(xml.@NoSelect.toString()=="true");
+				Border=(xml.@Border.toString()=="true");
+				WasStatic=(xml.@WasStatic.toString()=="true");
+				HTML=(xml.@HTML.toString()=="true");
+				UseOutlines=(xml.@UseOutlines.toString()=="true");
+				
+				var FontIDXML:XML=xml.@FontID[0];
+				if(FontIDXML){
+					FontID=int(FontIDXML.toString());
+				}else{
+					FontID=-1;
+				}
+				
+				var FontClassXML:XML=xml.@FontClass[0];
+				if(FontClassXML){
+					FontClass=FontClassXML.toString();
+				}else{
+					FontClass=null;
+				}
+				
+				var FontHeightXML:XML=xml.@FontHeight[0];
+				if(FontHeightXML){
+					FontHeight=int(FontHeightXML.toString());
+				}else{
+					FontHeight=-1;
+				}
+				
+				var TextColorXML:XML=xml.@TextColor[0];
+				if(TextColorXML){
+					HasTextColor=true;
+					TextColor=uint(TextColorXML.toString());
+				}else{
+					HasTextColor=false;
+				}
+				
+				var MaxLengthXML:XML=xml.@MaxLength[0];
+				if(MaxLengthXML){
+					MaxLength=int(MaxLengthXML.toString());
+				}else{
+					MaxLength=-1;
+				}
+				
+				var textLayoutXML:XML=xml.textLayout[0];
+				if(textLayoutXML){
+					textLayout=new TEXTLAYOUT();
+					textLayout.initByXML(textLayoutXML,_initByXMLOptions);
+				}else{
+					textLayout=null;
+				}
+				
+				VariableName=xml.@VariableName.toString();
+				
+				var InitialTextXML:XML=xml.@InitialText[0];
+				if(InitialTextXML){
+					InitialText=InitialTextXML.toString();
+				}else{
+					InitialText=null;
+				}
+				
 			}
 		}
-		}//end of CONFIG::USE_XML
 	}
 }
