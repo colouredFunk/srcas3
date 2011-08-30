@@ -12,10 +12,27 @@ package zero.swf{
 	import zero.swf.records.shapes.*;
 	import zero.swf.records.texts.*;
 	import zero.swf.tagBodys.*;
-	
 	import zero.utils.disorder;
 
 	public class IDManager{
+		public static function getAvalibleDefineObjIdV(swf:SWF):Vector.<int>{
+			var arr:Array=new Array();
+			product(swf.tagV,arr);
+			
+			var mark:Array=new Array();
+			for each(var subArr:Array in arr){
+				mark[subArr[2]]=true;
+			}
+			
+			var avalibleDefineObjIdV:Vector.<int>=new Vector.<int>();
+			for(var id:int=1;id<0x7fff;id++){
+				if(mark[id]){
+				}else{
+					avalibleDefineObjIdV.push(id);
+				}
+			}
+			return avalibleDefineObjIdV;
+		}
 		public static function disorderIds(swf:SWF):void{
 			var arr:Array=new Array();
 			product(swf.tagV,arr);
@@ -101,6 +118,9 @@ package zero.swf{
 		private static function product(tagV:Vector.<Tag>,arr:Array):void{
 			
 			var textRecord:TEXTRECORD;
+			var i:int;
+			var Tag_:int;
+			var MorphFillStyle:MORPHFILLSTYLE;
 			
 			for each(var tag:Tag in tagV){
 				switch(tag.type){
@@ -214,23 +234,51 @@ package zero.swf{
 						var defineButton2:DefineButton2=tag.getBody(DefineButton2,null);
 						arr.push([defineButton2,"id",defineButton2.id]);
 						for each(var Character:BUTTONRECORD in defineButton2.CharacterV){
-							Character.CharacterID
+							arr.push([Character,"CharacterId",Character.CharacterId]);
 						}
 					break;
-					//case TagTypes.DefineBitsJPEG3://0x23
-					//case TagTypes.DefineBitsLossless2://0x24
-					//case TagTypes.DefineEditText://0x25
+					case TagTypes.DefineBitsJPEG3://0x23
+						arr.push([tag,"UI16Id",tag.UI16Id]);
+					break;
+					case TagTypes.DefineBitsLossless2://0x24
+						arr.push([tag,"UI16Id",tag.UI16Id]);
+					break;
+					case TagTypes.DefineEditText://0x25
+						var defineEditText:DefineEditText=tag.getBody(DefineEditText,null);
+						arr.push([defineEditText,"id",defineEditText.id]);
+						if(defineEditText.FontID>0){
+							arr.push([defineEditText,"FontID",defineEditText.FontID]);
+						}
+					break;
 					////0x26
-					//case TagTypes.DefineSprite://0x27
+					case TagTypes.DefineSprite://0x27
+						var defineSprite:DefineSprite=tag.getBody(DefineSprite,null);
+						arr.push([defineSprite,"id",defineSprite.id]);
+						product(defineSprite.tagV,arr);
+					break;
 					////0x28
 					//case TagTypes.ProductInfo://0x29
 					////0x2a
 					//case TagTypes.FrameLabel_://0x2b
 					////0x2c
 					//case TagTypes.SoundStreamHead2://0x2d
-					//case TagTypes.DefineMorphShape://0x2e
+					case TagTypes.DefineMorphShape://0x2e
+						var defineMorphShape:DefineMorphShape=tag.getBody(DefineMorphShape,null);
+						arr.push([defineMorphShape,"id",defineMorphShape.id]);
+						for each(MorphFillStyle in defineMorphShape.MorphFillStyleV){
+							if(MorphFillStyle.BitmapId){
+								if(MorphFillStyle.BitmapId==65535){
+									//trace("奇怪的 BitmapId："+MorphFillStyle.BitmapId);
+								}else{
+									arr.push([MorphFillStyle,"BitmapId",MorphFillStyle.BitmapId]);
+								}
+							}
+						}
+					break;
 					////0x2f
-					//case TagTypes.DefineFont2://0x30
+					case TagTypes.DefineFont2://0x30
+						arr.push([tag,"UI16Id",tag.UI16Id]);
+					break;
 					////0x31
 					////0x32
 					////0x33
@@ -238,13 +286,42 @@ package zero.swf{
 					////0x35
 					////0x36
 					////0x37
-					//case TagTypes.ExportAssets://0x38
-					//case TagTypes.ImportAssets://0x39
+					case TagTypes.ExportAssets://0x38
+						var exportAssets:ExportAssets=tag.getBody(ExportAssets,null);
+						i=-1;
+						for each(Tag_ in exportAssets.TagV){
+							i++;
+							if(Tag_>0){
+								arr.push([exportAssets.TagV,i,Tag_]);
+							}
+						}
+					break;
+					case TagTypes.ImportAssets://0x39
+						var importAssets:ImportAssets=tag.getBody(ImportAssets,null);
+						i=-1;
+						for each(Tag_ in importAssets.TagV){
+							i++;
+							if(Tag_>0){
+								arr.push([importAssets.TagV,i,Tag_]);
+							}
+						}
+					break;
 					//case TagTypes.EnableDebugger://0x3a
-					//case TagTypes.DoInitAction://0x3b
-					//case TagTypes.DefineVideoStream://0x3c
-					//case TagTypes.VideoFrame://0x3d
-					//case TagTypes.DefineFontInfo2://0x3e
+					case TagTypes.DoInitAction://0x3b
+						var doInitAction:DoInitAction=tag.getBody(DoInitAction,null);
+						arr.push([doInitAction,"SpriteID",doInitAction.SpriteID]);
+					break;
+					case TagTypes.DefineVideoStream://0x3c
+						arr.push([tag,"UI16Id",tag.UI16Id]);
+					break;
+					case TagTypes.VideoFrame://0x3d
+						var videoFrame:VideoFrame=tag.getBody(VideoFrame,null);
+						arr.push([videoFrame,"StreamID",videoFrame.StreamID]);
+					break;
+					case TagTypes.DefineFontInfo2://0x3e
+						var defineFontInfo2:DefineFontInfo2=tag.getBody(DefineFontInfo2,null);
+						arr.push([defineFontInfo2,"FontID",defineFontInfo2.FontID]);
+					break;
 					//case TagTypes.DebugID://0x3f
 					//case TagTypes.EnableDebugger2://0x40
 					//case TagTypes.ScriptLimits://0x41
@@ -252,28 +329,101 @@ package zero.swf{
 					////0x43
 					////0x44
 					//case TagTypes.FileAttributes://0x45
-					//case TagTypes.PlaceObject3://0x46
-					//case TagTypes.ImportAssets2://0x47
+					case TagTypes.PlaceObject3://0x46
+						var placeObject3:PlaceObject3=tag.getBody(PlaceObject3,null);
+						if(placeObject3.CharacterId>0){
+							arr.push([placeObject3,"CharacterId",placeObject3.CharacterId]);
+						}
+					break;
+					case TagTypes.ImportAssets2://0x47
+						var importAssets2:ImportAssets2=tag.getBody(ImportAssets2,null);
+						i=-1;
+						for each(Tag_ in importAssets2.TagV){
+							i++;
+							if(Tag_>0){
+								arr.push([importAssets2.TagV,i,Tag_]);
+							}
+						}
+					break;
 					//case TagTypes.DoABCWithoutFlagsAndName://0x48
-					//case TagTypes.DefineFontAlignZones://0x49
-					//case TagTypes.CSMTextSettings://0x4a
-					//case TagTypes.DefineFont3://0x4b
-					//case TagTypes.SymbolClass://0x4c
+					case TagTypes.DefineFontAlignZones://0x49
+						var defineFontAlignZones:DefineFontAlignZones=tag.getBody(DefineFontAlignZones,null);
+						arr.push([defineFontAlignZones,"FontID",defineFontAlignZones.FontID]);
+					break;
+					case TagTypes.CSMTextSettings://0x4a
+						var csmTextSettings:CSMTextSettings=tag.getBody(CSMTextSettings,null);
+						arr.push([csmTextSettings,"TextID",csmTextSettings.TextID]);
+					break;
+					case TagTypes.DefineFont3://0x4b
+						arr.push([tag,"UI16Id",tag.UI16Id]);
+					break;
+					case TagTypes.SymbolClass://0x4c
+						var symbolClass:SymbolClass=tag.getBody(SymbolClass,null);
+						i=-1;
+						for each(Tag_ in symbolClass.TagV){
+							i++;
+							if(Tag_>0){
+								arr.push([symbolClass.TagV,i,Tag_]);
+							}
+						}
+					break;
 					//case TagTypes.Metadata://0x4d
-					//case TagTypes.DefineScalingGrid://0x4e
+					case TagTypes.DefineScalingGrid://0x4e
+						var defineScalingGrid:DefineScalingGrid=tag.getBody(DefineScalingGrid,null);
+						arr.push([defineScalingGrid,"CharacterId",defineScalingGrid.CharacterId]);
+					break;
 					////0x4f
 					////0x50
 					////0x51
 					//case TagTypes.DoABC://0x52
-					//case TagTypes.DefineShape4://0x53
-					//case TagTypes.DefineMorphShape2://0x54
+					case TagTypes.DefineShape4://0x53
+						var defineShape4:DefineShape4=tag.getBody(DefineShape4,null);
+						arr.push([defineShape4,"id",defineShape4.id]);
+						productShapes(defineShape4.Shapes,arr);
+					break;
+					case TagTypes.DefineMorphShape2://0x54
+						var defineMorphShape2:DefineMorphShape2=tag.getBody(DefineMorphShape2,null);
+						arr.push([defineMorphShape2,"id",defineMorphShape2.id]);
+						for each(MorphFillStyle in defineMorphShape2.MorphFillStyleV){
+							if(MorphFillStyle.BitmapId){
+								if(MorphFillStyle.BitmapId==65535){
+									//trace("奇怪的 BitmapId："+MorphFillStyle.BitmapId);
+								}else{
+									arr.push([MorphFillStyle,"BitmapId",MorphFillStyle.BitmapId]);
+								}
+							}
+						}
+						for each(var MorphLineStyle2:MORPHLINESTYLE2 in defineMorphShape2.MorphLineStyle2V){
+							if(MorphLineStyle2.FillType){
+								if(MorphLineStyle2.FillType.BitmapId){
+									if(MorphLineStyle2.FillType.BitmapId==65535){
+										//trace("奇怪的 BitmapId："+MorphLineStyle2.FillType.BitmapId);
+									}else{
+										arr.push([MorphLineStyle2.FillType,"BitmapId",MorphLineStyle2.FillType.BitmapId]);
+									}
+								}
+							}
+						}
+					break;
 					////0x55
 					//case TagTypes.DefineSceneAndFrameLabelData://0x56
-					//case TagTypes.DefineBinaryData://0x57
-					//case TagTypes.DefineFontName://0x58
-					//case TagTypes.StartSound2://0x59
-					//case TagTypes.DefineBitsJPEG4://0x5a
-					//case TagTypes.DefineFont4://0x5b
+					case TagTypes.DefineBinaryData://0x57
+						arr.push([tag,"UI16Id",tag.UI16Id]);
+					break;
+					case TagTypes.DefineFontName://0x58
+						var defineFontName:DefineFontName=tag.getBody(DefineFontName,null);
+						arr.push([defineFontName,"FontID",defineFontName.FontID]);
+					break;
+					case TagTypes.StartSound2://0x59
+						var startSound2:StartSound2=tag.getBody(StartSound2,null);
+						arr.push([startSound2,"SoundId",startSound2.SoundId]);
+					break;
+					case TagTypes.DefineBitsJPEG4://0x5a
+						arr.push([tag,"UI16Id",tag.UI16Id]);
+					break;
+					case TagTypes.DefineFont4://0x5b
+						arr.push([tag,"UI16Id",tag.UI16Id]);
+					break;
 					////0x5c
 					////0x5d
 					////0x5e
@@ -438,156 +588,6 @@ package zero.swf{
 					////0xfd
 					////0xfe
 					////0xff
-					/*
-					case TagTypes.DefineSprite://0x27
-						arr.push([tag,"UI16Id",tag.UI16Id]);
-						product(tag.getBody(DefineSprite,null).tagV,arr);
-					break;
-					case TagTypes.DefineShape://0x02
-						arr.push([tag,"UI16Id",tag.UI16Id]);
-						productShapes(tag.getBody(DefineShape,null).Shapes,arr);
-					break;
-					case TagTypes.DefineShape2://0x16
-						arr.push([tag,"UI16Id",tag.UI16Id]);
-						productShapes(tag.getBody(DefineShape2,null).Shapes,arr);
-					break;
-					case TagTypes.DefineShape3://0x20
-						arr.push([tag,"UI16Id",tag.UI16Id]);
-						productShapes(tag.getBody(DefineShape3,null).Shapes,arr);
-					break;
-					case TagTypes.DefineShape4://0x53
-						arr.push([tag,"UI16Id",tag.UI16Id]);
-						productShapes(tag.getBody(DefineShape4,null).Shapes,arr);
-					break;
-					case TagTypes.PlaceObject://0x04
-						var placeObject:PlaceObject=tag.getBody(PlaceObject,null);
-						arr.push([placeObject,"CharacterId",placeObject.CharacterId]);
-					break;
-					case TagTypes.PlaceObject2://0x1a
-						var placeObject2:PlaceObject2=tag.getBody(PlaceObject2,null);
-						if(placeObject2.CharacterId>0){
-							arr.push([placeObject2,"CharacterId",placeObject2.CharacterId]);
-						}
-					break;
-					case TagTypes.PlaceObject3://0x46
-						var placeObject3:PlaceObject3=tag.getBody(PlaceObject3,null);
-						if(placeObject3.CharacterId>0){
-							arr.push([placeObject3,"CharacterId",placeObject3.CharacterId]);
-						}
-					break;
-					case TagTypes.RemoveObject://0x05
-						var removeObject:RemoveObject=tag.getBody(RemoveObject,null);
-						arr.push([removeObject,"CharacterId",removeObject.CharacterId]);
-					break;
-					case TagTypes.DefineBits://0x06
-					case TagTypes.DefineBitsJPEG2://0x15
-					case TagTypes.DefineBitsJPEG3://0x23
-					case TagTypes.DefineBitsJPEG4://0x5a
-					case TagTypes.DefineBitsLossless://0x14
-					case TagTypes.DefineBitsLossless2://0x24
-					case TagTypes.DefineFont://0x0a
-					case TagTypes.DefineFont2://0x30
-					case TagTypes.DefineFont3://0x4b
-					case TagTypes.DefineFont4://0x5b
-					case TagTypes.DefineFontInfo://0x0d
-					case TagTypes.DefineFontInfo2://0x3e
-					case TagTypes.DefineFontName://0x58
-					case TagTypes.DefineFontAlignZones://0x49
-					case TagTypes.CSMTextSettings://0x4a
-					case TagTypes.DefineSound://0x0e
-					case TagTypes.StartSound://0x0f
-					case TagTypes.DefineButtonCxform://0x17
-					case TagTypes.DefineText2://0x21
-					case TagTypes.DefineButton2://0x22
-					case TagTypes.DefineEditText://0x25
-					case TagTypes.DefineMorphShape://0x2e
-					case TagTypes.StartSound2://0x59
-					case TagTypes.DefineBinaryData://0x57
-					case TagTypes.DefineMorphShape2://0x54
-						arr.push([tag,"UI16Id",tag.UI16Id]);
-					break;
-					case TagTypes.DefineButton://0x07
-						throw new Error("不支持 DefineButton");
-					break;
-					case TagTypes.DefineText://0x0b
-						arr.push([tag,"UI16Id",tag.UI16Id]);
-						var defineText:DefineText=tag.getBody(DefineText,null);
-						for each(var textRecord:TEXTRECORD in defineText.TextRecordV){
-							arr.push([textRecord,"FontID",textRecord.FontID]);
-						}
-					break;
-					case TagTypes.DefineButtonSound://0x11
-						arr.push([tag,"UI16Id",tag.UI16Id]);
-						var defineButtonSound:DefineButtonSound=tag.getBody(DefineButtonSound,null);
-						if(defineButtonSound.ButtonSoundChar0>0){
-							arr.push([defineButtonSound,"ButtonSoundChar0",defineButtonSound.ButtonSoundChar0]);
-						}
-						if(defineButtonSound.ButtonSoundChar1>0){
-							arr.push([defineButtonSound,"ButtonSoundChar1",defineButtonSound.ButtonSoundChar1]);
-						}
-						if(defineButtonSound.ButtonSoundChar2>0){
-							arr.push([defineButtonSound,"ButtonSoundChar2",defineButtonSound.ButtonSoundChar2]);
-						}
-						if(defineButtonSound.ButtonSoundChar3>0){
-							arr.push([defineButtonSound,"ButtonSoundChar3",defineButtonSound.ButtonSoundChar3]);
-						}
-					break;
-					//zase TagTypes.End://0x00
-					//case TagTypes.ShowFrame://0x01
-					//case TagTypes.JPEGTables://0x08
-					//case TagTypes.SetBackgroundColor://0x09
-					//case TagTypes.DoAction://0x0c
-					//0x10
-					//case TagTypes.SoundStreamHead://0x12
-					//case TagTypes.SoundStreamBlock://0x13
-					//case TagTypes.Protect://0x18
-					//0x19
-					//0x1b
-					//case TagTypes.RemoveObject2://0x1c
-					//0x1d
-					//0x1e
-					//0x1f
-					//0x26
-					//0x28
-					//case TagTypes.ProductInfo://0x29
-					//0x2a
-					//case TagTypes.FrameLabel_://0x2b
-					//0x2c
-					//case TagTypes.SoundStreamHead2://0x2d
-					//0x2f
-					//0x31
-					//0x32
-					//0x33
-					//0x34
-					//0x35
-					//0x36
-					//0x37
-					case TagTypes.ExportAssets://0x38
-					case TagTypes.ImportAssets://0x39
-					//case TagTypes.EnableDebugger://0x3a
-					case TagTypes.DoInitAction://0x3b
-					case TagTypes.DefineVideoStream://0x3c
-					case TagTypes.VideoFrame://0x3d
-					case TagTypes.DebugID://0x3f
-					case TagTypes.EnableDebugger2://0x40
-					case TagTypes.ScriptLimits://0x41
-					case TagTypes.SetTabIndex://0x42
-					//0x43
-					//0x44
-					case TagTypes.FileAttributes://0x45
-					case TagTypes.ImportAssets2://0x47
-					//case TagTypes.DoABCWithoutFlagsAndName://0x48
-					case TagTypes.SymbolClass://0x4c
-					case TagTypes.Metadata://0x4d
-					case TagTypes.DefineScalingGrid://0x4e
-					//0x4f
-					//0x50
-					//0x51
-					//case TagTypes.DoABC://0x52
-					//0x55
-					//case TagTypes.DefineSceneAndFrameLabelData://0x56
-					break;
-					*/
 				}
 			}
 		}

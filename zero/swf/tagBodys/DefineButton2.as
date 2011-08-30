@@ -31,7 +31,7 @@ package zero.swf.tagBodys{
 	
 	import flash.utils.ByteArray;
 	import zero.swf.records.buttons.BUTTONRECORD;
-	import zero.swf.records.buttons.BUTTONCONDACTIONs;
+	import zero.swf.BytesData;
 	
 	public class DefineButton2{
 		
@@ -39,7 +39,7 @@ package zero.swf.tagBodys{
 		//public var Reserved:int;//11111110
 		public var TrackAsMenu:Boolean;//00000001
 		public var CharacterV:Vector.<BUTTONRECORD>;
-		public var ButtonCondActions:BUTTONCONDACTIONs;
+		public var ButtonCondActions:*;
 		
 		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
 			
@@ -67,7 +67,17 @@ package zero.swf.tagBodys{
 			offset++;
 			
 			if(ActionOffset&&(offset<endOffset)){
-				ButtonCondActions=new BUTTONCONDACTIONs();
+				var ButtonCondActionsClass:Class;
+				if(_initByDataOptions){
+					if(_initByDataOptions.classes){
+						ButtonCondActionsClass=_initByDataOptions.classes["zero.swf.records.buttons.BUTTONCONDACTIONs"];
+					}
+					if(ButtonCondActionsClass){
+					}else{
+						ButtonCondActionsClass=_initByDataOptions.ButtonCondActionsClass;
+					}
+				}
+				ButtonCondActions=new (ButtonCondActionsClass||BytesData)();
 				offset=ButtonCondActions.initByData(data,offset,endOffset,_initByDataOptions);
 			}else{
 				ButtonCondActions=null;
@@ -164,7 +174,21 @@ package zero.swf.tagBodys{
 				
 				var ButtonCondActionsXML:XML=xml.ButtonCondActions[0];
 				if(ButtonCondActionsXML){
-					ButtonCondActions=new BUTTONCONDACTIONs();
+					var classStr:String=ButtonCondActionsXML["@class"].toString();
+					var ButtonCondActionsClass:Class=null;
+					if(_initByXMLOptions&&_initByXMLOptions.customClasses){
+						ButtonCondActionsClass=_initByXMLOptions.customClasses[classStr];
+					}
+					if(ButtonCondActionsClass){
+					}else{
+						try{
+							import flash.utils.getDefinitionByName;
+							ButtonCondActionsClass=getDefinitionByName(classStr) as Class;
+						}catch(e:Error){
+							ButtonCondActionsClass=null;
+						}
+					}
+					ButtonCondActions=new (ButtonCondActionsClass||BytesData)();
 					ButtonCondActions.initByXML(ButtonCondActionsXML,_initByXMLOptions);
 				}else{
 					ButtonCondActions=null;

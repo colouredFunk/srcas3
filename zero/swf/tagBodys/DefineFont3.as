@@ -119,7 +119,7 @@ package zero.swf.tagBodys{
 				
 			}
 			
-			if(FontFlagsHasLayout||offset<endOffset){
+			if(FontFlagsHasLayout||(offset<endOffset)){
 				if(_initByDataOptions){
 				}else{
 					_initByDataOptions=new Object();

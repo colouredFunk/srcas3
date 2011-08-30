@@ -40,7 +40,7 @@ package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
 	import zero.swf.records.MATRIX;
 	import zero.swf.records.CXFORMWITHALPHA;
-	import zero.swf.records.clips.CLIPACTIONs;
+	import zero.swf.BytesData;
 	
 	public class PlaceObject2{
 		
@@ -52,7 +52,7 @@ package zero.swf.tagBodys{
 		public var Ratio:int;//UI16
 		public var Name:String;//STRING
 		public var ClipDepth:int;//UI16
-		public var ClipActions:CLIPACTIONs;
+		public var ClipActions:*;
 		
 		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
 			
@@ -114,7 +114,17 @@ package zero.swf.tagBodys{
 			}
 			
 			if(PlaceFlagHasClipActions){
-				ClipActions=new CLIPACTIONs();
+				var ClipActionsClass:Class;
+				if(_initByDataOptions){
+					if(_initByDataOptions.classes){
+						ClipActionsClass=_initByDataOptions.classes["zero.swf.records.clips.CLIPACTIONs"];
+					}
+					if(ClipActionsClass){
+					}else{
+						ClipActionsClass=_initByDataOptions.ClipActionsClass;
+					}
+				}
+				ClipActions=new (ClipActionsClass||BytesData)();
 				offset=ClipActions.initByData(data,offset,endOffset,_initByDataOptions);
 			}else{
 				ClipActions=null;
@@ -289,7 +299,21 @@ package zero.swf.tagBodys{
 				
 				var ClipActionsXML:XML=xml.ClipActions[0];
 				if(ClipActionsXML){
-					ClipActions=new CLIPACTIONs();
+					var classStr:String=ClipActionsXML["@class"].toString();
+					var ClipActionsClass:Class=null;
+					if(_initByXMLOptions&&_initByXMLOptions.customClasses){
+						ClipActionsClass=_initByXMLOptions.customClasses[classStr];
+					}
+					if(ClipActionsClass){
+					}else{
+						try{
+							import flash.utils.getDefinitionByName;
+							ClipActionsClass=getDefinitionByName(classStr) as Class;
+						}catch(e:Error){
+							ClipActionsClass=null;
+						}
+					}
+					ClipActions=new (ClipActionsClass||BytesData)();
 					ClipActions.initByXML(ClipActionsXML,_initByXMLOptions);
 				}else{
 					ClipActions=null;
