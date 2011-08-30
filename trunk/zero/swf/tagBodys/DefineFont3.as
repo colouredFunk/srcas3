@@ -1,45 +1,44 @@
 /***
-DefineFont2
+DefineFont3
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
 创建时间：2011年08月30日 06:40:58（代码生成器 V2.0.0 F:/airs/program files2/CodesGenerater2/bin-debug/CodesGenerater2.swf）
 简要说明：这家伙很懒什么都没写。
 用法举例：这家伙还是很懒什么都没写。
 */
 
-//DefineFont2
-//The DefineFont2 tag extends the functionality of DefineFont. Enhancements include
-//the following:
-//■ 32-bit entries in the OffsetTable, for fonts with more than 64K glyphs.
-//■ Mapping to device fonts, by incorporating all the functionality of DefineFontInfo.
-//■ Font metrics for improved layout of dynamic glyph text.
-//DefineFont2 tags are the only font definitions that can be used for dynamic text.
-//The minimum file format version is SWF 3.
-//
-//DefineFont2
+//DefineFont3
+//The DefineFont3 tag is introduced along with the DefineFontAlignZones tag in SWF 8. The
+//DefineFontAlignZones tag is optional but recommended for SWF files using advanced antialiasing,
+//and it modifies the DefineFont3 tag.
+//The DefineFont3 tag extends the functionality of DefineFont2 by expressing the SHAPE
+//coordinates in the GlyphShapeTable at 20 times the resolution. All the EMSquare coordinates
+//are multiplied by 20 at export, allowing fractional resolution to 1/20 of a unit. This allows for
+//more precisely defined glyphs and results in better visual quality.
+//The minimum file format version is SWF 8.
+
+//DefineFont3
 //Field 					Type 												Comment
-//Header 					RECORDHEADER 										Tag type = 48.
+//Header 					RECORDHEADER 										Tag type = 75.
 //FontID 					UI16 												ID for this font character.
 //FontFlagsHasLayout 		UB[1] 												Has font metrics/layout information.
 //FontFlagsShiftJIS 		UB[1] 												ShiftJIS encoding.
 //FontFlagsSmallText 		UB[1] 												SWF 7 or later: Font is small. Character glyphs are aligned on pixel boundaries for dynamic and input text.
 //FontFlagsANSI 			UB[1] 												ANSI encoding.
 //FontFlagsWideOffsets 		UB[1] 												If 1, uses 32 bit offsets.
-//FontFlagsWideCodes 		UB[1] 												If 1, font uses 16-bit codes; otherwise font uses 8 bit codes.
+//FontFlagsWideCodes 		UB[1] 												Must be 1.
 //FontFlagsItalic 			UB[1] 												Italic Font.
 //FontFlagsBold 			UB[1] 												Bold Font.
 //LanguageCode 				LANGCODE 											SWF 5 or earlier: always 0
 //																				SWF 6 or later: language code
 //FontNameLen 				UI8 												Length of name.
-//FontName 					UI8[FontNameLen] 									Name of font (see DefineFontInfo).
+//FontName 					UI8[FontNameLen]									Name of font (see DefineFontInfo).
 //NumGlyphs 				UI16 												Count of glyphs in font. May be zero for device fonts.
 //OffsetTable 				If FontFlagsWideOffsets, UI32[NumGlyphs]			Same as in DefineFont.
 //							Otherwise UI16[NumGlyphs]
 //CodeTableOffset 			If FontFlagsWideOffsets, UI32						Byte count from start of OffsetTable to start of CodeTable.
 //							Otherwise UI16
-//
 //GlyphShapeTable 			SHAPE[NumGlyphs] 									Same as in DefineFont.
-//CodeTable 				If FontFlagsWideCodes, UI16[NumGlyphs]				Sorted in ascending order. Always UCS-2 in SWF 6 or later.
-//							Otherwise UI8[NumGlyphs]
+//CodeTable 				UI16[NumGlyphs] 									Sorted in ascending order. Always UCS-2 in SWF 6 or later.
 //FontAscent 				If FontFlagsHasLayout, SI16 						Font ascender height.
 //FontDescent 				If FontFlagsHasLayout, SI16 						Font descender height.
 //FontLeading 				If FontFlagsHasLayout, SI16 						Font leading height (see following).
@@ -47,34 +46,6 @@ DefineFont2
 //FontBoundsTable 			If FontFlagsHasLayout, RECT[NumGlyphs]				Not used in Flash Player through version 7 (but must be present).
 //KerningCount 				If FontFlagsHasLayout, UI16 						Not used in Flash Player through version 7 (always set to 0 to save space).
 //FontKerningTable 			If FontFlagsHasLayout, KERNINGRECORD[KerningCount]	Not used in Flash Player through version 7 (omit with KerningCount of 0).
-//In SWF 6 or later files, DefineFont2 has the same Unicode requirements as DefineFontInfo.
-//Similarly to the DefineFontInfo tag, the CodeTable (and thus also the OffsetTable,
-//GlyphShapeTable, and FontAdvanceTable) must be sorted in code point order.
-//If a DefineFont2 tag will be used only for dynamic device text, and no glyph-rendering
-//fallback is desired, set NumGlyphs to zero, and omit all tables having NumGlyphs entries.
-//This will substantially reduce the size of the DefineFont2 tag. DefineFont2 tags without
-//glyphs cannot support static text, which uses glyph indices to select characters, and also
-//cannot support glyph text, which requires glyph shape definitions.
-//Layout information (ascent, descent, leading, advance table, bounds table, kerning table) is
-//useful only for dynamic glyph text. This information takes the place of the per-character
-//placement information that is used in static glyph text. The layout information in the
-//DefineFont2 tag is fairly standard font-metrics information that can typically be extracted
-//directly from a standard font definition, such as a TrueType font.
-
-//NOTE
-//Leading is a vertical line-spacing metric. It is the distance (in EM-square coordinates)
-//between the bottom of the descender of one line and the top of the ascender of the next
-//line.
-//
-//As with DefineFont, in DefineFont2 the first STYLECHANGERECORD of each SHAPE in
-//the GlyphShapeTable does not use the LineStyle and LineStyles fields. In addition, the first
-//STYLECHANGERECORD of each shape must have both fields StateFillStyle0 and
-//FillStyle0 set to 1.
-//The DefineFont2 tag reserves space for a font bounds table and kerning table. This
-//information is not used in Flash Player through version 7. However, this information must be
-//present in order to constitute a well-formed DefineFont2 tag. Supply minimal (low-bit)
-//RECTs for FontBoundsTable, and always set KerningCount to zero, which allows
-//FontKerningTable to be omitted.
 
 package zero.swf.tagBodys{
 	
@@ -82,12 +53,13 @@ package zero.swf.tagBodys{
 	import zero.swf.records.shapes.SHAPE;
 	import zero.swf.records.texts.FONTLAYOUT;
 	
-	public class DefineFont2{
+	public class DefineFont3{
 		
 		public var id:int;//UI16
 		public var FontFlagsShiftJIS:Boolean;//01000000
 		public var FontFlagsSmallText:Boolean;//00100000
 		public var FontFlagsANSI:Boolean;//00010000
+		//public var Reserved:int;//00000100
 		public var FontFlagsItalic:Boolean;//00000010
 		public var FontFlagsBold:Boolean;//00000001
 		public var LanguageCode:int;//LANGCODE
@@ -110,7 +82,7 @@ package zero.swf.tagBodys{
 			FontFlagsSmallText=((flags&0x20)?true:false);//00100000
 			FontFlagsANSI=((flags&0x10)?true:false);//00010000
 			var FontFlagsWideOffsets:Boolean=((flags&0x08)?true:false);//00001000
-			var FontFlagsWideCodes:Boolean=((flags&0x04)?true:false);//00000100
+			//Reserved=flags&0x04;//00000100
 			FontFlagsItalic=((flags&0x02)?true:false);//00000010
 			FontFlagsBold=((flags&0x01)?true:false);//00000001
 			
@@ -140,20 +112,11 @@ package zero.swf.tagBodys{
 				
 			}
 			
-			i=-1;
 			CodeV=new Vector.<int>();
-			if(FontFlagsWideCodes){
-				for(i=0;i<NumGlyphs;i++){
-					
-					CodeV[i]=data[offset++]|(data[offset++]<<8);
-					
-				}
-			}else{
-				for(i=0;i<NumGlyphs;i++){
+			for(i=0;i<NumGlyphs;i++){
 				
-					CodeV[i]=data[offset++];
-					
-				}
+				CodeV[i]=data[offset++]|(data[offset++]<<8);
+				
 			}
 			
 			if(FontFlagsHasLayout||offset<endOffset){
@@ -162,7 +125,7 @@ package zero.swf.tagBodys{
 					_initByDataOptions=new Object();
 				}
 				_initByDataOptions.NumGlyphs=NumGlyphs;//20110830
-				_initByDataOptions.FontFlagsWideCodes=FontFlagsWideCodes;//20110830
+				_initByDataOptions.FontFlagsWideCodes=true;//20110830
 				fontLayout=new FONTLAYOUT();
 				offset=fontLayout.initByData(data,offset,endOffset,_initByDataOptions);
 			}else{
@@ -197,33 +160,6 @@ package zero.swf.tagBodys{
 				FontFlagsWideOffsets=false;
 			}
 			
-			var Code:int;
-			var FontFlagsWideCodes:Boolean=false;
-			for each(Code in CodeV){
-				if(Code>0xff){
-					FontFlagsWideCodes=true;
-					break;
-				}
-			}
-			if(FontFlagsWideCodes){
-			}else if(fontLayout){
-				for each(Code in fontLayout.FontKerningCode1V){
-					if(Code>0xff){
-						FontFlagsWideCodes=true;
-						break;
-					}
-				}
-				if(FontFlagsWideCodes){
-				}else{
-					for each(Code in fontLayout.FontKerningCode2V){
-						if(Code>0xff){
-							FontFlagsWideCodes=true;
-							break;
-						}
-					}
-				}
-			}
-			
 			flags=0;
 			if(fontLayout){
 				flags|=0x80;//FontFlagsHasLayout//10000000
@@ -240,9 +176,7 @@ package zero.swf.tagBodys{
 			if(FontFlagsWideOffsets){
 				flags|=0x08;//00001000
 			}
-			if(FontFlagsWideCodes){
-				flags|=0x04;//00000100
-			}
+			flags|=0x04;//00000100
 			if(FontFlagsItalic){
 				flags|=0x02;//00000010
 			}
@@ -292,19 +226,11 @@ package zero.swf.tagBodys{
 			data.position=data.length;
 			data.writeBytes(GlyphShapesData);
 			
-			if(FontFlagsWideCodes){
-				for each(Code in CodeV){
-					
-					data[data.length]=Code;
-					data[data.length]=Code>>8;
-					
-				}
-			}else{
-				for each(Code in CodeV){
-					
-					data[data.length]=Code;
-					
-				}
+			for each(var Code:int in CodeV){
+				
+				data[data.length]=Code;
+				data[data.length]=Code>>8;
+				
 			}
 			
 			if(fontLayout){
@@ -312,7 +238,7 @@ package zero.swf.tagBodys{
 				}else{
 					_toDataOptions=new Object();
 				}
-				_toDataOptions.FontFlagsWideCodes=FontFlagsWideCodes;//20110830
+				_toDataOptions.FontFlagsWideCodes=true;//20110830
 				data.position=data.length;
 				data.writeBytes(fontLayout.toData(_toDataOptions));
 			}
@@ -324,7 +250,7 @@ package zero.swf.tagBodys{
 		CONFIG::USE_XML{
 			public function toXML(xmlName:String,_toXMLOptions:Object):XML{
 				
-				var xml:XML=<{xmlName} class="zero.swf.tagBodys.DefineFont2"
+				var xml:XML=<{xmlName} class="zero.swf.tagBodys.DefineFont3"
 					id={id}
 					FontFlagsShiftJIS={FontFlagsShiftJIS}
 					FontFlagsSmallText={FontFlagsSmallText}

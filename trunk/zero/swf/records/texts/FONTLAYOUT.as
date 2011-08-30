@@ -6,14 +6,14 @@ FONTLAYOUT
 用法举例：这家伙还是很懒什么都没写。
 */
 
-							//FontAscent 				If FontFlagsHasLayout, SI16 						Font ascender height.
-							//FontDescent 				If FontFlagsHasLayout, SI16 						Font descender height.
-							//FontLeading 				If FontFlagsHasLayout, SI16 						Font leading height (see following).
-							//FontAdvanceTable 			If FontFlagsHasLayout, SI16[NumGlyphs]				Advance value to be used for each glyph in dynamic glyph text.
-							//FontBoundsTable 			If FontFlagsHasLayout, RECT[NumGlyphs]				Not used in Flash Player through version 7 (but must be present).
-							//KerningCount 				If FontFlagsHasLayout, UI16 						Not used in Flash Player through version 7 (always set to 0 to save space).
-							//FontKerningTable 			If FontFlagsHasLayout, KERNINGRECORD[KerningCount]	Not used in Flash Player through version 7 (omit with KerningCount of 0).
-							
+//FontAscent 				If FontFlagsHasLayout, SI16 						Font ascender height.
+//FontDescent 				If FontFlagsHasLayout, SI16 						Font descender height.
+//FontLeading 				If FontFlagsHasLayout, SI16 						Font leading height (see following).
+//FontAdvanceTable 			If FontFlagsHasLayout, SI16[NumGlyphs]				Advance value to be used for each glyph in dynamic glyph text.
+//FontBoundsTable 			If FontFlagsHasLayout, RECT[NumGlyphs]				Not used in Flash Player through version 7 (but must be present).
+//KerningCount 				If FontFlagsHasLayout, UI16 						Not used in Flash Player through version 7 (always set to 0 to save space).
+//FontKerningTable 			If FontFlagsHasLayout, KERNINGRECORD[KerningCount]	Not used in Flash Player through version 7 (omit with KerningCount of 0).
+
 //Kerning record
 //A Kerning Record defines the distance between two glyphs in EM square coordinates. Certain
 //pairs of glyphs appear more aesthetically pleasing if they are moved closer together, or farther
@@ -46,6 +46,11 @@ package zero.swf.records.texts{
 		
 		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
 			
+			if(_initByDataOptions){//20110830
+			}else{
+				throw new Error("需要提供 _initByDataOptions");
+			}
+			
 			var i:int;
 			
 			FontAscent=data[offset++]|(data[offset++]<<8);
@@ -58,7 +63,7 @@ package zero.swf.records.texts{
 			if(FontLeading&0x00008000){FontLeading|=0xffff0000}//最高位为1,表示负数
 			
 			FontAdvanceV=new Vector.<int>();
-			for(i=0;i<NumGlyphs;i++){
+			for(i=0;i<_initByDataOptions.NumGlyphs;i++){
 				
 				FontAdvanceV[i]=data[offset++]|(data[offset++]<<8);
 				if(FontAdvanceV[i]&0x00008000){FontAdvanceV[i]|=0xffff0000}//最高位为1,表示负数
@@ -66,7 +71,7 @@ package zero.swf.records.texts{
 			}
 			
 			FontBoundsV=new Vector.<RECT>();
-			for(i=0;i<NumGlyphs;i++){
+			for(i=0;i<_initByDataOptions.NumGlyphs;i++){
 				
 				FontBoundsV[i]=new RECT();
 				offset=FontBoundsV[i].initByData(data,offset,endOffset,_initByDataOptions);
@@ -79,7 +84,7 @@ package zero.swf.records.texts{
 			FontKerningCode2V=new Vector.<int>();
 			FontKerningAdjustmentV=new Vector.<int>();
 			
-			if(FontFlagsWideCodes){
+			if(_initByDataOptions.FontFlagsWideCodes){
 				for(i=0;i<KerningCount;i++){
 					
 					FontKerningCode1V[i]=data[offset++]|(data[offset++]<<8);
@@ -107,6 +112,11 @@ package zero.swf.records.texts{
 			
 		}
 		public function toData(_toDataOptions:Object):ByteArray{
+			
+			if(_toDataOptions){//20110830
+			}else{
+				throw new Error("需要提供 _toDataOptions");
+			}
 			
 			var i:int;
 			
@@ -141,7 +151,7 @@ package zero.swf.records.texts{
 			
 			i=-1;
 			var FontKerningAdjustment:int;
-			if(FontFlagsWideCodes){
+			if(_toDataOptions.FontFlagsWideCodes){
 				for each(FontKerningAdjustment in FontKerningAdjustmentV){
 					i++;
 					

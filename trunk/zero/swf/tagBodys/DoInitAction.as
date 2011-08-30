@@ -47,13 +47,23 @@ package zero.swf.tagBodys{
 		//ActionEndFlag //经测试这是会被播放器执行的（把 ActionEndFlag 设置为 8（toggleQuality）然后执行帧动作，将发现播放质量发生变化，所以 ActionEndFlag 应是 Actions 的一部分）
 		
 		public var SpriteID:int;//UI16
-		public var Actions:ACTIONRECORDs;
+		public var Actions:*;
 		
 		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
 			
 			SpriteID=data[offset++]|(data[offset++]<<8);
 			
-			Actions=new ACTIONRECORDs();
+			var ActionsClass:Class;
+			if(_initByDataOptions){
+				if(_initByDataOptions.classes){
+					ActionsClass=_initByDataOptions.classes["zero.swf.avm1.ACTIONRECORDs"];
+				}
+				if(ActionsClass){
+				}else{
+					ActionsClass=_initByDataOptions.ActionsClass;
+				}
+			}
+			Actions=new (ActionsClass||ACTIONRECORDs)();
 			return Actions.initByData(data,offset,endOffset,_initByDataOptions);
 			
 		}
@@ -87,8 +97,27 @@ package zero.swf.tagBodys{
 				
 				SpriteID=int(xml.@SpriteID.toString());
 				
-				Actions=new ACTIONRECORDs();
-				Actions.initByXML(xml.Actions[0],_initByXMLOptions);
+				var ActionsXML:XML=xml.Actions[0];
+				var classStr:String=ActionsXML["@class"].toString();
+				var ActionsClass:Class=null;
+				if(_initByXMLOptions&&_initByXMLOptions.customClasses){
+					ActionsClass=_initByXMLOptions.customClasses[classStr];
+				}
+				if(ActionsClass){
+				}else{
+					try{
+						import flash.utils.getDefinitionByName;
+						ActionsClass=getDefinitionByName(classStr) as Class;
+					}catch(e:Error){
+						ActionsClass=null;
+					}
+				}
+				if(ActionsClass){
+				}else{
+					ActionsClass=ACTIONRECORDs;
+				}
+				Actions=new ActionsClass();
+				Actions.initByXML(ActionsXML,_initByXMLOptions);
 				
 			}
 		}

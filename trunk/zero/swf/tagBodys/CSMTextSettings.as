@@ -65,14 +65,11 @@ package zero.swf.tagBodys{
 			
 			data.position=offset;
 			Thickness=data.readFloat();
-			offset+=4;
 			
-			data.position=offset;
 			Sharpness=data.readFloat();
-			offset+=4;
 			
 			//Reserved=data[offset++];
-			return offset+1;
+			return offset+9;
 			
 		}
 		public function toData(_toDataOptions:Object):ByteArray{
@@ -90,13 +87,12 @@ package zero.swf.tagBodys{
 			//flags|=Reserved;//00000111
 			data[2]=flags;
 			
-			data.position=data.length;
+			data.position=3;
 			data.writeFloat(Thickness);
 			
-			data.position=data.length;
 			data.writeFloat(Sharpness);
 			
-			data[3]=0x00;
+			data[11]=0x00;
 			
 			return data;
 			
