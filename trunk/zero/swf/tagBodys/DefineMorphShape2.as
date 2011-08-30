@@ -1,7 +1,7 @@
 /***
 DefineMorphShape2
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
-创建时间：2011年08月25日 15:03:40（代码生成器 V2.0.0 F:/airs/program files2/CodesGenerater2/bin-debug/CodesGenerater2.swf）
+创建时间：2011年08月29日 15:53:56（代码生成器 V2.0.0 F:/airs/program files2/CodesGenerater2/bin-debug/CodesGenerater2.swf）
 简要说明：这家伙很懒什么都没写。
 用法举例：这家伙还是很懒什么都没写。
 */
@@ -44,7 +44,7 @@ package zero.swf.tagBodys{
 	import flash.utils.ByteArray;
 	import zero.swf.records.RECT;
 	import zero.swf.records.shapes.MORPHFILLSTYLE;
-	import zero.swf.records.shapes.MORPHLINESTYLE;
+	import zero.swf.records.shapes.MORPHLINESTYLE2;
 	import zero.swf.records.shapes.SHAPE;
 	
 	public class DefineMorphShape2{
@@ -57,9 +57,8 @@ package zero.swf.tagBodys{
 		//public var Reserved:int;//11111100
 		public var UsesNonScalingStrokes:Boolean;//00000010
 		public var UsesScalingStrokes:Boolean;//00000001
-		public var Offset:uint;//UI32
 		public var MorphFillStyleV:Vector.<MORPHFILLSTYLE>;
-		public var MorphLineStyleV:Vector.<MORPHLINESTYLE>;
+		public var MorphLineStyle2V:Vector.<MORPHLINESTYLE2>;
 		public var StartEdges:SHAPE;
 		public var EndEdges:SHAPE;
 		
@@ -87,7 +86,8 @@ package zero.swf.tagBodys{
 			UsesNonScalingStrokes=((flags&0x02)?true:false);//00000010
 			UsesScalingStrokes=((flags&0x01)?true:false);//00000001
 			
-			Offset=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16)|(data[offset++]<<24);
+			//var Offset:int=data[offset++]|(data[offset++]<<8)|(data[offset++]<<16)|(data[offset++]<<24);
+			offset+=4;
 			
 			var FillStyleCount:int=data[offset++];
 			if(FillStyleCount==0xff){
@@ -105,11 +105,11 @@ package zero.swf.tagBodys{
 			if(LineStyleCount==0xff){
 				LineStyleCount=data[offset++]|(data[offset++]<<8);
 			}
-			MorphLineStyleV=new Vector.<MORPHLINESTYLE>();
+			MorphLineStyle2V=new Vector.<MORPHLINESTYLE2>();
 			for(i=0;i<LineStyleCount;i++){
 				
-				MorphLineStyleV[i]=new MORPHLINESTYLE();
-				offset=MorphLineStyleV[i].initByData(data,offset,endOffset,_initByDataOptions);
+				MorphLineStyle2V[i]=new MORPHLINESTYLE2();
+				offset=MorphLineStyle2V[i].initByData(data,offset,endOffset,_initByDataOptions);
 				
 			}
 			
@@ -148,10 +148,11 @@ package zero.swf.tagBodys{
 			}
 			data[data.length]=flags;
 			
-			data[data.length]=Offset;
-			data[data.length]=Offset>>8;
-			data[data.length]=Offset>>16;
-			data[data.length]=Offset>>24;
+			var Offset_offset:int=data.length;
+			data[Offset_offset]=0x00;
+			data[Offset_offset+1]=0x00;
+			data[Offset_offset+2]=0x00;
+			data[Offset_offset+3]=0x00;
 			
 			var FillStyleCount:int=MorphFillStyleV.length;
 			if(FillStyleCount<0xff){
@@ -168,7 +169,7 @@ package zero.swf.tagBodys{
 				
 			}
 			
-			var LineStyleCount:int=MorphLineStyleV.length;
+			var LineStyleCount:int=MorphLineStyle2V.length;
 			if(LineStyleCount<0xff){
 				data[data.length]=LineStyleCount;
 			}else{
@@ -177,14 +178,20 @@ package zero.swf.tagBodys{
 				data[data.length]=LineStyleCount>>8;
 			}
 			data.position=data.length;
-			for each(var MorphLineStyle:MORPHLINESTYLE in MorphLineStyleV){
+			for each(var MorphLineStyle2:MORPHLINESTYLE2 in MorphLineStyle2V){
 				
-				data.writeBytes(MorphLineStyle.toData(_toDataOptions));
+				data.writeBytes(MorphLineStyle2.toData(_toDataOptions));
 				
 			}
 			
 			data.position=data.length;
 			data.writeBytes(StartEdges.toData(_toDataOptions));
+			
+			var Offset:int=data.length-Offset_offset-4;
+			data[Offset_offset]=Offset;
+			data[Offset_offset+1]=Offset>>8;
+			data[Offset_offset+2]=Offset>>16;
+			data[Offset_offset+3]=Offset>>24;
 			
 			data.writeBytes(EndEdges.toData(_toDataOptions));
 			
@@ -199,7 +206,6 @@ package zero.swf.tagBodys{
 					id={id}
 					UsesNonScalingStrokes={UsesNonScalingStrokes}
 					UsesScalingStrokes={UsesScalingStrokes}
-					Offset={Offset}
 				/>;
 				
 				xml.appendChild(StartBounds.toXML("StartBounds",_toXMLOptions));
@@ -220,14 +226,14 @@ package zero.swf.tagBodys{
 					xml.appendChild(MorphFillStyleListXML);
 				}
 				
-				if(MorphLineStyleV.length){
-					var MorphLineStyleListXML:XML=<MorphLineStyleList count={MorphLineStyleV.length}/>;
-					for each(var MorphLineStyle:MORPHLINESTYLE in MorphLineStyleV){
+				if(MorphLineStyle2V.length){
+					var MorphLineStyle2ListXML:XML=<MorphLineStyle2List count={MorphLineStyle2V.length}/>;
+					for each(var MorphLineStyle2:MORPHLINESTYLE2 in MorphLineStyle2V){
 						
-						MorphLineStyleListXML.appendChild(MorphLineStyle.toXML("MorphLineStyle",_toXMLOptions));
+						MorphLineStyle2ListXML.appendChild(MorphLineStyle2.toXML("MorphLineStyle2",_toXMLOptions));
 						
 					}
-					xml.appendChild(MorphLineStyleListXML);
+					xml.appendChild(MorphLineStyle2ListXML);
 				}
 				
 				xml.appendChild(StartEdges.toXML("StartEdges",_toXMLOptions));
@@ -258,8 +264,6 @@ package zero.swf.tagBodys{
 				UsesNonScalingStrokes=(xml.@UsesNonScalingStrokes.toString()=="true");
 				UsesScalingStrokes=(xml.@UsesScalingStrokes.toString()=="true");
 				
-				Offset=uint(xml.@Offset.toString());
-				
 				i=-1;
 				MorphFillStyleV=new Vector.<MORPHFILLSTYLE>();
 				for each(var MorphFillStyleXML:XML in xml.MorphFillStyleList.MorphFillStyle){
@@ -269,15 +273,17 @@ package zero.swf.tagBodys{
 					MorphFillStyleV[i].initByXML(MorphFillStyleXML,_initByXMLOptions);
 					
 				}
+				
 				i=-1;
-				MorphLineStyleV=new Vector.<MORPHLINESTYLE>();
-				for each(var MorphLineStyleXML:XML in xml.MorphLineStyleList.MorphLineStyle){
+				MorphLineStyle2V=new Vector.<MORPHLINESTYLE2>();
+				for each(var MorphLineStyle2XML:XML in xml.MorphLineStyle2List.MorphLineStyle2){
 					i++;
 					
-					MorphLineStyleV[i]=new MORPHLINESTYLE();
-					MorphLineStyleV[i].initByXML(MorphLineStyleXML,_initByXMLOptions);
+					MorphLineStyle2V[i]=new MORPHLINESTYLE2();
+					MorphLineStyle2V[i].initByXML(MorphLineStyle2XML,_initByXMLOptions);
 					
 				}
+				
 				StartEdges=new SHAPE();
 				StartEdges.initByXML(xml.StartEdges[0],_initByXMLOptions);
 				

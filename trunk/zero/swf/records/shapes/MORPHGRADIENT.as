@@ -25,39 +25,42 @@ MORPHGRADIENT
 //EndColor 			RGBA 			Color of gradient for end shape.
 
 package zero.swf.records.shapes{
-	import flash.utils.ByteArray;
 	
+	import flash.utils.ByteArray;
 	import zero.BytesAndStr16;
+	
 	public class MORPHGRADIENT{
+		
 		public var StartRatioV:Vector.<int>;
 		public var StartColorV:Vector.<uint>;
 		public var EndRatioV:Vector.<int>;
 		public var EndColorV:Vector.<uint>;
-		//
+		
 		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
-			trace("可能不区分 RGB 和 RGBA?");
+			
 			var NumGradients:int=data[offset++];
+			
 			StartRatioV=new Vector.<int>();
 			StartColorV=new Vector.<uint>();
 			EndRatioV=new Vector.<int>();
 			EndColorV=new Vector.<uint>();
 			for(var i:int=0;i<NumGradients;i++){
+				
 				StartRatioV[i]=data[offset++];
-				if(_initByDataOptions&&_initByDataOptions.ColorUseRGBA){//20110813
-					StartColorV[i]=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++]|(data[offset++]<<24);
-				}else{
-					StartColorV[i]=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++];
-				}
+				
+				StartColorV[i]=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++]|(data[offset++]<<24);
+				
 				EndRatioV[i]=data[offset++];
-				if(_initByDataOptions&&_initByDataOptions.ColorUseRGBA){//20110813
-					EndColorV[i]=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++]|(data[offset++]<<24);
-				}else{
-					EndColorV[i]=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++];
-				}
+				
+				EndColorV[i]=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++]|(data[offset++]<<24);
+				
 			}
+			
 			return offset;
+			
 		}
-		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toData(_toDataOptions:Object):ByteArray{
+			
 			var data:ByteArray=new ByteArray();
 			
 			data[0]=StartRatioV.length;//NumGradients;
@@ -68,61 +71,46 @@ package zero.swf.records.shapes{
 				i++;
 				
 				data[offset++]=StartRatioV[i];
-				if(_toDataOptions&&_toDataOptions.ColorUseRGBA){//20110813
-					data[offset++]=StartColor>>16;
-					data[offset++]=StartColor>>8;
-					data[offset++]=StartColor;
-					data[offset++]=StartColor>>24;
-				}else{
-					data[offset++]=StartColor>>16;
-					data[offset++]=StartColor>>8;
-					data[offset++]=StartColor;
-				}
+				
+				data[offset++]=StartColor>>16;
+				data[offset++]=StartColor>>8;
+				data[offset++]=StartColor;
+				data[offset++]=StartColor>>24;
 				
 				data[offset++]=EndRatioV[i];
+				
 				var EndColor:uint=EndColorV[i];
-				if(_toDataOptions&&_toDataOptions.ColorUseRGBA){//20110813
-					data[offset++]=EndColor>>16;
-					data[offset++]=EndColor>>8;
-					data[offset++]=EndColor;
-					data[offset++]=EndColor>>24;
-				}else{
-					data[offset++]=EndColor>>16;
-					data[offset++]=EndColor>>8;
-					data[offset++]=EndColor;
-				}
+				
+				data[offset++]=EndColor>>16;
+				data[offset++]=EndColor>>8;
+				data[offset++]=EndColor;
+				data[offset++]=EndColor>>24;
 			}
+			
 			return data;
+			
 		}
 		
-		////
 		CONFIG::USE_XML{
-			public function toXML(xmlName:String,_toXMLOptions:Object/*zero_swf_ToXMLOptions*/):XML{
+			public function toXML(xmlName:String,_toXMLOptions:Object):XML{
 				var xml:XML=<{xmlName} class="zero.swf.records.shapes.MORPHGRADIENT"/>;
 				if(StartColorV.length){
-					var RatioAndColorListXML:XML=<RatioAndColorList count={StartColorV.length}/>
+					var RatioAndColorListXML:XML=<RatioAndColorList count={StartColorV.length}/>;
 					var i:int=-1;
 					for each(var StartColor:uint in StartColorV){
 						i++;
 						RatioAndColorListXML.appendChild(<StartRatio value={StartRatioV[i]}/>);
-						if(_toXMLOptions&&_toXMLOptions.ColorUseRGBA){//20110813
-							RatioAndColorListXML.appendChild(<StartColor value={"0x"+BytesAndStr16._16V[(StartColor>>24)&0xff]+BytesAndStr16._16V[(StartColor>>16)&0xff]+BytesAndStr16._16V[(StartColor>>8)&0xff]+BytesAndStr16._16V[StartColor&0xff]}/>);
-						}else{
-							RatioAndColorListXML.appendChild(<StartColor value={"0x"+BytesAndStr16._16V[(StartColor>>16)&0xff]+BytesAndStr16._16V[(StartColor>>8)&0xff]+BytesAndStr16._16V[StartColor&0xff]}/>);
-						}
+						RatioAndColorListXML.appendChild(<StartColor value={"0x"+BytesAndStr16._16V[(StartColor>>24)&0xff]+BytesAndStr16._16V[(StartColor>>16)&0xff]+BytesAndStr16._16V[(StartColor>>8)&0xff]+BytesAndStr16._16V[StartColor&0xff]}/>);
 						RatioAndColorListXML.appendChild(<EndRatio value={EndRatioV[i]}/>);
 						var EndColor:uint=EndColorV[i];
-						if(_toXMLOptions&&_toXMLOptions.ColorUseRGBA){//20110813
-							RatioAndColorListXML.appendChild(<EndColor value={"0x"+BytesAndStr16._16V[(EndColor>>24)&0xff]+BytesAndStr16._16V[(EndColor>>16)&0xff]+BytesAndStr16._16V[(EndColor>>8)&0xff]+BytesAndStr16._16V[EndColor&0xff]}/>);
-						}else{
-							RatioAndColorListXML.appendChild(<EndColor value={"0x"+BytesAndStr16._16V[(EndColor>>16)&0xff]+BytesAndStr16._16V[(EndColor>>8)&0xff]+BytesAndStr16._16V[EndColor&0xff]}/>);
-						}
+						RatioAndColorListXML.appendChild(<EndColor value={"0x"+BytesAndStr16._16V[(EndColor>>24)&0xff]+BytesAndStr16._16V[(EndColor>>16)&0xff]+BytesAndStr16._16V[(EndColor>>8)&0xff]+BytesAndStr16._16V[EndColor&0xff]}/>);
 					}
 					xml.appendChild(RatioAndColorListXML);
 				}
 				return xml;
 			}
 			public function initByXML(xml:XML,_initByXMLOptions:Object/*zero_swf_InitByXMLOptions*/):void{
+				
 				StartRatioV=new Vector.<int>();
 				StartColorV=new Vector.<uint>();
 				EndRatioV=new Vector.<int>();
@@ -139,6 +127,6 @@ package zero.swf.records.shapes{
 					EndColorV[i]=uint(EndColorXMLList[i].@value.toString());
 				}
 			}
-		}//end of CONFIG::USE_XML
+		}
 	}
 }
