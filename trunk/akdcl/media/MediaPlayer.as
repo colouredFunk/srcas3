@@ -1,5 +1,7 @@
 package akdcl.media {
 	import akdcl.utils.PageID;
+	import flash.display.DisplayObjectContainer;
+	import flash.geom.Rectangle;
 
 	/**
 	 * ...
@@ -12,7 +14,6 @@ package akdcl.media {
 		private var wmpPD:WMPProvider;
 
 		private var pageID:PageID;
-		private var contentPDList:Array;
 
 		//播放列表
 		private var __playlist:Playlist;
@@ -29,7 +30,7 @@ package akdcl.media {
 			stop();
 			__playlist = _playlist;
 			pageID.length = __playlist.length;
-			//dispatchEvent(new MediaEvent(MediaEvent.LIST_CHANGE));
+			dispatchEvent(new MediaEvent(MediaEvent.LIST_CHANGE));
 		}
 
 		//当前播放列表位置
@@ -51,9 +52,35 @@ package akdcl.media {
 			__repeat = _repeat;
 		}
 
+
+		
+		private var __container:DisplayObjectContainer;
+		public function set container(_container:DisplayObjectContainer):void {
+			for each (var _content:MediaProvider in playContent) {
+				if (_content.hasOwnProperty("container")) {
+					_content["container"] = _container;
+				}
+			}
+			__container = _container;
+		}
+		
+		private var showRect:Rectangle;
+		public function updateRect(_rect:Rectangle = null):void {
+			if (_rect) {
+				showRect = _rect;
+			}
+			if (showRect) {
+				for each (var _content:MediaProvider in playContent) {
+					if (_content.hasOwnProperty("updateRect")) {
+						_content["updateRect"](showRect);
+					}
+				}
+			}
+		}
+		
 		override protected function init():void {
 			super.init();
-			contentPDList = [];
+			playContent = [];
 			imagePD = new ImageProvider();
 			soundPD = new SoundProvider();
 			videoPD = new VideoProvider();
@@ -65,7 +92,10 @@ package akdcl.media {
 		private function onPlayIDChangeHandler(_id:uint):void {
 			stop();
 			var _content:MediaProvider;
-			for each (_content in contentPDList){
+			for each (_content in playContent) {
+				if (_content.hasOwnProperty("container")) {
+					_content["container"] = null;
+				}
 				_content.removeEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 				_content.removeEventListener(MediaEvent.LOAD_ERROR, onLoadErrorHandler);
 				_content.removeEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
@@ -77,40 +107,44 @@ package akdcl.media {
 			var _source:String = _item.source;
 			var _type:String = _source.split("?")[0];
 			_type = String(_type.split(".").pop()).toLowerCase();
+			
 			switch (_type){
 				case "gif":
 				case "jpg":
 				case "png":
 				case "swf":
 					imagePD.load(_source);
-					contentPDList[0] = imagePD;
+					playContent[0] = imagePD;
 					break;
 				case "mp3":
 				case "wav":
 					soundPD.load(_source);
-					contentPDList[0] = soundPD;
+					playContent[0] = soundPD;
 					break;
 				case "flv":
 				case "mov":
 				case "mp4":
 				case "f4v":
 					videoPD.load(_source);
-					contentPDList[0] = videoPD;
+					playContent[0] = videoPD;
 					break;
 				case "wma":
 				case "wmv":
 				case "mms":
 					wmpPD.load(_source);
-					contentPDList[0] = wmpPD;
+					playContent[0] = wmpPD;
 				default:
 					break;
 			}
-			for each (_content in contentPDList){
+			container = __container;
+			updateRect(showRect);
+			for each (_content in playContent){
 				_content.addEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 				_content.addEventListener(MediaEvent.LOAD_ERROR, onLoadErrorHandler);
 				_content.addEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
 				_content.addEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
 				_content.addEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);
+				
 			}
 			play();
 		}
@@ -124,21 +158,21 @@ package akdcl.media {
 				playID = 0;
 				return;
 			}
-			for each (var _content:MediaProvider in contentPDList){
+			for each (var _content:MediaProvider in playContent){
 				_content.play(_startTime);
 			}
 			super.play(_startTime);
 		}
 
 		override public function pause():void {
-			for each (var _content:MediaProvider in contentPDList){
+			for each (var _content:MediaProvider in playContent){
 				_content.pause();
 			}
 			super.pause();
 		}
 
 		override public function stop():void {
-			for each (var _content:MediaProvider in contentPDList){
+			for each (var _content:MediaProvider in playContent){
 				_content.stop();
 			}
 			super.stop();
@@ -153,7 +187,7 @@ package akdcl.media {
 		}
 
 		override protected function onLoadErrorHandler(_evt:* = null):void {
-			if (playlist.length() == 1){
+			if (playlist.length == 1){
 				//如果播放列表只有一个源，则停止播放
 				stop();
 			} else {

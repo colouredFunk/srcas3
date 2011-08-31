@@ -3,6 +3,9 @@ package akdcl.media {
 	import com.greensock.loading.VideoLoader;
 	import com.greensock.events.LoaderEvent;
 	import com.greensock.layout.ScaleMode;
+	import flash.display.DisplayObjectContainer;
+	import flash.geom.Rectangle;
+	import flash.media.Video;
 
 	import akdcl.interfaces.IVolume;
 
@@ -12,7 +15,7 @@ package akdcl.media {
 	 * ...
 	 * @author akdcl
 	 */
-	public class VideoProvider extends MediaProvider implements IVolume {
+	final public class VideoProvider extends MediaProvider implements IVolume {
 		private static const DEFAULT_PARAMS:Object = {autoPlay: false, scaleMode: ScaleMode.PROPORTIONAL_INSIDE, bgColor: 0x000000};
 		private static const VIDEOLOADER_GROUP:String = "VideoLoader";
 
@@ -55,13 +58,43 @@ package akdcl.media {
 			}
 		}
 
+		public function set container(_container:DisplayObjectContainer):void {
+			if (_container){
+				if (playContent && playContent.content){
+					_container.addChild(playContent.content);
+				}
+			} else {
+				if (playContent && playContent.content && playContent.content.parent){
+					playContent.content.parent.removeChild(playContent.content);
+				}
+			}
+		}
+		private var showRect:Rectangle;
+
+		public function updateRect(_rect:Rectangle = null):void {
+			if (_rect){
+				showRect = _rect;
+			}
+			if (showRect && playContent && playContent.content){
+				playContent.content.x = showRect.x;
+				playContent.content.y = showRect.y;
+				playContent.content.fitWidth = showRect.width;
+				playContent.content.fitHeight = showRect.height;
+			}
+		}
+
 		override public function remove():void {
 			removeContentListener();
 			super.remove();
+			showRect = null;
 		}
 
 		override public function load(_source:String):void {
 			super.load(_source);
+			var _container:DisplayObjectContainer;
+			if (playContent && playContent.content){
+				_container = playContent.content.parent;
+			}
 			removeContentListener();
 			playContent = sM.getSource(VIDEOLOADER_GROUP, _source);
 			if (playContent){
@@ -88,11 +121,14 @@ package akdcl.media {
 				playContent.addEventListener(LoaderEvent.COMPLETE, onLoadCompleteHandler);
 			}
 			playContent.addEventListener(VideoLoader.VIDEO_COMPLETE, onPlayCompleteHandler);
+			updateRect();
+			container = _container;
 		}
 
 		override public function play(_startTime:int = -1):void {
 			if (playContent){
 				if (_startTime < 0){
+
 					playContent.playVideo();
 				} else {
 					playContent.videoTime = _startTime * 0.001;
@@ -132,9 +168,20 @@ package akdcl.media {
 			super.onLoadProgressHandler(_evt);
 		}
 
+		override protected function onPlayCompleteHandler(_evt:* = null):void {
+			if (playContent){
+				playContent.videoTime = 0;
+				playContent.pauseVideo();
+			}
+			super.onPlayCompleteHandler(_evt);
+		}
+
 		private function removeContentListener():void {
 			if (playContent){
 				//卸载playContent
+				if (playContent.content && playContent.content.parent){
+					playContent.content.parent.removeChild(playContent.content);
+				}
 				playContent.removeEventListener(LoaderEvent.ERROR, onLoadErrorHandler);
 				playContent.removeEventListener(LoaderEvent.PROGRESS, onLoadProgressHandler);
 				playContent.removeEventListener(LoaderEvent.COMPLETE, onLoadCompleteHandler);

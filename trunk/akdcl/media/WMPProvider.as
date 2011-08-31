@@ -1,7 +1,6 @@
 package akdcl.media {
 	import flash.events.TimerEvent;
 	import flash.external.ExternalInterface;
-	import flash.utils.Timer;
 
 	import akdcl.interfaces.IVolume;
 
@@ -9,7 +8,7 @@ package akdcl.media {
 	 * ...
 	 * @author ...
 	 */
-	public class WMPProvider extends MediaProvider implements IVolume {
+	final public class WMPProvider extends MediaProvider implements IVolume {
 		private static const WMP_JS:XML = <script><![CDATA[
 			if(!pwrd){
 				var pwrd={};
@@ -241,7 +240,6 @@ package akdcl.media {
 		]]></script>
 		public static var isPlugin:Boolean = false;
 		private var isPlayComplete:Boolean = false;
-		private var timer:Timer;
 
 		override public function get loadProgress():Number {
 			var _loadProgress:Number;
@@ -314,7 +312,6 @@ package akdcl.media {
 		override protected function init():void {
 			super.init();
 			if (ExternalInterface.available){
-				timer = new Timer(100);
 				ExternalInterface.call("eval", WMP_JS.toString());
 				ExternalInterface.call("pwrd.wmpPlayer.createWMPContainer");
 				ExternalInterface.addCallback("playStateChange", playStateChange);
@@ -324,16 +321,12 @@ package akdcl.media {
 
 		override public function remove():void {
 			timer.removeEventListener(TimerEvent.TIMER, onLoadProgressHandler);
-			timer.stop();
 			super.remove();
-			timer = null;
 		}
 
 		override public function load(_source:String):void {
 			super.load(_source);
 			if (isPlugin){
-				timer.reset();
-				timer.start();
 				ExternalInterface.call("pwrd.wmpPlayer.openList", ExternalInterface.objectID, _source);
 			}
 		}

@@ -18,7 +18,7 @@ package akdcl.media {
 	 * ...
 	 * @author Akdcl
 	 */
-	public class SoundProvider extends MediaProvider implements IVolume {
+	final public class SoundProvider extends MediaProvider implements IVolume {
 		private static var sM:SourceManager = SourceManager.getInstance();
 		private static var REQUEST:URLRequest = new URLRequest();
 

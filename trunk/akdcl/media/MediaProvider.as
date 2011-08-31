@@ -1,4 +1,6 @@
 package akdcl.media {
+	import flash.events.TimerEvent;
+	import flash.utils.Timer;
 	import ui.UIEventDispatcher;
 
 	/**
@@ -8,7 +10,7 @@ package akdcl.media {
 	public class MediaProvider extends UIEventDispatcher {
 
 		protected var playContent:*;
-		protected var sourceID:String;
+		protected var timer:Timer;
 
 		public function get loadProgress():Number {
 			return 0;
@@ -54,15 +56,19 @@ package akdcl.media {
 				return false;
 			}
 			switch (_playState){
-				case PlayState.PLAY:
-				case PlayState.PAUSE:
-				case PlayState.STOP:
-				case PlayState.COMPLETE:
-				case PlayState.READY:
 				case PlayState.CONNECT:
 				case PlayState.WAIT:
 				case PlayState.BUFFER:
 				case PlayState.RECONNECT:
+				case PlayState.PLAY:
+					timer.addEventListener(TimerEvent.TIMER, onPlayProgressHander);
+					break;
+				case PlayState.READY:
+				case PlayState.PAUSE:
+				case PlayState.STOP:
+				case PlayState.COMPLETE:
+					timer.removeEventListener(TimerEvent.TIMER, onPlayProgressHander);
+					break;
 			}
 			__playState = _playState;
 			dispatchEvent(new MediaEvent(MediaEvent.STATE_CHANGE));
@@ -71,17 +77,21 @@ package akdcl.media {
 
 		override protected function init():void {
 			super.init();
+			timer = new Timer(100);
 			setPlayState(PlayState.READY);
 		}
 
 		override public function remove():void {
 			stop();
+			timer.stop();
+			timer = null;
 			playContent = null;
 			super.remove();
 		}
 
 		public function load(_source:String):void {
-			sourceID = _source;
+			timer.reset();
+			timer.start();
 		}
 
 		public function play(_startTime:int = -1):void {
@@ -114,6 +124,7 @@ package akdcl.media {
 			dispatchEvent(new MediaEvent(MediaEvent.BUFFER_PROGRESS));
 		}
 		protected function onPlayCompleteHandler(_evt:*= null):void {
+			timer.stop();
 			setPlayState(PlayState.COMPLETE);
 			dispatchEvent(new MediaEvent(MediaEvent.PLAY_COMPLETE));
 		}
