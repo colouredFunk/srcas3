@@ -94,7 +94,7 @@ package akdcl.media {
 
 		public function set scaleMode(_scaleMode:Number):void {
 			__scaleMode = _scaleMode;
-			updateArea();
+			updateRect();
 		}
 
 		override protected function init():void {
@@ -105,7 +105,8 @@ package akdcl.media {
 				container.addChild(bitmap);
 			} else {
 				container = this;
-				if (progressClip && contains(progressClip)){
+				if (progressClip && contains(progressClip)) {
+					areaRect = new Rectangle();
 					container.addChildAt(bitmap, getChildIndex(progressClip));
 				} else {
 					areaRect = getBounds(this);
@@ -215,7 +216,7 @@ package akdcl.media {
 				__content.alpha = 0;
 				TweenNano.to(__content, (_isTween && tweenMode > 0) ? TWEEN_FRAME : 0, {alpha: 1, useFrames: true});
 			}
-			updateArea();
+			updateRect();
 		}
 		
 		protected function fixContentLast():void {
@@ -226,7 +227,12 @@ package akdcl.media {
 			}
 		}
 
-		protected function updateArea():void {
+		public function updateRect():void {
+			if (__content) {
+				
+			}else {
+				return;
+			}
 			var _areaAspectRatio:Number = areaRect.width / areaRect.height;
 			var _contentAspectRatio:Number = contentWidth / contentHeight;
 			if (__content is BitmapData){
