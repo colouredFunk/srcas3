@@ -166,17 +166,19 @@ package akdcl.media {
 		protected function onImageHandler(_p:*, _url:String = null):void {
 			if (_p is IOErrorEvent){
 				setProgressClip(false);
-
 				dispatchEvent(errorEvent);
-			} else if (_p is ProgressEvent){
-				__loadProgress = _p.bytesLoaded / _p.bytesTotal;
+			} else if (!_p || _p is ProgressEvent) {
+				if (_p) {
+					__loadProgress = _p.bytesLoaded / _p.bytesTotal;
+					progressEvent.bytesLoaded = _p.bytesLoaded;
+					progressEvent.bytesTotal = _p.bytesTotal;
+				}else {
+					__loadProgress = 1;
+				}
 				if (isNaN(__loadProgress)){
 					__loadProgress = 0;
 				}
 				setProgressClip(__loadProgress);
-				progressEvent.bytesLoaded = _p.bytesLoaded;
-				progressEvent.bytesTotal = _p.bytesTotal;
-
 				dispatchEvent(progressEvent);
 			} else {
 				setProgressClip(false);

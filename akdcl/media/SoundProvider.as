@@ -10,15 +10,13 @@ package akdcl.media {
 	import flash.media.SoundMixer;
 	import flash.media.SoundTransform;
 
-	import akdcl.interfaces.IVolume;
-
 	import akdcl.manager.SourceManager;
 
 	/**
 	 * ...
 	 * @author Akdcl
 	 */
-	final public class SoundProvider extends MediaProvider implements IVolume {
+	final public class SoundProvider extends MediaProvider {
 		private static var sM:SourceManager = SourceManager.getInstance();
 		private static var REQUEST:URLRequest = new URLRequest();
 
@@ -47,25 +45,11 @@ package akdcl.media {
 		override public function get position():uint {
 			return channel ? channel.position : 0;
 		}
-
-		private var __volume:Number = 1;
-
-		public function get volume():Number {
-			return __volume;
-		}
-
-		public function set volume(_volume:Number):void {
-			if (_volume < 0){
-				_volume = 0;
-			} else if (_volume > 1){
-				_volume = 1;
-			}
-			if (__volume == _volume){
-				return;
-			}
-			__volume = _volume;
+		
+		override public function set volume(value:Number):void {
+			super.volume = value;
 			if (channel){
-				setChannelVolume(channel, __volume);
+				setChannelVolume(channel, volume);
 			}
 		}
 

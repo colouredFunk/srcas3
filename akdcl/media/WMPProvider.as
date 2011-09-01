@@ -2,13 +2,11 @@ package akdcl.media {
 	import flash.events.TimerEvent;
 	import flash.external.ExternalInterface;
 
-	import akdcl.interfaces.IVolume;
-
 	/**
 	 * ...
 	 * @author ...
 	 */
-	final public class WMPProvider extends MediaProvider implements IVolume {
+	final public class WMPProvider extends MediaProvider {
 		private static const WMP_JS:XML = <script><![CDATA[
 			if(!pwrd){
 				var pwrd={};
@@ -287,25 +285,11 @@ package akdcl.media {
 			}
 			return 0;
 		}
-
-		private var __volume:Number = 1;
-
-		public function get volume():Number {
-			return __volume;
-		}
-
-		public function set volume(_volume:Number):void {
-			if (_volume < 0){
-				_volume = 0;
-			} else if (_volume > 1){
-				_volume = 1;
-			}
-			if (__volume == _volume){
-				return;
-			}
-			__volume = _volume;
+		
+		override public function set volume(value:Number):void {
+			super.volume = value;
 			if (isPlugin){
-				ExternalInterface.call("pwrd.wmpPlayer.setVolume", ExternalInterface.objectID, __volume * 100);
+				ExternalInterface.call("pwrd.wmpPlayer.setVolume", ExternalInterface.objectID, volume * 100);
 			}
 		}
 
@@ -321,6 +305,7 @@ package akdcl.media {
 
 		override public function remove():void {
 			timer.removeEventListener(TimerEvent.TIMER, onLoadProgressHandler);
+			timer.removeEventListener(TimerEvent.TIMER, onBufferProgressHandler);
 			super.remove();
 		}
 
@@ -382,6 +367,7 @@ package akdcl.media {
 					//停止
 					if (isPlayComplete){
 						isPlayComplete = false;
+						trace(2);
 						onPlayCompleteHandler();
 					} else {
 						setPlayState(PlayState.STOP);
@@ -415,6 +401,7 @@ package akdcl.media {
 				case 8:
 					//完毕
 					isPlayComplete = true;
+					trace(1);
 					break;
 				case 9:
 					//连接
