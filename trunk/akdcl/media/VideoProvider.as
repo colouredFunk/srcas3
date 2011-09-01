@@ -7,15 +7,13 @@ package akdcl.media {
 	import flash.geom.Rectangle;
 	import flash.media.Video;
 
-	import akdcl.interfaces.IVolume;
-
 	import akdcl.manager.SourceManager;
 
 	/**
 	 * ...
 	 * @author akdcl
 	 */
-	final public class VideoProvider extends MediaProvider implements IVolume {
+	final public class VideoProvider extends MediaProvider {
 		private static const DEFAULT_PARAMS:Object = {autoPlay: false, scaleMode: ScaleMode.PROPORTIONAL_INSIDE, bgColor: 0x000000};
 		private static const VIDEOLOADER_GROUP:String = "VideoLoader";
 
@@ -36,26 +34,18 @@ package akdcl.media {
 		override public function get position():uint {
 			return playContent ? (playContent.videoTime * 1000) : 0;
 		}
-
-		private var __volume:Number = 1;
-
-		public function get volume():Number {
-			return __volume;
-		}
-
-		public function set volume(_volume:Number):void {
-			if (_volume < 0){
-				_volume = 0;
-			} else if (_volume > 1){
-				_volume = 1;
-			}
-			if (__volume == _volume){
-				return;
-			}
-			__volume = _volume;
+		
+		override public function set volume(value:Number):void {
+			super.volume = value;
 			if (playContent){
-				playContent.volume = __volume;
+				playContent.volume = volume;
 			}
+		}
+		
+		private var __container:DisplayObjectContainer;
+
+		public function get container():DisplayObjectContainer {
+			return __container;
 		}
 
 		public function set container(_container:DisplayObjectContainer):void {
@@ -64,11 +54,11 @@ package akdcl.media {
 					_container.addChild(playContent.content);
 				}
 			} else {
-				if (playContent && playContent.content && playContent.content.parent){
-					playContent.content.parent.removeChild(playContent.content);
-				}
+				removeContentFromContainer();
 			}
+			__container = _container;
 		}
+
 		private var showRect:Rectangle;
 
 		public function updateRect(_rect:Rectangle = null):void {
@@ -84,6 +74,7 @@ package akdcl.media {
 		}
 
 		override public function remove():void {
+			container = null;
 			removeContentListener();
 			super.remove();
 			showRect = null;
@@ -91,11 +82,8 @@ package akdcl.media {
 
 		override public function load(_source:String):void {
 			super.load(_source);
-			var _container:DisplayObjectContainer;
-			if (playContent && playContent.content){
-				_container = playContent.content.parent;
-			}
 			removeContentListener();
+			removeContentFromContainer();
 			playContent = sM.getSource(VIDEOLOADER_GROUP, _source);
 			if (playContent){
 			} else {
@@ -122,13 +110,12 @@ package akdcl.media {
 			}
 			playContent.addEventListener(VideoLoader.VIDEO_COMPLETE, onPlayCompleteHandler);
 			updateRect();
-			container = _container;
+			container = __container;
 		}
 
 		override public function play(_startTime:int = -1):void {
 			if (playContent){
 				if (_startTime < 0){
-
 					playContent.playVideo();
 				} else {
 					playContent.videoTime = _startTime * 0.001;
@@ -147,14 +134,15 @@ package akdcl.media {
 
 		override public function stop():void {
 			if (playContent){
-				playContent.videoTime = 0;
 				playContent.pauseVideo();
+				playContent.videoTime = 0;
 			}
 			super.stop();
 		}
 
 		override protected function onLoadErrorHandler(_evt:* = null):void {
 			removeContentListener();
+			removeContentFromContainer();
 			sM.removeSource(VIDEOLOADER_GROUP, playContent);
 			playContent.dispose();
 			playContent = null;
@@ -169,23 +157,24 @@ package akdcl.media {
 		}
 
 		override protected function onPlayCompleteHandler(_evt:* = null):void {
-			if (playContent){
-				playContent.videoTime = 0;
-				playContent.pauseVideo();
-			}
+			removeContentListener();
+			playContent.videoTime = 0;
 			super.onPlayCompleteHandler(_evt);
 		}
 
 		private function removeContentListener():void {
 			if (playContent){
 				//卸载playContent
-				if (playContent.content && playContent.content.parent){
-					playContent.content.parent.removeChild(playContent.content);
-				}
 				playContent.removeEventListener(LoaderEvent.ERROR, onLoadErrorHandler);
 				playContent.removeEventListener(LoaderEvent.PROGRESS, onLoadProgressHandler);
 				playContent.removeEventListener(LoaderEvent.COMPLETE, onLoadCompleteHandler);
 				playContent.removeEventListener(VideoLoader.VIDEO_COMPLETE, onPlayCompleteHandler);
+			}
+		}
+
+		private function removeContentFromContainer():void {
+			if (playContent && playContent.content && playContent.content.parent){
+				playContent.content.parent.removeChild(playContent.content);
 			}
 		}
 	}

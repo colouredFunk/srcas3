@@ -1005,7 +1005,8 @@ function errorHandler(event:LoaderEvent):void {
 		
 		/** @private **/
 		protected function _videoRemovedFromStage(event:Event):void {
-			_video.attachNetStream(null);
+			//不能删除，还要保留video
+			//_video.attachNetStream(null);
 			_video.clear();
 		}
 		

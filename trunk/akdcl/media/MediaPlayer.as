@@ -14,6 +14,50 @@ package akdcl.media {
 		private var wmpPD:WMPProvider;
 
 		private var pageID:PageID;
+		private var providers:Array;
+
+		override public function get loadProgress():Number {
+			var _progress:Number = 1;
+			for each (var _content:MediaProvider in playContent){
+				_progress = Math.min(_content.loadProgress, _progress);
+			}
+			return _progress;
+		}
+
+		override public function get totalTime():uint {
+			var _time:uint = 0;
+			for each (var _content:MediaProvider in playContent){
+				_time = Math.max(_content.totalTime, _time);
+			}
+			return _time;
+		}
+
+		override public function get bufferProgress():Number {
+			var _progress:Number = 1;
+			for each (var _content:MediaProvider in playContent){
+				_progress = Math.min(_content.bufferProgress, _progress);
+			}
+			return _progress;
+		}
+
+		override public function get position():uint {
+			var _time:uint = 0;
+			for each (var _content:MediaProvider in playContent){
+				_time = Math.max(_content.position, _time);
+			}
+			return _time;
+		}
+
+		override public function get volume():Number {
+			return super.volume;
+		}
+
+		override public function set volume(value:Number):void {
+			super.volume = value;
+			for each (var _content:MediaProvider in providers){
+				_content.volume = volume;
+			}
+		}
 
 		//播放列表
 		private var __playlist:Playlist;
@@ -52,48 +96,49 @@ package akdcl.media {
 			__repeat = _repeat;
 		}
 
-
-		
 		private var __container:DisplayObjectContainer;
+
 		public function set container(_container:DisplayObjectContainer):void {
-			for each (var _content:MediaProvider in playContent) {
-				if (_content.hasOwnProperty("container")) {
+			for each (var _content:MediaProvider in playContent){
+				if (_content.hasOwnProperty("container")){
 					_content["container"] = _container;
 				}
 			}
 			__container = _container;
 		}
-		
+
 		private var showRect:Rectangle;
+
 		public function updateRect(_rect:Rectangle = null):void {
-			if (_rect) {
+			if (_rect){
 				showRect = _rect;
 			}
-			if (showRect) {
-				for each (var _content:MediaProvider in playContent) {
-					if (_content.hasOwnProperty("updateRect")) {
+			if (showRect){
+				for each (var _content:MediaProvider in providers){
+					if (_content.hasOwnProperty("updateRect")){
 						_content["updateRect"](showRect);
 					}
 				}
 			}
 		}
-		
+
 		override protected function init():void {
 			super.init();
-			playContent = [];
 			imagePD = new ImageProvider();
 			soundPD = new SoundProvider();
 			videoPD = new VideoProvider();
 			wmpPD = new WMPProvider();
+			providers = [soundPD, videoPD, wmpPD, imagePD];
+			playContent = [];
 			pageID = new PageID();
 			pageID.onIDChange = onPlayIDChangeHandler;
 		}
 
 		private function onPlayIDChangeHandler(_id:uint):void {
-			stop();
+			//stop();
 			var _content:MediaProvider;
-			for each (_content in playContent) {
-				if (_content.hasOwnProperty("container")) {
+			for each (_content in playContent){
+				if (_content.hasOwnProperty("container")){
 					_content["container"] = null;
 				}
 				_content.removeEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
@@ -107,7 +152,7 @@ package akdcl.media {
 			var _source:String = _item.source;
 			var _type:String = _source.split("?")[0];
 			_type = String(_type.split(".").pop()).toLowerCase();
-			
+
 			switch (_type){
 				case "gif":
 				case "jpg":
@@ -131,9 +176,9 @@ package akdcl.media {
 				case "wma":
 				case "wmv":
 				case "mms":
+				default:
 					wmpPD.load(_source);
 					playContent[0] = wmpPD;
-				default:
 					break;
 			}
 			container = __container;
@@ -144,13 +189,13 @@ package akdcl.media {
 				_content.addEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
 				_content.addEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
 				_content.addEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);
-				
 			}
 			play();
 		}
 
 		override public function load(_source:String):void {
 			playlist = _source;
+			super.load(null);
 		}
 
 		override public function play(_startTime:int = -1):void {
@@ -189,15 +234,19 @@ package akdcl.media {
 		override protected function onLoadErrorHandler(_evt:* = null):void {
 			if (playlist.length == 1){
 				//如果播放列表只有一个源，则停止播放
-				stop();
+				super.onLoadErrorHandler(_evt);
 			} else {
 				//根据repeat的值执行下一步
 				onPlayCompleteHandler();
 			}
-			super.onLoadErrorHandler(_evt);
+		}
+
+		override protected function onPlayProgressHander(_evt:* = null):void {
+			super.onPlayProgressHander(_evt);
 		}
 
 		override protected function onPlayCompleteHandler(_evt:* = null):void {
+			super.onPlayCompleteHandler(_evt);
 			switch (repeat){
 				case 0:
 					stop();
@@ -226,7 +275,6 @@ package akdcl.media {
 					stop();
 					break;
 			}
-			super.onPlayCompleteHandler(_evt);
 		}
 	}
 
