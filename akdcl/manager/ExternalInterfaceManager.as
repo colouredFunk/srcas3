@@ -64,8 +64,9 @@
 		}
 		
 		public function hasInterface(_funName:String):Boolean {
-			if (isAvailable){
-				return ExternalInterface.call("eval", _funName + "!=" + "null");
+			if (isAvailable) {
+				//ExternalInterface.call("eval", _funName + "!=" + "null");
+				return true;
 			}
 			return false;
 		}

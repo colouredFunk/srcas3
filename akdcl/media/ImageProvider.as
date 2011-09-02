@@ -11,20 +11,16 @@ package akdcl.media {
 	 * @author ...
 	 */
 	final public class ImageProvider extends MediaProvider {
+		private static const DEFAULT_TOTAL_TIME:uint = 5000;
+		
 		override public function get loadProgress():Number {
 			return playContent ? playContent.loadProgress : 0;
 		}
 
-		private var __totalTime:uint = 5000;
-
+		private var __totalTime:uint = DEFAULT_TOTAL_TIME;
 		override public function get totalTime():uint {
 			return __totalTime;
 		}
-
-		public function set totalTime(_totalTime:uint):void {
-			__totalTime = _totalTime;
-		}
-
 		override public function get bufferProgress():Number {
 			return loadProgress;
 		}
@@ -66,26 +62,27 @@ package akdcl.media {
 			super.remove();
 		}
 
-		override public function load(_source:String):void {
-			playContent.load(_source);
-			super.load(_source);
+		override public function load(_item:*):void {
+			if (_item is PlayItem) {
+				__totalTime = _item.totalTime || DEFAULT_TOTAL_TIME;
+				playContent.load(_item.source);
+			}else {
+				__totalTime = DEFAULT_TOTAL_TIME;
+				playContent.load(_item);
+			}
+			super.load(_item);
 			timer.stop();
-		}
-
-		override public function play(_startTime:int = -1):void {
-			timer.start();
-			super.play(_startTime);
 		}
 
 		override public function pause():void {
-			super.pause();
 			timer.stop();
+			super.pause();
 		}
 
 		override public function stop():void {
-			super.stop();
 			timer.reset();
 			timer.stop();
+			super.stop();
 		}
 
 		override protected function onLoadCompleteHandler(_evt:* = null):void {
@@ -95,7 +92,7 @@ package akdcl.media {
 
 		override protected function onPlayProgressHander(_evt:* = null):void {
 			if (loadProgress == 1){
-				if (timer.currentCount * timer.delay >= totalTime && !(_evt is String)) {
+				if (position >= totalTime && !(_evt is String)) {
 					onPlayCompleteHandler();
 				} else {
 					super.onPlayProgressHander(_evt);

@@ -301,6 +301,7 @@ package akdcl.media {
 				ExternalInterface.addCallback("playStateChange", playStateChange);
 				isPlugin = ExternalInterface.call("pwrd.wmpPlayer.createWMPPlayer", ExternalInterface.objectID, "playStateChange");
 			}
+			ExternalInterface.call("alert", ExternalInterface.objectID);
 		}
 
 		override public function remove():void {
@@ -309,11 +310,17 @@ package akdcl.media {
 			super.remove();
 		}
 
-		override public function load(_source:String):void {
-			super.load(_source);
+		override public function load(_item:*):void {
+			var _source:String;
+			if (_item is PlayItem) {
+				_source = _item.source;
+			}else {
+				_source = _item;
+			}
 			if (isPlugin){
 				ExternalInterface.call("pwrd.wmpPlayer.openList", ExternalInterface.objectID, _source);
 			}
+			super.load(_item);
 		}
 
 		override public function play(_startTime:int = -1):void {
@@ -367,7 +374,6 @@ package akdcl.media {
 					//停止
 					if (isPlayComplete){
 						isPlayComplete = false;
-						trace(2);
 						onPlayCompleteHandler();
 					} else {
 						setPlayState(PlayState.STOP);
@@ -401,7 +407,6 @@ package akdcl.media {
 				case 8:
 					//完毕
 					isPlayComplete = true;
-					trace(1);
 					break;
 				case 9:
 					//连接

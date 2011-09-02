@@ -8,7 +8,7 @@ package akdcl.media {
 	 * @author Akdcl
 	 */
 	/// @eventType	akdcl.media.MediaEvent.VOLUME_CHANGE
-	[Event(name = "volumeChange", type = "akdcl.media.MediaEvent")]
+	[Event(name="volumeChange",type="akdcl.media.MediaEvent")]
 
 	/// @eventType	akdcl.media.MediaEvent.STATE_CHANGE
 	[Event(name="stateChange",type="akdcl.media.MediaEvent")]
@@ -32,8 +32,8 @@ package akdcl.media {
 	[Event(name="loadComplete",type="akdcl.media.MediaEvent")]
 
 	public class MediaProvider extends UIEventDispatcher {
-		public static const VOLUME_DEFAULT:Number = 0.8;
 		public static var TIMER_INTERVAL:uint = 100;
+		private static const VOLUME_DEFAULT:Number = 0.8;
 
 		protected var playContent:*;
 		protected var timer:Timer;
@@ -53,7 +53,6 @@ package akdcl.media {
 		public function get position():uint {
 			return 0;
 		}
-
 		public function set position(_position:uint):void {
 			play(Math.min(_position, totalTime));
 		}
@@ -61,7 +60,6 @@ package akdcl.media {
 		public function get playProgress():Number {
 			return totalTime > 0 ? (position / totalTime) : 0;
 		}
-
 		public function set playProgress(_playProgress:Number):void {
 			if (_playProgress < 0){
 				_playProgress = 0;
@@ -71,12 +69,10 @@ package akdcl.media {
 			position = totalTime * _playProgress;
 		}
 
-		private var __playState:String;
-
+		private var __playState:String = PlayState.READY;
 		public function get playState():String {
 			return __playState;
 		}
-
 		protected function setPlayState(_playState:String):Boolean {
 			if (__playState == _playState){
 				return false;
@@ -87,6 +83,7 @@ package akdcl.media {
 				case PlayState.WAIT:
 				case PlayState.RECONNECT:
 				case PlayState.PLAY:
+					timer.start();
 					timer.addEventListener(TimerEvent.TIMER, onPlayProgressHander);
 					break;
 				case PlayState.READY:
@@ -100,12 +97,12 @@ package akdcl.media {
 			dispatchEvent(new MediaEvent(MediaEvent.STATE_CHANGE));
 			return true;
 		}
-
+		
+		private var volumeLast:Number = 0;
 		private var __volume:Number = VOLUME_DEFAULT;
 		public function get volume():Number {
 			return __volume;
 		}
-
 		public function set volume(_volume:Number):void {
 			if (_volume < 0){
 				_volume = 0;
@@ -118,20 +115,19 @@ package akdcl.media {
 			__volume = _volume;
 			dispatchEvent(new MediaEvent(MediaEvent.VOLUME_CHANGE));
 		}
-		//静音
-		private var volumeLast:Number = 0;
+		
 		public function get mute():Boolean {
 			return volume == 0;
 		}
 		public function set mute(_mute:Boolean):void {
-			if (_mute && (volume == 0)) {
+			if (_mute && (volume == 0)){
 				return;
 			}
-			if (_mute) {
+			if (_mute){
 				volumeLast = volume;
 				volume = 0;
-			}else{
-				if (volumeLast < 0.004) {
+			} else {
+				if (volumeLast < 0.004){
 					volumeLast = VOLUME_DEFAULT;
 				}
 				volume = volumeLast;
@@ -141,24 +137,22 @@ package akdcl.media {
 		override protected function init():void {
 			super.init();
 			timer = new Timer(TIMER_INTERVAL);
-			setPlayState(PlayState.READY);
 		}
 
 		override public function remove():void {
 			stop();
 			timer.stop();
+			super.remove();
 			timer = null;
 			playContent = null;
-			super.remove();
 		}
 
-		public function load(_source:String):void {
+		public function load(_item:*):void {
 			timer.reset();
 			timer.start();
 		}
 
 		public function play(_startTime:int = -1):void {
-			timer.start();
 			setPlayState(PlayState.PLAY);
 		}
 
@@ -189,7 +183,7 @@ package akdcl.media {
 		}
 
 		protected function onBufferProgressHandler(_evt:* = null):void {
-			dispatchEvent(new MediaEvent(MediaEvent.BUFFER_PROGRESS));
+			//dispatchEvent(EVENT_STATE_CHANGE);
 		}
 
 		protected function onPlayCompleteHandler(_evt:* = null):void {

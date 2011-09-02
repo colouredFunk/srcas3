@@ -27,7 +27,6 @@ package akdcl.media {
 		}
 
 		private var channel:SoundChannel;
-
 		private var pausePosition:uint = 0;
 
 		override public function get loadProgress():Number {
@@ -58,8 +57,14 @@ package akdcl.media {
 			super.remove();
 		}
 
-		override public function load(_source:String):void {
-			super.load(_source);
+		override public function load(_item:*):void {
+			var _source:String;
+			if (_item is PlayItem) {
+				_source = _item.source;
+			}else {
+				_source = _item;
+			}
+			
 			removeContentListener();
 			playContent = sM.getSource(SourceManager.SOUND_GROUP, _source);
 			if (playContent){
@@ -72,12 +77,12 @@ package akdcl.media {
 			}
 			if (loadProgress >= 1){
 				//playContent已经加载完毕
-				onLoadProgressHandler();
 				onLoadCompleteHandler();
 			} else {
 				playContent.addEventListener(ProgressEvent.PROGRESS, onLoadProgressHandler);
 				playContent.addEventListener(Event.COMPLETE, onLoadCompleteHandler);
 			}
+			super.load(_item);
 		}
 
 		override public function play(_startTime:int = -1):void {
@@ -90,8 +95,8 @@ package akdcl.media {
 				channel = playContent.play(Math.min(_startTime, 0));
 				setChannelVolume(channel, volume);
 				channel.addEventListener(Event.SOUND_COMPLETE, onPlayCompleteHandler);
-				super.play(_startTime);
 			}
+			super.play(_startTime);
 		}
 
 		override public function pause():void {

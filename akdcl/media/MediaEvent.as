@@ -51,9 +51,9 @@ package akdcl.media {
 			super(type, bubbles, cancelable);
 		}
 
-	/*override public function clone():Event {
-	   return new MediaEvent(type, bubbles, cancelable);
-	 }*/
+		override public function clone():Event {
+			return new MediaEvent(type, bubbles, cancelable);
+		}
 	}
 
 }
