@@ -301,7 +301,6 @@ package akdcl.media {
 				ExternalInterface.addCallback("playStateChange", playStateChange);
 				isPlugin = ExternalInterface.call("pwrd.wmpPlayer.createWMPPlayer", ExternalInterface.objectID, "playStateChange");
 			}
-			ExternalInterface.call("alert", ExternalInterface.objectID);
 		}
 
 		override public function remove():void {

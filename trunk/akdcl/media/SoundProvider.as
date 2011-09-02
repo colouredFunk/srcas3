@@ -42,7 +42,7 @@ package akdcl.media {
 		}
 
 		override public function get position():uint {
-			return channel ? channel.position : 0;
+			return pausePosition?pausePosition:(channel ? channel.position : 0);
 		}
 		
 		override public function set volume(value:Number):void {
@@ -91,8 +91,11 @@ package akdcl.media {
 				if (_startTime < 0 && pausePosition > 0){
 					_startTime = pausePosition;
 				}
+				if (_startTime<0) {
+					_startTime = 0;
+				}
 				pausePosition = 0;
-				channel = playContent.play(Math.min(_startTime, 0));
+				channel = playContent.play(_startTime);
 				setChannelVolume(channel, volume);
 				channel.addEventListener(Event.SOUND_COMPLETE, onPlayCompleteHandler);
 			}
