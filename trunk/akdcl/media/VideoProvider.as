@@ -43,11 +43,9 @@ package akdcl.media {
 		}
 		
 		private var __container:DisplayObjectContainer;
-
 		public function get container():DisplayObjectContainer {
 			return __container;
 		}
-
 		public function set container(_container:DisplayObjectContainer):void {
 			if (_container){
 				if (playContent && playContent.content){
@@ -60,7 +58,6 @@ package akdcl.media {
 		}
 
 		private var showRect:Rectangle;
-
 		public function updateRect(_rect:Rectangle = null):void {
 			if (_rect){
 				showRect = _rect;
@@ -74,14 +71,20 @@ package akdcl.media {
 		}
 
 		override public function remove():void {
-			container = null;
 			removeContentListener();
 			super.remove();
+			container = null;
 			showRect = null;
 		}
 
-		override public function load(_source:String):void {
-			super.load(_source);
+		override public function load(_item:*):void {
+			var _source:String;
+			if (_item is PlayItem) {
+				_source = _item.source;
+			}else {
+				_source = _item;
+			}
+			
 			removeContentListener();
 			removeContentFromContainer();
 			playContent = sM.getSource(VIDEOLOADER_GROUP, _source);
@@ -102,7 +105,6 @@ package akdcl.media {
 			}
 			if (loadProgress >= 1){
 				//playContent已经加载完毕
-				onLoadProgressHandler();
 				onLoadCompleteHandler();
 			} else {
 				playContent.addEventListener(LoaderEvent.PROGRESS, onLoadProgressHandler);
@@ -111,6 +113,7 @@ package akdcl.media {
 			playContent.addEventListener(VideoLoader.VIDEO_COMPLETE, onPlayCompleteHandler);
 			updateRect();
 			container = __container;
+			super.load(_item);
 		}
 
 		override public function play(_startTime:int = -1):void {
@@ -121,8 +124,8 @@ package akdcl.media {
 					playContent.videoTime = _startTime * 0.001;
 				}
 				playContent.volume = volume;
-				super.play(_startTime);
 			}
+			super.play(_startTime);
 		}
 
 		override public function pause():void {

@@ -74,7 +74,7 @@ package akdcl.media {
 			stop();
 			__playlist = _playlist;
 			pageID.length = __playlist.length;
-			dispatchEvent(new MediaEvent(MediaEvent.LIST_CHANGE));
+			//dispatchEvent(new MediaEvent(MediaEvent.LIST_CHANGE));
 		}
 
 		//当前播放列表位置
@@ -193,8 +193,8 @@ package akdcl.media {
 			play();
 		}
 
-		override public function load(_source:String):void {
-			playlist = _source;
+		override public function load(_item:*):void {
+			playlist = _item;
 			super.load(null);
 		}
 
@@ -239,10 +239,6 @@ package akdcl.media {
 				//根据repeat的值执行下一步
 				onPlayCompleteHandler();
 			}
-		}
-
-		override protected function onPlayProgressHander(_evt:* = null):void {
-			super.onPlayProgressHander(_evt);
 		}
 
 		override protected function onPlayCompleteHandler(_evt:* = null):void {

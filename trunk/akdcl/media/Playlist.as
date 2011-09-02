@@ -5,9 +5,6 @@ package akdcl.media {
 	 * @author ...
 	 */
 	public class Playlist {
-		//格式化播放列表
-		public static var SOURCE_ID:String = "source";
-
 		public static function createList(_list:*):Playlist {
 			var _playlist:Playlist = new Playlist();
 			if ((_list is String) || (_list is Array)){
@@ -24,7 +21,7 @@ package akdcl.media {
 					_list = _list.item;
 				}
 				for each (var _xml:XML in _list){
-					_playlist.insertItem(new PlayItem(_xml.attribute(SOURCE_ID)));
+					_playlist.insertItem(new PlayItem(_xml));
 				}
 			} else {
 				return null;
