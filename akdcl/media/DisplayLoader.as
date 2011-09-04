@@ -105,12 +105,17 @@ package akdcl.media {
 				container.addChild(bitmap);
 			} else {
 				container = this;
-				if (progressClip && contains(progressClip)) {
+				if (progressClip && contains(progressClip) && numChildren == 1) {
 					areaRect = new Rectangle();
 					container.addChildAt(bitmap, getChildIndex(progressClip));
 				} else {
 					areaRect = getBounds(this);
-					container.addChild(bitmap);
+					if (progressClip && contains(progressClip)) {
+						container.addChildAt(bitmap, getChildIndex(progressClip));
+					}else {
+						container.addChild(bitmap);
+					}
+					
 				}
 			}
 			setProgressClip(false);
@@ -185,7 +190,7 @@ package akdcl.media {
 				if (_p is BitmapData){
 					contentWidth = _p.width;
 					contentHeight = _p.height;
-				} else if (__content is Loader){
+				} else if (_p is Loader){
 					contentWidth = _p.contentLoaderInfo.width;
 					contentHeight = _p.contentLoaderInfo.height;
 				} else {
@@ -272,7 +277,9 @@ package akdcl.media {
 			if (scaleMode < 0){
 				container.scrollRect = areaRect;
 			} else {
-				container.scrollRect = null;
+				if (container.scrollRect) {
+					container.scrollRect = null;
+				}
 			}
 		}
 
