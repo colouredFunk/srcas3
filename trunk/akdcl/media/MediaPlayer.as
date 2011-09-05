@@ -1,13 +1,19 @@
 package akdcl.media {
 	import flash.display.DisplayObjectContainer;
 	import flash.geom.Rectangle;
-	
+
 	import akdcl.utils.PageID;
 
 	/**
 	 * ...
 	 * @author ...
 	 */
+	/// @eventType	akdcl.media.MediaEvent.LIST_CHANGE
+	[Event(name="listChange",type="akdcl.media.MediaEvent")]
+
+	/// @eventType	akdcl.media.MediaEvent.PLAY_ITEM_CHANGE
+	[Event(name="playItemChange",type="akdcl.media.MediaEvent")]
+
 	public class MediaPlayer extends MediaProvider {
 		private var imagePD:ImageProvider;
 		private var soundPD:SoundProvider;
@@ -75,7 +81,7 @@ package akdcl.media {
 			stop();
 			__playlist = _playlist;
 			pageID.length = __playlist.length;
-			//dispatchEvent(new MediaEvent(MediaEvent.LIST_CHANGE));
+			dispatchEvent(new MediaEvent(MediaEvent.LIST_CHANGE));
 		}
 
 		//当前播放列表位置
@@ -191,6 +197,7 @@ package akdcl.media {
 				_content.addEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
 				_content.addEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);
 			}
+			dispatchEvent(new MediaEvent(MediaEvent.PLAY_ITEM_CHANGE));
 			play();
 		}
 

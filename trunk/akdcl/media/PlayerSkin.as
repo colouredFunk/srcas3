@@ -1,4 +1,5 @@
 package akdcl.media {
+	import akdcl.media.MediaEvent;
 	import ui.SimpleBtn;
 	import akdcl.utils.copyInstanceToArray;
 
@@ -40,9 +41,10 @@ package akdcl.media {
 		public var btnNext:*;
 		public var btnVolume:*;
 		public var barVolume:*;
-		public var barLoadProgress:*;
 		public var barPlayProgress:*;
 		public var txtPlayProgress:*;
+		public var loadProgressClip:*;
+		public var bufferProgressClip:*;
 		protected var player:MediaProvider;
 
 		override protected function onRemoveToStageHandler():void {
@@ -57,6 +59,7 @@ package akdcl.media {
 					player.removeEventListener(MediaEvent.VOLUME_CHANGE, onVolumeChangeHandler);
 					player.removeEventListener(MediaEvent.PLAY_PROGRESS, onPlayProgressHandler);
 					player.removeEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
+					player.removeEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 				}
 				player = null;
 				return;
@@ -102,9 +105,9 @@ package akdcl.media {
 			}
 			if (barPlayProgress){
 				if (barPlayProgress.track && barPlayProgress.track.hasOwnProperty("value")){
-					barLoadProgress = barPlayProgress.track;
-				} else if (barPlayProgress.barLoadProgress){
-					barLoadProgress = barPlayProgress.barLoadProgress;
+					loadProgressClip = barPlayProgress.track;
+				} else if (barPlayProgress.progressClip){
+					loadProgressClip = barPlayProgress.progressClip;
 				}
 				if (txtPlayProgress){
 					barPlayProgress.txt = txtPlayProgress;
@@ -125,18 +128,19 @@ package akdcl.media {
 					player.playProgress = barPlayProgress.value * 0.999;
 				}
 			}
-			if (barLoadProgress){
-				if (barLoadProgress.hasOwnProperty("maximum")){
-					barLoadProgress.maximum = 1;
-					barLoadProgress.snapInterval = 0.004;
-					barLoadProgress.enabled = false;
-					barLoadProgress.value = 0;
+			if (loadProgressClip){
+				if (loadProgressClip.hasOwnProperty("maximum")){
+					loadProgressClip.maximum = 1;
+					loadProgressClip.snapInterval = 0.004;
+					loadProgressClip.enabled = false;
+					loadProgressClip.value = 0;
 				}
 			}
 			player.addEventListener(MediaEvent.STATE_CHANGE, onStateChangeHandler);
 			player.addEventListener(MediaEvent.VOLUME_CHANGE, onVolumeChangeHandler);
 			player.addEventListener(MediaEvent.PLAY_PROGRESS, onPlayProgressHandler);
 			player.addEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
+			player.addEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 			onStateChangeHandler(null);
 		}
 
@@ -205,18 +209,36 @@ package akdcl.media {
 		}
 
 		protected function onLoadProgressHandler(_evt:MediaEvent):void {
-			if (barLoadProgress){
-				if (barLoadProgress.hasOwnProperty("text")){
-					barLoadProgress.text = Math.round(player.loadProgress * 100) + " %";
-				} else if (barLoadProgress.hasOwnProperty("value")){
-					barLoadProgress.value = player.loadProgress;
-				} else if (barLoadProgress.hasOwnProperty("totalFrames")){
+			if (loadProgressClip){
+				if (loadProgressClip.hasOwnProperty("text")){
+					loadProgressClip.text = Math.round(player.loadProgress * 100) + " %";
+				} else if (loadProgressClip.hasOwnProperty("value")){
+					loadProgressClip.value = player.loadProgress;
+				} else if (loadProgressClip.hasOwnProperty("play")){
 					if (player.loadProgress == 1){
-						barLoadProgress.stop();
-						barLoadProgress.visible = false;
+						loadProgressClip.stop();
+						loadProgressClip.visible = false;
 					} else {
-						barLoadProgress.play();
-						barLoadProgress.visible = true;
+						loadProgressClip.play();
+						loadProgressClip.visible = true;
+					}
+				}
+			}
+		}
+
+		protected function onBufferProgressHandler(_evt:MediaEvent):void {
+			if (bufferProgressClip){
+				if (bufferProgressClip.hasOwnProperty("text")){
+					bufferProgressClip.text = Math.round(player.bufferProgress * 100) + " %";
+				} else if (bufferProgressClip.hasOwnProperty("value")){
+					bufferProgressClip.value = player.bufferProgress;
+				} else if (bufferProgressClip.hasOwnProperty("play")){
+					if (player.bufferProgress == 1){
+						bufferProgressClip.stop();
+						bufferProgressClip.visible = false;
+					} else {
+						bufferProgressClip.play();
+						bufferProgressClip.visible = true;
 					}
 				}
 			}

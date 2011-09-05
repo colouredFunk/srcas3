@@ -229,6 +229,7 @@ package akdcl.media {
 			if (contentLast && container.contains(contentLast)){
 				container.removeChild(contentLast);
 				TweenNano.killTweensOf(contentLast);
+				contentLast.unloadAndStop();
 				contentLast = null;
 			}
 		}
