@@ -1,5 +1,4 @@
 ﻿package akdcl.net {
-	import akdcl.utils.replaceString;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.net.URLVariables;
@@ -11,10 +10,9 @@
 
 	import com.adobe.serialization.json.JSON;
 
-	import akdcl.utils.destroyObject;
 	import akdcl.utils.objectToURLVariables;
+	
 	import zero.net.FormVariables;
-
 	import ui.manager.EventManager;
 
 	/**
@@ -160,7 +158,6 @@
 
 		public function clear():void {
 			data = null;
-			destroyObject(userData);
 			userData = null;
 		}
 	}

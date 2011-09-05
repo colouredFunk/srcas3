@@ -19,7 +19,6 @@ package akdcl.media {
 	import ui.UISprite;
 
 	import akdcl.manager.RequestManager;
-
 	import akdcl.utils.addContextMenu;
 
 	/**
