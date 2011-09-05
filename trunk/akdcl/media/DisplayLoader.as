@@ -260,6 +260,9 @@ package akdcl.media {
 						bitmap.y = areaRect.y + (areaRect.height - bitmap.height) * 0.5;
 					}
 				}
+				if (scaleMode < 0){
+					container.scrollRect = areaRect;
+				}
 			} else {
 				if (areaRect.width + areaRect.height <= 0){
 				} else {
@@ -273,13 +276,7 @@ package akdcl.media {
 						__content.y = areaRect.y + (areaRect.height - contentHeight * __content.scaleY) * 0.5;
 					}
 				}
-			}
-			if (scaleMode < 0){
 				container.scrollRect = areaRect;
-			} else {
-				if (container.scrollRect) {
-					container.scrollRect = null;
-				}
 			}
 		}
 
