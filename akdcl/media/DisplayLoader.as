@@ -133,7 +133,7 @@ package akdcl.media {
 
 		public function load(_url:String, _tweenMode:int = 2):void {
 			if (__source == _url){
-				return;
+				//return;
 			}
 			tweenMode = _tweenMode;
 			hideContent(__content && tweenMode == 2 ? true : false);
