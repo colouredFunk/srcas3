@@ -109,6 +109,8 @@ package akdcl.media {
 			} else {
 				playContent.addEventListener(LoaderEvent.PROGRESS, onLoadProgressHandler);
 				playContent.addEventListener(LoaderEvent.COMPLETE, onLoadCompleteHandler);
+				playContent.addEventListener(VideoLoader.VIDEO_BUFFER_EMPTY, onBufferProgressHandler);
+				playContent.addEventListener(VideoLoader.VIDEO_BUFFER_FULL, onBufferProgressHandler);
 			}
 			playContent.addEventListener(VideoLoader.VIDEO_COMPLETE, onPlayCompleteHandler);
 			updateRect();
@@ -153,7 +155,7 @@ package akdcl.media {
 		}
 
 		override protected function onLoadProgressHandler(_evt:* = null):void {
-			if (bufferProgress < 1 && playContent){
+			if (bufferProgress < 1 && playContent) {
 				onBufferProgressHandler();
 			}
 			super.onLoadProgressHandler(_evt);
@@ -172,6 +174,8 @@ package akdcl.media {
 				playContent.removeEventListener(LoaderEvent.PROGRESS, onLoadProgressHandler);
 				playContent.removeEventListener(LoaderEvent.COMPLETE, onLoadCompleteHandler);
 				playContent.removeEventListener(VideoLoader.VIDEO_COMPLETE, onPlayCompleteHandler);
+				playContent.removeEventListener(VideoLoader.VIDEO_BUFFER_EMPTY, onBufferProgressHandler);
+				playContent.removeEventListener(VideoLoader.VIDEO_BUFFER_FULL, onBufferProgressHandler);
 			}
 		}
 

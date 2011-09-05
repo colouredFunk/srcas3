@@ -184,7 +184,7 @@ package akdcl.media {
 		}
 
 		protected function onBufferProgressHandler(_evt:* = null):void {
-			//dispatchEvent(EVENT_STATE_CHANGE);
+			dispatchEvent(new MediaEvent(MediaEvent.BUFFER_PROGRESS));
 		}
 
 		protected function onPlayCompleteHandler(_evt:* = null):void {
