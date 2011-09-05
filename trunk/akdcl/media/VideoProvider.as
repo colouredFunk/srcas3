@@ -1,11 +1,11 @@
 package akdcl.media {
 
+	import flash.display.DisplayObjectContainer;
+	import flash.geom.Rectangle;
+	
 	import com.greensock.loading.VideoLoader;
 	import com.greensock.events.LoaderEvent;
 	import com.greensock.layout.ScaleMode;
-	import flash.display.DisplayObjectContainer;
-	import flash.geom.Rectangle;
-	import flash.media.Video;
 
 	import akdcl.manager.SourceManager;
 

@@ -5,7 +5,7 @@ package akdcl.media {
 
 	import flash.events.Event;
 
-	import com.greensock.TweenLite;
+	import com.greensock.TweenNano;
 	import com.greensock.easing.Sine;
 
 	import akdcl.manager.ElementManager;
@@ -189,7 +189,7 @@ package akdcl.media {
 import flash.media.SoundChannel;
 
 import com.greensock.easing.Sine;
-import com.greensock.TweenLite;
+import com.greensock.TweenNano;
 
 import akdcl.manager.ElementManager;
 
@@ -220,7 +220,7 @@ class TweenObject {
 			volume = soundItem.volume;
 		}
 
-		TweenLite.to(this, _tween, tweenVars);
+		TweenNano.to(this, _tween, tweenVars);
 	}
 
 	private function onTweenUpdate():void {
@@ -228,7 +228,7 @@ class TweenObject {
 	}
 
 	private function onTweenComplete():void {
-		TweenLite.killTweensOf(this);
+		TweenNano.killTweensOf(this);
 		ElementManager.getInstance().recycle(this);
 	}
 }

@@ -12,9 +12,10 @@
 	import flash.system.Security;
 	import flash.system.System;
 	
-	import akdcl.net.DataLoader;
 	import akdcl.utils.addContextMenu;
+	
 	import akdcl.manager.ExternalInterfaceManager;
+	import akdcl.manager.RequestManager;
 
 	public class DocClass extends MovieClip {
 		protected static var instanceMap:Object = { };
@@ -40,6 +41,7 @@
 		public var onLoaded:Function;
 		
 		public var eiM:ExternalInterfaceManager;
+		public var rM:RequestManager;
 
 		protected var loadProgress:Number = 0;
 		protected var xmlLoadProgress:Number = 0;
@@ -72,6 +74,7 @@
 			tabChildren = false;
 			
 			eiM = ExternalInterfaceManager.getInstance();
+			rM = RequestManager.getInstance();
 			
 			if (onLoaded == null){
 				onLoaded = function():void {
@@ -81,8 +84,8 @@
 				}
 			}
 			optionsXMLPath = flashVars.xml || optionsXMLPath;
-			if (optionsXMLPath){
-				DataLoader.load(optionsXMLPath, onXMLLoadingHandler, onXMLLoadedHandler, onXMLErrorHandler);
+			if (optionsXMLPath) {
+				rM.load(optionsXMLPath, onXMLLoadedHandler, onXMLErrorHandler, onXMLLoadingHandler);
 			}
 			addEventListener(Event.ENTER_FRAME, onLoadingHandler);
 			
@@ -139,16 +142,25 @@
 			xmlLoadProgress = (_evt.bytesTotal > 0) ? (_evt.bytesLoaded / _evt.bytesTotal) : xmlLoadProgress;
 		}
 
-		protected function onXMLLoadedHandler(_evt:Event):void {
-			optionsXML = XML(_evt.currentTarget.data);
-			xmlLoadProgress = 1;
+		protected function onXMLLoadedHandler(_xml:XML, _url:String):void {
+			var _str:String = "ERROR:XML语法错误!\n" + _url;
+			if (_xml) {
+				optionsXML = _xml;
+				xmlLoadProgress = 1;
+				optionsXMLPath = _url;
+			}else if (eiM.isAvailable) {
+				eiM.debugMessage(_str);
+			}else {
+				throw new Error(_str);
+			}
 		}
 
-		protected function onXMLErrorHandler(_evt:IOErrorEvent):void {
+		protected function onXMLErrorHandler(_evt:IOErrorEvent, _url:String):void {
+			var _str:String = "ERROR:读取XML失败，请检查XML地址是否正确!\n" + _url;
 			if (eiM.isAvailable) {
-				eiM.debugMessage("未读取到XML，请检查是否配置正确!");
+				eiM.debugMessage(_str);
 			}else {
-				throw new Error("ERROR:未读取到XML，请检查是否配置正确!");
+				throw new Error(_str);
 			}
 		}
 

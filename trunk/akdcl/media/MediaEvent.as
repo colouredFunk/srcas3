@@ -5,35 +5,35 @@ package akdcl.media {
 	 * ...
 	 * @author Akdcl
 	 */
-	/// @eventType	akdcl.application.player.MediaEvent.LIST_CHANGE
-	[Event(name="listChange",type="akdcl.application.player.MediaEvent")]
+	/// @eventType	akdcl.media.MediaEvent.LIST_CHANGE
+	[Event(name="listChange",type="akdcl.media.MediaEvent")]
 
-	/// @eventType	akdcl.application.player.MediaEvent.VOLUME_CHANGE
-	[Event(name="volumeChange",type="akdcl.application.player.MediaEvent")]
+	/// @eventType	akdcl.media.MediaEvent.VOLUME_CHANGE
+	[Event(name="volumeChange",type="akdcl.media.MediaEvent")]
 
-	/// @eventType	akdcl.application.player.MediaEvent.STATE_CHANGE
-	[Event(name="stateChange",type="akdcl.application.player.MediaEvent")]
+	/// @eventType	akdcl.media.MediaEvent.STATE_CHANGE
+	[Event(name="stateChange",type="akdcl.media.MediaEvent")]
 
-	/// @eventType	akdcl.application.player.MediaEvent.PLAY_ITEM_CHANGE
-	[Event(name="playItemChange",type="akdcl.application.player.MediaEvent")]
+	/// @eventType	akdcl.media.MediaEvent.PLAY_ITEM_CHANGE
+	[Event(name="playItemChange",type="akdcl.media.MediaEvent")]
 
-	/// @eventType	akdcl.application.player.MediaEvent.PLAY_PROGRESS
-	[Event(name="playProgress",type="akdcl.application.player.MediaEvent")]
+	/// @eventType	akdcl.media.MediaEvent.PLAY_PROGRESS
+	[Event(name="playProgress",type="akdcl.media.MediaEvent")]
 
-	/// @eventType	akdcl.application.player.MediaEvent.PLAY_COMPLETE
-	[Event(name="playComplete",type="akdcl.application.player.MediaEvent")]
+	/// @eventType	akdcl.media.MediaEvent.PLAY_COMPLETE
+	[Event(name="playComplete",type="akdcl.media.MediaEvent")]
 
-	/// @eventType	akdcl.application.player.MediaEvent.LOAD_ERROR
-	[Event(name="loadError",type="akdcl.application.player.MediaEvent")]
+	/// @eventType	akdcl.media.MediaEvent.LOAD_ERROR
+	[Event(name="loadError",type="akdcl.media.MediaEvent")]
 
-	/// @eventType	akdcl.application.player.MediaEvent.BUFFER_PROGRESS
-	[Event(name="bufferProgress",type="akdcl.application.player.MediaEvent")]
+	/// @eventType	akdcl.media.MediaEvent.BUFFER_PROGRESS
+	[Event(name="bufferProgress",type="akdcl.media.MediaEvent")]
 
-	/// @eventType	akdcl.application.player.MediaEvent.LOAD_PROGRESS
-	[Event(name="loadProgress",type="akdcl.application.player.MediaEvent")]
+	/// @eventType	akdcl.media.MediaEvent.LOAD_PROGRESS
+	[Event(name="loadProgress",type="akdcl.media.MediaEvent")]
 
-	/// @eventType	akdcl.application.player.MediaEvent.LOAD_COMPLETE
-	[Event(name="loadComplete",type="akdcl.application.player.MediaEvent")]
+	/// @eventType	akdcl.media.MediaEvent.LOAD_COMPLETE
+	[Event(name="loadComplete",type="akdcl.media.MediaEvent")]
 
 	public class MediaEvent extends Event {
 		public static const LIST_CHANGE:String = "listChange";
