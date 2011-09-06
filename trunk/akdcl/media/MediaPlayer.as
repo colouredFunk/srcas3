@@ -1,7 +1,4 @@
 package akdcl.media {
-	import flash.display.DisplayObjectContainer;
-	import flash.geom.Rectangle;
-
 	import akdcl.utils.PageID;
 
 	/**
@@ -103,30 +100,14 @@ package akdcl.media {
 			__repeat = _repeat;
 		}
 
-		private var __container:DisplayObjectContainer;
-
-		public function set container(_container:DisplayObjectContainer):void {
+		private var __container:DisplayRect;
+		public function set container(_container:DisplayRect):void {
 			for each (var _content:MediaProvider in playContent){
 				if (_content.hasOwnProperty("container")){
 					_content["container"] = _container;
 				}
 			}
 			__container = _container;
-		}
-
-		private var showRect:Rectangle;
-
-		public function updateRect(_rect:Rectangle = null):void {
-			if (_rect){
-				showRect = _rect;
-			}
-			if (showRect){
-				for each (var _content:MediaProvider in providers){
-					if (_content.hasOwnProperty("updateRect")){
-						_content["updateRect"](showRect);
-					}
-				}
-			}
 		}
 
 		override protected function init():void {
@@ -145,9 +126,6 @@ package akdcl.media {
 			//stop();
 			var _content:MediaProvider;
 			for each (_content in playContent){
-				if (_content.hasOwnProperty("container")){
-					_content["container"] = null;
-				}
 				_content.removeEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 				_content.removeEventListener(MediaEvent.LOAD_ERROR, onLoadErrorHandler);
 				_content.removeEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
@@ -189,7 +167,6 @@ package akdcl.media {
 					break;
 			}
 			container = __container;
-			updateRect(showRect);
 			for each (_content in playContent){
 				_content.addEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 				_content.addEventListener(MediaEvent.LOAD_ERROR, onLoadErrorHandler);

@@ -1,6 +1,5 @@
 package akdcl.media {
 
-	import flash.display.DisplayObjectContainer;
 	import flash.geom.Rectangle;
 	
 	import com.greensock.loading.VideoLoader;
@@ -42,39 +41,21 @@ package akdcl.media {
 			}
 		}
 		
-		private var __container:DisplayObjectContainer;
-		public function get container():DisplayObjectContainer {
-			return __container;
-		}
-		public function set container(_container:DisplayObjectContainer):void {
+		private var __container:DisplayRect;
+		public function set container(_container:DisplayRect):void {
 			if (_container){
 				if (playContent && playContent.content){
-					_container.addChild(playContent.content);
+					_container.setContent(playContent.content);
 				}
-			} else {
-				removeContentFromContainer();
+			} else if (__container) {
+				__container.setContent();
 			}
 			__container = _container;
-		}
-
-		private var showRect:Rectangle;
-		public function updateRect(_rect:Rectangle = null):void {
-			if (_rect){
-				showRect = _rect;
-			}
-			if (showRect && playContent && playContent.content){
-				playContent.content.x = showRect.x;
-				playContent.content.y = showRect.y;
-				playContent.content.fitWidth = showRect.width;
-				playContent.content.fitHeight = showRect.height;
-			}
 		}
 
 		override public function remove():void {
 			removeContentListener();
 			super.remove();
-			container = null;
-			showRect = null;
 		}
 
 		override public function load(_item:*):void {
@@ -86,7 +67,6 @@ package akdcl.media {
 			}
 			
 			removeContentListener();
-			removeContentFromContainer();
 			playContent = sM.getSource(VIDEOLOADER_GROUP, _source);
 			if (playContent){
 			} else {
@@ -106,18 +86,27 @@ package akdcl.media {
 			if (loadProgress >= 1){
 				//playContent已经加载完毕
 				onLoadCompleteHandler();
+				if (__container) {
+					__container.setContent(playContent.content);
+				}
 			} else {
 				playContent.addEventListener(LoaderEvent.PROGRESS, onLoadProgressHandler);
 				playContent.addEventListener(LoaderEvent.COMPLETE, onLoadCompleteHandler);
+				playContent.addEventListener(LoaderEvent.INIT, onVideoInitHandler);
 				playContent.addEventListener(VideoLoader.VIDEO_BUFFER_EMPTY, onBufferProgressHandler);
 				playContent.addEventListener(VideoLoader.VIDEO_BUFFER_FULL, onBufferProgressHandler);
 			}
 			playContent.addEventListener(VideoLoader.VIDEO_COMPLETE, onPlayCompleteHandler);
-			updateRect();
-			container = __container;
 			super.load(_item);
 		}
 
+		private function onVideoInitHandler(_e:LoaderEvent):void {
+			playContent.removeEventListener(LoaderEvent.INIT, onVideoInitHandler);
+			if (__container) {
+				__container.setContent(playContent.content);
+			}
+		}
+		
 		override public function play(_startTime:int = -1):void {
 			if (playContent){
 				if (_startTime < 0){
@@ -147,7 +136,6 @@ package akdcl.media {
 
 		override protected function onLoadErrorHandler(_evt:* = null):void {
 			removeContentListener();
-			removeContentFromContainer();
 			sM.removeSource(VIDEOLOADER_GROUP, playContent);
 			playContent.dispose();
 			playContent = null;
@@ -173,15 +161,10 @@ package akdcl.media {
 				playContent.removeEventListener(LoaderEvent.ERROR, onLoadErrorHandler);
 				playContent.removeEventListener(LoaderEvent.PROGRESS, onLoadProgressHandler);
 				playContent.removeEventListener(LoaderEvent.COMPLETE, onLoadCompleteHandler);
+				playContent.removeEventListener(LoaderEvent.INIT, onVideoInitHandler);
 				playContent.removeEventListener(VideoLoader.VIDEO_COMPLETE, onPlayCompleteHandler);
 				playContent.removeEventListener(VideoLoader.VIDEO_BUFFER_EMPTY, onBufferProgressHandler);
 				playContent.removeEventListener(VideoLoader.VIDEO_BUFFER_FULL, onBufferProgressHandler);
-			}
-		}
-
-		private function removeContentFromContainer():void {
-			if (playContent && playContent.content && playContent.content.parent){
-				playContent.content.parent.removeChild(playContent.content);
 			}
 		}
 	}
