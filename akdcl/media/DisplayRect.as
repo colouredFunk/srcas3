@@ -54,6 +54,9 @@ package akdcl.media {
 		protected var isHidding:Boolean = false;
 		protected var tweenMode:int;
 		protected var useScrollRect:Boolean = false;
+		
+		protected var tweenOutVar:Object;
+		protected static var tweenInVar:Object = { alpha: 1, useFrames: true };
 
 		public function get rectWidth():uint {
 			return rect.width;
@@ -128,13 +131,14 @@ package akdcl.media {
 			if (_bgColor>=0) {
 				opaqueBackground = _bgColor;
 			}
+			tweenOutVar = { alpha: 0, useFrames: true, onComplete: showContent };
 			bitmap = new Bitmap();
 			addChild(bitmap);
 			contextMenu = createMenu(this);
 			super();
 		}
 
-		public function setContent(_content:Object, _tweenMode:int = 2):void {
+		public function setContent(_content:Object = null, _tweenMode:int = 2):void {
 			contentReady = _content;
 			if (isHidding){
 				return;
@@ -144,7 +148,7 @@ package akdcl.media {
 			if (content && tweenMode == 2 ? true : false) {
 				var _display:Object = content is BitmapData ? bitmap : content;
 				TweenNano.killTweensOf(_display);
-				TweenNano.to(_display, TWEEN_FRAME, { alpha: 0, useFrames: true, onComplete: showContent } );
+				TweenNano.to(_display, TWEEN_FRAME, tweenOutVar);
 			}else {
 				showContent();
 			}
@@ -156,14 +160,14 @@ package akdcl.media {
 				bitmap.bitmapData = null;
 			}else if (content) {
 				TweenNano.killTweensOf(content);
-				removeChild(content as DisplayObject);
+				if (contains(content as DisplayObject)) {
+					removeChild(content as DisplayObject);
+				}
 			}
 			
 			isHidding = false;
 			content = contentReady;
-			if (content) {
-				
-			}
+			
 			var _display:Object = content is BitmapData ? bitmap : content;
 			if (_display) {
 				_display.scaleX = _display.scaleY = 1;
@@ -179,8 +183,8 @@ package akdcl.media {
 				contentHeight = _display.contentLoaderInfo.height;
 				addChildAt(_display as DisplayObject, getChildIndex(bitmap));
 			}else if (_display is Video) {
-				contentWidth = _display.videoWidth;
-				contentHeight = _display.videoHeight;
+				contentWidth = _display.videoWidth || _display.width;
+				contentHeight = _display.videoHeight || _display.height;
 				addChildAt(_display as DisplayObject, getChildIndex(bitmap));
 			}else if (_display is DisplayObject) {
 				var _rect:Rectangle = _display.getRect(content);
@@ -194,35 +198,38 @@ package akdcl.media {
 			}
 			if (_display && tweenMode > 0) {
 				_display.alpha = 0;
-				TweenNano.to(_display, TWEEN_FRAME, { alpha: 1, useFrames: true } );
+				TweenNano.to(_display, TWEEN_FRAME, tweenInVar);
 			}
-			updateRect(false);
+			updateRect(useScrollRect);
 		}
 
 		public function updateRect(_useScrollRect:Boolean = true):void {
 			useScrollRect = _useScrollRect;
-			if (content){
-			} else {
-				return;
-			}
-			var _display:Object = content is BitmapData ? bitmap : content;
-			_display.y = _display.x = 0;
-			if (__widthOnly && __heightOnly) {
-				rect.width = contentWidth;
-				rect.height = contentHeight;
-				rect.x = offX;
-				rect.y = offY;
-			} else if (__widthOnly){
-				setDisplayScale(_display, true);
-			} else if (__heightOnly){
-				setDisplayScale(_display, false);
-			} else {
-				var _rectAspectRatio:Number = rect.width / rect.height;
-				var _contentAspectRatio:Number = contentWidth / contentHeight;
-				if (__scaleMode >= 0 ? (_rectAspectRatio > _contentAspectRatio) : (_rectAspectRatio < _contentAspectRatio)){
+			if (content) {
+				var _display:Object = content is BitmapData ? bitmap : content;
+				_display.y = _display.x = 0;
+				if (__widthOnly && __heightOnly) {
+					rect.width = contentWidth;
+					rect.height = contentHeight;
+					if (useScrollRect) {
+						rect.x = offX;
+						rect.y = offY;
+					}else {
+						_display.x = -offX;
+						_display.y = -offY;
+					}
+				} else if (__widthOnly){
+					setDisplayScale(_display, true);
+				} else if (__heightOnly){
 					setDisplayScale(_display, false);
 				} else {
-					setDisplayScale(_display, true);
+					var _rectAspectRatio:Number = rect.width / rect.height;
+					var _contentAspectRatio:Number = contentWidth / contentHeight;
+					if (__scaleMode >= 0 ? (_rectAspectRatio > _contentAspectRatio) : (_rectAspectRatio < _contentAspectRatio)){
+						setDisplayScale(_display, false);
+					} else {
+						setDisplayScale(_display, true);
+					}
 				}
 			}
 			if (useScrollRect) {

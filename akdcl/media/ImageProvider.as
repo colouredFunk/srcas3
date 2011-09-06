@@ -1,10 +1,11 @@
 package akdcl.media {
-	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
 	import flash.events.TimerEvent;
 	import flash.geom.Rectangle;
+	
+	import akdcl.manager.RequestManager;
 
 	/**
 	 * ...
@@ -13,8 +14,11 @@ package akdcl.media {
 	final public class ImageProvider extends MediaProvider {
 		private static const DEFAULT_TOTAL_TIME:uint = 5000;
 		
+		protected static var rM:RequestManager = RequestManager.getInstance();
+		
+		private var __loadProgress:Number = 0;
 		override public function get loadProgress():Number {
-			return playContent ? playContent.loadProgress : 0;
+			return __loadProgress;
 		}
 
 		private var __totalTime:uint = DEFAULT_TOTAL_TIME;
@@ -22,56 +26,36 @@ package akdcl.media {
 			return __totalTime;
 		}
 		override public function get bufferProgress():Number {
-			return loadProgress;
+			return __loadProgress;
 		}
 
 		override public function get position():uint {
 			return timer.currentCount * timer.delay;
 		}
 
-		public function set container(_container:DisplayObjectContainer):void {
+		private var __container:DisplayRect;
+		public function set container(_container:DisplayRect):void {
 			if (_container){
-				_container.addChild(playContent);
-			} else if (playContent.parent){
-				playContent.parent.removeChild(playContent);
+				if (playContent){
+					_container.setContent(playContent);
+				}
+			} else if (__container) {
+				__container.setContent();
 			}
-		}
-
-		public function updateRect(_rect:Rectangle = null):void {
-			if (_rect){
-				playContent.x = _rect.x;
-				playContent.y = _rect.y;
-				playContent.areaRect.width = _rect.width;
-				playContent.areaRect.height = _rect.height;
-				playContent.updateRect();
-			}
-		}
-
-		override protected function init():void {
-			super.init();
-			playContent = new DisplayLoader();
-			playContent.autoRemove = false;
-			playContent.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);
-			playContent.addEventListener(ProgressEvent.PROGRESS, onLoadProgressHandler);
-			playContent.addEventListener(ProgressEvent.PROGRESS, onBufferProgressHandler);
-			playContent.addEventListener(Event.COMPLETE, onLoadCompleteHandler);
-		}
-
-		override public function remove():void {
-			playContent.remove();
-			super.remove();
+			__container = _container;
 		}
 
 		override public function load(_item:*):void {
-			if (_item is PlayItem) {
-				__totalTime = _item.totalTime || DEFAULT_TOTAL_TIME;
-				playContent.load(_item.source);
+			__loadProgress = 0;
+			var _source:String;
+			if (_item is PlayItem) { 
+				_source = _item.source;
 			}else {
-				__totalTime = DEFAULT_TOTAL_TIME;
-				playContent.load(_item);
+				_source = _item;
 			}
 			super.load(_item);
 			timer.stop();
+			rM.loadDisplay(_source, onLoadCompleteHandler, onLoadErrorHandler, onLoadProgressHandler);
 		}
 
 		override public function pause():void {
@@ -84,10 +68,27 @@ package akdcl.media {
 			timer.stop();
 			super.stop();
 		}
+		
+		override protected function onLoadProgressHandler(_evt:* = null):void {
+			if (_evt) {
+				__loadProgress = _evt.bytesLoaded / _evt.bytesTotal;
+			}else {
+				__loadProgress = 1;
+			}
+			if (isNaN(__loadProgress)){
+				__loadProgress = 0;
+			}
+			onBufferProgressHandler();
+			super.onLoadProgressHandler(_evt);
+		}
 
 		override protected function onLoadCompleteHandler(_evt:* = null):void {
+			playContent = _evt;
+			if (__container) {
+				__container.setContent(playContent);
+			}
 			timer.start();
-			super.onLoadCompleteHandler(_evt);
+			super.onLoadCompleteHandler(null);
 		}
 
 		override protected function onPlayProgressHander(_evt:* = null):void {
