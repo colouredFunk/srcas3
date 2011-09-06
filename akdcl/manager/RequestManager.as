@@ -230,6 +230,7 @@ package akdcl.manager {
 import flash.display.AVM1Movie;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
+import flash.display.DisplayObject;
 import flash.display.Loader;
 import flash.events.Event;
 import flash.events.ProgressEvent;
@@ -273,7 +274,7 @@ class RequestLoader extends Loader {
 		for each (_fun in completeHandlers){
 			delete completeHandlers[_fun];
 		}
-		if (content is AVM1Movie) {
+		if (content is DisplayObject) {
 			return false;
 		}
 		url = null;
@@ -330,12 +331,10 @@ class RequestLoader extends Loader {
 
 	public function onCompleteHandler():void {
 		var _content:*;
-		if (content is AVM1Movie) {
-			_content = this;
-		}else if (content is Bitmap) {
+		if (content is Bitmap) {
 			_content = (content as Bitmap).bitmapData;
 		}else {
-			_content = content;
+			_content = this;
 		}
 		for each (var _onComplete:Function in completeHandlers){
 			switch (_onComplete.length){
