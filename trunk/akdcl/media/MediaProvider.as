@@ -38,6 +38,8 @@ package akdcl.media {
 
 		protected var playContent:*;
 		protected var timer:Timer;
+		
+		protected var playItem:PlayItem;
 
 		public function get loadProgress():Number {
 			return 0;
@@ -78,12 +80,14 @@ package akdcl.media {
 			if (__playState == _playState){
 				return false;
 			}
-			onPlayProgressHander(_playState);
+			onPlayProgressHander(false);
 			switch (_playState){
 				case PlayState.CONNECT:
 				case PlayState.WAIT:
 				case PlayState.RECONNECT:
 				case PlayState.PLAY:
+					onBufferProgressHandler(false);
+					onLoadProgressHandler(false);
 					timer.start();
 					timer.addEventListener(TimerEvent.TIMER, onPlayProgressHander);
 					break;
@@ -151,6 +155,11 @@ package akdcl.media {
 		public function load(_item:*):void {
 			timer.reset();
 			timer.start();
+			if (_item is PlayItem) {
+				playItem = _item;
+			}else if(_item){
+				playItem = new PlayItem(_item);
+			}
 		}
 
 		public function play(_startTime:int = -1):void {
@@ -168,29 +177,41 @@ package akdcl.media {
 		//
 		protected function onLoadErrorHandler(_evt:* = null):void {
 			stop();
-			dispatchEvent(new MediaEvent(MediaEvent.LOAD_ERROR));
+			if (!(_evt === false)) {
+				dispatchEvent(new MediaEvent(MediaEvent.LOAD_ERROR));
+			}
 		}
 
 		protected function onLoadProgressHandler(_evt:* = null):void {
-			dispatchEvent(new MediaEvent(MediaEvent.LOAD_PROGRESS));
+			if (!(_evt === false)) {
+				dispatchEvent(new MediaEvent(MediaEvent.LOAD_PROGRESS));
+			}
 		}
 
 		protected function onLoadCompleteHandler(_evt:* = null):void {
-			dispatchEvent(new MediaEvent(MediaEvent.LOAD_COMPLETE));
+			if (!(_evt === false)) {
+				dispatchEvent(new MediaEvent(MediaEvent.LOAD_COMPLETE));
+			}
 		}
 
 		protected function onPlayProgressHander(_evt:* = null):void {
-			dispatchEvent(new MediaEvent(MediaEvent.PLAY_PROGRESS));
+			if (!(_evt === false)) {
+				dispatchEvent(new MediaEvent(MediaEvent.PLAY_PROGRESS));
+			}
 		}
 
 		protected function onBufferProgressHandler(_evt:* = null):void {
-			dispatchEvent(new MediaEvent(MediaEvent.BUFFER_PROGRESS));
+			if (!(_evt === false)) {
+				dispatchEvent(new MediaEvent(MediaEvent.BUFFER_PROGRESS));
+			}
 		}
 
 		protected function onPlayCompleteHandler(_evt:* = null):void {
 			timer.stop();
 			setPlayState(PlayState.COMPLETE);
-			dispatchEvent(new MediaEvent(MediaEvent.PLAY_COMPLETE));
+			if (!(_evt === false)) {
+				dispatchEvent(new MediaEvent(MediaEvent.PLAY_COMPLETE));
+			}
 		}
 	}
 

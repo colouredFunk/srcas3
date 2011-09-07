@@ -107,6 +107,24 @@ package akdcl.manager {
 			_loader.addEvents(_onProgressHandler, _onErrorHandler, _onCompleteHandler);
 			_loader.load(request);
 		}
+		
+		public function unloadDisplay(_url:String, _onCompleteHandler:Function = null, _onErrorHandler:Function = null, _onProgressHandler:Function = null):void {
+			if (!_url){
+				return;
+			}
+			//
+			var _bmd:BitmapData = sM.getSource(SourceManager.BITMAPDATA_GROUP, _url);
+			if (_bmd){
+				return;
+			}
+			//
+			var _loader:RequestLoader = loaderDic[_url];
+			if (_loader) {
+				_loader.removeEvents(_onProgressHandler, _onErrorHandler, _onCompleteHandler);
+			} else {
+				return;
+			}
+		}
 
 		private function onLoaderCompleteOrErrorHandler(_evt:Event):void {
 			var _loaderInfo:LoaderInfo = (_evt.currentTarget as LoaderInfo);
