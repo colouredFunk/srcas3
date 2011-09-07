@@ -17,6 +17,8 @@ package akdcl.media {
 		private static const VIDEOLOADER_GROUP:String = "VideoLoader";
 
 		private static var sM:SourceManager = SourceManager.getInstance();
+		
+		private var isBuffering:Boolean = false;
 
 		override public function get loadProgress():Number {
 			return playContent ? playContent.progress : 0;
@@ -56,18 +58,13 @@ package akdcl.media {
 		override public function remove():void {
 			removeContentListener();
 			super.remove();
+			__container = null;
 		}
 
 		override public function load(_item:*):void {
-			var _source:String;
-			if (_item is PlayItem) {
-				_source = _item.source;
-			}else {
-				_source = _item;
-			}
-			
+			super.load(_item);
 			removeContentListener();
-			playContent = sM.getSource(VIDEOLOADER_GROUP, _source);
+			playContent = sM.getSource(VIDEOLOADER_GROUP, playItem.source);
 			if (playContent){
 			} else {
 				var _params:Object = null;
@@ -78,8 +75,8 @@ package akdcl.media {
 						}
 					}
 				}
-				playContent = new VideoLoader(_source, _params || DEFAULT_PARAMS);
-				sM.addSource(VIDEOLOADER_GROUP, _source, playContent);
+				playContent = new VideoLoader(playItem.source, _params || DEFAULT_PARAMS);
+				sM.addSource(VIDEOLOADER_GROUP, playItem.source, playContent);
 				playContent.addEventListener(LoaderEvent.ERROR, onLoadErrorHandler);
 				playContent.load();
 			}
@@ -93,11 +90,8 @@ package akdcl.media {
 				playContent.addEventListener(LoaderEvent.PROGRESS, onLoadProgressHandler);
 				playContent.addEventListener(LoaderEvent.COMPLETE, onLoadCompleteHandler);
 				playContent.addEventListener(LoaderEvent.INIT, onVideoInitHandler);
-				playContent.addEventListener(VideoLoader.VIDEO_BUFFER_EMPTY, onBufferProgressHandler);
-				playContent.addEventListener(VideoLoader.VIDEO_BUFFER_FULL, onBufferProgressHandler);
 			}
 			playContent.addEventListener(VideoLoader.VIDEO_COMPLETE, onPlayCompleteHandler);
-			super.load(_item);
 		}
 
 		private function onVideoInitHandler(_e:LoaderEvent):void {
@@ -113,6 +107,7 @@ package akdcl.media {
 					playContent.playVideo();
 				} else {
 					playContent.videoTime = _startTime * 0.001;
+					playContent.playVideo();
 				}
 				playContent.volume = volume;
 			}
@@ -143,15 +138,20 @@ package akdcl.media {
 		}
 
 		override protected function onLoadProgressHandler(_evt:* = null):void {
-			if (bufferProgress < 1 && playContent) {
-				onBufferProgressHandler();
+			if (!(_evt === false)) {
+				if (bufferProgress < 1) {
+					isBuffering = true;
+					onBufferProgressHandler();
+				}else if(isBuffering){
+					isBuffering = false;
+					onBufferProgressHandler();
+				}
 			}
 			super.onLoadProgressHandler(_evt);
 		}
 
 		override protected function onPlayCompleteHandler(_evt:* = null):void {
 			removeContentListener();
-			playContent.videoTime = 0;
 			super.onPlayCompleteHandler(_evt);
 		}
 
@@ -163,8 +163,6 @@ package akdcl.media {
 				playContent.removeEventListener(LoaderEvent.COMPLETE, onLoadCompleteHandler);
 				playContent.removeEventListener(LoaderEvent.INIT, onVideoInitHandler);
 				playContent.removeEventListener(VideoLoader.VIDEO_COMPLETE, onPlayCompleteHandler);
-				playContent.removeEventListener(VideoLoader.VIDEO_BUFFER_EMPTY, onBufferProgressHandler);
-				playContent.removeEventListener(VideoLoader.VIDEO_BUFFER_FULL, onBufferProgressHandler);
 			}
 		}
 	}

@@ -46,16 +46,17 @@ package akdcl.media {
 		}
 
 		override public function load(_item:*):void {
-			__loadProgress = 0;
-			var _source:String;
-			if (_item is PlayItem) { 
-				_source = _item.source;
-			}else {
-				_source = _item;
-			}
 			super.load(_item);
+			__loadProgress = 0;
 			timer.stop();
-			rM.loadDisplay(_source, onLoadCompleteHandler, onLoadErrorHandler, onLoadProgressHandler);
+			rM.loadDisplay(playItem.source, onLoadCompleteHandler, onLoadErrorHandler, onLoadProgressHandler);
+		}
+		override public function remove():void {
+			if (playItem) {
+				rM.unloadDisplay(playItem.source, onLoadCompleteHandler, onLoadErrorHandler, onLoadProgressHandler);
+			}
+			super.remove();
+			__container = null;
 		}
 
 		override public function pause():void {
@@ -93,7 +94,7 @@ package akdcl.media {
 
 		override protected function onPlayProgressHander(_evt:* = null):void {
 			if (loadProgress == 1){
-				if (position >= totalTime && !(_evt is String)) {
+				if (position >= totalTime && !(_evt === false)) {
 					onPlayCompleteHandler();
 				} else {
 					super.onPlayProgressHander(_evt);

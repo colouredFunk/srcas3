@@ -101,13 +101,13 @@ package akdcl.media {
 		}
 
 		private var __container:DisplayRect;
-		public function set container(_container:DisplayRect):void {
-			for each (var _content:MediaProvider in playContent){
-				if (_content.hasOwnProperty("container")){
-					_content["container"] = _container;
-				}
+		public function get container():DisplayRect {
+			return __container;
+		}
+		public function MediaPlayer(_container:DisplayRect = null) {
+			if (_container) {
+				__container = _container;
 			}
-			__container = _container;
 		}
 
 		override protected function init():void {
@@ -120,54 +120,69 @@ package akdcl.media {
 			playContent = [];
 			pageID = new PageID();
 			pageID.onIDChange = onPlayIDChangeHandler;
+			if (!__container) {
+				__container = new DisplayRect();
+				__container.autoRemove = false;
+			}
+		}
+		override public function remove():void {
+			__container.remove();
+			super.remove();
 		}
 
 		private function onPlayIDChangeHandler(_id:uint):void {
-			//stop();
 			var _content:MediaProvider;
-			for each (_content in playContent){
+			for each (_content in playContent) {
 				_content.removeEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 				_content.removeEventListener(MediaEvent.LOAD_ERROR, onLoadErrorHandler);
 				_content.removeEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
 				_content.removeEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
 				_content.removeEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);
+				
+				if (_content.hasOwnProperty("container")){
+					_content["container"] = null;
+				}
+				if (_content.playState!=PlayState.COMPLETE) {
+					_content.stop();
+				}
 			}
 
-			var _item:PlayItem = playlist.getItem(_id);
-			var _source:String = _item.source;
-			var _type:String = _source.split("?")[0];
+			playItem = playlist.getItem(_id);
+			__container.label = playItem.source;
+			var _type:String = playItem.source.split("?")[0];
 			_type = String(_type.split(".").pop()).toLowerCase();
-
 			switch (_type){
 				case "gif":
 				case "jpg":
 				case "png":
 				case "swf":
-					imagePD.load(_source);
+					imagePD.load(playItem);
 					playContent[0] = imagePD;
 					break;
 				case "mp3":
 				case "wav":
-					soundPD.load(_source);
+					soundPD.load(playItem);
 					playContent[0] = soundPD;
 					break;
 				case "flv":
 				case "mov":
 				case "mp4":
 				case "f4v":
-					videoPD.load(_source);
+					videoPD.load(playItem);
 					playContent[0] = videoPD;
 					break;
 				case "wma":
 				case "wmv":
 				case "mms":
 				default:
-					wmpPD.load(_source);
+					wmpPD.load(playItem);
 					playContent[0] = wmpPD;
 					break;
 			}
-			container = __container;
 			for each (_content in playContent){
+				if (_content.hasOwnProperty("container")){
+					_content["container"] = __container;
+				}
 				_content.addEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 				_content.addEventListener(MediaEvent.LOAD_ERROR, onLoadErrorHandler);
 				_content.addEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
@@ -175,12 +190,12 @@ package akdcl.media {
 				_content.addEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);
 			}
 			dispatchEvent(new MediaEvent(MediaEvent.PLAY_ITEM_CHANGE));
-			play();
+			play(0);
 		}
 
 		override public function load(_item:*):void {
-			playlist = _item;
 			super.load(null);
+			playlist = _item;
 		}
 
 		override public function play(_startTime:int = -1):void {
@@ -222,7 +237,7 @@ package akdcl.media {
 				super.onLoadErrorHandler(_evt);
 			} else {
 				//根据repeat的值执行下一步
-				onPlayCompleteHandler();
+				onPlayCompleteHandler(false);
 			}
 		}
 

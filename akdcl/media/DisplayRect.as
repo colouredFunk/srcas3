@@ -3,10 +3,11 @@ package akdcl.media {
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.display.Loader;
-	import flash.geom.Rectangle;
 	import flash.media.Video;
-
+	import flash.geom.Rectangle;
+	import flash.system.System;
 	import flash.events.ContextMenuEvent;
+
 	import flash.ui.ContextMenu;
 	import flash.ui.ContextMenuItem;
 	
@@ -22,25 +23,32 @@ package akdcl.media {
 	 */
 	public class DisplayRect extends UISprite {
 		protected static const TWEEN_FRAME:uint = 10;
-		
-		private static var contextMenuImageLoader:ContextMenu;
-		private static var contextMenuItemImageLoader:ContextMenuItem;
+		private static var sourceLabel:String;
+		private static var contextMenuStatic:ContextMenu;
+		private static var contextMenuItem:ContextMenuItem;
 		private static function createMenu(_target:Object):ContextMenu {
-			if (!contextMenuImageLoader){
-				contextMenuItemImageLoader = addContextMenu(_target, "");
-				contextMenuImageLoader = _target.contextMenu;
-				contextMenuImageLoader.addEventListener(ContextMenuEvent.MENU_SELECT, onImageMenuShowHandler);
+			if (!contextMenuStatic){
+				contextMenuItem = addContextMenu(_target, "", onMenuItemSelectHandler);
+				contextMenuStatic = _target.contextMenu;
+				contextMenuStatic.addEventListener(ContextMenuEvent.MENU_SELECT, onMenuSelectHandler);
 			}
-			return contextMenuImageLoader;
+			return contextMenuStatic;
 		}
 
-		private static function onImageMenuShowHandler(_evt:ContextMenuEvent):void {
+		private static function onMenuSelectHandler(_evt:ContextMenuEvent):void {
 			var _rect:Object = _evt.contextMenuOwner;
-			var _source:String = "RectSize: "+_rect.rectWidth + " x " + _rect.rectHeight;
-			contextMenuItemImageLoader.caption = _source;
+			sourceLabel = _rect.label;
+			var _source:String = _rect.label.split("/").pop();
+			_source = _source + ": " + _rect.rectWidth + " x " + _rect.rectHeight;
+			contextMenuItem.caption = _source;
+		}
+
+		private static function onMenuItemSelectHandler(_evt:ContextMenuEvent):void {
+			System.setClipboard(sourceLabel);
 		}
 		
 		public var autoUpdate:Boolean = true;
+		public var label:String = "Size";
 		
 		protected var rect:Rectangle;
 		protected var bitmap:Bitmap;
@@ -53,10 +61,10 @@ package akdcl.media {
 		
 		protected var isHidding:Boolean = false;
 		protected var tweenMode:int;
-		protected var useScrollRect:Boolean = false;
+		protected var useScrollRect:Boolean = true;
 		
 		protected var tweenOutVar:Object;
-		protected static var tweenInVar:Object = { alpha: 1, useFrames: true };
+		protected var tweenInVar:Object;
 
 		public function get rectWidth():uint {
 			return rect.width;
@@ -116,14 +124,15 @@ package akdcl.media {
 		
 		public function DisplayRect(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = 0):void {
 			rect = new Rectangle();
-			if (width > 16 || _rectWidth > 0) {
-				rect.width = _rectWidth || width;
+			var _rect:Rectangle = getRect(this);
+			if (_rect.width > 16 || _rectWidth > 0) {
+				rect.width = _rectWidth || _rect.width;
 				__heightOnly = false;
 			} else {
 				__heightOnly = true;
 			}
-			if (height > 16 || _rectHeight > 0) {
-				rect.height = _rectHeight || height;
+			if (_rect.height > 16 || _rectHeight > 0) {
+				rect.height = _rectHeight || _rect.height;
 				__widthOnly = false;
 			} else {
 				__widthOnly = true;
@@ -131,11 +140,28 @@ package akdcl.media {
 			if (_bgColor>=0) {
 				opaqueBackground = _bgColor;
 			}
-			tweenOutVar = { alpha: 0, useFrames: true, onComplete: showContent };
+			tweenOutVar = { alpha: 0, useFrames: true, onComplete: onHideCompleteHandler };
+			tweenInVar = { alpha: 1, useFrames: true };
 			bitmap = new Bitmap();
 			addChild(bitmap);
 			contextMenu = createMenu(this);
 			super();
+			mouseChildren = false;
+		}
+		
+		override public function remove():void {
+			if (content) {
+				TweenNano.killTweensOf(content);
+			}
+			TweenNano.killTweensOf(bitmap);
+			bitmap.bitmapData = null;
+			super.remove();
+			rect = null;
+			bitmap = null;
+			content = null;
+			contentReady = null;
+			tweenOutVar = null;
+			tweenInVar = null;
 		}
 
 		public function setContent(_content:Object = null, _tweenMode:int = 2):void {
@@ -150,7 +176,34 @@ package akdcl.media {
 				TweenNano.killTweensOf(_display);
 				TweenNano.to(_display, TWEEN_FRAME, tweenOutVar);
 			}else {
-				showContent();
+				onHideCompleteHandler();
+			}
+		}
+
+		public function updateRect(_useScrollRect:Boolean = true):void {
+			useScrollRect = _useScrollRect;
+			if (content) {
+				var _display:Object = content is BitmapData ? bitmap : content;
+				_display.y = _display.x = 0;
+				if (__widthOnly && __heightOnly) {
+					rect.width = contentWidth;
+					setDisplayScale(_display, true);
+				} else if (__widthOnly){
+					setDisplayScale(_display, true);
+				} else if (__heightOnly){
+					setDisplayScale(_display, false);
+				} else {
+					var _rectAspectRatio:Number = rect.width / rect.height;
+					var _contentAspectRatio:Number = contentWidth / contentHeight;
+					if (__scaleMode >= 0 ? (_rectAspectRatio > _contentAspectRatio) : (_rectAspectRatio < _contentAspectRatio)){
+						setDisplayScale(_display, false);
+					} else {
+						setDisplayScale(_display, true);
+					}
+				}
+			}
+			if (useScrollRect) {
+				scrollRect = rect;
 			}
 		}
 
@@ -165,7 +218,6 @@ package akdcl.media {
 				}
 			}
 			
-			isHidding = false;
 			content = contentReady;
 			
 			var _display:Object = content is BitmapData ? bitmap : content;
@@ -203,44 +255,11 @@ package akdcl.media {
 			updateRect(useScrollRect);
 		}
 
-		public function updateRect(_useScrollRect:Boolean = true):void {
-			useScrollRect = _useScrollRect;
-			if (content) {
-				var _display:Object = content is BitmapData ? bitmap : content;
-				_display.y = _display.x = 0;
-				if (__widthOnly && __heightOnly) {
-					rect.width = contentWidth;
-					rect.height = contentHeight;
-					if (useScrollRect) {
-						rect.x = offX;
-						rect.y = offY;
-					}else {
-						_display.x = -offX;
-						_display.y = -offY;
-					}
-				} else if (__widthOnly){
-					setDisplayScale(_display, true);
-				} else if (__heightOnly){
-					setDisplayScale(_display, false);
-				} else {
-					var _rectAspectRatio:Number = rect.width / rect.height;
-					var _contentAspectRatio:Number = contentWidth / contentHeight;
-					if (__scaleMode >= 0 ? (_rectAspectRatio > _contentAspectRatio) : (_rectAspectRatio < _contentAspectRatio)){
-						setDisplayScale(_display, false);
-					} else {
-						setDisplayScale(_display, true);
-					}
-				}
-			}
-			if (useScrollRect) {
-				scrollRect = rect;
-			}
-		}
-
 		protected function setDisplayScale(_display:Object, _isWidth:Boolean):void {
 			var _move:Object;
 			var _dir:int;
-			if (useScrollRect) {
+			//useScrollRect
+			if (false) {
 				_move = rect;
 				_dir = 1;
 			}else {
@@ -260,8 +279,6 @@ package akdcl.media {
 					_move.y = (contentHeight * _display.scaleY - rect.height) * 0.5 + offY * _display.scaleY;
 				}
 				_move.x = (contentWidth * _display.scaleX - rect.width) * 0.5 + offX * _display.scaleX;
-				_move.x *= _dir;
-				_move.y *= _dir;
 			} else {
 				if (__scaleMode > 0) {
 					_display.scaleY = _display.scaleX = Math.min(rect.height / contentHeight, __scaleMode);
@@ -275,9 +292,16 @@ package akdcl.media {
 					_move.x = (contentWidth * _display.scaleX - rect.width) * 0.5 + offX * _display.scaleX;
 				}
 				_move.y = (contentHeight * _display.scaleY - rect.height) * 0.5 + offY * _display.scaleY;
-				_move.x *= _dir;
-				_move.y *= _dir;
 			}
+			_move.x *= _dir;
+			_move.y *= _dir;
+			
+			_move.x = Math.round(_move.x);
+			_move.y = Math.round(_move.y);
+		}
+		protected function onHideCompleteHandler():void {
+			isHidding = false;
+			showContent();
 		}
 	}
 

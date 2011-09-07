@@ -310,16 +310,10 @@ package akdcl.media {
 		}
 
 		override public function load(_item:*):void {
-			var _source:String;
-			if (_item is PlayItem) {
-				_source = _item.source;
-			}else {
-				_source = _item;
-			}
-			if (isPlugin){
-				ExternalInterface.call("pwrd.wmpPlayer.openList", ExternalInterface.objectID, _source);
-			}
 			super.load(_item);
+			if (isPlugin){
+				ExternalInterface.call("pwrd.wmpPlayer.openList", ExternalInterface.objectID, playItem.source);
+			}
 		}
 
 		override public function play(_startTime:int = -1):void {
@@ -350,7 +344,7 @@ package akdcl.media {
 
 		override protected function onLoadProgressHandler(_evt:* = null):void {
 			super.onLoadProgressHandler(_evt);
-			if (loadProgress >= 1){
+			if (loadProgress >= 1 && !(_evt === false)) {
 				timer.removeEventListener(TimerEvent.TIMER, onLoadProgressHandler);
 				onLoadCompleteHandler();
 			}

@@ -28,6 +28,7 @@ package akdcl.media {
 
 		private var channel:SoundChannel;
 		private var pausePosition:uint = 0;
+		private var isBuffering:Boolean = false;
 
 		override public function get loadProgress():Number {
 			return (playContent && playContent.bytesTotal > 0) ? (playContent.bytesLoaded / playContent.bytesTotal) : 0;
@@ -58,20 +59,15 @@ package akdcl.media {
 		}
 
 		override public function load(_item:*):void {
-			var _source:String;
-			if (_item is PlayItem) {
-				_source = _item.source;
-			}else {
-				_source = _item;
-			}
+			super.load(_item);
 			
 			removeContentListener();
-			playContent = sM.getSource(SourceManager.SOUND_GROUP, _source);
+			playContent = sM.getSource(SourceManager.SOUND_GROUP, playItem.source);
 			if (playContent){
 			} else {
 				playContent = new Sound();
-				sM.addSource(SourceManager.SOUND_GROUP, _source, playContent);
-				REQUEST.url = _source;
+				sM.addSource(SourceManager.SOUND_GROUP, playItem.source, playContent);
+				REQUEST.url = playItem.source;
 				playContent.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorHandler);
 				playContent.load(REQUEST);
 			}
@@ -82,7 +78,6 @@ package akdcl.media {
 				playContent.addEventListener(ProgressEvent.PROGRESS, onLoadProgressHandler);
 				playContent.addEventListener(Event.COMPLETE, onLoadCompleteHandler);
 			}
-			super.load(_item);
 		}
 
 		override public function play(_startTime:int = -1):void {
@@ -122,7 +117,15 @@ package akdcl.media {
 		}
 
 		override protected function onLoadProgressHandler(_evt:* = null):void {
-			//探测buffer
+			if (!(_evt === false)) {
+				if (bufferProgress < 1) {
+					isBuffering = true;
+					onBufferProgressHandler();
+				}else if(isBuffering){
+					isBuffering = false;
+					onBufferProgressHandler();
+				}
+			}
 			super.onLoadProgressHandler(_evt);
 		}
 

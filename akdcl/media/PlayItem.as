@@ -22,8 +22,8 @@
 
 		public function PlayItem(_source:*){
 			if (_source is XML){
-				__source = _source.attribute(SOURCE);
-				__totalTime = _source.attribute(TOTAL_TIME);
+				__source = String(_source.attribute(SOURCE));
+				__totalTime = int(_source.attribute(TOTAL_TIME));
 			} else if (_source is String){
 				__source = _source;
 			}
