@@ -304,5 +304,4 @@ package akdcl.media {
 			showContent();
 		}
 	}
-
 }
