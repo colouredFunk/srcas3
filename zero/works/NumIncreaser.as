@@ -18,11 +18,6 @@ package zero.works{
 	public class NumIncreaser extends Sprite{
 		private static const ranArr:Array=[1,2,1,1,1,1,1,3,2,3,1,1,2,1,2,1,1,2,2,1,3,2,2,2,2,2,1,2,1,2,2,2,1,2,1,2,1,2,1,1,2,1,1,2,1,1,1,2,1,2,2,2,2,1,2,3,1,1,2,1,2,2,2,1,1,1,2,2,2,1,1,1,2,2,2,2,2,2,1,2,2,2,2,2,1,1,2,2,2,1,2,2,2,1,1,2,1,2,1,1];
 		
-		private static function getDateByDateStr(dateStr:String):Date{
-			var timeArr:Array=dateStr.replace(/^\s*|\s*$/g,"").split(/\D+/g);
-			return new Date(int(timeArr[0]),int(timeArr[1])-1,int(timeArr[2]),int(timeArr[3]),int(timeArr[4]),int(timeArr[5]));
-		}
-		
 		private var serverDate:ServerDate;
 		private var startDate:Date;
 		private var timeUpDate:Date;
@@ -87,15 +82,31 @@ package zero.works{
 			
 			start(
 				serverDate,
-				getDateByDateStr(this.loaderInfo.parameters.startTime),
-				getDateByDateStr(this.loaderInfo.parameters.endTime)
+				this.loaderInfo.parameters.startTime,
+				this.loaderInfo.parameters.endTime
 			);
 		}
 		
-		public function start(_serverDate:ServerDate,_startDate:Date,_timeUpDate:Date):void{
-			serverDate=_serverDate;
+		public function start(_serverDate:ServerDate,_startDate:*,_timeUpDate:*):void{
+			if(_startDate is Date){
+			}else{
+				_startDate=getDateByDateStr(_startDate);
+			}
+			if(_timeUpDate is Date){
+			}else{
+				_timeUpDate=getDateByDateStr(_timeUpDate);
+			}
 			startDate=_startDate;
 			timeUpDate=_timeUpDate;
+			if(_serverDate){
+				serverDate=_serverDate;
+				selfInitServerDateComplete();
+			}else{
+				serverDate=new ServerDate();
+				serverDate.init(selfInitServerDateComplete);
+			}
+		}
+		private function selfInitServerDateComplete():void{
 			this.addEventListener(Event.ENTER_FRAME,enterFrame);
 		}
 		private function enterFrame(event:Event):void{

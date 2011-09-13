@@ -28,13 +28,13 @@ package zero.works{
 				return;
 			}
 			__value=_value;
-			var i:int=0;
 			var num:int=1;
-			while(this.hasOwnProperty("txt"+i)){
-				var txt:TxtEffect=this["txt"+i];
+			for(var i:int=0;i<10;i++){
 				num*=10;
-				txt.value=(__value%num)/int(num/10);
-				i++;
+				if(this.hasOwnProperty("txt"+i)){
+					var txt:TxtEffect=this["txt"+i];
+					txt.value=(__value%num)/int(num/10);
+				}
 			}
 		}
 	}

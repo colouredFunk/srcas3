@@ -22,6 +22,7 @@ package zero.net{
 		//创建时间：2011年8月2日 18:26:25
 		private var urlLoader:URLLoader;
 		
+		public var url:String;
 		public var onLoadComplete:Function;
 		public var onLoadError:Function;
 		
@@ -32,6 +33,7 @@ package zero.net{
 			//urlLoader.addEventListener(ProgressEvent.PROGRESS,urlLoadProgress);
 			urlLoader.addEventListener(Event.COMPLETE,urlLoadComplete);
 			urlLoader.addEventListener(IOErrorEvent.IO_ERROR,urlLoadError);
+			urlLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR,urlLoadError);
 			//urlLoader.dataFormat=URLLoaderDataFormat.BINARY;
 			////===
 		}
@@ -40,6 +42,7 @@ package zero.net{
 				//urlLoader.removeEventListener(ProgressEvent.PROGRESS,urlLoadProgress);
 				urlLoader.removeEventListener(Event.COMPLETE,urlLoadComplete);
 				urlLoader.removeEventListener(IOErrorEvent.IO_ERROR,urlLoadError);
+				urlLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,urlLoadError);
 				urlLoader=null;
 			}
 			
@@ -47,16 +50,15 @@ package zero.net{
 			onLoadError=null;
 		}
 		
-		public function load(url:String,obj:ByteArray=null,dataFormat:String=null,method:String=null):void{
+		public function load(_url:String,obj:*=null,dataFormat:String=null,method:String=null):void{
+			url=_url;
 			var urlRequest:URLRequest=new URLRequest(url);
 			if(obj){
+				urlRequest.data=obj;
 				if(obj is ByteArray){
-					urlRequest.data=obj;
 					urlRequest.contentType="application/octet-stream";
-					urlRequest.method=method||URLRequestMethod.POST
-				}else{
-					throw new Error("暂不支持");
 				}
+				urlRequest.method=method||URLRequestMethod.POST
 			}
 			urlLoader.dataFormat=dataFormat||URLLoaderDataFormat.TEXT;
 			urlLoader.load(urlRequest);
@@ -79,7 +81,8 @@ package zero.net{
 				onLoadComplete(urlLoader.data);
 			}
 		}
-		private function urlLoadError(event:IOErrorEvent):void{
+		private function urlLoadError(event:Event):void{
+			trace("加载失败："+url);
 			if(onLoadError==null){
 			}else{
 				onLoadError();

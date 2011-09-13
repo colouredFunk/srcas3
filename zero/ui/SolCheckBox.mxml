@@ -54,7 +54,13 @@ SolCheckBox
 							solParentDocument=this.parentDocument;
 						}
 						var parentDocument:*=this.parentDocument;
+						var parentDocumentDict:Dictionary=new Dictionary();
+						//页面上使用时貌似会循环指向同一个 parentDocument...
 						while(parentDocument&&parentDocument.id&&parentDocument!=solParentDocument){
+							if(parentDocumentDict[parentDocument]){
+								break;
+							}
+							parentDocumentDict[parentDocument]=true;
 							sol_key=parentDocument.id+"."+sol_key;
 							parentDocument=parentDocument.parentDocument;
 						}
