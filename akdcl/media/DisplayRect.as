@@ -206,6 +206,11 @@ package akdcl.media {
 				scrollRect = rect;
 			}
 		}
+		
+		protected function onHideCompleteHandler():void {
+			isHidding = false;
+			showContent();
+		}
 
 		protected function showContent():void {
 			if (content is BitmapData) {
@@ -299,9 +304,18 @@ package akdcl.media {
 			_move.x = Math.round(_move.x);
 			_move.y = Math.round(_move.y);
 		}
-		protected function onHideCompleteHandler():void {
-			isHidding = false;
-			showContent();
-		}
+	}
+}
+class DisplayProxy {STRETCH
+	public var alignX:int = 0;
+	public var alignY:int = 0;
+	public var offX:int = 0;
+	public var offY:int = 0;
+	public var originalWidth:int = 0;
+	public var originalHeight:int = 0;
+	//-1:outside,0:noscale,1:inside,2:stretch,3:onlywidth,4:onlyheight
+	public var scaleMode:int = 0;
+	public function DisplayProxy() {
+		
 	}
 }
