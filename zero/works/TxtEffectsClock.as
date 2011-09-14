@@ -22,26 +22,39 @@ package zero.works{
 		public var txt3:TxtEffects;
 		public var txt4:TxtEffects;
 		
-		private var nowDate:Date;
-		private var timeUpDate:Date;
-		private var startTime:int;
-		private var currD:int;
+		private var serverDate:ServerDate;
 		
-		public function start(_nowDate:Date,_timeUpDate:Date):void{
+		private var startDate:Date;
+		private var timeUpDate:Date;
+		
+		public function start(_serverDate:ServerDate,_startDate:*,_timeUpDate:*):void{
 			
-			nowDate=_nowDate;
+			if(_startDate is Date){
+			}else{
+				_startDate=getDateByDateStr(_startDate);
+			}
+			if(_timeUpDate is Date){
+			}else{
+				_timeUpDate=getDateByDateStr(_timeUpDate);
+			}
+			startDate=_startDate;
 			timeUpDate=_timeUpDate;
-			
-			startTime=getTimer();
-			currD=getD();
+			if(_serverDate){
+				serverDate=_serverDate;
+				//selfInitServerDateComplete();
+			}//else{
+				//serverDate=new ServerDate();
+				//serverDate.init(selfInitServerDateComplete);
+			//}
 			
 			this.addEventListener(Event.ENTER_FRAME,enterFrame);
 		}
-		private function getD():int{
-			return (timeUpDate.time-(nowDate.time+(getTimer()-startTime)))/(24*3600*1000);
-		}
 		private function enterFrame(event:Event):void{
-			var d:Number=timeUpDate.time-(nowDate.time+(getTimer()-startTime));
+			var currTime:Number=serverDate.getDate().time;
+			if(currTime<startDate.time){
+				currTime=startDate.time;
+			}
+			var d:Number=timeUpDate.time-currTime;
 			
 			if(d<0){
 				d=0;
@@ -70,11 +83,6 @@ package zero.works{
 			}
 			if(txt4){
 				txt4.value=int(mss/100)*10;
-			}
-			
-			d=getD();
-			if(d!=currD){
-				currD=d
 			}
 		}
 	}

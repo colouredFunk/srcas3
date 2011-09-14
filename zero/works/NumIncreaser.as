@@ -21,15 +21,16 @@ package zero.works{
 		private var serverDate:ServerDate;
 		private var startDate:Date;
 		private var timeUpDate:Date;
-		public var startNum:int;
-		public var k:Number;
+		private var startNum:int;
+		private var endNum:int;
+		
+		private var arrSum:int;
+		private var dateSum:int;
+		private var k:Number;
 		
 		public var txt:*;
 		
 		public function NumIncreaser(){
-			
-			startNum=0;
-			k=0.2;
 			
 			if(txt){
 				return;
@@ -68,26 +69,31 @@ package zero.works{
 		}
 		private function initServerDateComplete():void{
 			
-			startNum=int(this.loaderInfo.parameters.startNum)||startNum;
-			k=Number(this.loaderInfo.parameters.k)||k;
+			startNum=int(this.loaderInfo.parameters.startNum);
+			endNum=int(this.loaderInfo.parameters.endNum);
 			
-			if(startNum>0){
+			if(int(this.loaderInfo.parameters.startNum)>0){
+				startNum=int(this.loaderInfo.parameters.startNum);
 			}else{
 				startNum=0;
 			}
-			if(k>0){
+			if(int(this.loaderInfo.parameters.endNum)>0){
+				endNum=int(this.loaderInfo.parameters.endNum);
 			}else{
-				k=0.2;
+				endNum=100000;
 			}
 			
 			start(
 				serverDate,
 				this.loaderInfo.parameters.startTime,
-				this.loaderInfo.parameters.endTime
+				this.loaderInfo.parameters.endTime,
+				startNum,
+				endNum
 			);
 		}
 		
-		public function start(_serverDate:ServerDate,_startDate:*,_timeUpDate:*):void{
+		public function start(_serverDate:ServerDate,_startDate:*,_timeUpDate:*,_startNum:int=0,_endNum:int=100000):void{
+			
 			if(_startDate is Date){
 			}else{
 				_startDate=getDateByDateStr(_startDate);
@@ -98,6 +104,20 @@ package zero.works{
 			}
 			startDate=_startDate;
 			timeUpDate=_timeUpDate;
+			
+			var i:int;
+			
+			arrSum=0;
+			for(i=0;i<100;i++){
+				arrSum+=ranArr[i];
+			}
+			dateSum=arrSum*864;
+			
+			startNum=_startNum;
+			endNum=_endNum;
+			k=(endNum-startNum)/getNum((timeUpDate.time-startDate.time)/1000);
+			trace("k="+k);
+			
 			if(_serverDate){
 				serverDate=_serverDate;
 				selfInitServerDateComplete();
@@ -105,6 +125,7 @@ package zero.works{
 				serverDate=new ServerDate();
 				serverDate.init(selfInitServerDateComplete);
 			}
+			
 		}
 		private function selfInitServerDateComplete():void{
 			this.addEventListener(Event.ENTER_FRAME,enterFrame);
@@ -125,26 +146,21 @@ package zero.works{
 				dTime=0;
 			}
 			
-			var i:int;
-			
-			var arrSum:int=0;
-			for(i=0;i<100;i++){
-				arrSum+=ranArr[i];
-			}
-			var dateSum:int=arrSum*864;
-			var totalPeople:int=int(dTime/86400)*dateSum;
-			dTime=dTime%86400;
-			totalPeople+=int(dTime/100)*arrSum;
-			dTime=dTime%100;
-			for(i=0;i<dTime;i++){
-				totalPeople+=ranArr[i];
-			}
-			
 			if(txt is TextField){
-				txt.text=int(startNum+totalPeople*k);
+				txt.text=int(startNum+getNum(dTime)*k);
 			}else{
-				txt.value=int(startNum+totalPeople*k);
+				txt.value=int(startNum+getNum(dTime)*k);
 			}
+		}
+		private function getNum(dTime:int):int{
+			var num:int=int(dTime/86400)*dateSum;
+			dTime=dTime%86400;
+			num+=int(dTime/100)*arrSum;
+			dTime=dTime%100;
+			for(var i:int=0;i<dTime;i++){
+				num+=ranArr[i];
+			}
+			return num;
 		}
 	}
 }
