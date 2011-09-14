@@ -55,7 +55,7 @@ SolBar
 					}
 				
 					if(FileClass){
-						sol=new Sol(new FileClass(FileClass.applicationDirectory.nativePath+"/../sol.xml"),_version,sol_changeSetting,onChangeValue);
+						sol=new Sol(new FileClass(FileClass.applicationDirectory.nativePath+"/sols/sol.xml"),_version,sol_changeSetting,onChangeValue);
 					}else{
 						var pojName:String;
 						var parent:*=this.parent;

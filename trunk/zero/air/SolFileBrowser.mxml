@@ -70,7 +70,7 @@ SolFileBrowser
 			}
 			
 			public function init():void{
-				sol=new Sol(new File(File.applicationDirectory.nativePath+"/../"+extension.replace(/[\*\.]/g,"")+".xml"),"");
+				sol=new Sol(new File(File.applicationDirectory.nativePath+"/sols/"+extension.replace(/[\*\.]/g,"")+".xml"),"");
 				
 				if(sol_key){
 				}else{
