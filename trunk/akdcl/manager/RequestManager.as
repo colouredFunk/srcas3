@@ -328,6 +328,7 @@ class RequestLoader extends Loader {
 	}
 
 	public function onErrorHandler(_evt:Event):void {
+		trace(_evt);
 		for each (var _onError:Function in errorHandlers){
 			switch (_onError.length){
 				case 0:
@@ -474,6 +475,7 @@ class RequestURLLoader extends URLLoader {
 	}
 
 	public function onErrorHandler(_evt:Event):void {
+		trace(_evt);
 		for each (var _onError:Function in errorHandlers){
 			switch (_onError.length){
 				case 0:

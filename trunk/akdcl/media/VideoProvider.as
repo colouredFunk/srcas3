@@ -46,7 +46,7 @@ package akdcl.media {
 		private var __container:DisplayRect;
 		public function set container(_container:DisplayRect):void {
 			if (_container){
-				if (playContent && playContent.content){
+				if (playContent && playContent.content && playContent.content.width > 0) {
 					_container.setContent(playContent.content);
 				}
 			} else if (__container) {
