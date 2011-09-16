@@ -1,5 +1,6 @@
 package akdcl.media {
 	import flash.display.MovieClip;
+	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
 	import akdcl.manager.RequestManager;
@@ -8,8 +9,12 @@ package akdcl.media {
 	 * ...
 	 * @author ...
 	 */
+	/// @eventType	flash.events.Event.COMPLETE
+	[Event(name = "complete", type = "flash.events.Event")]
+	
 	public class DisplayLoader extends DisplayRect {
 		protected static var rM:RequestManager = RequestManager.getInstance();
+		private const eventComplete:Event = new Event(Event.COMPLETE);
 		
 		public var progressClip:*;
 		protected var loadProgress:Number = 0;
@@ -50,7 +55,8 @@ package akdcl.media {
 				setProgressClip(loadProgress);
 			} else {
 				setProgressClip(false);
-				setContent(_p, tweenMode,alignX,alignY,scaleMode);
+				setContent(_p, tweenMode, alignX, alignY, scaleMode);
+				dispatchEvent(eventComplete);
 			}
 		}
 		override protected function showContent():void {
