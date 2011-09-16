@@ -4,6 +4,7 @@ package akdcl.media {
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.display.Loader;
+	import flash.events.Event;
 	import flash.media.Video;
 	import flash.geom.Rectangle;
 	import flash.system.System;
@@ -22,6 +23,11 @@ package akdcl.media {
 	 * ...
 	 * @author ...
 	 */
+	
+	 /// @eventType	flash.events.Event.CHANGE
+	[Event(name = "change", type = "flash.events.Event")]
+	 /// @eventType	flash.events.Event.RESIZE
+	[Event(name = "resize", type = "flash.events.Event")]
 	public class DisplayRect extends UISprite {
 		protected static const TWEEN_FRAME:uint = 10;
 		private static var sourceLabel:String;
@@ -48,6 +54,9 @@ package akdcl.media {
 		private static function onMenuItemSelectHandler(_evt:ContextMenuEvent):void {
 			System.setClipboard(sourceLabel);
 		}
+		
+		private const eventChange:Event = new Event(Event.CHANGE);
+		private const eventResize:Event = new Event(Event.RESIZE);
 
 		public var autoUpdate:Boolean = true;
 		public var label:String = "Size";
@@ -60,12 +69,12 @@ package akdcl.media {
 
 		protected var isHidding:Boolean = false;
 		protected var useScrollRect:Boolean = true;
-		
+
 		protected var tweenMode:int;
 
 		protected var tweenOutVar:Object;
 		protected var tweenInVar:Object;
-		
+
 		protected var alignX:int;
 		protected var alignY:int;
 		protected var scaleMode:int;
@@ -97,6 +106,44 @@ package akdcl.media {
 				updateRect();
 			}
 		}
+		
+		private var __scrollX:Number = 0;
+		public function get scrollX():Number {
+			return __scrollX;
+		}
+		public function set scrollX(_value:Number):void {
+			if (_value < -0.5) {
+				_value = -0.5;
+			}else if (_value>1.5) {
+				_value = 1.5;
+			}
+			if (__scrollX==_value) {
+				return;
+			}
+			__scrollX = _value;
+			if (autoUpdate){
+				updateRect(useScrollRect, false);
+			}
+		}
+		
+		private var __scrollY:Number = 0;
+		public function get scrollY():Number {
+			return __scrollY;
+		}
+		public function set scrollY(_value:Number):void {
+			if (_value < -0.5) {
+				_value = -0.5;
+			}else if (_value>1.5) {
+				_value = 1.5;
+			}
+			if (__scrollX==_value) {
+				return;
+			}
+			__scrollY = _value;
+			if (autoUpdate){
+				updateRect(useScrollRect, false);
+			}
+		}
 
 		public function DisplayRect(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = 0):void {
 			rect = new Rectangle();
@@ -108,10 +155,11 @@ package akdcl.media {
 			}
 			super();
 		}
+
 		override protected function init():void {
 			super.init();
 			tweenOutVar = {alpha: 0, useFrames: true, onComplete: onHideCompleteHandler};
-			tweenInVar = { alpha: 1, useFrames: true };
+			tweenInVar = {alpha: 1, useFrames: true};
 			contentProxy = new DisplayProxy();
 			bitmap = new Bitmap();
 			addChild(bitmap);
@@ -143,8 +191,8 @@ package akdcl.media {
 			}
 			tweenMode = _tweenMode;
 			isHidding = true;
-			if (content && tweenMode == 2 ? true : false) {
-				var _display:Object = content is BitmapData?bitmap:content;
+			if (content && tweenMode == 2 ? true : false){
+				var _display:Object = content is BitmapData ? bitmap : content;
 				TweenNano.killTweensOf(_display);
 				TweenNano.to(_display, TWEEN_FRAME, tweenOutVar);
 			} else {
@@ -152,19 +200,26 @@ package akdcl.media {
 			}
 		}
 
-		public function updateRect(_useScrollRect:Boolean = true):void {
-			if (content) {
+		public function getDisplayContent():DisplayObject {
+			return (content is BitmapData ? bitmap : content) as DisplayObject;
+		}
+
+		public function updateRect(_useScrollRect:Boolean = true, _isWH:Boolean = true):void {
+			if (content && _isWH) {
 				contentProxy.update(rect.width, rect.height);
 			}
+			//rect.x = (contentProxy.width - rectWidth) * (__scrollX - contentProxy.alignX);
+			//rect.y = (contentProxy.height - rectHeight) * __scrollY;
 			useScrollRect = _useScrollRect;
 			if (useScrollRect){
 				scrollRect = rect;
 			}
+			dispatchEvent(eventResize);
 		}
 
 		protected function onHideCompleteHandler():void {
-			if (content) {
-				var _display:Object = content is BitmapData?bitmap:content;
+			if (content){
+				var _display:Object = content is BitmapData ? bitmap : content;
 				TweenNano.killTweensOf(content);
 			}
 			isHidding = false;
@@ -175,22 +230,23 @@ package akdcl.media {
 			content = contentReady;
 			contentReady = null;
 			var _display:Object;
-			if (content is BitmapData) {
+			if (content is BitmapData){
 				bitmap.bitmapData = content as BitmapData;
 				bitmap.smoothing = true;
 				_display = bitmap;
-			}else if (content) {
+			} else if (content){
 				addChildAt(content as DisplayObject, getChildIndex(bitmap));
 				_display = content;
 			}
 			//
-			if (_display) {
+			if (_display){
 				contentProxy.setTarget(_display, alignX, alignY, scaleMode);
 				if (_display && tweenMode > 0){
 					_display.alpha = 0;
 					TweenNano.to(_display, TWEEN_FRAME, tweenInVar);
 				}
 				updateRect(useHandCursor);
+				dispatchEvent(eventChange);
 			}
 		}
 	}
@@ -204,19 +260,18 @@ import flash.media.Video;
 class DisplayProxy {
 	public var alignX:int;
 	public var alignY:int;
-	public var offX:int;
-	public var offY:int;
-	public var originalWidth:int;
-	public var originalHeight:int;
-	public var aspectRatio:Number;
+	public var width:Number = 0;
+	public var height:Number = 0;
+	private var offX:int;
+	private var offY:int;
+	private var originalWidth:int;
+	private var originalHeight:int;
+	private var aspectRatio:Number;
 	//-1:outside,0:noscale,1:inside,2:stretch,3:onlywidth,4:onlyheight
-	public var scaleMode:int;
+	private var scaleMode:int;
 
-	public var target:*;
+	private var target:*;
 
-	public function DisplayProxy(){
-	}
-	
 	public function clear():void {
 		target = null;
 	}
@@ -228,8 +283,8 @@ class DisplayProxy {
 		target = _target;
 		offX = offY = 0;
 		if (target is Bitmap){
-			originalWidth = target.width/target.scaleX;
-			originalHeight = target.height/target.scaleY;
+			originalWidth = target.width / target.scaleX;
+			originalHeight = target.height / target.scaleY;
 		} else if (target is Loader){
 			originalWidth = target.contentLoaderInfo.width;
 			originalHeight = target.contentLoaderInfo.height;
@@ -240,25 +295,25 @@ class DisplayProxy {
 			var _rect:Rectangle = target.getRect(target);
 			offX = _rect.x;
 			offY = _rect.y;
-			originalWidth = target.width/target.scaleX;
-			originalHeight = target.height/target.scaleY;
+			originalWidth = target.width / target.scaleX;
+			originalHeight = target.height / target.scaleY;
 		} else {
 			return;
 		}
 		aspectRatio = originalWidth / originalHeight;
 	}
-	
+
 	public function update(_width:int, _height:int):void {
 		var _aspectRatio:Number = _width / _height;
 		var _isWidth:Boolean;
-		switch(scaleMode) {
+		switch (scaleMode){
 			case 0:
 				break;
-			case -1:
+			case-1:
 			case 1:
-				if (scaleMode < 0?(_aspectRatio > aspectRatio):(_aspectRatio < aspectRatio)) {
+				if (scaleMode < 0 ? (_aspectRatio > aspectRatio) : (_aspectRatio < aspectRatio)){
 					target.scaleY = target.scaleX = _width / originalWidth;
-				}else {
+				} else {
 					target.scaleY = target.scaleX = _height / originalHeight;
 				}
 				break;
@@ -273,26 +328,29 @@ class DisplayProxy {
 				target.scaleY = _height / originalHeight;
 				break;
 		}
-		switch(alignX) {
-			case -1:
+		width = originalWidth * target.scaleX;
+		height = originalHeight * target.scaleY;
+		
+		switch (alignX){
+			case-1:
 				target.x = offX * target.scaleX;
 				break;
 			case 0:
-				target.x = (originalWidth * target.scaleX - _width) * 0.5 + offX * target.scaleX;
+				target.x = (width - _width) * 0.5 + offX * target.scaleX;
 				break;
 			case 1:
-				target.x = (originalWidth * target.scaleX - _width) + offX * target.scaleX;
+				target.x = (width - _width) + offX * target.scaleX;
 				break;
 		}
-		switch(alignY) {
-			case -1:
+		switch (alignY){
+			case-1:
 				target.y = offY * target.scaleY;
 				break;
 			case 0:
-				target.y = (originalHeight * target.scaleY - _height) * 0.5 + offY * target.scaleY;
+				target.y = (height- _height) * 0.5 + offY * target.scaleY;
 				break;
 			case 1:
-				target.y = (originalHeight * target.scaleY - _height) + offY * target.scaleY;
+				target.y = (height - _height) + offY * target.scaleY;
 				break;
 		}
 		target.x = -target.x;
