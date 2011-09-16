@@ -17,7 +17,7 @@ package zero.ui{
 	import flash.media.*;
 	
 	public class CameraPan extends Sprite{
-		public static var noCameraTest:Boolean=true;
+		public static var noCameraTest:Boolean=false;
 		
 		private var video:Video;
 		private var camera:Camera;

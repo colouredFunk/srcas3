@@ -186,10 +186,10 @@ OutputPane 版本:v1.0
 						msg+="　"+tail;
 					}
 				}
-				if(strArr.length>1000){
-					reset();
-					strArr[0]="输出过多自动清除...<br>";
-				}
+				//if(strArr.length>1000){
+				//	reset();
+				//	strArr[0]="输出过多自动清除...<br>";
+				//}
 				strArr[strArr.length]=msg+"<br>";
 			}
 			private function updateDelay():void{
