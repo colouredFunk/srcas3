@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+/***
+FileTree
+创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
+创建时间：2011年9月19日 11:49:40
+简要说明：这家伙很懒什么都没写。
+用法举例：这家伙还是很懒什么都没写。
+*/
+
+-->
+
+<s:Group
+	xmlns:fx="http://ns.adobe.com/mxml/2009"
+	xmlns:s="library://ns.adobe.com/flex/spark"
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	xmlns:ui="zero.ui.*"
+	xmlns:local="*"
+>
+	<mx:Tree width="100%" height="100%" id="tree" change="change()" itemOpen="saveSetting()" itemClose="saveSetting()" mouseUp="saveSetting()"/>
+	<fx:Script>
+		<![CDATA[
+			
+			import mx.collections.XMLListCollection;
+			
+			import zero.output;
+			import zero.outputError;
+			
+			private var iconsXMLLoader:URLLoader;
+			private var iconLoader:Loader;
+			private var fileListXLC:XMLListCollection;
+			private var onInitComplete:Function;
+			
+			private var iconsXMLPath:String;
+			private var iconsXML:XML;
+			private var currLoadingIconId:int;
+			
+			private var onChange:Function;
+			private var sol:Sol;
+			
+			public function init(_sol:Sol,_iconsXMLPath:String,_onInitComplete:Function,_onChange:Function):void{
+				// ^_^
+				sol=_sol;
+				iconsXMLPath=_iconsXMLPath;
+				onInitComplete=_onInitComplete;
+				onChange=_onChange;
+				
+				iconsXMLLoader=new URLLoader();
+				iconsXMLLoader.addEventListener(Event.COMPLETE,loadIconsXMLComplete);
+				iconsXMLLoader.addEventListener(IOErrorEvent.IO_ERROR,loadIconsXMLError);
+				iconsXMLLoader.load(new URLRequest(iconsXMLPath));
+			}
+			private function loadIconsXMLComplete(event:Event):void{
+				iconsXMLLoader.removeEventListener(Event.COMPLETE,loadIconsXMLComplete);
+				iconsXMLLoader.removeEventListener(IOErrorEvent.IO_ERROR,loadIconsXMLError);
+				iconsXML=new XML(iconsXMLLoader.data);
+				iconsXMLLoader=null;
+				
+				FileTreeIcon.iconBmds=new Object();
+				currLoadingIconId=-1;
+				iconLoader=new Loader();
+				iconLoader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadIconComplete);
+				iconLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,loadIconError);
+				loadIcon();
+			}
+			private function loadIconsXMLError(event:IOErrorEvent):void{
+				iconsXMLLoader.removeEventListener(Event.COMPLETE,loadIconsXMLComplete);
+				iconsXMLLoader.removeEventListener(IOErrorEvent.IO_ERROR,loadIconsXMLError);
+				iconsXMLLoader=null;
+				outputError("加载 "+iconsXMLPath+" 出错");
+			}
+			private function loadIcon():void{
+				if(++currLoadingIconId>=iconsXML.icon.length()){
+					iconLoader.contentLoaderInfo.removeEventListener(Event.COMPLETE,loadIconComplete);
+					iconLoader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,loadIconError);
+					iconLoader=null;
+					loadIconsComplete();
+					return;
+				}
+				iconLoader.load(new URLRequest(iconsXMLPath.replace(/^(.*\/).*?$/,"$1"+iconsXML.icon[currLoadingIconId].@src.toString())));
+			}
+			private function loadIconComplete(event:Event):void{
+				for each(var type:String in iconsXML.icon[currLoadingIconId].@type.toString().replace(/\s+/g,"").split("|")){
+					FileTreeIcon.iconBmds[type]=(iconLoader.content as Bitmap).bitmapData;
+				}
+				loadIcon();
+			}
+			private function loadIconError(event:IOErrorEvent):void{
+				outputError("加载 "+iconsXML.icon[currLoadingIconId].@src.toString()+" 出错");
+				loadIcon();
+			}
+			private function loadIconsComplete():void{
+				
+				tree.labelField="@name";
+				tree.iconFunction=treeIconFun;
+				
+				if(onInitComplete==null){
+				}else{
+					onInitComplete();
+				}
+			}
+			public function clear():void{
+				//^_^ 
+				
+				FileTreeIcon.iconBmds=null;
+				sol=null;
+				onChange=null;
+			}
+			public function update(fileListXML:XML):void{
+				
+				tree.dataProvider=fileListXLC=new XMLListCollection(new XMLList(fileListXML));
+				
+				openItems();
+				
+				select(sol.getValue(this.id+"_selectedItemXML"));
+				
+				tree.verticalScrollPosition=sol.getValue(this.id+"_verticalScrollPosition");
+				
+				change();
+			}
+			private function openItems():void{
+				var openItems:Object=new Object();
+				for each(var openItem:XML in sol.getValue(this.id+"_openItems")){
+					openItems[openItem.toXMLString()]=true;
+				}
+				_openItems(fileListXLC.source[0],openItems);
+			}
+			private function _openItems(itemXML:XML,openItems:Object):void{
+				if(openItems[itemXML.toXMLString()]){
+					//output("open："+itemXML.@name.toString());
+					tree.validateNow();
+					tree.expandItem(itemXML,true);
+				}
+				for each(var subItemXML:XML in itemXML.node){
+					_openItems(subItemXML,openItems);
+				}
+			}
+			private function select(itemXML:XML):void{
+				tree.selectedItem=null;
+				_select(fileListXLC.source[0],itemXML.toXMLString());
+			}
+			private function _select(xml:XML,itemXMLStr:String):void{
+				if(tree.selectedItem){
+					return;
+				}
+				if(xml.toXMLString()==itemXMLStr){
+					var xmlArr:Array=new Array();
+					while(xml){
+						xmlArr.unshift(xml);
+						xml=xml.parent();
+					}
+					for each(xml in xmlArr){
+						tree.validateNow();
+						tree.expandItem(xml,true);
+					}
+					tree.selectedItem=xml;
+					return;
+				}
+				for each(var node:XML in xml.node){
+					_select(node,itemXMLStr);
+				}
+			}
+			
+			private function saveSetting():void{
+				sol.setValue(this.id+"_openItems",tree.openItems);
+				sol.setValue(this.id+"_verticalScrollPosition",tree.verticalScrollPosition);
+			}
+			private function change():void{
+				if(tree.selectedItem){
+					sol.setValue(this.id+"_selectedItemXML",tree.selectedItem);
+					saveSetting();
+					if(onChange==null){
+					}else{
+						onChange(tree.selectedItem);
+					}
+				}
+			}
+			private function treeIconFun(item:XML):Class{
+				return FileTreeIcon;
+			}
+			
+		]]>
+	</fx:Script>
+</s:Group>
