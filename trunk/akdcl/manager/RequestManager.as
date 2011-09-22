@@ -430,16 +430,16 @@ class RequestURLLoader extends URLLoader {
 				try {
 					return XML(data);
 				}catch (_e:*) {
-					return null;
 				}
+				return null;
 			case RequestManager.DATAFORMAT_JSON:
 				try {
 					//去掉json不支持的字符串
 					var _dataFotmat:String = data.replace(/[\x00-\x1f]/g, "");
 					return JSON.decode(_dataFotmat);
 				}catch (_e:*) {
-					return null;
 				}
+				return null;
 			case URLLoaderDataFormat.TEXT:
 			case URLLoaderDataFormat.BINARY:
 			case URLLoaderDataFormat.VARIABLES:
