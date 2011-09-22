@@ -19,11 +19,13 @@ FileTree
 	xmlns:ui="zero.ui.*"
 	xmlns:local="*"
 >
-	<mx:Tree width="100%" height="100%" id="tree" change="change()" itemOpen="saveSetting()" itemClose="saveSetting()" mouseUp="saveSetting()"/>
+	<mx:Tree width="100%" height="100%" id="tree" change="change()" itemOpen="saveSetting()" itemClose="saveSetting()" mouseUp="saveSetting()" doubleClickEnabled="true" itemDoubleClick="itemDoubleClick(event)"/>
 	<fx:Script>
 		<![CDATA[
+			import flash.net.navigateToURL;
 			
 			import mx.collections.XMLListCollection;
+			import mx.events.ListEvent;
 			
 			import zero.output;
 			import zero.outputError;
@@ -179,6 +181,10 @@ FileTree
 			}
 			private function treeIconFun(item:XML):Class{
 				return FileTreeIcon;
+			}
+			
+			private function itemDoubleClick(event:ListEvent):void{
+				navigateToURL(new URLRequest(tree.selectedItem.@url.toString()));
 			}
 			
 		]]>
