@@ -9,6 +9,7 @@
 	 * @author Akdcl
 	 */
 	public class SimpleBtn extends UISprite {
+		private static const bM:ButtonManager = ButtonManager.getInstance();
 		public var rollOver:Function;
 		public var rollOut:Function;
 		public var press:Function;
@@ -17,9 +18,9 @@
 		override public function set enabled(_enabled:Boolean):void{
 			super.enabled = _enabled;
 			if (_enabled) {
-				ButtonManager.addButton(this);
+				bM.addButton(this);
 			}else {
-				ButtonManager.removeButton(this);
+				bM.removeButton(this);
 			}
 		}
 		override protected function init():void {

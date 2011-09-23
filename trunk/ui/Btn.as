@@ -12,6 +12,7 @@
 	 * @author Akdcl
 	 */
 	public class Btn extends UIMovieClip {
+		private static const bM:ButtonManager = ButtonManager.getInstance();
 		public var rollOver:Function;
 		public var rollOut:Function;
 		public var press:Function;
@@ -37,11 +38,11 @@
 				return;
 			}
 			if (__group){
-				ButtonManager.removeFromGroup(__group, this);
+				bM.removeFromGroup(__group, this);
 			}
 			__group = _group;
 			if (__group){
-				ButtonManager.addToGroup(__group, this);
+				bM.addToGroup(__group, this);
 			}
 		}
 		
@@ -56,25 +57,25 @@
 			__selected = _selected;
 			if (__group){
 				if (__selected){
-					if (ButtonManager.selectItem(__group, this)){
+					if (bM.selectItem(__group, this)){
 					} else {
 						return;
 					}
 				} else {
-					ButtonManager.unselectItem(__group, this);
+					bM.unselectItem(__group, this);
 				}
 			}
-			ButtonManager.setButtonStyle(this);
+			bM.setButtonStyle(this);
 			if (select != null) {
 				select();
 			}
 		}
 		override public function set enabled(_enabled:Boolean):void {
 			super.enabled = _enabled;
-			if (_enabled){
-				ButtonManager.addButton(this);
-			} else {
-				ButtonManager.removeButton(this);
+			if (_enabled) {
+				bM.addButton(this);
+			}else {
+				bM.removeButton(this);
 			}
 		}
 
