@@ -20,7 +20,6 @@ package akdcl.media {
 		protected var loadProgress:Number = 0;
 		public function DisplayLoader(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = -1):void {
 			super(_rectWidth, _rectHeight, _bgColor);
-			useHandCursor = _bgColor >= 0;
 			setProgressClip(false);
 		}
 
@@ -29,13 +28,13 @@ package akdcl.media {
 			progressClip = null;
 		}
 
-		public function load(_url:String, _tweenMode:int = 2, _alignX:int = 0, _alignY:int = 0, _scaleMode:int = 1):void {
+		public function load(_url:String, _tweenMode:int = 2, _scrollX:Number = 0.5, _scrollY:Number = 0.5, _scaleMode:Number = 1):void {
 			setContent(null, tweenMode);
-			alignX = _alignX;
-			alignY = _alignY;
-			scaleMode = _scaleMode;
 			loadProgress = 0;
 			label = _url;
+			scrollXReady = _scrollX;
+			scrollYReady = _scrollY;
+			scaleModeReady = _scaleMode;
 			tweenMode = _tweenMode;
 			rM.loadDisplay(_url, onImageHandler, onImageHandler, onImageHandler);
 		}
@@ -55,7 +54,7 @@ package akdcl.media {
 				setProgressClip(loadProgress);
 			} else {
 				setProgressClip(false);
-				setContent(_p, tweenMode, alignX, alignY, scaleMode);
+				setContent(_p, tweenMode, scrollXReady, scrollYReady, scaleModeReady);
 				dispatchEvent(eventComplete);
 			}
 		}
