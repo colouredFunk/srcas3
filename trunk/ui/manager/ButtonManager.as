@@ -56,8 +56,7 @@ package ui.manager {
 		private var intervalID:uint;
 		private var buttonTarget:*;
 		
-		public function addButton(_button:*, _buttonMode:Boolean = true):void {
-			_button.buttonMode = _buttonMode;
+		public function addButton(_button:*):void {
 			if (_button is MovieClip) {
 				_button.mouseChildren = false;
 			}
@@ -67,7 +66,6 @@ package ui.manager {
 			setButtonStyle(_button);
 		}
 		public function removeButton(_button:*):void {
-			_button.buttonMode = false;
 			_button.removeEventListener(MouseEvent.ROLL_OVER, onRollOverHandler);
 			_button.removeEventListener(MouseEvent.ROLL_OUT, onRollOutHandler);
 			_button.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseDownHandler);
@@ -80,73 +78,97 @@ package ui.manager {
 		private function onStageMouseUpHandler(_e:MouseEvent):void {
 			for each(buttonTarget in buttonDownDic) {
 				delete buttonDownDic[buttonTarget];
-				//buttonCallBack(buttonTarget, "$" + RELEASE);
-				//buttonCallBack(buttonTarget, RELEASE);
+				//trace("releaseOutSide");
+				buttonCallBack(buttonTarget, "$" + RELEASE);
+				buttonCallBack(buttonTarget, RELEASE);
 				setButtonStyle(buttonTarget);
+			}
+			buttonTarget = _e.target;
+			if (buttonInDic[buttonTarget]) {
+				//trace("releaseInOtherButton");
 			}
 		}
 		private function onRollOverHandler(_e:MouseEvent):void {
 			buttonTarget = _e.currentTarget;
 			if (buttonInDic[buttonTarget]) {
-				return;
+				
+			}else {
+				buttonInDic[buttonTarget] = buttonTarget;
+				buttonTarget.addEventListener(MouseEvent.ROLL_OUT, onRollOutHandler);
+				if (_e.buttonDown) {
+					//trace("DragOver");
+				}
+				
+				buttonCallBack(buttonTarget, "$" + ROLL_OVER);
+				buttonCallBack(buttonTarget, ROLL_OVER);
+				
+				setButtonStyle(buttonTarget);
 			}
-			buttonInDic[buttonTarget] = buttonTarget;
-			buttonTarget.addEventListener(MouseEvent.ROLL_OUT, onRollOutHandler);
-			
-			buttonCallBack(buttonTarget, "$" + ROLL_OVER);
-			buttonCallBack(buttonTarget, ROLL_OVER);
-			
-			setButtonStyle(buttonTarget);
 		}
 		private function onRollOutHandler(_e:MouseEvent):void {
 			buttonTarget = _e.currentTarget;
-			if (!buttonInDic[buttonTarget]) {
-				return;
-			}
-			delete buttonInDic[buttonTarget];
-			buttonTarget.removeEventListener(MouseEvent.ROLL_OUT, onRollOutHandler);
+			if (buttonInDic[buttonTarget]) {
+				delete buttonInDic[buttonTarget];
+				buttonTarget.removeEventListener(MouseEvent.ROLL_OUT, onRollOutHandler);
+				if (_e.buttonDown) {
+					//trace("DragOut");
+				}
 
-			buttonCallBack(buttonTarget, "$" + ROLL_OUT);
-			buttonCallBack(buttonTarget, ROLL_OUT);
-			
-			setButtonStyle(buttonTarget);
+				buttonCallBack(buttonTarget, "$" + ROLL_OUT);
+				buttonCallBack(buttonTarget, ROLL_OUT);
+				
+				setButtonStyle(buttonTarget);
+			}
 		}
 		private function onMouseDownHandler(_e:MouseEvent):void {
 			buttonTarget = _e.currentTarget;
 			if (buttonDownDic[buttonTarget]) {
-				return;
-			}
-			buttonDownDic[buttonTarget] = buttonTarget;
-			buttonTarget.addEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
+				
+			}else {
+				buttonDownDic[buttonTarget] = buttonTarget;
+				buttonTarget.addEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
 
-			buttonCallBack(buttonTarget, "$" + PRESS);
-			buttonCallBack(buttonTarget, PRESS);
-			
-			setButtonStyle(buttonTarget);
+				buttonCallBack(buttonTarget, "$" + PRESS);
+				buttonCallBack(buttonTarget, PRESS);
+				
+				setButtonStyle(buttonTarget);
+			}
 		}
 		private function onMouseUpHandler(_e:MouseEvent):void {
 			buttonTarget = _e.currentTarget;
-			if (!buttonDownDic[buttonTarget]) {
-				return;
-			}
-			delete buttonDownDic[buttonTarget];
-			buttonTarget.removeEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
+			if (buttonDownDic[buttonTarget]) {
+				delete buttonDownDic[buttonTarget];
+				buttonTarget.removeEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
 
-			buttonCallBack(buttonTarget, "$" + RELEASE);
-			buttonCallBack(buttonTarget, RELEASE);
-			
-			setButtonStyle(buttonTarget);
+				buttonCallBack(buttonTarget, "$" + RELEASE);
+				buttonCallBack(buttonTarget, RELEASE);
+				
+				setButtonStyle(buttonTarget);
+			}
 		}
 		private function buttonCallBack(_button:*, _method:*, ...args):void {
 			try {
-				if (_method is String && _button[_method] != null) {
+				if (_method is String && (_method in _button)) {
 					_method = _button[_method];
 				}
 			}catch (_ero:*) {
 				
 			}
 			if (_method is Function) {
-				_method.apply(_button, args);
+				if (args) {
+					_method.apply(_button, args);
+				}else {
+					switch(_method.length) {
+						case 1:
+							_method(_button);
+							break;
+						case 0:
+						default:
+							_method();
+							break;
+					}
+				}
+				
 			}
 		}
 		

@@ -72,6 +72,7 @@
 		}
 		override public function set enabled(_enabled:Boolean):void {
 			super.enabled = _enabled;
+			buttonMode = _enabled;
 			if (_enabled) {
 				bM.addButton(this);
 			}else {
@@ -87,25 +88,25 @@
 				for (var _i:uint; _i < _length; _i++){
 					area.getChildAt(_i).visible = false;
 				}
-				mouseChildren = false;
 				hitArea = area;
 			}
 			stop();
 		}
 
 		override protected function onRemoveToStageHandler():void {
+			group = null;
+			enabled = false;
+			super.onRemoveToStageHandler();
+			
 			rollOver = null;
 			rollOut = null;
 			press = null;
 			release = null;
-
+			
 			eEval = null;
 			href = null;
 			hrefTarget = null;
 			area = null;
-			group = null;
-			enabled = false;
-			super.onRemoveToStageHandler();
 		}
 		
 		public function $press():void {

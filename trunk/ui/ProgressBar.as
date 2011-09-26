@@ -4,7 +4,7 @@ package ui{
 	 * ...
 	 * @author Akdcl
 	 */
-	public class ProgressBar extends SimpleBtn {
+	public class ProgressBar extends UISprite {
 		public var change:Function;
 		public var labelFunction:Function;
 		
