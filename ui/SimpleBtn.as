@@ -17,6 +17,7 @@
 		
 		override public function set enabled(_enabled:Boolean):void{
 			super.enabled = _enabled;
+			buttonMode = _enabled;
 			if (_enabled) {
 				bM.addButton(this);
 			}else {

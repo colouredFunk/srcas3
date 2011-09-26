@@ -1,11 +1,13 @@
 ﻿package ui {
+	import flash.events.Event;
+	import flash.events.MouseEvent;
 	import flash.geom.Rectangle;
 	
 	/**
 	 * ...
 	 * @author Akdcl
 	 */
-	public class SliderBar extends SimpleBtn {
+	public class SliderBar extends UISprite {
 		public var offY:int;
 		private var offX:int;
 		private var maximum:int;
@@ -91,6 +93,12 @@
 			}
 			enabled = false;
 		}
+		override protected function onAddedToStageHandler(_evt:Event):void 
+		{
+			super.onAddedToStageHandler(_evt);
+			addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheelHandler);
+		}
+		
 		override protected function onRemoveToStageHandler():void {
 			super.onRemoveToStageHandler();
 			content = null;
@@ -105,10 +113,8 @@
 			}
 			content.y = offY - value;
 		}
-		public function $wheel(_delta:int):void {
-			if (mouseX >= maskArea.x && mouseX <= (maskArea.width + maskArea.x)&&mouseY >= maskArea.y && mouseY <= (maskArea.height + maskArea.y)) {
-				slider.value += (_delta > 0? -1:1) * wheelInterval;
-			}
+		protected function onMouseWheelHandler(_e:MouseEvent):void {
+			slider.value += (_e.delta > 0? -1:1) * wheelInterval;
 		}
 		/*
 		private function goUp():void {
