@@ -98,10 +98,10 @@ package akdcl.media {
 			return __scrollX;
 		}
 		public function set scrollX(_value:Number):void {
-			if (_value < -0.5) {
-				_value = -0.5;
-			}else if (_value>1.5) {
-				_value = 1.5;
+			if (_value < -1) {
+				_value = -1;
+			}else if (_value>2) {
+				_value = 2;
 			}
 			if (__scrollX==_value) {
 				return;
@@ -115,10 +115,10 @@ package akdcl.media {
 			return __scrollY;
 		}
 		public function set scrollY(_value:Number):void {
-			if (_value < -0.5) {
-				_value = -0.5;
-			}else if (_value>1.5) {
-				_value = 1.5;
+			if (_value < -1) {
+				_value = -1;
+			}else if (_value>2) {
+				_value = 2;
 			}
 			if (__scrollY==_value) {
 				return;
@@ -253,33 +253,33 @@ package akdcl.media {
 					_display.x = - offX * _display.scaleX;
 					_display.y = - offY * _display.scaleY;
 					if (__scrollX<0) {
-						rect.x = Math.round( _width * __scrollX);
+						rect.x = _width * __scrollX * 0.5;
 					}else if ( __scrollX <= 1) {
-						rect.x = Math.round((_dW - _width) * __scrollX);
+						rect.x = (_dW - _width) * __scrollX;
 					}else {
-						rect.x = Math.round((_dW - _width) +_width * (__scrollX - 1));
+						rect.x = (_dW - _width) +_width * (__scrollX - 1) * 0.5;
 					}
 					if (__scrollY<0) {
-						rect.y = Math.round(_height * __scrollY);
+						rect.y = _height * __scrollY * 0.5;
 					}else if (__scrollY <= 1) {
-						rect.y = Math.round((_dH - _height) * __scrollY);
+						rect.y = (_dH - _height) * __scrollY;
 					}else {
-						rect.y = Math.round((_dH - _height) +_height * (__scrollY - 1));
+						rect.y = (_dH - _height) +_height * (__scrollY - 1) * 0.5;
 					}
 				}else {
 					if (__scrollX<0) {
-						_display.x = Math.round( -_width * __scrollX - offX * _display.scaleX);
+						_display.x =  -_width * __scrollX * 0.5 - offX * _display.scaleX;
 					}else if ( __scrollX <= 1) {
-						_display.x = Math.round((_width - _dW) * __scrollX - offX * _display.scaleX);
+						_display.x = (_width - _dW) * __scrollX - offX * _display.scaleX;
 					}else {
-						_display.x = Math.round((_width - _dW) - _width * (__scrollX - 1) - offX * _display.scaleX);
+						_display.x = (_width - _dW) - _width * (__scrollX - 1) * 0.5 - offX * _display.scaleX;
 					}
 					if (__scrollY<0) {
-						_display.y = Math.round( -_height * __scrollY - offY * _display.scaleY);
+						_display.y = -_height * __scrollY * 0.5 - offY * _display.scaleY;
 					}else if (__scrollY <= 1) {
-						_display.y = Math.round((_height - _dH) * __scrollY - offY * _display.scaleY);
+						_display.y = (_height - _dH) * __scrollY - offY * _display.scaleY;
 					}else {
-						_display.y = Math.round((_height - _dH) -_height * (__scrollY - 1) - offY * _display.scaleY);
+						_display.y = (_height - _dH) -_height * (__scrollY - 1) * 0.5 - offY * _display.scaleY;
 					}
 					rect.x = 0;
 					rect.y = 0;
