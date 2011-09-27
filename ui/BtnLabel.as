@@ -1,4 +1,5 @@
 ﻿package ui{
+	import akdcl.events.InteractionEvent;
 	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.text.StyleSheet;
@@ -21,7 +22,7 @@
 				return;
 			}
 			__widthMax = _widthMax;
-			$setStyle(false);
+			onUpdateStyle();
 		}
 		
 		/*
@@ -29,13 +30,13 @@
 		[Inspectable(defaultValue=0,type="int",name="0_固定高")]
 		public function set heightMax(_heightMax:int):void {
 			__heightMax = _heightMax;
-			$setStyle(false);
+			onUpdateStyle();
 		}
 		*/
 		[Inspectable(enumeration="left,right,center",defaultValue="left",type="String",name="1_对齐")]
 		public function set autoSize(_autoSize:String):void {
 			txt.autoSize = _autoSize;
-			$setStyle(false);
+			onUpdateStyle();
 		}
 		private var __label:String;
 		public function get label():String {
@@ -46,7 +47,7 @@
 			if (__label!=_label) {
 				__label=_label;
 				txt.text=__label;
-				$setStyle(false);
+				onUpdateStyle();
 			}
 		}
 		override protected function init():void {
@@ -64,7 +65,8 @@
 			bar = null;
 			endClip = null;
 		}
-		public function $setStyle(_isActive:Boolean):void {
+
+		protected function onUpdateStyle(_e:InteractionEvent = null):void {
 			if (totalFrames > 8 || !bar) {
 				if (txt && !(txt is TextField)) {
 					if (txt.autoSize == TextFieldAutoSize.RIGHT) {

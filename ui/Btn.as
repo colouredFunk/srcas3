@@ -3,6 +3,7 @@
 	import flash.external.ExternalInterface;
 	
 	import akdcl.net.gotoURL;
+	import akdcl.events.InteractionEvent;
 
 	import ui.UIMovieClip;
 	import ui.manager.ButtonManager;
@@ -23,7 +24,6 @@
 		public var href:*;
 		public var hrefTarget:String = "_blank";
 		public var eEval:String;
-		public var isDown:Boolean;
 
 		public function set hrefXML(_hrefXML:XML):void {
 			href = _hrefXML;
@@ -82,6 +82,7 @@
 
 		override protected function init():void {
 			super.init();
+			addEventListener(InteractionEvent.RELEASE, onReleaseHandler);
 			enabled = true;
 			if (area){
 				var _length:uint = area.numChildren;
@@ -109,15 +110,10 @@
 			area = null;
 		}
 		
-		public function $press():void {
-			isDown = true;
-		}
-		
-		public function $release():void {
-			isDown = false;
+		protected function onReleaseHandler(_e:InteractionEvent):void {
 			if (href) {
 				gotoURL(href, hrefTarget);
-			}else if (eEval && ExternalInterface.available) {
+			}else if (eEval) {
 				ExternalInterface.call("eval", eEval);
 			}
 		}
