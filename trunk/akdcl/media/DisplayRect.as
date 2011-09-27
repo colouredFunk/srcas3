@@ -38,7 +38,9 @@ package akdcl.media {
 			if (!contextMenuStatic){
 				contextMenuItem = addContextMenu(_target, "", onMenuItemSelectHandler);
 				contextMenuStatic = _target.contextMenu;
-				contextMenuStatic.addEventListener(ContextMenuEvent.MENU_SELECT, onMenuSelectHandler);
+				if (contextMenuStatic) {
+					contextMenuStatic.addEventListener(ContextMenuEvent.MENU_SELECT, onMenuSelectHandler);
+				}
 			}
 			return contextMenuStatic;
 		}
@@ -105,9 +107,7 @@ package akdcl.media {
 				return;
 			}
 			__scrollX = _value;
-			if (autoUpdate){
-				updateRect();
-			}
+			updateScrollXY();
 		}
 		
 		private var __scrollY:Number = 0.5;
@@ -124,9 +124,7 @@ package akdcl.media {
 				return;
 			}
 			__scrollY = _value;
-			if (autoUpdate){
-				updateRect();
-			}
+			updateScrollXY();
 		}
 		//-1:outside,0:noscale,1:inside;
 		//>1||<-1:scale
@@ -239,23 +237,55 @@ package akdcl.media {
 						_display.scaleY = _display.scaleX = _scale;
 						break;
 				}
+				updateScrollXY();
+			}
+			scrollRect = rect;
+			dispatchEvent(eventResize);
+		}
+		protected function updateScrollXY():void {
+			var _display:Object = displayContent;
+			if (_display) {
+				var _width:Number = rect.width;
+				var _height:Number = rect.height;
 				var _dW:Number = originalWidth * _display.scaleX;
 				var _dH:Number = originalHeight * _display.scaleY;
 				if (moveRect) {
 					_display.x = - offX * _display.scaleX;
 					_display.y = - offY * _display.scaleY;
-					rect.x = (_dW - _width) * __scrollX;
-					rect.y = (_dH - _height) * __scrollY;
+					if (__scrollX<0) {
+						rect.x = Math.round( _width * __scrollX);
+					}else if ( __scrollX <= 1) {
+						rect.x = Math.round((_dW - _width) * __scrollX);
+					}else {
+						rect.x = Math.round((_dW - _width) +_width * (__scrollX - 1));
+					}
+					if (__scrollY<0) {
+						rect.y = Math.round(_height * __scrollY);
+					}else if (__scrollY <= 1) {
+						rect.y = Math.round((_dH - _height) * __scrollY);
+					}else {
+						rect.y = Math.round((_dH - _height) +_height * (__scrollY - 1));
+					}
 				}else {
-					_display.x = Math.round((_width - _dW) * __scrollX - offX * _display.scaleX);
-					_display.y = Math.round((_height - _dH) * __scrollY - offY * _display.scaleY);
+					if (__scrollX<0) {
+						_display.x = Math.round( -_width * __scrollX - offX * _display.scaleX);
+					}else if ( __scrollX <= 1) {
+						_display.x = Math.round((_width - _dW) * __scrollX - offX * _display.scaleX);
+					}else {
+						_display.x = Math.round((_width - _dW) - _width * (__scrollX - 1) - offX * _display.scaleX);
+					}
+					if (__scrollY<0) {
+						_display.y = Math.round( -_height * __scrollY - offY * _display.scaleY);
+					}else if (__scrollY <= 1) {
+						_display.y = Math.round((_height - _dH) * __scrollY - offY * _display.scaleY);
+					}else {
+						_display.y = Math.round((_height - _dH) -_height * (__scrollY - 1) - offY * _display.scaleY);
+					}
 					rect.x = 0;
 					rect.y = 0;
 				}
 				//_width / _dW, _height / _dH
 			}
-			scrollRect = rect;
-			dispatchEvent(eventResize);
 		}
 
 		public function setContent(_content:Object = null, _tweenMode:int = 2, _scrollX:Number = 0.5, _scrollY:Number = 0.5, _scaleMode:Number = 1):void {

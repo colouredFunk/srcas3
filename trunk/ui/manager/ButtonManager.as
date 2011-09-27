@@ -33,7 +33,8 @@ package ui.manager {
 			buttonDic = new Dictionary();
 			buttonInDic = new Dictionary();
 			buttonDownDic = new Dictionary();
-			mousePoint = new Point();
+			pointStart = new Point();
+			pointLast = new Point();
 			mouseSpeed = new Point();
 			
 			intervalID = setInterval(checkStage, 300);
@@ -63,8 +64,9 @@ package ui.manager {
 		
 		private var intervalID:uint;
 		private var buttonTarget:*;
-		private var mousePoint:Point;
-		private var mouseSpeed:Point;
+		public var pointStart:Point;
+		public var pointLast:Point;
+		public var mouseSpeed:Point;
 		
 		public function addButton(_button:*):void {
 			if (_button is MovieClip) {
@@ -88,6 +90,8 @@ package ui.manager {
 		
 		private function onStageMouseUpHandler(_e:MouseEvent):void {
 			for each(buttonTarget in buttonDownDic) {
+				buttonTarget.removeEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
+				buttonTarget.removeEventListener(Event.ENTER_FRAME, onMouseMoveHandler);
 				delete buttonDownDic[buttonTarget];
 				if (buttonTarget.hasEventListener(InteractionEvent.RELEASE_OUTSIDE)) {
 					buttonTarget.dispatchEvent(new InteractionEvent(InteractionEvent.RELEASE_OUTSIDE));
@@ -127,7 +131,7 @@ package ui.manager {
 			if (buttonInDic[buttonTarget]) {
 				delete buttonInDic[buttonTarget];
 				buttonTarget.removeEventListener(MouseEvent.ROLL_OUT, onRollOutHandler);
-				buttonTarget.removeEventListener(Event.ENTER_FRAME, onMouseMoveHandler);
+				//buttonTarget.removeEventListener(Event.ENTER_FRAME, onMouseMoveHandler);
 				if (_e.buttonDown) {
 					if (buttonTarget.hasEventListener(InteractionEvent.DRAG_OUT)) {
 						buttonTarget.dispatchEvent(new InteractionEvent(InteractionEvent.DRAG_OUT));
@@ -150,8 +154,9 @@ package ui.manager {
 				buttonTarget.addEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
 				if (buttonTarget.hasEventListener(InteractionEvent.DRAG_MOVE)) {
 					buttonTarget.addEventListener(Event.ENTER_FRAME, onMouseMoveHandler);
-					mousePoint.x = stage.mouseX;
-					mousePoint.y = stage.mouseY;
+					pointLast.x = pointStart.x = stage.mouseX;
+					pointLast.y = pointStart.y = stage.mouseY;
+					
 					mouseSpeed.normalize(0);
 				}
 				
@@ -181,10 +186,12 @@ package ui.manager {
 			}
 		}
 		private function onMouseMoveHandler(_e:Event):void {
-			mouseSpeed.x = stage.mouseX - mousePoint.x;
-			mouseSpeed.y = stage.mouseY - mousePoint.y;
-			mousePoint.x = stage.mouseX;
-			mousePoint.y = stage.mouseY;
+			mouseSpeed.x = stage.mouseX - pointLast.x;
+			mouseSpeed.y = stage.mouseY - pointLast.y;
+			pointLast.x = stage.mouseX;
+			pointLast.y = stage.mouseY;
+			var _iEvt:InteractionEvent = new InteractionEvent(InteractionEvent.DRAG_MOVE);
+			_e.currentTarget.dispatchEvent(_iEvt);
 		}
 		private function buttonCallBack(_button:*, _method:*, ...args):void {
 			try {
