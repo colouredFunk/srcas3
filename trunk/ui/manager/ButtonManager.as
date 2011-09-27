@@ -1,9 +1,11 @@
 package ui.manager {
+	import akdcl.events.InteractionEvent;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.geom.Point;
 	import flash.utils.Dictionary;
 	import flash.utils.setInterval;
 	import flash.utils.clearInterval;
@@ -31,7 +33,10 @@ package ui.manager {
 			buttonDic = new Dictionary();
 			buttonInDic = new Dictionary();
 			buttonDownDic = new Dictionary();
-			intervalID = setInterval(checkStage, 200);
+			mousePoint = new Point();
+			mouseSpeed = new Point();
+			
+			intervalID = setInterval(checkStage, 300);
 		}
 		private function checkStage():void {
 			for each(var _button:* in buttonDic) {
@@ -39,6 +44,7 @@ package ui.manager {
 					stage = _button.stage;
 					stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUpHandler);
 					clearInterval(intervalID);
+					break;
 				}
 			}
 		}
@@ -47,6 +53,8 @@ package ui.manager {
 		private static const PRESS:String = "press";
 		private static const RELEASE:String = "release";
 		private static const RELEASE_OUTSIDE:String = "releaseOutside";
+		private static const DRAG_OVER:String = "dragOver";
+		private static const DRAG_OUT:String = "dragOut";
 		
 		private var stage:Stage;
 		private var buttonDic:Dictionary;
@@ -55,6 +63,8 @@ package ui.manager {
 		
 		private var intervalID:uint;
 		private var buttonTarget:*;
+		private var mousePoint:Point;
+		private var mouseSpeed:Point;
 		
 		public function addButton(_button:*):void {
 			if (_button is MovieClip) {
@@ -70,6 +80,7 @@ package ui.manager {
 			_button.removeEventListener(MouseEvent.ROLL_OUT, onRollOutHandler);
 			_button.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseDownHandler);
 			_button.removeEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
+			_button.removeEventListener(Event.ENTER_FRAME, onMouseMoveHandler);
 			delete buttonDic[_button];
 			delete buttonInDic[_button];
 			delete buttonDownDic[_button];
@@ -78,8 +89,11 @@ package ui.manager {
 		private function onStageMouseUpHandler(_e:MouseEvent):void {
 			for each(buttonTarget in buttonDownDic) {
 				delete buttonDownDic[buttonTarget];
-				//trace("releaseOutSide");
-				buttonCallBack(buttonTarget, "$" + RELEASE);
+				if (buttonTarget.hasEventListener(InteractionEvent.RELEASE_OUTSIDE)) {
+					buttonTarget.dispatchEvent(new InteractionEvent(InteractionEvent.RELEASE_OUTSIDE));
+				}else if (buttonTarget.hasEventListener(InteractionEvent.RELEASE)) {
+					buttonTarget.dispatchEvent(new InteractionEvent(InteractionEvent.RELEASE));
+				}
 				buttonCallBack(buttonTarget, RELEASE);
 				setButtonStyle(buttonTarget);
 			}
@@ -96,10 +110,13 @@ package ui.manager {
 				buttonInDic[buttonTarget] = buttonTarget;
 				buttonTarget.addEventListener(MouseEvent.ROLL_OUT, onRollOutHandler);
 				if (_e.buttonDown) {
-					//trace("DragOver");
+					if (buttonTarget.hasEventListener(InteractionEvent.DRAG_OVER)) {
+						buttonTarget.dispatchEvent(new InteractionEvent(InteractionEvent.DRAG_OVER));
+					}
+				}else if (buttonTarget.hasEventListener(InteractionEvent.ROLL_OVER)) {
+					buttonTarget.dispatchEvent(new InteractionEvent(InteractionEvent.ROLL_OVER));
 				}
 				
-				buttonCallBack(buttonTarget, "$" + ROLL_OVER);
 				buttonCallBack(buttonTarget, ROLL_OVER);
 				
 				setButtonStyle(buttonTarget);
@@ -110,11 +127,15 @@ package ui.manager {
 			if (buttonInDic[buttonTarget]) {
 				delete buttonInDic[buttonTarget];
 				buttonTarget.removeEventListener(MouseEvent.ROLL_OUT, onRollOutHandler);
+				buttonTarget.removeEventListener(Event.ENTER_FRAME, onMouseMoveHandler);
 				if (_e.buttonDown) {
-					//trace("DragOut");
+					if (buttonTarget.hasEventListener(InteractionEvent.DRAG_OUT)) {
+						buttonTarget.dispatchEvent(new InteractionEvent(InteractionEvent.DRAG_OUT));
+					}
+				}else if (buttonTarget.hasEventListener(InteractionEvent.ROLL_OUT)) {
+					buttonTarget.dispatchEvent(new InteractionEvent(InteractionEvent.ROLL_OUT));
 				}
 
-				buttonCallBack(buttonTarget, "$" + ROLL_OUT);
 				buttonCallBack(buttonTarget, ROLL_OUT);
 				
 				setButtonStyle(buttonTarget);
@@ -127,8 +148,17 @@ package ui.manager {
 			}else {
 				buttonDownDic[buttonTarget] = buttonTarget;
 				buttonTarget.addEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
-
-				buttonCallBack(buttonTarget, "$" + PRESS);
+				if (buttonTarget.hasEventListener(InteractionEvent.DRAG_MOVE)) {
+					buttonTarget.addEventListener(Event.ENTER_FRAME, onMouseMoveHandler);
+					mousePoint.x = stage.mouseX;
+					mousePoint.y = stage.mouseY;
+					mouseSpeed.normalize(0);
+				}
+				
+				if (buttonTarget.hasEventListener(InteractionEvent.PRESS)) {
+					buttonTarget.dispatchEvent(new InteractionEvent(InteractionEvent.PRESS));
+				}
+				
 				buttonCallBack(buttonTarget, PRESS);
 				
 				setButtonStyle(buttonTarget);
@@ -139,12 +169,22 @@ package ui.manager {
 			if (buttonDownDic[buttonTarget]) {
 				delete buttonDownDic[buttonTarget];
 				buttonTarget.removeEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
+				buttonTarget.removeEventListener(Event.ENTER_FRAME, onMouseMoveHandler);
+				
+				if (buttonTarget.hasEventListener(InteractionEvent.RELEASE)) {
+					buttonTarget.dispatchEvent(new InteractionEvent(InteractionEvent.RELEASE));
+				}
 
-				buttonCallBack(buttonTarget, "$" + RELEASE);
 				buttonCallBack(buttonTarget, RELEASE);
 				
 				setButtonStyle(buttonTarget);
 			}
+		}
+		private function onMouseMoveHandler(_e:Event):void {
+			mouseSpeed.x = stage.mouseX - mousePoint.x;
+			mouseSpeed.y = stage.mouseY - mousePoint.y;
+			mousePoint.x = stage.mouseX;
+			mousePoint.y = stage.mouseY;
 		}
 		private function buttonCallBack(_button:*, _method:*, ...args):void {
 			try {
@@ -178,6 +218,7 @@ package ui.manager {
 			var _isIn:Boolean = buttonInDic[_button] != null;
 			var _isSelected:Boolean = _button.hasOwnProperty("selected") && _button.selected;
 			var _isActive:Boolean = _isDown || _isIn || _isSelected;
+			
 			if (_button is MovieClip) {
 				if (_button.totalFrames > 8) {
 					setButtonClipPlay(_button, _isActive);
@@ -195,10 +236,13 @@ package ui.manager {
 					}
 				}
 			}
+			
 			if (_button.hasOwnProperty("aniClip")) {
 				setButtonClipPlay(_button.aniClip, _isActive);
 			}
-			buttonCallBack(_button, "$setStyle", _isActive);
+			if (_button.hasEventListener(InteractionEvent.UPDATE_STYLE)) {
+				_button.dispatchEvent(new InteractionEvent(InteractionEvent.UPDATE_STYLE, _isActive));
+			}
 		}
 		public function setButtonClipPlay(_buttonClip:*, _nextFrame:Boolean):void {
 			if (! _buttonClip) {
@@ -307,8 +351,7 @@ package ui.manager {
 		private function unSelectItemFun(_item:*):void {
 			_item.selected = false;
 		}
-		//
-		public function removeFromArray(_a:Array,_ai:*):* {
+		private function removeFromArray(_a:Array,_ai:*):* {
 			var _i:int=_a.indexOf(_ai);
 			if (_i>=0) {
 				return _a.splice(_i,1);

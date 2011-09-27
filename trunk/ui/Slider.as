@@ -1,4 +1,5 @@
 ﻿package ui {
+	import akdcl.events.InteractionEvent;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import ui.manager.ButtonManager;
@@ -65,6 +66,10 @@
 		
 		override protected function init():void {
 			super.init();
+			addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheelHandler);
+			addEventListener(InteractionEvent.PRESS, onPressHandler);
+			addEventListener(InteractionEvent.RELEASE, onReleaseHandler);
+			addEventListener(InteractionEvent.UPDATE_STYLE, onUpdateStyle);
 			enabled = true;
 			if (txt){
 				txt.mouseEnabled = false;
@@ -73,11 +78,6 @@
 				}
 				mouseEnabled = false;
 			}
-		}
-
-		override protected function onAddedToStageHandler(_evt:Event):void {
-			super.onAddedToStageHandler(_evt);
-			addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheelHandler);
 		}
 		
 		override protected function onRemoveToStageHandler():void {
@@ -89,8 +89,8 @@
 			super.onRemoveToStageHandler();
 		}
 
-		public function $setStyle(_isActive:Boolean):void {
-			if (_isActive){
+		protected function onUpdateStyle(_e:InteractionEvent):void {
+			if (_e.isActive){
 				bM.setButtonClipPlay(thumb, true);
 				bM.setButtonClipPlay(bar, true);
 				bM.setButtonClipPlay(track, true);
@@ -101,13 +101,13 @@
 			}
 		}
 
-		public function $press():void {
+		protected function onPressHandler(_e:InteractionEvent):void {
 			timeHolded = 0;
 			onHoldingHandler(null);
 			addEventListener(Event.ENTER_FRAME, onHoldingHandler);
 		}
-
-		public function $release():void {
+		
+		protected function onReleaseHandler(_e:InteractionEvent):void {
 			timeHolded = 0;
 			removeEventListener(Event.ENTER_FRAME, onHoldingHandler);
 		}
