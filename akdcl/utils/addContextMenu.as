@@ -18,10 +18,13 @@
 		if (onSelect != null){
 			item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, onSelect);
 		}
-		menu.customItems.push(item);
-		if (obj){
-			obj.contextMenu = menu;
+		if (menu.customItems) {
+			menu.customItems.push(item);
+			if (obj){
+				obj.contextMenu = menu;
+			}
+			return item;
 		}
-		return item;
+		return null
 	}
 }
