@@ -23,11 +23,11 @@ package akdcl.media {
 	 * ...
 	 * @author ...
 	 */
-	
-	 /// @eventType	flash.events.Event.CHANGE
-	[Event(name = "change", type = "flash.events.Event")]
-	 /// @eventType	flash.events.Event.RESIZE
-	[Event(name = "resize", type = "flash.events.Event")]
+
+	/// @eventType	flash.events.Event.CHANGE
+	[Event(name="change",type="flash.events.Event")]
+	/// @eventType	flash.events.Event.RESIZE
+	[Event(name="resize",type="flash.events.Event")]
 	public class DisplayRect extends UISprite {
 		protected static const TWEEN_FRAME:uint = 10;
 		private static var sourceLabel:String;
@@ -38,7 +38,7 @@ package akdcl.media {
 			if (!contextMenuStatic){
 				contextMenuItem = addContextMenu(_target, "", onMenuItemSelectHandler);
 				contextMenuStatic = _target.contextMenu;
-				if (contextMenuStatic) {
+				if (contextMenuStatic){
 					contextMenuStatic.addEventListener(ContextMenuEvent.MENU_SELECT, onMenuSelectHandler);
 				}
 			}
@@ -56,7 +56,7 @@ package akdcl.media {
 		private static function onMenuItemSelectHandler(_evt:ContextMenuEvent):void {
 			System.setClipboard(sourceLabel);
 		}
-		
+
 		private const eventChange:Event = new Event(Event.CHANGE);
 		private const eventResize:Event = new Event(Event.RESIZE);
 
@@ -70,6 +70,7 @@ package akdcl.media {
 		public function get rectWidth():uint {
 			return rect.width;
 		}
+
 		public function set rectWidth(_w:uint):void {
 			if (rect.width == _w){
 				return;
@@ -83,6 +84,7 @@ package akdcl.media {
 		public function get rectHeight():uint {
 			return rect.height;
 		}
+
 		public function set rectHeight(_h:uint):void {
 			if (rect.height == _h){
 				return;
@@ -92,49 +94,112 @@ package akdcl.media {
 				updateRect();
 			}
 		}
-		
-		private var __scrollX:Number = 0.5;
-		public function get scrollX():Number {
+
+		private var __scrollX:int  = 0;
+		public function get scrollX():int  {
 			return __scrollX;
 		}
-		public function set scrollX(_value:Number):void {
-			if (_value < -1) {
-				_value = -1;
-			}else if (_value>2) {
-				_value = 2;
+		public function set scrollX(_value:int ):void {
+			var _display:Object = displayContent;
+			if (_display){
+				var _width:Number = rect.width;
+				var _dW:Number = originalWidth * _display.scaleX;
+				if (_value < -_dW){
+					_value = -_dW;
+				} else if (_value > _width){
+					_value = _width;
+				}
+				if (_width<_dW) {
+					if (_value < _width - _dW) {
+						__scrollX = (_value  + _width - _dW) * 0.5;
+					}else if (_value < 0) {
+						__scrollX = _value;
+					}else {
+						__scrollX = _value * 0.5;
+					}
+				}else {
+					if (_value < 0) {
+						__scrollX = _value * 0.5;
+					}else if (_value < _width - _dW) {
+						__scrollX = _value;
+					}else {
+						__scrollX = (_value  + _width - _dW) * 0.5;
+					}
+				}
+				alignX = __scrollX / (_width - _dW);
 			}
-			if (__scrollX==_value) {
+		}
+		
+		private var __scrollY:int = 0;
+		public function get scrollY():int  {
+			return __scrollY;
+		}
+		public function set scrollY(_value:int ):void {
+			var _display:Object = displayContent;
+			if (_display){
+				var _height:Number = rect.height;
+				var _dH:Number = originalHeight * _display.scaleY;
+				if (_value < -_dH){
+					_value = -_dH;
+				} else if (_value > _height){
+					_value = _height;
+				}
+				if (_height<_dH) {
+					if (_value < _height - _dH) {
+						__scrollY = (_value  + _height - _dH) * 0.5;
+					}else if (_value < 0) {
+						__scrollY = _value;
+					}else {
+						__scrollY = _value * 0.5;
+					}
+				}else {
+					if (_value < 0) {
+						__scrollY = _value * 0.5;
+					}else if (_value < _height - _dH) {
+						__scrollY = _value;
+					}else {
+						__scrollY = (_value  + _height - _dH) * 0.5;
+					}
+				}
+				alignY = __scrollY / (_height - _dH);
+			}
+		}
+
+		private var __alignX:Number = 0;
+		public function get alignX():Number {
+			return __alignX;
+		}
+		public function set alignX(_value:Number):void {
+			if (__alignX == _value){
 				return;
 			}
-			__scrollX = _value;
+			__alignX = _value;
+			updateScrollXY();
+		}
+
+		private var __alignY:Number = 0;
+		public function get alignY():Number {
+			return __alignY;
+		}
+		public function set alignY(_value:Number):void {
+			if (__alignY == _value){
+				return;
+			}
+			__alignY = _value;
 			updateScrollXY();
 		}
 		
-		private var __scrollY:Number = 0.5;
-		public function get scrollY():Number {
-			return __scrollY;
-		}
-		public function set scrollY(_value:Number):void {
-			if (_value < -1) {
-				_value = -1;
-			}else if (_value>2) {
-				_value = 2;
-			}
-			if (__scrollY==_value) {
-				return;
-			}
-			__scrollY = _value;
-			updateScrollXY();
-		}
 		//-1:outside,0:noscale,1:inside;
 		//>1||<-1:scale
 		//NaN:stretch,10:onlywidth,-10:onlyheight;
 		private var __scaleMode:Number = 1;
+
 		public function get scaleMode():Number {
 			return __scaleMode;
 		}
+
 		public function set scaleMode(_value:Number):void {
-			if (__scaleMode==_value) {
+			if (__scaleMode == _value){
 				return;
 			}
 			__scaleMode = _value;
@@ -150,15 +215,15 @@ package akdcl.media {
 		protected var rect:Rectangle;
 		protected var bitmap:Bitmap;
 		protected var content:Object;
-		protected var contentReady:Object; 
+		protected var contentReady:Object;
 
 		protected var isHidding:Boolean = false;
 
 		protected var tweenMode:int;
-		protected var scrollXReady:Number;
-		protected var scrollYReady:Number;
+		protected var alignXReady:Number;
+		protected var alignYReady:Number;
 		protected var scaleModeReady:Number;
-		
+
 		private var originalWidth:int;
 		private var originalHeight:int;
 		private var aspectRatio:Number;
@@ -168,11 +233,11 @@ package akdcl.media {
 		public function DisplayRect(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = 0):void {
 			rect = new Rectangle();
 			var _rect:Rectangle = getRect(this);
-			if (_rectWidth + _rectHeight > 0) {
+			if (_rectWidth + _rectHeight > 0){
 				rect = new Rectangle();
 				rect.width = _rectWidth;
 				rect.height = _rectHeight;
-			}else {
+			} else {
 				rect = getRect(this);
 				rect.y = rect.x = 0;
 			}
@@ -198,7 +263,8 @@ package akdcl.media {
 			super.remove();
 			rect = null;
 			bitmap = null;
-			content = null;;
+			content = null;
+			;
 			contentReady = null;
 			tweenOutVar = null;
 			tweenInVar = null;
@@ -206,7 +272,7 @@ package akdcl.media {
 
 		public function updateRect():void {
 			var _display:Object = displayContent;
-			if (_display) {
+			if (_display){
 				var _width:Number = rect.width;
 				var _height:Number = rect.height;
 				var _scaleABS:Number = Math.abs(__scaleMode);
@@ -216,9 +282,9 @@ package akdcl.media {
 						_display.scaleY = _height / originalHeight;
 						break;
 					case 10:
-						if (__scaleMode > 0) {
+						if (__scaleMode > 0){
 							_display.scaleX = _width / originalWidth;
-						}else {
+						} else {
 							_display.scaleY = _height / originalHeight;
 						}
 						break;
@@ -229,10 +295,10 @@ package akdcl.media {
 						} else {
 							_scale = _height / originalHeight;
 						}
-						if (_scaleABS <= 1) {
-							_scale = 1 + (_scale-1) * _scaleABS;
-						}else {
-							_scale = (1 + (_scale-1)) * _scaleABS;
+						if (_scaleABS <= 1){
+							_scale = 1 + (_scale - 1) * _scaleABS;
+						} else {
+							_scale = (1 + (_scale - 1)) * _scaleABS;
 						}
 						_display.scaleY = _display.scaleX = _scale;
 						break;
@@ -242,65 +308,48 @@ package akdcl.media {
 			scrollRect = rect;
 			dispatchEvent(eventResize);
 		}
+
 		protected function updateScrollXY():void {
 			var _display:Object = displayContent;
-			if (_display) {
+			if (_display){
 				var _width:Number = rect.width;
 				var _height:Number = rect.height;
 				var _dW:Number = originalWidth * _display.scaleX;
 				var _dH:Number = originalHeight * _display.scaleY;
-				if (moveRect) {
-					_display.x = - offX * _display.scaleX;
-					_display.y = - offY * _display.scaleY;
-					if (__scrollX<0) {
-						rect.x = _width * __scrollX * 0.5;
-					}else if ( __scrollX <= 1) {
-						rect.x = (_dW - _width) * __scrollX;
-					}else {
-						rect.x = (_dW - _width) +_width * (__scrollX - 1) * 0.5;
-					}
-					if (__scrollY<0) {
-						rect.y = _height * __scrollY * 0.5;
-					}else if (__scrollY <= 1) {
-						rect.y = (_dH - _height) * __scrollY;
-					}else {
-						rect.y = (_dH - _height) +_height * (__scrollY - 1) * 0.5;
-					}
-				}else {
-					if (__scrollX<0) {
-						_display.x =  -_width * __scrollX * 0.5 - offX * _display.scaleX;
-					}else if ( __scrollX <= 1) {
-						_display.x = (_width - _dW) * __scrollX - offX * _display.scaleX;
-					}else {
-						_display.x = (_width - _dW) - _width * (__scrollX - 1) * 0.5 - offX * _display.scaleX;
-					}
-					if (__scrollY<0) {
-						_display.y = -_height * __scrollY * 0.5 - offY * _display.scaleY;
-					}else if (__scrollY <= 1) {
-						_display.y = (_height - _dH) * __scrollY - offY * _display.scaleY;
-					}else {
-						_display.y = (_height - _dH) -_height * (__scrollY - 1) * 0.5 - offY * _display.scaleY;
-					}
+				var _x:Number = -offX * _display.scaleX;
+				var _y:Number = -offY * _display.scaleY;
+				
+				__scrollX = (_width - _dW) * __alignX;
+				__scrollY = (_height - _dH) * __alignY;
+				
+				if (moveRect){
+					_display.x = _x;
+					_display.y = _y;
+					rect.x = -__scrollX;
+					rect.y = -__scrollY;
+				} else {
+					_display.x = __scrollX +_x;
+					_display.y = __scrollY +_y;
 					rect.x = 0;
 					rect.y = 0;
 				}
-				//_width / _dW, _height / _dH
+					//_width / _dW, _height / _dH
 			}
 		}
 
-		public function setContent(_content:Object = null, _tweenMode:int = 2, _scrollX:Number = 0.5, _scrollY:Number = 0.5, _scaleMode:Number = 1):void {
+		public function setContent(_content:Object = null, _tweenMode:int = 2, _alignX:Number = 0.5, _alignY:Number = 0.5, _scaleMode:Number = 1):void {
 			contentReady = _content;
 			if (isHidding){
 				return;
 			}
-			scrollXReady = _scrollX;
-			scrollYReady = _scrollY;
+			alignXReady = _alignX;
+			alignYReady = _alignY;
 			scaleModeReady = _scaleMode;
 			tweenMode = _tweenMode;
 			isHidding = true;
 			if (content && tweenMode == 2 ? true : false){
 				TweenNano.killTweensOf(displayContent);
-				TweenNano.to(displayContent, tweenMode > 2?tweenMode:TWEEN_FRAME, tweenOutVar);
+				TweenNano.to(displayContent, tweenMode > 2 ? tweenMode : TWEEN_FRAME, tweenOutVar);
 			} else {
 				onHideCompleteHandler();
 			}
@@ -326,11 +375,11 @@ package akdcl.media {
 				addChildAt(content as DisplayObject, getChildIndex(bitmap));
 				_display = content;
 			}
-			if (_display) {
+			if (_display){
 				//
 				if (tweenMode > 0){
 					_display.alpha = 0;
-					TweenNano.to(_display, tweenMode > 2?tweenMode:TWEEN_FRAME, tweenInVar);
+					TweenNano.to(_display, tweenMode > 2 ? tweenMode : TWEEN_FRAME, tweenInVar);
 				}
 				//
 				offX = offY = 0;
@@ -350,11 +399,11 @@ package akdcl.media {
 					originalWidth = _display.width / _display.scaleX;
 					originalHeight = _display.height / _display.scaleY;
 				} else {
-					
+
 				}
 				aspectRatio = originalWidth / originalHeight;
-				__scrollX = scrollXReady;
-				__scrollY = scrollYReady;
+				__alignX = alignXReady;
+				__alignY = alignYReady;
 				__scaleMode = scaleModeReady;
 				updateRect();
 				dispatchEvent(eventChange);

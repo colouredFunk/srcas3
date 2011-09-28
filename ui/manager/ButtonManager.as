@@ -33,9 +33,6 @@ package ui.manager {
 			buttonDic = new Dictionary();
 			buttonInDic = new Dictionary();
 			buttonDownDic = new Dictionary();
-			pointStart = new Point();
-			pointLast = new Point();
-			mouseSpeed = new Point();
 			
 			intervalID = setInterval(checkStage, 300);
 		}
@@ -44,6 +41,9 @@ package ui.manager {
 				if (_button.stage) {
 					stage = _button.stage;
 					stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUpHandler);
+					if (mobileMode) {
+						stage.addEventListener(MouseEvent.MOUSE_DOWN, onStageMouseDownHandler);
+					}
 					clearInterval(intervalID);
 					break;
 				}
@@ -57,6 +57,8 @@ package ui.manager {
 		private static const DRAG_OVER:String = "dragOver";
 		private static const DRAG_OUT:String = "dragOut";
 		
+		public static var mobileMode:Boolean;
+		
 		private var stage:Stage;
 		private var buttonDic:Dictionary;
 		private var buttonInDic:Dictionary;
@@ -64,9 +66,12 @@ package ui.manager {
 		
 		private var intervalID:uint;
 		private var buttonTarget:*;
-		public var pointStart:Point;
-		public var pointLast:Point;
-		public var mouseSpeed:Point;
+		public var startX:int;
+		public var startY:int;
+		public var lastX:int;
+		public var lastY:int;
+		public var speedX:int;
+		public var speedY:int;
 		
 		public function addButton(_button:*):void {
 			if (_button is MovieClip) {
@@ -88,7 +93,8 @@ package ui.manager {
 			delete buttonDownDic[_button];
 		}
 		
-		private function onStageMouseUpHandler(_e:MouseEvent):void {
+		private function onStageMouseUpHandler(_e:Event):void {
+			stage.removeEventListener(MouseEvent.MOUSE_MOVE, onStageMouseMoveHandler);
 			for each(buttonTarget in buttonDownDic) {
 				buttonTarget.removeEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
 				buttonTarget.removeEventListener(Event.ENTER_FRAME, onMouseMoveHandler);
@@ -98,14 +104,25 @@ package ui.manager {
 				}else if (buttonTarget.hasEventListener(InteractionEvent.RELEASE)) {
 					buttonTarget.dispatchEvent(new InteractionEvent(InteractionEvent.RELEASE));
 				}
-				buttonCallBack(buttonTarget, RELEASE);
 				setButtonStyle(buttonTarget);
 			}
-			buttonTarget = _e.target;
-			if (buttonInDic[buttonTarget]) {
-				//trace("releaseInOtherButton");
+			if (_e) {
+				buttonTarget = _e.target;
+				if (buttonInDic[buttonTarget]) {
+					//trace("releaseInOtherButton");
+				}
 			}
 		}
+		private function onStageMouseDownHandler(_e:Event):void {
+			stage.addEventListener(MouseEvent.MOUSE_MOVE, onStageMouseMoveHandler);
+		}
+		private function onStageMouseMoveHandler(_e:MouseEvent):void {
+			if (_e.stageX > stage.stageWidth || _e.stageX < 0 || _e.stageY > stage.stageHeight || _e.stageY < 0) {
+				onStageMouseUpHandler(null);
+			}
+		}
+		
+		
 		private function onRollOverHandler(_e:MouseEvent):void {
 			buttonTarget = _e.currentTarget;
 			if (buttonInDic[buttonTarget]) {
@@ -154,10 +171,8 @@ package ui.manager {
 				buttonTarget.addEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
 				if (buttonTarget.hasEventListener(InteractionEvent.DRAG_MOVE)) {
 					buttonTarget.addEventListener(Event.ENTER_FRAME, onMouseMoveHandler);
-					pointLast.x = pointStart.x = stage.mouseX;
-					pointLast.y = pointStart.y = stage.mouseY;
-					
-					mouseSpeed.normalize(0);
+					lastX = startX = stage.mouseX;
+					lastY = startY = stage.mouseY;
 				}
 				
 				if (buttonTarget.hasEventListener(InteractionEvent.PRESS)) {
@@ -186,12 +201,14 @@ package ui.manager {
 			}
 		}
 		private function onMouseMoveHandler(_e:Event):void {
-			mouseSpeed.x = stage.mouseX - pointLast.x;
-			mouseSpeed.y = stage.mouseY - pointLast.y;
-			pointLast.x = stage.mouseX;
-			pointLast.y = stage.mouseY;
-			var _iEvt:InteractionEvent = new InteractionEvent(InteractionEvent.DRAG_MOVE);
-			_e.currentTarget.dispatchEvent(_iEvt);
+			speedX = stage.mouseX - lastX;
+			speedY = stage.mouseY - lastY;
+			lastX = stage.mouseX;
+			lastY = stage.mouseY;
+			if (speedX != 0 || speedY != 0) {
+				var _iEvt:InteractionEvent = new InteractionEvent(InteractionEvent.DRAG_MOVE);
+				_e.currentTarget.dispatchEvent(_iEvt);
+			}
 		}
 		private function buttonCallBack(_button:*, _method:*, ...args):void {
 			try {
