@@ -58,6 +58,7 @@
 			widthAdd = -xOff * 2;
 			heightAdd = -yOff * 2;
 			super.init();
+			addEventListener(InteractionEvent.UPDATE_STYLE, onUpdateStyle);
 		}
 		override protected function onRemoveToStageHandler():void {
 			super.onRemoveToStageHandler();
