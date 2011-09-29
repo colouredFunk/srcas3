@@ -109,7 +109,7 @@ package akdcl.media {
 				} else if (_value > _width){
 					_value = _width;
 				}
-				if (_width<_dW) {
+				if (_width<=_dW) {
 					if (_value < _width - _dW) {
 						__scrollX = (_value  + _width - _dW) * 0.5;
 					}else if (_value < 0) {
@@ -144,7 +144,7 @@ package akdcl.media {
 				} else if (_value > _height){
 					_value = _height;
 				}
-				if (_height<_dH) {
+				if (_height<=_dH) {
 					if (_value < _height - _dH) {
 						__scrollY = (_value  + _height - _dH) * 0.5;
 					}else if (_value < 0) {
