@@ -17,6 +17,7 @@ package akdcl.media {
 		private const eventComplete:Event = new Event(Event.COMPLETE);
 		
 		public var progressClip:*;
+		public var sameChange:Boolean;
 		protected var loadProgress:Number = 0;
 		public function DisplayLoader(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = -1):void {
 			super(_rectWidth, _rectHeight, _bgColor);
@@ -29,6 +30,9 @@ package akdcl.media {
 		}
 
 		public function load(_url:String, _tweenMode:int = 2, _alignX:Number = 0.5, _alignY:Number = 0.5, _scaleMode:Number = 1):void {
+			if (!sameChange && _url && label == _url) {
+				return;
+			}
 			setContent(null, tweenMode);
 			loadProgress = 0;
 			label = _url;
