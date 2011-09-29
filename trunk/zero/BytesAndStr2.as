@@ -64,7 +64,7 @@ package zero{
 			var bytes:ByteArray=new ByteArray();
 			if(str2){
 				var i:int=0;
-				for each(var str:String in str2.split(" ")){
+				for each(var str:String in str2.replace(/^\s*|\s*$/g,"").split(/\s+/)){
 					bytes[i++]=_2Obj[str];
 				}
 			}
