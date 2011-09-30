@@ -11,8 +11,9 @@ package zero.zero{
 			////
 			import flash.display.*;
 			import flash.events.*;
-			import flash.utils.*;
 			import flash.net.*;
+			import flash.utils.*;
+			
 			import zero.paths.path_BottomBar;
 			////
 			
@@ -59,8 +60,16 @@ package zero.zero{
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadBottomBarComplete);
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,loadBottomBarError);
 			
+			var so:SharedObject=SharedObject.getLocal("BottomBarContainer","/");
+			var currTime:int=int(new Date().time/1000);
+			var dTime:int=currTime-so.data.time;
+			if(dTime>0&&dTime<24*60*60){
+			}else{
+				so.data.time=currTime;
+			}
+			
 			try{
-				loader.load(new URLRequest(path_BottomBar));
+				loader.load(new URLRequest(path_BottomBar+"?"+so.data.time));
 				//loader.load(new URLRequest(ZeroCommon.path_BottomBar+"?"+Math.random()));trace("测试，添加随机数字");
 			}catch(e:Error){}
 			////
