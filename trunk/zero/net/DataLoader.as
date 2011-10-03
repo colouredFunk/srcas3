@@ -50,13 +50,17 @@ package zero.net{
 			onLoadError=null;
 		}
 		
-		public function load(_url:String,obj:*=null,dataFormat:String=null,method:String=null):void{
+		public function load(_url:String,obj:*=null,dataFormat:String=null,method:String=null,contentType:String=null):void{
 			url=_url;
 			var urlRequest:URLRequest=new URLRequest(url);
 			if(obj){
 				urlRequest.data=obj;
-				if(obj is ByteArray){
-					urlRequest.contentType="application/octet-stream";
+				if(contentType){
+					urlRequest.contentType=contentType;
+				}else{
+					if(obj is ByteArray){
+						urlRequest.contentType="application/octet-stream";
+					}
 				}
 				urlRequest.method=method||URLRequestMethod.POST
 			}
