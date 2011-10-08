@@ -124,7 +124,7 @@ SolBar
 				cb.selectedItem=sol.xml.@currSettingName.toString();
 			}
 			
-			private function resetSolUIs(ui:*):void{
+			public function resetSolUIs(ui:*):void{
 				if(ui.hasOwnProperty("resetBySol")){
 					ui.resetBySol(sol,this.parentDocument);
 				}

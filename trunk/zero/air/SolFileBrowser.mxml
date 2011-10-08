@@ -19,8 +19,8 @@ SolFileBrowser
 	xmlns:ui="zero.ui.*"
 >
 	<s:Label x="5" y="5" id="txt"/>
-	<mx:ComboBox id="cb" rowCount="20" minWidth="0" left="70" right="75" change="change()"/>
-	<mx:Button id="btn" right="0" click="browse()"/>
+	<mx:ComboBox id="cb" rowCount="20" minWidth="0" left="70" right="55" change="change()"/>
+	<mx:Button id="btn" right="0" click="browse()" width="50"/>
 	<fx:Script>
 		<![CDATA[
 			

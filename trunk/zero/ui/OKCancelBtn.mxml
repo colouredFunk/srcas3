@@ -52,7 +52,7 @@ OKCancelBtn
 			public function reset():void{
 				flag=false;
 			}
-			private function click():void{
+			public function click():void{
 				flag=!flag;
 				if(onClick==null){
 				}else{

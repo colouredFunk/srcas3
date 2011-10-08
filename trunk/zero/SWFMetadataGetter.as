@@ -180,7 +180,9 @@ package zero{
 				}
 			}
 			
-			trace(metadataXML.toXMLString());
+			if(metadataXML){
+				trace(metadataXML.toXMLString());
+			}
 			
 			return null;
 		}

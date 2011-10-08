@@ -53,12 +53,15 @@ SolComboBox
 						}
 					}
 					
-					sol.setValue(sol_key,this.selectedItem);
+					if(this.selectedItem){
+					}else{
+						this.selectedItem=__dataProvider[0];
+					}
 					
-					//trace("oldSelectedItem="+oldSelectedItem);
-					//trace("this.selectedItem="+this.selectedItem);
+					sol.setValue(sol_key,this.selectedItem);
 					if(oldSelectedItem==this.selectedItem){
 					}else{
+						
 						if(onChange==null){
 						}else{
 							onChange();
