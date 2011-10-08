@@ -63,6 +63,7 @@ package zero.zero{
 			var so:SharedObject=SharedObject.getLocal("BottomBarContainer","/");
 			var currTime:int=int(new Date().time/1000);
 			var dTime:int=currTime-so.data.time;
+			//trace("dTime="+dTime);
 			if(dTime>0&&dTime<24*60*60){
 			}else{
 				so.data.time=currTime;

@@ -417,6 +417,7 @@ package zero.ui{
 					updateUserMouse(currTarget);
 					oldMouseX=this.parent.mouseX;
 					oldMouseY=this.parent.mouseY;
+					(onStartTran==null)||onStartTran(__pic,__pic.transform.matrix);
 				}
 			}else{
 				this.visible=false;

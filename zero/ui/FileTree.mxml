@@ -40,10 +40,21 @@ FileTree
 			private var currLoadingIconId:int;
 			
 			private var onChange:Function;
+			public var sol_key:String;
 			private var sol:Sol;
+			
+			public var onUseItem:Function=defaultOnUseItem;
+			private function defaultOnUseItem():void{
+				navigateToURL(new URLRequest(tree.selectedItem.@url.toString()));
+			}
 			
 			public function init(_sol:Sol,_iconsXMLPath:String,_onInitComplete:Function,_onChange:Function):void{
 				// ^_^
+				if(sol_key){
+				}else{
+					sol_key=this.id;
+				}
+				
 				sol=_sol;
 				iconsXMLPath=_iconsXMLPath;
 				onInitComplete=_onInitComplete;
@@ -106,9 +117,23 @@ FileTree
 			public function clear():void{
 				//^_^ 
 				
+				if(iconsXMLLoader){
+					iconsXMLLoader.removeEventListener(Event.COMPLETE,loadIconsXMLComplete);
+					iconsXMLLoader.removeEventListener(IOErrorEvent.IO_ERROR,loadIconsXMLError);
+					iconsXMLLoader=null;
+				}
+				
+				if(iconLoader){
+					iconLoader.contentLoaderInfo.removeEventListener(Event.COMPLETE,loadIconComplete);
+					iconLoader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,loadIconError);
+					iconLoader=null;
+				}
+				
 				FileTreeIcon.iconBmds=null;
 				sol=null;
+				onInitComplete=null;
 				onChange=null;
+				onUseItem=null;
 			}
 			public function update(fileListXML:XML):void{
 				
@@ -116,15 +141,15 @@ FileTree
 				
 				openItems();
 				
-				select(sol.getValue(this.id+"_selectedItemXML"));
+				select(sol.getValue(sol_key+"_selectedItemXML"));
 				
-				tree.verticalScrollPosition=sol.getValue(this.id+"_verticalScrollPosition");
+				tree.verticalScrollPosition=sol.getValue(sol_key+"_verticalScrollPosition");
 				
 				change();
 			}
 			private function openItems():void{
 				var openItems:Object=new Object();
-				for each(var openItem:XML in sol.getValue(this.id+"_openItems")){
+				for each(var openItem:XML in sol.getValue(sol_key+"_openItems")){
 					openItems[openItem.toXMLString()]=true;
 				}
 				_openItems(fileListXLC.source[0],openItems);
@@ -140,8 +165,10 @@ FileTree
 				}
 			}
 			private function select(itemXML:XML):void{
-				tree.selectedItem=null;
-				_select(fileListXLC.source[0],itemXML.toXMLString());
+				if(itemXML){
+					tree.selectedItem=null;
+					_select(fileListXLC.source[0],itemXML.toXMLString());
+				}
 			}
 			private function _select(xml:XML,itemXMLStr:String):void{
 				if(tree.selectedItem){
@@ -166,12 +193,12 @@ FileTree
 			}
 			
 			private function saveSetting():void{
-				sol.setValue(this.id+"_openItems",tree.openItems);
-				sol.setValue(this.id+"_verticalScrollPosition",tree.verticalScrollPosition);
+				sol.setValue(sol_key+"_openItems",tree.openItems);
+				sol.setValue(sol_key+"_verticalScrollPosition",tree.verticalScrollPosition);
 			}
 			private function change():void{
 				if(tree.selectedItem){
-					sol.setValue(this.id+"_selectedItemXML",tree.selectedItem);
+					sol.setValue(sol_key+"_selectedItemXML",tree.selectedItem);
 					saveSetting();
 					if(onChange==null){
 					}else{
@@ -184,7 +211,7 @@ FileTree
 			}
 			
 			private function itemDoubleClick(event:ListEvent):void{
-				navigateToURL(new URLRequest(tree.selectedItem.@url.toString()));
+				onUseItem();
 			}
 			
 		]]>
