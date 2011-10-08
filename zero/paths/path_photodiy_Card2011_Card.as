@@ -8,4 +8,5 @@ path_photodiy_Card2011_Card
 
 package zero.paths{
 	public var path_photodiy_Card2011_Card:String=path_photodiy_Card2011+"Card.swf";
+	//public var path_photodiy_Card2011_Card:String=path_photodiy_Card2011+"Card_encrypt.swf";
 }
