@@ -219,7 +219,7 @@ package ui.manager {
 				
 			}
 			if (_method is Function) {
-				if (args) {
+				if (args && args.length > 0) {
 					_method.apply(_button, args);
 				}else {
 					switch(_method.length) {
