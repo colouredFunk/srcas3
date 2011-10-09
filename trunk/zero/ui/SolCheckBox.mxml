@@ -104,6 +104,9 @@ SolCheckBox
 			
 			override public function set selected(value:Boolean):void{
 				super.selected=value;
+				if(sol){
+					sol.setValue(sol_key,this.selected);
+				}
 				if(enabledElement){
 					enabledElement["enabled"]=value;
 				}

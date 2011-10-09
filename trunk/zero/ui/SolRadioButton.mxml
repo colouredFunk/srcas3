@@ -152,7 +152,7 @@ SolRadioButton
 			}
 			
 			private function change(event:Event):void{
-				trace("group.selectedValue="+group.selectedValue);
+				//trace("group.selectedValue="+group.selectedValue);
 				sol.setValue(sol_key,group.selectedValue);
 				if(onChange==null){
 				}else{
@@ -167,6 +167,9 @@ SolRadioButton
 					}else{
 						selectedValues={selected0:true};
 					}
+				}
+				if(sol){
+					sol.setValue(sol_key,group.selectedValue);
 				}
 				if(enabledElement){
 					enabledElement["enabled"]=value;
