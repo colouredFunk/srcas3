@@ -32,7 +32,6 @@ SolFileBrowser
 			import mx.events.CloseEvent;
 			import mx.events.ListEvent;
 			
-			import zero.net.*;
 			import zero.ui.*;
 			
 			public var sol:Sol;
@@ -181,7 +180,7 @@ SolFileBrowser
 				addFile(__file);
 			}
 			
-			public function addFile(_file:File):void{
+			public function addFile(_file:File,needCallBack:Boolean=true):void{
 				__file.url=_file.url;
 				var oldFileURL:String;
 				if(cb.selectedItem){
@@ -198,16 +197,22 @@ SolFileBrowser
 				//if(oldFileURL==fileURL){
 				//}else{
 					cb.selectedItem=fileURL;
-					_change(fileURL);
+					sol.setValue(sol_key,{
+						fileURL:fileURL,
+						fileURLArr:fileURLArr
+					});
+					if(needCallBack){
+						if(onChange==null){
+						}else{
+							onChange();
+						}
+					}
 				//}
 			}
 			private function change():void{
 				__file.url=cb.selectedItem.toString();
-				_change(decodeURI(__file.url));
-			}
-			private function _change(fileURL:String):void{
 				sol.setValue(sol_key,{
-					fileURL:fileURL,
+					fileURL:decodeURI(__file.url),
 					fileURLArr:fileURLArr
 				});
 				if(onChange==null){

@@ -25,7 +25,6 @@ SolBar
 		<![CDATA[
 			import mx.core.IVisualElementContainer;
 			
-			import zero.net.*;
 			import zero.ui.*;
 			
 			public var sol:Sol;
