@@ -21,6 +21,7 @@ package akdcl.media {
 		protected var loadProgress:Number = 0;
 		public function DisplayLoader(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = -1):void {
 			super(_rectWidth, _rectHeight, _bgColor);
+			label = null;
 			setProgressClip(false);
 		}
 
@@ -33,6 +34,7 @@ package akdcl.media {
 			if (!sameChange && _url && label == _url) {
 				return;
 			}
+			rM.unloadDisplay(label, onImageHandler, onImageHandler, onImageHandler);
 			setContent(null, tweenMode);
 			loadProgress = 0;
 			label = _url;
