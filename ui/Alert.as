@@ -389,23 +389,32 @@
 					default:
 						_btn.userData.btnFlag = _id;
 				}
-				_btn.release=function ():void {
-					btnRelease(this.userData.btnFlag);
-				}
+				_btn.release=onBtnReleaseHandler;
 			}
 		}
-		protected function btnRelease(_flag:*):void {
+		protected function onBtnReleaseHandler(_btn:*):void {
 			if (txtText.selectedText) {
 				System.setClipboard(txtText.selectedText);
 			}
-			if (_flag!=null) {
-				if ((callBack != null)?(callBack(_flag) != false):true) {
+			if(callBack!=null){
+				var _isRemove:Boolean;
+				switch(callBack.length){
+					case 1:
+						_isRemove=callBack(_btn.userData.btnFlag)!=false;
+						break;
+					case 2:
+						_isRemove=callBack(_btn.userData.btnFlag,this)!=false;
+						break;
+					case 0:
+					default:
+						_isRemove=callBack()!=false;
+						break;
+				}
+				if(_isRemove){
 					remove();
 				}
-			}else {
-				if ((callBack != null)?(callBack() != false):true) {
-					remove();
-				}
+			}else{
+				remove();
 			}
 		}
 		protected function setBtnStyle(_btn:*, _id:uint, ...args):void {
