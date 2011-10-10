@@ -232,7 +232,6 @@ package akdcl.media {
 
 		public function DisplayRect(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = 0):void {
 			rect = new Rectangle();
-			var _rect:Rectangle = getRect(this);
 			if (_rectWidth + _rectHeight > 0){
 				rect = new Rectangle();
 				rect.width = _rectWidth;
