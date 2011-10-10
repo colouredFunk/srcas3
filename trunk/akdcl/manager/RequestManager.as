@@ -197,7 +197,10 @@ package akdcl.manager {
 				if (_url.data) {
 					request.contentType = _url.contentType;
 					request.method = _url.method || URLRequestMethod.POST;
-					if ("sendFormat" in _url) {
+					if (_url.random) {
+						//_url.data.random = Math.random();
+					}
+					if (_url.sendFormat) {
 						switch(_url.sendFormat) {
 							case DATAFORMAT_FORM:
 								var _formVars:FormVariables = new FormVariables(_url.data);
@@ -225,14 +228,14 @@ package akdcl.manager {
 					}
 				}else {
 					if (_url.random) {
-						request.url += "?random=" + Math.random();
+						//request.url += "?random=" + Math.random();
 					}
 					request.data = null;
 					request.contentType = null;
 					request.method = URLRequestMethod.GET;
 				}
 				
-				if ("loadFormat" in _url) {
+				if (_url.loadFormat) {
 					dataFormat = _url.loadFormat;
 				}else {
 					dataFormat = null;
