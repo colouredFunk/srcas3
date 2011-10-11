@@ -1,4 +1,4 @@
-﻿package akdcl.net.action{
+﻿package akdcl.net.action {
 	import flash.events.Event;
 	import flash.events.ErrorEvent;
 	import flash.events.IOErrorEvent;
@@ -62,9 +62,10 @@
 		public static function replaceValue(_content:String, _str:String, _rep:String):String {
 			return replaceString(_content, "${" + _str + "}", _rep);
 		}
+
 		public static function getValue(_content:String, _id:uint = 0):String {
 			var _ary:Array = _content.match(/\$\{.*?\}/g);
-			if (_ary && _ary[_id]) {
+			if (_ary && _ary[_id]){
 				var _str:String = _ary[_id];
 				return _str.substring(2, _str.length - 1);
 			}
@@ -97,9 +98,9 @@
 		protected var isLoading:Boolean;
 
 		public function RemoteAction(_optionsXML:XML = null){
-			dataSend = { };
-			dataPreset = { };
-			sendProxy = { };
+			dataSend = {};
+			dataPreset = {};
+			sendProxy = {};
 			if (_optionsXML){
 				setOptions(_optionsXML);
 			}
@@ -130,13 +131,13 @@
 				optionsLoad = options.elements(E_LOAD)[0];
 				resolveSend(optionsSend);
 				resolveLoad(optionsLoad);
-				
+
 				sendProxy.url = options.attribute(A_SOURCE)[0];
 				sendProxy.method = options.attribute(A_METHOD)[0];
 				sendProxy.sendFormat = optionsSend.attribute(A_DATA_STRUCTURE)[0];
 				sendProxy.loadFormat = optionsLoad.attribute(A_DATA_STRUCTURE)[0];
 				sendProxy.random = true;
-				//dataSend.contentType
+					//dataSend.contentType
 			} else {
 				throw new Error("ERROR:数据源不匹配！");
 			}
@@ -166,7 +167,7 @@
 				}
 			}
 			//dataSend.random = Math.random();
-			//traceObject("[" + name + " send]", dataSend);
+			traceObject("[" + name + " send]", dataSend);
 			var _data:* = formatData(dataSend, optionsSend, true);
 			traceObject("[" + name + " remote send]", _data);
 			sendProxy.data = _data;
@@ -202,7 +203,7 @@
 				Alert.show("后台数据错误！");
 				return;
 			}
-			//traceObject("[" + name + " remote load]", rawData);
+			traceObject("[" + name + " remote load]", rawData);
 			data = formatData(rawData, optionsLoad, false);
 
 			var _name:String;
@@ -235,7 +236,7 @@
 			dispatchEvent(_evt);
 		}
 
-		protected function formatData(_data:Object, _xml:XML, _isSend:Boolean):* {
+		protected function formatData(_data:*, _xml:XML, _isSend:Boolean):* {
 			var _dataFormat:*;
 			var _tempXML:XML;
 			//没有传递_data也取E_DEFAULT值或空值
@@ -306,7 +307,12 @@
 								_tempXML = _tempXMLList[_data];
 								_dataFormat = _tempXML ? String(_tempXML.attribute(A_VALUE)[0]) : _data;
 							} else {
-								_dataFormat = _data;
+								if (isNaN(_data)) {
+									_dataFormat = _data;
+								}else {
+									_tempXML = _tempXMLList[_data];
+									_dataFormat = _tempXML ? String(_tempXML.attribute(A_LABEL)[0]) : _data;
+								}
 							}
 						} else {
 							//不包含case节点直接赋值
