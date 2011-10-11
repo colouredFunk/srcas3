@@ -146,6 +146,8 @@ package akdcl.net.action {
 					return new RadioButtonField();
 				case ST_CHECK_BOX:
 					return new CheckBoxField();
+				case ST_CHECK:
+					return new CheckField();
 				default:
 					trace(_styleType, "unknown styleType!!!");
 			}

@@ -11,7 +11,7 @@ package akdcl.net.action {
 	 * ...
 	 * @author ...
 	 */
-	public class TextInputField extends Field {
+	public class CheckField extends Field {
 		private static const OFFY:int = 2;
 
 		//Boolean
@@ -29,7 +29,7 @@ package akdcl.net.action {
 
 			if (options.attribute(RemoteAction.A_CONTENT).length() > 0){
 				view.label = options.attribute(RemoteAction.A_CONTENT);
-			} else if (_options.elements(RemoteAction.A_CONTENT).length() > 0){
+			} else if (options.elements(RemoteAction.A_CONTENT).length() > 0){
 				view.label = options.elements(RemoteAction.A_CONTENT);
 			} else {
 				view.label = options.attribute(RemoteAction.A_LABEL);
@@ -41,7 +41,7 @@ package akdcl.net.action {
 			view.addEventListener(FocusEvent.FOCUS_OUT, onFocusOutHandler);
 
 			label.visible = false;
-			view.x = x;
+			view.x = x + style.widthLabel + 1;
 			view.y = y;
 			//view.height = style.height;
 			height = style.height;
