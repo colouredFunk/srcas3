@@ -43,8 +43,8 @@ FileTree
 			public var sol_key:String;
 			private var sol:Sol;
 			
-			public var onUseItem:Function=defaultOnUseItem;
-			private function defaultOnUseItem():void{
+			public var onDoubleClickItem:Function=defaultOnDoubleClickItem;
+			private function defaultOnDoubleClickItem():void{
 				navigateToURL(new URLRequest(tree.selectedItem.@url.toString()));
 			}
 			
@@ -133,7 +133,7 @@ FileTree
 				sol=null;
 				onInitComplete=null;
 				onChange=null;
-				onUseItem=null;
+				onDoubleClickItem=null;
 			}
 			public function update(fileListXML:XML):void{
 				
@@ -211,7 +211,12 @@ FileTree
 			}
 			
 			private function itemDoubleClick(event:ListEvent):void{
-				onUseItem();
+				if(tree.selectedItem){
+					if(onDoubleClickItem==null){
+					}else{
+						onDoubleClickItem(tree.selectedItem);
+					}
+				}
 			}
 			
 		]]>

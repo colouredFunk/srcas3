@@ -23,6 +23,7 @@ SolFileBrowser
 	<mx:Button id="btn" right="0" click="browse()" width="50"/>
 	<fx:Script>
 		<![CDATA[
+			//import spark.components.WindowedApplication;
 			
 			import flash.desktop.ClipboardFormats;
 			import flash.desktop.NativeDragManager;
@@ -158,6 +159,9 @@ SolFileBrowser
 					if(fileArr.length==1){
 						if(checkIsMatchType(fileArr[0])){
 							addFile(fileArr[0]);
+							//(this.parentApplication as WindowedApplication).nativeWindow.activate();
+							//(this.parentApplication as WindowedApplication).activate();
+							//stage.nativeWindow.activate();
 							if(onDragDrop==null){
 							}else{
 								onDragDrop();
