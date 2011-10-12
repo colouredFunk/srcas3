@@ -263,7 +263,7 @@ package akdcl.media {
 			rect = null;
 			bitmap = null;
 			content = null;
-			;
+			
 			contentReady = null;
 			tweenOutVar = null;
 			tweenInVar = null;
@@ -355,8 +355,13 @@ package akdcl.media {
 		}
 
 		protected function onHideCompleteHandler():void {
-			if (content){
+			if (content) {
 				TweenNano.killTweensOf(displayContent);
+				if (content is BitmapData){
+					bitmap.bitmapData = null;
+				} else {
+					removeChild(content as DisplayObject);
+				}
 			}
 			isHidding = false;
 			showContent();
