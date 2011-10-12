@@ -173,15 +173,13 @@ package akdcl.net.action {
 					if (blendField) {
 						//绑定其他Field的数据
 						blendField.addEventListener(Event.CHANGE, onBlendFieldChangeHandler);
-						setView();
 					}else {
 						//xml远程列表
 						rM.load(_source, onOptionsCompleteHandler);
 					}
 				}
-			}else {
-				setView();
 			}
+			setView();
 		}
 		
 		//返回true（字段为非必要且没有数据）,false（没有数据或数据非法）或data（数据）

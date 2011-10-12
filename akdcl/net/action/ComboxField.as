@@ -72,10 +72,7 @@ package akdcl.net.action {
 
 		override protected function onBlendFieldChangeHandler(_e:Event):void {
 			options[RemoteAction.E_CASE] = blendField.orgData[RemoteAction.E_CASE];
-			view.removeAll();
-			for each (var _eachXML:XML in options.elements(RemoteAction.E_CASE)){
-				view.addItem({label: _eachXML.attribute(RemoteAction.A_LABEL)});
-			}
+			setView();
 		}
 	}
 

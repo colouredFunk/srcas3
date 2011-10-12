@@ -10,13 +10,14 @@
 	import zero.encoder.BMPEncoder;
 	
 	public class FileRef extends FileReference {
-		protected var fileInfo:String;
 		public var fileTypes:String;
-		public var maxSize:int = 5000;
+		public var maxSize:int = 8000;
 		public var autoLoad:Boolean = true;
 		public var autoImage:Boolean = true;
 		
-		private var isSet:Boolean;
+		protected var fileInfo:String;
+		protected var isSet:Boolean;
+		
 		public var onSelect:Function;
 		
 		public var onLoad:Function;
