@@ -17,7 +17,6 @@ package zero.ui{
 	import flash.media.*;
 	
 	public class CameraPan extends Sprite{
-		public static var noCameraTest:Boolean=false;
 		
 		private var video:Video;
 		private var camera:Camera;
@@ -35,17 +34,18 @@ package zero.ui{
 			_onOpen:Function,
 			_onClose:Function,
 			_wid:int=320,
-			_hei:int=240
+			_hei:int=240,
+			testNoCameraFlvPath:String=null//可以用一个 flv 地址来代替摄像头
 		):void{
 			close();
 			
 			onClose=_onClose;
 			camera=Camera.getCamera();
 			
-			if(noCameraTest){
-				trace("在无摄像头的机器上测试有摄像头的情况");
+			if(testNoCameraFlvPath){
+				trace("在无摄像头的机器上测试有摄像头的情况："+testNoCameraFlvPath);
 			}
-			if(camera||noCameraTest){
+			if(camera||testNoCameraFlvPath){
 				onOpen=_onOpen;
 				
 				wid=_wid;
