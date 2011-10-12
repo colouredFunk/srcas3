@@ -2,6 +2,7 @@
 	import flash.events.Event;
 	import flash.events.ErrorEvent;
 	import flash.events.IOErrorEvent;
+	import flash.net.URLRequestMethod;
 
 	import flash.net.URLVariables;
 	import flash.display.BitmapData;
@@ -88,6 +89,7 @@
 		protected var options:XML;
 		protected var optionsSend:XML;
 		protected var optionsLoad:XML;
+		
 		protected var alertXML:XML;
 		protected var actionXML:XML;
 
@@ -133,11 +135,13 @@
 				resolveLoad(optionsLoad);
 
 				sendProxy.url = options.attribute(A_SOURCE)[0];
-				sendProxy.method = options.attribute(A_METHOD)[0];
-				sendProxy.sendFormat = optionsSend.attribute(A_DATA_STRUCTURE)[0];
-				sendProxy.loadFormat = optionsLoad.attribute(A_DATA_STRUCTURE)[0];
+				sendProxy.method = String(options.attribute(A_METHOD)[0] || URLRequestMethod.POST);
+				//json,form
+				sendProxy.sendFormat = String(optionsSend.attribute(A_DATA_STRUCTURE)[0]);
+				//binary,variables,text,json,xml
+				sendProxy.loadFormat = String(optionsLoad.attribute(A_DATA_STRUCTURE)[0]);
 				sendProxy.random = true;
-					//dataSend.contentType
+				//sendProxy.contentType
 			} else {
 				throw new Error("ERROR:数据源不匹配！");
 			}
@@ -146,6 +150,10 @@
 		public function add(_key:String, _value:*):void {
 			//var _xmlList:XMLList = optionsSend.elements(_key);
 			dataSend[_key] = _value;
+		}
+		
+		public function getSendVariable(_key:String):XML {
+			return optionsSend?optionsSend.elements(E_VARIABLE).(attribute(A_NAME) == _key)[0]:null;
 		}
 
 		public function clear():void {
