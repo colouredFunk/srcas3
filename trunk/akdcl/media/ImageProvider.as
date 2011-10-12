@@ -33,18 +33,6 @@ package akdcl.media {
 			return timer.currentCount * timer.delay;
 		}
 
-		private var __container:DisplayRect;
-		public function set container(_container:DisplayRect):void {
-			if (_container){
-				if (playContent){
-					_container.setContent(playContent);
-				}
-			} else if (__container) {
-				__container.setContent();
-			}
-			__container = _container;
-		}
-
 		override public function load(_item:*):void {
 			super.load(_item);
 			__loadProgress = 0;
@@ -56,7 +44,6 @@ package akdcl.media {
 				rM.unloadDisplay(playItem.source, onLoadCompleteHandler, onLoadErrorHandler, onLoadProgressHandler);
 			}
 			super.remove();
-			__container = null;
 		}
 
 		override public function pause():void {
@@ -85,9 +72,7 @@ package akdcl.media {
 
 		override protected function onLoadCompleteHandler(_evt:* = null):void {
 			playContent = _evt;
-			if (__container) {
-				__container.setContent(playContent);
-			}
+			onDisplayChange();
 			timer.start();
 			super.onLoadCompleteHandler(null);
 		}
@@ -103,6 +88,11 @@ package akdcl.media {
 				timer.reset();
 				timer.stop();
 			}
+		}
+		
+		private function onDisplayChange():void {
+			//加载显示对象
+			//playContent;
 		}
 	}
 

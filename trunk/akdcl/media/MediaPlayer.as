@@ -89,6 +89,7 @@ package akdcl.media {
 		public function set playID(_playID:int):void {
 			pageID.id = _playID;
 		}
+		
 		//0:不循环，1:单首循环，2:顺序循环(全部播放完毕后停止)，3:顺序循环，4:随机播放
 		private var __repeat:uint = 3;
 
@@ -98,16 +99,6 @@ package akdcl.media {
 
 		public function set repeat(_repeat:uint):void {
 			__repeat = _repeat;
-		}
-
-		private var __container:DisplayRect;
-		public function get container():DisplayRect {
-			return __container;
-		}
-		public function MediaPlayer(_container:DisplayRect = null) {
-			if (_container) {
-				__container = _container;
-			}
 		}
 
 		override protected function init():void {
@@ -120,14 +111,22 @@ package akdcl.media {
 			playContent = [];
 			pageID = new PageID();
 			pageID.onIDChange = onPlayIDChangeHandler;
-			if (!__container) {
-				__container = new DisplayRect();
-				__container.autoRemove = false;
-			}
 		}
+		
 		override public function remove():void {
-			__container.remove();
+			//playlist.remove();
+			imagePD.remove();
+			soundPD.remove();
+			videoPD.remove();
+			wmpPD.remove();
+			pageID.remove();
 			super.remove();
+			playlist = null;
+			imagePD = null;
+			soundPD = null;
+			videoPD = null;
+			wmpPD = null;
+			pageID = null;
 		}
 
 		private function onPlayIDChangeHandler(_id:uint):void {
@@ -139,19 +138,13 @@ package akdcl.media {
 				_content.removeEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
 				_content.removeEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);
 				
-				if (_content.hasOwnProperty("container")){
-					_content["container"] = null;
-				}
 				if (_content.playState!=PlayState.COMPLETE) {
 					_content.stop();
 				}
 			}
 
 			playItem = playlist.getItem(_id);
-			__container.label = playItem.source;
-			var _type:String = playItem.source.split("?")[0];
-			_type = String(_type.split(".").pop()).toLowerCase();
-			switch (_type){
+			switch (playItem.type){
 				case "gif":
 				case "jpg":
 				case "png":
@@ -180,9 +173,6 @@ package akdcl.media {
 					break;
 			}
 			for each (_content in playContent){
-				if (_content.hasOwnProperty("container")){
-					_content["container"] = __container;
-				}
 				_content.addEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 				_content.addEventListener(MediaEvent.LOAD_ERROR, onLoadErrorHandler);
 				_content.addEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
@@ -271,6 +261,11 @@ package akdcl.media {
 					stop();
 					break;
 			}
+		}
+		
+		private function onDisplayChange():void {
+			//加载显示对象
+			//playContent.xxxxxxxxx;
 		}
 	}
 

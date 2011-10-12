@@ -42,23 +42,10 @@ package akdcl.media {
 				playContent.volume = volume;
 			}
 		}
-		
-		private var __container:DisplayRect;
-		public function set container(_container:DisplayRect):void {
-			if (_container){
-				if (playContent && playContent.content && playContent.content.width > 0) {
-					_container.setContent(playContent.content);
-				}
-			} else if (__container) {
-				__container.setContent();
-			}
-			__container = _container;
-		}
 
 		override public function remove():void {
 			removeContentListener();
 			super.remove();
-			__container = null;
 		}
 
 		override public function load(_item:*):void {
@@ -81,24 +68,15 @@ package akdcl.media {
 				playContent.load();
 			}
 			if (loadProgress >= 1){
+				onDisplayChange();
 				//playContent已经加载完毕
 				onLoadCompleteHandler();
-				if (__container) {
-					__container.setContent(playContent.content);
-				}
 			} else {
 				playContent.addEventListener(LoaderEvent.PROGRESS, onLoadProgressHandler);
 				playContent.addEventListener(LoaderEvent.COMPLETE, onLoadCompleteHandler);
 				playContent.addEventListener(LoaderEvent.INIT, onVideoInitHandler);
 			}
 			playContent.addEventListener(VideoLoader.VIDEO_COMPLETE, onPlayCompleteHandler);
-		}
-
-		private function onVideoInitHandler(_e:LoaderEvent):void {
-			playContent.removeEventListener(LoaderEvent.INIT, onVideoInitHandler);
-			if (__container) {
-				__container.setContent(playContent.content);
-			}
 		}
 		
 		override public function play(_startTime:int = -1):void {
@@ -164,6 +142,17 @@ package akdcl.media {
 				playContent.removeEventListener(LoaderEvent.INIT, onVideoInitHandler);
 				playContent.removeEventListener(VideoLoader.VIDEO_COMPLETE, onPlayCompleteHandler);
 			}
+		}
+
+		private function onVideoInitHandler(_e:LoaderEvent):void {
+			playContent.removeEventListener(LoaderEvent.INIT, onVideoInitHandler);
+			//
+			onDisplayChange();
+		}
+		
+		private function onDisplayChange():void {
+			//加载显示对象
+			//playContent.content;
 		}
 	}
 
