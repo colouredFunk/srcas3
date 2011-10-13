@@ -11,6 +11,8 @@ package akdcl.media {
 	 * ...
 	 * @author ...
 	 */
+	/// @eventType	akdcl.media.MediaEvent.DISPLAY_CHANGE
+	[Event(name="displayChange",type="akdcl.media.MediaEvent")]
 	final public class ImageProvider extends MediaProvider {
 		private static const DEFAULT_TOTAL_TIME:uint = 5000;
 		
@@ -93,6 +95,7 @@ package akdcl.media {
 		private function onDisplayChange():void {
 			//加载显示对象
 			//playContent;
+			dispatchEvent(new MediaEvent(MediaEvent.DISPLAY_CHANGE));
 		}
 	}
 

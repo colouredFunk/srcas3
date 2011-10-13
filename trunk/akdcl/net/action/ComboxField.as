@@ -34,6 +34,11 @@ package akdcl.net.action {
 			return options.elements(RemoteAction.E_CASE)[view.selectedIndex];
 		}
 
+		override public function clear():void {
+			view.selectedItem = null;
+			super.clear();
+		}
+
 		override protected function setView():void {
 			super.setView();
 			if (view){

@@ -34,6 +34,9 @@ package akdcl.media {
 
 	/// @eventType	akdcl.media.MediaEvent.LOAD_COMPLETE
 	[Event(name="loadComplete",type="akdcl.media.MediaEvent")]
+	
+	/// @eventType	akdcl.media.MediaEvent.DISPLAY_CHANGE
+	[Event(name="displayChange",type="akdcl.media.MediaEvent")]
 
 	public class MediaEvent extends Event {
 		public static const LIST_CHANGE:String = "listChange";
@@ -46,6 +49,7 @@ package akdcl.media {
 		public static const BUFFER_PROGRESS:String = "bufferProgress";
 		public static const LOAD_PROGRESS:String = "loadProgress";
 		public static const LOAD_COMPLETE:String = "loadComplete";
+		public static const DISPLAY_CHANGE:String = "displayChange";
 
 		public function MediaEvent(type:String, bubbles:Boolean = false, cancelable:Boolean = false):void {
 			super(type, bubbles, cancelable);

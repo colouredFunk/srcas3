@@ -28,6 +28,13 @@ package akdcl.net.action {
 			return _list.length > 0 ? _list : VALUE_UNSELECT;
 		}
 
+		override public function clear():void {
+			for each(var _check:CheckBox in view) {
+				_check.selected = false;
+			}
+			super.clear();
+		}
+
 		override protected function setView():void {
 			super.setView();
 

@@ -26,6 +26,11 @@ package akdcl.net.action {
 			return VALUE_UNSELECT;
 		}
 
+		override public function clear():void {
+			//view[0].group.selectedData = null;
+			super.clear();
+		}
+
 		override protected function setView():void {
 			super.setView();
 			if (view){
@@ -37,7 +42,7 @@ package akdcl.net.action {
 			for each (var _eachXML:XML in options.elements(RemoteAction.E_CASE)){
 				var _id:uint = _eachXML.childIndex();
 				var _radio:RadioButton;
-
+				
 				if (view[_id]){
 					_radio = view[_id];
 				} else {
