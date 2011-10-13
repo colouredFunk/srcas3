@@ -2,6 +2,7 @@
 	import flash.events.Event;
 	import flash.events.ErrorEvent;
 	import flash.events.IOErrorEvent;
+	import flash.events.SecurityErrorEvent;
 	import flash.net.URLRequestMethod;
 
 	import flash.net.URLVariables;
@@ -134,12 +135,12 @@
 				resolveSend(optionsSend);
 				resolveLoad(optionsLoad);
 
-				sendProxy.url = options.attribute(A_SOURCE)[0];
+				sendProxy.url = String(options.attribute(A_SOURCE)[0]);
 				sendProxy.method = String(options.attribute(A_METHOD)[0] || URLRequestMethod.POST);
 				//json,form
-				sendProxy.sendFormat = String(optionsSend.attribute(A_DATA_STRUCTURE)[0]);
+				sendProxy.sendFormat = String(optionsSend.attribute(A_DATA_STRUCTURE)[0] || "");
 				//binary,variables,text,json,xml
-				sendProxy.loadFormat = String(optionsLoad.attribute(A_DATA_STRUCTURE)[0]);
+				sendProxy.loadFormat = String(optionsLoad.attribute(A_DATA_STRUCTURE)[0] || "");
 				sendProxy.random = true;
 				//sendProxy.contentType
 			} else {
@@ -232,16 +233,24 @@
 			if (actionXML){
 				gotoURL(actionXML);
 			}
-			dispatchEvent(new Event(Event.COMPLETE));
+			if (hasEventListener(Event.COMPLETE)) {
+				dispatchEvent(new Event(Event.COMPLETE));
+			}
 		}
 
 		protected function onErrorHandler(_evt:Event):void {
 			isLoading = false;
 			data = null;
 			rawData = null;
-			var _ioErrorXML:XML = options.elements(E_IO_ERROR)[0];
-			alert = Alert.show(_ioErrorXML || "网络错误，请稍后重试！");
-			dispatchEvent(_evt);
+			if (_evt is SecurityErrorEvent) {
+				Alert.show("安全沙箱冲突，无法跨域访问！");
+			}else {
+				var _ioErrorXML:XML = options.elements(E_IO_ERROR)[0];
+				alert = Alert.show(_ioErrorXML || "网络错误，请稍后重试！");
+			}
+			if (hasEventListener(IOErrorEvent.IO_ERROR)) {
+				dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR));
+			}
 		}
 
 		protected function formatData(_data:*, _xml:XML, _isSend:Boolean):* {
