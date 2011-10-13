@@ -156,7 +156,12 @@
 		}
 
 		protected function onXMLErrorHandler(_evt:IOErrorEvent, _url:String):void {
-			var _str:String = "ERROR:读取XML失败，请检查XML地址是否正确!\n" + _url;
+			var _str:String;
+			if (_evt is IOErrorEvent) {
+				_str = "ERROR:读取XML失败，请检查XML地址是否正确!\n" + _url;
+			}else {
+				_str = "ERROR:安全沙箱冲突，无法跨域读取XML!\n" + _url;
+			}
 			if (eiM.isAvailable) {
 				eiM.debugMessage(_str);
 			}else {

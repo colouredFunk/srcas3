@@ -137,9 +137,9 @@
 
 				sendProxy.url = String(options.attribute(A_SOURCE)[0]);
 				sendProxy.method = String(options.attribute(A_METHOD)[0] || URLRequestMethod.POST);
-				//json,form
+				//json,form,amf3
 				sendProxy.sendFormat = String(optionsSend.attribute(A_DATA_STRUCTURE)[0] || "");
-				//binary,variables,text,json,xml
+				//binary,variables,text,json,xml,amf3
 				sendProxy.loadFormat = String(optionsLoad.attribute(A_DATA_STRUCTURE)[0] || "");
 				sendProxy.random = true;
 				//sendProxy.contentType
