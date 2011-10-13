@@ -18,8 +18,8 @@ package akdcl.net.action {
 		}
 
 		override public function clear():void {
-			super.clear();
 			view.text = "";
+			super.clear();
 		}
 
 		override protected function setView():void {

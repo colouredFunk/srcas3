@@ -19,6 +19,11 @@ package akdcl.net.action {
 			return view.selected;
 		}
 
+		override public function clear():void {
+			view.selected = false;
+			super.clear();
+		}
+
 		override protected function setView():void {
 			super.setView();
 			if (view){

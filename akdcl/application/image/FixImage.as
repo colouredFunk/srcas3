@@ -1,4 +1,6 @@
 ﻿package akdcl.application.image{
+	import akdcl.media.CameraProvider;
+	import akdcl.media.MediaEvent;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Graphics;
@@ -6,14 +8,13 @@
 	import flash.display.Sprite;
 	import flash.display.BlendMode;
 	import flash.utils.ByteArray;
-	import ui.Alert;
-	import zero.ui.CameraPan;
 
 	import flash.events.Event;
 
 	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
 
+	import ui.Alert;
 	import ui.UISprite;
 	import ui.transformTool.TransformTool;
 
@@ -25,6 +26,8 @@
 	 * @author Akdcl
 	 */
 	public class FixImage extends UISprite {
+		private static const MATRIX:Matrix = new Matrix();
+		
 		public var backgroundColor:uint = 0xffffff;
 		public var frameBorder:uint = 10;
 		public var maxImageWidth:uint;
@@ -42,13 +45,12 @@
 		protected var shapeMove:UISprite;
 		protected var shapesContainer:UISprite;
 
-		protected var cameraPan:CameraPan;
-		protected var transformTool:TransformTool;
+		protected var cameraProvider:CameraProvider;
 		protected var fileRef:FileRef;
+		protected var transformTool:TransformTool;
 		protected var bitmap:Bitmap;
 		protected var bitmapData:BitmapData;
 		protected var orgBitmapData:BitmapData;
-		protected var bitmapShow:Bitmap;
 		
 		public var isCamera:Boolean;
 
@@ -59,9 +61,10 @@
 			fileRef.onFailed = onImageFailedHandler;
 			fileRef.onLoadComplete = onImageCompleteHandler;
 
-			cameraPan = new CameraPan();
-			cameraPan.onOpen = onCameraOpenHandler;
-			cameraPan.onFailed = onCameraFailedHandler;
+			cameraProvider = new CameraProvider();
+			cameraProvider.addEventListener(MediaEvent.DISPLAY_CHANGE, onCameraOpenHandler);
+			cameraProvider.addEventListener(MediaEvent.PLAY_PROGRESS, onCameraPlayingHandler);
+			cameraProvider.addEventListener(MediaEvent.LOAD_ERROR, onCameraFailedHandler);
 			
 			imageWidth = maxImageWidth = frameShow.width - frameBorder * 2;
 			imageHeight = maxImageHeight = frameShow.height - frameBorder * 2;
@@ -71,23 +74,23 @@
 			shapeMask = new Shape();
 			shapeMove = new UISprite();
 			bitmap = new Bitmap();
-			bitmapShow = new Bitmap();
 
 			shapesContainer.blendMode = BlendMode.LAYER;
 			shapeMove.blendMode = BlendMode.ERASE;
 			displayRect.x = shapesContainer.x = frameArea.x + frameBorder;
 			displayRect.y = shapesContainer.y = frameArea.y + frameBorder;
-			bitmapShow.x = frameShow.x + frameBorder;
-			bitmapShow.y = frameShow.y + frameBorder;
+			bitmap.x = frameShow.x + frameBorder;
+			bitmap.y = frameShow.y + frameBorder;
 
 			addChildAt(displayRect, getChildIndex(frameArea) + 1);
 			addChildAt(shapesContainer, getChildIndex(displayRect) + 1);
-			addChildAt(bitmapShow, getChildIndex(frameShow) + 1);
+			addChildAt(bitmap, getChildIndex(frameShow) + 1);
 
 			shapesContainer.addChild(shapeMask);
 			shapesContainer.addChild(shapeMove);
 
 			transformTool = new TransformTool(shapesContainer);
+			transformTool.onChanging = updateBMD;
 			transformTool.area = new Rectangle(0, 0, displayRect.rectWidth, displayRect.rectHeight);
 			shapesContainer.scrollRect = transformTool.area;
 
@@ -98,14 +101,22 @@
 			clear();
 			transformTool.Clear();
 			fileRef.remove();
-			cameraPan.remove();
+			cameraProvider.remove();
 			super.onRemoveToStageHandler();
+			frameArea = null;
+			frameShow = null;
 			onChanging = null;
 			onLoaded = null;
-			transformTool = null;
+			displayRect = null;
+			shapeMask = null;
+			shapeMove = null;
+			shapesContainer = null;
+			cameraProvider = null;
 			fileRef = null;
+			transformTool = null;
+			bitmap = null;
 			bitmapData = null;
-			cameraPan = null;
+			orgBitmapData = null;
 		}
 
 		public function browse():void {
@@ -113,19 +124,18 @@
 		}
 		
 		public function useCamera():void {
-			cameraPan.open("http://vhot2.qqvideo.tc.qq.com/59261446/7O9m8Qn4Ron.flv");
+			cameraProvider.load(null);
 		}
 
 		public function clear():void {
 			reset();
 			transformTool.ArrowClear();
+			cameraProvider.stop();
 
 			if (bitmapData){
 				bitmapData.dispose();
 				bitmapData = null;
 			}
-			removeEventListener(Event.ENTER_FRAME, onCameraPlayingHandler);
-			cameraPan.close();
 		}
 
 		public function reset():void {
@@ -135,15 +145,15 @@
 			updateBMD();
 		}
 		
-		public function pauseCamera():void {
-			removeEventListener(Event.ENTER_FRAME, onCameraPlayingHandler);
-			cameraPan.pause();
+		public function activate():void {
+			if (isCamera) {
+				cameraProvider.play();
+			}
 		}
 		
-		public function resumeCamera():void {
+		public function deactivate():void {
 			if (isCamera) {
-				addEventListener(Event.ENTER_FRAME, onCameraPlayingHandler);
-				cameraPan.resume();
+				cameraProvider.pause();
 			}
 		}
 
@@ -155,6 +165,7 @@
 			return isCamera?null:fileRef.data;
 		}
 
+		//设置 width 和 height 后注意回收bitmapData;
 		public function getFixBitmapData(_width:Number = 0, _height:Number = 0):BitmapData {
 			if (!bitmapData){
 				return null;
@@ -163,11 +174,7 @@
 				return bitmapData;
 			}
 			var _bmd:BitmapData;
-			bitmap.bitmapData = bitmapData;
-			bitmap.smoothing = true;
 			bitmap.scaleY = bitmap.scaleX = 1;
-
-			var _matirx:Matrix = new Matrix();
 
 			var _aspectRatio:Number = _width / _height;
 			var _aspectRatioOrg:Number = bitmapData.width / bitmapData.height;
@@ -179,7 +186,7 @@
 				}
 				bitmap.scaleY = bitmap.scaleX;
 				bitmap.height = Math.round(bitmap.height);
-				_matirx.d = _matirx.a = bitmap.scaleX;
+				MATRIX.d = MATRIX.a = bitmap.scaleX;
 			} else {
 				if (_height <= 1){
 					bitmap.height = bitmap.height * _height;
@@ -188,20 +195,27 @@
 				}
 				bitmap.scaleX = bitmap.scaleY;
 				bitmap.width = Math.round(bitmap.width);
-				_matirx.d = _matirx.a = bitmap.scaleY;
+				MATRIX.d = MATRIX.a = bitmap.scaleY;
 			}
 
 			_bmd = new BitmapData(bitmap.width, bitmap.height, false, backgroundColor);
-			_bmd.draw(bitmap, _matirx);
+			_bmd.draw(bitmap, MATRIX);
+			//还原
+			bitmap.width = imageWidth;
+			bitmap.height = imageHeight;
 			//_bmd.dispose();
+			
 			return _bmd;
 		}
 
 		protected function onImageCompleteHandler(_data:*):void {
-			isCamera = false;
-			removeEventListener(Event.ENTER_FRAME, onCameraPlayingHandler);
-			cameraPan.close();
-			transformTool.onChanging = updateBMD;
+			if (isCamera) {
+				if (orgBitmapData) {
+					orgBitmapData.dispose();
+				}
+				isCamera = false;
+				cameraProvider.stop();
+			}
 			enabled = true;
 			setShapes();
 			orgBitmapData = _data;
@@ -216,14 +230,14 @@
 			Alert.show(_str);
 		}
 
-		protected function onCameraOpenHandler():void {
-			orgBitmapData = null;
-			isCamera = true;
-			addEventListener(Event.ENTER_FRAME, onCameraPlayingHandler);
-			transformTool.onChanging = null;
+		protected function onCameraOpenHandler(_e:*= null):void {
+			if (!isCamera) {
+				orgBitmapData = null;
+				isCamera = true;
+			}
 			enabled = true;
 			setShapes();
-			displayRect.setContent(cameraPan, 0);
+			displayRect.setContent(cameraProvider.playContent, 0);
 			reset();
 			if (onLoaded != null){
 				onLoaded();
@@ -231,15 +245,16 @@
 		}
 		
 		protected function onCameraPlayingHandler(_e:Event):void {
-			if (orgBitmapData) {
-				orgBitmapData.dispose();
+			if (!orgBitmapData) {
+				orgBitmapData = new BitmapData(cameraProvider.playContent.width, cameraProvider.playContent.height, false, backgroundColor);
 			}
-			orgBitmapData = cameraPan.getBmd();
+			MATRIX.d = MATRIX.a = cameraProvider.playContent.scaleX;
+			orgBitmapData.draw(cameraProvider.playContent,MATRIX);
 			updateBMD();
 		}
 
-		protected function onCameraFailedHandler(_str:String) {
-			Alert.show(_str);
+		protected function onCameraFailedHandler(_e:*= null) {
+			Alert.show("请允许使用摄像头或检查摄像头是否正常！");
 		}
 		
 		protected function setShapes():void {
@@ -267,11 +282,11 @@
 			}
 			bitmapData = getContainBmd(shapeMove, displayRect, backgroundColor);
 
-			bitmapShow.bitmapData = bitmapData;
-			bitmapShow.smoothing = true;
-			if (bitmapShow.scaleX == 1 && bitmapShow.width > 0){
-				bitmapShow.width = imageWidth;
-				bitmapShow.height = imageHeight;
+			bitmap.bitmapData = bitmapData;
+			bitmap.smoothing = true;
+			if (bitmap.width > 0 && bitmap.width != imageWidth) {
+				bitmap.width = imageWidth;
+				bitmap.height = imageHeight;
 			}
 			if (onChanging != null){
 				onChanging();

@@ -36,7 +36,7 @@ package akdcl.media {
 		public static var TIMER_INTERVAL:uint = 100;
 		private static const VOLUME_DEFAULT:Number = 0.8;
 
-		protected var playContent:*;
+		public var playContent:*;
 		protected var timer:Timer;
 		
 		protected var playItem:PlayItem;

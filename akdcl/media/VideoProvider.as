@@ -12,6 +12,8 @@ package akdcl.media {
 	 * ...
 	 * @author akdcl
 	 */
+	/// @eventType	akdcl.media.MediaEvent.DISPLAY_CHANGE
+	[Event(name="displayChange",type="akdcl.media.MediaEvent")]
 	final public class VideoProvider extends MediaProvider {
 		private static const DEFAULT_PARAMS:Object = {autoPlay: false, scaleMode: ScaleMode.PROPORTIONAL_INSIDE, bgColor: 0x000000};
 		private static const VIDEOLOADER_GROUP:String = "VideoLoader";
@@ -153,6 +155,7 @@ package akdcl.media {
 		private function onDisplayChange():void {
 			//加载显示对象
 			//playContent.content;
+			dispatchEvent(new MediaEvent(MediaEvent.DISPLAY_CHANGE));
 		}
 	}
 

@@ -33,7 +33,7 @@
 				__source = _source;
 			}
 			if (!__type) {
-				__type = String(playItem.source.split("?")[0].split(".").pop()).toLowerCase();
+				__type = String(__source.split("?")[0].split(".").pop()).toLowerCase();
 			}
 		}
 	}
