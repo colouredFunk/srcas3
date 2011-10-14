@@ -100,12 +100,28 @@
 				onLoadedHandler();
 			}
 			onLoadingStepFix(_loaded);
-			if (onLoading != null){
-				onLoading(loadProgress);
+			if (onLoading != null) {
+				switch(onLoading.length) {
+					case 0:
+						onLoading();
+						break;
+					case 1:
+					default:
+						onLoading(loadProgress);
+						break;
+				}
 			}
 			if (loadProgress == 1 && onLoaded != null){
 				removeEventListener(Event.ENTER_FRAME, onLoadingHandler);
-				onLoaded();
+				switch(onLoaded.length) {
+					case 0:
+						onLoaded();
+						break;
+					case 1:
+					default:
+						onLoaded(this);
+						break;
+				}
 			}
 		}
 		protected function onLoadedHandler():void {

@@ -45,7 +45,17 @@ package akdcl.utils {
 			__dir = _id - __id;
 			__id = _id;
 			if (onIDChange != null){
-				onIDChange(__id);
+				switch (onIDChange.length){
+					case 0:
+						onIDChange();
+						break;
+					case 2:
+						onIDChange(__id, __length);
+					case 1:
+					default:
+						onIDChange(__id);
+						break;
+				}
 			}
 		}
 		private var __dir:int;
