@@ -14,11 +14,13 @@ package akdcl.media {
 	
 	public class DisplayLoader extends DisplayRect {
 		protected static var rM:RequestManager = RequestManager.getInstance();
-		private const eventComplete:Event = new Event(Event.COMPLETE);
 		
 		public var progressClip:*;
 		public var sameChange:Boolean;
 		protected var loadProgress:Number = 0;
+		
+		protected var eventComplete:Event;
+		
 		public function DisplayLoader(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = -1):void {
 			super(_rectWidth, _rectHeight, _bgColor);
 			label = null;
@@ -28,6 +30,7 @@ package akdcl.media {
 		override protected function onRemoveToStageHandler():void {
 			super.onRemoveToStageHandler();
 			progressClip = null;
+			eventComplete = null;
 		}
 
 		public function load(_url:String, _tweenMode:int = 2, _alignX:Number = 0.5, _alignY:Number = 0.5, _scaleMode:Number = 1):void {
@@ -61,7 +64,12 @@ package akdcl.media {
 			} else {
 				setProgressClip(false);
 				setContent(_p, tweenMode, alignXReady, alignYReady, scaleModeReady);
-				dispatchEvent(eventComplete);
+				if (hasEventListener(Event.COMPLETE)) {
+					if (!eventComplete) {
+						eventComplete = new Event(Event.COMPLETE);
+					}
+					dispatchEvent(eventComplete);
+				}
 			}
 		}
 		override protected function showContent():void {
