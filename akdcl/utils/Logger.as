@@ -17,7 +17,21 @@ package akdcl.utils {
 				logList[_target] = args + "\n" + _log;
 			}
 			if (onLog != null) {
-				onLog(_target, args, logList[_target]);
+				switch(onLog.length) {
+					case 0:
+						onLog();
+						break;
+					case 1:
+						onLog(args);
+						break;
+					case 2:
+						onLog(_target, args);
+						break;
+					case 3:
+					default:
+						onLog(_target, args, logList[_target]);
+						break;
+				}
 			}
 		}
 
