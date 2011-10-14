@@ -57,11 +57,11 @@ package akdcl.media {
 			System.setClipboard(sourceLabel);
 		}
 
-		private const eventChange:Event = new Event(Event.CHANGE);
-		private const eventResize:Event = new Event(Event.RESIZE);
-
 		protected var tweenOutVar:Object;
 		protected var tweenInVar:Object;
+
+		protected var eventChange:Event = new Event(Event.CHANGE);
+		protected var eventResize:Event = new Event(Event.RESIZE);
 
 		public var label:String = "Size";
 		public var autoUpdate:Boolean = true;
@@ -95,11 +95,13 @@ package akdcl.media {
 			}
 		}
 
-		private var __scrollX:int  = 0;
-		public function get scrollX():int  {
+		private var __scrollX:int = 0;
+
+		public function get scrollX():int {
 			return __scrollX;
 		}
-		public function set scrollX(_value:int ):void {
+
+		public function set scrollX(_value:int):void {
 			var _display:Object = displayContent;
 			if (_display){
 				var _width:Number = rect.width;
@@ -109,32 +111,34 @@ package akdcl.media {
 				} else if (_value > _width){
 					_value = _width;
 				}
-				if (_width<=_dW) {
-					if (_value < _width - _dW) {
-						__scrollX = (_value  + _width - _dW) * 0.5;
-					}else if (_value < 0) {
+				if (_width <= _dW){
+					if (_value < _width - _dW){
+						__scrollX = (_value + _width - _dW) * 0.5;
+					} else if (_value < 0){
 						__scrollX = _value;
-					}else {
+					} else {
 						__scrollX = _value * 0.5;
 					}
-				}else {
-					if (_value < 0) {
+				} else {
+					if (_value < 0){
 						__scrollX = _value * 0.5;
-					}else if (_value < _width - _dW) {
+					} else if (_value < _width - _dW){
 						__scrollX = _value;
-					}else {
-						__scrollX = (_value  + _width - _dW) * 0.5;
+					} else {
+						__scrollX = (_value + _width - _dW) * 0.5;
 					}
 				}
 				alignX = __scrollX / (_width - _dW);
 			}
 		}
-		
+
 		private var __scrollY:int = 0;
-		public function get scrollY():int  {
+
+		public function get scrollY():int {
 			return __scrollY;
 		}
-		public function set scrollY(_value:int ):void {
+
+		public function set scrollY(_value:int):void {
 			var _display:Object = displayContent;
 			if (_display){
 				var _height:Number = rect.height;
@@ -144,21 +148,21 @@ package akdcl.media {
 				} else if (_value > _height){
 					_value = _height;
 				}
-				if (_height<=_dH) {
-					if (_value < _height - _dH) {
-						__scrollY = (_value  + _height - _dH) * 0.5;
-					}else if (_value < 0) {
+				if (_height <= _dH){
+					if (_value < _height - _dH){
+						__scrollY = (_value + _height - _dH) * 0.5;
+					} else if (_value < 0){
 						__scrollY = _value;
-					}else {
+					} else {
 						__scrollY = _value * 0.5;
 					}
-				}else {
-					if (_value < 0) {
+				} else {
+					if (_value < 0){
 						__scrollY = _value * 0.5;
-					}else if (_value < _height - _dH) {
+					} else if (_value < _height - _dH){
 						__scrollY = _value;
-					}else {
-						__scrollY = (_value  + _height - _dH) * 0.5;
+					} else {
+						__scrollY = (_value + _height - _dH) * 0.5;
 					}
 				}
 				alignY = __scrollY / (_height - _dH);
@@ -166,9 +170,11 @@ package akdcl.media {
 		}
 
 		private var __alignX:Number = 0;
+
 		public function get alignX():Number {
 			return __alignX;
 		}
+
 		public function set alignX(_value:Number):void {
 			if (__alignX == _value){
 				return;
@@ -178,9 +184,11 @@ package akdcl.media {
 		}
 
 		private var __alignY:Number = 0;
+
 		public function get alignY():Number {
 			return __alignY;
 		}
+
 		public function set alignY(_value:Number):void {
 			if (__alignY == _value){
 				return;
@@ -188,7 +196,7 @@ package akdcl.media {
 			__alignY = _value;
 			updateScrollXY();
 		}
-		
+
 		//-1:outside,0:noscale,1:inside;
 		//>1||<-1:scale
 		//NaN:stretch,10:onlywidth,-10:onlyheight;
@@ -256,17 +264,19 @@ package akdcl.media {
 			mouseChildren = false;
 		}
 
-		override public function remove():void {
+		override protected function onRemoveToStageHandler():void {
 			TweenNano.killTweensOf(bitmap);
 			bitmap.bitmapData = null;
-			super.remove();
+			super.onRemoveToStageHandler();
 			rect = null;
 			bitmap = null;
 			content = null;
-			
 			contentReady = null;
+
 			tweenOutVar = null;
 			tweenInVar = null;
+			eventChange = null;
+			eventResize = null;
 		}
 
 		public function updateRect():void {
@@ -305,113 +315,122 @@ package akdcl.media {
 				updateScrollXY();
 			}
 			scrollRect = rect;
-			dispatchEvent(eventResize);
-		}
-
-		protected function updateScrollXY():void {
-			var _display:Object = displayContent;
-			if (_display){
-				var _width:Number = rect.width;
-				var _height:Number = rect.height;
-				var _dW:Number = originalWidth * _display.scaleX;
-				var _dH:Number = originalHeight * _display.scaleY;
-				var _x:Number = -offX * _display.scaleX;
-				var _y:Number = -offY * _display.scaleY;
-				
-				__scrollX = (_width - _dW) * __alignX;
-				__scrollY = (_height - _dH) * __alignY;
-				
-				if (moveRect){
-					_display.x = _x;
-					_display.y = _y;
-					rect.x = -__scrollX;
-					rect.y = -__scrollY;
-				} else {
-					_display.x = __scrollX +_x;
-					_display.y = __scrollY +_y;
-					rect.x = 0;
-					rect.y = 0;
+			if (hasEventListener(Event.RESIZE)){
+				if (!eventResize){
+					eventResize = new Event(Event.RESIZE);
+					dispatchEvent(eventResize);
 				}
-					//_width / _dW, _height / _dH
 			}
-		}
 
-		public function setContent(_content:Object = null, _tweenMode:int = 2, _alignX:Number = 0.5, _alignY:Number = 0.5, _scaleMode:Number = 1):void {
-			contentReady = _content;
-			if (isHidding){
-				return;
-			}
-			alignXReady = _alignX;
-			alignYReady = _alignY;
-			scaleModeReady = _scaleMode;
-			tweenMode = _tweenMode;
-			isHidding = true;
-			if (content && tweenMode == 2 ? true : false){
-				TweenNano.killTweensOf(displayContent);
-				TweenNano.to(displayContent, tweenMode > 2 ? tweenMode : TWEEN_FRAME, tweenOutVar);
-			} else {
-				onHideCompleteHandler();
-			}
-		}
+			protected function updateScrollXY():void {
+				var _display:Object = displayContent;
+				if (_display){
+					var _width:Number = rect.width;
+					var _height:Number = rect.height;
+					var _dW:Number = originalWidth * _display.scaleX;
+					var _dH:Number = originalHeight * _display.scaleY;
+					var _x:Number = -offX * _display.scaleX;
+					var _y:Number = -offY * _display.scaleY;
 
-		protected function onHideCompleteHandler():void {
-			if (content) {
-				TweenNano.killTweensOf(displayContent);
+					__scrollX = (_width - _dW) * __alignX;
+					__scrollY = (_height - _dH) * __alignY;
+
+					if (moveRect){
+						_display.x = _x;
+						_display.y = _y;
+						rect.x = -__scrollX;
+						rect.y = -__scrollY;
+					} else {
+						_display.x = __scrollX + _x;
+						_display.y = __scrollY + _y;
+						rect.x = 0;
+						rect.y = 0;
+					}
+						//_width / _dW, _height / _dH
+				}
+			}
+
+			public function setContent(_content:Object = null, _tweenMode:int = 2, _alignX:Number = 0.5, _alignY:Number = 0.5, _scaleMode:Number = 1):void {
+				contentReady = _content;
+				if (isHidding){
+					return;
+				}
+				alignXReady = _alignX;
+				alignYReady = _alignY;
+				scaleModeReady = _scaleMode;
+				tweenMode = _tweenMode;
+				isHidding = true;
+				if (content && tweenMode == 2 ? true : false){
+					TweenNano.killTweensOf(displayContent);
+					TweenNano.to(displayContent, tweenMode > 2 ? tweenMode : TWEEN_FRAME, tweenOutVar);
+				} else {
+					onHideCompleteHandler();
+				}
+			}
+
+			protected function onHideCompleteHandler():void {
+				if (content){
+					TweenNano.killTweensOf(displayContent);
+					if (content is BitmapData){
+						bitmap.bitmapData = null;
+					} else {
+						removeChild(content as DisplayObject);
+					}
+				}
+				isHidding = false;
+				showContent();
+			}
+
+			protected function showContent():void {
+				content = contentReady;
+				contentReady = null;
+				var _display:Object;
 				if (content is BitmapData){
-					bitmap.bitmapData = null;
-				} else {
-					removeChild(content as DisplayObject);
+					bitmap.bitmapData = content as BitmapData;
+					bitmap.smoothing = true;
+					_display = bitmap;
+				} else if (content){
+					addChildAt(content as DisplayObject, getChildIndex(bitmap));
+					_display = content;
 				}
-			}
-			isHidding = false;
-			showContent();
-		}
+				if (_display){
+					//
+					if (tweenMode > 0){
+						_display.alpha = 0;
+						TweenNano.to(_display, tweenMode > 2 ? tweenMode : TWEEN_FRAME, tweenInVar);
+					}
+					//
+					offX = offY = 0;
+					if (_display is Bitmap){
+						originalWidth = _display.width / _display.scaleX;
+						originalHeight = _display.height / _display.scaleY;
+					} else if (_display is Loader){
+						originalWidth = _display.contentLoaderInfo.width;
+						originalHeight = _display.contentLoaderInfo.height;
+					} else if (_display is Video){
+						originalWidth = _display.videoWidth || _display.width / _display.scaleX;
+						originalHeight = _display.videoHeight || _display.height / _display.scaleY;
+					} else if (_display is DisplayObject){
+						var _rect:Rectangle = _display.getRect(_display);
+						offX = _rect.x;
+						offY = _rect.y;
+						originalWidth = _display.width / _display.scaleX;
+						originalHeight = _display.height / _display.scaleY;
+					} else {
 
-		protected function showContent():void {
-			content = contentReady;
-			contentReady = null;
-			var _display:Object;
-			if (content is BitmapData){
-				bitmap.bitmapData = content as BitmapData;
-				bitmap.smoothing = true;
-				_display = bitmap;
-			} else if (content){
-				addChildAt(content as DisplayObject, getChildIndex(bitmap));
-				_display = content;
-			}
-			if (_display){
-				//
-				if (tweenMode > 0){
-					_display.alpha = 0;
-					TweenNano.to(_display, tweenMode > 2 ? tweenMode : TWEEN_FRAME, tweenInVar);
+					}
+					aspectRatio = originalWidth / originalHeight;
+					__alignX = alignXReady;
+					__alignY = alignYReady;
+					__scaleMode = scaleModeReady;
+					updateRect();
+					if (hasEventListener(Event.CHANGE)){
+						if (!eventChange){
+							eventChange = new Event(Event.CHANGE);
+						}
+						dispatchEvent(eventChange);
+					}
 				}
-				//
-				offX = offY = 0;
-				if (_display is Bitmap){
-					originalWidth = _display.width / _display.scaleX;
-					originalHeight = _display.height / _display.scaleY;
-				} else if (_display is Loader){
-					originalWidth = _display.contentLoaderInfo.width;
-					originalHeight = _display.contentLoaderInfo.height;
-				} else if (_display is Video){
-					originalWidth = _display.videoWidth || _display.width / _display.scaleX;
-					originalHeight = _display.videoHeight || _display.height / _display.scaleY;
-				} else if (_display is DisplayObject){
-					var _rect:Rectangle = _display.getRect(_display);
-					offX = _rect.x;
-					offY = _rect.y;
-					originalWidth = _display.width / _display.scaleX;
-					originalHeight = _display.height / _display.scaleY;
-				} else {
-
-				}
-				aspectRatio = originalWidth / originalHeight;
-				__alignX = alignXReady;
-				__alignY = alignYReady;
-				__scaleMode = scaleModeReady;
-				updateRect();
-				dispatchEvent(eventChange);
 			}
 		}
 	}
-}

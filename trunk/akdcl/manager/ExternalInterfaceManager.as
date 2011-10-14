@@ -89,12 +89,15 @@
 				eventParams = null;
 			}
 			
-			//addEventListener(ExternalInterfaceManager.SWF_INTERFACE);
-			dispatchEvent(swfInterFaceEvent);
-			
-			var _event:Event = new Event(__eventType);
-			//addEventListener(__eventType);
-			dispatchEvent(_event);
+			if (hasEventListener(SWF_INTERFACE)) {
+				//addEventListener(ExternalInterfaceManager.SWF_INTERFACE);
+				dispatchEvent(swfInterFaceEvent);
+			}
+			if (hasEventListener(__eventType)) {
+				var _event:Event = new Event(__eventType);
+				//addEventListener(__eventType);
+				dispatchEvent(_event);
+			}
 		}
 		
 		//广播as调用js的事件
