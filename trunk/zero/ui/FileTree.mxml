@@ -41,7 +41,7 @@ FileTree
 			
 			private var onChange:Function;
 			public var sol_key:String;
-			private var sol:Sol;
+			public var sol:Sol;
 			
 			public var onDoubleClickItem:Function=defaultOnDoubleClickItem;
 			private function defaultOnDoubleClickItem():void{
@@ -138,10 +138,9 @@ FileTree
 			public function update(fileListXML:XML):void{
 				
 				tree.dataProvider=fileListXLC=new XMLListCollection(new XMLList(fileListXML));
-				
 				openItems();
 				
-				select(sol.getValue(sol_key+"_selectedItemXML"));
+				selectURL(sol.getValue(sol_key+"_selectedFileURL"));
 				
 				tree.verticalScrollPosition=sol.getValue(sol_key+"_verticalScrollPosition");
 				
@@ -164,17 +163,39 @@ FileTree
 					_openItems(subItemXML,openItems);
 				}
 			}
-			private function select(itemXML:XML):void{
+			
+			/*
+			public function selectItem(itemXML:XML):void{
 				if(itemXML){
-					tree.selectedItem=null;
-					_select(fileListXLC.source[0],itemXML.toXMLString());
+					selectURL(itemXML.@url.toString());
+				}else{
+					selectURL("");
 				}
 			}
-			private function _select(xml:XML,itemXMLStr:String):void{
+			*/
+			
+			public function selectURL(url:String):void{
+				if(tree.selectedItem&&tree.selectedItem.@url.toString()==url){
+					return;
+				}
+				//trace("selectURL "+url);
+				if(url){
+					sol.setValue(sol_key+"_selectedFileURL",url);
+				}else{
+					sol.setValue(sol_key+"_selectedFileURL","");
+				}
+				
+				if(fileListXLC){
+					tree.selectedItem=null;
+					_select(fileListXLC.source[0],url);
+				}
+			}
+			private function _select(xml:XML,url:String):void{
 				if(tree.selectedItem){
 					return;
 				}
-				if(xml.toXMLString()==itemXMLStr){
+				//trace("_select url="+url);
+				if(xml.@url.toString()==url){
 					var xmlArr:Array=new Array();
 					while(xml){
 						xmlArr.unshift(xml);
@@ -188,17 +209,22 @@ FileTree
 					return;
 				}
 				for each(var node:XML in xml.node){
-					_select(node,itemXMLStr);
+					_select(node,url);
 				}
 			}
 			
 			private function saveSetting():void{
 				sol.setValue(sol_key+"_openItems",tree.openItems);
-				sol.setValue(sol_key+"_verticalScrollPosition",tree.verticalScrollPosition);
+				if(tree.verticalScrollPosition>0){
+					sol.setValue(sol_key+"_verticalScrollPosition",tree.verticalScrollPosition);
+				}else{
+					sol.setValue(sol_key+"_verticalScrollPosition",0);
+				}
 			}
 			private function change():void{
+				//trace("tree.selectedItem="+tree.selectedItem);
 				if(tree.selectedItem){
-					sol.setValue(sol_key+"_selectedItemXML",tree.selectedItem);
+					sol.setValue(sol_key+"_selectedFileURL",tree.selectedItem.@url.toString());
 					saveSetting();
 					if(onChange==null){
 					}else{
