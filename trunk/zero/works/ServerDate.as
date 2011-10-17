@@ -38,18 +38,32 @@ package zero.works{
 			getTimeLoader.addEventListener(IOErrorEvent.IO_ERROR,getTimeLoadError);
 			getTimeLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR,getTimeLoadError);
 			//getTimeLoader.dataFormat=URLLoaderDataFormat.BINARY;
-			try{
-				getTimeLoader.load(new URLRequest("http://event21.wanmei.com/demo/flash/systime.jsp?"+Math.random()));
-			}catch(e:Error){
-				
-				//getTimeLoader.removeEventListener(ProgressEvent.PROGRESS,getTimeLoadProgress);
-				getTimeLoader.removeEventListener(Event.COMPLETE,getTimeLoadComplete);
-				getTimeLoader.removeEventListener(IOErrorEvent.IO_ERROR,getTimeLoadError);
-				getTimeLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,getTimeLoadError);
-				getTimeLoader=null;
-				
-				getTimeComplete(new Date());
+			
+			switch(Security.sandboxType){
+				case Security.REMOTE:
+					try{
+						getTimeLoader.load(new URLRequest("http://event21.wanmei.com/demo/flash/systime.jsp?"+Math.random()));
+					}catch(e:Error){
+						
+						//getTimeLoader.removeEventListener(ProgressEvent.PROGRESS,getTimeLoadProgress);
+						getTimeLoader.removeEventListener(Event.COMPLETE,getTimeLoadComplete);
+						getTimeLoader.removeEventListener(IOErrorEvent.IO_ERROR,getTimeLoadError);
+						getTimeLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,getTimeLoadError);
+						getTimeLoader=null;
+						
+						getTimeComplete(new Date());
+					}
+				break;
+				//case Security.LOCAL_WITH_FILE:
+				//case Security.LOCAL_WITH_NETWORK:
+				//case Security.LOCAL_TRUSTED:
+				//case Security.APPLICATION:
+				default:
+					getTimeComplete(new Date());
+				break;
 			}
+			
+			
 			////===
 		}
 		

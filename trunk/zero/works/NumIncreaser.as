@@ -30,12 +30,20 @@ package zero.works{
 		
 		public var txt:*;
 		
+		[Inspectable(name="起始时间",defaultValue="2011-10-17 16:15:00")]
+		public var set_startTime:String="2011-10-17 16:15:00";
+		
+		[Inspectable(name="终结时间",defaultValue="2012-12-21 15:14:35")]
+		public var set_endTime:String="2012-12-21 15:14:35";
+		
+		[Inspectable(name="起始人数",defaultValue=0)]
+		public var set_startNum:int=0;
+		
+		[Inspectable(name="终结人数",defaultValue=1000000)]
+		public var set_endNum:int=1000000;
+		
+		private var delayTime:int;
 		public function NumIncreaser(){
-			
-			if(txt){
-				return;
-			}
-			
 			var i:int;
 			var _txt:*;
 			
@@ -57,42 +65,43 @@ package zero.works{
 				throw new Error("找不到 txt");
 			}
 			
-			if(
-				this.loaderInfo.parameters.startTime//"2011-08-02 10:00:00";
-				&&
-				this.loaderInfo.parameters.endTime//"2011-08-09 12:00:00";
-			){
-				
-				serverDate=new ServerDate();
-				serverDate.init(initServerDateComplete);
+			txt.text="";
+			
+			delayTime=5;
+			this.addEventListener(Event.ENTER_FRAME,initDelay);
+		}
+		private function initDelay(event:Event):void{
+			if(--delayTime<=0){
+			}else{
+				return;
 			}
+			
+			this.removeEventListener(Event.ENTER_FRAME,initDelay);
+			
+			set_startTime=this.loaderInfo.parameters.startTime||set_startTime;
+			set_endTime=this.loaderInfo.parameters.endTime||set_endTime;set_endNum
+			if(int(this.loaderInfo.parameters.startNum)>0){
+				set_startNum=int(this.loaderInfo.parameters.startNum);
+			}
+			if(int(this.loaderInfo.parameters.set_endNum)>0){
+				set_endNum=int(this.loaderInfo.parameters.set_endNum);
+			}
+			
+			serverDate=new ServerDate();
+			serverDate.init(initServerDateComplete);
 		}
 		private function initServerDateComplete():void{
-			
-			startNum=int(this.loaderInfo.parameters.startNum);
-			endNum=int(this.loaderInfo.parameters.endNum);
-			
-			if(int(this.loaderInfo.parameters.startNum)>0){
-				startNum=int(this.loaderInfo.parameters.startNum);
-			}else{
-				startNum=0;
-			}
-			if(int(this.loaderInfo.parameters.endNum)>0){
-				endNum=int(this.loaderInfo.parameters.endNum);
-			}else{
-				endNum=100000;
-			}
-			
 			start(
 				serverDate,
-				this.loaderInfo.parameters.startTime,
-				this.loaderInfo.parameters.endTime,
-				startNum,
-				endNum
+				set_startTime,
+				set_endTime,
+				set_startNum,
+				set_endNum
 			);
 		}
 		
 		public function start(_serverDate:ServerDate,_startDate:*,_timeUpDate:*,_startNum:int=0,_endNum:int=100000):void{
+			this.removeEventListener(Event.ENTER_FRAME,enterFrame);
 			
 			if(_startDate is Date){
 			}else{
@@ -116,7 +125,7 @@ package zero.works{
 			startNum=_startNum;
 			endNum=_endNum;
 			k=(endNum-startNum)/getNum((timeUpDate.time-startDate.time)/1000);
-			trace("k="+k);
+			//trace("k="+k);
 			
 			if(_serverDate){
 				serverDate=_serverDate;
