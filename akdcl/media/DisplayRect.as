@@ -65,6 +65,7 @@
 
 		public var label:String = "Size";
 		public var autoUpdate:Boolean = true;
+		public var useScroll:Boolean = true;
 		public var moveRect:Boolean;
 
 		public function get rectWidth():uint {
@@ -248,7 +249,7 @@
 				rect = getRect(this);
 				rect.y = rect.x = 0;
 			}
-			if (_bgColor >= 0){
+			if (_bgColor >= 0 && useScroll) {
 				opaqueBackground = _bgColor;
 			}
 			super();
@@ -314,7 +315,9 @@
 				}
 				updateScrollXY();
 			}
-			scrollRect = rect;
+			if (useScroll) {
+				scrollRect = rect;
+			}
 			if (hasEventListener(Event.RESIZE)){
 				if (!eventResize){
 					eventResize = new Event(Event.RESIZE);
