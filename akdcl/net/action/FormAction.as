@@ -85,6 +85,7 @@ package akdcl.net.action {
 						case "height":
 						case "widthLabel":
 						case "dyFF":
+						case "color":
 							style[_paramName] = int(optionsSend.style.attribute(_paramName));
 							break;
 						case "colorLabel":

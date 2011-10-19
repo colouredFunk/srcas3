@@ -3,6 +3,7 @@
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
+	import flash.display.DisplayObjectContainer;
 	import flash.display.Loader;
 	import flash.events.Event;
 	import flash.media.Video;
@@ -67,6 +68,8 @@
 		public var autoUpdate:Boolean = true;
 		public var useScroll:Boolean = true;
 		public var moveRect:Boolean;
+		
+		public var container:DisplayObjectContainer;
 
 		public function get rectWidth():uint {
 			return rect.width;
@@ -240,27 +243,30 @@
 		private var offY:int;
 
 		public function DisplayRect(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = 0):void {
-			rect = new Rectangle();
 			if (_rectWidth + _rectHeight > 0){
 				rect = new Rectangle();
 				rect.width = _rectWidth;
 				rect.height = _rectHeight;
-			} else {
-				rect = getRect(this);
-				rect.y = rect.x = 0;
-			}
-			if (_bgColor >= 0 && useScroll) {
-				opaqueBackground = _bgColor;
 			}
 			super();
+			if (_bgColor >= 0 && useScroll) {
+				container.opaqueBackground = _bgColor;
+			}
 		}
 
 		override protected function init():void {
 			super.init();
+			if (!container) {
+				container = this;
+			}
+			if (!rect) {
+				rect = container.getRect(container);
+				rect.y = rect.x = 0;
+			}
 			tweenOutVar = {alpha: 0, useFrames: true, onComplete: onHideCompleteHandler};
 			tweenInVar = {alpha: 1, useFrames: true};
 			bitmap = new Bitmap();
-			addChild(bitmap);
+			container.addChild(bitmap);
 			contextMenu = createMenu(this);
 			mouseChildren = false;
 		}
@@ -316,7 +322,7 @@
 				updateScrollXY();
 			}
 			if (useScroll) {
-				scrollRect = rect;
+				container.scrollRect = rect;
 			}
 			if (hasEventListener(Event.RESIZE)){
 				if (!eventResize){
@@ -378,7 +384,7 @@
 				if (content is BitmapData){
 					bitmap.bitmapData = null;
 				} else {
-					removeChild(content as DisplayObject);
+					container.removeChild(content as DisplayObject);
 				}
 			}
 			isHidding = false;
@@ -394,7 +400,7 @@
 				bitmap.smoothing = true;
 				_display = bitmap;
 			} else if (content){
-				addChildAt(content as DisplayObject, getChildIndex(bitmap));
+				container.addChildAt(content as DisplayObject, container.getChildIndex(bitmap));
 				_display = content;
 			}
 			if (_display){

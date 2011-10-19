@@ -1,6 +1,5 @@
 package akdcl.media {
 	import flash.events.ActivityEvent;
-	import flash.events.Event;
 	import flash.events.StatusEvent;
 	import flash.media.Camera;
 	import flash.media.Video;
@@ -43,8 +42,6 @@ package akdcl.media {
 		override public function load(_item:*):void {
 			super.load(null);
 			if (camera){
-				//camera.addEventListener(Event.DEACTIVATE,onCameraHandler);
-				//camera.addEventListener(Event.ACTIVATE,onCameraHandler);
 				camera.addEventListener(ActivityEvent.ACTIVITY, onCameraHandler);
 				camera.addEventListener(StatusEvent.STATUS, onCameraHandler);
 				if (camera.muted && isCameraAdded){
@@ -83,7 +80,6 @@ package akdcl.media {
 			if (_evt is StatusEvent){
 				switch (_evt.code){
 					case "Camera.Muted":
-						onLoadErrorHandler();
 						break;
 					case "Camera.Unmuted":
 						break;

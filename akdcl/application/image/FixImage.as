@@ -1,6 +1,4 @@
-﻿package akdcl.application.image{
-	import akdcl.media.CameraProvider;
-	import akdcl.media.MediaEvent;
+﻿package akdcl.application.image {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Graphics;
@@ -20,6 +18,8 @@
 
 	import akdcl.net.FileRef;
 	import akdcl.media.DisplayRect;
+	import akdcl.media.CameraProvider;
+	import akdcl.media.MediaEvent;
 
 	/**
 	 * ...
@@ -27,7 +27,7 @@
 	 */
 	public class FixImage extends UISprite {
 		private static const MATRIX:Matrix = new Matrix();
-		
+
 		public var backgroundColor:uint = 0xffffff;
 		public var frameBorder:uint = 10;
 		public var maxImageWidth:uint;
@@ -51,7 +51,7 @@
 		protected var bitmap:Bitmap;
 		protected var bitmapData:BitmapData;
 		protected var orgBitmapData:BitmapData;
-		
+
 		public var isCamera:Boolean;
 
 		override protected function init():void {
@@ -65,7 +65,7 @@
 			cameraProvider.addEventListener(MediaEvent.DISPLAY_CHANGE, onCameraOpenHandler);
 			cameraProvider.addEventListener(MediaEvent.PLAY_PROGRESS, onCameraPlayingHandler);
 			cameraProvider.addEventListener(MediaEvent.LOAD_ERROR, onCameraFailedHandler);
-			
+
 			imageWidth = maxImageWidth = frameShow.width - frameBorder * 2;
 			imageHeight = maxImageHeight = frameShow.height - frameBorder * 2;
 
@@ -122,8 +122,9 @@
 		public function browse():void {
 			fileRef.browseFile();
 		}
-		
+
 		public function useCamera():void {
+			cameraProvider.pause();
 			cameraProvider.load(null);
 		}
 
@@ -144,15 +145,15 @@
 			transformTool.selectedItem = shapeMove;
 			updateBMD();
 		}
-		
+
 		public function activate():void {
-			if (isCamera) {
+			if (isCamera){
 				cameraProvider.play();
 			}
 		}
-		
+
 		public function deactivate():void {
-			if (isCamera) {
+			if (isCamera){
 				cameraProvider.pause();
 			}
 		}
@@ -162,7 +163,7 @@
 		}
 
 		public function getOrgFile():ByteArray {
-			return isCamera?null:fileRef.data;
+			return isCamera ? null : fileRef.data;
 		}
 
 		//设置 width 和 height 后注意回收bitmapData;
@@ -204,13 +205,13 @@
 			bitmap.width = imageWidth;
 			bitmap.height = imageHeight;
 			//_bmd.dispose();
-			
+
 			return _bmd;
 		}
 
 		protected function onImageCompleteHandler(_data:*):void {
-			if (isCamera) {
-				if (orgBitmapData) {
+			if (isCamera){
+				if (orgBitmapData){
 					orgBitmapData.dispose();
 				}
 				isCamera = false;
@@ -225,13 +226,13 @@
 				onLoaded();
 			}
 		}
-		
+
 		protected function onImageFailedHandler(_str:String):void {
 			Alert.show(_str);
 		}
 
-		protected function onCameraOpenHandler(_e:*= null):void {
-			if (!isCamera) {
+		protected function onCameraOpenHandler(_e:* = null):void {
+			if (!isCamera){
 				orgBitmapData = null;
 				isCamera = true;
 			}
@@ -243,20 +244,20 @@
 				onLoaded();
 			}
 		}
-		
+
 		protected function onCameraPlayingHandler(_e:Event):void {
-			if (!orgBitmapData) {
+			if (!orgBitmapData){
 				orgBitmapData = new BitmapData(cameraProvider.playContent.width, cameraProvider.playContent.height, false, backgroundColor);
 			}
 			MATRIX.d = MATRIX.a = cameraProvider.playContent.scaleX;
-			orgBitmapData.draw(cameraProvider.playContent,MATRIX);
+			orgBitmapData.draw(cameraProvider.playContent, MATRIX);
 			updateBMD();
 		}
 
-		protected function onCameraFailedHandler(_e:*= null) {
+		protected function onCameraFailedHandler(_e:* = null){
 			Alert.show("请允许使用摄像头或检查摄像头是否正常！");
 		}
-		
+
 		protected function setShapes():void {
 			if (shapeMove.width == 0){
 				shapeMask.graphics.beginFill(0x000000, 0.5);
@@ -274,7 +275,7 @@
 				transformTool.SetStyle(shapeMove, {eqScale: true, enSetMidPoint: false});
 			}
 		}
-		
+
 
 		protected function updateBMD():void {
 			if (bitmapData){
@@ -284,7 +285,7 @@
 
 			bitmap.bitmapData = bitmapData;
 			bitmap.smoothing = true;
-			if (bitmap.width > 0 && bitmap.width != imageWidth) {
+			if (bitmap.width > 0 && bitmap.width != imageWidth){
 				bitmap.width = imageWidth;
 				bitmap.height = imageHeight;
 			}
