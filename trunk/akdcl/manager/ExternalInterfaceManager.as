@@ -10,7 +10,7 @@
 	 * @author Akdcl
 	 */
 
-	/// @eventType	ExternalInterfaceManager.SWF_INTERFACE
+	/// @eventType	ExternalInterfaceManager.CALL
 	[Event(name = "call", type = "ExternalInterfaceManager")]
 	
 	final public class ExternalInterfaceManager extends EventDispatcher {
@@ -41,17 +41,17 @@
 				}
 			}
 			if (isAvailable){
-				ExternalInterface.addCallback(SWF_INTERFACE, swfInterface);
+				ExternalInterface.addCallback(CALL, swfInterface);
 			}
 		}
 		
-		public static const SWF_INTERFACE:String = "call";
+		public static const CALL:String = "call";
 
 		public static const EXTERNAL_LISTENER:String = "swfEventHandler";
 		
 		public var eventParams:Array;
 		
-		private var swfInterFaceEvent:Event = new Event(SWF_INTERFACE);
+		private var swfInterFaceEvent:Event = new Event(CALL);
 		
 		private var __isAvailable:Boolean = false;
 		public function get isAvailable():Boolean {
@@ -89,8 +89,8 @@
 				eventParams = null;
 			}
 			
-			if (hasEventListener(SWF_INTERFACE)) {
-				//addEventListener(ExternalInterfaceManager.SWF_INTERFACE);
+			if (hasEventListener(CALL)) {
+				//addEventListener(ExternalInterfaceManager.CALL);
 				dispatchEvent(swfInterFaceEvent);
 			}
 			if (hasEventListener(__eventType)) {

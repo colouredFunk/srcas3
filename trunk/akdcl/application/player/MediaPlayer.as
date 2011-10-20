@@ -1,4 +1,4 @@
-package akdcl.application.player{
+﻿package akdcl.application.player{
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
 	import flash.events.TimerEvent;
@@ -6,7 +6,7 @@ package akdcl.application.player{
 	
 	import ui.UIEventDispatcher;
 	
-	import akdcl.application.IDPart;
+	import akdcl.utils.PageID;
 	/**
 	 * ...
 	 * @author Akdcl
@@ -256,12 +256,12 @@ package akdcl.application.player{
 		public var autoRewind:Boolean = true;
 		public var updateInterval:uint = 30;
 		protected var timer:Timer;
-		protected var idPart:IDPart;
+		protected var idPart:PageID;
 		//
 		override protected function init():void {
 			super.init();
 			timer = new Timer(updateInterval);
-			idPart = new IDPart();
+			idPart = new PageID();
 			idPart.onIDChange = onPlayIDChangeHandler;
 		}
 		override public function remove():void {
