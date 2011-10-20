@@ -65,7 +65,7 @@ package ui {
 			hitArea = null;
 			contextMenu = null;
 			EventManager.removeTargetAllEvent(this);
-			removeChildren();
+			__removeChildren();
 			userData = null;
 		}
 
@@ -78,7 +78,7 @@ package ui {
 			}
 		}
 
-		private function removeChildren():void {
+		private function __removeChildren():void {
 			var _length:uint = numChildren;
 			var _children:*;
 			for (var _i:int = _length; _i >= 0; _i--){
