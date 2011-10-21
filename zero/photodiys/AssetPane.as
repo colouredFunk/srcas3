@@ -17,6 +17,10 @@ package zero.photodiys{
 	import flash.system.LoaderContext;
 	import flash.utils.*;
 	
+	import zero.swf.*;
+	import zero.swf.tagBodys.*;
+	import zero.swf.funs.*;
+	
 	public class AssetPane extends Sprite{
 		
 		public var dw:int;
@@ -43,12 +47,15 @@ package zero.photodiys{
 		public var scrollBar:Sprite;
 		private var moveThumbSpeed:int;
 		
+		private var assetDocClassName:String;
+		
 		public function AssetPane(){
 		}
-		public function init(_onInitComplete:Function,_onSelectAsset:Function):void{
+		public function init(_onInitComplete:Function,_onSelectAsset:Function,_assetDocClassName:String):void{
 			
 			onInitComplete=_onInitComplete;
 			onSelectAsset=_onSelectAsset;
+			assetDocClassName=_assetDocClassName;
 			
 			listLoader=new URLLoader();
 			listLoader.addEventListener(Event.COMPLETE,loadListXMLComplete);
@@ -167,8 +174,31 @@ package zero.photodiys{
 			container.addChild(assetLoader);
 			assetLoader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadAssetComplete);
 			assetLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,loadAssetError);
-			assetLoader.loadBytes(assetDataLoader.data);
+			var swf:SWF=new SWF();
+			swf.initBySWFData(assetDataLoader.data,null);
+			loop:for each(var tag:Tag in swf.tagV){
+				switch(tag.type){
+					case TagTypes.DoABC:
+					case TagTypes.DoABCWithoutFlagsAndName:
+						throw new Error("asset 不应带代码");
+					break;
+					case TagTypes.ShowFrame:
+						var symbolClass:SymbolClass=new SymbolClass();
+						symbolClass.NameV=new Vector.<String>();
+						symbolClass.TagV=new Vector.<int>();
+						symbolClass.NameV[0]=assetDocClassName;
+						symbolClass.TagV[0]=0;
+						var symbolClassTag:Tag=new Tag();
+						symbolClassTag.setBody(symbolClass);
+						swf.tagV.splice(swf.tagV.indexOf(tag),0,SimpleDoABC.getDoABCTag(assetDocClassName,"mc"),symbolClassTag);
+						break loop;
+					break;
+				}
+			}
+			var swfData:ByteArray=swf.toSWFData(null);
+			assetLoader.loadBytes(swfData);
 			assetLoader.mouseChildren=false;
+			//dataV[loadId].push(swfData);
 			dataV[loadId].push(assetDataLoader.data);
 			
 			assetDataLoader=null;
@@ -223,7 +253,7 @@ package zero.photodiys{
 			}else{
 				var asset:MovieClip=(event.target as Loader).content as MovieClip;
 				var data:Array=dataV[assetV.indexOf(asset)];
-				onSelectAsset(event.target,data[0],data[1]);
+				onSelectAsset(asset,data[0],data[1]);
 			}
 		}
 	}

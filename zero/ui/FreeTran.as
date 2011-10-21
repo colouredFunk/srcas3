@@ -30,9 +30,9 @@ package zero.ui{
 		private var typeDict:Dictionary;
 		private var dxDict:Dictionary;
 		private var dyDict:Dictionary;
-		private var dot_rotateDict:Dictionary;
-		private var dot_skewDict:Dictionary;
-		private var dot_scaleDict:Dictionary;
+		public var dot_rotateDict:Dictionary;
+		public var dot_skewDict:Dictionary;
+		public var dot_scaleDict:Dictionary;
 		
 		private var oldMouseX:Number;
 		private var oldMouseY:Number;
@@ -409,7 +409,7 @@ package zero.ui{
 				}
 				*/
 				
-				updateByPic();
+				__updateByPic();
 				
 				this.visible=true;
 				if(drag){
@@ -616,7 +616,7 @@ package zero.ui{
 						this.y+=moveBounds.bottom-b.bottom;
 					}
 				}
-				updatePic();
+				__updatePic();
 			}
 			
 			oldMouseX=this.parent.mouseX;
@@ -782,13 +782,21 @@ package zero.ui{
 			Mouse.show();
 			userMouse.gotoAndStop(1);
 		}
-		private function updateByPic():void{
-			var p:Point=getM(__pic,this.parent).transformPoint(midP);
-			this.transform.matrix=new Matrix(1,0,0,1,p.x,p.y);//把 this 移至 __pic 中点
-			this.rotation=__pic.rotation;//旋转设置为和 __pic 旋转一样
+		private function __updateByPic():void{
+			updateByPic(__pic);
+		}
+		private function __updatePic():void{
+			updatePic(__pic);
+			(onTran==null)||onTran(__pic,__pic.transform.matrix);
+		}
+		
+		public function updateByPic(_pic:DisplayObject):void{
+			var p:Point=getM(_pic,this.parent,false).transformPoint(midP);
+			this.transform.matrix=new Matrix(1,0,0,1,p.x,p.y);//把 this 移至 _pic 中点
+			this.rotation=_pic.rotation;//旋转设置为和 _pic 旋转一样
 			
 			var m:Matrix=dragArea_shape.transform.matrix.clone();
-			m.concat(getM(__pic,dragArea.parent));
+			m.concat(getM(_pic,dragArea.parent,false));
 			dragArea.transform.matrix=m;
 			
 			updateDotsByDragArea();
@@ -796,12 +804,11 @@ package zero.ui{
 			currCankaoK=(dot_scaleDict["dot-1-1"].x-dot_scaleDict["dot11"].x)/(dot_scaleDict["dot-1-1"].y-dot_scaleDict["dot11"].y);
 			//trace("currCankaoK="+currCankaoK);
 		}
-		private function updatePic():void{
-			__pic.transform.matrix=getM(dragArea_shape.parent,__pic.parent);
-			(onTran==null)||onTran(__pic,__pic.transform.matrix);
+		public function updatePic(_pic:DisplayObject):void{
+			_pic.transform.matrix=getM(dragArea_shape.parent,_pic.parent,false);
 		}
 		
-		private static function getM(dspObj0:DisplayObject,dspObj1:DisplayObject):Matrix{
+		public static function getM(dspObj0:DisplayObject,dspObj1:DisplayObject,useSameParentMatrix:Boolean):Matrix{
 			//求得 m，此 m 的功能具体描述就是：假如进行以下操作：dspObj1.addChild(dspObj0);dspObj0.transform.matrix=m; 那么 dspObj0 将会和操作前看上去一样
 			//
 			/*
@@ -847,29 +854,37 @@ package zero.ui{
 						}
 						parent=parent.parent;
 					}
-				}
-				
-				var m1:Matrix=dspObj1.transform.matrix;
-				if(m1){
-					parent=dspObj1.parent;
-					while(parent){
-						if(parent==sameParent){
-							break;
+					
+					if(useSameParentMatrix){
+						if(sameParent.transform.matrix){
+							m.concat(sameParent.transform.matrix);
 						}
-						if(parent.transform.matrix){
-							m1.concat(parent.transform.matrix);
-						}
-						parent=parent.parent;
 					}
 					
-					m1.invert();
-					m.concat(m1);
+					var m1:Matrix=dspObj1.transform.matrix;
+					if(m1){
+						parent=dspObj1.parent;
+						while(parent){
+							if(parent==sameParent){
+								break;
+							}
+							if(parent.transform.matrix){
+								m1.concat(parent.transform.matrix);
+							}
+							parent=parent.parent;
+						}
+						
+						m1.invert();
+						m.concat(m1);
+					}
+					
+					return m;
 				}
 				
-				return m;
+				throw new Error("m="+m);
 			}
+			
 			throw new Error("找不到 sameParent");
-			return null;
 		}
 	}
 }
