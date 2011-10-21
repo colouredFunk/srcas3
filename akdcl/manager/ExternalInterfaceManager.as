@@ -49,6 +49,7 @@
 
 		public static const EXTERNAL_LISTENER:String = "swfEventHandler";
 		
+		public var objectID:String;
 		public var eventParams:Array;
 		
 		private var swfInterFaceEvent:Event = new Event(CALL);
@@ -66,7 +67,7 @@
 		public function hasInterface(_funName:String):Boolean {
 			if (isAvailable) {
 				//ExternalInterface.call("eval", _funName + "!=" + "null");
-				return true;
+				return ExternalInterface.objectID || objectID;
 			}
 			return false;
 		}
@@ -104,15 +105,15 @@
 		public function dispatchSWFEvent(_type:String, ... args):void {
 			if (isAvailable){
 				if (args){
-					callInterface.apply(ExternalInterfaceManager, [EXTERNAL_LISTENER, ExternalInterface.objectID, _type].concat(args));
+					callInterface.apply(ExternalInterfaceManager, [EXTERNAL_LISTENER, ExternalInterface.objectID||objectID, _type].concat(args));
 				} else {
-					callInterface(EXTERNAL_LISTENER, ExternalInterface.objectID, _type);
+					callInterface(EXTERNAL_LISTENER, ExternalInterface.objectID||objectID, _type);
 				}
 			}
 		}
 
 		public function debugMessage(...args):void {
-			callInterface("alert", "[" + ExternalInterface.objectID + "]\r\n" + args);
+			callInterface("alert", "[" + ExternalInterface.objectID||objectID + "]\r\n" + args);
 		}
 	}
 }
