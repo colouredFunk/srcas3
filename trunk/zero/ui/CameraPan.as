@@ -35,7 +35,7 @@ package zero.ui{
 			_onClose:Function,
 			_wid:int=320,
 			_hei:int=240,
-			testNoCameraFlvPath:String=null//可以用一个 flv 地址来代替摄像头
+			testNoCameraFlvPath:String=null//可以用一个 flv 地址来代替摄像头 //http://localhost/zero.flashwing.net/test.flv
 		):void{
 			close();
 			
