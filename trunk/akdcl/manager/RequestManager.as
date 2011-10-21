@@ -196,8 +196,8 @@ package akdcl.manager {
 		//url,data,contentType,method,sendFormat,loadFormat,charSet,random
 		private function resetRequest(_url:*):void {
 			//重置request
-			if (_url is String){
-				request.url = _url;
+			if (_url is String || _url is XML || _url is XMLList) {
+				request.url = String(_url);
 				request.data = null;
 				request.contentType = null;
 				request.method = URLRequestMethod.GET;

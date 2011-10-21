@@ -73,8 +73,9 @@
 			}
 			tabChildren = false;
 			
-			eiM = ExternalInterfaceManager.getInstance();
 			rM = RequestManager.getInstance();
+			eiM = ExternalInterfaceManager.getInstance();
+			eiM.objectID = flashVars.__objectID;
 			
 			if (onLoaded == null){
 				onLoaded = function():void {
