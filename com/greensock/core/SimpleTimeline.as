@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 1.64
- * DATE: 2011-01-06
+ * VERSION: 1.672
+ * DATE: 2011-08-29
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -34,15 +34,16 @@ package com.greensock.core {
 		 * @return TweenLite, TweenMax, TimelineLite, or TimelineMax instance that was inserted
 		 */
 		public function insert(tween:TweenCore, time:*=0):TweenCore {
-			if (!tween.cachedOrphan && tween.timeline) {
-				tween.timeline.remove(tween, true); //removes from existing timeline so that it can be properly added to this one.
+			var prevTimeline:SimpleTimeline = tween.timeline;
+			if (!tween.cachedOrphan && prevTimeline) {
+				prevTimeline.remove(tween, true); //removes from existing timeline so that it can be properly added to this one.
 			}
 			tween.timeline = this;
 			tween.cachedStartTime = Number(time) + tween.delay;
 			if (tween.gc) {
 				tween.setEnabled(true, true);
 			}
-			if (tween.cachedPaused) {
+			if (tween.cachedPaused && prevTimeline != this) { //we only adjust the cachedPauseTime if it wasn't in this timeline already. Remember, sometimes a tween will be inserted again into the same timeline when its startTime is changed so that the tweens in the TimelineLite/Max are re-ordered properly in the linked list (so everything renders in the proper order). 
 				tween.cachedPauseTime = tween.cachedStartTime + ((this.rawTime - tween.cachedStartTime) / tween.cachedTimeScale);
 			}
 			if (_lastChild) {

@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 1.66
- * DATE: 2011-04-20
+ * VERSION: 1.691
+ * DATE: 2011-09-28
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -113,7 +113,7 @@ package com.greensock {
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:Number = 1.66;
+		public static const version:Number = 1.691;
 		/** @private **/
 		private static var _overwriteMode:int = (OverwriteManager.enabled) ? OverwriteManager.mode : OverwriteManager.init(2); //Ensures that TweenLite instances don't overwrite each other before being put into the timeline/sequence.
 		/** @private **/
@@ -251,7 +251,7 @@ package com.greensock {
 		
 		/**
 		 * Inserts a TweenLite, TweenMax, TimelineLite, or TimelineMax instance into the timeline at a specific time, frame, or label. 
-		 * If you insert at a label that doesn't exist yet, one is created at the end of the timeline.
+		 * If you insert at a label that doesn't exist yet, it will automatically place that label at the end of the timeline and then insert the tween/timeline.
 		 * 
 		 * @param tween TweenLite, TweenMax, TimelineLite, or TimelineMax instance to insert
 		 * @param timeOrLabel The time in seconds (or frames for frames-based timelines) or label at which the tween/timeline should be inserted. For example, myTimeline.insert(myTween, 3) would insert myTween 3-seconds into the timeline, and myTimeline.insert(myTween, "myLabel") would insert it at the "myLabel" label.
@@ -265,12 +265,13 @@ package com.greensock {
 				timeOrLabel = Number(_labels[timeOrLabel]);
 			}
 			
-			if (!tween.cachedOrphan && tween.timeline) {
-				tween.timeline.remove(tween, true); //removes from existing timeline so that it can be properly added to this one. Even if the timeline is this, it still needs to be removed so that it can be added in the appropriate order (required for proper rendering)
+			var prevTimeline:SimpleTimeline = tween.timeline;
+			if (!tween.cachedOrphan && prevTimeline) {
+				prevTimeline.remove(tween, true); //removes from existing timeline so that it can be properly added to this one. Even if the timeline is this, it still needs to be removed so that it can be added in the appropriate order (required for proper rendering)
 			}
 			tween.timeline = this;
 			tween.cachedStartTime = Number(timeOrLabel) + tween.delay;
-			if (tween.cachedPaused) {
+			if (tween.cachedPaused && prevTimeline != this) { //we only adjust the cachedPauseTime if it wasn't in this timeline already. Remember, sometimes a tween will be inserted again into the same timeline when its startTime is changed so that the tweens in the TimelineLite/Max are re-ordered properly in the linked list (so everything renders in the proper order). 
 				tween.cachedPauseTime = tween.cachedStartTime + ((this.rawTime - tween.cachedStartTime) / tween.cachedTimeScale);
 			}
 			if (tween.gc) {
@@ -531,7 +532,7 @@ package com.greensock {
 				if (_rawPrevTime <= totalDur && _rawPrevTime != time) {
 					this.cachedTotalTime = this.cachedTime = totalDur;
 					forceChildrenToEnd(totalDur, suppressEvents);
-					isComplete = !this.hasPausedChild();
+					isComplete = !this.hasPausedChild() && !this.cachedReversed;
 					rendered = true;
 					if (this.cachedDuration == 0 && isComplete && (time == 0 || _rawPrevTime < 0)) { //In order to accommodate zero-duration timelines, we must discern the momentum/direction of time in order to render values properly when the "playhead" goes past 0 in the forward direction or lands directly on it, and also when it moves past it in the backward direction (from a postitive time to a negative time).
 						force = true;
@@ -919,10 +920,8 @@ package com.greensock {
 				var max:Number = 0, end:Number, tween:TweenCore = (this.gc) ? _endCaps[0] : _firstChild, prevStart:Number = -Infinity, next:TweenCore;
 				while (tween) {
 					next = tween.nextNode; //record it here in case the tween changes position in the sequence...
-					
 					if (tween.cachedStartTime < prevStart) { //in case one of the tweens shifted out of order, it needs to be re-inserted into the correct position in the sequence
 						this.insert(tween, tween.cachedStartTime - tween.delay);
-						prevStart = tween.prevNode.cachedStartTime;
 					} else {
 						prevStart = tween.cachedStartTime;
 					}
@@ -934,7 +933,6 @@ package com.greensock {
 					if (end > max) {
 						max = end;
 					}
-					
 					tween = next;
 				}
 				this.cachedDuration = this.cachedTotalDuration = max;
@@ -986,7 +984,7 @@ package com.greensock {
 		 * @return The totalTime of the timeline without capping the number at the totalDuration (max) and zero (minimum)
 		 */
 		override public function get rawTime():Number {
-			if ((this.cachedTotalTime != 0 && this.cachedTotalTime != this.cachedTotalDuration)) { //note: don't use this.totalDuration because if other tweens get unpaused before this one, the totalDuration could change.  
+			if (this.cachedPaused || (this.cachedTotalTime != 0 && this.cachedTotalTime != this.cachedTotalDuration)) { //note: don't use this.totalDuration because if other tweens get unpaused before this one, the totalDuration could change.  
 				return this.cachedTotalTime;
 			} else {
 				return (this.timeline.rawTime - this.cachedStartTime) * this.cachedTimeScale;

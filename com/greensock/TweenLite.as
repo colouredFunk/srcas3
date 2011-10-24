@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 11.62
- * DATE: 2010-12-24
+ * VERSION: 11.691
+ * DATE: 2011-09-28
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -235,7 +235,7 @@ package com.greensock {
 		}
 		
 		/** @private **/
-		public static const version:Number = 11.62;
+		public static const version:Number = 11.691;
 		/** @private When plugins are activated, the class is added (named based on the special property) to this object so that we can quickly look it up in the initTweenVals() method.**/
 		public static var plugins:Object = {}; 
 		/** @private **/
@@ -547,7 +547,7 @@ package com.greensock {
 				var a:Array = TweenLite.masterList[this.target];
 				if (!a) {
 					TweenLite.masterList[this.target] = [this];
-				} else {
+				} else if (a.indexOf(this) == -1) {
 					a[a.length] = this;
 				}
 			}
@@ -603,6 +603,9 @@ package com.greensock {
 		 * @return TweenLite instance
 		 */
 		public static function from(target:Object, duration:Number, vars:Object):TweenLite {
+			if (vars.isGSVars) {  //to accommodate TweenMaxVars instances for strong data typing and code hinting
+				vars = vars.vars;
+			}
 			vars.runBackwards = true;
 			if (!("immediateRender" in vars)) {
 				vars.immediateRender = true;
@@ -660,14 +663,20 @@ package com.greensock {
 		
 		
 		/**
-		 * Kills all the tweens (or certain tweening properties) of a particular object, optionally completing them first.
-		 * If, for example, you want to kill all tweens of the "mc" object, you'd do:<br /><br /><code>
+		 * Kills all the tweens of a particular object or delayedCalls to a particular function, optionally 
+		 * completing them first. If, for example, you want to kill all tweens of the "mc" object, you'd do:<br /><br /><code>
 		 * 
 		 * TweenLite.killTweensOf(mc);<br /><br /></code>
 		 * 
-		 * But if you only want to kill all the "alpha" and "x" portions of mc's tweens, you'd do:<br /><br /><code>
+		 * You can also just kill certain tweening properties of a particular object. For example, if you only want to kill all 
+		 * the "alpha" and "x" portions of mc's tweens, you'd do:<br /><br /><code>
 		 * 
 		 * TweenLite.killTweensOf(mc, false, {alpha:true, x:true});<br /><br /></code>
+		 * 
+		 * To kill all the delayedCalls that were created like <code>TweenLite.delayedCall(5, myFunction);</code>, 
+		 * you can simply call <code>TweenLite.killTweensOf(myFunction);</code> because delayedCalls are just
+		 * tweens that have their <code>target</code> and <code>onComplete</code> set to the same function (and 
+		 * a <code>delay</code> of course). <br /><br />
 		 * 
 		 * <code>killTweensOf()</code> affects tweens that haven't begun yet too. If, for example, 
 		 * a tween of object "mc" has a delay of 5 seconds and <code>TweenLite.killTweensOf(mc)</code> is called

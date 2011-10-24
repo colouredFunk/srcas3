@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.83
- * DATE: 2011-02-15
+ * VERSION: 1.87
+ * DATE: 2011-07-30
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -111,6 +111,9 @@ package com.greensock.loading.core {
 				_loader.contentLoaderInfo.removeEventListener("securityError", _securityErrorHandler);
 				_loader.contentLoaderInfo.removeEventListener("httpStatus", _httpStatusHandler);
 				_loader.contentLoaderInfo.removeEventListener(Event.INIT, _initHandler);
+				if (_loader.hasOwnProperty("uncaughtErrorEvents")) { //not available when published to FP9, so we reference things this way to avoid compiler errors
+					Object(_loader).uncaughtErrorEvents.removeEventListener("uncaughtError", _errorHandler);
+				}
 				if (unloadContent) {
 					try {
 						if (_loader.parent == null && _sprite != null) {
@@ -139,6 +142,9 @@ package com.greensock.loading.core {
 			_loader.contentLoaderInfo.addEventListener("securityError", _securityErrorHandler, false, 0, true);
 			_loader.contentLoaderInfo.addEventListener("httpStatus", _httpStatusHandler, false, 0, true);
 			_loader.contentLoaderInfo.addEventListener(Event.INIT, _initHandler, false, 0, true);
+			if (_loader.hasOwnProperty("uncaughtErrorEvents")) { //not available when published to FP9, so we reference things this way to avoid compiler errors
+				Object(_loader).uncaughtErrorEvents.addEventListener("uncaughtError", _errorHandler, false, 0, true);
+			}
 		}
 		
 		/** @private works around bug in Flash Player that prevents SWFs from properly being garbage collected after being unloaded - for certain types of objects like swfs, this needs to be run more than once (spread out over several frames) to force Flash to properly garbage collect everything. **/

@@ -388,9 +388,6 @@ class RequestLoader extends Loader {
 				case 2:
 					_onComplete(_content, url);
 					break;
-				case 3:
-					_onComplete(_content, url, this);
-					break;
 				case 1:
 				default:
 					_onComplete(_content);
