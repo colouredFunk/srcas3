@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 11.68
- * DATE: 2011-05-09
+ * VERSION: 11.691
+ * DATE: 2011-09-28
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com 
  **/
@@ -296,7 +296,7 @@ package com.greensock {
  */
 	public class TweenMax extends TweenLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:Number = 11.68;
+		public static const version:Number = 11.691;
 		
 		TweenPlugin.activate([
 			
@@ -825,6 +825,9 @@ package com.greensock {
 		 * @return TweenMax instance
 		 */
 		public static function from(target:Object, duration:Number, vars:Object):TweenMax {
+			if (vars.isGSVars) {  //to accommodate TweenMaxVars instances for strong data typing and code hinting
+				vars = vars.vars;
+			}
 			vars.runBackwards = true;
 			if (!("immediateRender" in vars)) {
 				vars.immediateRender = true;
@@ -846,6 +849,12 @@ package com.greensock {
 		 * @return TweenMax instance
 		 */
 		public static function fromTo(target:Object, duration:Number, fromVars:Object, toVars:Object):TweenMax {
+			if (toVars.isGSVars) {  //to accommodate TweenMaxVars instances for strong data typing and code hinting
+				toVars = toVars.vars;
+			}
+			if (fromVars.isGSVars) {  //to accommodate TweenMaxVars instances for strong data typing and code hinting
+				fromVars = fromVars.vars;
+			}
 			toVars.startAt = fromVars;
 			if (fromVars.immediateRender) {
 				toVars.immediateRender = true;
@@ -927,6 +936,9 @@ package com.greensock {
 		 * @return Array of TweenMax instances
 		 */
 		public static function allFrom(targets:Array, duration:Number, vars:Object, stagger:Number=0, onCompleteAll:Function=null, onCompleteAllParams:Array=null):Array {
+			if (vars.isGSVars) {  //to accommodate TweenMaxVars instances for strong data typing and code hinting
+				vars = vars.vars;
+			}
 			vars.runBackwards = true;
 			if (!("immediateRender" in vars)) {
 				vars.immediateRender = true;
@@ -950,6 +962,12 @@ package com.greensock {
 		 * @return Array of TweenMax instances
 		 */
 		public static function allFromTo(targets:Array, duration:Number, fromVars:Object, toVars:Object, stagger:Number=0, onCompleteAll:Function=null, onCompleteAllParams:Array=null):Array {
+			if (toVars.isGSVars) {  //to accommodate TweenMaxVars instances for strong data typing and code hinting
+				toVars = toVars.vars;
+			}
+			if (fromVars.isGSVars) {  //to accommodate TweenMaxVars instances for strong data typing and code hinting
+				fromVars = fromVars.vars;
+			}
 			toVars.startAt = fromVars;
 			if (fromVars.immediateRender) {
 				toVars.immediateRender = true;

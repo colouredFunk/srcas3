@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.521
- * DATE: 2011-02-15
+ * VERSION: 1.7
+ * DATE: 2011-09-15
  * AS3
  * UPDATES AND DOCS AT: http://www.TweenMax.com
  **/
@@ -9,7 +9,6 @@ package com.greensock.plugins {
 	
 	import flash.display.*;
 	import flash.geom.ColorTransform;
-
 /**
  * Ever wanted to tween ColorTransform properties of a DisplayObject to do advanced effects like overexposing, altering
  * the brightness or setting the percent/amount of tint? Or maybe tween individual ColorTransform 
@@ -58,10 +57,16 @@ package com.greensock.plugins {
 		
 		/** @private **/
 		override public function onInitTween(target:Object, value:*, tween:TweenLite):Boolean {
-			if (!(target is DisplayObject)) {
+			var start:ColorTransform, end:ColorTransform = new ColorTransform();
+			if (target is DisplayObject) {
+				_transform = DisplayObject(target).transform;
+				start = _transform.colorTransform;
+			} else if (target is ColorTransform) {
+				start = target as ColorTransform;
+			} else {
 				return false;
 			}
-			var end:ColorTransform = target.transform.colorTransform;
+			end.concat(start);
 			for (var p:String in value) {
 				if (p == "tint" || p == "color") {
 					if (value[p] != null) {
@@ -88,9 +93,7 @@ package com.greensock.plugins {
 				end.redMultiplier = end.greenMultiplier = end.blueMultiplier = 1 - Math.abs(value.brightness - 1);
 			}
 			
-			_ignoreAlpha = Boolean(tween.vars.alpha != undefined && value.alphaMultiplier == undefined);
-			
-			init(target as DisplayObject, end);
+			init(start, end);
 			
 			return true;
 		}

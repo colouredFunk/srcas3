@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.83
- * DATE: 2011-02-15
+ * VERSION: 1.87
+ * DATE: 2011-07-30
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -43,7 +43,7 @@ package com.greensock.loading.core {
  */	
 	public class LoaderCore extends EventDispatcher {
 		/** @private **/
-		public static const version:Number = 1.83;
+		public static const version:Number = 1.87;
 		
 		/** @private **/
 		protected static var _loaderCount:uint = 0;
@@ -70,7 +70,8 @@ package com.greensock.loading.core {
 													  onChildComplete:"childComplete", 
 													  onChildProgress:"childProgress",
 													  onChildFail:"childFail",
-													  onRawLoad:"rawLoad"};
+													  onRawLoad:"rawLoad",
+													  onUncaughtError:"uncaughtError"};
 		/** @private **/
 		protected static var _types:Object = {};
 		/** @private **/
@@ -404,13 +405,20 @@ package com.greensock.loading.core {
 		protected function _errorHandler(event:Event):void {
 			var target:Object = event.target; //trigger the LoaderEvent's target getter once first in order to ensure that it reports properly - see the notes in LoaderEvent.target for more details.
 			target = (event is LoaderEvent && this.hasOwnProperty("getChildren")) ? event.target : this;
-			var text:String = (event as Object).text;
-			trace("----\nLoading error on " + this.toString() + ": " + text + "\n----");
-			if (event.type != LoaderEvent.ERROR && event.type != LoaderEvent.FAIL && this.hasEventListener(event.type)) {
-				dispatchEvent(new LoaderEvent(event.type, target, text));
+			var text:String = ""; 
+			if (event.hasOwnProperty("error") && Object(event).error is Error) {
+				text = Object(event).error.message;
+			} else if (event.hasOwnProperty("text")) {
+				text = Object(event).text;
 			}
-			if (this.hasEventListener(LoaderEvent.ERROR)) {
-				dispatchEvent(new LoaderEvent(LoaderEvent.ERROR, target, this.toString() + " > " + text));
+			if (event.type != LoaderEvent.ERROR && event.type != LoaderEvent.FAIL && this.hasEventListener(event.type)) {
+				dispatchEvent(new LoaderEvent(event.type, target, text, event));
+			}
+			if (event.type != "uncaughtError") {
+				trace("----\nError on " + this.toString() + ": " + text + "\n----");
+				if (this.hasEventListener(LoaderEvent.ERROR)) {
+					dispatchEvent(new LoaderEvent(LoaderEvent.ERROR, target, this.toString() + " > " + text, event));
+				}
 			}
 		}
 		
@@ -422,7 +430,7 @@ package com.greensock.loading.core {
 			} else {
 				var target:Object = event.target; //trigger the LoaderEvent's target getter once first in order to ensure that it reports properly - see the notes in LoaderEvent.target for more details.
 			}
-			dispatchEvent(new LoaderEvent(LoaderEvent.FAIL, ((event is LoaderEvent && this.hasOwnProperty("getChildren")) ? event.target : this), this.toString() + " > " + (event as Object).text));
+			dispatchEvent(new LoaderEvent(LoaderEvent.FAIL, ((event is LoaderEvent && this.hasOwnProperty("getChildren")) ? event.target : this), this.toString() + " > " + (event as Object).text, event));
 		}
 		
 		/** @private **/
@@ -444,7 +452,7 @@ package com.greensock.loading.core {
 				}
 			}
 			if (this.hasEventListener(type)) {
-				dispatchEvent(new LoaderEvent(type, target, (event.hasOwnProperty("text") ? (event as Object).text : "")));
+				dispatchEvent(new LoaderEvent(type, target, (event.hasOwnProperty("text") ? Object(event).text : ""), (event is LoaderEvent && LoaderEvent(event).data != null) ? LoaderEvent(event).data : event));
 			}
 		}
 		

@@ -95,7 +95,16 @@
 					removeEventListener(Event.ENTER_FRAME, runStep);
 				}
 				if (onComplete != null) {
-					onComplete(masked);
+					switch(onComplete.length) {
+						case 0:
+							onComplete();
+							break;
+						case 1:
+							onComplete(masked);
+							break;
+						default :
+							break;
+					}
 				}
 			}
 		}

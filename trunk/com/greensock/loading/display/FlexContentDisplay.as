@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.851
- * DATE: 2011-04-29
+ * VERSION: 1.871
+ * DATE: 2011-08-03
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -105,6 +105,7 @@ package com.greensock.loading.display {
 			}
 			this.rawContent = null;
 			this.gcProtect = null;
+			_cropContainer = null;
 			if (_loader != null) {
 				if (unloadLoader) {
 					_loader.unload();
@@ -134,7 +135,7 @@ package com.greensock.loading.display {
 			var contentWidth:Number =  mc.width;
 			var contentHeight:Number = mc.height;
 			
-			if (_loader.hasOwnProperty("getClass")) { //for SWFLoaders, use loaderInfo.width/height so that everything is based on the stage size, not the bounding box of the DisplayObjects that happen to be on the stage (which could be much larger or smaller than the swf's stage)
+			if (_loader != null && _loader.hasOwnProperty("getClass")) { //for SWFLoaders, use loaderInfo.width/height so that everything is based on the stage size, not the bounding box of the DisplayObjects that happen to be on the stage (which could be much larger or smaller than the swf's stage)
 				var m:Matrix = mc.transform.matrix;
 				var loaderInfo:LoaderInfo = (mc is Loader) ? Object(mc).contentLoaderInfo : mc.loaderInfo;
 				contentWidth = loaderInfo.width * Math.abs(m.a) + loaderInfo.height * Math.abs(m.b);
@@ -207,15 +208,17 @@ package com.greensock.loading.display {
 			measure();
 		}
 		
+		/** @private **/
 		override protected function measure():void {
-			var bounds:Rectangle = this.getBounds(this);
-			this.explicitWidth = bounds.width;
-			this.explicitHeight = bounds.height;
+			var bounds:Rectangle;
 			if (this.parent) {
 				bounds = this.getBounds(this.parent);
 				this.width = bounds.width;
 				this.height = bounds.height;
 			}
+			bounds = this.getBounds(this);
+			this.explicitWidth = bounds.width;
+			this.explicitHeight = bounds.height;
 			super.measure();
 		}
 		
@@ -409,8 +412,9 @@ package com.greensock.loading.display {
 			_rawContent = value as DisplayObject;
 			if (_rawContent == null) {
 				return;
+			} else if (_rawContent.parent == null || (_rawContent.parent != this && _rawContent.parent != _cropContainer)) {
+				addChildAt(_rawContent as DisplayObject, 0);
 			}
-			addChildAt(_rawContent as DisplayObject, 0);
 			_update();
 		}
 		
