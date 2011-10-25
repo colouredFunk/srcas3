@@ -71,7 +71,7 @@ HotkeyButton
 						throw new Error("找不到 keyCodeXML："+__keyCode);
 					}
 					
-					toolTip="快捷键："+(__ctrlKey?"Ctrl + ":"")+(__shiftKey?"Shift + ":"")+(__altKey?"Alt + ":"")+(Keyboard["KEYNAME_"+keyCodeXML.@name.toString()]||String.fromCharCode(__keyCode));
+					toolTip="快捷键："+(__ctrlKey?"Ctrl + ":"")+(__shiftKey?"Shift + ":"")+(__altKey?"Alt + ":"")+(Keyboard["KEYNAME_"+keyCodeXML.@name.toString()]||String.fromCharCode(__keyCode).replace(/\s+/g,"")||(keyCodeXML.@name.toString().toUpperCase().charAt(0)+keyCodeXML.@name.toString().toLowerCase().substr(1)));
 				}
 			}
 			
@@ -90,6 +90,7 @@ HotkeyButton
 						if(event.keyCode==__keyCode){
 							dispatchEvent(new FlexEvent(FlexEvent.BUTTON_DOWN));
 							dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+							//stage.focus=this;
 						}
 					}
 				}
