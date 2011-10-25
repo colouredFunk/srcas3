@@ -32,7 +32,7 @@ package zero.ui{
 			rect2=new Sprite();
 			this.addChild(rect2);
 			rect2.graphics.clear();
-			rect2.graphics.beginFill(0x00ff00,0.2);
+			rect2.graphics.beginFill(0x00ff00,0.05);
 			rect2.graphics.drawRect(0,0,100,100);
 			rect2.graphics.endFill();
 			rect2.mouseEnabled=rect2.mouseChildren=false;
@@ -40,7 +40,7 @@ package zero.ui{
 			rect1=new Sprite();
 			this.addChild(rect1);
 			rect1.graphics.clear();
-			rect1.graphics.beginFill(0xff0000,0.1);
+			rect1.graphics.beginFill(0xff0000,0.05);
 			rect1.graphics.drawRect(0,0,100,100);
 			rect1.graphics.endFill();
 			rect1.mouseEnabled=rect1.mouseChildren=false;
