@@ -108,6 +108,7 @@ package akdcl.manager {
 				_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onLoaderCompleteOrErrorHandler);
 				_loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onLoaderCompleteOrErrorHandler);
 				loaderDic[_url] = _loader;
+				_loader.params = args;
 			}
 			//
 			_loader.addEvents(_onProgressHandler, _onErrorHandler, _onCompleteHandler);
@@ -171,9 +172,10 @@ package akdcl.manager {
 				_loader.addEventListener(IOErrorEvent.IO_ERROR, onURLLoaderCompleteOrErrorHandler);
 				_loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onURLLoaderCompleteOrErrorHandler);
 				urlLoaderDic[_url] = _loader;
+				_loader.dataFormat = dataFormat;
+				_loader.params = args;
 			}
 			//
-			_loader.dataFormat = dataFormat;
 			_loader.addEvents(_onProgressHandler, _onErrorHandler, _onCompleteHandler);
 			_loader.load(request);
 		}
@@ -290,6 +292,8 @@ import akdcl.manager.RequestManager;
 
 class RequestLoader extends Loader {
 	public var url:String;
+	public var params:Array;
+	
 	private var errorHandlers:Dictionary;
 	private var progressHandlers:Dictionary;
 	private var completeHandlers:Dictionary;
@@ -321,6 +325,7 @@ class RequestLoader extends Loader {
 			return false;
 		}
 		url = null;
+		params = null;
 		unload();
 		unloadAndStop();
 		return true;
@@ -363,7 +368,7 @@ class RequestLoader extends Loader {
 					_onError(_evt, url);
 					break;
 				case 3:
-					_onError(_evt, url, this);
+					_onError(_evt, url, params);
 					break;
 				case 1:
 				default:
@@ -388,6 +393,9 @@ class RequestLoader extends Loader {
 				case 2:
 					_onComplete(_content, url);
 					break;
+				case 3:
+					_onComplete(_content, url, params);
+					break;
 				case 1:
 				default:
 					_onComplete(_content);
@@ -399,6 +407,8 @@ class RequestLoader extends Loader {
 
 class RequestURLLoader extends URLLoader {
 	public var url:String;
+	public var params:Array;
+	
 	private var errorHandlers:Dictionary;
 	private var progressHandlers:Dictionary;
 	private var completeHandlers:Dictionary;
@@ -430,7 +440,6 @@ class RequestURLLoader extends URLLoader {
 	}
 
 	public function clear():void {
-		url = null;
 		var _fun:Function;
 		for each (_fun in errorHandlers){
 			delete errorHandlers[_fun];
@@ -442,6 +451,8 @@ class RequestURLLoader extends URLLoader {
 		for each (_fun in completeHandlers){
 			delete completeHandlers[_fun];
 		}
+		url = null;
+		params = null;
 		data = null;
 		dataFormat = null;
 	}
@@ -517,7 +528,7 @@ class RequestURLLoader extends URLLoader {
 					_onError(_evt, url);
 					break;
 				case 3:
-					_onError(_evt, url, this);
+					_onError(_evt, url, params);
 					break;
 				case 1:
 				default:
@@ -538,7 +549,7 @@ class RequestURLLoader extends URLLoader {
 					_onComplete(_data, url);
 					break;
 				case 3:
-					_onComplete(_data, url, this);
+					_onComplete(_data, url, params);
 					break;
 				case 1:
 				default:
