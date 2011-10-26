@@ -53,10 +53,10 @@
 		 * @param graphics The Graphics instance to draw the vector on.
 		 * @param color The color of the line used to represent the vector.
 		 */
-		public function draw(graphics:Graphics, color:uint = 0):void {
-			graphics.lineStyle(0, color);
-			graphics.moveTo(0, 0);
-			graphics.lineTo(x, y);
+		public function draw(_graphics:Graphics, color:uint = 0):void {
+			_graphics.lineStyle(0, color);
+			_graphics.moveTo(0, 0);
+			_graphics.lineTo(x, y);
 		}
 
 		public function copy(_v2:Vector2D):Vector2D {
@@ -193,7 +193,9 @@
 		 * @return Vector2D A new vector containing the results of the multiplication.
 		 */
 		public function multiply(value:Number):Vector2D {
-			return new Vector2D(x * value, y * value);
+			x *= value;
+			y *= value;
+			return this;
 		}
 
 		/**
@@ -202,7 +204,9 @@
 		 * @return Vector2D A new vector containing the results of the division.
 		 */
 		public function divide(value:Number):Vector2D {
-			return new Vector2D(x / value, y / value);
+			x /= value;
+			y /= value;
+			return this;
 		}
 	}
 }

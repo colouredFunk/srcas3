@@ -11,26 +11,26 @@
 
 	import flash.system.Security;
 	import flash.system.System;
-	
+
 	import akdcl.utils.addContextMenu;
-	
+
 	import akdcl.manager.ExternalInterfaceManager;
 	import akdcl.manager.RequestManager;
 
 	public class DocClass extends MovieClip {
-		protected static var instanceMap:Object = { };
+		protected static var instanceMap:Object = {};
 
 		public static function getInstance(_key:String = "main"):DocClass {
 			var _instance:DocClass;
 			_instance = instanceMap[_key];
 			return _instance;
 		}
-		
-		public function DocClass(_key:String = "main") {
+
+		public function DocClass(_key:String = "main"){
 			stop();
 			/*if (instanceMap[_key] != null){
-				throw new Error("ERROR:DocClass Singleton already constructed!");
-			}*/
+			   throw new Error("ERROR:DocClass Singleton already constructed!");
+			 }*/
 			instanceMap[_key] = this;
 			loaderInfo.addEventListener(Event.INIT, onInitHandler);
 		}
@@ -39,7 +39,7 @@
 		public var optionsXML:XML;
 		public var onLoading:Function;
 		public var onLoaded:Function;
-		
+
 		public var eiM:ExternalInterfaceManager;
 		public var rM:RequestManager;
 
@@ -52,6 +52,7 @@
 		private var isLoadComplete:Boolean;
 
 		private var __flashVars:Object;
+
 		public function set flashVars(_flashVars:Object):void {
 			if (loaderInfo.parameters && __flashVars){
 				return;
@@ -72,11 +73,12 @@
 				stage.showDefaultContextMenu = false;
 			}
 			tabChildren = false;
-			
+
 			rM = RequestManager.getInstance();
 			eiM = ExternalInterfaceManager.getInstance();
 			eiM.objectID = flashVars.__objectID;
-			
+			eiM.addEventListener(ExternalInterfaceManager.CALL, onJSInterfaceHandler);
+
 			if (onLoaded == null){
 				onLoaded = function():void {
 					if (currentFrame == 1){
@@ -85,12 +87,27 @@
 				}
 			}
 			optionsXMLPath = flashVars.xml || optionsXMLPath;
-			if (optionsXMLPath) {
+			if (optionsXMLPath){
 				rM.load(optionsXMLPath, onXMLLoadedHandler, onXMLErrorHandler, onXMLLoadingHandler);
 			}
 			addEventListener(Event.ENTER_FRAME, onLoadingHandler);
-			
+
 			eiM.dispatchSWFEvent("load");
+		}
+
+		protected function onJSInterfaceHandler(_e:Event):void {
+			if (eiM.eventType=="jsRequest") {
+				rM.load(eiM.eventParams[0], onJSRequestHandler, onJSRequestHandler, null, eiM.eventParams[1]);
+			}
+		}
+		
+		protected function onJSRequestHandler(_dataOrEvent:*, _url:String, _params:Array):void {
+			if (_dataOrEvent is IOErrorEvent) {
+				eiM.dispatchSWFEvent("jsRequestError",_params[0]);
+			}else {
+				eiM.callInterface(_params[0], _dataOrEvent);
+				eiM.dispatchSWFEvent("jsRequestComplete", _params[0], _dataOrEvent);
+			}
 		}
 
 		protected function onLoadingHandler(_evt:*):void {
@@ -101,8 +118,8 @@
 				onLoadedHandler();
 			}
 			onLoadingStepFix(_loaded);
-			if (onLoading != null) {
-				switch(onLoading.length) {
+			if (onLoading != null){
+				switch (onLoading.length){
 					case 0:
 						onLoading();
 						break;
@@ -114,7 +131,7 @@
 			}
 			if (loadProgress == 1 && onLoaded != null){
 				removeEventListener(Event.ENTER_FRAME, onLoadingHandler);
-				switch(onLoaded.length) {
+				switch (onLoaded.length){
 					case 0:
 						onLoaded();
 						break;
@@ -125,21 +142,14 @@
 				}
 			}
 		}
+
 		protected function onLoadedHandler():void {
 			AuthorInformation.setFileBytes(loaderInfo.bytes);
-			
-			addContextMenu(
-				this, 
-				"Size: " + loaderInfo.width + " X " + loaderInfo.height,
-				onSizeMenuHandler
-			);
-			
-			addContextMenu(
-				this, 
-				AuthorInformation.getVersion(),
-				onVersionMenuHandler
-			);
-			
+
+			addContextMenu(this, "Size: " + loaderInfo.width + " X " + loaderInfo.height, onSizeMenuHandler);
+
+			addContextMenu(this, AuthorInformation.getVersion(), onVersionMenuHandler);
+
 			eiM.dispatchSWFEvent("loadComplete");
 		}
 
@@ -148,7 +158,7 @@
 				_loaded = _loaded * (1 - optionsXMLPerLoad) + xmlLoadProgress * optionsXMLPerLoad;
 			}
 			var _dV:Number = _loaded - loadProgress;
-			if (_dV > 0.01) {
+			if (_dV > 0.01){
 				loadProgress += _dV * loadDelay;
 			} else {
 				loadProgress = _loaded;
@@ -161,27 +171,27 @@
 
 		protected function onXMLLoadedHandler(_xml:XML, _url:String):void {
 			var _str:String = "ERROR:XML语法错误!\n" + _url;
-			if (_xml) {
+			if (_xml){
 				optionsXML = _xml;
 				xmlLoadProgress = 1;
 				optionsXMLPath = _url;
-			}else if (eiM.isAvailable) {
+			} else if (eiM.isAvailable){
 				eiM.debugMessage(_str);
-			}else {
+			} else {
 				throw new Error(_str);
 			}
 		}
 
 		protected function onXMLErrorHandler(_evt:IOErrorEvent, _url:String):void {
 			var _str:String;
-			if (_evt is IOErrorEvent) {
+			if (_evt is IOErrorEvent){
 				_str = "ERROR:读取XML失败，请检查XML地址是否正确!\n" + _url;
-			}else {
+			} else {
 				_str = "ERROR:安全沙箱冲突，无法跨域读取XML!\n" + _url;
 			}
-			if (eiM.isAvailable) {
+			if (eiM.isAvailable){
 				eiM.debugMessage(_str);
-			}else {
+			} else {
 				throw new Error(_str);
 			}
 		}
