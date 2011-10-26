@@ -72,7 +72,7 @@ package akdcl.net.action {
 		public static var TIP_ERROR_MOST_CHAR:String = "×至多仅能输入${" + A_LEAST + "}位字符";
 
 		public static var TIP_REQUIRED_COMPLETE:String = "√";
-		public static var TIP_REQUIRED:String = "☜";
+		public static var TIP_REQUIRED:String = "*";
 		
 		protected static var rM:RequestManager = RequestManager.getInstance();
 		
@@ -101,6 +101,9 @@ package akdcl.net.action {
 		protected var __data:*;
 		public function get data():*{
 			return __data;
+		}
+		public function set data(_data:*):void{
+			
 		}
 		
 		public function get orgData():* {
@@ -442,7 +445,7 @@ package akdcl.net.action {
 
 		protected function formatString(_str:String):String {
 			for each (var _eachAtt:XML in options.attributes()){
-				_str = RemoteAction.replaceValue(_str, _eachAtt.name(), _eachAtt);
+				_str = RemoteAction.replaceValue(_str, _eachAtt.name(), _eachAtt).replace(/：/g,"");
 			}
 			return _str;
 		}

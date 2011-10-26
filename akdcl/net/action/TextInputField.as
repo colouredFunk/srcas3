@@ -16,6 +16,10 @@ package akdcl.net.action {
 		override public function get data():* {
 			return stringToBoolean(view.text) ? view.text : VALUE_UNINPUT;
 		}
+		
+		override public function set data(_data:*):void{
+			view.text=_data;
+		}
 
 		override public function clear():void {
 			view.text = "";
