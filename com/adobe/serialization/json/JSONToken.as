@@ -32,6 +32,9 @@
 
 package com.adobe.serialization.json {
 
+	/**
+	 * @private
+	 */	
 	public class JSONToken {
 	
 		private var _type:int;

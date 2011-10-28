@@ -35,6 +35,7 @@ package com.adobe.crypto {
 	import flash.utils.Endian;
 	import flash.utils.describeType;
 	/**
+	 * @private
 	 * Keyed-Hashing for Message Authentication
 	 * Implementation based on algorithm description at 
 	 * http://www.faqs.org/rfcs/rfc2104.html
@@ -81,7 +82,7 @@ package com.adobe.crypto {
 			var endian:String = Endian.BIG_ENDIAN;
 			
 			if(algorithm == null){
-				algorithm = MD5;
+				algorithm = SHA1;
 			}
 			
 			if ( describeType(algorithm).@name.toString() == "com.adobe.crypto::MD5" ) {
