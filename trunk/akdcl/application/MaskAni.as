@@ -12,7 +12,7 @@
 	 */
 	public class MaskAni extends UIMovieClip
 	{
-		public static var maskAniLayer:DisplayObjectContainer;
+		public var maskAniLayer:DisplayObjectContainer;
 		public var speed:uint = 1;
 		public var delay:uint = 0;
 		public var onUpdate:Function;

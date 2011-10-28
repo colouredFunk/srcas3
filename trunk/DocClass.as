@@ -103,7 +103,8 @@
 		
 		protected function onJSRequestHandler(_dataOrEvent:*, _url:String, _params:Array):void {
 			if (_dataOrEvent is IOErrorEvent) {
-				eiM.dispatchSWFEvent("jsRequestError",_params[0]);
+				eiM.callInterface(_params[0]);
+				eiM.dispatchSWFEvent("jsRequestError", _params[0], "jsRequestError");
 			}else {
 				eiM.callInterface(_params[0], _dataOrEvent);
 				eiM.dispatchSWFEvent("jsRequestComplete", _params[0], _dataOrEvent);
