@@ -33,6 +33,7 @@
 package com.adobe.serialization.json {
 
 	/**
+	 * @private
 	 * Class containing constant values for the different types
 	 * of tokens in a JSON encoded string.
 	 */
@@ -61,8 +62,6 @@ package com.adobe.serialization.json {
 		public static const STRING:int = 10;
 		
 		public static const NUMBER:int = 11;
-		
-		public static const NAN:int = 12;
 		
 	}
 	

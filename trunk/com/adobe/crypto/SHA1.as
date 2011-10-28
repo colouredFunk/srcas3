@@ -28,15 +28,21 @@
   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  Modified 2010-01-07
+  Removed Base64Encode
+  Change the result of hashBytes.
 */
 
 package com.adobe.crypto
 {
 	import com.adobe.utils.IntUtil;
+	import com.dynamicflash.util.Base64;
+	
 	import flash.utils.ByteArray;
-	import mx.utils.Base64Encoder;
 	
 	/**
+	 * @private
 	 *  US Secure Hash Algorithm 1 (SHA1)
 	 *
 	 *  Implementation based on algorithm description at 
@@ -61,10 +67,10 @@ package com.adobe.crypto
 			var byteArray:ByteArray = hashBlocks( blocks );
 			
 			return IntUtil.toHex( byteArray.readInt(), true )
-					+ IntUtil.toHex( byteArray.readInt(), true )
-					+ IntUtil.toHex( byteArray.readInt(), true )
-					+ IntUtil.toHex( byteArray.readInt(), true )
-					+ IntUtil.toHex( byteArray.readInt(), true );
+				+ IntUtil.toHex( byteArray.readInt(), true )
+				+ IntUtil.toHex( byteArray.readInt(), true )
+				+ IntUtil.toHex( byteArray.readInt(), true )
+				+ IntUtil.toHex( byteArray.readInt(), true );
 		}
 		
 		/**
@@ -80,11 +86,16 @@ package com.adobe.crypto
 			var blocks:Array = SHA1.createBlocksFromByteArray( data );
 			var byteArray:ByteArray = hashBlocks(blocks);
 			
-			return IntUtil.toHex( byteArray.readInt(), true )
-					+ IntUtil.toHex( byteArray.readInt(), true )
-					+ IntUtil.toHex( byteArray.readInt(), true )
-					+ IntUtil.toHex( byteArray.readInt(), true )
-					+ IntUtil.toHex( byteArray.readInt(), true );
+			var charsInByteArray:String = "";
+			byteArray.position = 0;
+			for (var j:int = 0; j < byteArray.length; j++)
+			{
+				var byte:uint = byteArray.readUnsignedByte();
+				charsInByteArray += String.fromCharCode(byte);
+			}
+			
+			
+			return charsInByteArray;
 		}
 		
 		/**
@@ -114,9 +125,8 @@ package com.adobe.crypto
 				charsInByteArray += String.fromCharCode(byte);
 			}
 
-			var encoder:Base64Encoder = new Base64Encoder();
-			encoder.encode(charsInByteArray);
-			return encoder.flush();
+			
+			return Base64.encode(charsInByteArray);
 		}
 		
 		private static function hashBlocks( blocks:Array ):ByteArray
@@ -130,7 +140,6 @@ package com.adobe.crypto
 			
 			var len:int = blocks.length;
 			var w:Array = new Array( 80 );
-			var temp:int;
 			
 			// loop over all of the blocks
 			for ( var i:int = 0; i < len; i += 16 ) {
@@ -143,69 +152,24 @@ package com.adobe.crypto
 				var e:int = h4;
 				
 				// 80 steps to process each block
-				var t:int;
-				for ( t = 0; t < 20; t++ ) {
+				// TODO: unroll for faster execution, or 4 loops of
+				// 20 each to avoid the k and f function calls
+				for ( var t:int = 0; t < 80; t++ ) {
 					
 					if ( t < 16 ) {
 						// 6.1.a
 						w[ t ] = blocks[ i + t ];
 					} else {
 						// 6.1.b
-						temp = w[ t - 3 ] ^ w[ t - 8 ] ^ w[ t - 14 ] ^ w[ t - 16 ];
-						w[ t ] = ( temp << 1 ) | ( temp >>> 31 )
+						w[ t ] = IntUtil.rol( w[ t - 3 ] ^ w[ t - 8 ] ^ w[ t - 14 ] ^ w[ t - 16 ], 1 );
 					}
-
-					// 6.1.d
-					temp = ( ( a << 5 ) | ( a >>> 27 ) ) + ( ( b & c ) | ( ~b & d ) ) + e + int( w[ t ] ) + 0x5a827999;
-
-					e = d;
-					d = c;
-					c = ( b << 30 ) | ( b >>> 2 );
-					b = a;
-					a = temp;
-				}
-				for ( ; t < 40; t++ )
-				{
-					// 6.1.b
-					temp = w[ t - 3 ] ^ w[ t - 8 ] ^ w[ t - 14 ] ^ w[ t - 16 ];
-					w[ t ] = ( temp << 1 ) | ( temp >>> 31 )
-
-					// 6.1.d
-					temp = ( ( a << 5 ) | ( a >>> 27 ) ) + ( b ^ c ^ d ) + e + int( w[ t ] ) + 0x6ed9eba1;
-
-					e = d;
-					d = c;
-					c = ( b << 30 ) | ( b >>> 2 );
-					b = a;
-					a = temp;
-				}
-				for ( ; t < 60; t++ )
-				{
-					// 6.1.b
-					temp = w[ t - 3 ] ^ w[ t - 8 ] ^ w[ t - 14 ] ^ w[ t - 16 ];
-					w[ t ] = ( temp << 1 ) | ( temp >>> 31 )
 					
 					// 6.1.d
-					temp = ( ( a << 5 ) | ( a >>> 27 ) ) + ( ( b & c ) | ( b & d ) | ( c & d ) ) + e + int( w[ t ] ) + 0x8f1bbcdc;
+					var temp:int = IntUtil.rol( a, 5 ) + f( t, b, c, d ) + e + int( w[ t ] ) + k( t );
 					
 					e = d;
 					d = c;
-					c = ( b << 30 ) | ( b >>> 2 );
-					b = a;
-					a = temp;
-				}
-				for ( ; t < 80; t++ )
-				{
-					// 6.1.b
-					temp = w[ t - 3 ] ^ w[ t - 8 ] ^ w[ t - 14 ] ^ w[ t - 16 ];
-					w[ t ] = ( temp << 1 ) | ( temp >>> 31 )
-
-					// 6.1.d
-					temp = ( ( a << 5 ) | ( a >>> 27 ) ) + ( b ^ c ^ d ) + e + int( w[ t ] ) + 0xca62c1d6;
-
-					e = d;
-					d = c;
-					c = ( b << 30 ) | ( b >>> 2 );
+					c = IntUtil.rol( b, 30 );
 					b = a;
 					a = temp;
 				}
@@ -232,6 +196,34 @@ package com.adobe.crypto
 			return byteArray;
 		}
 
+		/**
+		 *  Performs the logical function based on t
+		 */
+		private static function f( t:int, b:int, c:int, d:int ):int {
+			if ( t < 20 ) {
+				return ( b & c ) | ( ~b & d );
+			} else if ( t < 40 ) {
+				return b ^ c ^ d;
+			} else if ( t < 60 ) {
+				return ( b & c ) | ( b & d ) | ( c & d );
+			}
+			return b ^ c ^ d;
+		}
+		
+		/**
+		 *  Determines the constant value based on t
+		 */
+		private static function k( t:int ):int {
+			if ( t < 20 ) {
+				return 0x5a827999;
+			} else if ( t < 40 ) {
+				return 0x6ed9eba1;
+			} else if ( t < 60 ) {
+				return 0x8f1bbcdc;
+			}
+			return 0xca62c1d6;
+		}
+					
 		/**
 		 *  Converts a ByteArray to a sequence of 16-word blocks
 		 *  that we'll do the processing on.  Appends padding

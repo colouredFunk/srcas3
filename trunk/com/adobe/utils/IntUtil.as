@@ -34,6 +34,7 @@ package com.adobe.utils {
 	import flash.utils.Endian;
 	
 	/**
+	 * @private
 	 * Contains reusable methods for operations pertaining 
 	 * to int values.
 	 */
