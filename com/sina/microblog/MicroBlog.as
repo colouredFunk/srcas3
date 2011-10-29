@@ -1363,7 +1363,7 @@ package com.sina.microblog
 		
 		private function onTokenGot(evt:Event):void
 		{
-			var obj:Object = JSON.decode(evt.target.data);
+			var obj:Object = com.adobe.serialization.json.JSON.decode(evt.target.data);
 			if (int(obj.status) == 1) {
 				_anywhereToken = obj.anywhereToken;
 				dispatchEvent(new MicroBlogEvent(MicroBlogEvent.LOGIN_RESULT));

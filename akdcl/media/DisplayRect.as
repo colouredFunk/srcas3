@@ -417,9 +417,11 @@
 				} else if (_display is Loader){
 					originalWidth = _display.contentLoaderInfo.width;
 					originalHeight = _display.contentLoaderInfo.height;
-				} else if (_display is Video){
-					originalWidth = _display.videoWidth || _display.width / _display.scaleX;
-					originalHeight = _display.videoHeight || _display.height / _display.scaleY;
+				} else if (_display is Video) {
+					//_display.videoWidth
+					//_display.videoHeight
+					originalWidth = _display.width / _display.scaleX;
+					originalHeight = _display.height / _display.scaleY;
 				} else if (_display is DisplayObject){
 					var _rect:Rectangle = _display.getRect(_display);
 					offX = _rect.x;
