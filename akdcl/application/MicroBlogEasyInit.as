@@ -1,12 +1,13 @@
 ﻿package akdcl.application {
 	import flash.display.Stage;
+	import flash.geom.Rectangle;
+	
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
-	import flash.geom.Rectangle;
+	
 	import flash.net.URLRequest;
 	import flash.net.URLRequestMethod;
 	import flash.net.URLLoaderDataFormat;
-	
 	import flash.net.SharedObject;
 	
 	import flash.media.StageWebView;
@@ -36,8 +37,7 @@
 		private static const OAUTH_ACCESS_TOKEN_REQUEST_URL:String = API_BASE_URL + "/oauth/access_token";
 
 		public var microBlog:MicroBlog;
-		public var onLoginComplete:Function;
-		public var onLoginError:Function;
+		public var onLogin:Function;
 		
 		private var shareObject:SharedObject;
 		private var stage:Stage;
@@ -51,8 +51,10 @@
 			return Boolean(microBlog.accessTokenKey && microBlog.accessTokenSecrect);
 		}
 
-		public function MicroBlogEasyInit(_stage:Stage):void {
+		public function MicroBlogEasyInit(_stage:Stage, _appKey:String, _appSecret:String):void {
 			stage = _stage;
+			consumerKey = _appKey;
+			consumerSecret = _appSecret;
 			
 			shareObject = SharedObject.getLocal(SINA_MICRO_BLOG_DATA);
 			
@@ -61,16 +63,12 @@
 			webView.addEventListener(Event.LOCATION_CHANGE, onLocationChange);
 			
 			microBlog = new MicroBlog();
-			microBlog.addEventListener(MicroBlogEvent.VERIFY_CREDENTIALS_RESULT, onVerifyCredentialHandler);
-			microBlog.addEventListener(MicroBlogErrorEvent.VERIFY_CREDENTIALS_ERROR, onVerifyCredentialHandler);
-		}
-		
-		public function setConsumer(_appKey:String, _appSecret:String):void {
-			consumerKey = _appKey;
-			consumerSecret = _appSecret;
 			microBlog.source = consumerKey;
 			microBlog.consumerKey = consumerKey;
 			microBlog.consumerSecret = consumerSecret;
+			microBlog.addEventListener(MicroBlogEvent.VERIFY_CREDENTIALS_RESULT, onVerifyCredentialHandler);
+			microBlog.addEventListener(MicroBlogErrorEvent.VERIFY_CREDENTIALS_ERROR, onVerifyCredentialHandler);
+			
 			var _consumer:Object = shareObject.data[consumerKey];
 			if (_consumer && _consumer.key && _consumer.secret) {
 				microBlog.accessTokenKey = _consumer.key;
@@ -81,39 +79,30 @@
 		public function setAccessToken(_key:String, _secret:String):void {
 			microBlog.accessTokenKey = _key;
 			microBlog.accessTokenSecrect = _secret;
+			updateShareObject();
 		}
 		
 		public function login():void {
-			if (isLogin) {
+			if (microBlog.accessTokenKey && microBlog.accessTokenSecrect) {
 				
 			}else {
 				requestAuthorize(OAUTH_REQUEST_TOKEN_REQUEST_URL);
 			}
 		}
-
-		private function onVerifyCredentialHandler(_e:Event):void {
-			//var user:MicroBlogUser = _e.result as MicroBlogUser;
-			//var str:String = "当前登录用户: " + user.name + "<br/>";
-			//str += "用户id: " + user.id + "<br/>";
-			//str += "最近一条微博: " + user.status.text;
-			//txtInfo.htmlText = str;
-			//microBlog.currentResult.toString();
-			
-			removeWebView();
-			if (_e is MicroBlogEvent) {
-				shareObject.data[consumerKey] = { 
-					key:microBlog.accessTokenKey, 
-					secret:microBlog.accessTokenSecrect
-				};
-				shareObject.flush();
-				if (onLoginComplete != null){
-					onLoginComplete();
-				}
-			}else {
-				if (onLoginError != null){
-					onLoginError();
-				}
-			}
+		
+		public function logout():void {
+			microBlog.accessTokenKey = "";
+			microBlog.accessTokenSecrect = "";
+			delete shareObject.data[consumerKey];
+			//microBlog.logout();
+		}
+		
+		private function updateShareObject():void {
+			shareObject.data[consumerKey] = { 
+				key:microBlog.accessTokenKey, 
+				secret:microBlog.accessTokenSecrect
+			};
+			shareObject.flush();
 		}
 
 		private function requestAuthorize(_url:String):void {
@@ -169,8 +158,8 @@
 		private function onOauthLoaderHandler(_dataOrEvent:*):void {
 			if (_dataOrEvent is IOErrorEvent) {
 				removeWebView();
-				if (onLoginError != null){
-					onLoginError();
+				if (onLogin != null){
+					onLogin(false);
 				}
 			}else if (_dataOrEvent) {
 				microBlog.accessTokenKey = _dataOrEvent.oauth_token;
@@ -183,6 +172,20 @@
 					_url += "&oauth_callback=http://api.t.sina.com.cn/flash/callback.htm";
 					webView.stage = stage;
 					webView.loadURL(_url);
+				}
+			}
+		}
+
+		private function onVerifyCredentialHandler(_e:Event):void {
+			removeWebView();
+			if (_e is MicroBlogEvent) {
+				updateShareObject();
+				if (onLogin != null){
+					onLogin(true);
+				}
+			}else {
+				if (onLogin != null){
+					onLogin(false);
 				}
 			}
 		}
@@ -200,6 +203,8 @@
 			
 			if (pin) {
 				requestAuthorize(OAUTH_ACCESS_TOKEN_REQUEST_URL);
+			}else if (onLogin != null){
+				onLogin(false);
 			}
 		}
 		
@@ -210,5 +215,4 @@
 			}
 		}
 	}
-
 }
