@@ -23,7 +23,7 @@ package akdcl.media {
 		override protected function init():void {
 			super.init();
 			camera = Camera.getCamera();
-			if (camera){
+			if (camera) {
 				playContent = new Video(camera.width, camera.height);
 				playContent.smoothing = true;
 			}
@@ -74,6 +74,13 @@ package akdcl.media {
 				playContent.attachCamera(null);
 				playContent.clear();
 			}
+		}
+		
+		public function setCameraMode(_width:int, _height:int):void 
+		{
+			camera.setMode(_width, _height, camera.fps);
+			//playContent.width = camera.width;
+			//playContent.height = camera.height;
 		}
 
 		private function onCameraHandler(_evt:* = null):void {

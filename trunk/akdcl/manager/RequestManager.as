@@ -222,7 +222,7 @@ package akdcl.manager {
 							request.data = _formVars.data;
 							break;
 						case DATAFORMAT_JSON:
-							request.data = JSON.encode(_url.data);
+							request.data = com.adobe.serialization.json.JSON.encode(_url.data);
 							break;
 						case RequestManager.DATAFORMAT_AMF3:
 							var _bytes:ByteArray = new ByteArray();
@@ -469,7 +469,7 @@ class RequestURLLoader extends URLLoader {
 				try {
 					//去掉json不支持的字符串
 					var _dataFotmat:String = data.replace(/[\x00-\x1f]/g, "");
-					return JSON.decode(_dataFotmat);
+					return com.adobe.serialization.json.JSON.decode(_dataFotmat);
 				} catch (_e:*){
 				}
 				return null;

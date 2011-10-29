@@ -1,4 +1,4 @@
-package akdcl.utils {
+﻿package akdcl.utils {
 	import com.adobe.serialization.json.JSON;
 	import akdcl.utils.replaceString;
 	import flash.utils.Dictionary;
@@ -16,11 +16,11 @@ package akdcl.utils {
 				case Object:
 				case Dictionary:
 				case Array:
-					_eachStr = replaceString(JSON.encode(_obj),",{",",\n{");
+					_eachStr = replaceString(com.adobe.serialization.json.JSON.encode(_obj),",{",",\n{");
 					break;
 				default:
 					if (_obj is Vector.<*>) {
-						_eachStr = replaceString(JSON.encode(_obj),",{",",\n{")+"\n"+_obj;
+						_eachStr = replaceString(com.adobe.serialization.json.JSON.encode(_obj),",{",",\n{")+"\n"+_obj;
 					}else {
 						_eachStr = _obj + "\n";
 					}
