@@ -15,7 +15,7 @@
 	public class MicroBlogQQ extends PlatformAPI {
 
 		private var doOauth:DoOauth;
-		private var doBroadcast:DoBroadcast;
+		public var doBroadcast:DoBroadcast;
 		
 		override public function get authorized():Boolean {
 			return Oauth.currentAccountKey != null;
@@ -89,6 +89,9 @@
 					//
 					removeWebView(true);
 					updateShareObject();
+					if (onLogin!=null) {
+						onLogin();
+					}
 					break;
 				default :
 					trace(_type,_data);
