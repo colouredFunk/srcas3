@@ -8,8 +8,6 @@ package com.core.microBlogs.standard
 {
 	import com.util.http.HttpConnection;
 	import com.util.http.HttpEvent;
-	
-	import com.adobe.serialization.json.JSON;
 
 	/**
 	 * Microblogs api - DoAPI
@@ -54,17 +52,6 @@ package com.core.microBlogs.standard
 		}
 		private function initEvents():void{
 			_httpConn.addEventListener(HttpEvent.onHttpError, onHttpErrorHandler);
-		}
-		
-		protected function executeResponse(format:String, data:String):Object{
-			//json
-			var params:Object;
-			if(format == "json")
-				params = com.adobe.serialization.json.JSON.decode(data);
-				//xml
-			else if(format == "xml")
-				params = new XML(data);
-			return params;
 		}
 	}
 }

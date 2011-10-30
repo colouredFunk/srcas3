@@ -15,6 +15,8 @@ package com.core.microBlogs.qq.api.tag
 	
 	import flash.net.URLRequestMethod;
 	
+	import com.adobe.serialization.json.JSON;
+	
 	/**
 	 * Microblogs api - DoTag
 	 * ---
@@ -106,6 +108,18 @@ package com.core.microBlogs.qq.api.tag
 		private function onHttpDataHandler(cmd:String, params:Object):void{
 			
 			_dataHandler(cmd, params);
+		}
+		
+		private function executeResponse(format:String, data:String):Object
+		{
+			//json
+			var params:Object;
+			if(format == "json")
+				params = com.adobe.serialization.json.JSON.decode(data);
+				//xml
+			else if(format == "xml")
+				params = new XML(data);
+			return params;
 		}
 	}
 }
