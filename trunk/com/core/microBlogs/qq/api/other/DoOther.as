@@ -13,6 +13,8 @@ package com.core.microBlogs.qq.api.other
 	import com.util.http.HttpEvent;
 	import com.util.http.HttpParameter;
 	
+	import com.adobe.serialization.json.JSON;
+	
 	/**
 	 * Microblogs api - DoOther
 	 * ---
@@ -77,6 +79,18 @@ package com.core.microBlogs.qq.api.other
 		private function onHttpDataHandler(cmd:String, params:Object):void{
 			
 			_dataHandler(cmd, params);
+		}
+		
+		private function executeResponse(format:String, data:String):Object
+		{
+			//json
+			var params:Object;
+			if(format == "json")
+				params = com.adobe.serialization.json.JSON.decode(data);
+				//xml
+			else if(format == "xml")
+				params = new XML(data);
+			return params;
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 
  * QQ微博:http://t.qq.com/maoyexing
  * e-mail:maoyexing@gmail.com
@@ -17,6 +17,8 @@ package com.core.microBlogs.qq.api.oauth
 	import flash.net.URLRequest;
 	import flash.net.navigateToURL;
 	
+	import com.adobe.serialization.json.JSON;
+	
 	/**
 	 * Microblogs api - DoOauth
 	 * 
@@ -31,15 +33,15 @@ package com.core.microBlogs.qq.api.oauth
 		/**
 		 * 获取request_token URL
 		 * */
-		public const REQUEST_TOKEN_URL:String = "https://open.t.qq.com/cgi-bin/request_token";
+		public static const REQUEST_TOKEN_URL:String = "https://open.t.qq.com/cgi-bin/request_token";
 		/**
 		 * 用户授权request_token URL
 		 * */
-		public const OAUTH_TOKEN_URL:String = "http://open.t.qq.com/cgi-bin/authorize";
+		public static const OAUTH_TOKEN_URL:String = "http://open.t.qq.com/cgi-bin/authorize";
 		/**
 		 * 交换access_token URL
 		 * */
-		public const ACCESS_TOKEN_URL:String = "https://open.t.qq.com/cgi-bin/access_token";
+		public static const ACCESS_TOKEN_URL:String = "https://open.t.qq.com/cgi-bin/access_token";
 		
 		
 		/**
@@ -141,6 +143,18 @@ package com.core.microBlogs.qq.api.oauth
 				}
 			}
 			_dataHandler(cmd, params);
+		}
+		
+		private function executeResponse(cmd:String, data:String):Object
+		{
+			var params:Object = {};
+			var datas:Array = data.split("&");
+			for(var i:int = 0; i < datas.length; i++){
+				var key:String = datas[i].split("=")[0];
+				var value:String = datas[i].split("=")[1];
+				params[key] = value;
+			}
+			return params;
 		}
 	}
 }
