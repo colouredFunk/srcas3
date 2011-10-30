@@ -28,7 +28,7 @@
 	 * ...
 	 * @author akdcl
 	 */
-	public class MicroBlogEasyInit {
+	public class MicroBlogSina {
 		public static const SINA_MICRO_BLOG_DATA:String = "sinaMicroBlogData";
 		
 		private static const API_BASE_URL:String = "http://api.t.sina.com.cn";
@@ -37,7 +37,6 @@
 		private static const OAUTH_ACCESS_TOKEN_REQUEST_URL:String = API_BASE_URL + "/oauth/access_token";
 
 		public var microBlog:MicroBlog;
-		public var onLogin:Function;
 		
 		private var shareObject:SharedObject;
 		private var stage:Stage;
@@ -47,11 +46,11 @@
 		private var consumerSecret:String = "00000000000000000000000000000000";
 		private var pin:String = "";
 		
-		public function get isLogin():Boolean {
+		public function get authorized():Boolean {
 			return Boolean(microBlog.accessTokenKey && microBlog.accessTokenSecrect);
 		}
 
-		public function MicroBlogEasyInit(_stage:Stage, _appKey:String, _appSecret:String):void {
+		public function MicroBlogSina(_stage:Stage, _appKey:String, _appSecret:String):void {
 			stage = _stage;
 			consumerKey = _appKey;
 			consumerSecret = _appSecret;
@@ -69,6 +68,8 @@
 			microBlog.addEventListener(MicroBlogEvent.VERIFY_CREDENTIALS_RESULT, onVerifyCredentialHandler);
 			microBlog.addEventListener(MicroBlogErrorEvent.VERIFY_CREDENTIALS_ERROR, onVerifyCredentialHandler);
 			
+			logout();
+			
 			var _consumer:Object = shareObject.data[consumerKey];
 			if (_consumer && _consumer.key && _consumer.secret) {
 				microBlog.accessTokenKey = _consumer.key;
@@ -83,7 +84,7 @@
 		}
 		
 		public function login():void {
-			if (microBlog.accessTokenKey && microBlog.accessTokenSecrect) {
+			if (authorized) {
 				
 			}else {
 				requestAuthorize(OAUTH_REQUEST_TOKEN_REQUEST_URL);
@@ -94,6 +95,7 @@
 			microBlog.accessTokenKey = "";
 			microBlog.accessTokenSecrect = "";
 			delete shareObject.data[consumerKey];
+			shareObject.flush();
 			//microBlog.logout();
 		}
 		
@@ -158,9 +160,6 @@
 		private function onOauthLoaderHandler(_dataOrEvent:*):void {
 			if (_dataOrEvent is IOErrorEvent) {
 				removeWebView();
-				if (onLogin != null){
-					onLogin(false);
-				}
 			}else if (_dataOrEvent) {
 				microBlog.accessTokenKey = _dataOrEvent.oauth_token;
 				microBlog.accessTokenSecrect = _dataOrEvent.oauth_token_secret;
@@ -180,13 +179,7 @@
 			removeWebView();
 			if (_e is MicroBlogEvent) {
 				updateShareObject();
-				if (onLogin != null){
-					onLogin(true);
-				}
 			}else {
-				if (onLogin != null){
-					onLogin(false);
-				}
 			}
 		}
 
@@ -203,8 +196,6 @@
 			
 			if (pin) {
 				requestAuthorize(OAUTH_ACCESS_TOKEN_REQUEST_URL);
-			}else if (onLogin != null){
-				onLogin(false);
 			}
 		}
 		
