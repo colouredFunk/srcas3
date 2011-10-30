@@ -1,4 +1,4 @@
-package com.sina.microblog
+﻿package com.sina.microblog
 {
 	import com.adobe.crypto.HMAC;
 	import com.adobe.crypto.SHA1;
