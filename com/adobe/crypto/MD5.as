@@ -33,7 +33,6 @@
 package com.adobe.crypto {
 	
 	import com.adobe.utils.IntUtil;
-	
 	import flash.utils.ByteArray;	
 	/**
 	 * The MD5 Message-Digest Algorithm
@@ -58,19 +57,14 @@ package com.adobe.crypto {
 			//Convert to byteArray and send through hashBinary function
 			// so as to only have complex code in one location
 			var ba:ByteArray = new ByteArray();
-			ba.writeUTFBytes(s);
+			ba.writeUTFBytes(s);	
 			return hashBinary(ba);
 		}
 		
 		public static function hashBytes(s:ByteArray) :String{	
 			return hashBinary(s);
 		}
-		public static function hashStr(s:String):String {
-			var ba:ByteArray = new ByteArray();
-			ba.writeUTFBytes(s);
-			hashBinary(ba);
-			return binl2str(binForStr);
-		}
+		
 		/**
 		 * Performs the MD5 hash algorithm on a ByteArray.
 		 *
@@ -190,7 +184,6 @@ package com.adobe.crypto {
 			digest.writeInt(c);
 			digest.writeInt(d);
 			digest.position = 0;
-			binForStr = [a, b, c, d];
 			// Finish up by concatening the buffers with their hex output
 			return IntUtil.toHex( a ) + IntUtil.toHex( b ) + IntUtil.toHex( c ) + IntUtil.toHex( d );
 		}
@@ -274,7 +267,7 @@ package com.adobe.crypto {
 			var blocks:Array = new Array();
 			var len:int = s.length * 8;
 			var mask:int = 0xFF; // ignore hi byte of characters > 0xFF
-			for ( var i:int = 0; i < len; i += 8 ) {
+			for( var i:int = 0; i < len; i += 8 ) {
 				blocks[ int(i >> 5) ] |= ( s[ i / 8 ] & mask ) << ( i % 32 );
 			}
 			
@@ -283,18 +276,6 @@ package com.adobe.crypto {
 			blocks[ int(( ( ( len + 64 ) >>> 9 ) << 4 ) + 14) ] = len;
 			return blocks;
 		}
-		/*
-		 * Convert an array of little-endian words to a string
-		 */
-		private static var binForStr:Array;
-		private static function binl2str(bin:Array):String{
-			var str:String = "";
-			var mask:uint = 0xFF; // ignore hi byte of characters > 0xFF
-			var len:uint = bin.length * 32;
-			for (var i:uint; i < len; i += 8) {
-				str += String.fromCharCode((bin[i >> 5] >>> (i % 32)) & mask);
-			}
-			return str;
-		}
+		
 	}
 }
