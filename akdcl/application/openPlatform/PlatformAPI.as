@@ -17,6 +17,9 @@ package akdcl.application.openPlatform
 	public class PlatformAPI extends UIEventDispatcher 
 	{
 		public static const PLATFORM_DATA:String = "akdcl/platformData";
+		
+		public var onLogin:Function;
+		
 		protected var shareObject:SharedObject;
 		
 		protected var stage:Stage;

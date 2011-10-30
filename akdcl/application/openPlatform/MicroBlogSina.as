@@ -31,7 +31,7 @@
 		private static const OAUTH_AUTHORIZE_REQUEST_URL:String = API_BASE_URL + "/authorize";
 		private static const OAUTH_ACCESS_TOKEN_REQUEST_URL:String = API_BASE_URL + "/access_token";
 
-		private var microBlog:MicroBlog;
+		public var microBlog:MicroBlog;
 		
 		override public function get authorized():Boolean {
 			return Boolean(accessTokenKey&&accessTokenSecrect);
@@ -136,6 +136,9 @@
 				case MicroBlogEvent.VERIFY_CREDENTIALS_RESULT:
 					removeWebView(true);
 					updateShareObject();
+					if (onLogin!=null) {
+						onLogin();
+					}
 					break;
 				case MicroBlogEvent.UPDATE_STATUS_RESULT:
 					break;
@@ -154,8 +157,8 @@
 		}
 
 		private function onOauthLoaderHandler(_dataOrEvent:*):void {
+			removeWebView();
 			if (_dataOrEvent is IOErrorEvent) {
-				removeWebView();
 			}else if (_dataOrEvent) {
 				accessTokenKey = _dataOrEvent.oauth_token;
 				accessTokenSecrect = _dataOrEvent.oauth_token_secret;
