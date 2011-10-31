@@ -224,11 +224,11 @@ package ui.manager {
 				}else {
 					switch(_method.length) {
 						case 1:
-							_method(_button);
+							_method.apply(_button,[_button]);
 							break;
 						case 0:
 						default:
-							_method();
+							_method.call(_button);
 							break;
 					}
 				}
