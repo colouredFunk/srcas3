@@ -65,7 +65,7 @@ public class JPEGEncoder{
      *  @playerversion AIR 1.1
      *  @productversion Flex 3
      */
-    public function JPEGEncoder(quality:int=50){
+    public function JPEGEncoder(quality:int){
     	var sf:int = 0;
         if (quality < 50.0)
             sf = int(5000 / quality);
@@ -307,7 +307,7 @@ public class JPEGEncoder{
         return CONTENT_TYPE;
     }
 	
-	public static function encode(bitmapData:BitmapData,quality:int):ByteArray{
+	public static function encode(bitmapData:BitmapData,quality:int=80):ByteArray{
 		if (quality <= 0){
 			quality = 1;
 		}else if (quality > 100){
