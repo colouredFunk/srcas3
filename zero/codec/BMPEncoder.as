@@ -6,7 +6,7 @@ BMPEncoder 版本:v1.0
 历次修改:未有修改
 用法举例:这家伙很懒什么都没写
 */
-package zero.encoder{
+package zero.codec{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
