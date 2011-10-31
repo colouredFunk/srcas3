@@ -8,7 +8,7 @@
 	import flash.net.URLVariables;
 	import flash.display.BitmapData;
 
-	import com.JPEGEncoder;
+	import zero.codec.JPEGEncoder;
 
 	import ui.Alert;
 	import ui.UIEventDispatcher;
@@ -59,7 +59,6 @@
 		public static const A_DATA_TYPE:String = "dataType";
 
 		protected static var rM:RequestManager = RequestManager.getInstance();
-		protected static const jpegEncoder:JPEGEncoder = new JPEGEncoder();
 
 		public static function replaceValue(_content:String, _str:String, _rep:String):String {
 			return replaceString(_content, "${" + _str + "}", _rep);
@@ -335,8 +334,7 @@
 							//不包含case节点直接赋值
 							if (_data is BitmapData){
 								//如果数据是BitmapData则格式化为JPEG格式的ByteArray，以后可能扩展成png和gif可选
-								jpegEncoder.setQuality(int(_xml.attribute(A_QUALITY)[0]) || 80);
-								_data = jpegEncoder.encode(_data as BitmapData);
+								_data = JPEGEncoder.encode(_data as BitmapData,int(_xml.attribute(A_QUALITY)[0]) || 80);
 							}
 							_dataFormat = _data;
 						}
