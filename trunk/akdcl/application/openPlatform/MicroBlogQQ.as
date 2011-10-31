@@ -10,7 +10,7 @@
 	import com.core.microBlogs.qq.api.oauth.DoOauth;
 	import com.core.microBlogs.qq.api.broadcast.DoBroadcast;
 	
-	import com.sina.microblog.utils.StringEncoders;
+	import com.util.OauthUrlUtil;
 
 	public class MicroBlogQQ extends PlatformAPI {
 
@@ -77,7 +77,7 @@
 				case DoOauth.CMD_REQUEST_TOKEN:
 					//得到未授权的Request Token
 					var _url:String = DoOauth.OAUTH_TOKEN_URL;
-					_url += "?oauth_token=" + StringEncoders.urlEncodeUtf8String(_data.oauth_token);
+					_url += "?oauth_token=" + OauthUrlUtil.executeString(_data.oauth_token);
 					_url += "&oauth_callback=null";
 					webView.stage = stage;
 					webView.loadURL(_url);
