@@ -3,7 +3,9 @@
 	import com.adobe.crypto.HMAC;
 	import com.adobe.crypto.SHA1;
 	import com.adobe.serialization.json.JSON;
-	import com.dynamicflash.util.Base64;
+	
+	import com.hurlant.util.Base64;
+	
 	import com.sina.microblog.data.MicroBlogComment;
 	import com.sina.microblog.data.MicroBlogCount;
 	import com.sina.microblog.data.MicroBlogDirectMessage;
