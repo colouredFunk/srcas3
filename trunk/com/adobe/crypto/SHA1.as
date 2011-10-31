@@ -1,4 +1,4 @@
-/*
+﻿/*
   Copyright (c) 2008, Adobe Systems Incorporated
   All rights reserved.
 
@@ -37,7 +37,7 @@
 package com.adobe.crypto
 {
 	import com.adobe.utils.IntUtil;
-	import com.dynamicflash.util.Base64;
+	import com.hurlant.util.Base64;
 	
 	import flash.utils.ByteArray;
 	

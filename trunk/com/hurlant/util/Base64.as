@@ -19,6 +19,8 @@ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Modified to fix a string to ByteArray bug.
 */
 package com.hurlant.util {
 
@@ -32,8 +34,18 @@ package com.hurlant.util {
 
 		public static function encode(data:String):String {
 			// Convert string to ByteArray
+			/*
+			Modified to fix a string to ByteArray bug.
 			var bytes:ByteArray = new ByteArray();
 			bytes.writeUTFBytes(data);
+			*/
+			
+			var bytes:ByteArray = new ByteArray();
+			var len:int = data.length;
+			for ( var i:int = 0; i < len; ++i)
+			{
+				bytes.writeByte(data.charCodeAt(i));
+			}
 			
 			// Return encoded ByteArray
 			return encodeByteArray(bytes);
