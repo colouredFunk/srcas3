@@ -10,11 +10,13 @@
 	
 	import com.adobe.crypto.HMAC;
 	import com.adobe.crypto.SHA1;
-	import com.dynamicflash.util.Base64;
+	
+	import com.hurlant.util.Base64;
+	
+	import com.util.OauthUrlUtil;
 
 	import com.sina.microblog.MicroBlog;
 	import com.sina.microblog.utils.GUID;
-	import com.sina.microblog.utils.StringEncoders;
 	import com.sina.microblog.events.MicroBlogErrorEvent;
 	import com.sina.microblog.events.MicroBlogEvent;
 	
@@ -51,6 +53,8 @@
 			microBlog.addEventListener(MicroBlogEvent.UPDATE_STATUS_RESULT, onMicroBlogDataHandler);
 			microBlog.addEventListener(MicroBlogErrorEvent.UPDATE_STATUS_ERROR, onMicroBlogErrorHandler);
 			
+			//logout();
+			
 			updateShareObject();
 		}
 		
@@ -64,50 +68,19 @@
 		override protected function requestAuthorize():void 
 		{
 			super.requestAuthorize();
-			var _data:Object = {};
-			_data.oauth_consumer_key = consumerKey;
-			_data.oauth_signature_method = "HMAC-SHA1";
-			_data.oauth_timestamp = new Date().time.toString().substr(0, 10);
-			_data.oauth_nonce = GUID.createGUID();
-			_data.oauth_version = "1.0";
-
-			if (accessTokenKey){
-				_data.oauth_token = accessTokenKey;
-			}
-			if (pin){
-				_data.oauth_verifier = pin;
-				_data.oauth_callback = "oob";
-			}else {
-				_data.oauth_callback = "http://api.t.sina.com.cn/flash/callback.htm";
-			}
-
-			var _urlObj:Object = {};
-			_urlObj.data = _data;
-			_urlObj.url = pin?OAUTH_ACCESS_TOKEN_REQUEST_URL:OAUTH_REQUEST_TOKEN_REQUEST_URL;
+			var _urlObj:Object = { };
+			_urlObj.url = OauthUrlUtil.getOauthUrl(
+				pin?OAUTH_ACCESS_TOKEN_REQUEST_URL:OAUTH_REQUEST_TOKEN_REQUEST_URL,
+				"GET",
+				consumerKey,
+				consumerSecret,
+				accessTokenKey,
+				accessTokenSecrect,
+				pin,
+				pin?OAUTH_ACCESS_TOKEN_REQUEST_URL:OAUTH_REQUEST_TOKEN_REQUEST_URL,
+				[]
+			);
 			_urlObj.loadFormat = URLLoaderDataFormat.VARIABLES;
-			//
-			var _ary:Array = [];
-			for (var _i:String in _data){
-				if (_data[_i]){
-					_ary.push(_i + "=" + StringEncoders.urlEncodeUtf8String(_data[_i].toString()));
-				}
-			}
-			_ary.sort();
-
-			var _str:String = _ary.join("&");
-			var _msgStr:String = StringEncoders.urlEncodeUtf8String(URLRequestMethod.POST.toUpperCase()) + "&";
-			_msgStr += StringEncoders.urlEncodeUtf8String(_urlObj.url);
-			_msgStr += "&";
-			_msgStr += StringEncoders.urlEncodeUtf8String(_str);
-
-			var _secrectStr:String = consumerSecret + "&";
-			if (pin){
-				_secrectStr += accessTokenSecrect;
-			}
-
-			var _sig:String = Base64.encode(HMAC.hash(_secrectStr, _msgStr, SHA1));
-			//
-			_data.oauth_signature = _sig;
 			
 			RequestManager.getInstance().load(_urlObj, onOauthLoaderHandler, onOauthLoaderHandler);
 		}
@@ -170,7 +143,7 @@
 				} else {
 					//得到未授权的Request Token
 					var _url:String = OAUTH_AUTHORIZE_REQUEST_URL;
-					_url += "?oauth_token=" + StringEncoders.urlEncodeUtf8String(accessTokenKey);
+					_url += "?oauth_token=" + OauthUrlUtil.executeString(accessTokenKey);
 					_url += "&oauth_callback=http://api.t.sina.com.cn/flash/callback.htm";
 					webView.stage = stage;
 					webView.loadURL(_url);

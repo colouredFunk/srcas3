@@ -103,11 +103,11 @@ package akdcl.application.openPlatform
 		
 		protected function removeWebView(_success:Boolean = false):void {
 			if (webView.stage) {
+				webView.stage = null;
 				if (_success) {
 					webView.removeEventListener(Event.LOCATION_CHANGE, onWebViewLocationChangeHandler);
+					webView.dispose();
 				}
-				webView.stage = null;
-				webView.dispose();
 			}
 		}
 	}
