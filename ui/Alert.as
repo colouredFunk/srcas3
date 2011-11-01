@@ -16,8 +16,6 @@
 	//import flash.system.LoaderContext;
 	//import flash.system.ApplicationDomain;
 	
-	import akdcl.utils.destroyObject;
-	
 	public class Alert extends UISprite {
 		public static const A_ALERT:String = "alert";
 		public static const A_LABEL:String = "label";
@@ -57,7 +55,6 @@
 			if (delayCallBack!=null) {
 				delayCallBack.apply(Alert, delayCallBackParams);
 				delayCallBack = null;
-				destroyObject(delayCallBackParams);
 				delayCallBackParams = null;
 			}
 		}*/
@@ -292,7 +289,7 @@
 		}
 		override protected function onRemoveToStageHandler():void {
 			super.onRemoveToStageHandler();
-			destroyObject(btnList);
+			
 			btnList = null;
 			callBack = null;
 			txtTitle = null;

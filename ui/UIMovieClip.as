@@ -20,13 +20,19 @@ package ui {
 		public function get autoRemove():Boolean {
 			return __autoRemove;
 		}
+
 		public function set autoRemove(_autoRemove:Boolean):void {
+
+			if (__autoRemove == _autoRemove){
+				return;
+			}
 			__autoRemove = _autoRemove;
 			if (__autoRemove){
 				addEventListener(Event.REMOVED_FROM_STAGE, onRemoveToStageDelayHandler);
 			} else {
 				removeEventListener(Event.REMOVED_FROM_STAGE, onRemoveToStageDelayHandler);
 			}
+			setChildAutoRemove(__autoRemove);
 		}
 
 		public function UIMovieClip(){
@@ -48,9 +54,9 @@ package ui {
 			if (stage && stage.focus == this){
 				stage.focus = null;
 			}
-			addEventListener(Event.ENTER_FRAME, onRemoveToStageDelayHandler);
-			if (_evt.type == Event.ENTER_FRAME){
-				removeEventListener(Event.ENTER_FRAME, onRemoveToStageDelayHandler);
+			addEventListener(Event.EXIT_FRAME, onRemoveToStageDelayHandler);
+			if (_evt.type == Event.EXIT_FRAME){
+				removeEventListener(Event.EXIT_FRAME, onRemoveToStageDelayHandler);
 				if (stage){
 					return;
 				}
@@ -70,7 +76,7 @@ package ui {
 		}
 
 		public function remove():void {
-			if (parent){
+			if (parent && stage){
 				autoRemove = true;
 				parent.removeChild(this);
 			} else {
@@ -91,6 +97,16 @@ package ui {
 						_children.stop();
 					}
 					removeChild(_children);
+				}
+			}
+		}
+
+		private function setChildAutoRemove(_autoRemove:Boolean):void {
+			var _displayContent:*;
+			for (var _i:uint = 0; _i < numChildren; _i++){
+				_displayContent = getChildAt(_i);
+				if ("autoRemove" in _displayContent){
+					_displayContent["autoRemove"] = _autoRemove;
 				}
 			}
 		}
