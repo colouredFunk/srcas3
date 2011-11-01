@@ -113,7 +113,7 @@
 		}
 
 		public function debugMessage(...args):void {
-			callInterface("alert", "[" + ExternalInterface.objectID||objectID + "]\r\n" + args);
+			callInterface("alert", "[" + (ExternalInterface.objectID||objectID) + "]\r\n" + args);
 		}
 	}
 }
