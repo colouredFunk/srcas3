@@ -1,18 +1,17 @@
 ﻿package akdcl.application.openPlatform {
-	import flash.display.Stage;
-	import flash.utils.ByteArray;
-	import flash.net.URLLoaderDataFormat;
-
-	import flash.events.Event;
-	import flash.events.IOErrorEvent;
-
+	import akdcl.manager.RequestManager;
+	
 	import com.sina.microblog.MicroBlog;
 	import com.sina.microblog.events.MicroBlogErrorEvent;
 	import com.sina.microblog.events.MicroBlogEvent;
-
 	import com.util.OauthUrlUtil;
-
-	import akdcl.manager.RequestManager;
+	
+	import flash.display.Stage;
+	import flash.events.Event;
+	import flash.events.IOErrorEvent;
+	import flash.geom.Rectangle;
+	import flash.net.URLLoaderDataFormat;
+	import flash.utils.ByteArray;
 
 	/**
 	 * ...
@@ -31,8 +30,8 @@
 			return Boolean(accessTokenKey && accessTokenSecrect);
 		}
 
-		public function MicroBlogSina(_stage:Stage, _appKey:String, _appSecret:String):void {
-			super(_stage, _appKey, _appSecret);
+		public function MicroBlogSina(_stage:Stage, _appKey:String, _appSecret:String, _viewPort:Rectangle):void {
+			super(_stage, _appKey, _appSecret, _viewPort);
 			name = "MicroBlogSina";
 
 			microBlog = new MicroBlog();
