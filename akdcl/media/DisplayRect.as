@@ -14,7 +14,7 @@
 	import flash.ui.ContextMenu;
 	import flash.ui.ContextMenuItem;
 
-	import com.greensock.TweenNano;
+	import com.greensock.TweenLite;
 
 	import ui.UISprite;
 
@@ -31,6 +31,7 @@
 	[Event(name="resize",type="flash.events.Event")]
 	public class DisplayRect extends UISprite {
 		protected static const TWEEN_FRAME:uint = 10;
+		
 		private static var sourceLabel:String;
 		private static var contextMenuStatic:ContextMenu;
 		private static var contextMenuItem:ContextMenuItem;
@@ -68,7 +69,7 @@
 		public var autoUpdate:Boolean = true;
 		public var useScroll:Boolean = true;
 		public var moveRect:Boolean;
-		
+
 		public var container:DisplayObjectContainer;
 
 		public function get rectWidth():uint {
@@ -109,15 +110,14 @@
 			var _display:Object = displayContent;
 			if (_display){
 				var _width:Number = rect.width;
-				var _dW:Number = originalWidth * _display.scaleX;
-				if (_value < -_dW){
-					_value = -_dW;
+				if (_value < -scaleWidth){
+					_value = -scaleWidth;
 				} else if (_value > _width){
 					_value = _width;
 				}
-				if (_width <= _dW){
-					if (_value < _width - _dW){
-						__scrollX = (_value + _width - _dW) * 0.5;
+				if (_width <= scaleWidth){
+					if (_value < _width - scaleWidth){
+						__scrollX = (_value + _width - scaleWidth) * 0.5;
 					} else if (_value < 0){
 						__scrollX = _value;
 					} else {
@@ -126,13 +126,13 @@
 				} else {
 					if (_value < 0){
 						__scrollX = _value * 0.5;
-					} else if (_value < _width - _dW){
+					} else if (_value < _width - scaleWidth){
 						__scrollX = _value;
 					} else {
-						__scrollX = (_value + _width - _dW) * 0.5;
+						__scrollX = (_value + _width - scaleWidth) * 0.5;
 					}
 				}
-				alignX = __scrollX / (_width - _dW);
+				alignX = __scrollX / (_width - scaleWidth);
 			}
 		}
 
@@ -146,15 +146,14 @@
 			var _display:Object = displayContent;
 			if (_display){
 				var _height:Number = rect.height;
-				var _dH:Number = originalHeight * _display.scaleY;
-				if (_value < -_dH){
-					_value = -_dH;
+				if (_value < -scaleHeight){
+					_value = -scaleHeight;
 				} else if (_value > _height){
 					_value = _height;
 				}
-				if (_height <= _dH){
-					if (_value < _height - _dH){
-						__scrollY = (_value + _height - _dH) * 0.5;
+				if (_height <= scaleHeight){
+					if (_value < _height - scaleHeight){
+						__scrollY = (_value + _height - scaleHeight) * 0.5;
 					} else if (_value < 0){
 						__scrollY = _value;
 					} else {
@@ -163,13 +162,13 @@
 				} else {
 					if (_value < 0){
 						__scrollY = _value * 0.5;
-					} else if (_value < _height - _dH){
+					} else if (_value < _height - scaleHeight){
 						__scrollY = _value;
 					} else {
-						__scrollY = (_value + _height - _dH) * 0.5;
+						__scrollY = (_value + _height - scaleHeight) * 0.5;
 					}
 				}
-				alignY = __scrollY / (_height - _dH);
+				alignY = __scrollY / (_height - scaleHeight);
 			}
 		}
 
@@ -236,8 +235,12 @@
 		protected var alignYReady:Number;
 		protected var scaleModeReady:Number;
 
-		private var originalWidth:int;
-		private var originalHeight:int;
+		protected var originalWidth:int;
+		protected var originalHeight:int;
+		
+		protected var scaleWidth:Number;
+		protected var scaleHeight:Number;
+		
 		private var aspectRatio:Number;
 		private var offX:int;
 		private var offY:int;
@@ -249,17 +252,17 @@
 				rect.height = _rectHeight;
 			}
 			super();
-			if (_bgColor >= 0 && useScroll) {
+			if (_bgColor >= 0 && useScroll){
 				container.opaqueBackground = _bgColor;
 			}
 		}
 
 		override protected function init():void {
 			super.init();
-			if (!container) {
+			if (!container){
 				container = this;
 			}
-			if (!rect) {
+			if (!rect){
 				rect = container.getRect(container);
 				rect.y = rect.x = 0;
 			}
@@ -272,7 +275,7 @@
 		}
 
 		override protected function onRemoveToStageHandler():void {
-			TweenNano.killTweensOf(bitmap);
+			TweenLite.killTweensOf(bitmap);
 			bitmap.bitmapData = null;
 			super.onRemoveToStageHandler();
 			rect = null;
@@ -319,9 +322,12 @@
 						_display.scaleY = _display.scaleX = _scale;
 						break;
 				}
+				scaleWidth = originalWidth * _display.scaleX;
+				scaleHeight = originalHeight * _display.scaleY;
+				
 				updateScrollXY();
 			}
-			if (useScroll) {
+			if (useScroll){
 				container.scrollRect = rect;
 			}
 			if (hasEventListener(Event.RESIZE)){
@@ -335,15 +341,11 @@
 		protected function updateScrollXY():void {
 			var _display:Object = displayContent;
 			if (_display){
-				var _width:Number = rect.width;
-				var _height:Number = rect.height;
-				var _dW:Number = originalWidth * _display.scaleX;
-				var _dH:Number = originalHeight * _display.scaleY;
 				var _x:Number = -offX * _display.scaleX;
 				var _y:Number = -offY * _display.scaleY;
 
-				__scrollX = (_width - _dW) * __alignX;
-				__scrollY = (_height - _dH) * __alignY;
+				__scrollX = (rect.width - scaleWidth) * __alignX;
+				__scrollY = (rect.height - scaleHeight) * __alignY;
 
 				if (moveRect){
 					_display.x = _x;
@@ -371,8 +373,8 @@
 			tweenMode = _tweenMode;
 			isHidding = true;
 			if (content && tweenMode == 2 ? true : false){
-				TweenNano.killTweensOf(displayContent);
-				TweenNano.to(displayContent, tweenMode > 2 ? tweenMode : TWEEN_FRAME, tweenOutVar);
+				TweenLite.killTweensOf(displayContent);
+				TweenLite.to(displayContent, tweenMode > 2 ? tweenMode : TWEEN_FRAME, tweenOutVar);
 			} else {
 				onHideCompleteHandler();
 			}
@@ -380,7 +382,7 @@
 
 		protected function onHideCompleteHandler():void {
 			if (content){
-				TweenNano.killTweensOf(displayContent);
+				TweenLite.killTweensOf(displayContent);
 				if (content is BitmapData){
 					bitmap.bitmapData = null;
 				} else {
@@ -407,7 +409,7 @@
 				//
 				if (tweenMode > 0){
 					_display.alpha = 0;
-					TweenNano.to(_display, tweenMode > 2 ? tweenMode : TWEEN_FRAME, tweenInVar);
+					TweenLite.to(_display, tweenMode > 2 ? tweenMode : TWEEN_FRAME, tweenInVar);
 				}
 				//
 				offX = offY = 0;
@@ -417,7 +419,7 @@
 				} else if (_display is Loader){
 					originalWidth = _display.contentLoaderInfo.width;
 					originalHeight = _display.contentLoaderInfo.height;
-				} else if (_display is Video) {
+				} else if (_display is Video){
 					//_display.videoWidth
 					//_display.videoHeight
 					originalWidth = _display.width / _display.scaleX;

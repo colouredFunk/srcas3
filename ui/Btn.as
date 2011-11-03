@@ -1,7 +1,7 @@
 ﻿package ui {
 	import flash.events.Event;
 	import flash.external.ExternalInterface;
-	
+
 	import akdcl.net.gotoURL;
 	import akdcl.events.InteractionEvent;
 
@@ -28,11 +28,13 @@
 		public function set hrefXML(_hrefXML:XML):void {
 			href = _hrefXML;
 		}
-		
+
 		private var __group:String;
+
 		public function get group():String {
 			return __group;
 		}
+
 		public function set group(_group:String):void {
 			if (__group && _group == __group){
 				return;
@@ -45,11 +47,13 @@
 				bM.addToGroup(__group, this);
 			}
 		}
-		
+
 		private var __selected:Boolean;
+
 		public function get selected():Boolean {
 			return __selected;
 		}
+
 		public function set selected(_selected:Boolean):void {
 			if (__selected == _selected){
 				return;
@@ -66,24 +70,27 @@
 				}
 			}
 			bM.setButtonStyle(this);
-			if (select != null) {
+			if (select != null){
 				select();
 			}
 		}
+
 		override public function set enabled(_enabled:Boolean):void {
 			super.enabled = _enabled;
 			buttonMode = _enabled;
-			if (_enabled) {
-				bM.addButton(this);
-			}else {
-				bM.removeButton(this);
-			}
 		}
 
 		override protected function init():void {
 			super.init();
-			addEventListener(InteractionEvent.RELEASE, onReleaseHandler);
-			enabled = true;
+			stop();
+		}
+
+		override protected function onAddedToStageHandler(_evt:Event):void {
+			super.onAddedToStageHandler(_evt);
+			if (enabled){
+				buttonMode = true;
+				bM.addButton(this);
+			}
 			if (area){
 				var _length:uint = area.numChildren;
 				for (var _i:uint; _i < _length; _i++){
@@ -91,29 +98,30 @@
 				}
 				hitArea = area;
 			}
-			stop();
+			addEventListener(InteractionEvent.RELEASE, onReleaseHandler);
+
 		}
 
 		override protected function onRemoveToStageHandler():void {
 			group = null;
 			enabled = false;
 			super.onRemoveToStageHandler();
-			
+
 			rollOver = null;
 			rollOut = null;
 			press = null;
 			release = null;
-			
+
 			eEval = null;
 			href = null;
 			hrefTarget = null;
 			area = null;
 		}
-		
+
 		protected function onReleaseHandler(_e:InteractionEvent):void {
-			if (href) {
+			if (href){
 				gotoURL(href, hrefTarget);
-			}else if (eEval) {
+			} else if (eEval){
 				ExternalInterface.call("eval", eEval);
 			}
 		}

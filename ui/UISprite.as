@@ -71,12 +71,13 @@
 		}
 
 		protected function onRemoveToStageHandler():void {
+			__removeChildren();
 			scrollRect = null;
 			mask = null;
 			hitArea = null;
 			contextMenu = null;
+			enabled = false;
 			EventManager.removeTargetAllEvent(this);
-			__removeChildren();
 
 			userData = null;
 		}
