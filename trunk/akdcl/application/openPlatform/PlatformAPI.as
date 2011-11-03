@@ -1,12 +1,10 @@
 package akdcl.application.openPlatform {
 	import flash.display.Stage;
-	import flash.geom.Rectangle;
-
 	import flash.events.Event;
-
-	import flash.net.SharedObject;
+	import flash.geom.Rectangle;
 	import flash.media.StageWebView;
-
+	import flash.net.SharedObject;
+	
 	import ui.UIEventDispatcher;
 
 	/**
@@ -36,7 +34,7 @@ package akdcl.application.openPlatform {
 			return false;
 		}
 
-		public function PlatformAPI(_stage:Stage, _appKey:String, _appSecret:String):void {
+		public function PlatformAPI(_stage:Stage, _appKey:String, _appSecret:String, _viewPort:Rectangle=null):void {
 			stage = _stage;
 			consumerKey = _appKey;
 			consumerSecret = _appSecret;
@@ -44,7 +42,7 @@ package akdcl.application.openPlatform {
 			shareObject = SharedObject.getLocal(PLATFORM_DATA);
 
 			webView = new StageWebView();
-			webView.viewPort = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
+			webView.viewPort = _viewPort||new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
 			webView.addEventListener(Event.LOCATION_CHANGE, onWebViewLocationChangeHandler);
 
 		}
@@ -99,7 +97,7 @@ package akdcl.application.openPlatform {
 
 		}
 
-		protected function removeWebView(_success:Boolean = false):void {
+		public function removeWebView(_success:Boolean = false):void {
 			if (webView.stage){
 				webView.stage = null;
 				if (_success){

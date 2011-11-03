@@ -3,9 +3,7 @@
 	import com.adobe.crypto.HMAC;
 	import com.adobe.crypto.SHA1;
 	import com.adobe.serialization.json.JSON;
-	
 	import com.hurlant.util.Base64;
-	
 	import com.sina.microblog.data.MicroBlogComment;
 	import com.sina.microblog.data.MicroBlogCount;
 	import com.sina.microblog.data.MicroBlogDirectMessage;
@@ -3439,6 +3437,15 @@
 			url+="&oauth_callback=oob";
 			if (ExternalInterface.available) ExternalInterface.call("window.open", url,'newwindow','height=420,width=500,top=0,left=0,toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no, z-look=yes, alwaysRaised=yes');
 			else navigateToURL(new URLRequest(url), "_blank");
+		}
+		
+		public var onDispatchEvent:Function;
+		override public function dispatchEvent(event:Event):Boolean{
+			if(onDispatchEvent==null){
+			}else{
+				onDispatchEvent(event);
+			}
+			return super.dispatchEvent(event);
 		}
 	}
 }
