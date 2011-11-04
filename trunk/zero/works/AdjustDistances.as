@@ -51,6 +51,9 @@ package zero.works{
 				top=u_rect.top;
 				bottom=u_rect.bottom;
 			}
+			
+			trace("top="+top);
+			trace("bottom="+bottom);
 		}
 		public function step():void{
 			var sum:Number=0;
@@ -85,6 +88,7 @@ package zero.works{
 					rect=getB(dspObj);
 					dspObj.y+=(y-rect.y)*u;//缓动
 					y+=rect.height+d;
+					trace("rect="+rect);
 				}
 				
 				//最右边的有些振动，调一下：
