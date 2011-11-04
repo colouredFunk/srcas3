@@ -98,12 +98,28 @@ package akdcl.application.openPlatform {
 		}
 
 		public function removeWebView(_success:Boolean = false):void {
-			if (webView.stage){
+			var hasStage:Boolean;
+			try{
+				if(webView.stage){
+					hasStage=true;
+				}else{
+					hasStage=false;
+				}
+			}catch(e:Error){
+				hasStage=false;
+			}
+			if (hasStage){
 				webView.stage = null;
 				if (_success){
 					webView.removeEventListener(Event.LOCATION_CHANGE, onWebViewLocationChangeHandler);
 					webView.dispose();
+				}else{
+					accessTokenKey = "";
+					accessTokenSecrect = "";
 				}
+			}else{
+				accessTokenKey = "";
+				accessTokenSecrect = "";
 			}
 			if (onLogin != null){
 				onLogin(_success);

@@ -27,10 +27,12 @@
 		public var microBlog:MicroBlog;
 
 		override public function get authorized():Boolean {
+			trace("accessTokenKey="+accessTokenKey);
+			trace("accessTokenSecrect="+accessTokenSecrect);
 			return Boolean(accessTokenKey && accessTokenSecrect);
 		}
 
-		public function MicroBlogSina(_stage:Stage, _appKey:String, _appSecret:String, _viewPort:Rectangle):void {
+		public function MicroBlogSina(_stage:Stage, _appKey:String, _appSecret:String, _viewPort:Rectangle=null):void {
 			super(_stage, _appKey, _appSecret, _viewPort);
 			name = "MicroBlogSina";
 
