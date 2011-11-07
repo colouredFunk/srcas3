@@ -21,6 +21,9 @@ OutputPane 版本:v1.0
 	<mx:Button label="清空" bottom="2" right="22" id="btn" click="reset()"/>
 	<fx:Script>
 		<![CDATA[
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.managers.PopUpManager;
 			
 			import zero.output;
 			import zero.outputError;
@@ -29,6 +32,8 @@ OutputPane 版本:v1.0
 			private var timeoutId:int=-1;
 			private var linkFunArr:Array;
 			private var linkId:int;
+			
+			private var alert:Alert;
 			
 			public function init():void{
 				//^_^
@@ -60,6 +65,11 @@ OutputPane 版本:v1.0
 				
 				output=trace;
 				outputError=trace;
+				
+				if(alert){
+					PopUpManager.removePopUp(alert);
+					alert=null;
+				}
 			}
 			private function _output(msg:String,styleOrXML:*=undefined,tail:*=null,linkFun:Function=null,immediately:Boolean=false):void{
 				if(linkFun==null){
@@ -73,9 +83,10 @@ OutputPane 版本:v1.0
 				msg2strArr(msg,styleOrXML,tail);
 				clearTimeout(timeoutId);
 				if(immediately){
+					trace("immediately");
 					updateDelay();
 				}else{
-					timeoutId=setTimeout(updateDelay,100);
+					timeoutId=setTimeout(updateDelay,200);
 				}
 			}
 			private function link(event:TextEvent):void{
@@ -179,30 +190,49 @@ OutputPane 版本:v1.0
 						msg+="　"+tail;
 					}
 				}
-				//if(strArr.length>1000){
-				//	reset();
-				//	strArr[0]="输出过多自动清除...<br>";
-				//}
+				
 				strArr[strArr.length]=msg+"<br>";
 			}
 			private function updateDelay():void{
+				clearTimeout(timeoutId);
+				//trace("updateDelay");
+				if(strArr.length>1000){
+					
+					if(alert){
+						PopUpManager.removePopUp(alert);
+						alert=null;
+					}
+					
+					alert=Alert.show(
+						"输出过多（"+strArr.length+"条），是否以文本方式保存？\n"+strArr[0]+"\n...\n"+strArr[999],
+						"",
+						Alert.YES|Alert.NO,
+						null,
+						confirmSave
+					);
+				}else{
+					_updateDelay();
+				}
+			}
+			private function confirmSave(event:CloseEvent):void{
+				if(event.detail==Alert.YES){
+					new FileReference().save(strArr.join(""),"log"+new Date().time+".txt");
+					reset();
+				}else{
+					_updateDelay();
+				}
+			}
+			private function _updateDelay():void{
 				txt.htmlText=strArr.join("");
 				txt.validateNow();
 				txt.verticalScrollPosition=txt.mx_internal::getTextField().numLines;
 				txt.validateNow();
-				/*
-				txt.validateNow();
-				while(txt.textHeight>this.height-50&&strArr.length>0){
-				strArr.shift();
-				txt.htmlText=strArr.join("");
-				txt.validateNow();
-				}
-				*/
 			}
 			private function _outputError(msg:String):void{
 				_output(msg,"red");
 			}
 			private function reset():void{
+				clearTimeout(timeoutId);
 				txt.htmlText="";
 				strArr=new Array();
 			}
