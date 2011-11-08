@@ -94,7 +94,9 @@
 		protected var actionXML:XML;
 
 		protected var dataPreset:Object;
-		protected var dataSend:Object;
+		public var dataSend:Object;
+		public var dataSendFormated:Object;
+		
 		protected var sendProxy:Object;
 
 		protected var isLoading:Boolean;
@@ -176,9 +178,9 @@
 			}
 			//dataSend.random = Math.random();
 			traceObject("[" + name + " send]", dataSend);
-			var _data:* = formatData(dataSend, optionsSend, true);
-			traceObject("[" + name + " remote send]", _data);
-			sendProxy.data = _data;
+			dataSendFormated = formatData(dataSend, optionsSend, true);
+			traceObject("[" + name + " remote send]", dataSendFormated);
+			sendProxy.data = dataSendFormated;
 			rM.load(sendProxy, onCompleteHandler, onErrorHandler, null);
 			return true;
 		}
