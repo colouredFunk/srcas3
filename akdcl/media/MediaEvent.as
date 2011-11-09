@@ -46,6 +46,7 @@ package akdcl.media {
 		public static const PLAY_PROGRESS:String = "playProgress";
 		public static const PLAY_COMPLETE:String = "playComplete";
 		public static const LOAD_ERROR:String = "loadError";
+		
 		public static const BUFFER_PROGRESS:String = "bufferProgress";
 		public static const LOAD_PROGRESS:String = "loadProgress";
 		public static const LOAD_COMPLETE:String = "loadComplete";
