@@ -1,4 +1,5 @@
 package akdcl.net.action {
+	import akdcl.utils.replaceString;
 	import flash.display.DisplayObjectContainer;
 	import ui.manager.FLManager;
 
@@ -157,9 +158,10 @@ package akdcl.net.action {
 
 		private function flStyleSet():void {
 			FLManager.setTextFormat(style.fontSize, style.color, style.font);
-			FLManager.setTextFormatTo(ST_RADIO_BUTTON, style.fontSize, style.colorLabel, style.font);
-			FLManager.setTextFormatTo(ST_CHECK, style.fontSize, style.colorLabel, style.font);
-			FLManager.setTextFormatTo(ST_CHECK_BOX, style.fontSize, style.colorLabel, style.font);
+			var _color:uint = int(replaceString(style.colorLabel, "#", "0x"));
+			FLManager.setTextFormatTo(ST_RADIO_BUTTON, style.fontSize, _color, style.font);
+			FLManager.setTextFormatTo(ST_CHECK, style.fontSize, _color, style.font);
+			FLManager.setTextFormatTo(ST_CHECK_BOX, style.fontSize, _color, style.font);
 		}
 	}
 }
