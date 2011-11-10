@@ -1,176 +1,131 @@
-﻿package akdcl.net{
+﻿package akdcl.net {
 	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.display.Loader;
-	import flash.events.*;
+
+	import flash.events.Event;
+	import flash.events.IOErrorEvent;
+	import flash.events.DataEvent;
+
 	import flash.net.FileFilter;
 	import flash.net.FileReference;
 	import flash.net.URLRequest;
-	
+
 	import zero.FileTypes;
-	import zero.encoder.BMPEncoder;
-	
-	public class FileRef extends FileReference {
-		public var fileTypes:String;
-		public var maxSize:int = 8000;
-		public var autoLoad:Boolean = true;
-		public var autoImage:Boolean = true;
-		
-		protected var fileInfo:String;
-		protected var isSet:Boolean;
-		
-		public var onSelect:Function;
-		
-		public var onLoad:Function;
-		public var onLoadComplete:Function;
-		
-		public var onUpload:Function;
-		public var onUploading:Function;
-		public var onUploadComplete:Function;
-		public var onFailed:Function;
-		public function remove():void{
-			removeEventListener(Event.SELECT, selectFile);
-			removeEventListener(IOErrorEvent.IO_ERROR, error);
-			removeEventListener(Event.COMPLETE, loadComplete);
-			removeEventListener(ProgressEvent.PROGRESS, uploadProgress);
-			removeEventListener(IOErrorEvent.IO_ERROR, error);
-			removeEventListener(DataEvent.UPLOAD_COMPLETE_DATA, uploadComplete);
-			
-			onSelect=null;
-			
-			onLoad=null;
-			onLoadComplete=null;
-			
-			onUpload=null;
-			onUploading=null;
-			onUploadComplete=null;
-			
-			onFailed=null;
+	import zero.codec.BMPEncoder;
+
+	public class FileREF extends FileReference {
+
+		private static const ERROR_BROWSE:String = "浏览失败！";
+		private static const ERROR_SIZE_LIMIT:String = "超过尺寸限制！";
+		private static const ERROR_IO:String = "IO错误！";
+
+		public var fileSizeLimit:int = 10240;
+		public var fileInfo:String = "图片";
+		public var fileTypes:String = "jpg,jpeg,gif,png,bmp";
+
+		public var errorMessage:String;
+		public var dataDecoded:Object;
+
+		private var url:Object;
+		private var fileID:String;
+
+		public function FileREF(){
+			addEventListener(Event.SELECT, onSelectedHandler);
+			addEventListener(IOErrorEvent.IO_ERROR, onErrorHandler);
+			addEventListener(Event.COMPLETE, onLoadComplete);
+			addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, onUploadComplete);
 		}
-		public function browseFile(_fileInfo:String = "图片", _fileTypes:String = "jpg,jpeg,gif,png,bmp"):void {
+
+		public function remove():void {
+			removeEventListener(Event.SELECT, onSelectedHandler);
+			removeEventListener(IOErrorEvent.IO_ERROR, onErrorHandler);
+			removeEventListener(Event.COMPLETE, onLoadComplete);
+			removeEventListener(DataEvent.UPLOAD_COMPLETE_DATA, onUploadComplete);
+			if (dataDecoded is BitmapData) {
+				dataDecoded.dispose();
+			}
+			dataDecoded = null;
+		}
+
+		public function launch(_url:Object = null, _fileID:String = null):void {
 			try {
-				fileInfo = _fileInfo;
-				fileTypes = _fileTypes;
-				addEventListener(Event.SELECT, selectFile);
+				url = _url;
+				fileID = _fileID;
 				browse([new FileFilter(fileInfo, "*." + fileTypes.replace(/\,/g, ";*."))]);
-			} catch (e:Error) {
-				if(onFailed!=null){
-					onFailed("打开" + fileInfo + "失败!");
+			} catch (_e:Error){
+				onErrorHandler(fileInfo + ERROR_BROWSE);
+			}
+		}
+
+		private function onSelectedHandler(_e:Event):void {
+			if (size > fileSizeLimit * 1024){
+				_e.stopImmediatePropagation();
+				//fileSizeLimit + "K!"
+				onErrorHandler(fileInfo + ERROR_SIZE_LIMIT);
+			} else {
+				if (dataDecoded is BitmapData) {
+					dataDecoded.dispose();
+				}
+				dataDecoded = null;
+				if (url){
+					upload(new URLRequest(url as String), fileID);
+				} else {
+					load();
 				}
 			}
 		}
-		private function selectFile(_evt:Event):void {
-			removeEventListener(Event.SELECT, selectFile);
-			if (size > maxSize * 1024) {
-				if (onFailed != null) {
-					onFailed(fileInfo + "大小不要超过" + maxSize + "K!");
+
+		private function onErrorHandler(_eOrMessage:Object):void {
+			if (_eOrMessage is String){
+				errorMessage = _eOrMessage as String;
+				dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR));
+			} else if (_eOrMessage is Event){
+				switch (_eOrMessage.type){
+					case IOErrorEvent.IO_ERROR:
+						errorMessage = fileInfo + ERROR_IO;
+						break;
 				}
-				isSet = false;
-				return;
-			}
-			isSet = true;
-			if (onSelect != null) {
-				onSelect();
-			}
-			if (autoLoad) {
-				loadFile();
 			}
 		}
-		public function saveFile(_data:*, _fileName:String):void {
-			save(_data, _fileName);
+
+		private function onUploadComplete(_e:DataEvent):void {
+			var _result:String = _e.data.replace(/(^\s*)|(\s*$)/g, "");
+			dataDecoded = _result;
 		}
-		public function loadFile():Boolean{
-			if(!isSet){
-				if(onFailed!=null){
-					onFailed("选择要打开的" + fileInfo + "!");
-				}
-				return false;
-			}
-			addEventListener(IOErrorEvent.IO_ERROR, error);
-			addEventListener(Event.COMPLETE, loadComplete);
-			load();
-			if (onLoad!=null) {
-				onLoad();
-			}
-			return true;
-		}
-		private function loadComplete(_evt:Event):void {
-			removeEventListener(IOErrorEvent.IO_ERROR, error);
-			removeEventListener(Event.COMPLETE, loadComplete);
-			isSet = false;
-			var _data:*;
-			_data = _evt.currentTarget.data;
-			if (autoImage) {
-				if (FileTypes.getType(_data, name) == FileTypes.BMP ) {
-					_data = BMPEncoder.decode(_data);
-					if (onLoadComplete!=null) {
-						onLoadComplete(_data);
+
+		private function onLoadComplete(_e:Event):void {
+			switch (FileTypes.getType(data, name)){
+				case FileTypes.BMP:
+					dataDecoded = BMPEncoder.decode(data);
+					break;
+				case FileTypes.JPG:
+				case FileTypes.PNG:
+				case FileTypes.GIF:
+					if (dataDecoded){
+					} else {
+						var _loader:Loader = new Loader();
+						_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onImageDecodeHandler);
+						_loader.loadBytes(data);
+						_e.stopImmediatePropagation();
 					}
-				}else {
-					var _loader:Loader = new Loader();
-					_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onImageLoadedComplete);
-					_loader.loadBytes(_data);
-					return;
-				}	
-				//}
-			}else {
-				if (onLoadComplete!=null) {
-					onLoadComplete(_data);
-				}
+					break;
+				default:
+					dataDecoded = data;
+					break;
 			}
 		}
-		private function onImageLoadedComplete(_evt:Event):void {
-			_evt.currentTarget.removeEventListener(Event.COMPLETE, onImageLoadedComplete);
-			if (onLoadComplete != null) {
-				var _loader:Loader = _evt.currentTarget.loader;
-				onLoadComplete((_loader.content as Bitmap).bitmapData);
+
+		private function onImageDecodeHandler(_e:Event):void {
+			_e.target.removeEventListener(Event.COMPLETE, onImageDecodeHandler);
+			var _loader:Loader = _e.currentTarget.loader;
+			dataDecoded = (_loader.content as Bitmap).bitmapData;
+			dispatchEvent(_e);
+			try {
 				_loader.unload();
-			}
-		}
-		public function uploadFile(_url:String, _id:String):Boolean {
-			if(!isSet){
-				if(onFailed!=null){
-					onFailed("选择要打开的"+fileInfo+"!");
-				}
-				return false;
-			}else if(!_url){
-				if(onFailed!=null){
-					onFailed("没有上传地址!");
-				}
-				return false;
-			}
-			addEventListener(ProgressEvent.PROGRESS,uploadProgress);
-			addEventListener(IOErrorEvent.IO_ERROR,error);
-			addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,uploadComplete);
-			upload(new URLRequest(_url),_id);
-			if (onUpload!=null) {
-				onUpload();
-			}
-			return true;
-		}
-		private function uploadProgress(_evt:ProgressEvent):void {
-			if(onUploading!=null){
-				onUploading(_evt.bytesLoaded/_evt.bytesTotal);
-			}
-		}
-		private function uploadComplete(_evt:DataEvent):void {
-			removeEventListener(ProgressEvent.PROGRESS,uploadProgress);
-			removeEventListener(IOErrorEvent.IO_ERROR,error);
-			removeEventListener(DataEvent.UPLOAD_COMPLETE_DATA,uploadComplete);
-			isSet=false;
-			var _result:String=_evt.data.replace(/(^\s*)|(\s*$)/g,"");
-			if (onUploadComplete!=null) {
-				onUploadComplete(_result);
-			}
-		}
-		private function error(_evt:IOErrorEvent):void {
-			removeEventListener(Event.SELECT,selectFile);
-			removeEventListener(IOErrorEvent.IO_ERROR,error);
-			removeEventListener(Event.COMPLETE,loadComplete);
-			removeEventListener(ProgressEvent.PROGRESS,uploadProgress);
-			removeEventListener(IOErrorEvent.IO_ERROR,error);
-			removeEventListener(DataEvent.UPLOAD_COMPLETE_DATA,uploadComplete);
-			if(onFailed!=null){
-				onFailed("程序失败，页面未响应!");
+				_loader.close();
+			} catch (_e:Error){
+
 			}
 		}
 	}

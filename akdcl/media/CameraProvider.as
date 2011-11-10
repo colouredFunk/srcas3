@@ -48,7 +48,6 @@ package akdcl.media {
 					Security.showSettings(SecurityPanel.PRIVACY);
 				}
 				playContent.attachCamera(camera);
-				isCameraAdded = true;
 			} else {
 				onLoadErrorHandler();
 			}
@@ -86,8 +85,13 @@ package akdcl.media {
 			if (_evt is StatusEvent){
 				switch (_evt.code){
 					case "Camera.Muted":
+						if (!isCameraAdded) {
+							onLoadErrorHandler();
+						}
+						isCameraAdded = true;
 						break;
 					case "Camera.Unmuted":
+						isCameraAdded = true;
 						break;
 					default:
 						trace("CameraStatusEvent:" + _evt);
@@ -105,7 +109,9 @@ package akdcl.media {
 		private function onDisplayChange():void {
 			//加载显示对象
 			//playContent;
-			dispatchEvent(new MediaEvent(MediaEvent.DISPLAY_CHANGE));
+			if (hasEventListener(MediaEvent.DISPLAY_CHANGE)){
+				dispatchEvent(new MediaEvent(MediaEvent.DISPLAY_CHANGE));
+			}
 		}
 
 	}
