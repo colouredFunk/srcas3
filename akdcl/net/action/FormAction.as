@@ -157,6 +157,9 @@ package akdcl.net.action {
 
 		private function flStyleSet():void {
 			FLManager.setTextFormat(style.fontSize, style.color, style.font);
+			FLManager.setTextFormatTo(ST_RADIO_BUTTON, style.fontSize, style.colorLabel, style.font);
+			FLManager.setTextFormatTo(ST_CHECK, style.fontSize, style.colorLabel, style.font);
+			FLManager.setTextFormatTo(ST_CHECK_BOX, style.fontSize, style.colorLabel, style.font);
 		}
 	}
 }
