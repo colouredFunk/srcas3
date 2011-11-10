@@ -259,11 +259,11 @@
 			super.init();
 			__barWidth = int(bar.width);
 			widthAddText = __barWidth - txtText.width;
+			
 			offXLabel = int(btnY.x);
 			__labelWidth = int(btnY.width);
 			dYBtnTopToBarBottom = bar.height - btnY.y;
 			dYTextBottomToBarBottom = bar.height - (txtText.y + txtText.height);
-			
 			
 			txtText.autoSize = TextFieldAutoSize.LEFT;
 			setTextSelectable(false);
@@ -300,6 +300,19 @@
 			maskArea = null;
 			item = null;
 		}
+		
+		public function addItem(_item:DisplayObject, _width:uint = 0, _height:uint = 0 ):void {
+			if (item) {
+				removeChild(item);
+			}
+			item = _item;
+			addChild(item);
+			barWidth = (_width || item.width) + widthAddText;
+			barHeight = (_height || item.height) + widthAddText + dYBtnTopToBarBottom + 10;
+			item.y = item.x = widthAddText * 0.5;
+		}
+		
+		
 		public function setStyle():void {
 			btnList.forEach(setBtnStyle);
 			adjustXY();
@@ -389,6 +402,7 @@
 				_btn.release=onBtnReleaseHandler;
 			}
 		}
+		
 		protected function onBtnReleaseHandler(_btn:*):void {
 			if (txtText.selectedText) {
 				System.setClipboard(txtText.selectedText);
@@ -414,6 +428,7 @@
 				remove();
 			}
 		}
+		
 		protected function setBtnStyle(_btn:*, _id:uint, ...args):void {
 			var _perWidth:uint = (barWidth - offXLabel * 2) / (labelList.length);
 			switch(labelsAutoSize) {
@@ -430,6 +445,7 @@
 			}
 			_btn.y = barHeight - dYBtnTopToBarBottom;
 		}
+		
 		protected function adjustXY():void {
 			if (!stage) {
 				return;
