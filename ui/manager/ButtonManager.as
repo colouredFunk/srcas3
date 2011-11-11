@@ -103,6 +103,8 @@ package ui.manager {
 					buttonTarget.dispatchEvent(new InteractionEvent(InteractionEvent.RELEASE_OUTSIDE));
 				}else if (buttonTarget.hasEventListener(InteractionEvent.RELEASE)) {
 					buttonTarget.dispatchEvent(new InteractionEvent(InteractionEvent.RELEASE));
+				}else {
+					buttonCallBack(buttonTarget, RELEASE);
 				}
 				setButtonStyle(buttonTarget);
 			}
