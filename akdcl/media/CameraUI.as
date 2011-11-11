@@ -8,6 +8,7 @@ package akdcl.media {
 	import akdcl.media.CameraProvider;
 	import akdcl.media.DisplayRect;
 	import akdcl.media.MediaEvent;
+	import akdcl.utils.setDisplayWH;
 
 	import ui.Alert;
 
@@ -24,7 +25,6 @@ package akdcl.media {
 	[Event(name="ioError",type="flash.events.IOErrorEvent")]
 
 	public class CameraUI extends UIEventDispatcher {
-
 		private static const CAMERA_WIDTH:uint = 320;
 		private static const CAMERA_HEIGHT:uint = 240;
 
@@ -44,11 +44,14 @@ package akdcl.media {
 			cameraP = new CameraProvider();
 			cameraP.addEventListener(MediaEvent.DISPLAY_CHANGE, onCameraChangeHandler);
 			cameraP.addEventListener(MediaEvent.LOAD_ERROR, onCameraErrorHandler);
-			data = new BitmapData(cameraP.playContent.width, cameraP.playContent.height, false, 0);
 		}
 
 		public function launch():void {
 			cameraP.load(null);
+		}
+
+		public function setCameraMode(_width:int = 0, _height:int = 0):void {
+			cameraP.setCameraMode(_width, _height);
 		}
 
 		protected function onCameraErrorHandler(_e:MediaEvent):void {
@@ -58,6 +61,13 @@ package akdcl.media {
 		}
 
 		protected function onCameraChangeHandler(_e:MediaEvent):void {
+			displayRect.autoUpdate = false;
+			displayRect.rectWidth = cameraP.playContent.width;
+			displayRect.rectHeight = cameraP.playContent.height;
+			
+			setDisplayWH(displayRect, CAMERA_WIDTH, CAMERA_HEIGHT, "rectWidth", "rectHeight");
+			
+			displayRect.autoUpdate = true;
 			displayRect.setContent(cameraP.playContent, 0);
 
 			var _alert:Alert = Alert.show("", "拍照|取消", onAlertHandler);
@@ -66,6 +76,12 @@ package akdcl.media {
 
 		protected function onAlertHandler(_b:Boolean):Boolean {
 			if (_b){
+				if (!data || data.width != cameraP.playContent.width || data.height != cameraP.playContent.height){
+					if (data){
+						data.dispose();
+					}
+					data = new BitmapData(cameraP.playContent.width / cameraP.playContent.scaleX, cameraP.playContent.height / cameraP.playContent.scaleY, false, 0);
+				}
 				data.draw(cameraP.playContent);
 				if (hasEventListener(Event.COMPLETE)){
 					dispatchEvent(eventComplete);

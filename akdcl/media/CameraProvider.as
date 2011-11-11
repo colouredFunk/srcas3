@@ -20,15 +20,6 @@ package akdcl.media {
 		private var camera:Camera;
 		private var isCameraAdded:Boolean;
 
-		override protected function init():void {
-			super.init();
-			camera = Camera.getCamera();
-			if (camera){
-				playContent = new Video(camera.width, camera.height);
-				playContent.smoothing = true;
-			}
-		}
-
 		override public function remove():void {
 			if (camera){
 				camera.removeEventListener(ActivityEvent.ACTIVITY, onCameraHandler);
@@ -41,6 +32,11 @@ package akdcl.media {
 
 		override public function load(_item:*):void {
 			super.load(null);
+
+			if (!camera){
+				setCameraMode();
+			}
+
 			if (camera){
 				camera.addEventListener(ActivityEvent.ACTIVITY, onCameraHandler);
 				camera.addEventListener(StatusEvent.STATUS, onCameraHandler);
@@ -48,6 +44,7 @@ package akdcl.media {
 					Security.showSettings(SecurityPanel.PRIVACY);
 				}
 				playContent.attachCamera(camera);
+				playContent.smoothing = true;
 			} else {
 				onLoadErrorHandler();
 			}
@@ -57,6 +54,7 @@ package akdcl.media {
 			super.play(_startTime);
 			if (camera && playContent){
 				playContent.attachCamera(camera);
+				playContent.smoothing = true;
 			}
 		}
 
@@ -75,17 +73,25 @@ package akdcl.media {
 			}
 		}
 
-		public function setCameraMode(_width:int, _height:int):void {
-			camera.setMode(_width, _height, camera.fps);
-			//playContent.width = camera.width;
-			//playContent.height = camera.height;
+		public function setCameraMode(_width:int = 0, _height:int = 0):void {
+			camera = Camera.getCamera();
+			if (camera){
+				camera.setMode(_width || 1280, _height || 960, camera.fps);
+				if (playContent){
+
+				} else {
+					playContent = new Video(camera.width, camera.height);
+				}
+				trace("camera:", camera.width, camera.height);
+				trace("video:", playContent.width, playContent.height);
+			}
 		}
 
 		private function onCameraHandler(_evt:* = null):void {
 			if (_evt is StatusEvent){
 				switch (_evt.code){
 					case "Camera.Muted":
-						if (!isCameraAdded) {
+						if (!isCameraAdded){
 							onLoadErrorHandler();
 						}
 						isCameraAdded = true;
