@@ -19,15 +19,12 @@ package akdcl.net {
 		}else {
 			_href = _urlOrXML;
 		}
-		if (_href) {
-			
-		}else {
-			var _js:String = (_urlOrXML.attribute("js"));
-			if (_js && ExternalInterface.available) {
-				ExternalInterface.call("eval", _js);
-			}
-			return;
+		
+		var _js:String = (_urlOrXML.attribute("js"));
+		if (_js && ExternalInterface.available) {
+			ExternalInterface.call("eval", _js);
 		}
+		
 		var _request:URLRequest = new URLRequest(_href);
 		if (_data) {
 			if (_data["constructor"] === Object) {
