@@ -64,7 +64,11 @@ package zero.works{
 			if(xml.@smoothing.toString()=="true"){
 				(loader.content as Bitmap).smoothing=true;
 			}
-			TweenMax.to(container,0.5,{alpha:1,onComplete:initComplete});
+			
+			//TweenMax.to(container,0.5,{alpha:1,onComplete:initComplete});
+			
+			TweenMax.to(container,0.5,{alpha:1});
+			initComplete();
 		}
 		private function initComplete():void{
 			if(onInitComplete==null){
