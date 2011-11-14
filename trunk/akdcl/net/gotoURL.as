@@ -22,7 +22,6 @@ package akdcl.net {
 			_href = _urlOrXML;
 		}
 		
-		var _js:String = (_urlOrXML.attribute("js"));
 		if (_js && ExternalInterface.available) {
 			ExternalInterface.call("eval", _js);
 		}
