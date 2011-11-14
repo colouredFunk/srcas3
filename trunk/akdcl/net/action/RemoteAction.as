@@ -207,8 +207,9 @@
 
 		protected function onCompleteHandler(_data:*):void {
 			isLoading = false;
-			rawData = _data;
-			if (rawData){
+			rawData = String(_data).replace(/^\s*|\s*$/g, "");
+			if (rawData) {
+				
 			} else {
 				Alert.show("后台数据错误！");
 				return;

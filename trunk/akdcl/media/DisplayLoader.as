@@ -37,7 +37,7 @@ package akdcl.media {
 			if (!sameChange && _url && label == _url) {
 				return;
 			}
-			rM.unloadDisplay(label, onImageHandler, onImageHandler, onImageHandler);
+			rM.unloadDisplay(label, onCompleteHandler, onErrorHandler, onProgressHandler);
 			setContent(null, tweenMode);
 			loadProgress = 0;
 			label = _url;
@@ -45,31 +45,33 @@ package akdcl.media {
 			alignYReady = _alignY;
 			scaleModeReady = _scaleMode;
 			tweenMode = _tweenMode;
-			rM.loadDisplay(_url, onImageHandler, onImageHandler, onImageHandler);
+			rM.loadDisplay(_url, onCompleteHandler, onErrorHandler, onProgressHandler);
+		}
+		
+		protected function onErrorHandler(_e:IOErrorEvent):void {
+			setProgressClip(false);
+		}
+		
+		protected function onProgressHandler(_e:ProgressEvent):void {
+			if (_e) {
+				loadProgress = _e.bytesLoaded / _e.bytesTotal;
+			}else {
+				loadProgress = 1;
+			}
+			if (isNaN(loadProgress)){
+				loadProgress = 0;
+			}
+			setProgressClip(loadProgress);
 		}
 
-		protected function onImageHandler(_p:*, _url:String = null):void {
-			if (_p is IOErrorEvent){
-				setProgressClip(false);
-			} else if (!_p || _p is ProgressEvent) {
-				if (_p) {
-					loadProgress = _p.bytesLoaded / _p.bytesTotal;
-				}else {
-					loadProgress = 1;
+		protected function onCompleteHandler(_data:*, _url:String = null):void {
+			setProgressClip(false);
+			setContent(_data, tweenMode, alignXReady, alignYReady, scaleModeReady);
+			if (hasEventListener(Event.COMPLETE)) {
+				if (!eventComplete) {
+					eventComplete = new Event(Event.COMPLETE);
 				}
-				if (isNaN(loadProgress)){
-					loadProgress = 0;
-				}
-				setProgressClip(loadProgress);
-			} else {
-				setProgressClip(false);
-				setContent(_p, tweenMode, alignXReady, alignYReady, scaleModeReady);
-				if (hasEventListener(Event.COMPLETE)) {
-					if (!eventComplete) {
-						eventComplete = new Event(Event.COMPLETE);
-					}
-					dispatchEvent(eventComplete);
-				}
+				dispatchEvent(eventComplete);
 			}
 		}
 		override protected function showContent():void {
