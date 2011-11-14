@@ -1,4 +1,5 @@
 package akdcl.media {
+	import flash.display.BitmapData;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
@@ -18,6 +19,7 @@ package akdcl.media {
 		
 		protected static var rM:RequestManager = RequestManager.getInstance();
 		
+		public var displayContent:BitmapData;
 		private var __loadProgress:Number = 0;
 		override public function get loadProgress():Number {
 			return __loadProgress;
@@ -94,8 +96,10 @@ package akdcl.media {
 		
 		private function onDisplayChange():void {
 			//加载显示对象
-			//playContent;
-			dispatchEvent(new MediaEvent(MediaEvent.DISPLAY_CHANGE));
+			displayContent = playContent;
+			if (hasEventListener(MediaEvent.DISPLAY_CHANGE)){
+				dispatchEvent(new MediaEvent(MediaEvent.DISPLAY_CHANGE));
+			}
 		}
 	}
 

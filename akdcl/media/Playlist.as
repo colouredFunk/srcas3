@@ -18,7 +18,9 @@ package akdcl.media {
 			} else if (_list is XMLList || _list is XML){
 				if (_list is XML){
 					//取XML中的"item"列表
-					_list = _list.item;
+					if (_list.item.length() > 0) {
+						_list = _list.item;
+					}
 				}
 				for each (var _xml:XML in _list){
 					_playlist.insertItem(new PlayItem(_xml));
