@@ -99,12 +99,23 @@ package ui.manager {
 				buttonTarget.removeEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
 				buttonTarget.removeEventListener(Event.ENTER_FRAME, onMouseMoveHandler);
 				delete buttonDownDic[buttonTarget];
-				if (buttonTarget.hasEventListener(InteractionEvent.RELEASE_OUTSIDE)) {
-					buttonTarget.dispatchEvent(new InteractionEvent(InteractionEvent.RELEASE_OUTSIDE));
-				}else if (buttonTarget.hasEventListener(InteractionEvent.RELEASE)) {
-					buttonTarget.dispatchEvent(new InteractionEvent(InteractionEvent.RELEASE));
-				}else {
-					buttonCallBack(buttonTarget, RELEASE);
+				var _isActive:Boolean = true;
+				var _parent:*= buttonTarget.parent;
+				while (_parent) {
+					if (_parent.mouseChildren) {
+						_parent = _parent.parent;
+					}else {
+						_isActive = false;
+						break;
+					}
+				}
+				if (_isActive) {
+					if (buttonTarget.hasEventListener(InteractionEvent.RELEASE_OUTSIDE)) {
+						buttonTarget.dispatchEvent(new InteractionEvent(InteractionEvent.RELEASE_OUTSIDE));
+					}else if (buttonTarget.hasEventListener(InteractionEvent.RELEASE)) {
+						buttonTarget.dispatchEvent(new InteractionEvent(InteractionEvent.RELEASE));
+						buttonCallBack(buttonTarget, RELEASE);
+					}
 				}
 				setButtonStyle(buttonTarget);
 			}

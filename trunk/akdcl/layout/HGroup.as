@@ -9,7 +9,7 @@ package akdcl.layout {
 			super(_width, _height);
 		}
 
-		override internal function update():void {
+		override public function update():void {
 			var _each:Group;
 			var _prevGroup:Group;
 
@@ -17,18 +17,20 @@ package akdcl.layout {
 				_each = children[_i];
 				_each.setWidth();
 				_each.setHeight();
+				_each.y = y;
 				if (_prevGroup){
-					_each.x = _prevGroup.x + _prevGroup.__width;
+					_each.x = _prevGroup.x + _prevGroup.__width + interval;
 				} else {
-					_each.x = 0;
+					_each.x = x;
 				}
+				_each.update();
 				_prevGroup = _each;
 			}
 		}
 
 		override internal function getChildWidth(_child:Group):uint {
 			var _each:Group;
-			var _width:uint = 0;
+			var _width:uint = (children.length - 1) * interval;
 			var _percent:Number = 0;
 			var _defaultPercent:Number = 0;
 			for each (_each in children){

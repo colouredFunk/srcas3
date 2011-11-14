@@ -23,7 +23,6 @@ package akdcl.media {
 		
 		public function DisplayLoader(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = -1):void {
 			super(_rectWidth, _rectHeight, _bgColor);
-			useScroll = false;
 			label = null;
 			setProgressClip(false);
 		}

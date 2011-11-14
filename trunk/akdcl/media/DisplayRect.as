@@ -67,7 +67,7 @@
 
 		public var label:String = "Size";
 		public var autoUpdate:Boolean = true;
-		public var useScroll:Boolean = true;
+		public var useScroll:Boolean;
 		public var moveRect:Boolean;
 
 		public var container:DisplayObjectContainer;
@@ -252,8 +252,11 @@
 				rect.height = _rectHeight;
 			}
 			super();
-			if (_bgColor >= 0 && useScroll){
+			if (_bgColor >= 0) {
+				useScroll = true;
 				container.opaqueBackground = _bgColor;
+			}else {
+				useScroll = false;
 			}
 		}
 
