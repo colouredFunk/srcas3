@@ -5,11 +5,11 @@ package akdcl.layout {
 	 * @author akdcl
 	 */
 	public class VGroup extends Group {
-		public function VGroup(_width:Number = 1, _height:Number = 0) {
+		public function VGroup(_width:Number = 1, _height:Number = 0){
 			super(_width, _height);
 		}
 
-		override internal function update():void {
+		override public function update():void {
 			var _each:Group;
 			var _prevGroup:Group;
 
@@ -17,24 +17,26 @@ package akdcl.layout {
 				_each = children[_i];
 				_each.setWidth();
 				_each.setHeight();
+				_each.x = x;
 				if (_prevGroup){
-					_each.y = _prevGroup.y + _prevGroup.__height;
+					_each.y = _prevGroup.y + _prevGroup.__height + interval;
 				} else {
-					_each.y = 0;
+					_each.y = y;
 				}
+				_each.update();
 				_prevGroup = _each;
 			}
 		}
 
 		override internal function getChildHeight(_child:Group):uint {
 			var _each:Group;
-			var _height:uint = 0;
+			var _height:uint = (children.length - 1) * interval;
 			var _percent:Number = 0;
 			var _defaultPercent:Number = 0;
 			for each (_each in children){
 				if (_each.percentHeight > 0){
 					_percent += _each.percentHeight;
-				} else if(_each.autoPercentY){
+				} else if (_each.autoPercentY){
 					_defaultPercent++;
 				} else if (_each.percentHeight == 0 && _each.__height){
 					_height += _each.__height;
@@ -48,8 +50,7 @@ package akdcl.layout {
 			}
 			//剩余height
 			_height = Math.max(0, __height - _height);
-			//trace(_height);
-			return Math.round(_height * (_each.autoPercentY?_defaultPercent:_child.percentHeight) / _percent);
+			return Math.round(_height * (_each.autoPercentY ? _defaultPercent : _child.percentHeight) / _percent);
 		}
 	}
 

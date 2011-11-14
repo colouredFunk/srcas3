@@ -74,12 +74,13 @@ package ui {
 			}
 
 			addEventListener(Event.ENTER_FRAME, onEnterFrameHandler);
-			if (needMouseChildren){
-				mouseChildren = true;
-			}
 		}
 
 		private function onEnterFrameHandler(_e:Event):void {
+			if (needMouseChildren) {
+				needMouseChildren = false;
+				mouseChildren = true;
+			}
 			if (!lockX){
 				scrollX += speedX;
 				var _isOutX:Boolean = alignX < 0 || alignX > 1;
