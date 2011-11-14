@@ -5,6 +5,7 @@
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Loader;
+	import flash.display.Shape;
 	import flash.events.Event;
 	import flash.media.Video;
 	import flash.geom.Rectangle;
@@ -68,6 +69,7 @@
 		public var label:String = "Size";
 		public var autoUpdate:Boolean = true;
 		public var useScroll:Boolean;
+		public var useMask:Boolean;
 		public var moveRect:Boolean;
 
 		public var container:DisplayObjectContainer;
@@ -239,9 +241,12 @@
 		protected var scaleModeReady:Number;
 		protected var originalWidth:int;
 		protected var originalHeight:int;
+		
 		private var aspectRatio:Number;
 		private var offX:int;
 		private var offY:int;
+		
+		private var maskShape:Shape;
 
 		public function DisplayRect(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = 0):void {
 			if (_rectWidth + _rectHeight > 0){
@@ -328,14 +333,36 @@
 				
 				updateScrollXY();
 			}
-			if (useScroll){
+			if (useScroll) {
+				if (container.mask) {
+					container.mask = null;
+					
+				}
 				container.scrollRect = rect;
+			}else if (useMask && maskShape) {
+				maskShape.x = rect.x;
+				maskShape.y = rect.y;
+				maskShape.width = rect.width;
+				maskShape.height = rect.height;
+				container.mask = maskShape;
 			}
 			if (hasEventListener(Event.RESIZE)){
 				if (!eventResize){
 					eventResize = new Event(Event.RESIZE);
 					dispatchEvent(eventResize);
 				}
+			}
+		}
+		
+		public function setUseMask(_b:Boolean):void {
+			useMask = _b;
+			if (useMask && !maskShape) {
+				maskShape = new Shape();
+				maskShape.graphics.beginFill(0);
+				maskShape.graphics.drawRect(0, 0, 1, 1);
+				maskShape.graphics.endFill();
+				maskShape.visible = false;
+				addChildAt(maskShape,0);
 			}
 		}
 		

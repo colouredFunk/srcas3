@@ -11,7 +11,13 @@ package akdcl.media {
 	/// @eventType	akdcl.media.MediaEvent.PLAY_ITEM_CHANGE
 	[Event(name="playItemChange",type="akdcl.media.MediaEvent")]
 
+	/// @eventType	akdcl.media.MediaEvent.DISPLAY_CHANGE
+	[Event(name="displayChange",type="akdcl.media.MediaEvent")]
+
 	public class MediaPlayer extends MediaProvider {
+		public var displayContent:Array;
+		public var onDisplayChange:Function;
+
 		private var imagePD:ImageProvider;
 		private var soundPD:SoundProvider;
 		private var videoPD:VideoProvider;
@@ -76,6 +82,7 @@ package akdcl.media {
 				return;
 			}
 			stop();
+			pageID.setID(-1);
 			__playlist = _playlist;
 			pageID.length = __playlist.length;
 			dispatchEvent(new MediaEvent(MediaEvent.LIST_CHANGE));
@@ -89,7 +96,7 @@ package akdcl.media {
 		public function set playID(_playID:int):void {
 			pageID.id = _playID;
 		}
-		
+
 		//0:不循环，1:单首循环，2:顺序循环(全部播放完毕后停止)，3:顺序循环，4:随机播放
 		private var __repeat:uint = 3;
 
@@ -112,7 +119,7 @@ package akdcl.media {
 			pageID = new PageID();
 			pageID.onIDChange = onPlayIDChangeHandler;
 		}
-		
+
 		override public function remove():void {
 			//playlist.remove();
 			imagePD.remove();
@@ -131,18 +138,20 @@ package akdcl.media {
 
 		private function onPlayIDChangeHandler(_id:uint):void {
 			var _content:MediaProvider;
-			for each (_content in playContent) {
+			for each (_content in playContent){
 				_content.removeEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 				_content.removeEventListener(MediaEvent.LOAD_ERROR, onLoadErrorHandler);
 				_content.removeEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
 				_content.removeEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
 				_content.removeEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);
 				_content.removeEventListener(MediaEvent.DISPLAY_CHANGE, onDisplayChangeHandler);
-				
-				if (_content.playState!=PlayState.COMPLETE) {
+
+				if (_content.playState != PlayState.COMPLETE){
 					_content.stop();
 				}
 			}
+
+			displayContent = [];
 
 			playItem = playlist.getItem(_id);
 			switch (playItem.type){
@@ -150,26 +159,22 @@ package akdcl.media {
 				case "jpg":
 				case "png":
 				case "swf":
-					imagePD.load(playItem);
 					playContent[0] = imagePD;
 					break;
 				case "mp3":
 				case "wav":
-					soundPD.load(playItem);
 					playContent[0] = soundPD;
 					break;
 				case "flv":
 				case "mov":
 				case "mp4":
 				case "f4v":
-					videoPD.load(playItem);
 					playContent[0] = videoPD;
 					break;
 				case "wma":
 				case "wmv":
 				case "mms":
 				default:
-					wmpPD.load(playItem);
 					playContent[0] = wmpPD;
 					break;
 			}
@@ -180,6 +185,8 @@ package akdcl.media {
 				_content.addEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
 				_content.addEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);
 				_content.addEventListener(MediaEvent.DISPLAY_CHANGE, onDisplayChangeHandler);
+				//
+				_content.load(playItem);
 			}
 			dispatchEvent(new MediaEvent(MediaEvent.PLAY_ITEM_CHANGE));
 			play(0);
@@ -264,10 +271,19 @@ package akdcl.media {
 					break;
 			}
 		}
-		
-		private function onDisplayChange():void {
+
+		private function onDisplayChangeHandler(_e:MediaEvent):void {
 			//加载显示对象
-			//playContent.xxxxxxxxx;
+			var _content:MediaProvider = _e.target as MediaProvider;
+			if ("displayContent" in _content){
+				displayContent.push(_content["displayContent"]);
+				if (hasEventListener(MediaEvent.DISPLAY_CHANGE)){
+					dispatchEvent(new MediaEvent(MediaEvent.DISPLAY_CHANGE));
+				}
+				if (onDisplayChange != null) {
+					onDisplayChange(_content["displayContent"]);
+				}
+			}
 		}
 	}
 

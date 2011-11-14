@@ -1,4 +1,5 @@
 package akdcl.media {
+	import flash.display.DisplayObject;
 	import flash.events.ActivityEvent;
 	import flash.events.StatusEvent;
 	import flash.media.Camera;
@@ -17,6 +18,7 @@ package akdcl.media {
 	[Event(name="displayChange",type="akdcl.media.MediaEvent")]
 
 	final public class CameraProvider extends MediaProvider {
+		public var displayContent:DisplayObject;
 		private var camera:Camera;
 		private var isCameraAdded:Boolean;
 
@@ -115,6 +117,7 @@ package akdcl.media {
 		private function onDisplayChange():void {
 			//加载显示对象
 			//playContent;
+			displayContent = playContent;
 			if (hasEventListener(MediaEvent.DISPLAY_CHANGE)){
 				dispatchEvent(new MediaEvent(MediaEvent.DISPLAY_CHANGE));
 			}

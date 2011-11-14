@@ -13,9 +13,11 @@ package akdcl.net {
 			_urlOrXML = _urlOrXML[0];
 		}
 		var _href:String;
+		var _js:String;
 		if (_urlOrXML is XML) {
 			_target = String(_urlOrXML.attribute("target")) || _target;
 			_href = String(_urlOrXML.attribute("href"));
+			_js = _urlOrXML.attribute("js");
 		}else {
 			_href = _urlOrXML;
 		}

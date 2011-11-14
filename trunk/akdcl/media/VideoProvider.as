@@ -1,5 +1,6 @@
 package akdcl.media {
 
+	import flash.display.DisplayObject;
 	import flash.geom.Rectangle;
 	
 	import com.greensock.loading.VideoLoader;
@@ -19,6 +20,8 @@ package akdcl.media {
 		private static const VIDEOLOADER_GROUP:String = "VideoLoader";
 
 		private static var sM:SourceManager = SourceManager.getInstance();
+		
+		public var displayContent:DisplayObject;
 		
 		private var isBuffering:Boolean = false;
 
@@ -154,8 +157,10 @@ package akdcl.media {
 		
 		private function onDisplayChange():void {
 			//加载显示对象
-			//playContent.content;
-			dispatchEvent(new MediaEvent(MediaEvent.DISPLAY_CHANGE));
+			displayContent = playContent.content;
+			if (hasEventListener(MediaEvent.DISPLAY_CHANGE)){
+				dispatchEvent(new MediaEvent(MediaEvent.DISPLAY_CHANGE));
+			}
 		}
 	}
 
