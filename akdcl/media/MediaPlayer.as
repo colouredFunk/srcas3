@@ -137,6 +137,7 @@ package akdcl.media {
 				_content.removeEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
 				_content.removeEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
 				_content.removeEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);
+				_content.removeEventListener(MediaEvent.DISPLAY_CHANGE, onDisplayChangeHandler);
 				
 				if (_content.playState!=PlayState.COMPLETE) {
 					_content.stop();
@@ -178,6 +179,7 @@ package akdcl.media {
 				_content.addEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
 				_content.addEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
 				_content.addEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);
+				_content.addEventListener(MediaEvent.DISPLAY_CHANGE, onDisplayChangeHandler);
 			}
 			dispatchEvent(new MediaEvent(MediaEvent.PLAY_ITEM_CHANGE));
 			play(0);

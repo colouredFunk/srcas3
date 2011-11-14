@@ -231,16 +231,14 @@
 		protected var isHidding:Boolean = false;
 
 		protected var tweenMode:int;
-		protected var alignXReady:Number;
-		protected var alignYReady:Number;
-		protected var scaleModeReady:Number;
-
-		protected var originalWidth:int;
-		protected var originalHeight:int;
-		
 		protected var scaleWidth:Number;
 		protected var scaleHeight:Number;
 		
+		protected var alignXReady:Number;
+		protected var alignYReady:Number;
+		protected var scaleModeReady:Number;
+		protected var originalWidth:int;
+		protected var originalHeight:int;
 		private var aspectRatio:Number;
 		private var offX:int;
 		private var offY:int;
@@ -340,6 +338,14 @@
 				}
 			}
 		}
+		
+		public function setUseScroll(_useScroll:Boolean, _color:int = -1):void {
+			useScroll = _useScroll;
+			if (useScroll){
+				container.scrollRect = rect;
+			}
+			container.opaqueBackground = _color < 0?null:_color;
+		}
 
 		protected function updateScrollXY():void {
 			var _display:Object = displayContent;
@@ -417,8 +423,8 @@
 				//
 				offX = offY = 0;
 				if (_display is Bitmap){
-					originalWidth = _display.width / _display.scaleX;
-					originalHeight = _display.height / _display.scaleY;
+					originalWidth = content.width;
+					originalHeight = content.height;
 				} else if (_display is Loader){
 					originalWidth = _display.contentLoaderInfo.width;
 					originalHeight = _display.contentLoaderInfo.height;
