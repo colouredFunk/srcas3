@@ -167,6 +167,7 @@ package zero.works{
 			}
 		}
 		private function loadError(event:Event):void{
+			trace(this+" 加载 "+xml.toXMLString()+" 失败");
 			loader.contentLoaderInfo.removeEventListener(Event.COMPLETE,loadComplete);
 			loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,loadError);
 			loader.contentLoaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,loadError);
