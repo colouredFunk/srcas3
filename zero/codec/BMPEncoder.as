@@ -7,47 +7,38 @@ BMPEncoder 版本:v1.0
 用法举例:这家伙很懒什么都没写
 */
 package zero.codec{
+	
 	import flash.display.*;
 	import flash.events.*;
 	import flash.utils.*;
+	import flash.geom.*;
+
 	public class BMPEncoder{
-		public static function encode(bmdOrBytes:*,biBitCount:int=24,isRev:Boolean=false,biWidth:int=-1,biHeight:int=-1):ByteArray{
-			if(biBitCount!=24){
-				trace("暂不支持24位以外的encode ^_^");
-				return null;
-			}
-			var bmd:BitmapData;
-			var bytes:ByteArray;
-			if(bmdOrBytes is BitmapData){
-				bmd=bmdOrBytes;
-				biWidth=bmd.width;
-				biHeight=bmd.height;
-			}else{
-				bytes=bmdOrBytes;
-			}
+		public static function encode(bmd:BitmapData,biBitCount:int=24,isRev:Boolean=false):ByteArray{
+			var biWidth:int=bmd.width;
+			var biHeight:int=bmd.height;
 			var bmdData:ByteArray=new ByteArray();
-			/*
-			BMP文件头
-			typedef struct tagBITMAPFILEHEADER {
-				WORD	bfType;			// 位图文件的类型，必须为BM
-				DWORD	bfSize;			// 位图文件的大小，以字节为单位
-				WORD	bfReserved1;	// 位图文件保留字，必须为0
-				WORD	bfReserved2;	// 位图文件保留字，必须为0
-				DWORD	bfOffBits;		// 位图数据的起始位置，以相对于位图文件头的偏移量表示，以字节为单位
-			} BITMAPFILEHEADER, *PBITMAPFILEHEADER;
 			
-			|.BM.|....大小...|..0..|..0..|
-			42 4d b6 70 06 00 00 00 00 00
-			*/
+			//BMP文件头
+			//typedef struct tagBITMAPFILEHEADER {
+			//	WORD	bfType;			// 位图文件的类型，必须为BM
+			//	DWORD	bfSize;			// 位图文件的大小，以字节为单位
+			//	WORD	bfReserved1;	// 位图文件保留字，必须为0
+			//	WORD	bfReserved2;	// 位图文件保留字，必须为0
+			//	DWORD	bfOffBits;		// 位图数据的起始位置，以相对于位图文件头的偏移量表示，以字节为单位
+			//} BITMAPFILEHEADER, *PBITMAPFILEHEADER;
+			//
+			//|.BM.|....大小...|..0..|..0..|
+			//42 4d b6 70 06 00 00 00 00 00
 			
 			bmdData[0]=0x42;
 			bmdData[1]=0x4d;//"BM"
 			
 			//bfSize
-			bmdData[2]=0;
-			bmdData[3]=0;
-			bmdData[4]=0;
-			bmdData[5]=0;
+			//bmdData[2]=0;
+			//bmdData[3]=0;
+			//bmdData[4]=0;
+			//bmdData[5]=0;
 			
 			bmdData[6]=0;
 			bmdData[7]=0;
@@ -60,43 +51,41 @@ package zero.codec{
 			bmdData[13]=0;
 			
 			
-			/*
-			位图信息头
-			typedef struct tagBITMAPINFOHEADER{
-				DWORD	biSize; //本结构所占用字节数
-				LONG	biWidth; //位图的宽度
-				LONG	biHeight; //位图的高度
-				WORD	biPlanes; //永远为1 ,由于没有用过所以 没做研究 附msdn解释 Specifies the number of planes for the target device. This value must be set to 1. 
-				WORD	biBitCount;//位图的位数  分为1 4 8 16 24 32 本文没对1 4 进行研究
-				DWORD	biCompression; //本意为压缩类型，但是却另外有作用，稍候解释
-				DWORD	biSizeImage; //表示位图数据区域的大小以字节为单位
-				LONG	biXPelsPerMeter;//位图水平分辨率，每米像素数
-				LONG	biYPelsPerMeter;//位图垂直分辨率，每米像素数
-				DWORD	biClrUsed;//ColorsUsed 位图实际使用的颜色表中的颜色数
-				DWORD	biClrImportant;//ColorsImportant 位图显示过程中重要的颜色数
-			} BITMAPINFOHEADER, *PBITMAPINFOHEADER;
-			*/
+			//位图信息头
+			//typedef struct tagBITMAPINFOHEADER{
+			//	DWORD	biSize; //本结构所占用字节数
+			//	LONG	biWidth; //位图的宽度
+			//	LONG	biHeight; //位图的高度
+			//	WORD	biPlanes; //永远为1 ,由于没有用过所以 没做研究 附msdn解释 Specifies the number of planes for the target device. This value must be set to 1. 
+			//	WORD	biBitCount;//位图的位数  分为1 4 8 16 24 32 本文没对1 4 进行研究
+			//	DWORD	biCompression; //本意为压缩类型，但是却另外有作用，稍候解释
+			//	DWORD	biSizeImage; //表示位图数据区域的大小以字节为单位
+			//	LONG	biXPelsPerMeter;//位图水平分辨率，每米像素数
+			//	LONG	biYPelsPerMeter;//位图垂直分辨率，每米像素数
+			//	DWORD	biClrUsed;//ColorsUsed 位图实际使用的颜色表中的颜色数
+			//	DWORD	biClrImportant;//ColorsImportant 位图显示过程中重要的颜色数
+			//} BITMAPINFOHEADER, *PBITMAPINFOHEADER;
 			
 			bmdData[14]=40;
 			bmdData[15]=0;
 			bmdData[16]=0;
 			bmdData[17]=0;
 			
-			bmdData[18]=biWidth&0xff;
-			bmdData[19]=(biWidth&0xff00)>>8;
-			bmdData[20]=(biWidth&0xff0000)>>16;//因为BitmapData最大只能到2880,所以这个其实总是0
-			bmdData[21]=(biWidth&0xff000000)>>24;//因为BitmapData最大只能到2880,所以这个其实总是0
+			bmdData[18]=biWidth;
+			bmdData[19]=biWidth>>8;
+			bmdData[20]=biWidth>>16;//因为BitmapData最大只能到2880,所以这个其实总是0
+			bmdData[21]=biWidth>>24;//因为BitmapData最大只能到2880,所以这个其实总是0
 			
 			var uBiHeight:uint=isRev?-biHeight:biHeight;
-			bmdData[22]=uBiHeight&0xff;
-			bmdData[23]=(uBiHeight&0xff00)>>8;
-			bmdData[24]=(uBiHeight&0xff0000)>>16;
-			bmdData[25]=(uBiHeight&0xff000000)>>24;
+			bmdData[22]=uBiHeight;
+			bmdData[23]=uBiHeight>>8;
+			bmdData[24]=uBiHeight>>16;
+			bmdData[25]=uBiHeight>>24;
 			
 			bmdData[26]=1;
 			bmdData[27]=0;
 			
-			bmdData[28]=24;
+			bmdData[28]=biBitCount;
 			bmdData[29]=0;
 			
 			bmdData[30]=0;
@@ -105,19 +94,18 @@ package zero.codec{
 			bmdData[33]=0;
 			
 			//biSizeImage
-			bmdData[34]=0;
-			bmdData[35]=0;
-			bmdData[36]=0;
-			bmdData[37]=0;
+			//bmdData[34]=0;
+			//bmdData[35]=0;
+			//bmdData[36]=0;
+			//bmdData[37]=0;
 			
-			
-			bmdData[38]=0;
-			bmdData[39]=0;
+			bmdData[38]=0x12;
+			bmdData[39]=0x0b;
 			bmdData[40]=0;
 			bmdData[41]=0;
 			
-			bmdData[42]=0;
-			bmdData[43]=0;
+			bmdData[42]=0x12;
+			bmdData[43]=0x0b;
 			bmdData[44]=0;
 			bmdData[45]=0;
 			
@@ -132,163 +120,168 @@ package zero.codec{
 			bmdData[53]=0;//biClrImportant
 			
 			//设置像素值
-			var pos:int=54;
-			var restArr:Array;//在设置像素时保持在行末是4个字节的整数倍
-			var colorArr:Array;
-			var i:int,x:int,y:int,num:int;
-			var color:uint;
-			var biCompression:int;
 			
-			restArr=getRestArr(pos);
+			var pos:int=54;
+			var x:int,y:int;
+			
+			//if(biWidth%4){
+			//	trace("biWidth="+biWidth);
+			//	biWidth=Math.ceil(biWidth/4)*4;
+			//	trace("biWidth="+biWidth);
+			//	var _bmd:BitmapData=new BitmapData(biWidth,biHeight,false,0x000000);
+			//	_bmd.copyPixels(bmd,bmd.rect,new Point());
+			//	bmd=_bmd;
+			//}
+			
+			var bmdCopy:BitmapData,bmdBytes:ByteArray
+			if(isRev){
+				bmdBytes=bmd.getPixels(bmd.rect);
+			}else{
+				bmdCopy=bmd.clone();
+				bmdCopy.draw(bmd,new Matrix(1,0,0,-1,0,biHeight));
+				bmdBytes=bmdCopy.getPixels(bmd.rect);
+			}
+			
+			if(isRev){
+			}else{
+				bmdCopy.dispose();
+				bmdCopy=null;
+			}
+			
+			var i:int=0;
 			switch(biBitCount){
+				case 32:
+					for(y=0;y<biHeight;y++){
+						for(x=0;x<biWidth;x++){
+							bmdData[pos++]=bmdBytes[i+3];//g
+							bmdData[pos++]=bmdBytes[i+2];//b
+							bmdData[pos++]=bmdBytes[i+1];//r
+							bmdData[pos++]=bmdBytes[i];
+							i+=4;
+						}
+					}
+				break;
 				case 24:
-				if(bmd){
-					if(isRev){
-						for(y=0;y<biHeight;y++){
-							for(x=0;x<biWidth;x++){
-								color=bmd.getPixel(x,y);
-								//trace("color="+color.toString(16));
-								bmdData[pos++]=color&0xff;
-								bmdData[pos++]=(color&0xff00)>>8;
-								bmdData[pos++]=(color&0xff0000)>>16;
-							}
-							pos+=restArr[pos%4];
+					for(y=0;y<biHeight;y++){
+						for(x=0;x<biWidth;x++){
+							bmdData[pos++]=bmdBytes[i+3];//g
+							bmdData[pos++]=bmdBytes[i+2];//b
+							bmdData[pos++]=bmdBytes[i+1];//r
+							i+=4;
 						}
-					}else{
-						for(y=biHeight-1;y>=0;y--){
-							for(x=0;x<biWidth;x++){
-								color=bmd.getPixel(x,y);
-								//trace("color="+color.toString(16));
-								bmdData[pos++]=color&0xff;
-								bmdData[pos++]=(color&0xff00)>>8;
-								bmdData[pos++]=(color&0xff0000)>>16;
-							}
-							pos+=restArr[pos%4];
-						}
+						pos+=(6-(pos%4))%4;//在设置像素时保持在行末是4个字节的整数倍
 					}
-				}else{
-					if(isRev){
-						for(y=biHeight-1;y>=0;y--){
-							i=biWidth*y*4;
-							for(x=0;x<biWidth;x++){
-								bmdData[pos++]=bytes[i+3];
-								bmdData[pos++]=bytes[i+2];
-								bmdData[pos++]=bytes[i+1];
-								i+=4;
-							}
-							pos+=restArr[pos%4];
-						}
-					}else{
-						for(y=biHeight-1;y>=0;y--){
-							i=biWidth*y*4;
-							for(x=0;x<biWidth;x++){
-								bmdData[pos++]=bytes[i+3];
-								bmdData[pos++]=bytes[i+2];
-								bmdData[pos++]=bytes[i+1];
-								i+=4;
-							}
-							pos+=restArr[pos%4];
-						}
-					}
-				}
+				break;
+				case 16:
+					trace("暂不支持对16位位图的编码");
+				break;
+				case 8:
+					trace("暂不支持对8位位图的编码");
+				break;
+				case 4:
+					trace("暂不支持对4位位图的编码");
+				break;
+				case 1:
+					trace("暂不支持对1位位图的编码");
+				break;
+			}
+			
+			i=4-(pos%4);
+			while(--i>=0){
+				bmdData[pos++]=0x00;
 			}
 			
 			var bfSize:int=bmdData.length;
-			bmdData[2]=bfSize&0xff;
-			bmdData[3]=(bfSize&0xff00)>>8;
-			bmdData[4]=(bfSize&0xff0000)>>16;
-			bmdData[5]=(bfSize&0xff000000)>>24;
+			bmdData[2]=bfSize;
+			bmdData[3]=bfSize>>8;
+			bmdData[4]=bfSize>>16;
+			bmdData[5]=bfSize>>24;
+			
+			var biSizeImage:int=bfSize-54;
+			bmdData[34]=biSizeImage;
+			bmdData[35]=biSizeImage>>8;
+			bmdData[36]=biSizeImage>>16;
+			bmdData[37]=biSizeImage>>24;
+			
 			return bmdData;
 		}
 		public static function decode(bmdData:ByteArray):BitmapData{
-			if(!(bmdData[0]==0x42&&bmdData[1]==0x4d)){
+			
+			//BMP文件头
+			//typedef struct tagBITMAPFILEHEADER {
+			//	WORD	bfType;			// 位图文件的类型，必须为BM
+			//	DWORD	bfSize;			// 位图文件的大小，以字节为单位
+			//	WORD	bfReserved1;	// 位图文件保留字，必须为0
+			//	WORD	bfReserved2;	// 位图文件保留字，必须为0
+			//	DWORD	bfOffBits;		// 位图数据的起始位置，以相对于位图文件头的偏移量表示，以字节为单位
+			//} BITMAPFILEHEADER, *PBITMAPFILEHEADER;
+			//
+			//|.BM.|....大小...|..0..|..0..|
+			//42 4d b6 70 06 00 00 00 00 00
+			
+			if(
+				bmdData[0]==0x42
+				&&
+				bmdData[1]==0x4d
+			){
 				//0x42,0x4d----66,77----BM
-				trace("不是有效的位图文件");
-				return null;
+			}else{
+				throw new Error("不是有效的位图文件");
 			}
+			
+			//位图信息头
+			//typedef struct tagBITMAPINFOHEADER{
+			//	DWORD	biSize; //本结构所占用字节数
+			//	LONG	biWidth; //位图的宽度
+			//	LONG	biHeight; //位图的高度
+			//	WORD	biPlanes; //永远为1 ,由于没有用过所以 没做研究 附msdn解释 Specifies the number of planes for the target device. This value must be set to 1. 
+			//	WORD	biBitCount;//位图的位数  分为1 4 8 16 24 32 本文没对1 4 进行研究
+			//	DWORD	biCompression; //本意为压缩类型，但是却另外有作用，稍候解释
+			//	DWORD	biSizeImage; //表示位图数据区域的大小以字节为单位
+			//	LONG	biXPelsPerMeter;//位图水平分辨率，每米像素数
+			//	LONG	biYPelsPerMeter;//位图垂直分辨率，每米像素数
+			//	DWORD	biClrUsed;//ColorsUsed 位图实际使用的颜色表中的颜色数
+			//	DWORD	biClrImportant;//ColorsImportant 位图显示过程中重要的颜色数
+			//} BITMAPINFOHEADER, *PBITMAPINFOHEADER;
+			
 			var bfOffBits:int=bmdData[10]|(bmdData[11]<<8)|(bmdData[12]<<16)|(bmdData[13]<<24);
-			//trace("bfOffBits="+bfOffBits);
+			//var biSize:int=bmdData[14]|(bmdData[15]<<8)|(bmdData[16]<<16)|(bmdData[17]<<24);
 			var biWidth:int=bmdData[18]|(bmdData[19]<<8)|(bmdData[20]<<16)|(bmdData[21]<<24);
-			//trace("biWidth="+biWidth);
 			var biHeight:int=bmdData[22]|(bmdData[23]<<8)|(bmdData[24]<<16)|(bmdData[25]<<24);
-			//trace("biHeight="+biHeight);
+			//var biPlanes:int=bmdData[26]|(bmdData[27]<<8);
 			var biBitCount:int=bmdData[28]|(bmdData[29]<<8);
-			//trace("biBitCount="+biBitCount);
 			var biCompression:int=bmdData[30]|(bmdData[31]<<8)|(bmdData[32]<<16)|(bmdData[33]<<24);
-			//trace("biCompression="+biCompression);
+			//var biSizeImage:int=bmdData[34]|(bmdData[35]<<8)|(bmdData[36]<<16)|(bmdData[37]<<24);
+			//var biXPelsPerMeter:int=bmdData[38]|(bmdData[39]<<8)|(bmdData[40]<<16)|(bmdData[41]<<24);
+			//var biYPelsPerMeter:int=bmdData[42]|(bmdData[43]<<8)|(bmdData[44]<<16)|(bmdData[45]<<24);
+			//var biClrUsed:int=bmdData[46]|(bmdData[47]<<8)|(bmdData[48]<<16)|(bmdData[49]<<24);
+			//var biClrImportant:int=bmdData[50]|(bmdData[51]<<8)|(bmdData[52]<<16)|(bmdData[53]<<24);
 			
-			/*
-			BMP文件头
-			typedef struct tagBITMAPFILEHEADER {
-				WORD	bfType;			// 位图文件的类型，必须为BM
-				DWORD	bfSize;			// 位图文件的大小，以字节为单位
-				WORD	bfReserved1;	// 位图文件保留字，必须为0
-				WORD	bfReserved2;	// 位图文件保留字，必须为0
-				DWORD	bfOffBits;		// 位图数据的起始位置，以相对于位图文件头的偏移量表示，以字节为单位
-			} BITMAPFILEHEADER, *PBITMAPFILEHEADER;
+			//颜色表
+			//typedef struct tagRGBQUAD {
+			//	BYTE	rgbBlue;// 蓝色的亮度(值范围为0-255)
+			//	BYTE	rgbGreen; // 绿色的亮度(值范围为0-255)
+			//	BYTE	rgbRed; // 红色的亮度(值范围为0-255)
+			//	BYTE	rgbReserved;// 保留，必须为0
+			//} RGBQUAD;
+			//颜色表中RGBQUAD结构数据的个数有biBitCount来确定:
+			//当biBitCount=1,4,8时，分别有2,16,256个表项;
 			
-			|.BM.|....大小...|..0..|..0..|
-			42 4d b6 70 06 00 00 00 00 00
-			*/
-			
-			/*trace(String.fromCharCode(bmdData[0])+String.fromCharCode(bmdData[1]));//BM
-			var bfSize:int=bmdData[2]|(bmdData[3]<<8)|(bmdData[4]<<16)|(bmdData[5]<<24);
-			trace("bfSize="+bfSize);
-			trace(bmdData[6],bmdData[7],bmdData[8],bmdData[9]);//0 0 0 0*/
-			
-			/*
-			位图信息头
-			typedef struct tagBITMAPINFOHEADER{
-				DWORD	biSize; //本结构所占用字节数
-				LONG	biWidth; //位图的宽度
-				LONG	biHeight; //位图的高度
-				WORD	biPlanes; //永远为1 ,由于没有用过所以 没做研究 附msdn解释 Specifies the number of planes for the target device. This value must be set to 1. 
-				WORD	biBitCount;//位图的位数  分为1 4 8 16 24 32 本文没对1 4 进行研究
-				DWORD	biCompression; //本意为压缩类型，但是却另外有作用，稍候解释
-				DWORD	biSizeImage; //表示位图数据区域的大小以字节为单位
-				LONG	biXPelsPerMeter;//位图水平分辨率，每米像素数
-				LONG	biYPelsPerMeter;//位图垂直分辨率，每米像素数
-				DWORD	biClrUsed;//ColorsUsed 位图实际使用的颜色表中的颜色数
-				DWORD	biClrImportant;//ColorsImportant 位图显示过程中重要的颜色数
-			} BITMAPINFOHEADER, *PBITMAPINFOHEADER;
-			*/
-			
-			/*var biSize:int=bmdData[14]|(bmdData[15]<<8)|(bmdData[16]<<16)|(bmdData[17]<<24);
-			trace("biSize="+biSize);
-			trace("biPlanes="+(bmdData[26]|(bmdData[27]<<8)));
-			var biSizeImage:int=bmdData[34]|(bmdData[35]<<8)|(bmdData[36]<<16)|(bmdData[37]<<24);
-			trace("biSizeImage="+biSizeImage);
-			var biXPelsPerMeter:int=bmdData[38]|(bmdData[39]<<8)|(bmdData[40]<<16)|(bmdData[41]<<24);
-			trace("biXPelsPerMeter="+biXPelsPerMeter);
-			var biYPelsPerMeter:int=bmdData[42]|(bmdData[43]<<8)|(bmdData[44]<<16)|(bmdData[45]<<24);
-			trace("biYPelsPerMeter="+biYPelsPerMeter);
-			var biClrUsed:int=bmdData[46]|(bmdData[47]<<8)|(bmdData[48]<<16)|(bmdData[49]<<24);
-			trace("biClrUsed="+biClrUsed);
-			var biClrImportant:int=bmdData[50]|(bmdData[51]<<8)|(bmdData[52]<<16)|(bmdData[53]<<24);
-			trace("biClrImportant="+biClrImportant);*/
-			
-			/*
-			颜色表
-			typedef struct tagRGBQUAD {
-				BYTE	rgbBlue;// 蓝色的亮度(值范围为0-255)
-				BYTE	rgbGreen; // 绿色的亮度(值范围为0-255)
-				BYTE	rgbRed; // 红色的亮度(值范围为0-255)
-				BYTE	rgbReserved;// 保留，必须为0
-			} RGBQUAD;
-			颜色表中RGBQUAD结构数据的个数有biBitCount来确定:
-			当biBitCount=1,4,8时，分别有2,16,256个表项;
-			*/
+			var isRev:Boolean;
+			if(biHeight<0){
+				isRev=true;
+				biHeight=-biHeight;
+			}else{
+				isRev=false;
+			}
 			
 			var pos:int=54;
 			var restArr:Array;//在读取像素时保持在行末是4个字节的整数倍
-			var bmd:BitmapData=new BitmapData(biWidth,biHeight>0?biHeight:-biHeight,false,0x000000);
+			var bmd:BitmapData=new BitmapData(biWidth,biHeight,false,0x000000);
 			var colorArr:Array;
 			var i:int,x:int,y:int,num:int;
 			var color:uint;
-			var isRev:Boolean=biHeight<0;//是否翻转
-			if(isRev){
-				biHeight=-biHeight;
-			}
+			
 			switch(biBitCount){
 				case 32:
 					//得到像素值
