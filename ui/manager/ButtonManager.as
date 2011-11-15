@@ -58,6 +58,7 @@ package ui.manager {
 		private static const DRAG_OUT:String = "dragOut";
 		
 		public static var mobileMode:Boolean;
+		public static var moveAccuracy:int = 0;
 		
 		private var stage:Stage;
 		private var buttonDic:Dictionary;
@@ -218,7 +219,7 @@ package ui.manager {
 			speedY = stage.mouseY - lastY;
 			lastX = stage.mouseX;
 			lastY = stage.mouseY;
-			if (speedX != 0 || speedY != 0) {
+			if (Math.abs(speedX) > moveAccuracy || Math.abs(speedY) > moveAccuracy) {
 				var _iEvt:InteractionEvent = new InteractionEvent(InteractionEvent.DRAG_MOVE);
 				_e.currentTarget.dispatchEvent(_iEvt);
 			}
