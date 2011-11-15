@@ -17,7 +17,7 @@ package akdcl.net {
 		if (_urlOrXML is XML) {
 			_target = String(_urlOrXML.attribute("target")) || _target;
 			_href = String(_urlOrXML.attribute("href"));
-			_js = (_urlOrXML.attribute("js"));
+			_js = _urlOrXML.attribute("js").toString();
 		}else {
 			_href = _urlOrXML;
 		}
