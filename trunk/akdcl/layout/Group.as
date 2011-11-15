@@ -45,7 +45,7 @@ package akdcl.layout {
 			}
 		}
 
-		public function Group(_width:Number = 1, _height:Number = 1){
+		public function Group(_width:Number = 1, _height:Number = 1) {
 			autoPercentX = _width == 0;
 			autoPercentY = _height == 0;
 
