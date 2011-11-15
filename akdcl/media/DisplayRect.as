@@ -336,7 +336,6 @@
 			if (useScroll) {
 				if (container.mask) {
 					container.mask = null;
-					
 				}
 				container.scrollRect = rect;
 			}else if (useMask && maskShape) {
@@ -363,6 +362,15 @@
 				maskShape.graphics.endFill();
 				maskShape.visible = false;
 				addChildAt(maskShape,0);
+			}
+			if (useMask) {
+				maskShape.x = rect.x;
+				maskShape.y = rect.y;
+				maskShape.width = rect.width;
+				maskShape.height = rect.height;
+				container.mask = maskShape;
+			}else {
+				container.mask = null;
 			}
 		}
 		

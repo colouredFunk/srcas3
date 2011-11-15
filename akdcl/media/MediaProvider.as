@@ -1,4 +1,4 @@
-package akdcl.media {
+﻿package akdcl.media {
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
 	
@@ -70,6 +70,10 @@ package akdcl.media {
 				_playProgress = 1;
 			}
 			position = totalTime * _playProgress;
+		}
+		
+		public function get isPlaying():Boolean {
+			return __playState == PlayState.PLAY;
 		}
 
 		private var __playState:String = PlayState.READY;

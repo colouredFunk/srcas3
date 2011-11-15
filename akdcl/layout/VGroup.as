@@ -50,7 +50,8 @@ package akdcl.layout {
 			}
 			//剩余height
 			_height = Math.max(0, __height - _height);
-			return Math.round(_height * (_each.autoPercentY ? _defaultPercent : _child.percentHeight) / _percent);
+			_height = Math.round(_height * (_child.autoPercentY ? _defaultPercent : _child.percentHeight) / _percent);
+			return _height;
 		}
 	}
 

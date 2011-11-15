@@ -207,7 +207,7 @@
 
 		protected function onCompleteHandler(_data:*):void {
 			isLoading = false;
-			rawData = String(_data).replace(/^\s*|\s*$/g, "");
+			rawData = _data;
 			if (rawData) {
 				
 			} else {

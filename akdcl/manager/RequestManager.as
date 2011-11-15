@@ -483,10 +483,12 @@ class RequestURLLoader extends URLLoader {
 				} catch (_e:*){
 				}
 				return null;
-			case URLLoaderDataFormat.TEXT:
 			case URLLoaderDataFormat.BINARY:
 			case URLLoaderDataFormat.VARIABLES:
+				return data;
+			case URLLoaderDataFormat.TEXT:
 			default:
+				data = String(data).replace(/^\s*|\s*$/g, "");
 				return data;
 		}
 	}
