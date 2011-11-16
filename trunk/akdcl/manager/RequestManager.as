@@ -209,9 +209,7 @@ package akdcl.manager {
 				if (_url.data){
 					request.contentType = _url.contentType;
 					request.method = _url.method || URLRequestMethod.POST;
-					if (_url.random){
-						//_url.data.random = Math.random();
-					}
+					_url.data.random = Math.random();
 					switch (_url.sendFormat){
 						case DATAFORMAT_FORM:
 							var _formVars:FormVariables = new FormVariables(_url.data);
@@ -250,9 +248,7 @@ package akdcl.manager {
 							break;
 					}
 				} else {
-					if (_url.random){
-						//request.url += "?random=" + Math.random();
-					}
+					request.url += "?random=" + Math.random();
 					request.data = null;
 					request.contentType = null;
 					request.method = URLRequestMethod.GET;
