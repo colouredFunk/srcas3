@@ -242,7 +242,7 @@
 		protected var originalWidth:int;
 		protected var originalHeight:int;
 		
-		private var aspectRatio:Number;
+		protected var aspectRatio:Number;
 		private var offX:int;
 		private var offY:int;
 		

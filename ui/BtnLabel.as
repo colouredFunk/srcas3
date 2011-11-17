@@ -80,7 +80,7 @@
 				}
 			}else if (bar){
 				if (txt.width + widthAdd < __widthMax && txt.width + widthAdd * 0.25 < __widthMax) {
-					bar.width = __widthMax;
+					bar.width = int(__widthMax);
 				}else {
 					bar.width = int(txt.width + widthAdd);
 				}
