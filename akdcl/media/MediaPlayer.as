@@ -116,6 +116,7 @@ package akdcl.media {
 			wmpPD = new WMPProvider();
 			providers = [soundPD, videoPD, wmpPD, imagePD];
 			playContent = [];
+			displayContent = [];
 			pageID = new PageID();
 			pageID.onIDChange = onPlayIDChangeHandler;
 		}
@@ -187,6 +188,11 @@ package akdcl.media {
 				_content.addEventListener(MediaEvent.DISPLAY_CHANGE, onDisplayChangeHandler);
 				//
 				_content.load(playItem);
+				if ("displayContent" in _content && _content["displayContent"]) {
+					if (displayContent.indexOf(_content["displayContent"]) < 0) {
+						displayContent.push(_content["displayContent"]);
+					}
+				}
 			}
 			dispatchEvent(new MediaEvent(MediaEvent.PLAY_ITEM_CHANGE));
 			play(0);
@@ -275,8 +281,10 @@ package akdcl.media {
 		private function onDisplayChangeHandler(_e:MediaEvent):void {
 			//加载显示对象
 			var _content:MediaProvider = _e.target as MediaProvider;
-			if ("displayContent" in _content){
-				displayContent.push(_content["displayContent"]);
+			if ("displayContent" in _content && _content["displayContent"]) {
+				if (displayContent.indexOf(_content["displayContent"]) < 0) {
+					displayContent.push(_content["displayContent"]);
+				}
 				if (hasEventListener(MediaEvent.DISPLAY_CHANGE)){
 					dispatchEvent(new MediaEvent(MediaEvent.DISPLAY_CHANGE));
 				}
