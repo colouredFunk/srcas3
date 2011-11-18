@@ -84,7 +84,7 @@ package akdcl.media {
 				//暂时只修改最后一个通道的音量
 				setChannelVolume(channelLast, __volume * maxVolume * tempVolume);
 			}
-
+			
 		}
 
 		public function SoundEmbedItem(_sound:Sound, _maxVolume:Number = 1){
