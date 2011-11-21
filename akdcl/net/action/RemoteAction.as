@@ -82,6 +82,11 @@
 
 		public var rawData:Object;
 		public var data:Object;
+		public var dataPreset:Object;
+		
+		public var sendProxy:Object;
+		public var dataSend:Object;
+		public var dataSendFormated:Object;
 
 		public var name:String;
 		public var alert:Alert;
@@ -92,12 +97,6 @@
 		
 		protected var alertXML:XML;
 		protected var actionXML:XML;
-
-		protected var dataPreset:Object;
-		public var dataSend:Object;
-		public var dataSendFormated:Object;
-		
-		protected var sendProxy:Object;
 
 		protected var isLoading:Boolean;
 
