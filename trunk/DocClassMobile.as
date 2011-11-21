@@ -49,9 +49,9 @@ package {
 
 		protected function onInitHandler(_evt:Event):void {
 			if (stage){
-				stage.align = StageAlign.TOP;
+				stage.align = StageAlign.TOP_LEFT;
 				stage.scaleMode = StageScaleMode.NO_SCALE;
-					//stage.scaleMode = StageScaleMode.SHOW_ALL;
+				//stage.scaleMode = StageScaleMode.SHOW_ALL;
 			}
 			tabChildren = false;
 
