@@ -161,6 +161,18 @@ package zero.works{
 				this.addEventListener(Event.ENTER_FRAME,showContainer_step);
 			}
 			
+			if(xml.@smoothing.toString()=="true"){
+				var bmp:Bitmap;
+				try{
+					bmp=loader.content as Bitmap;
+				}catch(e:Error){
+					bmp=null;
+				}
+				if(bmp){
+					bmp.smoothing=true;
+				}
+			}
+			
 			if(onLoadComplete==null){
 			}else{
 				onLoadComplete();
