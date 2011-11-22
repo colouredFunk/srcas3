@@ -208,7 +208,6 @@
 		protected function onVersionMenuHandler(_evt:ContextMenuEvent):void {
 			System.setClipboard(AuthorInformation.getInformation());
 		}
-
 		
 		private static const JS_REQUEST:String = "jsRequest";
 		private static const JS_REQUEST_ERROR:String = "jsRequestError";
