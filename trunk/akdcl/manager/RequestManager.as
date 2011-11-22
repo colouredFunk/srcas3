@@ -56,7 +56,7 @@ package akdcl.manager {
 
 		private static const REQUESTLOADER:String = "RequestLoader";
 		private static const REQUESTURLLOADER:String = "RequestURLLoader";
-		
+
 		private static const CONTENT_TYPE_STREAM:String = "application/octet-stream";
 
 		private var eM:ElementManager;
@@ -104,6 +104,7 @@ package akdcl.manager {
 			if (_loader){
 			} else {
 				_loader = eM.getElement(REQUESTLOADER);
+				_loader.contentLoaderInfo.addEventListener(Event.INIT, onLoaderInitHandler);
 				_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderCompleteOrErrorHandler);
 				_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onLoaderCompleteOrErrorHandler);
 				_loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onLoaderCompleteOrErrorHandler);
@@ -133,6 +134,14 @@ package akdcl.manager {
 			}
 		}
 
+		private function onLoaderInitHandler(_evt:Event):void {
+			var _loaderInfo:LoaderInfo = (_evt.currentTarget as LoaderInfo);
+			var _loader:RequestLoader = _loaderInfo.loader as RequestLoader;
+			if (_loader.params && _loader.content && ("flashVars" in _loader.content)) {
+				_loader.content["flashVars"] = _loader.params[0];
+			}
+		}
+		
 		private function onLoaderCompleteOrErrorHandler(_evt:Event):void {
 			var _loaderInfo:LoaderInfo = (_evt.currentTarget as LoaderInfo);
 			var _loader:RequestLoader = _loaderInfo.loader as RequestLoader;
@@ -198,7 +207,7 @@ package akdcl.manager {
 		//url,data,contentType,method,sendFormat,loadFormat,charSet,random
 		private function resetRequest(_url:*):void {
 			//重置request
-			if (_url is String || _url is XML || _url is XMLList) {
+			if (_url is String || _url is XML || _url is XMLList){
 				request.url = String(_url);
 				request.data = null;
 				request.contentType = null;
@@ -289,7 +298,7 @@ import akdcl.manager.RequestManager;
 class RequestLoader extends Loader {
 	public var url:String;
 	public var params:Array;
-	
+
 	private var errorHandlers:Dictionary;
 	private var progressHandlers:Dictionary;
 	private var completeHandlers:Dictionary;
@@ -404,7 +413,7 @@ class RequestLoader extends Loader {
 class RequestURLLoader extends URLLoader {
 	public var url:String;
 	public var params:Array;
-	
+
 	private var errorHandlers:Dictionary;
 	private var progressHandlers:Dictionary;
 	private var completeHandlers:Dictionary;

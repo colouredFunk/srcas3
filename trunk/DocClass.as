@@ -34,8 +34,6 @@
 			instanceMap[_key] = this;
 			loaderInfo.addEventListener(Event.INIT, onInitHandler);
 		}
-
-		public var loadDelay:Number = 1;
 		public var optionsXML:XML;
 		public var onLoading:Function;
 		public var onLoaded:Function;
@@ -43,11 +41,11 @@
 		public var eiM:ExternalInterfaceManager;
 		public var rM:RequestManager;
 
-		protected var loadProgress:Number = 0;
-		protected var xmlLoadProgress:Number = 0;
+		protected var loadDelay:Number = 1;
 		protected var optionsXMLPath:String;
 		protected var optionsXMLPerLoad:Number = 0.1;
-		protected var modifyDate:String;
+		protected var loadProgress:Number = 0;
+		protected var xmlLoadProgress:Number = 0;
 
 		private var isLoadComplete:Boolean;
 
@@ -63,13 +61,44 @@
 		public function get flashVars():Object {
 			return __flashVars || loaderInfo.parameters;
 		}
+		
+		private static const STAGE_ALIGN:Array = [
+			[StageAlign.TOP_LEFT, StageAlign.TOP, StageAlign.TOP_RIGHT],
+			[StageAlign.LEFT, "", StageAlign.RIGHT],
+			[StageAlign.BOTTOM_LEFT, StageAlign.BOTTOM, StageAlign.BOTTOM_RIGHT]
+		];
+		
+		public function setStageAlignAndScale(_alignX:int = 0, _alignY:int = 0 , _scale:int = -1):void {
+			if (stage) {
+				if (_alignX<0) {
+					_alignX = -1;
+				}else if (_alignX > 0) {
+					_alignX = 1;
+				}
+				_alignX++;
+				if (_alignY<0) {
+					_alignY = -1;
+				}else if (_alignY > 0) {
+					_alignY = 1;
+				}
+				_alignY++;
+				stage.align = STAGE_ALIGN[_alignY][_alignX];
+				switch(_scale) {
+					case 0:
+						stage.scaleMode = StageScaleMode.NO_SCALE;
+						break;
+					case 1:
+						stage.scaleMode = StageScaleMode.SHOW_ALL;
+						break;
+				}
+			}
+		}
 
 		protected function onInitHandler(_evt:Event):void {
 			Security.allowDomain("*");
 			Security.allowInsecureDomain("*");
-			if (stage){
-				stage.align = StageAlign.TOP;
-				stage.scaleMode = StageScaleMode.SHOW_ALL;
+			setStageAlignAndScale(0, -1, 1);
+			if (stage) {
 				stage.showDefaultContextMenu = false;
 			}
 			tabChildren = false;
@@ -95,22 +124,6 @@
 			eiM.dispatchSWFEvent("load");
 		}
 
-		protected function onJSInterfaceHandler(_e:Event):void {
-			if (eiM.eventType=="jsRequest") {
-				rM.load(eiM.eventParams[0], onJSRequestHandler, onJSRequestHandler, null, eiM.eventParams[1]);
-			}
-		}
-		
-		protected function onJSRequestHandler(_dataOrEvent:*, _url:String, _params:Array):void {
-			if (_dataOrEvent is IOErrorEvent) {
-				eiM.callInterface(_params[0]);
-				eiM.dispatchSWFEvent("jsRequestError", _params[0], "jsRequestError");
-			}else {
-				eiM.callInterface(_params[0], _dataOrEvent);
-				eiM.dispatchSWFEvent("jsRequestComplete", _params[0], _dataOrEvent);
-			}
-		}
-
 		protected function onLoadingHandler(_evt:*):void {
 			gotoAndStop(1);
 			var _loaded:Number = (loaderInfo.bytesTotal > 0) ? (loaderInfo.bytesLoaded / loaderInfo.bytesTotal) : loadProgress;
@@ -120,27 +133,11 @@
 			}
 			onLoadingStepFix(_loaded);
 			if (onLoading != null){
-				switch (onLoading.length){
-					case 0:
-						onLoading();
-						break;
-					case 1:
-					default:
-						onLoading(loadProgress);
-						break;
-				}
+				onLoading(loadProgress);
 			}
 			if (loadProgress == 1 && onLoaded != null){
 				removeEventListener(Event.ENTER_FRAME, onLoadingHandler);
-				switch (onLoaded.length){
-					case 0:
-						onLoaded();
-						break;
-					case 1:
-					default:
-						onLoaded(this);
-						break;
-				}
+				onLoaded();
 			}
 		}
 
@@ -210,6 +207,26 @@
 
 		protected function onVersionMenuHandler(_evt:ContextMenuEvent):void {
 			System.setClipboard(AuthorInformation.getInformation());
+		}
+
+		
+		private static const JS_REQUEST:String = "jsRequest";
+		private static const JS_REQUEST_ERROR:String = "jsRequestError";
+		private static const JS_REQUEST_COMPLETE:String = "jsRequestComplete";
+		protected function onJSInterfaceHandler(_e:Event):void {
+			if (eiM.eventType == JS_REQUEST) {
+				rM.load(eiM.eventParams[0], onJSRequestHandler, onJSRequestHandler, null, eiM.eventParams[1]);
+			}
+		}
+
+		protected function onJSRequestHandler(_dataOrEvent:*, _url:String, _params:Array):void {
+			if (_dataOrEvent is IOErrorEvent){
+				eiM.callInterface(_params[0]);
+				eiM.dispatchSWFEvent(JS_REQUEST_ERROR, _params[0], JS_REQUEST_ERROR);
+			} else {
+				eiM.callInterface(_params[0], _dataOrEvent);
+				eiM.dispatchSWFEvent(JS_REQUEST_COMPLETE, _params[0], _dataOrEvent);
+			}
 		}
 	}
 }
