@@ -70,10 +70,11 @@
 			addEventListener(InteractionEvent.PRESS, onPressHandler);
 			addEventListener(InteractionEvent.RELEASE, onReleaseHandler);
 			addEventListener(InteractionEvent.UPDATE_STYLE, onUpdateStyle);
+			buttonMode = true;
 			enabled = true;
 			if (txt){
 				txt.mouseEnabled = false;
-				if (txt.hasOwnProperty("mouseChildren")){
+				if ("mouseChildren" in txt){
 					txt.mouseChildren = false;
 				}
 				mouseEnabled = false;
@@ -85,7 +86,6 @@
 			rollOut = null;
 			press = null;
 			release = null;
-			enabled = false;
 			super.onRemoveToStageHandler();
 		}
 
@@ -102,7 +102,7 @@
 		}
 
 		protected function onPressHandler(_e:InteractionEvent):void {
-			timeHolded = 0;
+			timeHolded = 1;
 			onHoldingHandler(null);
 			addEventListener(Event.ENTER_FRAME, onHoldingHandler);
 		}

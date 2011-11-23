@@ -86,12 +86,11 @@ package ui{
 			}
 			scaleX = 1;
 			value = 0;
-			buttonMode = false;
 		}
 		override protected function onRemoveToStageHandler():void {
-			super.onRemoveToStageHandler();
 			labelFunction = null;
 			change = null;
+			super.onRemoveToStageHandler();
 			txt = null;
 			thumb = null;
 			bar = null;
