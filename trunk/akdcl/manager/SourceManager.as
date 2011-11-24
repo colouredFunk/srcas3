@@ -6,7 +6,7 @@ package akdcl.manager {
 	 * ...
 	 * @author ...
 	 */
-	public class SourceManager {
+	final public class SourceManager {
 		private static var instance:SourceManager;
 
 		public static function getInstance():SourceManager {

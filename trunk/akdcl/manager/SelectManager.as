@@ -6,7 +6,7 @@ package akdcl.manager {
 	 * ...
 	 * @author ...
 	 */
-	public class SelectManager {
+	final public class SelectManager {
 		private static var instance:SelectManager;
 
 		public static function getInstance():SelectManager {

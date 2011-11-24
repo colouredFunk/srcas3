@@ -9,7 +9,7 @@ package akdcl.manager {
 	 * ...
 	 * @author Akdcl
 	 */
-	public class SoundManager {
+	final public class SoundManager {
 		private static var instance:SoundManager;
 
 		public static function getInstance():SoundManager {
