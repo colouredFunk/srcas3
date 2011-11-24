@@ -30,6 +30,8 @@ package zero.works{
 		
 		public var txt:*;
 		
+		public var version:String=null;
+		
 		[Inspectable(name="起始时间",defaultValue="2011-10-17 16:15:00")]
 		public var set_startTime:String="2011-10-17 16:15:00";
 		
@@ -52,8 +54,8 @@ package zero.works{
 				_txt=this.getChildAt(i);
 				if(
 					_txt is TextField
-					||
-					getQualifiedClassName(_txt).indexOf("TxtEffects")>-1
+					//||
+					//getQualifiedClassName(_txt).indexOf("TxtEffects")>-1
 				){
 					txt=_txt;
 					break;;
@@ -69,6 +71,26 @@ package zero.works{
 			
 			delayTime=5;
 			this.addEventListener(Event.ENTER_FRAME,initDelay);
+			
+			if(version){
+				addMenu(this,"Size: " + loaderInfo.width + " X " + loaderInfo.height, onSizeMenuHandler+" "+version);
+				
+				if(obj.contextMenu){
+				}else{
+					obj.contextMenu=new ContextMenu();
+				}
+				obj.contextMenu.hideBuiltInItems();
+				var item:ContextMenuItem=new ContextMenuItem(caption);
+				if(obj.contextMenu.customItems){
+				}else{
+					obj.contextMenu.customItems=new Array();
+				}
+				obj.contextMenu.customItems.push(item);
+				if(callBack==null){
+				}else{
+					item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,callBack);
+				}
+			}
 		}
 		private function initDelay(event:Event):void{
 			if(--delayTime<=0){
@@ -101,7 +123,7 @@ package zero.works{
 		}
 		
 		public function start(_serverDate:ServerDate,_startDate:*,_timeUpDate:*,_startNum:int=0,_endNum:int=100000):void{
-			this.removeEventListener(Event.ENTER_FRAME,enterFrame);
+			this.removeEventListener(Event.ENTER_FRAME,initDelay);
 			
 			if(_startDate is Date){
 			}else{
