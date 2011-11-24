@@ -5,7 +5,7 @@ package akdcl.utils {
 	 * @author ...
 	 */
 	public class Logger {
-		public static var logList:Object = [];
+		public static var logList:Object = {};
 
 		public static var onLog:Function;
 
