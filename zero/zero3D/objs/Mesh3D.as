@@ -23,7 +23,7 @@ package zero.zero3D.objs{
 		
 		public var vertexIdV:Vector.<int>;//目前主要用在 needTriangles==false 时
 		
-		private var bmd:BitmapData;
+		public var bmd:BitmapData;
 		
 		public var lineThickness:int=1;
 		public var lineColor:int=-1;
