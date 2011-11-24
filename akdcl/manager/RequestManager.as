@@ -70,12 +70,12 @@ package akdcl.manager {
 
 		private var dataFormat:String;
 
-		public function loadDisplay(_url:String, _onCompleteHandler:Function = null, _onErrorHandler:Function = null, _onProgressHandler:Function = null, ... args):void {
+		public function loadDisplay(_url:String, _onCompleteHandler:Function = null, _onErrorHandler:Function = null, _onProgressHandler:Function = null, ... args):Loader {
 			resetRequest(_url);
 			_url = request.url;
 			if (!_url){
 				trace("WARNNING:RequestManager.loadImage(_url), _url is null!!!");
-				return;
+				return null;
 			}
 			//
 			var _bmd:BitmapData = sM.getSource(SourceManager.BITMAPDATA_GROUP, _url);
@@ -97,7 +97,7 @@ package akdcl.manager {
 							break;
 					}
 				}
-				return;
+				return null;
 			}
 			//
 			var _loader:RequestLoader = loaderDic[_url];
@@ -114,6 +114,7 @@ package akdcl.manager {
 			//
 			_loader.addEvents(_onProgressHandler, _onErrorHandler, _onCompleteHandler);
 			_loader.load(request);
+			return _loader;
 		}
 
 		public function unloadDisplay(_url:String, _onCompleteHandler:Function = null, _onErrorHandler:Function = null, _onProgressHandler:Function = null):void {
