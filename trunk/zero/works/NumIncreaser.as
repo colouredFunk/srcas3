@@ -13,6 +13,7 @@ package zero.works{
 	import flash.net.*;
 	import flash.system.*;
 	import flash.text.*;
+	import flash.ui.*;
 	import flash.utils.*;
 	
 	public class NumIncreaser extends Sprite{
@@ -28,9 +29,13 @@ package zero.works{
 		private var dateSum:int;
 		private var k:Number;
 		
-		public var txt:*;
+		private var txt:TextField;
 		
-		public var version:String=null;
+		private var version:String="";
+		private var wid:int=-1;
+		private var hei:int=-1;
+		private var size:int=-1;
+		private var isBold:Boolean=false;
 		
 		[Inspectable(name="起始时间",defaultValue="2011-10-17 16:15:00")]
 		public var set_startTime:String="2011-10-17 16:15:00";
@@ -45,7 +50,11 @@ package zero.works{
 		public var set_endNum:int=1000000;
 		
 		private var delayTime:int;
+		
+		private var xmlLoader:URLLoader;
+		
 		public function NumIncreaser(){
+			
 			var i:int;
 			var _txt:*;
 			
@@ -58,7 +67,7 @@ package zero.works{
 					//getQualifiedClassName(_txt).indexOf("TxtEffects")>-1
 				){
 					txt=_txt;
-					break;;
+					break;
 				}
 			}
 			
@@ -67,48 +76,143 @@ package zero.works{
 				throw new Error("找不到 txt");
 			}
 			
+			txt.autoSize=TextFieldAutoSize.CENTER;
 			txt.text="";
+			
+			this.addEventListener(Event.ENTER_FRAME,init);
+		}
+		private function init(event:Event):void{
+			if(wid>0&&hei>0){
+			}else{
+				try{
+					wid=this.loaderInfo.width;
+					hei=this.loaderInfo.height;
+				}catch(e:Error){
+					wid=-1;
+					hei=-1;
+					return;
+				}
+			}
+			this.removeEventListener(Event.ENTER_FRAME,init);
+			
+			//this.graphics.clear();
+			//this.graphics.beginFill(0x00ff00,0.3);
+			//this.graphics.drawRect(0,0,wid,hei);
+			//this.graphics.endFill();
+			
+			if(this.contextMenu){
+			}else{
+				this.contextMenu=new ContextMenu();
+			}
+			this.contextMenu.hideBuiltInItems();
+			if(this.contextMenu.customItems){
+			}else{
+				this.contextMenu.customItems=new Array();
+			}
+			var item:ContextMenuItem=new ContextMenuItem("宽 "+wid+" 像素，高 "+hei+" 像素"+(version?"；出厂时间："+version:""));
+			this.contextMenu.customItems.push(item);
+			item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,clickMenuItem);
 			
 			delayTime=5;
 			this.addEventListener(Event.ENTER_FRAME,initDelay);
-			
-			if(version){
-				addMenu(this,"Size: " + loaderInfo.width + " X " + loaderInfo.height, onSizeMenuHandler+" "+version);
-				
-				if(obj.contextMenu){
-				}else{
-					obj.contextMenu=new ContextMenu();
-				}
-				obj.contextMenu.hideBuiltInItems();
-				var item:ContextMenuItem=new ContextMenuItem(caption);
-				if(obj.contextMenu.customItems){
-				}else{
-					obj.contextMenu.customItems=new Array();
-				}
-				obj.contextMenu.customItems.push(item);
-				if(callBack==null){
-				}else{
-					item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,callBack);
-				}
+		}
+		private function clickMenuItem(event:ContextMenuEvent):void{
+			System.setClipboard(getHTMLCode());
+		}
+		public function getHTMLCode(src:String=null):String{
+			if(src){
+			}else{
+				var urlArr:Array=this.loaderInfo.url.replace(/^(.*)\?.*$/,"$1").split("/");
+				//do{
+					var url1:String=urlArr.pop();
+					var url2:String=urlArr.pop();
+				//}while(url2=="[[DYNAMIC]]");
+				src=url2+"/"+url1;
 			}
+			return '<script src="http://www.wanmei.com/public/js/swfobject.js" type="text/javascript"></script>\n'+
+				'<div id="containerID"></div>\n'+
+				'<script type="text/javascript">\n'+
+				'	addSWF("'+src+'","containerID",'+wid+','+hei+',{xml:"'+getXML().toXMLString().replace(/"/g,"'")+'"});\n'+
+				'</script>\n';
+		}
+		public function getXML():XML{
+			return <xml startTime={set_startTime} endTime={set_endTime} startNum={set_startNum} endNum={set_endNum}/>;
 		}
 		private function initDelay(event:Event):void{
 			if(--delayTime<=0){
 			}else{
 				return;
 			}
-			
 			this.removeEventListener(Event.ENTER_FRAME,initDelay);
 			
-			set_startTime=this.loaderInfo.parameters.startTime||set_startTime;
-			set_endTime=this.loaderInfo.parameters.endTime||set_endTime;set_endNum
-			if(int(this.loaderInfo.parameters.startNum)>0){
-				set_startNum=int(this.loaderInfo.parameters.startNum);
+			if(
+				this.loaderInfo.parameters.startTime
+				||
+				this.loaderInfo.parameters.endTime
+				||
+				this.loaderInfo.parameters.startNum
+				||
+				this.loaderInfo.parameters.endNum
+			){
+				if(this.loaderInfo.parameters.startTime){
+					set_startTime=this.loaderInfo.parameters.startTime;
+				}
+				if(this.loaderInfo.parameters.endTime){
+					set_endTime=this.loaderInfo.parameters.endTime;
+				}
+				if(int(this.loaderInfo.parameters.startNum)>0){
+					set_startNum=int(this.loaderInfo.parameters.startNum);
+				}
+				if(int(this.loaderInfo.parameters.endNum)>0){
+					set_endNum=int(this.loaderInfo.parameters.endNum);
+				}
+				initServerDate();
+			}else if(this.loaderInfo.parameters.xml){
+				if(this.loaderInfo.parameters.xml.indexOf("<")==0){
+					initXML(this.loaderInfo.parameters.xml);
+				}else{
+					xmlLoader=new URLLoader();
+					xmlLoader.addEventListener(Event.COMPLETE,loadXMLComplete);
+				}
+			}else{
+				initServerDate();
 			}
-			if(int(this.loaderInfo.parameters.set_endNum)>0){
-				set_endNum=int(this.loaderInfo.parameters.set_endNum);
+		}
+		private function loadXMLComplete(event:Event):void{
+			xmlLoader.removeEventListener(Event.COMPLETE,loadXMLComplete);
+			initXML(xmlLoader.data);
+			xmlLoader=null;
+		}
+		private function initXML(xmlStr:String):void{
+			var xml:XML;
+			try{
+				xml=new XML(xmlStr);
+				if(xml.name().toString()){
+				}else{
+					xml=null;
+				}
+			}catch(e:Error){
+				xml=null;
 			}
-			
+			if(xml){
+				if(xml.@startTime.toString()){
+					set_startTime=xml.@startTime.toString();
+				}
+				if(xml.@endTime.toString()){
+					set_endTime=xml.@endTime.toString();
+				}
+				if(int(xml.@startNum.toString())>0){
+					set_startNum=int(xml.@startNum.toString());
+				}
+				if(int(xml.@endNum.toString())>0){
+					set_endNum=int(xml.@endNum.toString());
+				}
+				initServerDate();
+			}else{
+				throw new Error("xml 格式不正确：xmlStr="+xmlStr);
+			}
+		}
+		private function initServerDate():void{
 			serverDate=new ServerDate();
 			serverDate.init(initServerDateComplete);
 		}
@@ -123,7 +227,19 @@ package zero.works{
 		}
 		
 		public function start(_serverDate:ServerDate,_startDate:*,_timeUpDate:*,_startNum:int=0,_endNum:int=100000):void{
+			this.removeEventListener(Event.ENTER_FRAME,init);
 			this.removeEventListener(Event.ENTER_FRAME,initDelay);
+			this.removeEventListener(Event.ENTER_FRAME,enterFrame);
+			if(xmlLoader){
+				xmlLoader.removeEventListener(Event.COMPLETE,loadXMLComplete);
+				xmlLoader=null;
+			}
+			
+			showNum(88888888);
+			var b:Rectangle=txt.getBounds(this);
+			txt.x+=(wid-b.width)/2-b.x;
+			txt.y+=(hei-b.height)/2-b.y;
+			txt.text="";
 			
 			if(_startDate is Date){
 			}else{
@@ -177,11 +293,24 @@ package zero.works{
 				dTime=0;
 			}
 			
-			if(txt is TextField){
-				txt.text=int(startNum+getNum(dTime)*k);
-			}else{
-				txt.value=int(startNum+getNum(dTime)*k);
+			//if(txt is TextField){
+			//	txt.text=int(startNum+getNum(dTime)*k);
+			//}else{
+			//	txt.value=int(startNum+getNum(dTime)*k);
+			//}
+			
+			showNum(int(startNum+getNum(dTime)*k));
+			
+		}
+		private function showNum(num:int):void{
+			var htmlText:String=num.toString();
+			if(size>0){
+				htmlText='<font size="'+size+'">'+htmlText+'</font>';
 			}
+			if(isBold){
+				htmlText="<b>"+htmlText+"</b>";
+			}
+			txt.htmlText=htmlText;
 		}
 		private function getNum(dTime:int):int{
 			var num:int=int(dTime/86400)*dateSum;
