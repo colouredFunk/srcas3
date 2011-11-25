@@ -11,7 +11,9 @@ package zero.works{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.net.*;
+	import flash.system.*;
 	import flash.text.*;
+	import flash.ui.*;
 	import flash.utils.*;
 	
 	public class TxtEffectsClock extends Sprite{
@@ -27,7 +29,162 @@ package zero.works{
 		private var startDate:Date;
 		private var timeUpDate:Date;
 		
+		private var version:String="";
+		private var wid:int=-1;
+		private var hei:int=-1;
+		
+		[Inspectable(name="起始时间",defaultValue="2011-10-17 16:15:00")]
+		public var set_startTime:String="2011-10-17 16:15:00";
+		
+		[Inspectable(name="终结时间",defaultValue="2012-12-21 15:14:35")]
+		public var set_endTime:String="2012-12-21 15:14:35";
+		
+		private var delayTime:int;
+		
+		private var xmlLoader:URLLoader;
+		
+		public function TxtEffectsClock(){
+			this.addEventListener(Event.ENTER_FRAME,init);
+		}
+		private function init(event:Event):void{
+			if(wid>0&&hei>0){
+			}else{
+				try{
+					wid=this.loaderInfo.width;
+					hei=this.loaderInfo.height;
+				}catch(e:Error){
+					wid=-1;
+					hei=-1;
+					return;
+				}
+			}
+			this.removeEventListener(Event.ENTER_FRAME,init);
+			
+			//this.graphics.clear();
+			//this.graphics.beginFill(0x00ff00,0.3);
+			//this.graphics.drawRect(0,0,wid,hei);
+			//this.graphics.endFill();
+			
+			if(this.contextMenu){
+			}else{
+				this.contextMenu=new ContextMenu();
+			}
+			this.contextMenu.hideBuiltInItems();
+			if(this.contextMenu.customItems){
+			}else{
+				this.contextMenu.customItems=new Array();
+			}
+			var item:ContextMenuItem=new ContextMenuItem("宽 "+wid+" 像素，高 "+hei+" 像素"+(version?"；出厂时间："+version:""));
+			this.contextMenu.customItems.push(item);
+			item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,clickMenuItem);
+			
+			delayTime=5;
+			this.addEventListener(Event.ENTER_FRAME,initDelay);
+		}
+		private function clickMenuItem(event:ContextMenuEvent):void{
+			System.setClipboard(getHTMLCode());
+		}
+		public function getHTMLCode(src:String=null):String{
+			if(src){
+			}else{
+				var urlArr:Array=this.loaderInfo.url.replace(/^(.*)\?.*$/,"$1").split("/");
+				//do{
+				var url1:String=urlArr.pop();
+				var url2:String=urlArr.pop();
+				//}while(url2=="[[DYNAMIC]]");
+				src=url2+"/"+url1;
+			}
+			return '<script src="http://www.wanmei.com/public/js/swfobject.js" type="text/javascript"></script>\n'+
+				'<div id="containerID"></div>\n'+
+				'<script type="text/javascript">\n'+
+				'	addSWF("'+src+'","containerID",'+wid+','+hei+',{xml:"'+getXML().toXMLString().replace(/"/g,"'")+'"});\n'+
+				'</script>\n';
+		}
+		public function getXML():XML{
+			return <xml startTime={set_startTime} endTime={set_endTime}/>;
+		}
+		private function initDelay(event:Event):void{
+			if(--delayTime<=0){
+			}else{
+				return;
+			}
+			this.removeEventListener(Event.ENTER_FRAME,initDelay);
+			
+			if(
+				this.loaderInfo.parameters.startTime
+				||
+				this.loaderInfo.parameters.endTime
+				||
+				this.loaderInfo.parameters.startNum
+				||
+				this.loaderInfo.parameters.endNum
+			){
+				if(this.loaderInfo.parameters.startTime){
+					set_startTime=this.loaderInfo.parameters.startTime;
+				}
+				if(this.loaderInfo.parameters.endTime){
+					set_endTime=this.loaderInfo.parameters.endTime;
+				}
+				initServerDate();
+			}else if(this.loaderInfo.parameters.xml){
+				if(this.loaderInfo.parameters.xml.indexOf("<")==0){
+					initXML(this.loaderInfo.parameters.xml);
+				}else{
+					xmlLoader=new URLLoader();
+					xmlLoader.addEventListener(Event.COMPLETE,loadXMLComplete);
+				}
+			}else{
+				initServerDate();
+			}
+		}
+		private function loadXMLComplete(event:Event):void{
+			xmlLoader.removeEventListener(Event.COMPLETE,loadXMLComplete);
+			initXML(xmlLoader.data);
+			xmlLoader=null;
+		}
+		private function initXML(xmlStr:String):void{
+			var xml:XML;
+			try{
+				xml=new XML(xmlStr);
+				if(xml.name().toString()){
+				}else{
+					xml=null;
+				}
+			}catch(e:Error){
+				xml=null;
+			}
+			if(xml){
+				if(xml.@startTime.toString()){
+					set_startTime=xml.@startTime.toString();
+				}
+				if(xml.@endTime.toString()){
+					set_endTime=xml.@endTime.toString();
+				}
+				initServerDate();
+			}else{
+				throw new Error("xml 格式不正确：xmlStr="+xmlStr);
+			}
+		}
+		private function initServerDate():void{
+			serverDate=new ServerDate();
+			serverDate.init(initServerDateComplete);
+		}
+		private function initServerDateComplete():void{
+			start(
+				serverDate,
+				set_startTime,
+				set_endTime
+			);
+		}
+		
 		public function start(_serverDate:ServerDate,_startDate:*,_timeUpDate:*):void{
+			this.removeEventListener(Event.ENTER_FRAME,init);
+			this.removeEventListener(Event.ENTER_FRAME,initDelay);
+			this.removeEventListener(Event.ENTER_FRAME,enterFrame);
+			if(xmlLoader){
+				xmlLoader.removeEventListener(Event.COMPLETE,loadXMLComplete);
+				xmlLoader=null;
+			}
 			
 			if(_startDate is Date){
 			}else{
