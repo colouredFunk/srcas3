@@ -117,6 +117,30 @@ package zero.zero3D{
 			);
 		}
 		
+		public function setRotaX(degrees:Number):void{
+			var rad:Number=degrees*Math.PI/180;
+			var c:Number=Math.cos(rad);
+			var s:Number=Math.sin(rad);
+			matrix3D.rawData=Vector.<Number>([
+				1,0,0,0,
+				0,c,s,0,
+				0,-s,c,0,
+				0,0,0,1
+			]);
+		}
+		
+		public function setRotaY(degrees:Number):void{
+			var rad:Number=degrees*Math.PI/180;
+			var c:Number=Math.cos(rad);
+			var s:Number=Math.sin(rad);
+			matrix3D.rawData=Vector.<Number>([
+				c,0,-s,0,
+				0,1,0,0,
+				s,0,c,0,
+				0,0,0,1
+			]);
+		}
+		
 		public function setRotaZ(degrees:Number):void{
 			var rad:Number=degrees*Math.PI/180;
 			var c:Number=Math.cos(rad);
