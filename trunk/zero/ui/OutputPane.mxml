@@ -83,7 +83,7 @@ OutputPane 版本:v1.0
 				msg2strArr(msg,styleOrXML,tail);
 				clearTimeout(timeoutId);
 				if(immediately){
-					trace("immediately");
+					//trace("immediately");
 					updateDelay();
 				}else{
 					timeoutId=setTimeout(updateDelay,200);
