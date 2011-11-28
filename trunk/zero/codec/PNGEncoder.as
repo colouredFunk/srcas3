@@ -57,12 +57,7 @@ public class PNGEncoder
      *  @playerversion AIR 1.1
      *  @productversion Flex 3
      */
-    public function PNGEncoder()
-    {
-    	super();
-
-		initializeCRCTable();
-	}
+	initializeCRCTable();
 
 	//--------------------------------------------------------------------------
 	//
@@ -75,7 +70,7 @@ public class PNGEncoder
 	 *  Used for computing the cyclic redundancy checksum
 	 *  at the end of each chunk.
      */
-    private var crcTable:Array;
+    private static var crcTable:Array;
     
 	//--------------------------------------------------------------------------
 	//
@@ -96,7 +91,7 @@ public class PNGEncoder
      *  @playerversion AIR 1.1
      *  @productversion Flex 3
      */
-    public function get contentType():String
+    public static function get contentType():String
     {
         return CONTENT_TYPE;
     }
@@ -120,7 +115,7 @@ public class PNGEncoder
      *  @playerversion AIR 1.1
      *  @productversion Flex 3
      */
-    public function encode(bitmapData:BitmapData):ByteArray
+    public static function encode(bitmapData:BitmapData):ByteArray
     {
         return internalEncode(bitmapData, bitmapData.width, bitmapData.height,
 							  bitmapData.transparent);
@@ -155,7 +150,7 @@ public class PNGEncoder
      *  @playerversion AIR 1.1
      *  @productversion Flex 3
      */
-    public function encodeByteArray(byteArray:ByteArray, width:int, height:int,
+    public static function encodeByteArray(byteArray:ByteArray, width:int, height:int,
 									transparent:Boolean = true):ByteArray
     {
         return internalEncode(byteArray, width, height, transparent);
@@ -164,7 +159,7 @@ public class PNGEncoder
     /**
 	 *  @private
 	 */
-	private function initializeCRCTable():void
+	private static function initializeCRCTable():void
 	{
         crcTable = [];
 
@@ -185,7 +180,7 @@ public class PNGEncoder
     /**
 	 *  @private
 	 */
-	private function internalEncode(source:Object, width:int, height:int,
+	private static function internalEncode(source:Object, width:int, height:int,
 									transparent:Boolean = true):ByteArray
     {
      	// The source is either a BitmapData or a ByteArray.
@@ -262,7 +257,7 @@ public class PNGEncoder
     /**
 	 *  @private
 	 */
-	private function writeChunk(png:ByteArray, type:uint, data:ByteArray):void
+	private static function writeChunk(png:ByteArray, type:uint, data:ByteArray):void
     {
         // Write length of data.
         var len:uint = 0;
