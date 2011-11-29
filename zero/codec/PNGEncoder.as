@@ -9,7 +9,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-//改进 ZЁЯ¤ 2011年10月31日
+//改进 ZЁЯ¤ 2011年11月29日
 
 package zero.codec
 {
@@ -180,69 +180,79 @@ public class PNGEncoder
     /**
 	 *  @private
 	 */
-	private static function internalEncode(source:Object, width:int, height:int,
-									transparent:Boolean = true):ByteArray
-    {
+	private static function internalEncode(
+		source:Object,
+		width:int,
+		height:int,
+		transparent:Boolean = true
+	):ByteArray{
      	// The source is either a BitmapData or a ByteArray.
-    	var sourceBitmapData:BitmapData = source as BitmapData;
-    	var sourceByteArray:ByteArray = source as ByteArray;
-    	
-    	if (sourceByteArray)
-    		sourceByteArray.position = 0;
+		var sourceByteArray:ByteArray;
+		if(source is BitmapData){
+			sourceByteArray = (source as BitmapData).getPixels((source as BitmapData).rect);
+		}else{
+			sourceByteArray = source as ByteArray;
+		}
     	
         // Create output byte array
         var png:ByteArray = new ByteArray();
 
         // Write PNG signature
-        png.writeUnsignedInt(0x89504E47);
-        png.writeUnsignedInt(0x0D0A1A0A);
+        png[0]=0x89;
+		png[1]=0x50;
+		png[2]=0x4E;
+		png[3]=0x47;
+		png[4]=0x0D;
+		png[5]=0x0A;
+		png[6]=0x1A;
+		png[7]=0x0A;
 
         // Build IHDR chunk
         var IHDR:ByteArray = new ByteArray();
-        IHDR.writeInt(width);
-        IHDR.writeInt(height);
-		IHDR.writeByte(8); // bit depth per channel
-		IHDR.writeByte(6); // color type: RGBA
-		IHDR.writeByte(0); // compression method
-		IHDR.writeByte(0); // filter method
-        IHDR.writeByte(0); // interlace method
+		IHDR[0]=width>>24;
+		IHDR[1]=width>>16;
+		IHDR[2]=width>>8;
+		IHDR[3]=width;
+		IHDR[4]=height>>24;
+		IHDR[5]=height>>16;
+		IHDR[6]=height>>8;
+		IHDR[7]=height;
+		IHDR[8]=8; // bit depth per channel
+		IHDR[9]=6; // color type: RGBA
+		IHDR[10]=0; // compression method
+		IHDR[11]=0; // filter method
+		IHDR[12]=0; // interlace method
         writeChunk(png, 0x49484452, IHDR);
 
         // Build IDAT chunk
         var IDAT:ByteArray = new ByteArray();
-        for (var y:int = 0; y < height; y++)
-        {
-            IDAT.writeByte(0); // no filter
-
-            var x:int;
-            var pixel:uint;
-            
-			if (!transparent)
-            {
-                for (x = 0; x < width; x++)
-                {
-                    if (sourceBitmapData)
-                    	pixel = sourceBitmapData.getPixel(x, y);
-                   	else
-             			pixel = sourceByteArray.readUnsignedInt();
-					
-					IDAT.writeUnsignedInt(uint(((pixel & 0xFFFFFF) << 8) | 0xFF));
-                }
-            }
-            else
-            {
-                for (x = 0; x < width; x++)
-                {
-                    if (sourceBitmapData)
-                   		pixel = sourceBitmapData.getPixel32(x, y);
-                    else
-						pixel = sourceByteArray.readUnsignedInt();
- 
-                    IDAT.writeUnsignedInt(uint(((pixel & 0xFFFFFF) << 8) |
-												(pixel >>> 24)));
-                }
-            }
-        }
+		var x:int,y:int;
+		var offset:int=0;
+		var sourceOffset:int=0;
+		if(transparent){
+			for (y = 0; y < height; y++){
+				IDAT[offset++]=0; // no filter
+				for (x = 0; x < width; x++){
+					IDAT[offset++]=sourceByteArray[sourceOffset+1];
+					IDAT[offset++]=sourceByteArray[sourceOffset+2];
+					IDAT[offset++]=sourceByteArray[sourceOffset+3];
+					IDAT[offset++]=sourceByteArray[sourceOffset];
+					sourceOffset+=4;
+				}
+			}
+		}else{
+			for (y = 0; y < height; y++){
+				IDAT.writeByte(0); // no filter
+				for (x = 0; x < width; x++){
+					IDAT[offset++]=sourceByteArray[sourceOffset+1];
+					IDAT[offset++]=sourceByteArray[sourceOffset+2];
+					IDAT[offset++]=sourceByteArray[sourceOffset+3];
+					IDAT[offset++]=0xff;
+					sourceOffset+=4;
+				}
+			}
+		}
+        
         IDAT.compress();
         writeChunk(png, 0x49444154, IDAT);
 
@@ -250,41 +260,59 @@ public class PNGEncoder
         writeChunk(png, 0x49454E44, null);
 
         // return PNG
-        png.position = 0;
         return png;
     }
 
     /**
 	 *  @private
 	 */
-	private static function writeChunk(png:ByteArray, type:uint, data:ByteArray):void
+	private static function writeChunk(png:ByteArray, type:int, data:ByteArray):void
     {
         // Write length of data.
-        var len:uint = 0;
-        if (data)
-            len = data.length;
-		png.writeUnsignedInt(len);
+        
+		var offset:int=png.length;
+		if (data){
+			var len:int = data.length;
+			png[offset++]=len>>24;
+			png[offset++]=len>>16;
+			png[offset++]=len>>8;
+			png[offset++]=len;
+		}else{
+			png[offset++]=0;
+			png[offset++]=0;
+			png[offset++]=0;
+			png[offset++]=0;
+		}
         
 		// Write chunk type.
-		var typePos:uint = png.position;
-		png.writeUnsignedInt(type);
+		var typePos:int = offset;
+		png[offset++]=type>>24;
+		png[offset++]=type>>16;
+		png[offset++]=type>>8;
+		png[offset++]=type;
         
 		// Write data.
-		if (data)
-            png.writeBytes(data);
+		if (data){
+            png.position=offset;
+			png.writeBytes(data);
+			offset=png.length;
+		}
 
         // Write CRC of chunk type and data.
-		var crcPos:uint = png.position;
-        png.position = typePos;
+		var crcPos:int = offset;
+        offset = typePos;
         var crc:uint = 0xFFFFFFFF;
-        for (var i:uint = typePos; i < crcPos; i++)
-        {
-            crc = uint(crcTable[(crc ^ png.readUnsignedByte()) & uint(0xFF)] ^
-					   uint(crc >>> 8));
+		
+		var i:int=crcPos-typePos;
+        while(--i>=0){
+            crc = crcTable[(crc ^ png[offset++]) & 0xFF] ^ (crc >>> 8);
         }
-        crc = uint(crc ^ uint(0xFFFFFFFF));
-        png.position = crcPos;
-        png.writeUnsignedInt(crc);
+        crc = crc ^ 0xFFFFFFFF;
+        offset = crcPos;
+		png[offset++]=crc>>24;
+		png[offset++]=crc>>16;
+		png[offset++]=crc>>8;
+		png[offset++]=crc;
     }
 }
 
