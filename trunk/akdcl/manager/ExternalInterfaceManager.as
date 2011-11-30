@@ -14,7 +14,9 @@
 	[Event(name="call",type="ExternalInterfaceManager")]
 
 	final public class ExternalInterfaceManager extends EventDispatcher {
-		public static var instance:ExternalInterfaceManager;
+		private static const ERROR:String = "ExternalInterfaceManager Singleton already constructed!";
+		private static var instance:ExternalInterfaceManager;
+		private static var lM:LoggerManager = LoggerManager.getInstance();
 
 		public static function getInstance():ExternalInterfaceManager {
 			if (instance){
@@ -26,7 +28,8 @@
 
 		public function ExternalInterfaceManager(){
 			if (instance){
-				throw new Error("ERROR:ExternalInterfaceManager Singleton already constructed!");
+				lM.fatal(ExternalInterfaceManager, ERROR);
+				throw new Error("[ERROR]:" + ERROR);
 			}
 			instance = this;
 
@@ -43,6 +46,8 @@
 			if (isAvailable){
 				ExternalInterface.addCallback(CALL, swfInterface);
 			}
+			
+			lM.info(ExternalInterfaceManager, "init isAvailable:{0} objectID:{1}", null, isAvailable, objectID);
 		}
 
 		public static const CALL:String = "call";
@@ -84,6 +89,7 @@
 		}
 
 		public function callInterface(_funName:String, ... args):* {
+			lM.info(ExternalInterfaceManager, "callInterface(funName:{2}, args:{3}) isAvailable:{0} objectID:{1}", null, isAvailable, objectID, _funName, args);
 			if (isAvailable && hasInterface(_funName)){
 				if (args){
 					return ExternalInterface.call.apply(ExternalInterface, [_funName].concat(args));
@@ -104,7 +110,7 @@
 		}
 
 		public function debugMessage(... args):void {
-			callInterface("alert", "[" + objectID + "]\r\n" + args);
+			callInterface("alert", "[" + objectID + "]:" + args);
 		}
 
 		//广播js调用as的事件
@@ -117,8 +123,10 @@
 			} else {
 				eventParams = null;
 			}
-
-			if (hasEventListener(CALL)){
+			
+			lM.info(ExternalInterfaceManager, "接收外部事件(type:{2}, args:{3}) isAvailable:{0} objectID:{1}", null, isAvailable, objectID, __eventType, args);
+			
+			if (hasEventListener(CALL)) {
 				dispatchEvent(swfInterFaceEvent);
 			}
 			if (hasEventListener(__eventType)){

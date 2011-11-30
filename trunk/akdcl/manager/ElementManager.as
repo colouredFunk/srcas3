@@ -1,9 +1,11 @@
 package akdcl.manager {
 
-	import akdcl.manager.SourceManager;
+	import flash.events.EventDispatcher;
 
-	public class ElementManager {
+	final public class ElementManager extends EventDispatcher{
+		private static const ERROR:String = "ElementManager Singleton already constructed!";
 		private static var instance:ElementManager;
+		private static var lM:LoggerManager = LoggerManager.getInstance();
 
 		public static function getInstance():ElementManager {
 			if (instance){
@@ -15,9 +17,11 @@ package akdcl.manager {
 
 		public function ElementManager(){
 			if (instance){
-				throw new Error("ERROR:ElementManager Singleton already constructed!");
+				lM.fatal(ElementManager, ERROR);
+				throw new Error("[ERROR]:" + ERROR);
 			}
 			instance = this;
+			lM.info(ElementManager, "init");
 		}
 
 		private static const ELEMENTS_GROUP:String = "Elements";
@@ -25,30 +29,41 @@ package akdcl.manager {
 		private static var sM:SourceManager = SourceManager.getInstance();
 
 		public function recycle(_element:*):void {
+			var _success:Boolean;
 			for each (var _elements:Elements in sM.getGroup(ELEMENTS_GROUP)){
-				if (_elements.recycle(_element)){
-					return;
+				if (_elements.recycle(_element)) {
+					_success = true;
+					break;
 				}
 			}
+			lM.info(ElementManager, "recycle({0}) success:{1} length:{2}", null, _element, _success, _elements.getElementsLength());
 		}
 
 		public function register(_elementID:String, _ElementClass:Class):void {
 			if (sM.getSource(ELEMENTS_GROUP, _elementID)){
 				return;
 			}
-			if (_ElementClass){
+			if (_ElementClass) {
+				lM.info(ElementManager, "register(id:{0}, class:{1})", null, _elementID, _ElementClass);
 				sM.addSource(ELEMENTS_GROUP, _elementID, new Elements(_ElementClass));
 			} else {
-				trace("WARNNING:" + _elementID + " class is null!");
+				var _str:String = "ElementManager.register(id, class), class is null!";
+				lM.warn(ElementManager, _str);
+				trace("[WARNNING]:" + _str);
 			}
 		}
 
 		public function getElement(_elementID:String):* {
 			var _elements:Elements = sM.getSource(ELEMENTS_GROUP, _elementID);
-			if (_elements){
+			if (_elements) {
+				lM.info(ElementManager, "getElement(id:{0})", null, _elementID);
 				return _elements.getElement();
 			}
-			throw new Error("ERROR:" + _elementID + " has not yet registered!");
+			
+			var _str:String = "ElementManager.getElement(" + _elementID + "), class is unregistered!";
+			lM.warn(ElementManager, _str);
+			trace("[WARNNING]:" + _str);
+			return null;
 		}
 
 		public function getElementsLength(_elementID:String):uint {

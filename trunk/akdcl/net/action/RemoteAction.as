@@ -13,6 +13,7 @@
 	import ui.Alert;
 	import ui.UIEventDispatcher;
 
+	import akdcl.manager.LoggerManager;
 	import akdcl.manager.RequestManager;
 	import akdcl.net.gotoURL;
 	import akdcl.utils.traceObject;
@@ -58,6 +59,7 @@
 		public static const A_DATA_STRUCTURE:String = "dataStructure";
 		public static const A_DATA_TYPE:String = "dataType";
 
+		protected static var lM:LoggerManager = LoggerManager.getInstance();
 		protected static var rM:RequestManager = RequestManager.getInstance();
 
 		public static function replaceValue(_content:String, _str:String, _rep:String):String {
@@ -143,12 +145,14 @@
 				sendProxy.loadFormat = String(optionsLoad.attribute(A_DATA_STRUCTURE)[0] || "");
 				sendProxy.random = true;
 				//sendProxy.contentType
+				lM.info(this, "setOptions-->\n" + _optionsXML.toXMLString());
 			} else {
-				throw new Error("ERROR:数据源不匹配！");
+				throw new Error("[ERROR]:数据源不匹配！");
 			}
 		}
 
 		public function add(_key:String, _value:*):void {
+			lM.info(this, "add(key:{0}, value:{1})", null, _key, _value);
 			//var _xmlList:XMLList = optionsSend.elements(_key);
 			dataSend[_key] = _value;
 		}
@@ -158,6 +162,7 @@
 		}
 
 		public function clear():void {
+			lM.info(this, "clear");
 			dataSend = {};
 			rawData = null;
 			data = null;
@@ -165,6 +170,7 @@
 
 		public function sendAndLoad():Boolean {
 			if (isLoading){
+				lM.info(this, "sendAndLoad() 正在发送数据，需等待！");
 				return true;
 			}
 			isLoading = true;
@@ -176,9 +182,11 @@
 				}
 			}
 			//dataSend.random = Math.random();
-			traceObject("[" + name + " send]", dataSend);
+			var _str:String;
+			_str = traceObject("[" + name + " send]", dataSend);
 			dataSendFormated = formatData(dataSend, optionsSend, true);
-			traceObject("[" + name + " remote send]", dataSendFormated);
+			_str += "\n\n\n" + traceObject("[" + name + " remote send]", dataSendFormated);
+			lM.info(this, "sendAndLoad()-->\n" + _str);
 			sendProxy.data = dataSendFormated;
 			rM.load(sendProxy, onCompleteHandler, onErrorHandler, null);
 			return true;
@@ -204,16 +212,19 @@
 
 		}
 
-		protected function onCompleteHandler(_data:*):void {
+		protected function onCompleteHandler(_data:*, _url:String, _params:Array, _dataNoFormat:Object):void {
+			var _str:String;
 			isLoading = false;
 			rawData = _data;
 			if (rawData) {
 				
 			} else {
-				Alert.show("后台数据错误！");
+				_str = "后台数据错误！-->\n" + _dataNoFormat;
+				lM.error(this, _str);
+				alert = Alert.show(_str);
 				return;
 			}
-			traceObject("[" + name + " remote load]", rawData);
+			_str = traceObject("[" + name + " remote load]", rawData);
 			data = formatData(rawData, optionsLoad, false);
 
 			var _name:String;
@@ -227,7 +238,10 @@
 				}
 			}
 
-			traceObject("[" + name + " load]", data);
+			_str += "\n\n\n" + traceObject("[" + name + " load]", data);
+			
+			lM.info(this, "sendAndLoadComplete-->\n" + _str);
+			
 			if (alertXML){
 				showAlert(alertXML);
 			}
@@ -243,12 +257,14 @@
 			isLoading = false;
 			data = null;
 			rawData = null;
+			var _str:String;
 			if (_evt is SecurityErrorEvent) {
-				Alert.show("安全沙箱冲突，无法跨域访问！");
+				_str = "安全沙箱冲突，无法跨域访问！";
 			}else {
-				var _ioErrorXML:XML = options.elements(E_IO_ERROR)[0];
-				alert = Alert.show(_ioErrorXML || "网络错误，请稍后重试！");
+				_str = options.elements(E_IO_ERROR)[0] || "网络错误，请稍后重试！";
 			}
+			lM.error(this, _str);
+			alert = Alert.show(_str);
 			if (hasEventListener(IOErrorEvent.IO_ERROR)) {
 				dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR));
 			}

@@ -1,13 +1,16 @@
 package akdcl.manager {
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
+	import flash.events.EventDispatcher;
 
 	/**
 	 * ...
 	 * @author ...
 	 */
-	final public class SourceManager {
+	final public class SourceManager extends EventDispatcher {
+		private static const ERROR:String = "SourceManager Singleton already constructed!";
 		private static var instance:SourceManager;
+		private static var lM:LoggerManager = LoggerManager.getInstance();
 
 		public static function getInstance():SourceManager {
 			if (instance){
@@ -19,9 +22,11 @@ package akdcl.manager {
 
 		public function SourceManager(){
 			if (instance){
-				throw new Error("ERROR:SourceManager Singleton already constructed!");
+				lM.fatal(SourceManager, ERROR);
+				throw new Error("[ERROR]:" + ERROR);
 			}
 			instance = this;
+			lM.info(SourceManager, "init");
 			sourceGroup = {};
 		}
 
@@ -35,6 +40,7 @@ package akdcl.manager {
 			if (sourceGroup[_groupID]){
 
 			} else {
+				lM.info(SourceManager, "addGroup(id:{0})", null, _groupID);
 				sourceGroup[_groupID] = {};
 			}
 		}
@@ -45,6 +51,7 @@ package akdcl.manager {
 		}
 
 		public function removeGroup(_groupID:String):void {
+			lM.info(SourceManager, "removeGroup(id:{0})", null, _groupID);
 			var _group:Object = getGroup[_groupID];
 			for (var _i:String in _group){
 				removeSourceByID(_groupID, _i);
@@ -54,9 +61,7 @@ package akdcl.manager {
 
 		public function addSource(_groupID:String, _sourceID:String, _source:*):void {
 			var _group:Object = getGroup(_groupID);
-			if (_group[_sourceID]){
-
-			}
+			lM.info(SourceManager, "addSource(groupID:{0}, sourceID:{1}, source:{2})", null, _groupID, _sourceID, _source);
 			_group[_sourceID] = _source;
 		}
 
@@ -75,6 +80,7 @@ package akdcl.manager {
 		}
 
 		public function removeSource(_groupID:String, _source:*):void {
+			lM.info(SourceManager, "removeSource(id:{0}, source:{1})", null, _groupID, _source);
 			var _group:Object = getGroup(_groupID);
 			for (var _sourceID:String in _group){
 				if (_group[_sourceID] == _source){
