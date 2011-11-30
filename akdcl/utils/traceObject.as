@@ -1,7 +1,8 @@
 ﻿package akdcl.utils {
-	import com.adobe.serialization.json.JSON;
-	import akdcl.utils.replaceString;
 	import flash.utils.Dictionary;
+	import com.adobe.serialization.json.JSON;
+	
+	import akdcl.utils.replaceString;
 	/**
 	 * ...
 	 * @author Akdcl

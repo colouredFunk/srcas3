@@ -2,7 +2,9 @@
 	import flash.net.URLRequest;
 	import flash.net.navigateToURL;
 	import flash.external.ExternalInterface;
+	
 	import akdcl.utils.objectToURLVariables;
+	import akdcl.manager.LoggerManager;
 	/**
 	 * ...
 	 * @author Akdcl
@@ -33,6 +35,7 @@
 		}
 		
 		if (_js is String && ExternalInterface.available) {
+			LoggerManager.getInstance().info(this, "执行JS:" + _js);
 			ExternalInterface.call("eval", _js);
 		}
 		if(_href is String){
@@ -45,6 +48,7 @@
 				}
 				_request.method = _method;
 				navigateToURL(_request, _target);
+				LoggerManager.getInstance().info(this, "toURLAndPost:\n" + _request);
 				return;
 			}
 			
@@ -84,6 +88,7 @@
 					navigateToURL(_request, _target);
 					break;
 			}
+			LoggerManager.getInstance().info(this, "toURL(url:{0}, target:{1})", null, _request.url, _target);
 		}
 	}
 }

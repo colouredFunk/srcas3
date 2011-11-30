@@ -9,6 +9,7 @@ package akdcl.manager {
 	import flash.net.ObjectEncoding;
 	import flash.events.ProgressEvent;
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.utils.ByteArray;
@@ -21,8 +22,10 @@ package akdcl.manager {
 	 * ...
 	 * @author ...
 	 */
-	public class RequestManager {
+	final public class RequestManager extends EventDispatcher {
+		private static const ERROR:String = "RequestManager Singleton already constructed!";
 		private static var instance:RequestManager;
+		private static var lM:LoggerManager = LoggerManager.getInstance();
 
 		public static function getInstance():RequestManager {
 			if (instance){
@@ -32,11 +35,15 @@ package akdcl.manager {
 			return instance;
 		}
 
-		public function RequestManager(){
-			if (instance){
-				throw new Error("ERROR:RequestManager Singleton already constructed!");
+		public function RequestManager() {
+			if (instance) {
+				lM.fatal(RequestManager, ERROR);
+				throw new Error("[ERROR]:" + ERROR);
 			}
 			instance = this;
+			
+			lM.info(RequestManager, "init");
+			
 			eM = ElementManager.getInstance();
 			eM.register(REQUESTLOADER, RequestLoader);
 			eM.register(REQUESTURLLOADER, RequestURLLoader);
@@ -74,9 +81,11 @@ package akdcl.manager {
 			resetRequest(_url);
 			_url = request.url;
 			if (!_url){
-				trace("WARNNING:RequestManager.loadImage(_url), _url is null!!!");
-				return null;
+				var _str:String = "RequestManager.loadDisplay(url), url is null!";
+				lM.warn(RequestManager, _str);
+				trace("[WARNNING]:" + _str);
 			}
+			lM.info(RequestManager, "loadDisplay(url:{0})", null, _url);
 			//
 			var _bmd:BitmapData = sM.getSource(SourceManager.BITMAPDATA_GROUP, _url);
 			if (_bmd){
@@ -139,6 +148,7 @@ package akdcl.manager {
 			var _loaderInfo:LoaderInfo = (_evt.currentTarget as LoaderInfo);
 			var _loader:RequestLoader = _loaderInfo.loader as RequestLoader;
 			if (_loader.params && _loader.content && ("flashVars" in _loader.content)) {
+				lM.info(RequestManager, "设置{0}flashVars{1}", null, _loader.content, _loader.params[0]);
 				_loader.content["flashVars"] = _loader.params[0];
 			}
 		}
@@ -151,14 +161,18 @@ package akdcl.manager {
 			_loaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onLoaderCompleteOrErrorHandler);
 
 			if (_evt is IOErrorEvent || _evt is SecurityError){
+				lM.error(RequestManager, _evt.toString());
+				trace("[ERROR:]" + _evt);
 				_loader.onErrorHandler(_evt);
 			} else {
+				lM.info(RequestManager, "loadDisplayComplete:" + _loader.url);
 				if (_loader.content is Bitmap){
 					sM.addSource(SourceManager.BITMAPDATA_GROUP, _loader.url, (_loader.content as Bitmap).bitmapData);
 				} else {
 					//swf
 				}
 				_loader.onCompleteHandler();
+				
 			}
 			delete loaderDic[_loader.url];
 			if (_loader.clear()){
@@ -169,10 +183,13 @@ package akdcl.manager {
 		public function load(_url:*, _onCompleteHandler:Function = null, _onErrorHandler:Function = null, _onProgressHandler:Function = null, ... args):void {
 			resetRequest(_url);
 			_url = request.url;
-			if (!_url){
-				trace("WARNNING:RequestManager.load(_url), _url is null!!!");
+			if (!_url) {
+				var _str:String = "RequestManager.load(url), url is null!";
+				lM.warn(RequestManager, _str);
+				trace("[WARNNING]:" + _str);
 				return;
 			}
+			lM.info(RequestManager, "load(url:{0})", null, _url);
 			//
 			var _loader:RequestURLLoader = urlLoaderDic[_url];
 			if (_loader){
@@ -196,8 +213,11 @@ package akdcl.manager {
 			_loader.removeEventListener(IOErrorEvent.IO_ERROR, onURLLoaderCompleteOrErrorHandler);
 			_loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onURLLoaderCompleteOrErrorHandler);
 			if (_evt is IOErrorEvent || _evt is SecurityError){
+				lM.error(RequestManager, _evt.toString());
+				trace("[ERROR:]" + _evt);
 				_loader.onErrorHandler(_evt);
 			} else {
+				lM.info(RequestManager, "loadComplete:" + _loader.url);
 				_loader.onCompleteHandler();
 			}
 			delete urlLoaderDic[_loader.url];
@@ -272,6 +292,7 @@ package akdcl.manager {
 			} else {
 				request.url = null;
 			}
+			lM.info(RequestManager, "resetRequest-->\n" + request);
 		}
 	}
 
@@ -364,7 +385,6 @@ class RequestLoader extends Loader {
 	}
 
 	public function onErrorHandler(_evt:Event):void {
-		trace(_evt);
 		for each (var _onError:Function in errorHandlers){
 			switch (_onError.length){
 				case 0:
@@ -526,7 +546,6 @@ class RequestURLLoader extends URLLoader {
 	}
 
 	public function onErrorHandler(_evt:Event):void {
-		trace(_evt);
 		for each (var _onError:Function in errorHandlers){
 			switch (_onError.length){
 				case 0:
@@ -558,6 +577,9 @@ class RequestURLLoader extends URLLoader {
 					break;
 				case 3:
 					_onComplete(_data, url, params);
+					break;
+				case 4:
+					_onComplete(_data, url, params, data);
 					break;
 				case 1:
 				default:
