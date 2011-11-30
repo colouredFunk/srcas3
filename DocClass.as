@@ -1,8 +1,10 @@
 ﻿package {
+	import akdcl.utils.traceObject;
 	import flash.display.MovieClip;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.display.StageDisplayState;
+	import flash.utils.getTimer;
 
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
@@ -14,8 +16,9 @@
 
 	import akdcl.utils.addContextMenu;
 
-	import akdcl.manager.ExternalInterfaceManager;
+	import akdcl.manager.LoggerManager;
 	import akdcl.manager.RequestManager;
+	import akdcl.manager.ExternalInterfaceManager;
 
 	public class DocClass extends MovieClip {
 		protected static var instanceMap:Object = {};
@@ -28,18 +31,25 @@
 
 		public function DocClass(_key:String = "main"){
 			stop();
-			/*if (instanceMap[_key] != null){
-			   throw new Error("ERROR:DocClass Singleton already constructed!");
-			 }*/
+			if (instanceMap[_key] != null) {
+				var _str:String = "DocClass(@" + _key + ") Singleton already constructed!";
+				lM.fatal(DocClass, _str);
+				throw new Error("[ERROR]:" + _str);
+			}
 			instanceMap[_key] = this;
 			loaderInfo.addEventListener(Event.INIT, onInitHandler);
 		}
+		
+		private static const STATUS_LOAD:String = "load";
+		private static const STATUS_LOAD_COMPLETE:String = "loadComplete";
+		
 		public var optionsXML:XML;
 		public var onLoading:Function;
 		public var onLoaded:Function;
 
-		public var eiM:ExternalInterfaceManager;
+		public var lM:LoggerManager;
 		public var rM:RequestManager;
+		public var eiM:ExternalInterfaceManager;
 
 		protected var loadDelay:Number = 1;
 		protected var optionsXMLPath:String;
@@ -103,7 +113,15 @@
 			}
 			tabChildren = false;
 
+			lM = LoggerManager.getInstance();
+			lM.id = decodeURI(loaderInfo.url);
+			if (flashVars.debug) {
+				lM.startConnect();
+			}
+			lM.info(this, STATUS_LOAD +"-->\n" + traceObject(flashVars));
+			
 			rM = RequestManager.getInstance();
+			
 			eiM = ExternalInterfaceManager.getInstance();
 			eiM.objectID = flashVars.__objectID;
 			eiM.addEventListener(ExternalInterfaceManager.CALL, onJSInterfaceHandler);
@@ -121,7 +139,7 @@
 			}
 			addEventListener(Event.ENTER_FRAME, onLoadingHandler);
 
-			eiM.dispatchSWFEvent("load");
+			eiM.dispatchSWFEvent(STATUS_LOAD);
 		}
 
 		protected function onLoadingHandler(_evt:*):void {
@@ -141,16 +159,6 @@
 			}
 		}
 
-		protected function onLoadedHandler():void {
-			AuthorInformation.setFileBytes(loaderInfo.bytes);
-
-			addContextMenu(this, "Size: " + loaderInfo.width + " X " + loaderInfo.height, onSizeMenuHandler);
-
-			addContextMenu(this, AuthorInformation.getVersion(), onVersionMenuHandler);
-
-			eiM.dispatchSWFEvent("loadComplete");
-		}
-
 		protected function onLoadingStepFix(_loaded:Number):void {
 			if (optionsXMLPath){
 				_loaded = _loaded * (1 - optionsXMLPerLoad) + xmlLoadProgress * optionsXMLPerLoad;
@@ -163,17 +171,31 @@
 			}
 		}
 
+		protected function onLoadedHandler():void {
+			lM.info(this, STATUS_LOAD_COMPLETE);
+			AuthorInformation.setFileBytes(loaderInfo.bytes);
+
+			addContextMenu(this, "Size: " + loaderInfo.width + " X " + loaderInfo.height, onSizeMenuHandler);
+
+			addContextMenu(this, AuthorInformation.getVersion(), onVersionMenuHandler);
+
+			eiM.dispatchSWFEvent(STATUS_LOAD_COMPLETE);
+		}
+
 		protected function onXMLLoadingHandler(_evt:ProgressEvent):void {
 			xmlLoadProgress = (_evt.bytesTotal > 0) ? (_evt.bytesLoaded / _evt.bytesTotal) : xmlLoadProgress;
 		}
 
 		protected function onXMLLoadedHandler(_xml:XML, _url:String):void {
-			var _str:String = "ERROR:XML语法错误!\n" + _url;
 			if (_xml){
 				optionsXML = _xml;
 				xmlLoadProgress = 1;
 				optionsXMLPath = _url;
-			} else if (eiM.isAvailable){
+				return;
+			}
+			var _str:String = "[ERROR]:XML语法错误!" + _url;
+			lM.fatal(this, _str);
+			if (eiM.isAvailable){
 				eiM.debugMessage(_str);
 			} else {
 				throw new Error(_str);
@@ -183,10 +205,11 @@
 		protected function onXMLErrorHandler(_evt:IOErrorEvent, _url:String):void {
 			var _str:String;
 			if (_evt is IOErrorEvent){
-				_str = "ERROR:读取XML失败，请检查XML地址是否正确!\n" + _url;
+				_str = "[ERROR]:读取XML失败，请检查XML地址是否正确!" + _url;
 			} else {
-				_str = "ERROR:安全沙箱冲突，无法跨域读取XML!\n" + _url;
+				_str = "[ERROR]:安全沙箱冲突，无法跨域读取XML!" + _url;
 			}
+			lM.fatal(this, _str);
 			if (eiM.isAvailable){
 				eiM.debugMessage(_str);
 			} else {
@@ -195,7 +218,7 @@
 		}
 
 		protected function onSizeMenuHandler(_evt:ContextMenuEvent):void {
-			var _url:String = decodeURI(this.loaderInfo.url);
+			var _url:String = decodeURI(loaderInfo.url);
 			var _ary:Array = _url.split("/");
 			_url = _ary.pop();
 			_url = _ary.pop() + "/" + _url;
@@ -204,9 +227,16 @@
 			_str = _str + "\r\n</script>";
 			System.setClipboard(_str);
 		}
-
+		
+		private static var timeLM:uint;
+		
 		protected function onVersionMenuHandler(_evt:ContextMenuEvent):void {
 			System.setClipboard(AuthorInformation.getInformation());
+			var _t:uint = getTimer();
+			if (timeLM != 0 && _t - timeLM < 2000) {
+				lM.isConnected()?lM.stopConnect():lM.startConnect();
+			}
+			timeLM = _t;
 		}
 		
 		private static const JS_REQUEST:String = "jsRequest";
