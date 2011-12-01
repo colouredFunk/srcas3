@@ -183,9 +183,9 @@
 			}
 			//dataSend.random = Math.random();
 			var _str:String;
-			_str = traceObject("[" + name + " send]", dataSend);
+			_str = traceObject("[" + name + " send]", dataSend, true);
 			dataSendFormated = formatData(dataSend, optionsSend, true);
-			_str += "\n\n\n" + traceObject("[" + name + " remote send]", dataSendFormated);
+			_str += "\n\n\n" + traceObject("[" + name + " remote send]", dataSendFormated, true);
 			lM.info(this, "sendAndLoad()====>>>>\n" + _str);
 			sendProxy.data = dataSendFormated;
 			rM.load(sendProxy, onCompleteHandler, onErrorHandler, null);
@@ -224,7 +224,7 @@
 				alert = Alert.show(_str);
 				return;
 			}
-			_str = traceObject("[" + name + " remote load]", rawData);
+			_str = traceObject("[" + name + " remote load]", rawData, true);
 			data = formatData(rawData, optionsLoad, false);
 
 			var _name:String;
@@ -238,7 +238,7 @@
 				}
 			}
 
-			_str += "\n\n\n" + traceObject("[" + name + " load]", data);
+			_str += "\n\n\n" + traceObject("[" + name + " load]", data, true);
 			
 			lM.info(this, "sendAndLoadComplete====>>>>\n" + _str);
 			

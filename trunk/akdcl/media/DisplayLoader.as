@@ -3,6 +3,7 @@ package akdcl.media {
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
+
 	import akdcl.manager.RequestManager;
 
 	/**
@@ -10,17 +11,17 @@ package akdcl.media {
 	 * @author ...
 	 */
 	/// @eventType	flash.events.Event.COMPLETE
-	[Event(name = "complete", type = "flash.events.Event")]
-	
+	[Event(name="complete",type="flash.events.Event")]
+
 	public class DisplayLoader extends DisplayRect {
 		protected static var rM:RequestManager = RequestManager.getInstance();
-		
-		public var progressClip:*;
+
+		public var progressClip:Object;
 		public var sameChange:Boolean;
 		protected var loadProgress:Number = 0;
-		
-		protected var eventComplete:Event;
-		
+
+		protected var eventComplete:Event = new Event(Event.COMPLETE);
+
 		public function DisplayLoader(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = -1):void {
 			super(_rectWidth, _rectHeight, _bgColor);
 			label = null;
@@ -34,7 +35,7 @@ package akdcl.media {
 		}
 
 		public function load(_url:String, _tweenMode:int = 2, _alignX:Number = 0.5, _alignY:Number = 0.5, _scaleMode:Number = 1):void {
-			if (!sameChange && _url && label == _url) {
+			if (!sameChange && _url && label == _url){
 				return;
 			}
 			rM.unloadDisplay(label, onCompleteHandler, onErrorHandler, onProgressHandler);
@@ -47,15 +48,15 @@ package akdcl.media {
 			tweenMode = _tweenMode;
 			rM.loadDisplay(_url, onCompleteHandler, onErrorHandler, onProgressHandler);
 		}
-		
+
 		protected function onErrorHandler(_e:IOErrorEvent):void {
 			setProgressClip(false);
 		}
-		
+
 		protected function onProgressHandler(_e:ProgressEvent):void {
-			if (_e) {
+			if (_e){
 				loadProgress = _e.bytesLoaded / _e.bytesTotal;
-			}else {
+			} else {
 				loadProgress = 1;
 			}
 			if (isNaN(loadProgress)){
@@ -67,17 +68,15 @@ package akdcl.media {
 		protected function onCompleteHandler(_data:*, _url:String = null):void {
 			setProgressClip(false);
 			setContent(_data, tweenMode, alignXReady, alignYReady, scaleModeReady);
-			if (hasEventListener(Event.COMPLETE)) {
-				if (!eventComplete) {
-					eventComplete = new Event(Event.COMPLETE);
-				}
+			if (hasEventListener(Event.COMPLETE)){
 				dispatchEvent(eventComplete);
 			}
 		}
+
 		override protected function showContent():void {
-			if (isHidding && loadProgress < 0) {
-				
-			}else {
+			if (isHidding && loadProgress < 0){
+
+			} else {
 				super.showContent();
 			}
 		}
@@ -107,5 +106,4 @@ package akdcl.media {
 			}
 		}
 	}
-
 }

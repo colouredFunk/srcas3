@@ -1,5 +1,4 @@
 ﻿package akdcl.media {
-	import akdcl.manager.ElementManager;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
@@ -102,13 +101,13 @@
 			}
 		}
 
-		private var __scrollX:int = 0;
-
-		public function get scrollX():int {
+		//scrollX,scrollY 0~1
+		private var __scrollX:Number = 0;
+		public function get scrollX():Number {
 			return __scrollX;
 		}
 
-		public function set scrollX(_value:int):void {
+		public function set scrollX(_value:Number):void {
 			var _display:Object = displayContent;
 			if (_display){
 				var _width:Number = rect.width;
@@ -138,13 +137,12 @@
 			}
 		}
 
-		private var __scrollY:int = 0;
-
-		public function get scrollY():int {
+		private var __scrollY:Number = 0;
+		public function get scrollY():Number {
 			return __scrollY;
 		}
 
-		public function set scrollY(_value:int):void {
+		public function set scrollY(_value:Number):void {
 			var _display:Object = displayContent;
 			if (_display){
 				var _height:Number = rect.height;
@@ -173,9 +171,9 @@
 				alignY = __scrollY / (_height - scaleHeight);
 			}
 		}
-
+		
+		//alignX,alignY 0~1
 		private var __alignX:Number = 0;
-
 		public function get alignX():Number {
 			return __alignX;
 		}
@@ -189,7 +187,6 @@
 		}
 
 		private var __alignY:Number = 0;
-
 		public function get alignY():Number {
 			return __alignY;
 		}
@@ -281,7 +278,7 @@
 		}
 
 		override protected function onRemoveToStageHandler():void {
-			TweenLite.killTweensOf(bitmap);
+			TweenLite.killTweensOf(displayContent);
 			bitmap.bitmapData = null;
 			super.onRemoveToStageHandler();
 			rect = null;
@@ -346,10 +343,7 @@
 				container.mask = maskShape;
 			}
 			if (hasEventListener(Event.RESIZE)){
-				if (!eventResize){
-					eventResize = new Event(Event.RESIZE);
-					dispatchEvent(eventResize);
-				}
+				dispatchEvent(eventResize);
 			}
 		}
 		
@@ -402,7 +396,7 @@
 					rect.x = 0;
 					rect.y = 0;
 				}
-					//_width / _dW, _height / _dH
+				//_width / _dW, _height / _dH
 			}
 		}
 
@@ -483,9 +477,6 @@
 				__scaleMode = scaleModeReady;
 				updateRect();
 				if (hasEventListener(Event.CHANGE)){
-					if (!eventChange){
-						eventChange = new Event(Event.CHANGE);
-					}
 					dispatchEvent(eventChange);
 				}
 			}
