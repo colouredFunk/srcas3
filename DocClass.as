@@ -115,10 +115,8 @@
 
 			lM = LoggerManager.getInstance();
 			lM.id = decodeURI(loaderInfo.url);
-			if (flashVars.debug) {
-				lM.startConnect();
-			}
-			lM.info(this, STATUS_LOAD +"-->\n" + traceObject(flashVars));
+			lM.startConnect();
+			lM.info(this, STATUS_LOAD);
 			
 			rM = RequestManager.getInstance();
 			
@@ -156,6 +154,7 @@
 			if (loadProgress == 1 && onLoaded != null){
 				removeEventListener(Event.ENTER_FRAME, onLoadingHandler);
 				onLoaded();
+				lM.stopConnect();
 			}
 		}
 
@@ -172,7 +171,7 @@
 		}
 
 		protected function onLoadedHandler():void {
-			lM.info(this, STATUS_LOAD_COMPLETE);
+			lM.info(this, STATUS_LOAD_COMPLETE +"-->\n" + traceObject(flashVars));
 			AuthorInformation.setFileBytes(loaderInfo.bytes);
 
 			addContextMenu(this, "Size: " + loaderInfo.width + " X " + loaderInfo.height, onSizeMenuHandler);
@@ -234,7 +233,7 @@
 			System.setClipboard(AuthorInformation.getInformation());
 			var _t:uint = getTimer();
 			if (timeLM != 0 && _t - timeLM < 2000) {
-				lM.isConnected()?lM.stopConnect():lM.startConnect();
+				lM.isConnected?lM.stopConnect():lM.startConnect();
 			}
 			timeLM = _t;
 		}
