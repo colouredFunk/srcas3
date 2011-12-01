@@ -21,6 +21,10 @@ package akdcl.net.action {
 			view.text=_data;
 		}
 
+		public function TextInputField(_name:String) {
+			super(_name);
+		}
+
 		override public function clear():void {
 			view.text = "";
 			super.clear();

@@ -19,6 +19,10 @@ package akdcl.net.action {
 			return view.selected;
 		}
 
+		public function CheckField(_name:String) {
+			super(_name);
+		}
+
 		override public function clear():void {
 			view.selected = false;
 			super.clear();

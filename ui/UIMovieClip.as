@@ -1,6 +1,8 @@
 package ui {
 	import flash.display.MovieClip;
 	import flash.events.Event;
+	
+	import akdcl.manager.LoggerManager;
 
 	import ui.manager.EventManager;
 
@@ -9,6 +11,7 @@ package ui {
 	 * @author Akdcl
 	 */
 	public class UIMovieClip extends MovieClip {
+		protected static const lM:LoggerManager = LoggerManager.getInstance();
 		public var userData:Object;
 
 		override public function set enabled(_enabled:Boolean):void {
@@ -48,6 +51,7 @@ package ui {
 			if (autoRemove){
 				addEventListener(Event.REMOVED_FROM_STAGE, onRemoveToStageDelayHandler);
 			}
+			lM.info(this, Event.ADDED_TO_STAGE + " parent is " + parent + parent.name);
 		}
 
 		private function onRemoveToStageDelayHandler(_evt:Event):void {
@@ -65,6 +69,8 @@ package ui {
 		}
 
 		protected function onRemoveToStageHandler():void {
+			lM.info(this, Event.REMOVED_FROM_STAGE);
+			
 			stop();
 			__removeChildren();
 			scrollRect = null;
