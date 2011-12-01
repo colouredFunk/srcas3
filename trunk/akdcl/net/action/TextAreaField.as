@@ -17,6 +17,10 @@ package akdcl.net.action {
 			return stringToBoolean(view.text) ? view.text : VALUE_UNINPUT;
 		}
 
+		public function TextAreaField(_name:String) {
+			super(_name);
+		}
+
 		override public function clear():void {
 			view.text = "";
 			super.clear();

@@ -34,6 +34,10 @@ package akdcl.net.action {
 			return options.elements(RemoteAction.E_CASE)[view.selectedIndex];
 		}
 
+		public function ComboxField(_name:String) {
+			super(_name);
+		}
+		
 		override public function clear():void {
 			view.selectedItem = null;
 			super.clear();

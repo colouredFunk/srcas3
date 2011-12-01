@@ -212,14 +212,14 @@
 
 		}
 
-		protected function onCompleteHandler(_data:*, _url:String, _params:Array, _dataNoFormat:Object):void {
+		protected function onCompleteHandler(_data:*, _url:String):void {
 			var _str:String;
 			isLoading = false;
 			rawData = _data;
 			if (rawData) {
 				
 			} else {
-				_str = "后台数据错误！-->\n" + _dataNoFormat;
+				_str = "后台数据错误！";
 				lM.error(this, _str);
 				alert = Alert.show(_str);
 				return;

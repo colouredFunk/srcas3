@@ -217,7 +217,7 @@ package akdcl.manager {
 				trace("[ERROR:]" + _evt);
 				_loader.onErrorHandler(_evt);
 			} else {
-				lM.info(RequestManager, "loadComplete:" + _loader.url);
+				lM.info(RequestManager, "loadComplete:{0}-->\n" + _loader.data, null, _loader.url);
 				_loader.onCompleteHandler();
 			}
 			delete urlLoaderDic[_loader.url];
@@ -577,9 +577,6 @@ class RequestURLLoader extends URLLoader {
 					break;
 				case 3:
 					_onComplete(_data, url, params);
-					break;
-				case 4:
-					_onComplete(_data, url, params, data);
 					break;
 				case 1:
 				default:

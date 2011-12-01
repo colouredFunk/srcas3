@@ -107,7 +107,7 @@ package akdcl.net.action {
 				var _fieldXML:XML = optionsSend.elements(E_INPUT)[_i];
 				var _fieldName:String = _fieldXML.attribute(A_NAME);
 
-				var _field:Field = createField(_fieldXML);
+				var _field:Field = createField(_fieldName, _fieldXML);
 				if (_field){
 					_field.setOptions(_fieldXML, this, x, y + height);
 					width = Math.max(width, _field.width);
@@ -121,7 +121,7 @@ package akdcl.net.action {
 			return _xml.elements().(name() == E_VARIABLE || name() == E_INPUT);
 		}
 
-		private function createField(_fieldXML:XML):Field {
+		private function createField(_fieldName:String,_fieldXML:XML):Field {
 			var _styleType:String = _fieldXML.attribute(Field.A_STYLE_TYPE)[0];
 			if (_styleType){
 			} else {
@@ -139,17 +139,17 @@ package akdcl.net.action {
 			}
 			switch (_styleType){
 				case ST_TEXT_INPUT:
-					return new TextInputField();
+					return new TextInputField(_fieldName);
 				case ST_TEXT_AREA:
-					return new TextAreaField();
+					return new TextAreaField(_fieldName);
 				case ST_COMBO_BOX:
-					return new ComboxField();
+					return new ComboxField(_fieldName);
 				case ST_RADIO_BUTTON:
-					return new RadioButtonField();
+					return new RadioButtonField(_fieldName);
 				case ST_CHECK_BOX:
-					return new CheckBoxField();
+					return new CheckBoxField(_fieldName);
 				case ST_CHECK:
-					return new CheckField();
+					return new CheckField(_fieldName);
 				default:
 					trace(_styleType, "unknown styleType!!!");
 			}

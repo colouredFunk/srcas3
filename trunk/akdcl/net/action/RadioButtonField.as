@@ -26,6 +26,10 @@ package akdcl.net.action {
 			return VALUE_UNSELECT;
 		}
 
+		public function RadioButtonField(_name:String) {
+			super(_name);
+		}
+		
 		override public function clear():void {
 			//view[0].group.selectedData = null;
 			super.clear();

@@ -125,6 +125,11 @@ package akdcl.net.action {
 		protected var most:uint;
 		protected var timeOutID:uint;
 		
+		public function Field(_name:String) {
+			name = _name;
+			super();
+		}
+		
 		override public function remove():void {
 			clear();
 			super.remove();

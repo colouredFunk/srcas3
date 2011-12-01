@@ -27,6 +27,10 @@ package akdcl.net.action {
 			}
 			return _list.length > 0 ? _list : VALUE_UNSELECT;
 		}
+		
+		public function CheckBoxField(_name:String) {
+			super(_name);
+		}
 
 		override public function clear():void {
 			for each(var _check:CheckBox in view) {
