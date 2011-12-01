@@ -145,7 +145,7 @@
 				sendProxy.loadFormat = String(optionsLoad.attribute(A_DATA_STRUCTURE)[0] || "");
 				sendProxy.random = true;
 				//sendProxy.contentType
-				lM.info(this, "setOptions-->\n" + _optionsXML.toXMLString());
+				lM.info(this, "setOptions====>>>>\n" + _optionsXML.toXMLString());
 			} else {
 				throw new Error("[ERROR]:数据源不匹配！");
 			}
@@ -186,7 +186,7 @@
 			_str = traceObject("[" + name + " send]", dataSend);
 			dataSendFormated = formatData(dataSend, optionsSend, true);
 			_str += "\n\n\n" + traceObject("[" + name + " remote send]", dataSendFormated);
-			lM.info(this, "sendAndLoad()-->\n" + _str);
+			lM.info(this, "sendAndLoad()====>>>>\n" + _str);
 			sendProxy.data = dataSendFormated;
 			rM.load(sendProxy, onCompleteHandler, onErrorHandler, null);
 			return true;
@@ -240,7 +240,7 @@
 
 			_str += "\n\n\n" + traceObject("[" + name + " load]", data);
 			
-			lM.info(this, "sendAndLoadComplete-->\n" + _str);
+			lM.info(this, "sendAndLoadComplete====>>>>\n" + _str);
 			
 			if (alertXML){
 				showAlert(alertXML);

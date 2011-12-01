@@ -171,7 +171,7 @@
 		}
 
 		protected function onLoadedHandler():void {
-			lM.info(this, STATUS_LOAD_COMPLETE +"-->\n" + traceObject(flashVars));
+			lM.info(this, STATUS_LOAD_COMPLETE +"====>>>>\n" + traceObject(flashVars));
 			AuthorInformation.setFileBytes(loaderInfo.bytes);
 
 			addContextMenu(this, "Size: " + loaderInfo.width + " X " + loaderInfo.height, onSizeMenuHandler);

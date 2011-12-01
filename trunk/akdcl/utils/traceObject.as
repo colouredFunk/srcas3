@@ -1,4 +1,5 @@
 ﻿package akdcl.utils {
+	import flash.net.URLRequest;
 	import flash.utils.Dictionary;
 	import com.adobe.serialization.json.JSON;
 	
@@ -15,6 +16,7 @@
 			var _obj:*= args[_i];
 			switch(_obj?_obj["constructor"]:_obj) {
 				case Object:
+				case URLRequest:
 				case Dictionary:
 				case Array:
 					_eachStr = replaceString(com.adobe.serialization.json.JSON.encode(_obj),",{",",\n{");
