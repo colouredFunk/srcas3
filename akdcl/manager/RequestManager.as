@@ -17,6 +17,8 @@ package akdcl.manager {
 	import com.adobe.serialization.json.JSON;
 
 	import zero.net.FormVariables;
+	
+	import akdcl.utils.traceObject;
 
 	/**
 	 * ...
@@ -217,7 +219,7 @@ package akdcl.manager {
 				trace("[ERROR:]" + _evt);
 				_loader.onErrorHandler(_evt);
 			} else {
-				lM.info(RequestManager, "loadComplete:{0}-->\n" + _loader.data, null, _loader.url);
+				lM.info(RequestManager, "loadComplete:{0}====>>>>\n" + _loader.data, null, _loader.url);
 				_loader.onCompleteHandler();
 			}
 			delete urlLoaderDic[_loader.url];
@@ -292,7 +294,7 @@ package akdcl.manager {
 			} else {
 				request.url = null;
 			}
-			lM.info(RequestManager, "resetRequest-->\n" + request);
+			lM.info(RequestManager, "resetRequest====>>>>\n" + traceObject(request));
 		}
 	}
 
