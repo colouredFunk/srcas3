@@ -78,6 +78,8 @@
 			[StageAlign.BOTTOM_LEFT, StageAlign.BOTTOM, StageAlign.BOTTOM_RIGHT]
 		];
 		
+		//_scale:0 NO_SCALE
+		//_scale:1 SHOW_ALL
 		public function setStageAlignAndScale(_alignX:int = 0, _alignY:int = 0 , _scale:int = -1):void {
 			if (stage) {
 				if (_alignX<0) {

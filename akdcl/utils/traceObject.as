@@ -31,7 +31,9 @@
 			}
 			_str += _eachStr;
 		}
-		trace(_str);
+		if (args[_i - 1] === true) {
+			trace(_str);
+		}
 		return _str;
 	}
 }
