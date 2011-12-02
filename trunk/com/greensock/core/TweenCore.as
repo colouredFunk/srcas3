@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.691
- * DATE: 2011-09-28
+ * VERSION: 1.693
+ * DATE: 2011-11-07
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -16,7 +16,7 @@ package com.greensock.core {
  */
 	public class TweenCore {
 		/** @private **/
-		public static const version:Number = 1.691;
+		public static const version:Number = 1.693;
 		
 		/** @private **/
 		protected static var _classInitted:Boolean;
@@ -301,10 +301,10 @@ package com.greensock.core {
 		public function set duration(n:Number):void {
 			var ratio:Number = n / this.cachedDuration;
 			this.cachedDuration = this.cachedTotalDuration = n;
+			setDirtyCache(true); //true in case it's a TweenMax or TimelineMax that has a repeat - we'll need to refresh the totalDuration. 
 			if (this.active && !this.cachedPaused && n != 0) {
 				this.setTotalTime(this.cachedTotalTime * ratio, true);
 			}
-			setDirtyCache(false);
 		}
 		
 		/**

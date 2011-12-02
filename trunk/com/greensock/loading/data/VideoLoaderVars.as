@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.23
- * DATE: 2011-07-27
+ * VERSION: 1.24
+ * DATE: 2011-11-03
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -324,7 +324,7 @@ package com.greensock.loading.data {
 			return _set("autoAdjustBuffer", value);
 		}
 		
-		/** If <code>true</code> (the default), the NetStream will only be attached to the Video object (the <code>rawContent</code>) when it is in the display list (on the stage). This conserves memory but it can cause a very brief rendering delay when the content is initially added to the stage (often imperceptible). Also, if you add it to the stage when the <code>videoTime</code> is <i>after</i> its last encoded keyframe, it will render at that last keyframe. **/
+		/** If <code>true</code>, the NetStream will only be attached to the Video object (the <code>rawContent</code>) when it is in the display list (on the stage). This conserves memory but it can cause a very brief rendering delay when the content is initially added to the stage (often imperceptible). Also, if you add it to the stage when the <code>videoTime</code> is <i>after</i> its last encoded keyframe, it will render at that last keyframe. **/
 		public function autoDetachNetStream(value:Boolean):VideoLoaderVars {
 			return _set("autoDetachNetStream", value);
 		}

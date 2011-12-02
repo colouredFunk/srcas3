@@ -8,6 +8,7 @@ package com.greensock {
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.display.Graphics;
+	import flash.display.BlendMode;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
@@ -16,65 +17,68 @@ package com.greensock {
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.geom.Transform;
+	
+	import mx.core.UIComponent;
 /**
- * A BlitMask is basically a rectangular Sprite that acts as a high-performance mask for a DisplayObject
+ * A FlexBlitMask is basically a rectangular UIComponent that acts as a high-performance mask for a DisplayObject
  * by caching a bitmap version of it and blitting only the pixels that should be visible at any given time,
  * although its <code>bitmapMode</code> can be turned off to restore interactivity in the DisplayObject 
- * whenever you want. When scrolling very large images or text blocks, a BlitMask can greatly improve 
- * performance, especially on mobile devices that have weaker processors. <br /><br />
+ * whenever you want. It is a Flex-friendly version of BlitMask. When scrolling very large images or text 
+ * blocks, a FlexBlitMask can greatly improve performance, especially on mobile devices that have weaker 
+ * processors. <br /><br />
  * 
- * Here are some of the conveniences BlitMask offers:<br />
+ * Here are some of the conveniences FlexBlitMask offers:<br />
  * <ul>
  * 		<li>Excellent scrolling performance</li>
  * 		<li>You don't need to do anything special with your target DisplayObject - move/scale/rotate it 
- * 			however you please and then <code>update()</code> the BlitMask and it syncs the pixels.
- * 			The BlitMask basically sits on top of the DisplayObject in the display list and you can 
+ * 			however you please and then <code>update()</code> the FlexBlitMask and it syncs the pixels.
+ * 			The FlexBlitMask basically sits on top of the DisplayObject in the display list and you can 
  * 			move it independently too if you want.</li>
- * 		<li>Use the BlitMask's <code>scrollX</code> and <code>scrollY</code> properties to move the
+ * 		<li>Use the FlexBlitMask's <code>scrollX</code> and <code>scrollY</code> properties to move the
  * 			target DisplayObject inside the masked area. For example, to scroll from top to bottom over 
- * 			the course of 2 seconds, simply do: <br /><code>myBlitMask.scrollY = 0;<br />
- * 			TweenLite.to(myBlitMask, 2, {scrollY:1});</code> </li>
+ * 			the course of 2 seconds, simply do: <br /><code>myFlexBlitMask.scrollY = 0;<br />
+ * 			TweenLite.to(myFlexBlitMask, 2, {scrollY:1});</code> </li>
  * 		<li>Use the "wrap" feature to make the bitmap wrap around to the opposite side when it scrolls 
- * 			off one of the edges (only in <code>bitmapMode</code> of course), as though the BlitMask is 
+ * 			off one of the edges (only in <code>bitmapMode</code> of course), as though the FlexBlitMask is 
  * 			filled with a grid of bitmap copies of the target.</li>
- * 		<li>For maximum performance in bitmapMode, set <code>smoothing</code> to <code>false</code> or 
- * 			for maximum quality, set it to <code>true</code></li>
+ * 		<li>For maximum <i>performance</i> in bitmapMode, set <code>smoothing</code> to <code>false</code> or 
+ * 			for maximum <i>quality</i>, set it to <code>true</code></li>
  * 		<li>You can toggle the <code>bitmapMode</code> to get either maximum performance or interactivity 
  * 			in the target DisplayObject anytime. (some other solutions out there are only viable for 
  * 			non-interactive bitmap content) </li>
- * 		<li>MouseEvents are dispatched by the BlitMask, so you can listen for clicks, rollovers, rollouts, etc.</li>
+ * 		<li>MouseEvents are dispatched by the FlexBlitMask, so you can listen for clicks, rollovers, rollouts, etc.</li>
  * </ul>
  * 
  * @example Example AS3 code:<listing version="3.0">
- import com.greensock.~~;
- 
- //create a 200x200 BlitMask positioned at x:20, y:50 to mask our "mc" object and turn smoothing on:
- var blitMask:BlitMask = new BlitMask(mc, 20, 50, 200, 200, true);
- 
- //position mc at the top left of the BlitMask using the scrollX and scrollY properties
- blitMask.scrollX = 0;
- blitMask.scrollY = 0;
- 
- //tween the scrollY to make mc scroll to the bottom over the course of 3 seconds and then turn off bitmapMode so that mc becomes interactive:
- TweenLite.to(blitMask, 3, {scrollY:1, onComplete:blitMask.disableBitmapMode});
- 
- //or simply position mc manually and then call update() to sync the display:
- mc.x = 350;
- blitMask.update();
- 
- </listing>
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" frameRate="60" layout="absolute" xmlns:greensock="com.greensock.~~" creationComplete="tween()"&gt;
+	&lt;mx:Script&gt;
+		&lt;![CDATA[
+			import com.greensock.TweenLite;
+			private function tween():void {
+				myText.y = 50;
+				TweenLite.to(myText, 6, {y:-100});
+			}
+		]]&gt;
+	&lt;/mx:Script&gt;
+	&lt;greensock:FlexBlitMask id="blitMask" target="{myText}" wrap="false" x="20" y="50" width="300" height="200" smoothing="true" /&gt;
+	&lt;mx:Label text="FlexBlitMask Example" fontSize="24" /&gt;
+	&lt;mx:Text id="myText" x="20" y="50" width="135" height="500" text="FlexBlitMask can be great for high-performance scrolling. Performance is of paramount importance in mobile apps. There is, of course, a trade-off in memory because an extra bitmap version of the target needs to be captured/maintained, but overall performance while scrolling can be significantly improved. It doesn't make sense to use FlexBlitMask if you're tweening the scale or rotation of the target, though - it is primarily for scrolling (tweening the x and/or y properties)." /&gt;
+	&lt;mx:Button id="tweenButton" label="Tween" x="20" y="260" click="tween()" /&gt;
+&lt;/mx:Application&gt;
+</listing>
  * 
  * Notes:
  * <ul>
- * 		<li>BlitMasks themselves should not be rotated or scaled (although technically you can alter the scaleX and scaleY 
+ * 		<li>FlexBlitMasks themselves should not be rotated or scaled (although technically you can alter the scaleX and scaleY 
  * 			but doing so will only change the width or height instead). You can, of course, alter their x, y, width, 
  * 			or height properties as much as you want. </li>
- * 		<li>BlitMasks don't perform nearly as well in bitmapMode when the <code>target</code> is being scaled or rotated 
- * 			because it forces a flushing and recapture of the internal bitmap. BlitMasks are <b>MUCH</b> better when you are
+ * 		<li>FlexBlitMasks don't perform nearly as well in bitmapMode when the <code>target</code> is being scaled or rotated 
+ * 			because it forces a flushing and recapture of the internal bitmap. FlexBlitMasks are <b>MUCH</b> better when you are
  * 			simply changing x/y properties (scrolling) because it can reuse the same cached bitmap over and over.</li>
  * 		<li>If the target content is changing frequently (like if it has nested MovieClips that are animating on every frame),
- * 			you'd need to call update(null, true) each time you want the BlitMask to redraw itself to sync with the changes 
- * 			in the target, but that's a relatively expensive operation so it's not a great use case for BlitMask. You may
+ * 			you'd need to call update(null, true) each time you want the FlexBlitMask to redraw itself to sync with the changes 
+ * 			in the target, but that's a relatively expensive operation so it's not a great use case for FlexBlitMask. You may
  * 			be better off just turning off bitmapMode during that animation sequence.</li>
  * </ul><br /><br />
  * 
@@ -82,7 +86,7 @@ package com.greensock {
  * 
  * @author Jack Doyle, jack@greensock.com
  **/
-	public class BlitMask extends Sprite {
+	public class FlexBlitMask extends UIComponent {
 		/** @private **/
 		public static var version:Number = 0.5;
 		
@@ -152,17 +156,17 @@ package com.greensock {
 		/**
 		 * Constructor
 		 * 
-		 * @param target The DisplayObject that will be masked by the BlitMask
-		 * @param x x coorinate of the upper left corner of the BlitMask. If <code>smoothing</code> is <code>false</code>, the x coordinate will be rounded to the closest integer.
-		 * @param y y coordinate of the upper right corner of the BlitMask
-		 * @param width width of the BlitMask (in pixels)
-		 * @param height height of the BlitMask (in pixels)
-		 * @param smoothing If <code>false</code> (the default), the bitmap (and the BlitMask's x/y coordinates) will be rendered only on whole pixels which is faster in terms of processing. However, for the best quality and smoothest animation, set <code>smoothing</code> to <code>true</code>.
-		 * @param autoUpdate If <code>true</code>, the BlitMask will automatically watch the <code>target</code> to see if its position/scale/rotation has changed on each frame (while <code>bitmapMode</code> is <code>true</code>) and if so, it will <code>update()</code> to make sure the BlitMask always stays synced with the <code>target</code>. This is the easiest way to use BlitMask but it is slightly less efficient than manually calling <code>update()</code> whenever you need to. Keep in mind that if you're tweening with TweenLite or TweenMax, you can simply set its <code>onUpdate</code> to the BlitMask's <code>update()</code> method to keep things synced. Like <code>onUpdate:myBlitMask.update</code>.
-		 * @param fillColor The ARGB hexadecimal color that should fill the empty areas of the BlitMask. By default, it is transparent (0x00000000). If you wanted a red color, for example, it would be <code>0xFFFF0000</code>.
-		 * @param wrap If <code>true</code>, the bitmap will be wrapped around to the opposite side when it scrolls off one of the edges (only in <code>bitmapMode</code> of course), like the BlitMask is filled with a grid of bitmap copies of the target. Use the <code>wrapOffsetX</code> and <code>wrapOffsetY</code> properties to affect how far apart the copies are from each other. 
+		 * @param target The DisplayObject that will be masked by the FlexBlitMask
+		 * @param x x coorinate of the upper left corner of the FlexBlitMask. If <code>smoothing</code> is <code>false</code>, the x coordinate will be rounded to the closest integer.
+		 * @param y y coordinate of the upper right corner of the FlexBlitMask
+		 * @param width width of the FlexBlitMask (in pixels)
+		 * @param height height of the FlexBlitMask (in pixels)
+		 * @param smoothing If <code>false</code> (the default), the bitmap (and the FlexBlitMask's x/y coordinates) will be rendered only on whole pixels which is faster in terms of processing. However, for the best quality and smoothest animation, set <code>smoothing</code> to <code>true</code>.
+		 * @param autoUpdate If <code>true</code> (the default), the FlexBlitMask will automatically watch the <code>target</code> to see if its position/scale/rotation has changed on each frame (while <code>bitmapMode</code> is <code>true</code>) and if so, it will <code>update()</code> to make sure the FlexBlitMask always stays synced with the <code>target</code>. This is the easiest way to use FlexBlitMask but it is slightly less efficient than manually calling <code>update()</code> whenever you need to. Keep in mind that if you're tweening with TweenLite or TweenMax, you can simply set its <code>onUpdate</code> to the FlexBlitMask's <code>update()</code> method to keep things synced. Like <code>onUpdate:myFlexBlitMask.update</code>.
+		 * @param fillColor The ARGB hexadecimal color that should fill the empty areas of the FlexBlitMask. By default, it is transparent (0x00000000). If you wanted a red color, for example, it would be <code>0xFFFF0000</code>.
+		 * @param wrap If <code>true</code>, the bitmap will be wrapped around to the opposite side when it scrolls off one of the edges (only in <code>bitmapMode</code> of course), like the FlexBlitMask is filled with a grid of bitmap copies of the target. Use the <code>wrapOffsetX</code> and <code>wrapOffsetY</code> properties to affect how far apart the copies are from each other. 
 		 */
-		public function BlitMask(target:DisplayObject, x:Number=0, y:Number=0, width:Number=100, height:Number=100, smoothing:Boolean=false, autoUpdate:Boolean=false, fillColor:uint=0x00000000, wrap:Boolean=false) {
+		public function FlexBlitMask(target:DisplayObject=null, x:Number=0, y:Number=0, width:Number=100, height:Number=100, smoothing:Boolean=false, autoUpdate:Boolean=true, fillColor:uint=0x00000000, wrap:Boolean=false) {
 			super();
 			if (width < 0 || height < 0) {
 				throw new Error("A FlexBlitMask cannot have a negative width or height.");
@@ -273,11 +277,11 @@ package com.greensock {
 		}
 	
 		/**
-		 * Updates the BlitMask's internal bitmap to reflect the <code>target's</code> current position/scale/rotation. 
+		 * Updates the FlexBlitMask's internal bitmap to reflect the <code>target's</code> current position/scale/rotation. 
 		 * This is a very important method that you'll need to call whenever visual or transformational changes are made 
-		 * to the target so that the BlitMask remains synced with it. 
+		 * to the target so that the FlexBlitMask remains synced with it. 
 		 * 
-		 * @param event An optional Event object (which isn't used at all internally) in order to make it easier to use <code>update()</code> as an event handler. For example, you could <code>addEventListener(Event.ENTER_FRAME, myBlitMask.update)</code> to make sure it is updated on every frame (although it would be more efficient to simply set <code>autoUpdate</code> to <code>true</code> in this case). 
+		 * @param event An optional Event object (which isn't used at all internally) in order to make it easier to use <code>update()</code> as an event handler. For example, you could <code>addEventListener(Event.ENTER_FRAME, myFlexBlitMask.update)</code> to make sure it is updated on every frame (although it would be more efficient to simply set <code>autoUpdate</code> to <code>true</code> in this case). 
 		 * @param forceRecaptureBitmap Normally, the cached bitmap of the <code>target</code> is only recaptured if its scale or rotation changed because doing so is rather processor-intensive, but you can force a full update (and regeneration of the cached bitmap) by setting <code>forceRecaptureBitmap</code> to <code>true</code>.
 		 */
 		public function update(event:Event=null, forceRecaptureBitmap:Boolean=false):void {
@@ -288,7 +292,11 @@ package com.greensock {
 			}  else if (_target.parent) {
 				_bounds = _target.getBounds(_target.parent);
 				if (this.parent != _target.parent) {
-					_target.parent.addChildAt(this, _target.parent.getChildIndex(_target));
+					if (_target.parent.hasOwnProperty("addElementAt")) { //for Flex compatibility (spark)
+						Object(_target.parent).addElementAt(this, Object(_target.parent).getChildIndex(_target));
+					} else {
+						_target.parent.addChildAt(this, _target.parent.getChildIndex(_target));
+					}
 				}
 			}
 			if (_bitmapMode || forceRecaptureBitmap) {
@@ -329,8 +337,6 @@ package com.greensock {
 			
 			var x:Number = super.x + xOffset;
 			var y:Number = super.y + yOffset;
-			
-			
 			var wrapWidth:int = (_bounds.width + _wrapOffsetX + 0.5) >> 0;
 			var wrapHeight:int = (_bounds.height + _wrapOffsetY + 0.5) >> 0;
 			var g:Graphics = this.graphics;
@@ -438,12 +444,12 @@ package com.greensock {
 		}
 		
 		/** 
-		 * Sets the width and height of the BlitMask. 
-		 * Keep in mind that a BlitMask should not be rotated or scaled. 
+		 * Sets the width and height of the FlexBlitMask. 
+		 * Keep in mind that a FlexBlitMask should not be rotated or scaled. 
 		 * You can also directly set the <code>width</code> or <code>height</code> properties. 
 		 * 
-		 * @param width The width of the BlitMask
-		 * @param height The height of the BlitMask
+		 * @param width The width of the FlexBlitMask
+		 * @param height The height of the FlexBlitMask
 		 * @see #width
 		 * @see #height
 		 **/
@@ -451,7 +457,7 @@ package com.greensock {
 			if (_width == width && _height == height) {
 				return;
 			} else if (width < 0 || height < 0) {
-				throw new Error("A BlitMask cannot have a negative width or height.");
+				throw new Error("A FlexBlitMask cannot have a negative width or height.");
 			} else if (_bd != null) {
 				_bd.dispose();
 			}
@@ -473,10 +479,10 @@ package com.greensock {
 		 * functionality to tweens or using it as an event handler. For example, to enable bitmapMode at
 		 * the beginning of a tween and then disable it when the tween completes, you could do: <br /><br /><code>
 		 * 
-		 * TweenLite.to(mc, 3, {x:400, onStart:myBlitMask.enableBitmapMode, onUpdate:myBlitMask.update, onComplete:myBlitMask.disableBitmapMode});
+		 * TweenLite.to(mc, 3, {x:400, onStart:myFlexBlitMask.enableBitmapMode, onUpdate:myFlexBlitMask.update, onComplete:myFlexBlitMask.disableBitmapMode});
 		 * </code>
 		 * 
-		 * @param event An optional Event that isn't used internally but makes it possible to use the method as an event handler like <code>addEventListener(MouseEvent.CLICK, myBlitMask.enableBitmapMode)</code>.
+		 * @param event An optional Event that isn't used internally but makes it possible to use the method as an event handler like <code>addEventListener(MouseEvent.CLICK, myFlexBlitMask.enableBitmapMode)</code>.
 		 * @see #disableBitmapMode()
 		 * @see #bitmapMode
 		 */
@@ -489,10 +495,10 @@ package com.greensock {
 		 * functionality to tweens or using it as an event handler. For example, to enable bitmapMode at
 		 * the beginning of a tween and then disable it when the tween completes, you could do: <br /><br /><code>
 		 * 
-		 * TweenLite.to(mc, 3, {x:400, onStart:myBlitMask.enableBitmapMode, onUpdate:myBlitMask.update, onComplete:myBlitMask.disableBitmapMode});
+		 * TweenLite.to(mc, 3, {x:400, onStart:myFlexBlitMask.enableBitmapMode, onUpdate:myFlexBlitMask.update, onComplete:myFlexBlitMask.disableBitmapMode});
 		 * </code>
 		 * 
-		 * @param event An optional Event that isn't used internally but makes it possible to use the method as an event handler like <code>addEventListener(MouseEvent.CLICK, myBlitMask.disableBitmapMode)</code>.
+		 * @param event An optional Event that isn't used internally but makes it possible to use the method as an event handler like <code>addEventListener(MouseEvent.CLICK, myFlexBlitMask.disableBitmapMode)</code>.
 		 * @see #enableBitmapMode()
 		 * @see #bitmapMode
 		 */
@@ -532,7 +538,7 @@ package com.greensock {
 			}
 		}
 		
-		/** Disposes of the BlitMask and its internal BitmapData instances, releasing them for garbage collection. **/
+		/** Disposes of the FlexBlitMask and its internal BitmapData instances, releasing them for garbage collection. **/
 		public function dispose():void {
 			if (_bd == null) { //already disposed.
 				return;
@@ -546,26 +552,49 @@ package com.greensock {
 				_target.mask = null;
 			}
 			if (this.parent != null) {
-				this.parent.removeChild(this);
+				if (this.parent.hasOwnProperty("removeElement")) {
+					Object(this.parent).removeElement(this); //for Flex compatibility (spark)
+				} else {
+					this.parent.removeChild(this);
+				}
 			}
 			this.target = null;
 		}
+		
+		/** @private **/
+		override protected function measure():void {
+			if (this.parent) {
+				var bounds:Rectangle = this.getBounds(this.parent);
+				super.width = bounds.width;
+				super.height = bounds.height;
+			}
+			this.explicitWidth = _width;
+			this.explicitHeight = _height;
+			super.measure();
+		}
+		
+		/** @inheritDoc **/
+		override public function setActualSize(w:Number, h:Number):void {
+			setSize(w, h);
+			super.setActualSize(w, h);
+		}
+		
 	
 //---- GETTERS / SETTERS --------------------------------------------------------------------
 		
 		/** 
-		 * When <code>true</code>, the BlitMask optimizes itself for performance by setting the <code>target's</code> 
+		 * When <code>true</code>, the FlexBlitMask optimizes itself for performance by setting the <code>target's</code> 
 		 * <code>visible</code> property to <code>false</code> (greatly reducing the load on Flash's graphics rendering 
 		 * routines) and uses its internally cached bitmap version of the <code>target</code> to redraw only the necessary
 		 * pixels inside the masked area. Since only a bitmap version of the <code>target</code> is shown while in bitmapMode,
 		 * the <code>target</code> won't be interactive. So if you have buttons and other objects that normally react to 
 		 * MouseEvents, they won't while in bitmapMode. If you need the interactivity, simply set <code>bitmapMode</code>
 		 * to <code>false</code> and then it will turn the <code>target's</code> <code>visible</code> property back to <code>true</code>
-		 * and its <code>mask</code> property to the BlitMask itself. Typically it is best to turn bitmapMode on at least when you're 
-		 * animating the <code>target</code> or the BlitMask itself, and then when the tween/animation is done and you need 
+		 * and its <code>mask</code> property to the FlexBlitMask itself. Typically it is best to turn bitmapMode on at least when you're 
+		 * animating the <code>target</code> or the FlexBlitMask itself, and then when the tween/animation is done and you need 
 		 * interactivity, set bitmapMode back to false. For example: <br /><br /><code>
 		 * 
-		 * var bm:BlitMask = new BlitMask(mc, 0, 0, 300, 200, true);<br /><br />
+		 * var bm:FlexBlitMask = new FlexBlitMask(mc, 0, 0, 300, 200, true);<br /><br />
 		 * 
 		 * TweenLite.to(mc, 3, {x:200, onUpdate:bm.update, onComplete:completeHandler});<br /><br />
 		 * 
@@ -589,7 +618,11 @@ package com.greensock {
 					if (_bitmapMode) {
 						this.filters = _target.filters;
 						this.transform.colorTransform = _transform.colorTransform;
-						this.blendMode = _target.blendMode;
+						if (_target.blendMode == "auto") { 
+							this.blendMode = (_target.alpha == 0 || _target.alpha == 1) ? BlendMode.NORMAL : BlendMode.LAYER;
+						} else {
+							this.blendMode = _target.blendMode;
+						}
 						_target.mask = null;
 					} else {
 						this.filters = _emptyArray;
@@ -611,13 +644,13 @@ package com.greensock {
 		}
 		
 		/** 
-		 * If <code>true</code>, the BlitMask will automatically watch the <code>target</code> to see if 
+		 * If <code>true</code>, the FlexBlitMask will automatically watch the <code>target</code> to see if 
 		 * its position/scale/rotation has changed on each frame (while <code>bitmapMode</code> is <code>true</code>) 
-		 * and if so, it will <code>update()</code> to make sure the BlitMask always stays synced with the <code>target</code>. 
-		 * This is the easiest way to use BlitMask but it is slightly less efficient than manually calling <code>update()</code> 
+		 * and if so, it will <code>update()</code> to make sure the FlexBlitMask always stays synced with the <code>target</code>. 
+		 * This is the easiest way to use FlexBlitMask but it is slightly less efficient than manually calling <code>update()</code> 
 		 * whenever you need to. Keep in mind that if you're tweening with TweenLite or TweenMax, you can simply set 
-		 * its <code>onUpdate</code> to the BlitMask's <code>update()</code> method to keep things synced. 
-		 * Like <code>onUpdate:myBlitMask.update</code>. 
+		 * its <code>onUpdate</code> to the FlexBlitMask's <code>update()</code> method to keep things synced. 
+		 * Like <code>onUpdate:myFlexBlitMask.update</code>. 
 		 **/
 		public function get autoUpdate():Boolean {
 			return _autoUpdate;
@@ -633,7 +666,7 @@ package com.greensock {
 			}
 		}
 		
-		/** The target DisplayObject that the BlitMask should mask **/
+		/** The target DisplayObject that the FlexBlitMask should mask **/
 		public function get target():DisplayObject {
 			return _target;
 		}
@@ -661,7 +694,7 @@ package com.greensock {
 			}
 		}
 		
-		/** x coordinate of the BlitMask (it will automatically be forced to whole pixel values if <code>smoothing</code> is <code>false</code>). **/
+		/** x coordinate of the FlexBlitMask (it will automatically be forced to whole pixel values if <code>smoothing</code> is <code>false</code>). **/
 		override public function get x():Number {
 			return super.x;
 		}
@@ -678,7 +711,7 @@ package com.greensock {
 			}
 		}
 		
-		/** y coordinate of the BlitMask (it will automatically be forced to whole pixel values if <code>smoothing</code> is <code>false</code>). **/
+		/** y coordinate of the FlexBlitMask (it will automatically be forced to whole pixel values if <code>smoothing</code> is <code>false</code>). **/
 		override public function get y():Number {
 			return super.y;
 		}
@@ -695,7 +728,7 @@ package com.greensock {
 			}
 		}
 		
-		/** Width of the BlitMask **/
+		/** Width of the FlexBlitMask **/
 		override public function get width():Number {
 			return _width;
 		}
@@ -703,7 +736,7 @@ package com.greensock {
 			setSize(value, _height);
 		}
 		
-		/** Height of the BlitMask **/
+		/** Height of the FlexBlitMask **/
 		override public function get height():Number {
 			return _height;
 		}
@@ -731,21 +764,21 @@ package com.greensock {
 			setSize(_width, _height * (_scaleY / oldScaleY));
 		}
 		
-		/** Rotation of the BlitMask (always 0 because BlitMasks can't be rotated!) **/
+		/** Rotation of the FlexBlitMask (always 0 because FlexBlitMasks can't be rotated!) **/
 		override public function set rotation(value:Number):void {
 			if (value != 0) {
-				throw new Error("Cannot set the rotation of a BlitMask to a non-zero number. BlitMasks should remain unrotated.");
+				throw new Error("Cannot set the rotation of a FlexBlitMask to a non-zero number. FlexBlitMasks should remain unrotated.");
 			}
 		}
 		
 		/** 
-		 * Typically a value between 0 and 1 indicating the <code>target's</code> position in relation to the BlitMask 
+		 * Typically a value between 0 and 1 indicating the <code>target's</code> position in relation to the FlexBlitMask 
 		 * on the x-axis where 0 is at the beginning, 0.5 is scrolled to exactly the halfway point, and 1 is scrolled 
 		 * all the way. This makes it very easy to animate the scroll. For example, to scroll from beginning to end 
 		 * over 5 seconds, you could do: <br /><br /><code>
 		 * 
-		 * myBlitMask.scrollX = 0; <br />
-		 * TweenLite.to(myBlitMask, 5, {scrollX:1});
+		 * myFlexBlitMask.scrollX = 0; <br />
+		 * TweenLite.to(myFlexBlitMask, 5, {scrollX:1});
 		 * </code>
 		 * @see #scrollY
 		 **/
@@ -766,13 +799,13 @@ package com.greensock {
 		}
 		
 		/** 
-		 * Typically a value between 0 and 1 indicating the <code>target's</code> position in relation to the BlitMask 
+		 * Typically a value between 0 and 1 indicating the <code>target's</code> position in relation to the FlexBlitMask 
 		 * on the y-axis where 0 is at the beginning, 0.5 is scrolled to exactly the halfway point, and 1 is scrolled 
 		 * all the way. This makes it very easy to animate the scroll. For example, to scroll from beginning to end 
 		 * over 5 seconds, you could do: <br /><br /><code>
 		 * 
-		 * myBlitMask.scrollY = 0; <br />
-		 * TweenLite.to(myBlitMask, 5, {scrollY:1});
+		 * myFlexBlitMask.scrollY = 0; <br />
+		 * TweenLite.to(myFlexBlitMask, 5, {scrollY:1});
 		 * </code>
 		 * @see #scrollX
 		 **/
@@ -792,7 +825,7 @@ package com.greensock {
 		}
 		
 		/** 
-		 * If <code>false</code> (the default), the bitmap (and the BlitMask's x/y coordinates) 
+		 * If <code>false</code> (the default), the bitmap (and the FlexBlitMask's x/y coordinates) 
 		 * will be rendered only on whole pixels which is faster in terms of processing. However, 
 		 * for the best quality and smoothest animation, set <code>smoothing</code> to <code>true</code>. 
 		 **/
@@ -810,7 +843,7 @@ package com.greensock {
 		}
 		
 		/** 
-		 * The ARGB hexadecimal color that should fill the empty areas of the BlitMask. By default, 
+		 * The ARGB hexadecimal color that should fill the empty areas of the FlexBlitMask. By default, 
 		 * it is transparent (0x00000000). If you wanted a red color, for example, it would be 
 		 * <code>0xFFFF0000</code>. 
 		 **/
@@ -828,10 +861,10 @@ package com.greensock {
 		
 		/** 
 		 * If <code>true</code>, the bitmap will be wrapped around to the opposite side when it scrolls off 
-		 * one of the edges (only in <code>bitmapMode</code> of course), like the BlitMask is filled with a 
+		 * one of the edges (only in <code>bitmapMode</code> of course), like the FlexBlitMask is filled with a 
 		 * grid of bitmap copies of the target. Use the <code>wrapOffsetX</code> and <code>wrapOffsetY</code> 
 		 * properties to affect how far apart the copies are from each other. You can reposition the 
-		 * <code>target</code> anywhere and BlitMask will align the copies accordingly.
+		 * <code>target</code> anywhere and FlexBlitMask will align the copies accordingly.
 		 * @see #wrapOffsetX
 		 * @see #wrapOffsetY
 		 **/

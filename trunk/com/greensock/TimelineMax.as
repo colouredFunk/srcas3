@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.691
- * DATE: 2011-09-28
+ * VERSION: 1.693
+ * DATE: 2011-11-08
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinemax/
  **/
@@ -146,7 +146,7 @@ package com.greensock {
  **/
 	public class TimelineMax extends TimelineLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:Number = 1.691;
+		public static const version:Number = 1.693;
 		
 		/** @private **/
 		protected var _repeat:int;
@@ -435,7 +435,7 @@ package com.greensock {
 			}
 			var totalDur:Number = (this.cacheIsDirty) ? this.totalDuration : this.cachedTotalDuration, prevTime:Number = this.cachedTime, prevTotalTime:Number = this.cachedTotalTime, prevStart:Number = this.cachedStartTime, prevTimeScale:Number = this.cachedTimeScale, tween:TweenCore, isComplete:Boolean, rendered:Boolean, repeated:Boolean, next:TweenCore, dur:Number, prevPaused:Boolean = this.cachedPaused;
 			if (time >= totalDur) {
-				if (_rawPrevTime <= totalDur && _rawPrevTime != time) {
+				if (prevTime != totalDur && _rawPrevTime != time) {
 					this.cachedTotalTime = totalDur;
 					if (!this.cachedReversed && this.yoyo && _repeat % 2 != 0) {
 						this.cachedTime = 0;
@@ -461,7 +461,7 @@ package com.greensock {
 				} else if (time == 0 && !this.initted) {
 					force = true;
 				}
-				if (_rawPrevTime >= 0 && _rawPrevTime != time) {
+				if (prevTime != 0 && _rawPrevTime != time) {
 					this.cachedTotalTime = 0;
 					this.cachedTime = 0;
 					forceChildrenToBeginning(0, suppressEvents);
