@@ -58,7 +58,8 @@ package akdcl.manager {
 		public function getElement(_elementID:String):* {
 			var _elements:Elements = sM.getSource(ELEMENTS_GROUP, _elementID);
 			if (_elements) {
-				lM.info(ElementManager, "getElement(id:{0})", null, _elementID);
+				;
+				lM.info(ElementManager, "getElement(id:{0}) length:{1}", null, _elementID, Math.max(_elements.getElementsLength() - 1, 0));
 				return _elements.getElement();
 			}
 			
@@ -106,4 +107,3 @@ class Elements extends Object {
 		return false;
 	}
 }
-

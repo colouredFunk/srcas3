@@ -76,8 +76,8 @@ package akdcl.manager {
 		private var logConnectEvent:Event;
 		private var localConnection:LocalConnection;
 
-		private var timeOff:uint;
-		private var countOff:uint;
+		//private var timeOff:uint;
+		//private var countOff:uint;
 		
 		private var __isConnected:Boolean;
 		public function get isConnected():Boolean {
@@ -124,7 +124,7 @@ package akdcl.manager {
 				lastSource = sourceDic[_managerID];
 
 				if (lastSource){
-					var _list:XMLList = lastSource.elements(E_LOGS).elements(E_LOG);
+					/*var _list:XMLList = lastSource.elements(E_LOGS).elements(E_LOG);
 					if (_list.length() > 0 && int(_list[_list.length() - 1].attribute(A_TIME)) > _time){
 						timeOff = new Date().time - int(lastSource.attribute(A_TIME));
 					}
@@ -132,7 +132,7 @@ package akdcl.manager {
 					if (_countBefore >= _logConnectCount){
 						countOff = _countBefore;
 					}
-					lastSource.elements(E_LOGS)[0]["@" + A_LOG_COUNT] = countOff + _logConnectCount;
+					lastSource.elements(E_LOGS)[0]["@" + A_LOG_COUNT] = countOff + _logConnectCount;*/
 				} else {
 					lastSource = sourceDic[_managerID] =  <root {A_ID}={_managerID} {A_TIME}={new Date().time}/>;
 					lastSource.appendChild(<{E_CLASSES} {A_ID}={E_CLASSES} {A_PATH}="0"/>);
@@ -180,7 +180,8 @@ package akdcl.manager {
 				_logXML["@" + A_PATH] = _path;
 				_logXML["@" + A_ID] = _name;
 				_logXML["@" + A_LEVEL] = _level;
-				_logXML["@" + A_TIME] = _time + timeOff;
+				_logXML["@" + A_TIME] = _time;
+				//+ timeOff;
 				_logXML["@" + A_MSG] = _msg;
 				lastSource.elements(E_LOGS)[0].appendChild(_logXML);
 
