@@ -1,6 +1,42 @@
 CHANGE LOG : GREENSOCK LOADERMAX SYSTEM
 ----------------------------------------
 
+2011-11-27
+----------------------------------------
+LoaderMax			1.895
+ContentDisplay		1.895
+FlexContentDisplay	1.895
+	- Fixed issue introduced in version 1.892 that caused videos not to scale correctly when using a scaleMode other than "none" or "stretch"
+
+2011-11-26
+----------------------------------------
+LoaderMax			1.894
+VideoLoader			1.894
+DisplayObjectLoader	1.894
+	- Fixed issue that could cause VideoLoader not to dispatch PLAY_PROGRESS events if you called gotoVideoTime() on every frame
+	- SWFLoaders and ImageLoaders now do not force garbage collection when dispose(false) is called (or autoDispose is set to true). 
+	- Added a DisplayObjectLoader.defaultAutoForceGC static property that you can set to false to prevent it from forcing GC whenever a SWFLoader or ImageLoader is unloaded (or dispose(true)). 
+	- Added "autoForceGC" special property recognition for SWFLoader and ImageLoader (default is true). 
+
+2011-11-17
+----------------------------------------
+LoaderMax			1.893
+VideoLoader			1.893
+ContentDisplay		1.892
+FlexContentDisplay	1.892
+	- Fixed issue that could cause a VIDEO_BUFFER_FULL event to be dispatched from VideoLoader after the video finishes playing
+	- Changed behavior of VideoLoader so that it only dispatches a PLAY_PROGRESS event after the NetStream renders its new frame (which can take a brief moment after you alter the videoProgress or gotoVideoTime()).
+	- Fixed an issue that caused ContentDisplay and FlexContentDisplay to use the wrong aspect ratio on the rawContent if the scaleMode is set to "stretch" and then either "proportionalInside" or "proportionalOutside". Again, it would ONLY happen after it was changed from "stretch". 
+	- Changed behavior of VideoLoader so that it dispatches a VIDEO_BUFFER_EMPTY event whenever the playhead is moved (like with gotoVideoTime() or changing the videoProgress) which is essentially what happens with the NetStream - it empties the buffer when the playhead moves and then dispatches a VIDEO_BUFFER_FULL event when the buffer fills from the new spot. 
+
+2011-11-03
+----------------------------------------
+LoaderMax			1.891
+XMLLoader			1.891
+VideoLoader			1.891
+	- Changed the default value of VideoLoader's autoDetachNetStream from true to false because Adobe's NetStream and/or Video classes exhibit some buggy/inconsistent behavior when trying to attach the NetStream at very particular times during the load when the Video object isn't in the display list yet. In most cases, autoDetachNetStream will work great, but it shouldn't be toggled on when the content isn't in the display list yet. 
+	- XMLLoader now recognizes the "autoDetachNetStream" property of <VideoLoader> nodes. 
+
 2011-10-20
 ----------------------------------------
 LoaderMax			1.89

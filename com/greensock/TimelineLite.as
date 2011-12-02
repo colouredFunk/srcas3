@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 1.691
- * DATE: 2011-09-28
+ * VERSION: 1.693
+ * DATE: 2011-11-08
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -113,7 +113,7 @@ package com.greensock {
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:Number = 1.691;
+		public static const version:Number = 1.693;
 		/** @private **/
 		private static var _overwriteMode:int = (OverwriteManager.enabled) ? OverwriteManager.mode : OverwriteManager.init(2); //Ensures that TweenLite instances don't overwrite each other before being put into the timeline/sequence.
 		/** @private **/
@@ -529,7 +529,7 @@ package com.greensock {
 			}
 			var totalDur:Number = (this.cacheIsDirty) ? this.totalDuration : this.cachedTotalDuration, prevTime:Number = this.cachedTime, prevStart:Number = this.cachedStartTime, prevTimeScale:Number = this.cachedTimeScale, tween:TweenCore, isComplete:Boolean, rendered:Boolean, next:TweenCore, dur:Number, prevPaused:Boolean = this.cachedPaused;
 			if (time >= totalDur) {
-				if (_rawPrevTime <= totalDur && _rawPrevTime != time) {
+				if (prevTime != totalDur && _rawPrevTime != time) {
 					this.cachedTotalTime = this.cachedTime = totalDur;
 					forceChildrenToEnd(totalDur, suppressEvents);
 					isComplete = !this.hasPausedChild() && !this.cachedReversed;
@@ -549,7 +549,7 @@ package com.greensock {
 				} else if (time == 0 && !this.initted) {
 					force = true;
 				}
-				if (_rawPrevTime >= 0 && _rawPrevTime != time) {
+				if (prevTime != 0 && _rawPrevTime != time) {
 					this.cachedTotalTime = 0;
 					this.cachedTime = 0;
 					forceChildrenToBeginning(0, suppressEvents);

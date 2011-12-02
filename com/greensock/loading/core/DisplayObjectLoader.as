@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.87
- * DATE: 2011-07-30
+ * VERSION: 1.894
+ * DATE: 2011-11-23
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -32,6 +32,8 @@ package com.greensock.loading.core {
  * @author Jack Doyle, jack@greensock.com
  */	
 	public class DisplayObjectLoader extends LoaderItem {
+		/** By default, LoaderMax will automatically attempt to force garbage collection when a SWFLoader or ImageLoader is unloaded or cancelled but if you prefer to skip this measure, set defaultAutoForceGC to <code>false</code>. If garbage collection isn't forced, sometimes Flash doesn't completely unload swfs/images properly, particularly if there is audio embedded in the root timeline. **/
+		public static var defaultAutoForceGC:Boolean = true;
 		/** @private the Sprite to which the EVENT_LISTENER was attached for forcing garbage collection after 1 frame (improves performance especially when multiple loaders are disposed at one time). **/
 		protected static var _gcDispatcher:Sprite;
 		/** @private **/
@@ -131,8 +133,10 @@ package com.greensock.loading.core {
 					if (_loader.parent) {
 						_loader.parent.removeChild(_loader);
 					}
+					if (("autoForceGC" in this.vars) ? this.vars.autoForceGC : defaultAutoForceGC) {
+						forceGC((this.hasOwnProperty("getClass")) ? 3 : 1);
+					}
 				}
-				forceGC((this.hasOwnProperty("getClass")) ? 3 : 1);
 			}
 			_initted = false;
 			_loader = new Loader();
@@ -160,11 +164,9 @@ package com.greensock.loading.core {
 		
 		/** @private **/
 		protected static function _forceGCHandler(event:Event):void {
-			if (_gcCycles == 0) {
+			if (--_gcCycles <= 0) {
 				_gcDispatcher.removeEventListener(Event.ENTER_FRAME, _forceGCHandler);
 				_gcDispatcher = null;
-			} else {
-				_gcCycles--;
 			}
 			try {
 				new LocalConnection().connect("FORCE_GC");
