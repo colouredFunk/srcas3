@@ -32,6 +32,11 @@ package zero.works{
 		private var version:String="";
 		private var wid:int=-1;
 		private var hei:int=-1;
+		private var x0:int=-1;
+		private var x1:int=-1;
+		private var x2:int=-1;
+		private var x3:int=-1;
+		private var x4:int=-1;
 		
 		[Inspectable(name="起始时间",defaultValue="2011-10-17 16:15:00")]
 		public var set_startTime:String="2011-10-17 16:15:00";
@@ -45,6 +50,29 @@ package zero.works{
 		
 		public function TxtEffectsClock(){
 			this.addEventListener(Event.ENTER_FRAME,init);
+			if(x0>0){
+				txt0.x=x0;
+				txt0.y=hei/2;
+			}
+			if(x1>0){
+				txt1.x=x1;
+				txt1.y=hei/2;
+			}
+			if(x2>0){
+				txt2.x=x2;
+				txt2.y=hei/2;
+			}
+			if(x3>0){
+				txt3.x=x3;
+				txt3.y=hei/2;
+			}
+			if(x4>0){
+				txt4.x=x4;
+				txt4.y=hei/2;
+			}
+			if(txt4){
+				txt4.txt2.visible=false;
+			}
 		}
 		private function init(event:Event):void{
 			if(wid>0&&hei>0){
