@@ -6,9 +6,10 @@ package akdcl.layout {
 	 */
 	public class Group {
 		public var userData:Object;
-		public var x:uint = 0;
-		public var y:uint = 0;
-		public var interval:int = 10;
+		public var x:Number = 0;
+		public var y:Number = 0;
+		public var interval:Number = 10;
+		public var displayContent:Object;
 
 		internal var parent:Group;
 		internal var children:Array;
@@ -19,7 +20,7 @@ package akdcl.layout {
 		internal var percentWidth:Number = 0;
 		internal var percentHeight:Number = 0;
 
-		internal var __width:uint = 0;
+		internal var __width:Number = 0;
 
 		public function get width():Number {
 			return __width;
@@ -29,10 +30,12 @@ package akdcl.layout {
 			setWidth(_value);
 			if (parent){
 				parent.update();
+			} else {
+				update();
 			}
 		}
 
-		internal var __height:uint = 0;
+		internal var __height:Number = 0;
 
 		public function get height():Number {
 			return __height;
@@ -42,10 +45,13 @@ package akdcl.layout {
 			setHeight(_value);
 			if (parent){
 				parent.update();
+			} else {
+				update();
 			}
 		}
 
-		public function Group(_width:Number = 1, _height:Number = 1) {
+		//0~1为设置percentWH,1~n为设置WH
+		public function Group(_width:Number = 1, _height:Number = 1, _display:Object = null){
 			autoPercentX = _width == 0;
 			autoPercentY = _height == 0;
 
@@ -61,11 +67,14 @@ package akdcl.layout {
 				percentHeight = _height;
 			}
 			children = [];
+			displayContent = _display;
+			update();
 		}
 
 		public function addChild(_child:Group):void {
 			_child.parent = this;
 			children.push(_child);
+			update();
 		}
 
 		public function forEach(_fun:Function, ... args){
@@ -79,8 +88,34 @@ package akdcl.layout {
 			}
 		}
 
-		public function update():void {
+		public function setSize(_w:Number, _h:Number):void {
+			setWidth(_w);
+			setHeight(_h);
+			if (parent){
+				parent.update();
+			} else {
+				update();
+			}
+		}
 
+		public function update():void {
+			for each (var _each:Group in children){
+				_each.x = x;
+				_each.y = y;
+				_each.setWidth(__width);
+				_each.setHeight(__height);
+				_each.update();
+			}
+			updateDisplay();
+		}
+		
+		internal function updateDisplay():void {
+			if (displayContent){
+				displayContent.x = x;
+				displayContent.y = y;
+				displayContent.width = width;
+				displayContent.height = height;
+			}
 		}
 
 		internal function setWidth(_value:Number = 0):void {
@@ -98,10 +133,6 @@ package akdcl.layout {
 			}
 		}
 
-		internal function getChildWidth(_child:Group):uint {
-			return (_child.percentWidth || 1) * __width;
-		}
-
 		internal function setHeight(_value:Number = 0):void {
 			if (autoPercentY){
 				_value = _value || percentHeight;
@@ -117,7 +148,11 @@ package akdcl.layout {
 			}
 		}
 
-		internal function getChildHeight(_child:Group):uint {
+		internal function getChildWidth(_child:Group):Number {
+			return (_child.percentWidth || 1) * __width;
+		}
+
+		internal function getChildHeight(_child:Group):Number {
 			return (_child.percentHeight || 1) * __height;
 		}
 
@@ -127,7 +162,6 @@ package akdcl.layout {
 			_str += "y:" + y + "\n";
 			_str += "width:" + width + "\n";
 			_str += "height:" + height + "\n";
-			_str += "userData:" + userData + "\n";
 			for each (var _child:Group in children){
 				_str += "\n";
 				_str += _child.toString();

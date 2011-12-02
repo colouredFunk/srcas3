@@ -52,7 +52,6 @@ package akdcl.manager {
 			sM = SourceManager.getInstance();
 
 			request = new URLRequest();
-			urlVariables = new URLVariables();
 
 			loaderDic = {};
 			urlLoaderDic = {};
@@ -73,7 +72,6 @@ package akdcl.manager {
 		private var sM:SourceManager;
 
 		private var request:URLRequest;
-		private var urlVariables:URLVariables;
 
 		private var loaderDic:Object;
 		private var urlLoaderDic:Object;
