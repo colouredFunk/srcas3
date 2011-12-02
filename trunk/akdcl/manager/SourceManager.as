@@ -10,7 +10,6 @@ package akdcl.manager {
 	final public class SourceManager extends EventDispatcher {
 		private static const ERROR:String = "SourceManager Singleton already constructed!";
 		private static var instance:SourceManager;
-		private static var lM:LoggerManager = LoggerManager.getInstance();
 
 		public static function getInstance():SourceManager {
 			if (instance){
@@ -21,19 +20,24 @@ package akdcl.manager {
 		}
 
 		public function SourceManager(){
+			lM = LoggerManager.getInstance();
 			if (instance){
 				lM.fatal(SourceManager, ERROR);
 				throw new Error("[ERROR]:" + ERROR);
 			}
 			instance = this;
 			lM.info(SourceManager, "init");
+			
 			sourceGroup = {};
 		}
 
 		public static const SOUND_GROUP:String = "Sound";
 		public static const BITMAPDATA_GROUP:String = "BitmapData";
 		public static const NETSTREAM_GROUP:String = "NetStream";
+		public static const REMOTE_GROUP:String = "Remote";
 
+		private var lM:LoggerManager;
+		
 		private var sourceGroup:Object;
 
 		public function addGroup(_groupID:String):void {

@@ -82,8 +82,7 @@
 
 		public function hasInterface(_funName:String):Boolean {
 			if (isAvailable){
-				//ExternalInterface.call("eval", _funName + "!=" + "null");
-				return Boolean(objectID);
+				return ExternalInterface.call("eval", _funName + "!=" + "null");
 			}
 			return false;
 		}

@@ -10,13 +10,14 @@ package akdcl.media {
 	 * ...
 	 * @author ...
 	 */
+	
 	/// @eventType	flash.events.Event.COMPLETE
-	[Event(name="complete",type="flash.events.Event")]
+	[Event(name="complete", type="flash.events.Event")] 
 
 	public class DisplayLoader extends DisplayRect {
 		protected static var rM:RequestManager = RequestManager.getInstance();
 
-		public var progressClip:Object;
+		public var progressClip:*;
 		public var sameChange:Boolean;
 		protected var loadProgress:Number = 0;
 

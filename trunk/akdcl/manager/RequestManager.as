@@ -17,7 +17,7 @@ package akdcl.manager {
 	import com.adobe.serialization.json.JSON;
 
 	import zero.net.FormVariables;
-	
+
 	import akdcl.utils.traceObject;
 
 	/**
@@ -27,7 +27,6 @@ package akdcl.manager {
 	final public class RequestManager extends EventDispatcher {
 		private static const ERROR:String = "RequestManager Singleton already constructed!";
 		private static var instance:RequestManager;
-		private static var lM:LoggerManager = LoggerManager.getInstance();
 
 		public static function getInstance():RequestManager {
 			if (instance){
@@ -37,18 +36,19 @@ package akdcl.manager {
 			return instance;
 		}
 
-		public function RequestManager() {
-			if (instance) {
+		public function RequestManager(){
+			lM = LoggerManager.getInstance();
+			if (instance){
 				lM.fatal(RequestManager, ERROR);
 				throw new Error("[ERROR]:" + ERROR);
 			}
 			instance = this;
-			
 			lM.info(RequestManager, "init");
-			
+
 			eM = ElementManager.getInstance();
-			eM.register(REQUESTLOADER, RequestLoader);
-			eM.register(REQUESTURLLOADER, RequestURLLoader);
+			eM.register(REQUESTLOADER, _RequestLoader);
+			eM.register(REQUESTURLLOADER, _RequestURLLoader);
+
 			sM = SourceManager.getInstance();
 
 			request = new URLRequest();
@@ -63,11 +63,12 @@ package akdcl.manager {
 		public static const DATAFORMAT_FORM:String = "form";
 		public static const DATAFORMAT_AMF3:String = "amf3";
 
-		private static const REQUESTLOADER:String = "RequestLoader";
-		private static const REQUESTURLLOADER:String = "RequestURLLoader";
+		private static const REQUESTLOADER:String = "_RequestLoader";
+		private static const REQUESTURLLOADER:String = "_RequestURLLoader";
 
 		private static const CONTENT_TYPE_STREAM:String = "application/octet-stream";
 
+		private var lM:LoggerManager;
 		private var eM:ElementManager;
 		private var sM:SourceManager;
 
@@ -102,6 +103,9 @@ package akdcl.manager {
 						case 2:
 							_onCompleteHandler(_bmd, _url);
 							break;
+						case 3:
+							_onCompleteHandler(_bmd, _url, args);
+							break;
 						case 1:
 						default:
 							_onCompleteHandler(_bmd);
@@ -111,7 +115,7 @@ package akdcl.manager {
 				return null;
 			}
 			//
-			var _loader:RequestLoader = loaderDic[_url];
+			var _loader:_RequestLoader = loaderDic[_url];
 			if (_loader){
 			} else {
 				_loader = eM.getElement(REQUESTLOADER);
@@ -138,7 +142,7 @@ package akdcl.manager {
 				return;
 			}
 			//
-			var _loader:RequestLoader = loaderDic[_url];
+			var _loader:_RequestLoader = loaderDic[_url];
 			if (_loader){
 				_loader.removeEvents(_onProgressHandler, _onErrorHandler, _onCompleteHandler);
 			} else {
@@ -148,16 +152,17 @@ package akdcl.manager {
 
 		private function onLoaderInitHandler(_evt:Event):void {
 			var _loaderInfo:LoaderInfo = (_evt.currentTarget as LoaderInfo);
-			var _loader:RequestLoader = _loaderInfo.loader as RequestLoader;
-			if (_loader.params && _loader.content && ("flashVars" in _loader.content)) {
+			var _loader:_RequestLoader = _loaderInfo.loader as _RequestLoader;
+			if (_loader.params && _loader.content && ("flashVars" in _loader.content)){
 				lM.info(RequestManager, "设置{0}flashVars{1}", null, _loader.content, _loader.params[0]);
 				_loader.content["flashVars"] = _loader.params[0];
 			}
 		}
-		
+
 		private function onLoaderCompleteOrErrorHandler(_evt:Event):void {
 			var _loaderInfo:LoaderInfo = (_evt.currentTarget as LoaderInfo);
-			var _loader:RequestLoader = _loaderInfo.loader as RequestLoader;
+			var _loader:_RequestLoader = _loaderInfo.loader as _RequestLoader;
+			_loaderInfo.removeEventListener(Event.INIT, onLoaderInitHandler);
 			_loaderInfo.removeEventListener(Event.COMPLETE, onLoaderCompleteOrErrorHandler);
 			_loaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onLoaderCompleteOrErrorHandler);
 			_loaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onLoaderCompleteOrErrorHandler);
@@ -174,7 +179,6 @@ package akdcl.manager {
 					//swf
 				}
 				_loader.onCompleteHandler();
-				
 			}
 			delete loaderDic[_loader.url];
 			if (_loader.clear()){
@@ -185,7 +189,7 @@ package akdcl.manager {
 		public function load(_url:*, _onCompleteHandler:Function = null, _onErrorHandler:Function = null, _onProgressHandler:Function = null, ... args):void {
 			resetRequest(_url);
 			_url = request.url;
-			if (!_url) {
+			if (!_url){
 				var _str:String = "RequestManager.load(url), url is null!";
 				lM.warn(RequestManager, _str);
 				trace("[WARNNING]:" + _str);
@@ -193,7 +197,7 @@ package akdcl.manager {
 			}
 			lM.info(RequestManager, "load(url:{0})", null, _url);
 			//
-			var _loader:RequestURLLoader = urlLoaderDic[_url];
+			var _loader:_RequestURLLoader = urlLoaderDic[_url];
 			if (_loader){
 			} else {
 				_loader = eM.getElement(REQUESTURLLOADER);
@@ -210,7 +214,7 @@ package akdcl.manager {
 		}
 
 		private function onURLLoaderCompleteOrErrorHandler(_evt:Event):void {
-			var _loader:RequestURLLoader = _evt.currentTarget as RequestURLLoader;
+			var _loader:_RequestURLLoader = _evt.currentTarget as _RequestURLLoader;
 			_loader.removeEventListener(Event.COMPLETE, onURLLoaderCompleteOrErrorHandler);
 			_loader.removeEventListener(IOErrorEvent.IO_ERROR, onURLLoaderCompleteOrErrorHandler);
 			_loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onURLLoaderCompleteOrErrorHandler);
@@ -228,7 +232,7 @@ package akdcl.manager {
 		}
 
 		//url,data,contentType,method,sendFormat,loadFormat,charSet,random
-		private function resetRequest(_url:*):void {
+		private function resetRequest(_url:Object):void {
 			//重置request
 			if (_url is String || _url is XML || _url is XMLList){
 				request.url = String(_url);
@@ -239,9 +243,9 @@ package akdcl.manager {
 			} else if (_url is URLRequest || _url is Object){
 				request.url = _url.url;
 				if (_url.data){
+					_url.data.random = Math.random();
 					request.contentType = _url.contentType;
 					request.method = _url.method || URLRequestMethod.POST;
-					_url.data.random = Math.random();
 					switch (_url.sendFormat){
 						case DATAFORMAT_FORM:
 							var _formVars:FormVariables = new FormVariables(_url.data);
@@ -258,8 +262,8 @@ package akdcl.manager {
 							var _bytes:ByteArray = new ByteArray();
 							_bytes.writeObject(_url.data);
 							_bytes.objectEncoding = ObjectEncoding.AMF3;
-							//if(_compressed) {  
-							//_bytes.compress();  
+							//if(_compressed) {
+							//_bytes.compress();
 							//}
 							request.contentType = CONTENT_TYPE_STREAM;
 							request.data = _bytes;
@@ -295,296 +299,6 @@ package akdcl.manager {
 				request.url = null;
 			}
 			lM.info(RequestManager, "resetRequest====>>>>\n" + traceObject(request));
-		}
-	}
-
-}
-
-import flash.display.AVM1Movie;
-import flash.display.Bitmap;
-import flash.display.BitmapData;
-import flash.display.DisplayObject;
-import flash.display.Loader;
-import flash.events.Event;
-import flash.events.ProgressEvent;
-import flash.system.LoaderContext;
-import flash.utils.ByteArray;
-import flash.utils.Dictionary;
-
-import flash.net.URLLoader;
-import flash.net.URLRequest;
-import flash.net.URLLoaderDataFormat;
-
-import com.adobe.serialization.json.JSON;
-
-import akdcl.manager.RequestManager;
-
-class RequestLoader extends Loader {
-	public var url:String;
-	public var params:Array;
-
-	private var errorHandlers:Dictionary;
-	private var progressHandlers:Dictionary;
-	private var completeHandlers:Dictionary;
-
-	public function RequestLoader(){
-		errorHandlers = new Dictionary();
-		progressHandlers = new Dictionary();
-		completeHandlers = new Dictionary();
-	}
-
-	override public function load(request:URLRequest, context:LoaderContext = null):void {
-		url = request.url;
-		super.load(request, context);
-	}
-
-	public function clear():Boolean {
-		var _fun:Function;
-		for each (_fun in errorHandlers){
-			delete errorHandlers[_fun];
-		}
-		for each (_fun in progressHandlers){
-			contentLoaderInfo.removeEventListener(ProgressEvent.PROGRESS, _fun);
-			delete progressHandlers[_fun];
-		}
-		for each (_fun in completeHandlers){
-			delete completeHandlers[_fun];
-		}
-		if (content is DisplayObject){
-			return false;
-		}
-		url = null;
-		params = null;
-		unload();
-		unloadAndStop();
-		return true;
-	}
-
-	public function addEvents(_onProgressHandler:Function, _onErrorHandler:Function, _onCompleteHandler:Function):void {
-		if (_onErrorHandler != null){
-			errorHandlers[_onErrorHandler] = _onErrorHandler;
-		}
-		if (_onProgressHandler != null){
-			progressHandlers[_onProgressHandler] = _onProgressHandler;
-			contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS, _onProgressHandler);
-		}
-		if (_onCompleteHandler != null){
-			completeHandlers[_onCompleteHandler] = _onCompleteHandler;
-		}
-	}
-
-	public function removeEvents(_onProgressHandler:Function, _onErrorHandler:Function, _onCompleteHandler:Function):void {
-		if (_onErrorHandler != null){
-			delete errorHandlers[_onErrorHandler];
-		}
-		if (_onProgressHandler != null){
-			contentLoaderInfo.removeEventListener(ProgressEvent.PROGRESS, _onProgressHandler);
-			delete progressHandlers[_onProgressHandler];
-		}
-		if (_onCompleteHandler != null){
-			delete completeHandlers[_onCompleteHandler];
-		}
-	}
-
-	public function onErrorHandler(_evt:Event):void {
-		for each (var _onError:Function in errorHandlers){
-			switch (_onError.length){
-				case 0:
-					_onError();
-					break;
-				case 2:
-					_onError(_evt, url);
-					break;
-				case 3:
-					_onError(_evt, url, params);
-					break;
-				case 1:
-				default:
-					_onError(_evt);
-					break;
-			}
-		}
-	}
-
-	public function onCompleteHandler():void {
-		var _content:*;
-		if (content is Bitmap){
-			_content = (content as Bitmap).bitmapData;
-		} else {
-			_content = this;
-		}
-		for each (var _onComplete:Function in completeHandlers){
-			switch (_onComplete.length){
-				case 0:
-					_onComplete();
-					break;
-				case 2:
-					_onComplete(_content, url);
-					break;
-				case 3:
-					_onComplete(_content, url, params);
-					break;
-				case 1:
-				default:
-					_onComplete(_content);
-					break;
-			}
-		}
-	}
-}
-
-class RequestURLLoader extends URLLoader {
-	public var url:String;
-	public var params:Array;
-
-	private var errorHandlers:Dictionary;
-	private var progressHandlers:Dictionary;
-	private var completeHandlers:Dictionary;
-
-	public function RequestURLLoader(){
-		errorHandlers = new Dictionary();
-		progressHandlers = new Dictionary();
-		completeHandlers = new Dictionary();
-	}
-
-	override public function load(request:URLRequest):void {
-		url = request.url;
-		var _type:String = url.split(".").pop().toLowerCase();
-		if (dataFormat){
-		} else {
-			switch (_type){
-				case "jpg":
-				case "png":
-				case "gif":
-				case "swf":
-					dataFormat = URLLoaderDataFormat.BINARY;
-					break;
-				case "xml":
-					dataFormat = RequestManager.DATAFORMAT_XML;
-					break;
-			}
-		}
-		super.load(request);
-	}
-
-	public function clear():void {
-		var _fun:Function;
-		for each (_fun in errorHandlers){
-			delete errorHandlers[_fun];
-		}
-		for each (_fun in progressHandlers){
-			removeEventListener(ProgressEvent.PROGRESS, _fun);
-			delete progressHandlers[_fun];
-		}
-		for each (_fun in completeHandlers){
-			delete completeHandlers[_fun];
-		}
-		url = null;
-		params = null;
-		data = null;
-		dataFormat = null;
-	}
-
-	public function getFormatData():* {
-		switch (dataFormat){
-			case RequestManager.DATAFORMAT_XML:
-				try {
-					return XML(data);
-				} catch (_e:*){
-				}
-				return null;
-			case RequestManager.DATAFORMAT_JSON:
-				try {
-					//去掉json不支持的字符串
-					var _dataFotmat:String = data.replace(/[\x00-\x1f]/g, "");
-					return com.adobe.serialization.json.JSON.decode(_dataFotmat);
-				} catch (_e:*){
-				}
-				return null;
-			case RequestManager.DATAFORMAT_AMF3:
-				try {
-					var _bytes:ByteArray = data as ByteArray;
-					//if (_compressed){
-					//_bytes.uncompress();
-					//}
-					return _bytes.readObject();
-				} catch (_e:*){
-				}
-				return null;
-			case URLLoaderDataFormat.BINARY:
-			case URLLoaderDataFormat.VARIABLES:
-				return data;
-			case URLLoaderDataFormat.TEXT:
-			default:
-				data = String(data).replace(/^\s*|\s*$/g, "");
-				return data;
-		}
-	}
-
-	public function addEvents(_onProgressHandler:Function, _onErrorHandler:Function, _onCompleteHandler:Function):void {
-		if (_onErrorHandler != null){
-			errorHandlers[_onErrorHandler] = _onErrorHandler;
-		}
-		if (_onProgressHandler != null){
-			progressHandlers[_onProgressHandler] = _onProgressHandler;
-			addEventListener(ProgressEvent.PROGRESS, _onProgressHandler);
-		}
-		if (_onCompleteHandler != null){
-			completeHandlers[_onCompleteHandler] = _onCompleteHandler;
-		}
-	}
-
-	public function removeEvents(_onProgressHandler:Function, _onErrorHandler:Function, _onCompleteHandler:Function):void {
-		if (_onErrorHandler != null){
-			delete errorHandlers[_onErrorHandler];
-		}
-		if (_onProgressHandler != null){
-			removeEventListener(ProgressEvent.PROGRESS, _onProgressHandler);
-			delete progressHandlers[_onProgressHandler];
-		}
-		if (_onCompleteHandler != null){
-			delete completeHandlers[_onCompleteHandler];
-		}
-	}
-
-	public function onErrorHandler(_evt:Event):void {
-		for each (var _onError:Function in errorHandlers){
-			switch (_onError.length){
-				case 0:
-					_onError();
-					break;
-				case 2:
-					_onError(_evt, url);
-					break;
-				case 3:
-					_onError(_evt, url, params);
-					break;
-				case 1:
-				default:
-					_onError(_evt);
-					break;
-			}
-		}
-	}
-
-	public function onCompleteHandler():void {
-		var _data:* = getFormatData();
-		for each (var _onComplete:Function in completeHandlers){
-			switch (_onComplete.length){
-				case 0:
-					_onComplete();
-					break;
-				case 2:
-					_onComplete(_data, url);
-					break;
-				case 3:
-					_onComplete(_data, url, params);
-					break;
-				case 1:
-				default:
-					_onComplete(_data);
-					break;
-			}
 		}
 	}
 }
