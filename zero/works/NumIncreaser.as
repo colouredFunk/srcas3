@@ -53,6 +53,8 @@ package zero.works{
 		
 		private var xmlLoader:URLLoader;
 		
+		public var bg:Sprite;
+		
 		public function NumIncreaser(){
 			
 			var i:int;

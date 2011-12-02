@@ -16,7 +16,12 @@ package zero.works{
 	import flash.utils.*;
 	
 	public class TxtEffects extends Sprite{
+		public var txt1:TxtEffect;
+		public var txt2:TxtEffect;
 		public function TxtEffects(){
+			value=0;
+			txt1.x=-(txt1.width/2+1);
+			txt2.x=(txt2.width/2+1);
 		}
 		
 		private var __value:int;
@@ -28,14 +33,8 @@ package zero.works{
 				return;
 			}
 			__value=_value;
-			var num:int=1;
-			for(var i:int=0;i<10;i++){
-				num*=10;
-				if(this.hasOwnProperty("txt"+i)){
-					var txt:TxtEffect=this["txt"+i];
-					txt.value=(__value%num)/int(num/10);
-				}
-			}
+			txt1.value=int(__value/10);
+			txt2.value=__value%10;
 		}
 	}
 }
