@@ -1,11 +1,9 @@
 package akdcl.manager {
-
 	import flash.events.EventDispatcher;
 
 	final public class ElementManager extends EventDispatcher{
 		private static const ERROR:String = "ElementManager Singleton already constructed!";
 		private static var instance:ElementManager;
-		private static var lM:LoggerManager = LoggerManager.getInstance();
 
 		public static function getInstance():ElementManager {
 			if (instance){
@@ -16,17 +14,21 @@ package akdcl.manager {
 		}
 
 		public function ElementManager(){
+			lM = LoggerManager.getInstance();
 			if (instance){
 				lM.fatal(ElementManager, ERROR);
 				throw new Error("[ERROR]:" + ERROR);
 			}
 			instance = this;
 			lM.info(ElementManager, "init");
+			
+			sM = SourceManager.getInstance();
 		}
 
 		private static const ELEMENTS_GROUP:String = "Elements";
 
-		private static var sM:SourceManager = SourceManager.getInstance();
+		private var lM:LoggerManager;
+		private var sM:SourceManager;
 
 		public function recycle(_element:*):void {
 			var _success:Boolean;
