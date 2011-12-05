@@ -5,6 +5,7 @@ package akdcl.layout {
 	 * @author ...
 	 */
 	public class Rect {
+		public var userData:Object;
 		internal var parent:Rect;
 		internal var isAverageWidth:Boolean;
 		internal var isAverageHeight:Boolean;
