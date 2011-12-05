@@ -217,7 +217,7 @@ package akdcl.layout {
 			__alignX = _alignX;
 			__alignY = _alignY;
 			__scaleMode = _scaleMode;
-			
+
 			content = _content;
 			if (content is Loader){
 				originalWidth = content.contentLoaderInfo.width;
