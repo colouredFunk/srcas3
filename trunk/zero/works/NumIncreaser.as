@@ -238,9 +238,11 @@ package zero.works{
 			}
 			
 			showNum(88888888);
-			var b:Rectangle=txt.getBounds(this);
-			txt.x+=(wid-b.width)/2-b.x;
-			txt.y+=(hei-b.height)/2-b.y;
+			if(this==root){
+				var b:Rectangle=txt.getBounds(this);
+				txt.x+=(wid-b.width)/2-b.x;
+				txt.y+=(hei-b.height)/2-b.y;
+			}
 			txt.text="";
 			
 			if(_startDate is Date){
