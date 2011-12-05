@@ -5,6 +5,35 @@ package akdcl.layout {
 	 * @author akdcl
 	 */
 	public class Group extends Rect {
+		public static function createGroup(_xml:XML, _index:int):Object {
+			var _rect:Object;
+			switch (_xml.localName()) {
+				case "Group":
+				case "HGroup":
+				case "VGroup":
+					_rect = new Group(0, 0, 0, 0, GROUP_VALUES[_xml.localName()]);
+					break;
+				case "Display":
+				default:
+					_rect = new DisplayProxy(0, 0, 0, 0);
+					return _rect;
+			}
+			for each (var _xml:XML in _xml.children()){
+				_rect.addChild(createGroup(_xml, _index + 1));
+			}
+			return _rect;
+		}
+		
+		public static const GROUP:int = 0;
+		public static const HGROUP:int = 1;
+		public static const VGROUP:int = -1;
+		
+		public static const GROUP_VALUES:Object = { 
+			Group:GROUP,
+			HGroup:HGROUP,
+			VGroup:VGROUP
+		};
+
 		public var intervalH:Number = 10;
 		public var intervalV:Number = 10;
 		public var type:int;
@@ -22,12 +51,12 @@ package akdcl.layout {
 			var _y:Number;
 			var _prevChild:Rect;
 			for each (var _child:Rect in children){
-				if (type > 0 && _prevChild){
+				if (type > GROUP && _prevChild){
 					_x = _prevChild.__x + _prevChild.__width + intervalH;
 				} else {
 					_x = __x;
 				}
-				if (type < 0 && _prevChild){
+				if (type < GROUP && _prevChild){
 					_y = _prevChild.__y + _prevChild.__height + intervalV;
 				} else {
 					_y = __y;
@@ -43,11 +72,11 @@ package akdcl.layout {
 			var _percent:Number = 0;
 			var _averageCount:Number = 0;
 
-			if (type == 0){
+			if (type == GROUP){
 				for each (_child in children){
 					_child.setSize(__width, __height);
 				}
-			} else if (type > 0){
+			} else if (type > GROUP){
 				_value = (children.length - 1) * intervalH;
 				for each (_child in children){
 					if (_child.isAverageWidth){
@@ -103,8 +132,9 @@ package akdcl.layout {
 		}
 
 		public function forEach(_fun:Function, ... args){
-			var _arr1:Array = args.concat();
-			_arr1.unshift(this);
+			var _arr1:Array;
+			//= args.concat();
+			//_arr1.unshift(this);
 			//_fun.apply(this, _arr1);
 			var _arrn:Array = args.concat();
 			_arrn.unshift(_fun);
@@ -113,6 +143,8 @@ package akdcl.layout {
 				if (_child is Group){
 					(_child as Group).forEach.apply(_child, _arrn);
 				} else {
+					_arr1 = args.concat();
+					_arr1.unshift(_child);
 					_fun.apply(_child, _arr1);
 				}
 			}
