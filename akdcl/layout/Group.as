@@ -4,170 +4,127 @@ package akdcl.layout {
 	 * ...
 	 * @author akdcl
 	 */
-	public class Group {
-		public var userData:Object;
-		public var x:Number = 0;
-		public var y:Number = 0;
-		public var interval:Number = 10;
-		public var displayContent:Object;
+	public class Group extends Rect {
+		public var intervalH:Number = 10;
+		public var intervalV:Number = 10;
+		public var type:int;
 
-		internal var parent:Group;
-		internal var children:Array;
+		private var children:Array;
 
-		internal var autoPercentX:Boolean;
-		internal var autoPercentY:Boolean;
-
-		internal var percentWidth:Number = 0;
-		internal var percentHeight:Number = 0;
-
-		internal var __width:Number = 0;
-
-		public function get width():Number {
-			return __width;
-		}
-
-		public function set width(_value:Number):void {
-			setWidth(_value);
-			if (parent){
-				parent.update();
-			} else {
-				update();
-			}
-		}
-
-		internal var __height:Number = 0;
-
-		public function get height():Number {
-			return __height;
-		}
-
-		public function set height(_value:Number):void {
-			setHeight(_value);
-			if (parent){
-				parent.update();
-			} else {
-				update();
-			}
-		}
-
-		//0~1为设置percentWH,1~n为设置WH
-		public function Group(_width:Number = 1, _height:Number = 1, _display:Object = null){
-			autoPercentX = _width == 0;
-			autoPercentY = _height == 0;
-
-			if (_width > 1){
-				__width = _width;
-			} else {
-				percentWidth = _width;
-			}
-
-			if (_height > 1){
-				__height = _height;
-			} else {
-				percentHeight = _height;
-			}
+		public function Group(_x:Number, _y:Number, _width:Number, _height:Number, _type:int = 0){
+			type = _type;
 			children = [];
-			displayContent = _display;
-			update();
+			super(_x, _y, _width, _height);
 		}
 
-		public function addChild(_child:Group):void {
+		override protected function updatePoint():void {
+			var _x:Number;
+			var _y:Number;
+			var _prevChild:Rect;
+			for each (var _child:Rect in children){
+				if (type > 0 && _prevChild){
+					_x = _prevChild.__x + _prevChild.__width + intervalH;
+				} else {
+					_x = __x;
+				}
+				if (type < 0 && _prevChild){
+					_y = _prevChild.__y + _prevChild.__height + intervalV;
+				} else {
+					_y = __y;
+				}
+				_child.setPoint(_x, _y);
+				_prevChild = _child;
+			}
+		}
+
+		override protected function updateSize():void {
+			var _child:Rect;
+			var _value:Number;
+			var _percent:Number = 0;
+			var _averageCount:Number = 0;
+
+			if (type == 0){
+				for each (_child in children){
+					_child.setSize(__width, __height);
+				}
+			} else if (type > 0){
+				_value = (children.length - 1) * intervalH;
+				for each (_child in children){
+					if (_child.isAverageWidth){
+						_averageCount++;
+					} else if (_child.percentWidth > 0){
+						_percent += _child.percentWidth;
+					} else {
+						_value += _child.__width;
+					}
+				}
+				if (_percent < 1){
+					if (_averageCount > 0){
+						_averageCount = (1 - _percent) / _averageCount;
+					}
+					_percent = 1;
+				}
+				_value = Math.max(0, __width - _value);
+				for each (_child in children){
+					_child.setSize(_value * (_child.isAverageWidth ? _averageCount : _child.percentWidth) / _percent, __height);
+				}
+			} else {
+				_value = (children.length - 1) * intervalV;
+				for each (_child in children){
+					if (_child.isAverageHeight){
+						_averageCount++;
+					} else if (_child.percentHeight > 0){
+						_percent += _child.percentHeight;
+					} else {
+						_value += _child.__height;
+					}
+				}
+
+				if (_percent < 1){
+					if (_averageCount > 0){
+						_averageCount = (1 - _percent) / _averageCount;
+					}
+					_percent = 1;
+				}
+
+				_value = Math.max(0, __height - _value);
+
+				for each (_child in children){
+					_child.setSize(__width, _value * (_child.isAverageHeight ? _averageCount : _child.percentHeight) / _percent);
+				}
+			}
+			updatePoint();
+		}
+
+		public function addChild(_child:Rect):void {
 			_child.parent = this;
 			children.push(_child);
-			update();
+			updateSize();
 		}
 
 		public function forEach(_fun:Function, ... args){
-			var _argCopy1:Array = args.concat();
-			_argCopy1.unshift(this);
-			_fun.apply(this, _argCopy1);
-			var _argCopy2:Array = args.concat();
-			_argCopy2.unshift(_fun);
-			for each (var _child:Group in children){
-				_child.forEach.apply(_child, _argCopy2);
+			var _arr1:Array = args.concat();
+			_arr1.unshift(this);
+			//_fun.apply(this, _arr1);
+			var _arrn:Array = args.concat();
+			_arrn.unshift(_fun);
+
+			for each (var _child:Rect in children){
+				if (_child is Group){
+					(_child as Group).forEach.apply(_child, _arrn);
+				} else {
+					_fun.apply(_child, _arr1);
+				}
 			}
 		}
 
-		public function setSize(_w:Number, _h:Number):void {
-			setWidth(_w);
-			setHeight(_h);
-			if (parent){
-				parent.update();
-			} else {
-				update();
-			}
-		}
-
-		public function update():void {
-			for each (var _each:Group in children){
-				_each.x = x;
-				_each.y = y;
-				_each.setWidth(__width);
-				_each.setHeight(__height);
-				_each.update();
-			}
-			updateDisplay();
-		}
-		
-		internal function updateDisplay():void {
-			if (displayContent){
-				displayContent.x = x;
-				displayContent.y = y;
-				displayContent.width = width;
-				displayContent.height = height;
-			}
-		}
-
-		internal function setWidth(_value:Number = 0):void {
-			if (autoPercentX){
-				_value = _value || percentWidth;
-			} else {
-				_value = _value || percentWidth || __width;
-			}
-			if (_value > 1){
-				__width = _value;
-				percentWidth = 0;
-			} else {
-				percentWidth = _value;
-				__width = parent.getChildWidth(this);
-			}
-		}
-
-		internal function setHeight(_value:Number = 0):void {
-			if (autoPercentY){
-				_value = _value || percentHeight;
-			} else {
-				_value = _value || percentHeight || __height;
-			}
-			if (_value > 1){
-				__height = _value;
-				percentHeight = 0;
-			} else {
-				percentHeight = _value;
-				__height = parent.getChildHeight(this);
-			}
-		}
-
-		internal function getChildWidth(_child:Group):Number {
-			return (_child.percentWidth || 1) * __width;
-		}
-
-		internal function getChildHeight(_child:Group):Number {
-			return (_child.percentHeight || 1) * __height;
-		}
-
-		public function toString():String {
-			var _str:String = "";
-			_str += "x:" + x + "\n";
-			_str += "y:" + y + "\n";
-			_str += "width:" + width + "\n";
-			_str += "height:" + height + "\n";
-			for each (var _child:Group in children){
+		override public function toString():String {
+			var _str:String = super.toString();
+			for each (var _child:Rect in children){
 				_str += "\n";
 				_str += _child.toString();
 			}
 			return _str;
 		}
 	}
-
 }

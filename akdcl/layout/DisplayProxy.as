@@ -1,16 +1,14 @@
-package akdcl.layout
-{
+package akdcl.layout {
 	import flash.display.DisplayObject;
 	import flash.display.Loader;
-	
+
 	/**
 	 * ...
 	 * @author ...
 	 */
-	public class WHProxy extends Rect
-	{
+	public class DisplayProxy extends Rect {
 		private var content:Object;
-		
+
 		private var aspectRatio:Number = 1;
 		private var originalWidth:Number = 0;
 		private var originalHeight:Number = 0;
@@ -18,13 +16,14 @@ package akdcl.layout
 		private var scaleY:Number = 0;
 		private var scaleWidth:Number = 0;
 		private var scaleHeight:Number = 0;
-		
+
 		private var __scrollX:Number = 0;
+
 		public function get scrollX():Number {
 			return __scrollX;
 		}
-		public function set scrollX(_value:Number):void 
-		{
+
+		public function set scrollX(_value:Number):void {
 			if (_value < -scaleWidth){
 				_value = -scaleWidth;
 			} else if (_value > __width){
@@ -53,10 +52,11 @@ package akdcl.layout
 		}
 
 		private var __scrollY:Number = 0;
+
 		public function get scrollY():Number {
 			return __scrollY;
 		}
-		
+
 		public function set scrollY(_value:Number):void {
 			if (_value < -scaleHeight){
 				_value = -scaleHeight;
@@ -84,9 +84,10 @@ package akdcl.layout
 			__scrollY = _value;
 			updatePoint();
 		}
-		
+
 		//alignX,alignY 0~1
 		private var __alignX:Number = 0;
+
 		public function get alignX():Number {
 			return __alignX;
 		}
@@ -101,6 +102,7 @@ package akdcl.layout
 		}
 
 		private var __alignY:Number = 0;
+
 		public function get alignY():Number {
 			return __alignY;
 		}
@@ -118,6 +120,7 @@ package akdcl.layout
 		//>1||<-1:scale
 		//NaN:stretch,10:onlywidth,-10:onlyheight;
 		private var __scaleMode:Number = 1;
+
 		public function get scaleMode():Number {
 			return __scaleMode;
 		}
@@ -129,44 +132,47 @@ package akdcl.layout
 			__scaleMode = _value;
 			updateSize();
 		}
-		
-		public function WHProxy(_x:Number, _y:Number, _width:Number, _height:Number, _alignX:Number = 0.5, _alignY:Number = 0.5, _scaleMode:Number = 1):void {
-			super(_x, _y, _width, _height);
-			
+
+		public function DisplayProxy(_x:Number, _y:Number, _width:Number, _height:Number, _alignX:Number = 0.5, _alignY:Number = 0.5, _scaleMode:Number = 1):void {
 			__alignX = _alignX;
 			__alignY = _alignY;
 			__scaleMode = _scaleMode;
+			super(_x, _y, _width, _height);
 		}
-		
-		override protected function updatePoint():void 
-		{
-			if (content) {
+
+		override public function remove():void {
+			super.remove();
+			content = null;
+		}
+
+		override protected function updatePoint():void {
+			if (content){
 				content.x = __x + __scrollX;
 				content.y = __y + __scrollY;
 			}
 		}
-		
+
 		override protected function updateSize():void {
 			var _scaleABS:Number = Math.abs(__scaleMode);
 			switch (_scaleABS){
 				case NaN:
 					scaleX = __width / originalWidth;
 					scaleY = __height / originalHeight;
-					
+
 					scaleWidth = __width;
 					scaleHeight = __height;
 					break;
 				case 10:
 					if (__scaleMode > 0){
 						scaleX = __width / originalWidth;
-						
+
 						scaleWidth = __width;
-						//scaleHeight = originalHeight;
+							//scaleHeight = originalHeight;
 					} else {
 						scaleY = __height / originalHeight;
-						
+
 						scaleHeight = __height;
-						//scaleWidth = originalWidth;
+							//scaleWidth = originalWidth;
 					}
 					break;
 				default:
@@ -183,31 +189,35 @@ package akdcl.layout
 						_scale = (1 + (_scale - 1)) * _scaleABS;
 					}
 					scaleY = scaleX = _scale;
-					
+
 					scaleWidth = originalWidth * scaleX;
 					scaleHeight = originalHeight * scaleY;
 					break;
 			}
-			
-			if (content) {
-				if ("scaleX" in content) {
+
+			if (content){
+				if ("scaleX" in content){
 					content["scaleX"] = scaleX;
-				}else {
+				} else {
 					content.width = scaleWidth;
 				}
-				if ("scaleY" in content) {
+				if ("scaleY" in content){
 					content["scaleY"] = scaleY;
-				}else {
+				} else {
 					content.height = scaleHeight;
 				}
 			}
-			
+
 			__scrollX = (__width - scaleWidth) * __alignX;
 			__scrollY = (__height - scaleHeight) * __alignY;
 			updatePoint();
 		}
-		
-		public function setContent(_content:Object = null):void {
+
+		public function setContent(_content:Object, _alignX:Number = 0.5, _alignY:Number = 0.5, _scaleMode:Number = 1):void {
+			__alignX = _alignX;
+			__alignY = _alignY;
+			__scaleMode = _scaleMode;
+			
 			content = _content;
 			if (content is Loader){
 				originalWidth = content.contentLoaderInfo.width;
