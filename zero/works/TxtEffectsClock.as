@@ -142,10 +142,6 @@ package zero.works{
 				this.loaderInfo.parameters.startTime
 				||
 				this.loaderInfo.parameters.endTime
-				||
-				this.loaderInfo.parameters.startNum
-				||
-				this.loaderInfo.parameters.endNum
 			){
 				if(this.loaderInfo.parameters.startTime){
 					set_startTime=this.loaderInfo.parameters.startTime;
