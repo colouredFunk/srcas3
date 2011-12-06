@@ -1,5 +1,4 @@
 ﻿package {
-	import akdcl.utils.traceObject;
 	import flash.display.MovieClip;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
@@ -15,6 +14,7 @@
 	import flash.system.System;
 
 	import akdcl.utils.addContextMenu;
+	import akdcl.utils.traceObject;
 
 	import akdcl.manager.LoggerManager;
 	import akdcl.manager.RequestManager;

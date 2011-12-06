@@ -76,7 +76,7 @@ package akdcl.media {
 
 		override protected function showContent():void {
 			if (isHidding && loadProgress < 0){
-
+				
 			} else {
 				super.showContent();
 			}

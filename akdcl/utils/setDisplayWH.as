@@ -16,8 +16,12 @@ package akdcl.utils {
 				_display[_hK] = _display[_wK] / _aspectRatioOrg;
 			} else {
 				_display.width = _width <= 1 ? _wOrg * _width : _width;
-				_display.scaleY = _display.scaleX;
-				_display.height = Math.round(_display.height);
+				if ("scaleY" in _display) {
+					_display.scaleY = _display.scaleX;
+					//_display.height = Math.round(_display.height);
+				}else {
+					_display.height = int(_display.width / _aspectRatioOrg);
+				}
 			}
 		} else {
 			if (_hK){
@@ -25,8 +29,12 @@ package akdcl.utils {
 				_display[_wK] = _display[_hK] * _aspectRatioOrg;
 			} else {
 				_display.height = _height <= 1 ? _hOrg * _height : _height;
-				_display.scaleX = _display.scaleY;
-				_display.width = Math.round(_display.width);
+				if ("scaleY" in _display) {
+					_display.scaleX = _display.scaleY;
+					//_display.width = Math.round(_display.width);
+				}else {
+					_display.width = int(_display.height * _aspectRatioOrg);
+				}
 			}
 		}
 	}
