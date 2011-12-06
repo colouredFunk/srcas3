@@ -36,8 +36,8 @@ package akdcl.layout {
 
 		public static const GROUP_VALUES:Object = {Group: GROUP, HGroup: HGROUP, VGroup: VGROUP};
 
-		public var intervalH:Number = 2;
-		public var intervalV:Number = 2;
+		public var intervalH:Number = 0;
+		public var intervalV:Number = 0;
 		public var type:int;
 
 		private var children:Array;
@@ -142,7 +142,7 @@ package akdcl.layout {
 				}
 				_value = Math.max(0, __height - _value);
 				for each (_child in children){
-					if (_child.isAverageHeight) {
+					if (_child.isAverageWidth) {
 						_width = __width;
 					}else if (_child.percentWidth) {
 						_width = _child.percentWidth * __width;
