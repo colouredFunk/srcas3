@@ -14,11 +14,6 @@ package akdcl.net.remoting {
 	import flash.utils.Proxy;
 	import flash.utils.Dictionary;
 
-	/**
-	 * Remoting服务
-	 * @author Kinglong(kinglong@gmail.com)
-	 * @since:2010-8-3
-	 */
 	[Event(name="fault", type="com.klstudio.events.FaultEvent")]
 	[Event(name="result", type="com.klstudio.events.ResultEvent")]
 	

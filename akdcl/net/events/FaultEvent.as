@@ -3,11 +3,6 @@ package akdcl.net.events {
 
 	import flash.events.Event;
 
-	/**
-	 * FaultEvent
-	 * @author Kinglong(kinglong@gmail.com)
-	 * @since:2010-8-3
-	 */
 	public class FaultEvent extends Event {
 		public static const FAULT : String = "fault";	
 
