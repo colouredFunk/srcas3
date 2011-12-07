@@ -143,6 +143,7 @@
 			onProxyResizeHandler();
 			if (useMask){
 				container.mask = maskShape;
+				container.scrollRect = null;
 			} else {
 				container.mask = null;
 			}
@@ -153,8 +154,10 @@
 			if (useScroll && !scrollRectCopy){
 				scrollRectCopy = new Rectangle(0, 0, 0, 0);
 			}
-			if (container.mask){
+			if (useScroll) {
 				container.mask = null;
+			}else {
+				container.scrollRect = null;
 			}
 			onProxyResizeHandler();
 			container.opaqueBackground = (_useScroll && _color >= 0) ? _color : null;
