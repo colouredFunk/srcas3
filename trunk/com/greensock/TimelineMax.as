@@ -1,5 +1,5 @@
 /**
- * VERSION: 1.693
+ * VERSION: 1.694
  * DATE: 2011-11-08
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinemax/
@@ -146,7 +146,7 @@ package com.greensock {
  **/
 	public class TimelineMax extends TimelineLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:Number = 1.693;
+		public static const version:Number = 1.694;
 		
 		/** @private **/
 		protected var _repeat:int;
@@ -435,7 +435,7 @@ package com.greensock {
 			}
 			var totalDur:Number = (this.cacheIsDirty) ? this.totalDuration : this.cachedTotalDuration, prevTime:Number = this.cachedTime, prevTotalTime:Number = this.cachedTotalTime, prevStart:Number = this.cachedStartTime, prevTimeScale:Number = this.cachedTimeScale, tween:TweenCore, isComplete:Boolean, rendered:Boolean, repeated:Boolean, next:TweenCore, dur:Number, prevPaused:Boolean = this.cachedPaused;
 			if (time >= totalDur) {
-				if (prevTime != totalDur && _rawPrevTime != time) {
+				if (prevTotalTime != totalDur && _rawPrevTime != time) {
 					this.cachedTotalTime = totalDur;
 					if (!this.cachedReversed && this.yoyo && _repeat % 2 != 0) {
 						this.cachedTime = 0;
@@ -461,7 +461,7 @@ package com.greensock {
 				} else if (time == 0 && !this.initted) {
 					force = true;
 				}
-				if (prevTime != 0 && _rawPrevTime != time) {
+				if (prevTotalTime != 0 && _rawPrevTime != time) {
 					this.cachedTotalTime = 0;
 					this.cachedTime = 0;
 					forceChildrenToBeginning(0, suppressEvents);
@@ -478,20 +478,17 @@ package com.greensock {
 			if (_repeat != 0) {
 				var cycleDuration:Number = this.cachedDuration + _repeatDelay;
 				var prevCycles:int = _cyclesComplete;
-				_cyclesComplete = (this.cachedTotalTime / cycleDuration) >> 0; //rounds result, like int()
-				if (_cyclesComplete == this.cachedTotalTime / cycleDuration) {
+				if ((_cyclesComplete = (this.cachedTotalTime / cycleDuration) >> 0) == (this.cachedTotalTime / cycleDuration) && _cyclesComplete != 0) {
 					_cyclesComplete--; //otherwise when rendered exactly at the end time, it will act as though it is repeating (at the beginning)
 				}
-				if (prevCycles != _cyclesComplete) {
-					repeated = true;
-				}
+				repeated = Boolean(prevCycles != _cyclesComplete);
 				
 				if (isComplete) {
 					if (this.yoyo && _repeat % 2) {
 						this.cachedTime = 0;
 					}
 				} else if (time > 0) {
-					this.cachedTime = ((this.cachedTotalTime / cycleDuration) - _cyclesComplete) * cycleDuration; //originally this.cachedTotalTime % cycleDuration but floating point errors caused problems, so I normalized it. (4 % 0.8 should be 0 but Flash reports it as 0.79999999!)
+					this.cachedTime = this.cachedTotalTime - (_cyclesComplete * cycleDuration); //originally this.cachedTotalTime % cycleDuration but floating point errors caused problems, so I normalized it. (4 % 0.8 should be 0 but Flash reports it as 0.79999999!)
 					
 					if (this.yoyo && _cyclesComplete % 2) {
 						this.cachedTime = this.cachedDuration - this.cachedTime;
@@ -505,7 +502,7 @@ package com.greensock {
 					_cyclesComplete = 0;
 				}
 				
-				if (repeated && !isComplete && (this.cachedTime != prevTime || force)) {
+				if (repeated && !isComplete && (this.cachedTotalTime != prevTotalTime || force)) {
 					
 					/*
 					  make sure children at the end/beginning of the timeline are rendered properly. If, for example, 
@@ -775,7 +772,10 @@ package com.greensock {
 		
 //---- GETTERS / SETTERS -------------------------------------------------------------------------------------------------------
 		
-		
+		/** @inheritDoc **/
+		override public function set currentProgress(n:Number):void {
+			this.currentTime = this.duration * n;
+		}
 		
 		/** 
 		 * Value between 0 and 1 indicating the overall progress of the timeline according to its <code>totalDuration</code> 

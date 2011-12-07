@@ -1,6 +1,13 @@
 CHANGE LOG : GREENSOCK TWEENING PLATFORM
 ----------------------------------------
 
+2011-12-06
+---------------------------------------------
+TimelineMax			1.694
+TweenMax			1.694
+	- Fixed issue that could cause a timeline that has a non-zero "repeat" to trigger callbacks in child tweens when its currentProgress is set to 0 after having repeated at least once. 
+	- Fixed issue that caused TimelineMax to always render in its first cycle when currentProgress was set, rather than honoring the current cycle if it had repeated one or more times. 
+
 2011-11-29
 ---------------------------------------------
 BlitMask				0.5
