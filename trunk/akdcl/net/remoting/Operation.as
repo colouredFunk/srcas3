@@ -5,11 +5,6 @@ package akdcl.net.remoting {
 	import flash.net.Responder;
 	import flash.events.EventDispatcher;
 
-	/**
-	 * Operation 
-	 * @author Kinglong(kinglong@gmail.com)
-	 * @since:2010-8-3
-	 */
 	[Event(name="fault", type="com.klstudio.events.FaultEvent")]	
 	[Event(name="result", type="com.klstudio.events.ResultEvent")]
 	

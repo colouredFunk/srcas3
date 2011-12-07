@@ -1,11 +1,6 @@
 package akdcl.net.events {
 	import flash.events.Event;
 
-	/**
-	 * ResultEvent
-	 * @author Kinglong(kinglong@gmail.com)
-	 * @since:2010-8-3
-	 */
 	public class ResultEvent extends Event {
 		public static const RESULT:String = "result";	
 

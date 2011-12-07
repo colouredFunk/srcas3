@@ -1,10 +1,4 @@
 package akdcl.net.remoting {
-
-	/**
-	 * Fault
-	 * @author Kinglong(kinglong@gmail.com)
-	 * @since:2010-8-3
-	 */
 	public class Fault extends Error {
 		public var rootCause : Object;
 		public var content : Object;
