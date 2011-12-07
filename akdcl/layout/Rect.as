@@ -12,7 +12,7 @@ package akdcl.layout {
 	[Event(name="resize",type="flash.events.Event")]
 
 	/// @eventType	flash.events.Event.SCROLL
-	[Event(name="scroll",type="flash.events.SCROLL")]
+	[Event(name="scroll",type="flash.events.Event")]
 	public class Rect extends UIEventDispatcher {
 		internal var isAverageWidth:Boolean;
 		internal var isAverageHeight:Boolean;
@@ -35,6 +35,9 @@ package akdcl.layout {
 		}
 
 		public function set x(_value:Number):void {
+			if (__x == _value) {
+				return;
+			}
 			__x = _value;
 			if (autoUpdate){
 				updatePoint(true);
@@ -46,6 +49,9 @@ package akdcl.layout {
 		}
 
 		public function set y(_value:Number):void {
+			if (__y == _value) {
+				return;
+			}
 			__y = _value;
 			if (autoUpdate){
 				updatePoint(true);
@@ -57,6 +63,9 @@ package akdcl.layout {
 		}
 
 		public function set width(_value:Number):void {
+			if (__width == _value) {
+				return;
+			}
 			__width = _value;
 			if (autoUpdate){
 				updateSize(true);
@@ -68,6 +77,9 @@ package akdcl.layout {
 		}
 
 		public function set height(_value:Number):void {
+			if (__height == _value) {
+				return;
+			}
 			__height = _value;
 			if (autoUpdate){
 				updateSize(true);
@@ -75,8 +87,18 @@ package akdcl.layout {
 		}
 
 		public function Rect(_x:Number, _y:Number, _width:Number, _height:Number):void {
-			setPoint(_x, __y);
-			setSize(_width, _height);
+			__x = _x;
+			__y = _y;
+			if (_width > 1){
+				__width = _width;
+			} else {
+				percentWidth = _width;
+			}
+			if (_height > 1){
+				__height = _height;
+			} else {
+				percentHeight = _height;
+			}
 			isAverageWidth = !Boolean(__width);
 			isAverageHeight = !Boolean(__height);
 			eventResize = new Event(Event.RESIZE);
@@ -85,23 +107,20 @@ package akdcl.layout {
 		}
 
 		public function setPoint(_x:Number, _y:Number):void {
+			if (__x == _x && __y == _y) {
+				return;
+			}
 			__x = _x;
 			__y = _y;
 			updatePoint(true);
 		}
 
 		public function setSize(_width:Number, _height:Number):void {
-			if (_width > 1){
-				__width = _width;
-			} else {
-				percentWidth = _width;
+			if (__width == _width && __height == _height) {
+				return;
 			}
-
-			if (_height > 1){
-				__height = _height;
-			} else {
-				percentHeight = _height;
-			}
+			__width = _width;
+			__height = _height;
 			updateSize(true);
 		}
 
@@ -111,13 +130,13 @@ package akdcl.layout {
 		}
 
 		protected function updatePoint(_dispathEvent:Boolean = true):void {
-			if (_dispathEvent && hasEventListener(Event.SCROLL) && eventScroll){
+			if (_dispathEvent && hasEventListener(Event.SCROLL)){
 				dispatchEvent(eventScroll);
 			}
 		}
 
 		protected function updateSize(_dispathEvent:Boolean = true):void {
-			if (_dispathEvent && hasEventListener(Event.RESIZE) && eventResize){
+			if (_dispathEvent && hasEventListener(Event.RESIZE)){
 				dispatchEvent(eventResize);
 			}
 		}

@@ -163,20 +163,20 @@ package akdcl.layout {
 					_child.setSize(_width, _height);
 				}
 			}
+			updatePoint(_dispathEvent);
 			super.updateSize(_dispathEvent);
-			updatePoint(true);
 		}
 
 		public function addChild(_child:Rect):void {
 			_child.addEventListener(Event.RESIZE, onChildResizeHandler);
 			children.push(_child);
-			if (autoUpdate) {
+			if (autoUpdate){
 				updateSize(true);
 			}
 		}
 
 		private function onChildResizeHandler(e:Event):void {
-			if (autoUpdate) {
+			if (autoUpdate){
 				updateSize(true);
 			}
 		}

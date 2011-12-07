@@ -1,13 +1,18 @@
 package akdcl.layout {
 	import flash.display.DisplayObject;
 	import flash.display.Loader;
+	import flash.events.Event;
 
 	/**
 	 * ...
 	 * @author ...
 	 */
+
+	/// @eventType	flash.events.Event.CHANGE
+	[Event(name="change",type="flash.events.Event")]
 	public class DisplayProxy extends Rect {
 		private var content:Object;
+		private var eventChange:Event;
 
 		private var aspectRatio:Number = 1;
 		private var originalWidth:Number = 0;
@@ -48,7 +53,7 @@ package akdcl.layout {
 			}
 			__alignX = _value / (__width - scaleWidth);
 			__scrollX = _value;
-			if (autoUpdate) {
+			if (autoUpdate){
 				updatePoint(true);
 			}
 		}
@@ -84,7 +89,7 @@ package akdcl.layout {
 			}
 			__alignY = _value / (__height - scaleHeight);
 			__scrollY = _value;
-			if (autoUpdate) {
+			if (autoUpdate){
 				updatePoint(true);
 			}
 		}
@@ -102,7 +107,7 @@ package akdcl.layout {
 			}
 			__alignX = _value;
 			__scrollX = (__width - scaleWidth) * __alignX;
-			if (autoUpdate) {
+			if (autoUpdate){
 				updatePoint(true);
 			}
 		}
@@ -119,7 +124,7 @@ package akdcl.layout {
 			}
 			__alignY = _value;
 			__scrollY = (__height - scaleHeight) * __alignY;
-			if (autoUpdate) {
+			if (autoUpdate){
 				updatePoint(true);
 			}
 		}
@@ -138,12 +143,13 @@ package akdcl.layout {
 				return;
 			}
 			__scaleMode = _value;
-			if (autoUpdate) {
+			if (autoUpdate){
 				updateSize(true);
 			}
 		}
 
 		public function DisplayProxy(_x:Number, _y:Number, _width:Number, _height:Number):void {
+			eventChange = new Event(Event.CHANGE);
 			super(_x, _y, _width, _height);
 		}
 
@@ -162,13 +168,13 @@ package akdcl.layout {
 
 		override protected function updateSize(_dispathEvent:Boolean = true):void {
 			var _scaleABS:Number = Math.abs(__scaleMode);
-			if (isNaN(_scaleABS)) {
+			if (isNaN(_scaleABS)){
 				scaleX = __width / originalWidth;
 				scaleY = __height / originalHeight;
 
 				scaleWidth = __width;
 				scaleHeight = __height;
-			}else if (_scaleABS==10) {
+			} else if (_scaleABS == 10){
 				if (__scaleMode > 0){
 					scaleX = __width / originalWidth;
 
@@ -180,7 +186,7 @@ package akdcl.layout {
 					scaleHeight = __height;
 						//scaleWidth = originalWidth;
 				}
-			}else {
+			} else {
 				var _scale:Number;
 				if (__scaleMode < 0 ? (__width / __height > aspectRatio) : (__width / __height < aspectRatio)){
 					_scale = __width / originalWidth;
@@ -214,7 +220,7 @@ package akdcl.layout {
 
 			__scrollX = (__width - scaleWidth) * __alignX;
 			__scrollY = (__height - scaleHeight) * __alignY;
-			updatePoint(true);
+			updatePoint(_dispathEvent);
 			super.updateSize(_dispathEvent);
 		}
 
@@ -234,7 +240,10 @@ package akdcl.layout {
 				originalHeight = 0;
 			}
 			aspectRatio = originalWidth / originalHeight;
-			updateSize(true);
+			updateSize(false);
+			if (hasEventListener(Event.CHANGE)){
+				dispatchEvent(eventChange);
+			}
 		}
 	}
 }
