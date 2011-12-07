@@ -1,4 +1,5 @@
 package akdcl.layout {
+	import flash.events.Event;
 
 	/**
 	 * ...
@@ -48,7 +49,15 @@ package akdcl.layout {
 			super(_x, _y, _width, _height);
 		}
 
-		override protected function updatePoint():void {
+		override public function remove():void {
+			for each (var _child:Rect in children){
+				_child.remove();
+			}
+			super.remove();
+			children = null;
+		}
+
+		override protected function updatePoint(_dispathEvent:Boolean = true):void {
 			var _x:Number;
 			var _y:Number;
 			var _prevChild:Rect;
@@ -66,9 +75,10 @@ package akdcl.layout {
 				_child.setPoint(_x, _y);
 				_prevChild = _child;
 			}
+			super.updatePoint(_dispathEvent);
 		}
 
-		override protected function updateSize():void {
+		override protected function updateSize(_dispathEvent:Boolean = true):void {
 			var _child:Rect;
 			var _value:Number;
 			var _percent:Number = 0;
@@ -78,18 +88,18 @@ package akdcl.layout {
 
 			if (type == GROUP){
 				for each (_child in children){
-					if (_child.isAverageHeight) {
+					if (_child.isAverageHeight){
 						_width = __width;
-					}else if (_child.percentWidth) {
+					} else if (_child.percentWidth){
 						_width = _child.percentWidth * __width;
-					}else {
+					} else {
 						_width = _child.__width;
 					}
-					if (_child.isAverageHeight) {
+					if (_child.isAverageHeight){
 						_height = __height;
-					}else if (_child.percentHeight) {
+					} else if (_child.percentHeight){
 						_height = _child.percentHeight * __height;
-					}else {
+					} else {
 						_height = _child.__height;
 					}
 					_child.setSize(_width, _height);
@@ -112,13 +122,13 @@ package akdcl.layout {
 					_percent = 1;
 				}
 				_value = Math.max(0, __width - _value);
-				for each (_child in children) {
+				for each (_child in children){
 					_width = _value * (_child.isAverageWidth ? _averageCount : _child.percentWidth) / _percent;
-					if (_child.isAverageHeight) {
+					if (_child.isAverageHeight){
 						_height = __height;
-					}else if (_child.percentHeight) {
+					} else if (_child.percentHeight){
 						_height = _child.percentHeight * __height;
-					}else {
+					} else {
 						_height = _child.__height;
 					}
 					_child.setSize(_width, _height);
@@ -142,24 +152,33 @@ package akdcl.layout {
 				}
 				_value = Math.max(0, __height - _value);
 				for each (_child in children){
-					if (_child.isAverageWidth) {
+					if (_child.isAverageWidth){
 						_width = __width;
-					}else if (_child.percentWidth) {
+					} else if (_child.percentWidth){
 						_width = _child.percentWidth * __width;
-					}else {
+					} else {
 						_width = _child.__width;
 					}
 					_height = _value * (_child.isAverageHeight ? _averageCount : _child.percentHeight) / _percent;
 					_child.setSize(_width, _height);
 				}
 			}
-			updatePoint();
+			super.updateSize(_dispathEvent);
+			updatePoint(true);
 		}
 
 		public function addChild(_child:Rect):void {
-			_child.parent = this;
+			_child.addEventListener(Event.RESIZE, onChildResizeHandler);
 			children.push(_child);
-			updateSize();
+			if (autoUpdate) {
+				updateSize(true);
+			}
+		}
+
+		private function onChildResizeHandler(e:Event):void {
+			if (autoUpdate) {
+				updateSize(true);
+			}
 		}
 
 		public function forEachGroup(_fun:Function, ... args){

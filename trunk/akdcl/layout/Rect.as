@@ -1,12 +1,19 @@
 package akdcl.layout {
+	import flash.events.Event;
+
+	import ui.UIEventDispatcher;
 
 	/**
 	 * ...
 	 * @author ...
 	 */
-	public class Rect {
-		public var userData:Object;
-		internal var parent:Rect;
+
+	/// @eventType	flash.events.Event.RESIZE
+	[Event(name="resize",type="flash.events.Event")]
+
+	/// @eventType	flash.events.Event.SCROLL
+	[Event(name="scroll",type="flash.events.SCROLL")]
+	public class Rect extends UIEventDispatcher {
 		internal var isAverageWidth:Boolean;
 		internal var isAverageHeight:Boolean;
 
@@ -18,13 +25,20 @@ package akdcl.layout {
 		internal var percentWidth:Number = 0;
 		internal var percentHeight:Number = 0;
 
+		private var eventResize:Event;
+		private var eventScroll:Event;
+
+		public var autoUpdate:Boolean = true;
+
 		public function get x():Number {
 			return __x;
 		}
 
 		public function set x(_value:Number):void {
 			__x = _value;
-			updatePoint();
+			if (autoUpdate){
+				updatePoint(true);
+			}
 		}
 
 		public function get y():Number {
@@ -33,7 +47,9 @@ package akdcl.layout {
 
 		public function set y(_value:Number):void {
 			__y = _value;
-			updatePoint();
+			if (autoUpdate){
+				updatePoint(true);
+			}
 		}
 
 		public function get width():Number {
@@ -42,7 +58,9 @@ package akdcl.layout {
 
 		public function set width(_value:Number):void {
 			__width = _value;
-			updateSize();
+			if (autoUpdate){
+				updateSize(true);
+			}
 		}
 
 		public function get height():Number {
@@ -51,7 +69,9 @@ package akdcl.layout {
 
 		public function set height(_value:Number):void {
 			__height = _value;
-			updateSize();
+			if (autoUpdate){
+				updateSize(true);
+			}
 		}
 
 		public function Rect(_x:Number, _y:Number, _width:Number, _height:Number):void {
@@ -59,12 +79,15 @@ package akdcl.layout {
 			setSize(_width, _height);
 			isAverageWidth = !Boolean(__width);
 			isAverageHeight = !Boolean(__height);
+			eventResize = new Event(Event.RESIZE);
+			eventScroll = new Event(Event.SCROLL);
+			super();
 		}
 
 		public function setPoint(_x:Number, _y:Number):void {
 			__x = _x;
 			__y = _y;
-			updatePoint();
+			updatePoint(true);
 		}
 
 		public function setSize(_width:Number, _height:Number):void {
@@ -79,22 +102,32 @@ package akdcl.layout {
 			} else {
 				percentHeight = _height;
 			}
+			updateSize(true);
+		}
+
+		override public function remove():void {
+			super.remove();
+			eventResize = null;
+		}
+
+		protected function updatePoint(_dispathEvent:Boolean = true):void {
+			if (_dispathEvent && hasEventListener(Event.SCROLL) && eventScroll){
+				dispatchEvent(eventScroll);
+			}
+		}
+
+		protected function updateSize(_dispathEvent:Boolean = true):void {
+			if (_dispathEvent && hasEventListener(Event.RESIZE) && eventResize){
+				dispatchEvent(eventResize);
+			}
+		}
+
+		public function update():void {
+			updatePoint();
 			updateSize();
 		}
-		
-		public function remove():void {
-			parent = null;
-		}
 
-		protected function updatePoint():void {
-
-		}
-
-		protected function updateSize():void {
-
-		}
-
-		public function toString():String {
+		override public function toString():String {
 			var _str:String = "";
 			_str += "x:" + x + ", ";
 			_str += "y:" + y + ", ";
