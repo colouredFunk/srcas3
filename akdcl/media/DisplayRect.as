@@ -3,10 +3,8 @@
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
-	import flash.display.Loader;
 	import flash.display.Shape;
 	import flash.events.Event;
-	import flash.media.Video;
 	import flash.geom.Rectangle;
 	import flash.system.System;
 	import flash.events.ContextMenuEvent;
@@ -18,6 +16,7 @@
 
 	import ui.UISprite;
 
+	import akdcl.layout.DisplayProxy;
 	import akdcl.utils.addContextMenu;
 
 	/**
@@ -31,7 +30,7 @@
 	[Event(name="resize",type="flash.events.Event")]
 	public class DisplayRect extends UISprite {
 		protected static const TWEEN_FRAME:uint = 10;
-		
+
 		private static var sourceLabel:String;
 		private static var contextMenuStatic:ContextMenu;
 		private static var contextMenuItem:ContextMenuItem;
@@ -51,12 +50,22 @@
 			var _rect:Object = _evt.contextMenuOwner;
 			sourceLabel = _rect.label;
 			var _source:String = _rect.label.split("/").pop();
-			_source = _source + ": " + _rect.rectWidth + " x " + _rect.rectHeight;
+			_source = _source + ": " + _rect.proxy.width + " x " + _rect.proxy.height;
 			contextMenuItem.caption = _source;
 		}
 
 		private static function onMenuItemSelectHandler(_evt:ContextMenuEvent):void {
 			System.setClipboard(sourceLabel);
+		}
+
+		public var label:String = "Size";
+		public var moveRect:Boolean;
+		public var proxy:DisplayProxy;
+
+		public var container:DisplayObjectContainer;
+
+		public function get displayContent():DisplayObject {
+			return (content is BitmapData ? bitmap : content) as DisplayObject;
 		}
 
 		protected var tweenOutVar:Object;
@@ -65,223 +74,52 @@
 		protected var eventChange:Event = new Event(Event.CHANGE);
 		protected var eventResize:Event = new Event(Event.RESIZE);
 
-		public var label:String = "Size";
-		public var autoUpdate:Boolean = true;
-		public var useScroll:Boolean;
-		public var useMask:Boolean;
-		public var moveRect:Boolean;
-
-		public var container:DisplayObjectContainer;
-
-		public function get rectWidth():uint {
-			return rect.width;
-		}
-
-		public function set rectWidth(_w:uint):void {
-			if (rect.width == _w){
-				return;
-			}
-			rect.width = _w;
-			if (autoUpdate){
-				updateRect();
-			}
-		}
-
-		public function get rectHeight():uint {
-			return rect.height;
-		}
-
-		public function set rectHeight(_h:uint):void {
-			if (rect.height == _h){
-				return;
-			}
-			rect.height = _h;
-			if (autoUpdate){
-				updateRect();
-			}
-		}
-
-		//scrollX,scrollY 0~1
-		private var __scrollX:Number = 0;
-		public function get scrollX():Number {
-			return __scrollX;
-		}
-
-		public function set scrollX(_value:Number):void {
-			var _display:Object = displayContent;
-			if (_display){
-				var _width:Number = rect.width;
-				if (_value < -scaleWidth){
-					_value = -scaleWidth;
-				} else if (_value > _width){
-					_value = _width;
-				}
-				if (_width <= scaleWidth){
-					if (_value < _width - scaleWidth){
-						__scrollX = (_value + _width - scaleWidth) * 0.5;
-					} else if (_value < 0){
-						__scrollX = _value;
-					} else {
-						__scrollX = _value * 0.5;
-					}
-				} else {
-					if (_value < 0){
-						__scrollX = _value * 0.5;
-					} else if (_value < _width - scaleWidth){
-						__scrollX = _value;
-					} else {
-						__scrollX = (_value + _width - scaleWidth) * 0.5;
-					}
-				}
-				alignX = __scrollX / (_width - scaleWidth);
-			}
-		}
-
-		private var __scrollY:Number = 0;
-		public function get scrollY():Number {
-			return __scrollY;
-		}
-
-		public function set scrollY(_value:Number):void {
-			var _display:Object = displayContent;
-			if (_display){
-				var _height:Number = rect.height;
-				if (_value < -scaleHeight){
-					_value = -scaleHeight;
-				} else if (_value > _height){
-					_value = _height;
-				}
-				if (_height <= scaleHeight){
-					if (_value < _height - scaleHeight){
-						__scrollY = (_value + _height - scaleHeight) * 0.5;
-					} else if (_value < 0){
-						__scrollY = _value;
-					} else {
-						__scrollY = _value * 0.5;
-					}
-				} else {
-					if (_value < 0){
-						__scrollY = _value * 0.5;
-					} else if (_value < _height - scaleHeight){
-						__scrollY = _value;
-					} else {
-						__scrollY = (_value + _height - scaleHeight) * 0.5;
-					}
-				}
-				alignY = __scrollY / (_height - scaleHeight);
-			}
-		}
-		
-		//alignX,alignY 0~1
-		private var __alignX:Number = 0;
-		public function get alignX():Number {
-			return __alignX;
-		}
-
-		public function set alignX(_value:Number):void {
-			if (__alignX == _value){
-				return;
-			}
-			__alignX = _value;
-			updateScrollXY();
-		}
-
-		private var __alignY:Number = 0;
-		public function get alignY():Number {
-			return __alignY;
-		}
-
-		public function set alignY(_value:Number):void {
-			if (__alignY == _value){
-				return;
-			}
-			__alignY = _value;
-			updateScrollXY();
-		}
-
-		//-1:outside,0:noscale,1:inside;
-		//>1||<-1:scale
-		//NaN:stretch,10:onlywidth,-10:onlyheight;
-		private var __scaleMode:Number = 1;
-
-		public function get scaleMode():Number {
-			return __scaleMode;
-		}
-
-		public function set scaleMode(_value:Number):void {
-			if (__scaleMode == _value){
-				return;
-			}
-			__scaleMode = _value;
-			if (autoUpdate){
-				updateRect();
-			}
-		}
-
-		public function get displayContent():DisplayObject {
-			return (content is BitmapData ? bitmap : content) as DisplayObject;
-		}
-
-		protected var rect:Rectangle;
 		protected var bitmap:Bitmap;
 		protected var content:Object;
 		protected var contentReady:Object;
+		protected var maskShape:Shape;
+		
+		protected var useScroll:Boolean;
+		protected var useMask:Boolean;
 
 		protected var isHidding:Boolean = false;
-
 		protected var tweenMode:int;
-		protected var scaleWidth:Number;
-		protected var scaleHeight:Number;
-		
+
 		protected var alignXReady:Number;
 		protected var alignYReady:Number;
 		protected var scaleModeReady:Number;
-		protected var originalWidth:int;
-		protected var originalHeight:int;
-		
-		protected var aspectRatio:Number;
-		private var offX:int;
-		private var offY:int;
-		
-		private var maskShape:Shape;
+
+		protected var scrollRectCopy:Rectangle;
 
 		public function DisplayRect(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = 0):void {
-			if (_rectWidth + _rectHeight > 0){
-				rect = new Rectangle();
-				rect.width = _rectWidth;
-				rect.height = _rectHeight;
+			if (!container){
+				container = this;
+			}
+			proxy = new DisplayProxy(0, 0, _rectWidth || container.width, _rectHeight || container.height);
+			if (_bgColor >= 0){
+				setUseScroll(true, _bgColor)
 			}
 			super();
-			if (_bgColor >= 0) {
-				useScroll = true;
-				container.opaqueBackground = _bgColor;
-			}else {
-				useScroll = false;
-			}
 		}
 
 		override protected function init():void {
 			super.init();
-			if (!container){
-				container = this;
-			}
-			if (!rect){
-				rect = container.getRect(container);
-				rect.y = rect.x = 0;
-			}
 			tweenOutVar = {alpha: 0, useFrames: true, onComplete: onHideCompleteHandler};
 			tweenInVar = {alpha: 1, useFrames: true};
 			bitmap = new Bitmap();
 			container.addChild(bitmap);
 			contextMenu = createMenu(this);
 			mouseChildren = false;
+			proxy.addEventListener(Event.RESIZE, onProxyResizeHandler);
+
 		}
 
 		override protected function onRemoveToStageHandler():void {
 			TweenLite.killTweensOf(displayContent);
 			bitmap.bitmapData = null;
+			proxy.remove();
 			super.onRemoveToStageHandler();
-			rect = null;
+			proxy = null;
 			bitmap = null;
 			content = null;
 			contentReady = null;
@@ -292,112 +130,34 @@
 			eventResize = null;
 		}
 
-		public function updateRect():void {
-			var _display:Object = displayContent;
-			if (_display){
-				var _width:Number = rect.width;
-				var _height:Number = rect.height;
-				var _scaleABS:Number = Math.abs(__scaleMode);
-				switch (_scaleABS){
-					case NaN:
-						_display.scaleX = _width / originalWidth;
-						_display.scaleY = _height / originalHeight;
-						break;
-					case 10:
-						if (__scaleMode > 0){
-							_display.scaleX = _width / originalWidth;
-						} else {
-							_display.scaleY = _height / originalHeight;
-						}
-						break;
-					default:
-						var _scale:Number;
-						if (__scaleMode < 0 ? (_width / _height > aspectRatio) : (_width / _height < aspectRatio)){
-							_scale = _width / originalWidth;
-						} else {
-							_scale = _height / originalHeight;
-						}
-						if (_scaleABS <= 1){
-							_scale = 1 + (_scale - 1) * _scaleABS;
-						} else {
-							_scale = (1 + (_scale - 1)) * _scaleABS;
-						}
-						_display.scaleY = _display.scaleX = _scale;
-						break;
-				}
-				scaleWidth = originalWidth * _display.scaleX;
-				scaleHeight = originalHeight * _display.scaleY;
-				
-				updateScrollXY();
-			}
-			if (useScroll) {
-				if (container.mask) {
-					container.mask = null;
-				}
-				container.scrollRect = rect;
-			}else if (useMask && maskShape) {
-				maskShape.x = rect.x;
-				maskShape.y = rect.y;
-				maskShape.width = rect.width;
-				maskShape.height = rect.height;
-				container.mask = maskShape;
-			}
-			if (hasEventListener(Event.RESIZE)){
-				dispatchEvent(eventResize);
-			}
-		}
-		
-		public function setUseMask(_b:Boolean):void {
-			useMask = _b;
-			if (useMask && !maskShape) {
+		public function setUseMask(_useMask:Boolean):void {
+			useMask = _useMask;
+			if (useMask && !maskShape){
 				maskShape = new Shape();
 				maskShape.graphics.beginFill(0);
 				maskShape.graphics.drawRect(0, 0, 1, 1);
 				maskShape.graphics.endFill();
 				maskShape.visible = false;
-				addChildAt(maskShape,0);
+				addChildAt(maskShape, 0);
 			}
-			if (useMask) {
-				maskShape.x = rect.x;
-				maskShape.y = rect.y;
-				maskShape.width = rect.width;
-				maskShape.height = rect.height;
+			onProxyResizeHandler();
+			if (useMask){
 				container.mask = maskShape;
-			}else {
+			} else {
 				container.mask = null;
 			}
 		}
-		
+
 		public function setUseScroll(_useScroll:Boolean, _color:int = -1):void {
 			useScroll = _useScroll;
-			if (useScroll){
-				container.scrollRect = rect;
+			if (useScroll && !scrollRectCopy){
+				scrollRectCopy = new Rectangle(0, 0, 0, 0);
 			}
-			container.opaqueBackground = _color < 0?null:_color;
-		}
-
-		protected function updateScrollXY():void {
-			var _display:Object = displayContent;
-			if (_display){
-				var _x:Number = -offX * _display.scaleX;
-				var _y:Number = -offY * _display.scaleY;
-
-				__scrollX = (rect.width - scaleWidth) * __alignX;
-				__scrollY = (rect.height - scaleHeight) * __alignY;
-
-				if (moveRect){
-					_display.x = _x;
-					_display.y = _y;
-					rect.x = -__scrollX;
-					rect.y = -__scrollY;
-				} else {
-					_display.x = __scrollX + _x;
-					_display.y = __scrollY + _y;
-					rect.x = 0;
-					rect.y = 0;
-				}
-				//_width / _dW, _height / _dH
+			if (container.mask){
+				container.mask = null;
 			}
+			onProxyResizeHandler();
+			container.opaqueBackground = (_useScroll && _color >= 0) ? _color : null;
 		}
 
 		public function setContent(_content:Object = null, _tweenMode:int = 2, _alignX:Number = 0.5, _alignY:Number = 0.5, _scaleMode:Number = 1):void {
@@ -444,41 +204,25 @@
 				_display = content;
 			}
 			if (_display){
-				//
 				if (tweenMode > 0){
 					_display.alpha = 0;
 					TweenLite.to(_display, tweenMode > 2 ? tweenMode : TWEEN_FRAME, tweenInVar);
 				}
-				//
-				offX = offY = 0;
-				if (_display is Bitmap){
-					originalWidth = content.width;
-					originalHeight = content.height;
-				} else if (_display is Loader){
-					originalWidth = _display.contentLoaderInfo.width;
-					originalHeight = _display.contentLoaderInfo.height;
-				} else if (_display is Video){
-					//_display.videoWidth
-					//_display.videoHeight
-					originalWidth = _display.width / _display.scaleX;
-					originalHeight = _display.height / _display.scaleY;
-				} else if (_display is DisplayObject){
-					var _rect:Rectangle = _display.getRect(_display);
-					offX = _rect.x;
-					offY = _rect.y;
-					originalWidth = _display.width / _display.scaleX;
-					originalHeight = _display.height / _display.scaleY;
-				} else {
+				proxy.setContent(_display, alignXReady, alignYReady, scaleModeReady);
+				onProxyResizeHandler();
+			}
+		}
 
-				}
-				aspectRatio = originalWidth / originalHeight;
-				__alignX = alignXReady;
-				__alignY = alignYReady;
-				__scaleMode = scaleModeReady;
-				updateRect();
-				if (hasEventListener(Event.CHANGE)){
-					dispatchEvent(eventChange);
-				}
+		protected function onProxyResizeHandler(_e:Event = null):void {
+			if (useScroll){
+				scrollRectCopy.width = proxy.width;
+				scrollRectCopy.height = proxy.height;
+				container.scrollRect = scrollRectCopy;
+			} else if (useMask){
+				maskShape.x = proxy.x;
+				maskShape.y = proxy.y;
+				maskShape.width = proxy.width;
+				maskShape.height = proxy.height;
 			}
 		}
 	}

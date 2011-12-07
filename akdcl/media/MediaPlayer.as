@@ -282,9 +282,7 @@ package akdcl.media {
 			//加载显示对象
 			var _content:MediaProvider = _e.target as MediaProvider;
 			if ("displayContent" in _content && _content["displayContent"]) {
-				if (displayContent.indexOf(_content["displayContent"]) < 0) {
-					displayContent.push(_content["displayContent"]);
-				}
+				displayContent[0] = _content["displayContent"];
 				if (hasEventListener(MediaEvent.DISPLAY_CHANGE)){
 					dispatchEvent(new MediaEvent(MediaEvent.DISPLAY_CHANGE));
 				}

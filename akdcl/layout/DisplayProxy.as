@@ -48,7 +48,9 @@ package akdcl.layout {
 			}
 			__alignX = _value / (__width - scaleWidth);
 			__scrollX = _value;
-			updatePoint();
+			if (autoUpdate) {
+				updatePoint(true);
+			}
 		}
 
 		private var __scrollY:Number = 0;
@@ -82,7 +84,9 @@ package akdcl.layout {
 			}
 			__alignY = _value / (__height - scaleHeight);
 			__scrollY = _value;
-			updatePoint();
+			if (autoUpdate) {
+				updatePoint(true);
+			}
 		}
 
 		//alignX,alignY 0~1
@@ -98,7 +102,9 @@ package akdcl.layout {
 			}
 			__alignX = _value;
 			__scrollX = (__width - scaleWidth) * __alignX;
-			updatePoint();
+			if (autoUpdate) {
+				updatePoint(true);
+			}
 		}
 
 		private var __alignY:Number = 0;
@@ -113,7 +119,9 @@ package akdcl.layout {
 			}
 			__alignY = _value;
 			__scrollY = (__height - scaleHeight) * __alignY;
-			updatePoint();
+			if (autoUpdate) {
+				updatePoint(true);
+			}
 		}
 
 		//-1:outside,0:noscale,1:inside;
@@ -130,10 +138,12 @@ package akdcl.layout {
 				return;
 			}
 			__scaleMode = _value;
-			updateSize();
+			if (autoUpdate) {
+				updateSize(true);
+			}
 		}
 
-		public function DisplayProxy(_x:Number, _y:Number, _width:Number, _height:Number, _alignX:Number = 0.5, _alignY:Number = 0.5, _scaleMode:Number = 1):void {
+		public function DisplayProxy(_x:Number, _y:Number, _width:Number, _height:Number, _alignX:Number = 0, _alignY:Number = 0, _scaleMode:Number = 1):void {
 			__alignX = _alignX;
 			__alignY = _alignY;
 			__scaleMode = _scaleMode;
@@ -145,14 +155,15 @@ package akdcl.layout {
 			content = null;
 		}
 
-		override protected function updatePoint():void {
+		override protected function updatePoint(_dispathEvent:Boolean = true):void {
 			if (content){
 				content.x = __x + __scrollX;
 				content.y = __y + __scrollY;
 			}
+			super.updatePoint(_dispathEvent);
 		}
 
-		override protected function updateSize():void {
+		override protected function updateSize(_dispathEvent:Boolean = true):void {
 			var _scaleABS:Number = Math.abs(__scaleMode);
 			switch (_scaleABS){
 				case NaN:
@@ -210,7 +221,8 @@ package akdcl.layout {
 
 			__scrollX = (__width - scaleWidth) * __alignX;
 			__scrollY = (__height - scaleHeight) * __alignY;
-			updatePoint();
+			updatePoint(true);
+			super.updateSize(_dispathEvent);
 		}
 
 		public function setContent(_content:Object, _alignX:Number = 0.5, _alignY:Number = 0.5, _scaleMode:Number = 1):void {
@@ -230,7 +242,7 @@ package akdcl.layout {
 				originalHeight = 0;
 			}
 			aspectRatio = originalWidth / originalHeight;
-			updateSize();
+			updateSize(true);
 		}
 	}
 }
