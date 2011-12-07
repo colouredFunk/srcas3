@@ -23,11 +23,6 @@
 	 * ...
 	 * @author ...
 	 */
-
-	/// @eventType	flash.events.Event.CHANGE
-	[Event(name="change",type="flash.events.Event")]
-	/// @eventType	flash.events.Event.RESIZE
-	[Event(name="resize",type="flash.events.Event")]
 	public class DisplayRect extends UISprite {
 		protected static const TWEEN_FRAME:uint = 10;
 
