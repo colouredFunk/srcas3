@@ -55,10 +55,12 @@ package akdcl.media {
 		}
 
 		protected function onProgressHandler(_e:ProgressEvent):void {
-			if (_e){
+			if (_e is ProgressEvent){
 				loadProgress = _e.bytesLoaded / _e.bytesTotal;
-			} else {
-				loadProgress = 1;
+			} else if(_e is Number){
+				loadProgress = _e as Number;
+			}else {
+				loadProgress = 0;
 			}
 			if (isNaN(loadProgress)){
 				loadProgress = 0;
