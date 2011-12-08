@@ -58,7 +58,8 @@ package akdcl.media {
 			super.remove();
 		}
 
-		override protected function loadHandler():void {
+		override protected function loadHandler(_item:*):void {
+			super.loadHandler(_item);
 			removeContentListener();
 			playContent = sM.getSource(SourceManager.SOUND_GROUP, playItem.source);
 			if (playContent){
@@ -89,7 +90,7 @@ package akdcl.media {
 				}
 				pausePosition = 0;
 				channel = playContent.play(_startTime);
-				setChannelVolume(channel, volume);
+				setChannelVolume(channel, __volume);
 				channel.addEventListener(Event.SOUND_COMPLETE, onPlayCompleteHandler);
 			}
 		}

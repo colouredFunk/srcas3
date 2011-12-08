@@ -31,14 +31,12 @@ package akdcl.media {
 			playContent = null;
 			camera = null;
 		}
-
-		override public function load(_item:*):void {
-			super.load(null);
-
+		
+		override protected function loadHandler(_item:*):void {
+			//super.loadHandler(_item);
 			if (!camera){
 				setCameraMode();
 			}
-
 			if (camera){
 				camera.addEventListener(ActivityEvent.ACTIVITY, onCameraHandler);
 				camera.addEventListener(StatusEvent.STATUS, onCameraHandler);
@@ -51,24 +49,24 @@ package akdcl.media {
 				onLoadErrorHandler();
 			}
 		}
-
-		override public function play(_startTime:int = -1):void {
-			super.play(_startTime);
+		
+		override protected function playHandler(_startTime:int = -1):void 
+		{
 			if (camera && playContent){
 				playContent.attachCamera(camera);
 				playContent.smoothing = true;
 			}
 		}
-
-		override public function pause():void {
-			super.pause();
+		
+		override protected function pauseHandler():void 
+		{
 			if (playContent){
 				playContent.attachCamera(null);
 			}
 		}
-
-		override public function stop():void {
-			super.stop();
+		
+		override protected function stopHandler():void 
+		{
 			if (playContent){
 				playContent.attachCamera(null);
 				playContent.clear();

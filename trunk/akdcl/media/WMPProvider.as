@@ -236,8 +236,9 @@ package akdcl.media {
 				}
 			}
 		]]></script>
-		public static var isPlugin:Boolean = false;
+		private static var isPlugin:Boolean = false;
 		private var isPlayComplete:Boolean = false;
+		private var isLoadComplete:Boolean = false;
 
 		override public function get loadProgress():Number {
 			var _loadProgress:Number;
@@ -310,7 +311,8 @@ package akdcl.media {
 		}
 
 		override public function load(_item:*):void {
-			super.load(_item);
+			isLoadComplete = false;
+			loadHandler(_item);
 			if (isPlugin){
 				ExternalInterface.call("pwrd.wmpPlayer.openList", ExternalInterface.objectID, playItem.source);
 			}
@@ -325,26 +327,24 @@ package akdcl.media {
 				}
 				ExternalInterface.call("pwrd.wmpPlayer.setVolume", ExternalInterface.objectID, volume * 100);
 			}
-			super.play(_startTime);
 		}
 
 		override public function pause():void {
 			if (isPlugin){
 				ExternalInterface.call("pwrd.wmpPlayer.pause", ExternalInterface.objectID);
 			}
-			super.pause();
 		}
 
 		override public function stop():void {
 			if (isPlugin){
 				ExternalInterface.call("pwrd.wmpPlayer.stop", ExternalInterface.objectID);
 			}
-			super.stop();
 		}
 
 		override protected function onLoadProgressHandler(_evt:* = null):void {
 			super.onLoadProgressHandler(_evt);
-			if (loadProgress >= 1 && !(_evt === false)) {
+			if (loadProgress >= 1 && !isLoadComplete) {
+				isLoadComplete = true;
 				timer.removeEventListener(TimerEvent.TIMER, onLoadProgressHandler);
 				onLoadCompleteHandler();
 			}
@@ -378,8 +378,8 @@ package akdcl.media {
 					break;
 				case 3:
 					//播放
-					playContent = ExternalInterface.call("pwrd.wmpPlayer.getWMPInfo", ExternalInterface.objectID);
 					timer.addEventListener(TimerEvent.TIMER, onLoadProgressHandler);
+					playContent = ExternalInterface.call("pwrd.wmpPlayer.getWMPInfo", ExternalInterface.objectID);
 					setPlayState(PlayState.PLAY);
 					break;
 				case 4:
@@ -399,6 +399,7 @@ package akdcl.media {
 					break;
 				case 8:
 					//完毕
+					//完毕后windowsmediaplayer会触发stop事件，而此player不会在complete触发stop事件，故不在此设置playComplete事件
 					isPlayComplete = true;
 					break;
 				case 9:

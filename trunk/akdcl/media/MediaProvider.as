@@ -57,7 +57,11 @@
 			return 0;
 		}
 		public function set position(_position:uint):void {
-			play(Math.min(_position, totalTime));
+			if (_position == position) {
+				return;
+			}
+			__playState = PlayState.PAUSE;
+			play(_position);
 		}
 
 		public function get playProgress():Number {
@@ -76,13 +80,13 @@
 			return __playState == PlayState.PLAY;
 		}
 
-		private var __playState:String = PlayState.READY;
+		protected var __playState:String = PlayState.READY;
 		public function get playState():String {
 			return __playState;
 		}
 		
 		private var volumeLast:Number = 0;
-		private var __volume:Number = VOLUME_DEFAULT;
+		protected var __volume:Number = VOLUME_DEFAULT;
 		public function get volume():Number {
 			return __volume;
 		}
@@ -134,18 +138,12 @@
 		}
 
 		public function load(_item:*):void {
-			timer.reset();
-			timer.start();
-			if (_item is PlayItem) {
-				playItem = _item;
-			}else if(_item){
-				playItem = new PlayItem(_item);
-			}
-			setPlayState(PlayState.CONNECT, loadHandler);
+			setPlayState(PlayState.CONNECT, loadHandler, _item);
+			setPlayState(PlayState.WAIT);
 		}
 
 		public function play(_startTime:int = -1):void {
-			setPlayState(PlayState.PLAY, playHandler, _startTime);
+			setPlayState(PlayState.PLAY, playHandler, Math.min(_startTime, totalTime));
 		}
 
 		public function pause():void {
@@ -180,15 +178,22 @@
 				_callBack.apply(this, args);
 			}
 			//
-			onBufferProgressHandler();
-			onLoadProgressHandler();
-			onPlayProgressHander();
+			onBufferProgressHandler(bufferProgress);
+			onLoadProgressHandler(loadProgress);
+			onPlayProgressHander(playProgress);
 			if (hasEventListener(MediaEvent.STATE_CHANGE)) {
 				dispatchEvent(new MediaEvent(MediaEvent.STATE_CHANGE));	
 			}
 		}
 		
-		protected function loadHandler():void {
+		protected function loadHandler(_item:*):void {
+			timer.reset();
+			timer.start();
+			if (_item is PlayItem) {
+				playItem = _item;
+			}else if(_item){
+				playItem = new PlayItem(_item);
+			}
 		}
 		
 		protected function playHandler(_startTime:int = -1):void {
@@ -238,6 +243,7 @@
 			if (hasEventListener(MediaEvent.PLAY_COMPLETE)) {
 				dispatchEvent(new MediaEvent(MediaEvent.PLAY_COMPLETE));
 			}
+			timer.reset();
 		}
 	}
 
