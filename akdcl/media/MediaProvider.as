@@ -80,32 +80,6 @@
 		public function get playState():String {
 			return __playState;
 		}
-		protected function setPlayState(_playState:String):Boolean {
-			if (__playState == _playState){
-				return false;
-			}
-			onPlayProgressHander(false);
-			switch (_playState){
-				case PlayState.CONNECT:
-				case PlayState.WAIT:
-				case PlayState.RECONNECT:
-				case PlayState.PLAY:
-					onBufferProgressHandler(false);
-					onLoadProgressHandler(false);
-					timer.start();
-					timer.addEventListener(TimerEvent.TIMER, onPlayProgressHander);
-					break;
-				case PlayState.READY:
-				case PlayState.PAUSE:
-				case PlayState.STOP:
-				case PlayState.COMPLETE:
-					timer.removeEventListener(TimerEvent.TIMER, onPlayProgressHander);
-					break;
-			}
-			__playState = _playState;
-			dispatchEvent(new MediaEvent(MediaEvent.STATE_CHANGE));
-			return true;
-		}
 		
 		private var volumeLast:Number = 0;
 		private var __volume:Number = VOLUME_DEFAULT;
@@ -122,7 +96,9 @@
 				return;
 			}
 			__volume = _volume;
-			dispatchEvent(new MediaEvent(MediaEvent.VOLUME_CHANGE));
+			if (hasEventListener(MediaEvent.VOLUME_CHANGE)) {
+				dispatchEvent(new MediaEvent(MediaEvent.VOLUME_CHANGE));
+			}
 		}
 		
 		public function get mute():Boolean {
@@ -154,6 +130,7 @@
 			super.remove();
 			timer = null;
 			playContent = null;
+			playItem = null;
 		}
 
 		public function load(_item:*):void {
@@ -164,48 +141,93 @@
 			}else if(_item){
 				playItem = new PlayItem(_item);
 			}
+			setPlayState(PlayState.CONNECT, loadHandler);
 		}
 
 		public function play(_startTime:int = -1):void {
-			setPlayState(PlayState.PLAY);
+			setPlayState(PlayState.PLAY, playHandler, _startTime);
 		}
 
 		public function pause():void {
-			setPlayState(PlayState.PAUSE);
+			setPlayState(PlayState.PAUSE, pauseHandler);
 		}
 
 		public function stop():void {
-			setPlayState(PlayState.STOP);
+			setPlayState(PlayState.STOP, stopHandler);
+		}
+		
+		protected function setPlayState(_playState:String, _callBack:Function = null, ...args):void {
+			if (__playState==_playState) {
+				return;
+			}
+			switch (_playState){
+				case PlayState.CONNECT:
+				case PlayState.WAIT:
+				case PlayState.RECONNECT:
+				case PlayState.PLAY:
+					timer.start();
+					timer.addEventListener(TimerEvent.TIMER, onPlayProgressHander);
+					break;
+				case PlayState.READY:
+				case PlayState.PAUSE:
+				case PlayState.STOP:
+				case PlayState.COMPLETE:
+					timer.removeEventListener(TimerEvent.TIMER, onPlayProgressHander);
+					break;
+			}
+			__playState = _playState;
+			if (_callBack != null) {
+				_callBack.apply(this, args);
+			}
+			//
+			onBufferProgressHandler();
+			onLoadProgressHandler();
+			onPlayProgressHander();
+			if (hasEventListener(MediaEvent.STATE_CHANGE)) {
+				dispatchEvent(new MediaEvent(MediaEvent.STATE_CHANGE));	
+			}
+		}
+		
+		protected function loadHandler():void {
+		}
+		
+		protected function playHandler(_startTime:int = -1):void {
+		}
+		
+		protected function pauseHandler():void {
+		}
+		
+		protected function stopHandler():void {
 		}
 
 		//
 		protected function onLoadErrorHandler(_evt:* = null):void {
 			stop();
-			if (!(_evt === false)) {
+			if (hasEventListener(MediaEvent.LOAD_ERROR)) {
 				dispatchEvent(new MediaEvent(MediaEvent.LOAD_ERROR));
 			}
 		}
 
 		protected function onLoadProgressHandler(_evt:* = null):void {
-			if (!(_evt === false)) {
+			if (hasEventListener(MediaEvent.LOAD_PROGRESS)) {
 				dispatchEvent(new MediaEvent(MediaEvent.LOAD_PROGRESS));
 			}
 		}
 
 		protected function onLoadCompleteHandler(_evt:* = null):void {
-			if (!(_evt === false)) {
+			if (hasEventListener(MediaEvent.LOAD_COMPLETE)) {
 				dispatchEvent(new MediaEvent(MediaEvent.LOAD_COMPLETE));
 			}
 		}
 
 		protected function onPlayProgressHander(_evt:* = null):void {
-			if (!(_evt === false)) {
+			if (hasEventListener(MediaEvent.PLAY_PROGRESS)) {
 				dispatchEvent(new MediaEvent(MediaEvent.PLAY_PROGRESS));
 			}
 		}
 
 		protected function onBufferProgressHandler(_evt:* = null):void {
-			if (!(_evt === false)) {
+			if (hasEventListener(MediaEvent.BUFFER_PROGRESS)) {
 				dispatchEvent(new MediaEvent(MediaEvent.BUFFER_PROGRESS));
 			}
 		}
@@ -213,7 +235,7 @@
 		protected function onPlayCompleteHandler(_evt:* = null):void {
 			timer.stop();
 			setPlayState(PlayState.COMPLETE);
-			if (!(_evt === false)) {
+			if (hasEventListener(MediaEvent.PLAY_COMPLETE)) {
 				dispatchEvent(new MediaEvent(MediaEvent.PLAY_COMPLETE));
 			}
 		}

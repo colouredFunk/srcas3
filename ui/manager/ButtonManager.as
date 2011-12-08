@@ -238,7 +238,8 @@ package ui.manager {
 				if (args && args.length > 0) {
 					_method.apply(_button, args);
 				}else {
-					switch(_method.length) {
+					_method();
+					/*switch(_method.length) {
 						case 1:
 							_method.apply(_button,[_button]);
 							break;
@@ -246,7 +247,7 @@ package ui.manager {
 						default:
 							_method.call(_button);
 							break;
-					}
+					}*/
 				}
 				
 			}

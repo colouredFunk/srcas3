@@ -43,9 +43,9 @@ package akdcl.media {
 		}
 
 		override public function get position():uint {
-			return pausePosition?pausePosition:(channel ? channel.position : 0);
+			return pausePosition ? pausePosition : (channel ? channel.position : 0);
 		}
-		
+
 		override public function set volume(value:Number):void {
 			super.volume = value;
 			if (channel){
@@ -58,9 +58,7 @@ package akdcl.media {
 			super.remove();
 		}
 
-		override public function load(_item:*):void {
-			super.load(_item);
-			
+		override protected function loadHandler():void {
 			removeContentListener();
 			playContent = sM.getSource(SourceManager.SOUND_GROUP, playItem.source);
 			if (playContent){
@@ -80,13 +78,13 @@ package akdcl.media {
 			}
 		}
 
-		override public function play(_startTime:int = -1):void {
+		override protected function playHandler(_startTime:int = -1):void {
 			if (playContent){
 				removeChannel();
 				if (_startTime < 0 && pausePosition > 0){
 					_startTime = pausePosition;
 				}
-				if (_startTime<0) {
+				if (_startTime < 0){
 					_startTime = 0;
 				}
 				pausePosition = 0;
@@ -94,19 +92,16 @@ package akdcl.media {
 				setChannelVolume(channel, volume);
 				channel.addEventListener(Event.SOUND_COMPLETE, onPlayCompleteHandler);
 			}
-			super.play(_startTime);
 		}
 
-		override public function pause():void {
+		override protected function pauseHandler():void {
 			pausePosition = position;
 			removeChannel();
-			super.pause();
 		}
 
-		override public function stop():void {
+		override protected function stopHandler():void {
 			pausePosition = 0;
 			removeChannel();
-			super.stop();
 		}
 
 		override protected function onLoadErrorHandler(_evt:* = null):void {
@@ -117,14 +112,12 @@ package akdcl.media {
 		}
 
 		override protected function onLoadProgressHandler(_evt:* = null):void {
-			if (!(_evt === false)) {
-				if (bufferProgress < 1) {
-					isBuffering = true;
-					onBufferProgressHandler();
-				}else if(isBuffering){
-					isBuffering = false;
-					onBufferProgressHandler();
-				}
+			if (bufferProgress < 1){
+				isBuffering = true;
+				onBufferProgressHandler();
+			} else if (isBuffering){
+				isBuffering = false;
+				onBufferProgressHandler();
 			}
 			super.onLoadProgressHandler(_evt);
 		}

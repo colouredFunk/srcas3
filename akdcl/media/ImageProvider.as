@@ -5,7 +5,7 @@ package akdcl.media {
 	import flash.events.ProgressEvent;
 	import flash.events.TimerEvent;
 	import flash.geom.Rectangle;
-	
+
 	import akdcl.manager.RequestManager;
 
 	/**
@@ -16,19 +16,22 @@ package akdcl.media {
 	[Event(name="displayChange",type="akdcl.media.MediaEvent")]
 	final public class ImageProvider extends MediaProvider {
 		private static const DEFAULT_TOTAL_TIME:uint = 5000;
-		
+
 		protected static var rM:RequestManager = RequestManager.getInstance();
-		
+
 		public var displayContent:BitmapData;
 		private var __loadProgress:Number = 0;
+
 		override public function get loadProgress():Number {
 			return __loadProgress;
 		}
 
 		private var __totalTime:uint = DEFAULT_TOTAL_TIME;
+
 		override public function get totalTime():uint {
 			return __totalTime;
 		}
+
 		override public function get bufferProgress():Number {
 			return __loadProgress;
 		}
@@ -37,34 +40,32 @@ package akdcl.media {
 			return timer.currentCount * timer.delay;
 		}
 
-		override public function load(_item:*):void {
-			super.load(_item);
-			__loadProgress = 0;
-			timer.stop();
-			rM.loadDisplay(playItem.source, onLoadCompleteHandler, onLoadErrorHandler, onLoadProgressHandler);
-		}
 		override public function remove():void {
-			if (playItem) {
+			if (playItem){
 				rM.unloadDisplay(playItem.source, onLoadCompleteHandler, onLoadErrorHandler, onLoadProgressHandler);
 			}
 			super.remove();
 		}
 
-		override public function pause():void {
+		override protected function loadHandler():void {
+			__loadProgress = 0;
 			timer.stop();
-			super.pause();
+			rM.loadDisplay(playItem.source, onLoadCompleteHandler, onLoadErrorHandler, onLoadProgressHandler);
 		}
 
-		override public function stop():void {
+		override protected function pauseHandler():void {
+			timer.stop();
+		}
+
+		override protected function stopHandler():void {
 			timer.reset();
 			timer.stop();
-			super.stop();
 		}
-		
+
 		override protected function onLoadProgressHandler(_evt:* = null):void {
-			if (_evt) {
+			if (_evt){
 				__loadProgress = _evt.bytesLoaded / _evt.bytesTotal;
-			}else {
+			} else {
 				__loadProgress = 1;
 			}
 			if (isNaN(__loadProgress)){
@@ -82,18 +83,19 @@ package akdcl.media {
 		}
 
 		override protected function onPlayProgressHander(_evt:* = null):void {
-			if (loadProgress == 1){
-				if (position >= totalTime && !(_evt === false)) {
+			if (loadProgress == 1) {
+				if (position >= totalTime) {
 					onPlayCompleteHandler();
 				} else {
 					super.onPlayProgressHander(_evt);
 				}
 			} else {
+				//loadProgress为1以前，都不播放
 				timer.reset();
 				timer.stop();
 			}
 		}
-		
+
 		private function onDisplayChange():void {
 			//加载显示对象
 			displayContent = playContent;
