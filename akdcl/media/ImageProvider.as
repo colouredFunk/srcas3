@@ -1,10 +1,6 @@
 package akdcl.media {
 	import flash.display.BitmapData;
 	import flash.events.Event;
-	import flash.events.IOErrorEvent;
-	import flash.events.ProgressEvent;
-	import flash.events.TimerEvent;
-	import flash.geom.Rectangle;
 
 	import akdcl.manager.RequestManager;
 
@@ -47,7 +43,11 @@ package akdcl.media {
 			super.remove();
 		}
 
-		override protected function loadHandler():void {
+		override protected function loadHandler(_item:*):void {
+			if (playItem){
+				rM.unloadDisplay(playItem.source, onLoadCompleteHandler, onLoadErrorHandler, onLoadProgressHandler);
+			}
+			super.loadHandler(_item);
 			__loadProgress = 0;
 			timer.stop();
 			rM.loadDisplay(playItem.source, onLoadCompleteHandler, onLoadErrorHandler, onLoadProgressHandler);
@@ -63,10 +63,12 @@ package akdcl.media {
 		}
 
 		override protected function onLoadProgressHandler(_evt:* = null):void {
-			if (_evt){
+			if (_evt is Event){
 				__loadProgress = _evt.bytesLoaded / _evt.bytesTotal;
-			} else {
-				__loadProgress = 1;
+			} else if (_evt is Number) {
+				__loadProgress = _evt;
+			} else{
+				__loadProgress = 0;
 			}
 			if (isNaN(__loadProgress)){
 				__loadProgress = 0;
@@ -78,13 +80,15 @@ package akdcl.media {
 		override protected function onLoadCompleteHandler(_evt:* = null):void {
 			playContent = _evt;
 			onDisplayChange();
-			timer.start();
+			if (isPlaying) {
+				timer.start();
+			}
 			super.onLoadCompleteHandler(null);
 		}
 
 		override protected function onPlayProgressHander(_evt:* = null):void {
 			if (loadProgress == 1) {
-				if (position >= totalTime) {
+				if (position >= totalTime && __playState != PlayState.COMPLETE) {
 					onPlayCompleteHandler();
 				} else {
 					super.onPlayProgressHander(_evt);
