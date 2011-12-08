@@ -128,6 +128,7 @@ package akdcl.media {
 					player.playProgress = barPlayProgress.value * 0.999;
 				}
 			}
+			
 			if (loadProgressClip){
 				if (loadProgressClip.hasOwnProperty("maximum")){
 					loadProgressClip.maximum = 1;
@@ -136,6 +137,7 @@ package akdcl.media {
 					loadProgressClip.value = 0;
 				}
 			}
+			
 			player.addEventListener(MediaEvent.STATE_CHANGE, onStateChangeHandler);
 			player.addEventListener(MediaEvent.VOLUME_CHANGE, onVolumeChangeHandler);
 			player.addEventListener(MediaEvent.PLAY_PROGRESS, onPlayProgressHandler);
