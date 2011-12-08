@@ -22,5 +22,11 @@ package akdcl.utils{
 			"http://b43.photo.store.qq.com/psu?/4a564f59-c54b-43b7-8a66-dc1ddd092a94/xa96UglmaIjVYTg.Fr5tfi0Q30UlK687xlv*Vzb1u*U!/b/YTKcIRaxhAAAYlKnthnWMAAAby4k3BdOhAAA&a=37&b=43&o=40",
 			"http://b40.photo.store.qq.com/psu?/4a564f59-c54b-43b7-8a66-dc1ddd092a94/GOz0b7By1QNZ7wDYXWLXtRt99BMDo9PEQ3ziEqqQ9.Y!/b/Ya1H5ReJhgAAYhri7BdkhQAAb.cUshkyQwAA"
 		];
+		public static function getImage(_id:int = -1):String {
+			if (_id<0) {
+				_id = int(Math.random() * TEST_IMAGES.length);
+			}
+			return TEST_IMAGES[_id];
+		}
 	}
 }

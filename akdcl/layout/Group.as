@@ -6,7 +6,7 @@ package akdcl.layout {
 	 * @author akdcl
 	 */
 	public class Group extends Rect {
-		public static function createGroup(_xml:XML, _index:int):Object {
+		public static function createGroup(_xml:XML, _index:int = 0):Object {
 			var _rect:Object;
 			switch (_xml.localName()){
 				case "Group":
@@ -31,14 +31,14 @@ package akdcl.layout {
 			return _rect;
 		}
 
-		public static const GROUP:int = 0;
-		public static const HGROUP:int = 1;
-		public static const VGROUP:int = -1;
+		private static const GROUP:int = 0;
+		private static const HGROUP:int = 1;
+		private static const VGROUP:int = -1;
 
-		public static const GROUP_VALUES:Object = {Group: GROUP, HGroup: HGROUP, VGroup: VGROUP};
+		private static const GROUP_VALUES:Object = {Group: GROUP, HGroup: HGROUP, VGroup: VGROUP};
 
-		public var intervalH:Number = 0;
-		public var intervalV:Number = 0;
+		public var intervalH:Number = 10;
+		public var intervalV:Number = 10;
 		public var type:int;
 
 		private var children:Array;
@@ -72,7 +72,7 @@ package akdcl.layout {
 				} else {
 					_y = __y;
 				}
-				_child.setPoint(_x, _y);
+				_child.setPoint(_x, _y, false);
 				_prevChild = _child;
 			}
 			super.updatePoint(_dispathEvent);
@@ -81,10 +81,13 @@ package akdcl.layout {
 		override protected function updateSize(_dispathEvent:Boolean = true):void {
 			var _child:Rect;
 			var _value:Number;
-			var _percent:Number = 0;
-			var _averageCount:Number = 0;
 			var _width:Number;
 			var _height:Number;
+			var _percent:Number = 0;
+			var _averageCount:Number = 0;
+			var _childrenValue:Number = 0;
+			var _i:uint;
+			var _length:uint=children.length;
 
 			if (type == GROUP){
 				for each (_child in children){
@@ -102,7 +105,7 @@ package akdcl.layout {
 					} else {
 						_height = _child.__height;
 					}
-					_child.setSize(_width, _height);
+					_child.setSize(_width, _height,false);
 				}
 			} else if (type > GROUP){
 				_value = (children.length - 1) * intervalH;
@@ -122,8 +125,8 @@ package akdcl.layout {
 					_percent = 1;
 				}
 				_value = Math.max(0, __width - _value);
-				for each (_child in children){
-					_width = _value * (_child.isAverageWidth ? _averageCount : _child.percentWidth) / _percent;
+				for (_i = 0; _i < _length; _i++) {
+					_child = children[_i];
 					if (_child.isAverageHeight){
 						_height = __height;
 					} else if (_child.percentHeight){
@@ -131,7 +134,13 @@ package akdcl.layout {
 					} else {
 						_height = _child.__height;
 					}
-					_child.setSize(_width, _height);
+					if (_i == _length - 1) {
+						_width = __width - _childrenValue-(children.length - 1) * intervalH;
+					}else {
+						_width = _value * (_child.isAverageWidth ? _averageCount : _child.percentWidth) / _percent;
+					}
+					_child.setSize(_width, _height, false);
+					_childrenValue += _child.__width;
 				}
 			} else {
 				_value = (children.length - 1) * intervalV;
@@ -151,7 +160,8 @@ package akdcl.layout {
 					_percent = 1;
 				}
 				_value = Math.max(0, __height - _value);
-				for each (_child in children){
+				for (_i = 0; _i < _length; _i++) {
+					_child = children[_i];
 					if (_child.isAverageWidth){
 						_width = __width;
 					} else if (_child.percentWidth){
@@ -159,8 +169,13 @@ package akdcl.layout {
 					} else {
 						_width = _child.__width;
 					}
-					_height = _value * (_child.isAverageHeight ? _averageCount : _child.percentHeight) / _percent;
-					_child.setSize(_width, _height);
+					if (_i == _length - 1) {
+						_height = __height - _childrenValue-(children.length - 1) * intervalV;
+					}else {
+						_height = _value * (_child.isAverageHeight ? _averageCount : _child.percentHeight) / _percent;
+					}
+					_child.setSize(_width, _height, false);
+					_childrenValue += _child.__height;
 				}
 			}
 			updatePoint(_dispathEvent);
@@ -198,9 +213,7 @@ package akdcl.layout {
 
 		public function forEachChild(_fun:Function, ... args){
 			var _arr1:Array;
-			//= args.concat();
-			//_arr1.unshift(this);
-			//_fun.apply(this, _arr1);
+			
 			var _arrn:Array = args.concat();
 			_arrn.unshift(_fun);
 

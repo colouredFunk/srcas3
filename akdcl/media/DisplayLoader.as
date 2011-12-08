@@ -10,9 +10,9 @@ package akdcl.media {
 	 * ...
 	 * @author ...
 	 */
-	
+
 	/// @eventType	flash.events.Event.COMPLETE
-	[Event(name="complete", type="flash.events.Event")] 
+	[Event(name="complete",type="flash.events.Event")]
 
 	public class DisplayLoader extends DisplayRect {
 		protected static var rM:RequestManager = RequestManager.getInstance();
@@ -23,7 +23,7 @@ package akdcl.media {
 
 		protected var eventComplete:Event = new Event(Event.COMPLETE);
 
-		public function DisplayLoader(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = -1):void {
+		public function DisplayLoader(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = -1){
 			super(_rectWidth, _rectHeight, _bgColor);
 			label = null;
 			setProgressClip(false);
@@ -76,7 +76,7 @@ package akdcl.media {
 
 		override protected function showContent():void {
 			if (isHidding && loadProgress < 0){
-				
+
 			} else {
 				super.showContent();
 			}
