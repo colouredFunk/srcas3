@@ -63,6 +63,22 @@
 			return (content is BitmapData ? bitmap : content) as DisplayObject;
 		}
 
+		override public function get width():Number {
+			return proxy.width;
+		}
+
+		override public function set width(_value:Number):void {
+			proxy.width = _value;
+		}
+
+		override public function get height():Number {
+			return proxy.height;
+		}
+
+		override public function set height(_value:Number):void {
+			proxy.height = _value;
+		}
+
 		protected var tweenOutVar:Object;
 		protected var tweenInVar:Object;
 
@@ -73,7 +89,7 @@
 		protected var content:Object;
 		protected var contentReady:Object;
 		protected var maskShape:Shape;
-		
+
 		protected var useScroll:Boolean;
 		protected var useMask:Boolean;
 
@@ -86,15 +102,28 @@
 
 		protected var scrollRectCopy:Rectangle;
 
-		public function DisplayRect(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = 0):void {
-			if (!container){
+		public function DisplayRect(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = 0) {
+			if (container){
+				_rectWidth = _rectWidth || container.width;
+				_rectHeight = _rectHeight || container.height;
+			} else {
+				_rectWidth = _rectWidth || getWidth();
+				_rectHeight = _rectHeight || getHeight();
 				container = this;
 			}
-			proxy = new DisplayProxy(0, 0, _rectWidth || container.width, _rectHeight || container.height);
+			proxy = new DisplayProxy(0, 0, _rectWidth||2, _rectHeight||2);
 			if (_bgColor >= 0){
 				setUseScroll(true, _bgColor)
 			}
 			super();
+		}
+		
+		private function getWidth():Number {
+			return super.width;
+		}
+		
+		private function getHeight():Number {
+			return super.height;
 		}
 
 		override protected function init():void {
@@ -149,9 +178,9 @@
 			if (useScroll && !scrollRectCopy){
 				scrollRectCopy = new Rectangle(0, 0, 0, 0);
 			}
-			if (useScroll) {
+			if (useScroll){
 				container.mask = null;
-			}else {
+			} else {
 				container.scrollRect = null;
 			}
 			onProxyResizeHandler();

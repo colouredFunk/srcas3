@@ -179,12 +179,12 @@ package akdcl.layout {
 					scaleX = __width / originalWidth;
 
 					scaleWidth = __width;
-						//scaleHeight = originalHeight;
+					//scaleHeight = originalHeight;
 				} else {
 					scaleY = __height / originalHeight;
 
 					scaleHeight = __height;
-						//scaleWidth = originalWidth;
+					//scaleWidth = originalWidth;
 				}
 			} else {
 				var _scale:Number;
@@ -205,15 +205,12 @@ package akdcl.layout {
 				scaleHeight = originalHeight * scaleY;
 			}
 
-			if (content){
-				if ("scaleX" in content){
-					content["scaleX"] = scaleX;
-				} else {
+			if (content) {
+				if (content is Loader) {
+					content.scaleX = scaleX;
+					content.scaleY = scaleY;
+				}else {
 					content.width = scaleWidth;
-				}
-				if ("scaleY" in content){
-					content["scaleY"] = scaleY;
-				} else {
 					content.height = scaleHeight;
 				}
 			}
@@ -224,7 +221,7 @@ package akdcl.layout {
 			super.updateSize(_dispathEvent);
 		}
 
-		public function setContent(_content:Object, _alignX:Number = 0.5, _alignY:Number = 0.5, _scaleMode:Number = 1):void {
+		public function setContent(_content:Object, _alignX:Number = 0, _alignY:Number = 0, _scaleMode:Number = NaN):void {
 			__alignX = _alignX;
 			__alignY = _alignY;
 			__scaleMode = _scaleMode;

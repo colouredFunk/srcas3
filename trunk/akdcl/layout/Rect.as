@@ -35,7 +35,7 @@ package akdcl.layout {
 		}
 
 		public function set x(_value:Number):void {
-			if (__x == _value) {
+			if (__x == _value){
 				return;
 			}
 			__x = _value;
@@ -49,7 +49,7 @@ package akdcl.layout {
 		}
 
 		public function set y(_value:Number):void {
-			if (__y == _value) {
+			if (__y == _value){
 				return;
 			}
 			__y = _value;
@@ -63,7 +63,7 @@ package akdcl.layout {
 		}
 
 		public function set width(_value:Number):void {
-			if (__width == _value) {
+			if (__width == _value){
 				return;
 			}
 			__width = _value;
@@ -77,7 +77,7 @@ package akdcl.layout {
 		}
 
 		public function set height(_value:Number):void {
-			if (__height == _value) {
+			if (__height == _value){
 				return;
 			}
 			__height = _value;
@@ -106,22 +106,26 @@ package akdcl.layout {
 			super();
 		}
 
-		public function setPoint(_x:Number, _y:Number):void {
-			if (__x == _x && __y == _y) {
+		public function setPoint(_x:Number, _y:Number, _dispathEvent:Boolean = true):void {
+			if (__x == _x && __y == _y){
 				return;
 			}
-			__x = _x;
-			__y = _y;
-			updatePoint(true);
+			__x = Math.round(_x);
+			__y = Math.round(_y);
+			if (autoUpdate){
+				updatePoint(_dispathEvent);
+			}
 		}
 
-		public function setSize(_width:Number, _height:Number):void {
-			if (__width == _width && __height == _height) {
+		public function setSize(_width:Number, _height:Number, _dispathEvent:Boolean = true):void {
+			if (__width == _width && __height == _height){
 				return;
 			}
-			__width = _width;
-			__height = _height;
-			updateSize(true);
+			__width = Math.round(_width);
+			__height = Math.round(_height);
+			if (autoUpdate){
+				updateSize(_dispathEvent);
+			}
 		}
 
 		override public function remove():void {
@@ -142,8 +146,8 @@ package akdcl.layout {
 		}
 
 		public function update():void {
-			updatePoint();
-			updateSize();
+			updatePoint(true);
+			updateSize(true);
 		}
 
 		override public function toString():String {
