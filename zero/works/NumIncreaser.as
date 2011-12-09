@@ -78,7 +78,6 @@ package zero.works{
 				throw new Error("找不到 txt");
 			}
 			
-			txt.autoSize=TextFieldAutoSize.CENTER;
 			txt.text="";
 			
 			this.addEventListener(Event.ENTER_FRAME,init);
@@ -239,6 +238,7 @@ package zero.works{
 			
 			showNum(88888888);
 			if(this==root){
+				txt.autoSize=TextFieldAutoSize.CENTER;
 				var b:Rectangle=txt.getBounds(this);
 				txt.x+=(wid-b.width)/2-b.x;
 				txt.y+=(hei-b.height)/2-b.y;
@@ -279,7 +279,8 @@ package zero.works{
 			
 		}
 		private function selfInitServerDateComplete():void{
-			this.addEventListener(Event.ENTER_FRAME,enterFrame);
+			enterFrame(null);
+			//this.addEventListener(Event.ENTER_FRAME,enterFrame);
 		}
 		private function enterFrame(event:Event):void{
 			
