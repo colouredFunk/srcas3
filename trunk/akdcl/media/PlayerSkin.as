@@ -1,5 +1,6 @@
 package akdcl.media {
 	import akdcl.media.MediaEvent;
+	import akdcl.utils.setProgressClip;
 	import ui.SimpleBtn;
 	import akdcl.utils.copyInstanceToArray;
 
@@ -229,39 +230,11 @@ package akdcl.media {
 		}
 
 		protected function onLoadProgressHandler(_evt:MediaEvent):void {
-			if (loadProgressClip){
-				if (loadProgressClip.hasOwnProperty("text")){
-					loadProgressClip.text = Math.round(player.loadProgress * 100) + " %";
-				} else if (loadProgressClip.hasOwnProperty("value")){
-					loadProgressClip.value = player.loadProgress;
-				} else if (loadProgressClip.hasOwnProperty("play")){
-					if (player.loadProgress == 1){
-						loadProgressClip.stop();
-						loadProgressClip.visible = false;
-					} else {
-						loadProgressClip.play();
-						loadProgressClip.visible = true;
-					}
-				}
-			}
+			setProgressClip(loadProgressClip, player.loadProgress);
 		}
 
 		protected function onBufferProgressHandler(_evt:MediaEvent):void {
-			if (bufferProgressClip){
-				if (bufferProgressClip.hasOwnProperty("text")){
-					bufferProgressClip.text = Math.round(player.bufferProgress * 100) + " %";
-				} else if (bufferProgressClip.hasOwnProperty("value")){
-					bufferProgressClip.value = player.bufferProgress;
-				} else if (bufferProgressClip.hasOwnProperty("play")){
-					if (player.bufferProgress == 1){
-						bufferProgressClip.stop();
-						bufferProgressClip.visible = false;
-					} else {
-						bufferProgressClip.play();
-						bufferProgressClip.visible = true;
-					}
-				}
-			}
+			setProgressClip(bufferProgressClip, player.bufferProgress, true);
 		}
 		
 		protected function onLoadCompleteHandler(_evt:MediaEvent):void {
