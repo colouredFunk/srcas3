@@ -20,8 +20,8 @@ package zero.works{
 	public class ImgLoader extends Sprite{
 		private var xml:XML;
 		public var loader:Loader;
-		private var container:Sprite;
-		private var container2:Sprite;
+		public var container:Sprite;
+		public var container2:Sprite;
 		private var onLoadComplete:Function;
 		private var onLoadError:Function;
 		private var onFadeComplete:Function;
@@ -159,6 +159,13 @@ package zero.works{
 			}else{
 				container.alpha=0;
 				this.addEventListener(Event.ENTER_FRAME,showContainer_step);
+			}
+			
+			switch(xml.@align.toString()){
+				case "center":
+					loader.x=-loader.contentLoaderInfo.width/2;
+					loader.y=-loader.contentLoaderInfo.height/2;
+				break;
 			}
 			
 			if(xml.@smoothing.toString()=="true"){
