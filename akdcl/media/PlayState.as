@@ -5,6 +5,7 @@ package akdcl.media{
 	 * @author Akdcl
 	 */
 	public class PlayState {
+		public static const SEEK:String = "seek";
 		public static const PLAY:String = "play";
 		public static const PAUSE:String = "pause";
 		public static const STOP:String = "stop";
@@ -16,6 +17,7 @@ package akdcl.media{
 		public static const RECONNECT:String = "reconnect";
 		
 		private static const NAME_LIST:Object = { };
+		NAME_LIST[SEEK] = "搜索";
 		NAME_LIST[PLAY] = "播放";
 		NAME_LIST[PAUSE] = "暂停";
 		NAME_LIST[STOP] = "停止";

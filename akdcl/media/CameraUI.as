@@ -61,14 +61,11 @@ package akdcl.media {
 		}
 
 		protected function onCameraChangeHandler(_e:MediaEvent):void {
-			displayRect.autoUpdate = false;
-			displayRect.rectWidth = cameraP.playContent.width;
-			displayRect.rectHeight = cameraP.playContent.height;
+			displayRect.proxy.setSize(cameraP.displayContent.width, cameraP.displayContent.height, false);
 			
-			setDisplayWH(displayRect, CAMERA_WIDTH, CAMERA_HEIGHT, "rectWidth", "rectHeight");
+			setDisplayWH(displayRect.proxy, CAMERA_WIDTH, CAMERA_HEIGHT);
 			
-			displayRect.autoUpdate = true;
-			displayRect.setContent(cameraP.playContent, 0);
+			displayRect.setContent(cameraP.displayContent, 0);
 
 			var _alert:Alert = Alert.show("", "拍照|取消", onAlertHandler);
 			_alert.addItem(displayRect);
@@ -76,13 +73,13 @@ package akdcl.media {
 
 		protected function onAlertHandler(_b:Boolean):Boolean {
 			if (_b){
-				if (!data || data.width != cameraP.playContent.width || data.height != cameraP.playContent.height){
+				if (!data || data.width != cameraP.displayContent.width || data.height != cameraP.displayContent.height){
 					if (data){
 						data.dispose();
 					}
-					data = new BitmapData(cameraP.playContent.width / cameraP.playContent.scaleX, cameraP.playContent.height / cameraP.playContent.scaleY, false, 0);
+					data = new BitmapData(cameraP.displayContent.width / cameraP.displayContent.scaleX, cameraP.displayContent.height / cameraP.displayContent.scaleY, false, 0);
 				}
-				data.draw(cameraP.playContent);
+				data.draw(cameraP.displayContent);
 				if (hasEventListener(Event.COMPLETE)){
 					dispatchEvent(eventComplete);
 				}

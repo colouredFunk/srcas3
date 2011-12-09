@@ -32,8 +32,7 @@ package akdcl.media {
 			camera = null;
 		}
 		
-		override protected function loadHandler(_item:*):void {
-			//super.loadHandler(_item);
+		override protected function loadHandler():void {
 			if (!camera){
 				setCameraMode();
 			}

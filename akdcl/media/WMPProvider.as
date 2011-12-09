@@ -237,6 +237,9 @@ package akdcl.media {
 			}
 		]]></script>
 		private static var isPlugin:Boolean = false;
+
+		public var name:String = "wmpProvider";
+		
 		private var isPlayComplete:Boolean = false;
 		private var isLoadComplete:Boolean = false;
 
@@ -311,8 +314,13 @@ package akdcl.media {
 		}
 
 		override public function load(_item:*):void {
+			stop();
+			if (_item is PlayItem){
+				playItem = _item;
+			} else if (_item){
+				playItem = new PlayItem(_item);
+			}
 			isLoadComplete = false;
-			loadHandler(_item);
 			if (isPlugin){
 				ExternalInterface.call("pwrd.wmpPlayer.openList", ExternalInterface.objectID, playItem.source);
 			}
@@ -342,11 +350,12 @@ package akdcl.media {
 		}
 
 		override protected function onLoadProgressHandler(_evt:* = null):void {
-			super.onLoadProgressHandler(_evt);
 			if (loadProgress >= 1 && !isLoadComplete) {
 				isLoadComplete = true;
 				timer.removeEventListener(TimerEvent.TIMER, onLoadProgressHandler);
 				onLoadCompleteHandler();
+			}else {
+				super.onLoadProgressHandler(_evt);
 			}
 		}
 

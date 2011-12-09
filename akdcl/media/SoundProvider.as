@@ -26,6 +26,8 @@ package akdcl.media {
 			_channel.soundTransform = _soundTransform;
 		}
 
+		public var name:String = "soundProvider";
+		
 		private var channel:SoundChannel;
 		private var pausePosition:uint = 0;
 		private var isBuffering:Boolean = false;
@@ -58,8 +60,7 @@ package akdcl.media {
 			super.remove();
 		}
 
-		override protected function loadHandler(_item:*):void {
-			super.loadHandler(_item);
+		override protected function loadHandler():void {
 			removeContentListener();
 			playContent = sM.getSource(SourceManager.SOUND_GROUP, playItem.source);
 			if (playContent){
@@ -71,11 +72,16 @@ package akdcl.media {
 				playContent.load(REQUEST);
 			}
 			if (loadProgress >= 1){
-				//playContent已经加载完毕
-				onLoadCompleteHandler();
+				//playContent已经加载完毕，在waitHandler中调用onLoadCompleteHandler;
 			} else {
 				playContent.addEventListener(ProgressEvent.PROGRESS, onLoadProgressHandler);
 				playContent.addEventListener(Event.COMPLETE, onLoadCompleteHandler);
+			}
+		}
+		
+		override protected function waitHandler():void {
+			if (loadProgress >= 1 && !playContent.hasEventListener(Event.COMPLETE)) {
+				onLoadCompleteHandler();
 			}
 		}
 

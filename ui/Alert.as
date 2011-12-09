@@ -1,14 +1,16 @@
 ﻿package ui{
-	import akdcl.utils.replaceString;
 	import flash.display.DisplayObject;
 	import flash.display.Loader;
 	import flash.display.Sprite;
+	import flash.events.MouseEvent;
 	import flash.system.System;
 	import flash.text.TextField;
 	
 	import flash.geom.Point;
 	import flash.events.Event;
 	import flash.text.TextFieldAutoSize;
+	
+	import akdcl.utils.replaceString;
 	
 	//import flash.utils.ByteArray;
 	//import flash.display.LoaderInfo;
@@ -399,11 +401,12 @@
 					default:
 						_btn.userData.btnFlag = _id;
 				}
-				_btn.release=onBtnReleaseHandler;
+				_btn.addEventListener(MouseEvent.CLICK, onBtnReleaseHandler);
 			}
 		}
 		
-		protected function onBtnReleaseHandler(_btn:*):void {
+		protected function onBtnReleaseHandler(_e:MouseEvent):void {
+			var _btn:*= _e.target;
 			if (txtText.selectedText) {
 				System.setClipboard(txtText.selectedText);
 			}
