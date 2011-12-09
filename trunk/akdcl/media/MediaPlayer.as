@@ -15,6 +15,8 @@ package akdcl.media {
 	[Event(name="displayChange",type="akdcl.media.MediaEvent")]
 
 	public class MediaPlayer extends MediaProvider {
+		public var name:String = "mediaPlayer";
+		
 		public var displayContent:Array;
 		public var onDisplayChange:Function;
 
@@ -135,9 +137,17 @@ package akdcl.media {
 			videoPD = null;
 			wmpPD = null;
 			pageID = null;
+			
+			displayContent = null;
+			providers = null;
+			onDisplayChange = null;
+			
 		}
 
 		private function onPlayIDChangeHandler(_id:uint):void {
+			if (!playlist) {
+				return;
+			}
 			var _content:MediaProvider;
 			for each (_content in playContent){
 				_content.removeEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
@@ -199,7 +209,6 @@ package akdcl.media {
 		}
 
 		override public function load(_item:*):void {
-			super.load(null);
 			playlist = _item;
 		}
 
@@ -242,7 +251,7 @@ package akdcl.media {
 				super.onLoadErrorHandler(_evt);
 			} else {
 				//根据repeat的值执行下一步
-				onPlayCompleteHandler(false);
+				onPlayCompleteHandler();
 			}
 		}
 

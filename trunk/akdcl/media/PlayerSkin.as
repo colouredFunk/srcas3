@@ -45,6 +45,7 @@ package akdcl.media {
 		public var txtPlayProgress:*;
 		public var loadProgressClip:*;
 		public var bufferProgressClip:*;
+		
 		protected var player:MediaProvider;
 
 		override protected function onRemoveToStageHandler():void {
@@ -53,14 +54,8 @@ package akdcl.media {
 		}
 
 		public function setPlayer(_player:MediaProvider):void {
+			removePlayerEvent();
 			if (!_player){
-				if (player){
-					player.removeEventListener(MediaEvent.STATE_CHANGE, onStateChangeHandler);
-					player.removeEventListener(MediaEvent.VOLUME_CHANGE, onVolumeChangeHandler);
-					player.removeEventListener(MediaEvent.PLAY_PROGRESS, onPlayProgressHandler);
-					player.removeEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
-					player.removeEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
-				}
 				player = null;
 				return;
 			}
@@ -137,13 +132,30 @@ package akdcl.media {
 					loadProgressClip.value = 0;
 				}
 			}
-			
-			player.addEventListener(MediaEvent.STATE_CHANGE, onStateChangeHandler);
-			player.addEventListener(MediaEvent.VOLUME_CHANGE, onVolumeChangeHandler);
-			player.addEventListener(MediaEvent.PLAY_PROGRESS, onPlayProgressHandler);
-			player.addEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
-			player.addEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
+			addPlayerEvent();
 			onStateChangeHandler(null);
+		}
+		
+		protected function addPlayerEvent():void {
+			if (player){
+				player.addEventListener(MediaEvent.STATE_CHANGE, onStateChangeHandler);
+				player.addEventListener(MediaEvent.VOLUME_CHANGE, onVolumeChangeHandler);
+				player.addEventListener(MediaEvent.PLAY_PROGRESS, onPlayProgressHandler);
+				player.addEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
+				player.addEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
+				player.addEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
+			}
+		}
+		
+		protected function removePlayerEvent():void {
+			if (player){
+				player.removeEventListener(MediaEvent.STATE_CHANGE, onStateChangeHandler);
+				player.removeEventListener(MediaEvent.VOLUME_CHANGE, onVolumeChangeHandler);
+				player.removeEventListener(MediaEvent.PLAY_PROGRESS, onPlayProgressHandler);
+				player.removeEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
+				player.removeEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
+				player.removeEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
+			}
 		}
 
 		protected function playOrPause():void {
@@ -186,6 +198,9 @@ package akdcl.media {
 			if (btnStop){
 				btnStop.selected = player.playState == PlayState.STOP;
 			}
+			onLoadProgressHandler(null);
+			onBufferProgressHandler(null);
+			onPlayProgressHandler(null);
 		}
 
 		protected function onVolumeChangeHandler(_evt:MediaEvent):void {
@@ -206,6 +221,9 @@ package akdcl.media {
 
 		protected function onPlayProgressHandler(_evt:MediaEvent):void {
 			if (barPlayProgress && !barPlayProgress.isHold){
+				if (!_evt) {
+					barPlayProgress.value = 1;
+				}
 				barPlayProgress.value = player.playProgress;
 			}
 		}
@@ -244,6 +262,12 @@ package akdcl.media {
 					}
 				}
 			}
+		}
+		
+		protected function onLoadCompleteHandler(_evt:MediaEvent):void {
+			onLoadProgressHandler(null);
+			onBufferProgressHandler(null);
+			onPlayProgressHandler(null);
 		}
 	}
 

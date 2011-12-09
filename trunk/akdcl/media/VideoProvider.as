@@ -2,7 +2,7 @@ package akdcl.media {
 
 	import flash.display.DisplayObject;
 	import flash.geom.Rectangle;
-	
+
 	import com.greensock.loading.VideoLoader;
 	import com.greensock.events.LoaderEvent;
 	import com.greensock.layout.ScaleMode;
@@ -20,9 +20,11 @@ package akdcl.media {
 		private static const VIDEOLOADER_GROUP:String = "VideoLoader";
 
 		private static var sM:SourceManager = SourceManager.getInstance();
-		
+
+		public var name:String = "videoProvider";
+
 		public var displayContent:DisplayObject;
-		
+
 		private var isBuffering:Boolean = false;
 
 		override public function get loadProgress():Number {
@@ -34,13 +36,16 @@ package akdcl.media {
 		}
 
 		override public function get bufferProgress():Number {
+			if (loadProgress >= 1){
+				return 1;
+			}
 			return playContent ? playContent.bufferProgress : 0;
 		}
 
 		override public function get position():uint {
 			return playContent ? (playContent.videoTime * 1000) : 0;
 		}
-		
+
 		override public function set volume(value:Number):void {
 			super.volume = value;
 			if (playContent){
@@ -53,8 +58,7 @@ package akdcl.media {
 			super.remove();
 		}
 
-		override public function load(_item:*):void {
-			super.load(_item);
+		override protected function loadHandler():void {
 			removeContentListener();
 			playContent = sM.getSource(VIDEOLOADER_GROUP, playItem.source);
 			if (playContent){
@@ -73,9 +77,7 @@ package akdcl.media {
 				playContent.load();
 			}
 			if (loadProgress >= 1){
-				onDisplayChange();
-				//playContent已经加载完毕
-				onLoadCompleteHandler();
+				//playContent已经加载完毕，在waitHandler中调用onLoadCompleteHandler;
 			} else {
 				playContent.addEventListener(LoaderEvent.PROGRESS, onLoadProgressHandler);
 				playContent.addEventListener(LoaderEvent.COMPLETE, onLoadCompleteHandler);
@@ -83,8 +85,15 @@ package akdcl.media {
 			}
 			playContent.addEventListener(VideoLoader.VIDEO_COMPLETE, onPlayCompleteHandler);
 		}
-		
-		override public function play(_startTime:int = -1):void {
+
+		override protected function waitHandler():void {
+			if (loadProgress >= 1){
+				onDisplayChange();
+				onLoadCompleteHandler();
+			}
+		}
+
+		override protected function playHandler(_startTime:int = -1):void {
 			if (playContent){
 				if (_startTime < 0){
 					playContent.playVideo();
@@ -94,22 +103,19 @@ package akdcl.media {
 				}
 				playContent.volume = volume;
 			}
-			super.play(_startTime);
 		}
 
-		override public function pause():void {
+		override protected function pauseHandler():void {
 			if (playContent){
 				playContent.pauseVideo();
 			}
-			super.pause();
 		}
 
-		override public function stop():void {
+		override protected function stopHandler():void {
 			if (playContent){
 				playContent.pauseVideo();
 				playContent.videoTime = 0;
 			}
-			super.stop();
 		}
 
 		override protected function onLoadErrorHandler(_evt:* = null):void {
@@ -121,11 +127,11 @@ package akdcl.media {
 		}
 
 		override protected function onLoadProgressHandler(_evt:* = null):void {
-			if (!(_evt === false)) {
-				if (bufferProgress < 1) {
+			if (!(_evt === false)){
+				if (bufferProgress < 1){
 					isBuffering = true;
 					onBufferProgressHandler();
-				}else if(isBuffering){
+				} else if (isBuffering){
 					isBuffering = false;
 					onBufferProgressHandler();
 				}
@@ -154,7 +160,7 @@ package akdcl.media {
 			//
 			onDisplayChange();
 		}
-		
+
 		private function onDisplayChange():void {
 			//加载显示对象
 			displayContent = playContent.content;
