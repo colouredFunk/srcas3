@@ -143,10 +143,10 @@
 			content.alpha = 0;
 			contextMenu = createMenu(this);
 		}
-		override protected function onRemoveToStageHandler():void {
+		override protected function onRemoveHandler():void {
 			TweenMax.killChildTweensOf(this);
 			TweenMax.killTweensOf(content);
-			super.onRemoveToStageHandler();
+			super.onRemoveHandler();
 			if (container != this && container.contains(content)) {
 				container.removeChild(content);
 			}

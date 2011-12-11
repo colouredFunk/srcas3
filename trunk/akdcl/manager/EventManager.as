@@ -41,7 +41,7 @@ package akdcl.manager {
 			if (_listeners == null) {
 				_listeners = targetMap[_target][_type] = new Dictionary();
 			}
-			lM.info(_target, "addEvent(type:{0})", null, _type);
+			//lM.info(_target, "addEvent(type:{0})", null, _type);
 			_listeners[_listener] = _listener;
 		}
 

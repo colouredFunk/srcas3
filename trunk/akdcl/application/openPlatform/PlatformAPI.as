@@ -5,7 +5,7 @@ package akdcl.application.openPlatform {
 	import flash.media.StageWebView;
 	import flash.net.SharedObject;
 	
-	import ui.UIEventDispatcher;
+	import akdcl.events.UIEventDispatcher;
 
 	/**
 	 * ...
@@ -44,7 +44,7 @@ package akdcl.application.openPlatform {
 			webView = new StageWebView();
 			webView.viewPort = _viewPort||new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
 			webView.addEventListener(Event.LOCATION_CHANGE, onWebViewLocationChangeHandler);
-
+			super();
 		}
 
 		public function setAccessToken(_key:String, _secret:String):void {
