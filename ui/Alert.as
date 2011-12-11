@@ -1,5 +1,6 @@
 ﻿package ui{
 	import flash.display.DisplayObject;
+	import flash.display.DisplayObjectContainer;
 	import flash.display.Loader;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
@@ -11,6 +12,9 @@
 	import flash.text.TextFieldAutoSize;
 	
 	import akdcl.utils.replaceString;
+	import akdcl.display.UISprite;
+	
+	import com.greensock.TweenMax;
 	
 	//import flash.utils.ByteArray;
 	//import flash.display.LoaderInfo;
@@ -22,13 +26,11 @@
 		public static const A_ALERT:String = "alert";
 		public static const A_LABEL:String = "label";
 		
-		public static var alertLayer:*;
+		public static var alertLayer:DisplayObjectContainer;
 		public static var AlertClass:Class = Alert;
 		public static var alertPoint:Point;
-		//private static var dataClassAlert:ByteArray;
-		//private static var delayCallBack:Function;
-		//private static var delayCallBackParams:Array;
-		public static function init(_layer:*= null, _Class:Class = null):void {
+		
+		public static function init(_layer:DisplayObjectContainer= null, _Class:Class = null):void {
 			alertLayer = _layer;
 			if (_Class) {
 				AlertClass = _Class;
@@ -143,14 +145,6 @@
 			moveToCenter();
 			setStyle();
 		}
-		//
-		public function get autoSize():String {
-			return "";
-		}
-		public function set autoSize(_autoSize:String):void {
-			"";
-		}
-		//
 		public function get text():String{
 			return txtText.text;
 		}
@@ -159,12 +153,12 @@
 			var _loader:Loader = txtText.getImageReference("msg") as Loader;
 			if (_loader) {
 				txtText.filters = null;
-				_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, autoStyle);
+				_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onImageLoadedHandler);
 			}
 			barHeight = 0;
 		}
 		
-		protected function autoStyle(...args):void {
+		protected function onImageLoadedHandler(_e:Event):void {
 			if (txtText.width + widthAddText > barWidth) {
 				barWidth = txtText.width + widthAddText;
 			}
@@ -289,8 +283,9 @@
 			moveToCenter();
 			setStyle();
 		}
-		override protected function onRemoveToStageHandler():void {
-			super.onRemoveToStageHandler();
+		override protected function onRemoveHandler():void 
+		{
+			super.onRemoveHandler();
 			
 			btnList = null;
 			callBack = null;
@@ -371,11 +366,12 @@
 			if (isWinking) {
 				return;
 			}
-			//isWinking = true;
-			//TweenMax.to(bar, 0.1, { colorMatrixFilter: { contrast:1.5, brightness:1.5 }, yoyo:true, repeat:3 ,ease:Cubic.easeInOut, onComplete:onWinkBarEndHandle } );
+			isWinking = true;
+			//,ease:Cubic.easeInOut
+			TweenMax.to(bar, 0.1, { colorMatrixFilter: { contrast:1.5, brightness:1.5 }, yoyo:true, repeat:3 , onComplete:onWinkBarEndHandle } );
 		}
 		protected function onWinkBarEndHandle():void {
-			//isWinking = false;
+			isWinking = false;
 		}
 		protected function setBtn(_btn:*, _id:uint, ...args):void {
 			

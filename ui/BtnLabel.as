@@ -1,10 +1,12 @@
 ﻿package ui{
-	import akdcl.events.InteractionEvent;
 	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.text.StyleSheet;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
+	
+	import akdcl.events.UIEvent;
+	
 	public class BtnLabel extends Btn {
 		public var txt:*;
 		public var bar:*;
@@ -51,23 +53,23 @@
 			}
 		}
 		override protected function init():void {
+			super.init();
 			if (bar) {
 				xOff = int(bar.x - txt.x);
 				yOff = int(bar.y - txt.y);
 			}
 			widthAdd = -xOff * 2;
 			heightAdd = -yOff * 2;
-			super.init();
-			addEventListener(InteractionEvent.UPDATE_STYLE, onUpdateStyle);
+			addEventListener(UIEvent.UPDATE_STYLE, onUpdateStyle);
 		}
-		override protected function onRemoveToStageHandler():void {
-			super.onRemoveToStageHandler();
+		override protected function onRemoveHandler():void {
+			super.onRemoveHandler();
 			txt = null;
 			bar = null;
 			endClip = null;
 		}
 
-		protected function onUpdateStyle(_e:InteractionEvent = null):void {
+		protected function onUpdateStyle(_e:UIEvent = null):void {
 			if (totalFrames > 8 || !bar) {
 				if (txt && !(txt is TextField)) {
 					if (txt.autoSize == TextFieldAutoSize.RIGHT) {

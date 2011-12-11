@@ -15,8 +15,8 @@ package ui {
 		public var rotThumb:Boolean;
 
 		override protected function init():void {
-			radius = thumb.x;
 			super.init();
+			radius = thumb.x;
 		}
 
 		override protected function formatValue(_value:Number):Number {

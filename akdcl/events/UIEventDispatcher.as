@@ -1,6 +1,8 @@
-package ui {
-	import flash.events.EventDispatcher;
+package akdcl.events {
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
+	
+	import akdcl.interfaces.IBaseObject;
 
 	import akdcl.manager.LoggerManager;
 	import akdcl.manager.EventManager;
@@ -9,23 +11,37 @@ package ui {
 	 * ...
 	 * @author Akdcl
 	 */
-	public class UIEventDispatcher extends EventDispatcher {
+	public class UIEventDispatcher extends EventDispatcher implements IBaseObject {
 		protected static const lM:LoggerManager = LoggerManager.getInstance();
 		protected static const evtM:EventManager = EventManager.getInstance();
+		
+		public var name:String;
 		public var userData:Object;
+		
+		private var removed:Boolean;
 
-		public function UIEventDispatcher(){
+		public function UIEventDispatcher() {
+			super();
 			init();
-		}
-
-		public function remove():void {
-			lM.info(this, "remove");
-			evtM.removeTargetEvents(this);
-			userData = null;
 		}
 
 		protected function init():void {
 			lM.info(this, "init");
+		}
+		
+		public function remove():void {
+			if (removed) {
+				return;
+			}
+			removed = true;
+			onRemoveHandler();
+		}
+		
+		protected function onRemoveHandler():void {
+			lM.info(this, "remove");
+			evtM.removeTargetEvents(this);
+			userData = null;
+			name = null;
 		}
 
 		override public function addEventListener(_type:String, _listener:Function, _useCapture:Boolean = false, _priority:int = 0, _useWeakReference:Boolean = false):void {
@@ -38,5 +54,4 @@ package ui {
 			evtM.removeEvent(_type, _listener, this);
 		}
 	}
-
 }

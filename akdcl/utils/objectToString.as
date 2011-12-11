@@ -1,5 +1,6 @@
 ﻿package akdcl.utils {
 	import flash.net.URLRequest;
+	import flash.net.URLVariables;
 	import flash.utils.Dictionary;
 	import com.adobe.serialization.json.JSON;
 	
@@ -8,15 +9,17 @@
 	 * ...
 	 * @author Akdcl
 	 */
-	public function traceObject(...args):String {
+	public function objectToString(...args):String {
 		var _str:String = "";
 		
+		var _eachStr:String;
+		var _obj:*= args[_i];
 		for (var _i:uint; _i < args.length; _i++ ) {
-			var _eachStr:String;
-			var _obj:*= args[_i];
+			_obj = args[_i];
 			switch(_obj?_obj["constructor"]:_obj) {
 				case Object:
 				case URLRequest:
+				case URLVariables:
 				case Dictionary:
 				case Array:
 					_eachStr = replaceString(com.adobe.serialization.json.JSON.encode(_obj),",{",",\n{");
@@ -30,9 +33,6 @@
 					break;
 			}
 			_str += _eachStr;
-		}
-		if (args[_i - 1] === true) {
-			trace(_str);
 		}
 		return _str;
 	}

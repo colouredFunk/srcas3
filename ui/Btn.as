@@ -2,11 +2,11 @@
 	import flash.events.Event;
 	import flash.external.ExternalInterface;
 
+	import akdcl.manager.ButtonManager;
 	import akdcl.net.gotoURL;
-	import akdcl.events.InteractionEvent;
-
-	import ui.UIMovieClip;
-	import ui.manager.ButtonManager;
+	
+	import akdcl.events.UIEvent;
+	import akdcl.display.UIMovieClip;
 
 	/**
 	 * ...
@@ -14,6 +14,7 @@
 	 */
 	public class Btn extends UIMovieClip {
 		private static const bM:ButtonManager = ButtonManager.getInstance();
+		
 		public var rollOver:Function;
 		public var rollOut:Function;
 		public var press:Function;
@@ -21,20 +22,27 @@
 		public var select:Function;
 
 		public var area:*;
-		public var href:*;
 		public var hrefTarget:String = "_blank";
 		public var eEval:String;
-
-		public function set hrefXML(_hrefXML:XML):void {
-			href = _hrefXML;
+		
+		private var __href:Object;
+		public function get href():Object 
+		{
+			return __href;
+		}
+		public function set href(_value:Object):void {
+			__href = _value;
+			if (__href) {
+				addEventListener(UIEvent.RELEASE, onReleaseHandler);
+			}else {
+				removeEventListener(UIEvent.RELEASE, onReleaseHandler);
+			}
 		}
 
 		private var __group:String;
-
 		public function get group():String {
 			return __group;
 		}
-
 		public function set group(_group:String):void {
 			if (__group && _group == __group){
 				return;
@@ -49,11 +57,9 @@
 		}
 
 		private var __selected:Boolean;
-
 		public function get selected():Boolean {
 			return __selected;
 		}
-
 		public function set selected(_selected:Boolean):void {
 			if (__selected == _selected){
 				return;
@@ -76,21 +82,19 @@
 		}
 
 		override public function set enabled(_enabled:Boolean):void {
-			super.enabled = _enabled;
-			buttonMode = _enabled;
+			__enabled = _enabled;
+			buttonMode = mouseEnabled = __enabled;
 		}
 
 		override protected function init():void {
 			super.init();
+			buttonMode = true;
 			stop();
 		}
 
 		override protected function onAddedToStageHandler(_evt:Event):void {
 			super.onAddedToStageHandler(_evt);
-			if (enabled){
-				buttonMode = true;
-				bM.addButton(this);
-			}
+			bM.addButton(this);
 			if (area){
 				var _length:uint = area.numChildren;
 				for (var _i:uint; _i < _length; _i++){
@@ -98,29 +102,29 @@
 				}
 				hitArea = area;
 			}
-			addEventListener(InteractionEvent.RELEASE, onReleaseHandler);
-
 		}
-
-		override protected function onRemoveToStageHandler():void {
+		
+		override protected function onRemoveHandler():void 
+		{
+			super.onRemoveHandler();
 			group = null;
-			enabled = false;
-			super.onRemoveToStageHandler();
-
+			bM.removeButton(this);
+			
 			rollOver = null;
 			rollOut = null;
 			press = null;
 			release = null;
+			select = null;
 
 			eEval = null;
-			href = null;
 			hrefTarget = null;
 			area = null;
+			__href = null;
 		}
 
-		protected function onReleaseHandler(_e:InteractionEvent):void {
-			if (href){
-				gotoURL(href, hrefTarget);
+		private function onReleaseHandler(_e:UIEvent):void {
+			if (__href){
+				gotoURL(__href, hrefTarget);
 			} else if (eEval){
 				ExternalInterface.call("eval", eEval);
 			}

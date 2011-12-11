@@ -11,10 +11,9 @@ package akdcl.net.action {
 	import fl.controls.Label;
 
 	import akdcl.manager.RequestManager;
+	import akdcl.events.UIEventDispatcher;
 	import akdcl.utils.stringToBoolean;
 	import akdcl.utils.replaceString;
-
-	import ui.UIEventDispatcher;
 
 	/**
 	 * ...
@@ -58,8 +57,6 @@ package akdcl.net.action {
 		public static const ERROR_REG:String = "errorREG";
 		public static const ERROR_UNINPUT_CUSTOM:String = "errorUndataCustom";
 
-		private static const OFFY_LABEL:uint = 2;
-
 		//√×✔✘☜☞
 		public static var TIP_ERROR_UNSELECTED:String = "×请选择${" + RemoteAction.A_LABEL + "}";
 		public static var TIP_ERROR_UNINPUT:String = "×请输入${" + RemoteAction.A_LABEL + "}";
@@ -74,7 +71,9 @@ package akdcl.net.action {
 		public static var TIP_REQUIRED_COMPLETE:String = "√";
 		public static var TIP_REQUIRED:String = "*";
 		
-		protected static var rM:RequestManager = RequestManager.getInstance();
+		protected static const rM:RequestManager = RequestManager.getInstance();
+
+		private static const OFFY_LABEL:uint = 2;
 		
 		protected static function testStringReg(_str:String, _regStr:String):Boolean {
 			if (_regStr) {
@@ -95,7 +94,6 @@ package akdcl.net.action {
 		public var height:uint;
 		public var followLabelToBottom:Boolean = false;
 		
-		public var name:String;
 		public var required:Boolean;
 		
 		protected var __data:*;
@@ -130,9 +128,10 @@ package akdcl.net.action {
 			super();
 		}
 		
-		override public function remove():void {
+		override protected function onRemoveHandler():void 
+		{
+			super.onRemoveHandler();
 			clear();
-			super.remove();
 			options = null;
 			formAction = null;
 			container = null;
@@ -145,6 +144,7 @@ package akdcl.net.action {
 			
 			name = null;
 			reg = null;
+			//不完善
 		}
 		
 		public function clear():void {

@@ -1,4 +1,8 @@
 package ui{
+	import flash.display.DisplayObject;
+	import flash.text.TextField;
+	
+	import akdcl.display.UISprite;
 	
 	/**
 	 * ...
@@ -8,11 +12,11 @@ package ui{
 		public var change:Function;
 		public var labelFunction:Function;
 		
-		public var txt:*;
-		public var thumb:*;
-		public var bar:*;
-		public var maskClip:*;
-		public var track:*;
+		public var txt:TextField;
+		public var thumb:DisplayObject;
+		public var bar:DisplayObject;
+		public var maskClip:DisplayObject;
+		public var track:DisplayObject;
 		
 		protected var offXThumb:int;
 		protected var offWidthMaskClip:int;
@@ -87,10 +91,12 @@ package ui{
 			scaleX = 1;
 			value = 0;
 		}
-		override protected function onRemoveToStageHandler():void {
+		
+		override protected function onRemoveHandler():void 
+		{
+			super.onRemoveHandler();
 			labelFunction = null;
 			change = null;
-			super.onRemoveToStageHandler();
 			txt = null;
 			thumb = null;
 			bar = null;
@@ -114,7 +120,7 @@ package ui{
 		public function setStyle():void {
 			setClips(getClipsValue());
 			if (txt) {
-				txt.htmlText = (labelFunction!=null)?labelFunction(value):setLabel(value);
+				txt.text = (labelFunction!=null)?labelFunction(value):setLabel(value);
 			}
 		}
 		protected function setClips(_value:Number):void {

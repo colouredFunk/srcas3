@@ -1,4 +1,4 @@
-package akdcl.media {
+package akdcl.media.providers {
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
@@ -25,8 +25,6 @@ package akdcl.media {
 			_soundTransform.volume = _volume;
 			_channel.soundTransform = _soundTransform;
 		}
-
-		public var name:String = "soundProvider";
 		
 		private var channel:SoundChannel;
 		private var pausePosition:uint = 0;
@@ -54,10 +52,17 @@ package akdcl.media {
 				setChannelVolume(channel, volume);
 			}
 		}
-
-		override public function remove():void {
+		
+		override protected function init():void 
+		{
+			super.init();
+			name = "soundProvider";
+		}
+		
+		override protected function onRemoveHandler():void 
+		{
 			removeContentListener();
-			super.remove();
+			super.onRemoveHandler();
 		}
 
 		override protected function loadHandler():void {

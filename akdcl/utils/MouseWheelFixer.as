@@ -1,4 +1,4 @@
-package ui {
+package akdcl.utils {
     import flash.display.Stage;
     import flash.events.Event;
     import flash.events.MouseEvent;

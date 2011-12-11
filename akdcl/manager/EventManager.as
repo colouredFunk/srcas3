@@ -41,6 +41,7 @@ package akdcl.manager {
 			if (_listeners == null) {
 				_listeners = targetMap[_target][_type] = new Dictionary();
 			}
+			lM.info(_target, "addEvent(type:{0})", null, _type);
 			_listeners[_listener] = _listener;
 		}
 
@@ -48,24 +49,26 @@ package akdcl.manager {
 			if (targetMap[_target]) {
 				var _listeners:Dictionary = targetMap[_target][_type];
 				if (_listeners != null) {
-					trace("remove", _type,_target);
 					delete _listeners[_listener];
 				}
 			}
 		}
 
-		public function removeTargetEventType(_type:String, _target:EventDispatcher):void {
+		public function removeTargetEventType(_type:String, _target:EventDispatcher):Boolean {
 			if (targetMap[_target] != null) {
 				var _listeners:Dictionary = targetMap[_target][_type];
 			}
 			if (_listeners == null) {
-				return;
+				return false;
 			}
+			var _removed:Boolean;
 			for each(var _listener:Function in _listeners) {
+				_removed = true;
 				_target.removeEventListener(_type, _listener);
 			}
 			//destroy _listeners
 			delete targetMap[_target][_type];
+			return _removed;
 		}
 
 		public function removeTargetEvents(_target:EventDispatcher):void {
@@ -73,11 +76,12 @@ package akdcl.manager {
 			if (_targetTypes != null) {
 				var _typeNames:String = "";
 				for (var _type:String in _targetTypes) {
-					_typeNames += _type + "\n";
-					removeTargetEventType(_type, _target);
+					if (removeTargetEventType(_type, _target)) {
+						_typeNames += _type + "\n";
+					}
 				}
 				delete targetMap[_target];
-				lM.info(EventManager, "removeTargetEvents(target:{0})====>>>>\n" + _typeNames, null, _target);
+				lM.info(_target, "removeAllEvents====>>>>\n" + _typeNames);
 			}
 		}
 	}

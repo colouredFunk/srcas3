@@ -14,7 +14,7 @@
 	import flash.system.System;
 
 	import akdcl.utils.addContextMenu;
-	import akdcl.utils.traceObject;
+	import akdcl.utils.objectToString;
 
 	import akdcl.manager.LoggerManager;
 	import akdcl.manager.RequestManager;
@@ -173,7 +173,7 @@
 		}
 
 		protected function onLoadedHandler():void {
-			lM.info(this, STATUS_LOAD_COMPLETE +"====>>>>\n" + traceObject(flashVars));
+			lM.info(this, STATUS_LOAD_COMPLETE +"====>>>>\n" + objectToString(flashVars));
 			AuthorInformation.setFileBytes(loaderInfo.bytes);
 
 			addContextMenu(this, "Size: " + loaderInfo.width + " X " + loaderInfo.height, onSizeMenuHandler);

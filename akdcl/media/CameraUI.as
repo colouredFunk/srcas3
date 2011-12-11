@@ -5,14 +5,14 @@ package akdcl.media {
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 
-	import akdcl.media.CameraProvider;
-	import akdcl.media.DisplayRect;
-	import akdcl.media.MediaEvent;
+	import akdcl.media.providers.CameraProvider;
+	import akdcl.display.UIDisplay;
+	import akdcl.events.MediaEvent;
 	import akdcl.utils.setDisplayWH;
 
 	import ui.Alert;
 
-	import ui.UIEventDispatcher;
+	import akdcl.events.UIEventDispatcher;
 
 	/**
 	 * ...
@@ -28,22 +28,40 @@ package akdcl.media {
 		private static const CAMERA_WIDTH:uint = 320;
 		private static const CAMERA_HEIGHT:uint = 240;
 
-		protected var eventComplete:Event = new Event(Event.COMPLETE);
-
-		protected var cameraP:CameraProvider;
-		protected var displayRect:DisplayRect;
-
 		public var data:BitmapData;
+
+		private var eventComplete:Event;
+
+		private var cameraP:CameraProvider;
+		private var display:UIDisplay;
+		
+		private var alert:Alert;
 
 		override protected function init():void {
 			super.init();
-			displayRect = new DisplayRect(CAMERA_WIDTH, CAMERA_HEIGHT, 0);
-			displayRect.autoRemove = false;
-			displayRect.enabled = false;
+			display = new UIDisplay(CAMERA_WIDTH, CAMERA_HEIGHT, 0);
+			display.autoRemove = false;
+			display.enabled = false;
 
+			eventComplete = new Event(Event.COMPLETE);
+			
 			cameraP = new CameraProvider();
 			cameraP.addEventListener(MediaEvent.DISPLAY_CHANGE, onCameraChangeHandler);
 			cameraP.addEventListener(MediaEvent.LOAD_ERROR, onCameraErrorHandler);
+		}
+		
+		override protected function onRemoveHandler():void 
+		{
+			super.onRemoveHandler();
+			cameraP.remove();
+			display.remove();
+			if (data) {
+				data.dispose();
+			}
+			cameraP = null;
+			display = null;
+			eventComplete = null;
+			data = null;
 		}
 
 		public function launch():void {
@@ -54,24 +72,31 @@ package akdcl.media {
 			cameraP.setCameraMode(_width, _height);
 		}
 
-		protected function onCameraErrorHandler(_e:MediaEvent):void {
+		private function onCameraErrorHandler(_e:MediaEvent):void {
 			if (hasEventListener(IOErrorEvent.IO_ERROR)){
 				dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR));
 			}
 		}
 
-		protected function onCameraChangeHandler(_e:MediaEvent):void {
-			displayRect.proxy.setSize(cameraP.displayContent.width, cameraP.displayContent.height, false);
-			
-			setDisplayWH(displayRect.proxy, CAMERA_WIDTH, CAMERA_HEIGHT);
-			
-			displayRect.setContent(cameraP.displayContent, 0);
+		private function onCameraChangeHandler(_e:MediaEvent):void {
+			if (cameraP.displayContent) {
+				display.proxy.setSize(cameraP.displayContent.width, cameraP.displayContent.height, false);
+				
+				setDisplayWH(display.proxy, CAMERA_WIDTH, CAMERA_HEIGHT);
+				
+				display.setContent(cameraP.displayContent, 0);
 
-			var _alert:Alert = Alert.show("", "拍照|取消", onAlertHandler);
-			_alert.addItem(displayRect);
+				alert = Alert.show("", "拍照|取消", onAlertHandler);
+				alert.addItem(display);
+			}else {
+				if (alert) {
+					alert.remove();
+				}
+				alert = null;
+			}
 		}
 
-		protected function onAlertHandler(_b:Boolean):Boolean {
+		private function onAlertHandler(_b:Boolean):void {
 			if (_b){
 				if (!data || data.width != cameraP.displayContent.width || data.height != cameraP.displayContent.height){
 					if (data){
@@ -83,12 +108,8 @@ package akdcl.media {
 				if (hasEventListener(Event.COMPLETE)){
 					dispatchEvent(eventComplete);
 				}
-				cameraP.stop();
-				return true;
-			} else {
-				cameraP.stop();
-				return true;
 			}
+			cameraP.stop();
 		}
 	}
 

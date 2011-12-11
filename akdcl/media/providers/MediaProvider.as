@@ -1,40 +1,46 @@
-﻿package akdcl.media {
-	import akdcl.manager.LoggerManager;
+﻿package akdcl.media.providers {
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
 
-	import ui.UIEventDispatcher;
+	import akdcl.manager.LoggerManager;
+	
+	import akdcl.events.UIEventDispatcher;
+	import akdcl.events.MediaEvent;
+	
+	import akdcl.media.PlayItem;
+	import akdcl.media.PlayState;
 
 	/**
 	 * ...
 	 * @author Akdcl
 	 */
-	/// @eventType	akdcl.media.MediaEvent.VOLUME_CHANGE
-	[Event(name="volumeChange",type="akdcl.media.MediaEvent")]
+	/// @eventType	akdcl.events.MediaEvent.VOLUME_CHANGE
+	[Event(name="volumeChange",type="akdcl.events.MediaEvent")]
 
-	/// @eventType	akdcl.media.MediaEvent.STATE_CHANGE
-	[Event(name="stateChange",type="akdcl.media.MediaEvent")]
+	/// @eventType	akdcl.events.MediaEvent.STATE_CHANGE
+	[Event(name="stateChange",type="akdcl.events.MediaEvent")]
 
-	/// @eventType	akdcl.media.MediaEvent.PLAY_PROGRESS
-	[Event(name="playProgress",type="akdcl.media.MediaEvent")]
+	/// @eventType	akdcl.events.MediaEvent.PLAY_PROGRESS
+	[Event(name="playProgress",type="akdcl.events.MediaEvent")]
 
-	/// @eventType	akdcl.media.MediaEvent.PLAY_COMPLETE
-	[Event(name="playComplete",type="akdcl.media.MediaEvent")]
+	/// @eventType	akdcl.events.MediaEvent.PLAY_COMPLETE
+	[Event(name="playComplete",type="akdcl.events.MediaEvent")]
 
-	/// @eventType	akdcl.media.MediaEvent.LOAD_ERROR
-	[Event(name="loadError",type="akdcl.media.MediaEvent")]
+	/// @eventType	akdcl.events.MediaEvent.LOAD_ERROR
+	[Event(name="loadError",type="akdcl.events.MediaEvent")]
 
-	/// @eventType	akdcl.media.MediaEvent.LOAD_PROGRESS
-	[Event(name="loadProgress",type="akdcl.media.MediaEvent")]
+	/// @eventType	akdcl.events.MediaEvent.LOAD_PROGRESS
+	[Event(name="loadProgress",type="akdcl.events.MediaEvent")]
 
-	/// @eventType	akdcl.media.MediaEvent.BUFFER_PROGRESS
-	[Event(name="bufferProgress",type="akdcl.media.MediaEvent")]
+	/// @eventType	akdcl.events.MediaEvent.BUFFER_PROGRESS
+	[Event(name="bufferProgress",type="akdcl.events.MediaEvent")]
 
-	/// @eventType	akdcl.media.MediaEvent.LOAD_COMPLETE
-	[Event(name="loadComplete",type="akdcl.media.MediaEvent")]
+	/// @eventType	akdcl.events.MediaEvent.LOAD_COMPLETE
+	[Event(name="loadComplete",type="akdcl.events.MediaEvent")]
 
 	public class MediaProvider extends UIEventDispatcher {
 		public static var TIMER_INTERVAL:uint = 100;
+		
 		private static const VOLUME_DEFAULT:Number = 0.8;
 		private static const lM:LoggerManager = LoggerManager.getInstance();
 		
@@ -60,9 +66,9 @@
 		}
 
 		public function set position(_position:uint):void {
-			if (_position == position){
+			/*if (_position == position){
 				return;
-			}
+			}*/
 			setPlayState(PlayState.SEEK);
 			play(_position);
 		}
@@ -135,11 +141,12 @@
 			super.init();
 			timer = new Timer(TIMER_INTERVAL);
 		}
-
-		override public function remove():void {
+		
+		override protected function onRemoveHandler():void 
+		{
+			super.onRemoveHandler();
 			stop();
 			timer.stop();
-			super.remove();
 			timer = null;
 			playContent = null;
 			playItem = null;

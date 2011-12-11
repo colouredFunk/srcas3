@@ -19,7 +19,7 @@
 	import akdcl.net.FileRef;
 	import akdcl.media.DisplayRect;
 	import akdcl.media.CameraProvider;
-	import akdcl.media.MediaEvent;
+	import akdcl.events.MediaEvent;
 
 	/**
 	 * ...
