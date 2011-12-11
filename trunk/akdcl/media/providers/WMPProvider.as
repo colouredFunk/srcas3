@@ -1,6 +1,9 @@
-package akdcl.media {
+﻿package akdcl.media.providers {
 	import flash.events.TimerEvent;
 	import flash.external.ExternalInterface;
+	
+	import akdcl.media.PlayState;
+	import akdcl.media.PlayItem;
 
 	/**
 	 * ...
@@ -237,8 +240,6 @@ package akdcl.media {
 			}
 		]]></script>
 		private static var isPlugin:Boolean = false;
-
-		public var name:String = "wmpProvider";
 		
 		private var isPlayComplete:Boolean = false;
 		private var isLoadComplete:Boolean = false;
@@ -299,6 +300,7 @@ package akdcl.media {
 
 		override protected function init():void {
 			super.init();
+			name = "wmpProvider";
 			if (ExternalInterface.available){
 				ExternalInterface.call("eval", WMP_JS.toString());
 				ExternalInterface.call("pwrd.wmpPlayer.createWMPContainer");
@@ -306,11 +308,12 @@ package akdcl.media {
 				isPlugin = ExternalInterface.call("pwrd.wmpPlayer.createWMPPlayer", ExternalInterface.objectID, "playStateChange");
 			}
 		}
-
-		override public function remove():void {
+		
+		override protected function onRemoveHandler():void 
+		{
 			timer.removeEventListener(TimerEvent.TIMER, onLoadProgressHandler);
 			timer.removeEventListener(TimerEvent.TIMER, onBufferProgressHandler);
-			super.remove();
+			super.onRemoveHandler();
 		}
 
 		override public function load(_item:*):void {

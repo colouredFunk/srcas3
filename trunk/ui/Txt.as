@@ -1,25 +1,13 @@
 ﻿package ui{
-	import flash.display.Sprite;
 	import flash.text.StyleSheet;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
+	
+	import akdcl.display.UISprite;
+	
 	public class Txt extends UISprite {
 		public var txt:TextField;
-		protected var textFormat:TextFormat;
-		override protected function init():void {
-			super.init();
-			txt.mouseWheelEnabled = false;
-			txt.mouseEnabled = false;
-			txt.selectable = false;
-			txt.wordWrap = false;
-			txt.autoSize = "left";
-		}
-		override protected function onRemoveToStageHandler():void {
-			super.onRemoveToStageHandler();
-			//txt.setTextFormat(null);
-			textFormat = null;
-			txt = null;
-		}
+		
 		protected var __widthMax:int;
 		[Inspectable(defaultValue=0,type="int",name="0_固定宽")]
 		public function get widthMax():int{
@@ -77,6 +65,26 @@
 		public function set styleSheet(_styleSheet:StyleSheet):void {
 			txt.styleSheet = _styleSheet;
 		}
+		
+		protected var textFormat:TextFormat;
+		
+		
+		override protected function init():void {
+			super.init();
+			txt.mouseWheelEnabled = false;
+			txt.mouseEnabled = false;
+			txt.selectable = false;
+			txt.wordWrap = false;
+			txt.autoSize = "left";
+		}
+		
+		override protected function onRemoveHandler():void 
+		{
+			super.onRemoveHandler();
+			textFormat = null;
+			txt = null;
+		}
+		
 		public function setStyle():void {
 			if (widthMax) {
 				txt.wordWrap=true;

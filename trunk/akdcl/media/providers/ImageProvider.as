@@ -1,21 +1,21 @@
-package akdcl.media {
+﻿package akdcl.media.providers {
 	import flash.display.BitmapData;
 	import flash.events.Event;
 
 	import akdcl.manager.RequestManager;
+	import akdcl.events.MediaEvent;
+	import akdcl.media.PlayState;
 
 	/**
 	 * ...
 	 * @author ...
 	 */
-	/// @eventType	akdcl.media.MediaEvent.DISPLAY_CHANGE
-	[Event(name="displayChange",type="akdcl.media.MediaEvent")]
+	/// @eventType	akdcl.events.MediaEvent.DISPLAY_CHANGE
+	[Event(name="displayChange",type="akdcl.events.MediaEvent")]
 	final public class ImageProvider extends MediaProvider {
 		private static const DEFAULT_TOTAL_TIME:uint = 5000;
 
 		protected static var rM:RequestManager = RequestManager.getInstance();
-
-		public var name:String = "imageProvider";
 
 		public var displayContent:BitmapData;
 		private var lastSource:String;
@@ -38,12 +38,21 @@ package akdcl.media {
 		override public function get position():uint {
 			return timer.currentCount * timer.delay;
 		}
-
-		override public function remove():void {
+		
+		override protected function init():void 
+		{
+			super.init();
+			name = "imageProvider";
+		}
+		
+		override protected function onRemoveHandler():void 
+		{	
 			if (lastSource){
 				rM.unloadDisplay(lastSource, onLoadCompleteHandler, onLoadErrorHandler, onLoadProgressHandler);
 			}
-			super.remove();
+			super.onRemoveHandler();
+			displayContent = null;
+			lastSource = null;
 		}
 
 		override protected function loadHandler():void {

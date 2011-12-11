@@ -1,14 +1,18 @@
 package akdcl.media {
-	import akdcl.media.MediaEvent;
+	import flash.display.InteractiveObject;
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	
+	import akdcl.display.UISprite;
+	import akdcl.events.MediaEvent;
 	import akdcl.utils.setProgressClip;
-	import ui.SimpleBtn;
-	import akdcl.utils.copyInstanceToArray;
+	import akdcl.media.providers.MediaProvider;
 
 	/**
 	 * ...
 	 * @author Akdcl
 	 */
-	public class PlayerSkin extends SimpleBtn {
+	public class PlayerSkin extends UISprite {
 		protected static function complexTime(_position:uint, _totalTime:uint):String {
 			var _timePlayed:String;
 			var _timeTotal:String;
@@ -33,14 +37,15 @@ package akdcl.media {
 			return s_m + ":" + s_s;
 		}
 
-		public var btnPlay:*;
-		public var btnPause:*;
-		public var btnStop:*;
-		public var btnPlayPause:*;
-		public var btnPlayStop:*;
-		public var btnPrev:*;
-		public var btnNext:*;
-		public var btnVolume:*;
+		public var btnPlay:InteractiveObject;
+		public var btnPause:InteractiveObject;
+		public var btnStop:InteractiveObject;
+		public var btnPlayPause:InteractiveObject;
+		public var btnPlayStop:InteractiveObject;
+		public var btnPrev:InteractiveObject;
+		public var btnNext:InteractiveObject;
+		public var btnVolume:InteractiveObject;
+		
 		public var barVolume:*;
 		public var barPlayProgress:*;
 		public var txtPlayProgress:*;
@@ -48,93 +53,103 @@ package akdcl.media {
 		public var bufferProgressClip:*;
 		
 		protected var player:MediaProvider;
-
-		override protected function onRemoveToStageHandler():void {
+		
+		override protected function onAddedToStageHandler(_evt:Event):void 
+		{
+			super.onAddedToStageHandler(_evt);
+			addEventListener(MouseEvent.CLICK, onClickHandler);
+		}
+		
+		override protected function onRemoveHandler():void 
+		{
+			super.onRemoveHandler();
 			setPlayer(null);
-			super.onRemoveToStageHandler();
+		}
+		
+		protected function onClickHandler(_e:Event):void {
+			if (player == null) {
+				return
+			}
+			var _target:InteractiveObject = _e.target as InteractiveObject;
+			switch(_target) {
+				case btnPlay:
+					player.play();
+					break;
+				case btnPause:
+					player.pause();
+					break;
+				case btnStop:
+					player.stop();
+					break;
+				case btnPlayPause:
+					playOrPause();
+					break;
+				case btnPlayStop:
+					playOrPause();
+					break;
+				case btnPrev:
+					(player as MediaPlayer).prev();
+					break;
+				case btnNext:
+					(player as MediaPlayer).next();
+					break;
+				case btnVolume:
+					player.mute = !player.mute;
+					break;
+			}
 		}
 
 		public function setPlayer(_player:MediaProvider):void {
 			removePlayerEvent();
-			if (!_player){
+			if (_player == null) {
 				player = null;
 				return;
 			}
 			player = _player;
-			if (btnPlay){
-				btnPlay.release = player.play;
-			}
-			if (btnPause){
-				btnPause.release = player.pause;
-			}
-			if (btnStop){
-				btnStop.release = player.stop;
-			}
-			if (btnPlayPause){
-				btnPlayPause.release = playOrPause;
-			}
-			if (btnPlayStop){
-				btnPlayStop.release = playOrStop;
-			}
-			if (player is MediaPlayer) {
-				if (btnNext) {
-					btnNext.release = player["next"];
-				}
-				if (btnPrev) {
-					btnPrev.release = player["prev"];
-				}
-			}
 			onVolumeChangeHandler(null);
-			if (btnVolume){
-				btnVolume.release = function():void {
-					player.mute = !player.mute;
-				}
-			}
+			
 			if (barVolume){
 				barVolume.maximum = 1;
 				barVolume.snapInterval = 0.004;
-				barVolume.change = null;
-				barVolume.value = player.volume;
-				barVolume.change = function(_value:Number):void {
-					player.volume = _value;
-				}
+				barVolume.change = onVolumeCtrlHandler;
 			}
 			if (barPlayProgress){
-				if (barPlayProgress.track && barPlayProgress.track.hasOwnProperty("value")){
+				if (barPlayProgress.track && "value" in barPlayProgress.track) {
 					loadProgressClip = barPlayProgress.track;
 				} else if (barPlayProgress.progressClip){
 					loadProgressClip = barPlayProgress.progressClip;
 				}
 				if (txtPlayProgress){
-					barPlayProgress.txt = txtPlayProgress;
+					barPlayProgress.txt = txtPlayProgress; 
 				}
 				barPlayProgress.maximum = 1;
 				barPlayProgress.snapInterval = 0.004;
 				barPlayProgress.labelFunction = timeLabelFunction;
 				barPlayProgress.setStyle();
-				barPlayProgress.change = null;
-				barPlayProgress.value = 0;
-				//barPlayProgress.press = 
-				barPlayProgress.change = function(_value:Number):void {
-					if (barPlayProgress.isHold){
-
-					}
-				}
-				barPlayProgress.release = function():void {
-					player.playProgress = barPlayProgress.value * 0.999;
-				}
+				barPlayProgress.release = onProgressCtrlHandler;
 			}
 			
-			if (loadProgressClip){
-				if (loadProgressClip.hasOwnProperty("maximum")){
-					loadProgressClip.maximum = 1;
-					loadProgressClip.snapInterval = 0.004;
-					loadProgressClip.enabled = false;
-					loadProgressClip.value = 0;
-				}
+			if (loadProgressClip && "maximum" in loadProgressClip) {
+				loadProgressClip.maximum = 1;
+				loadProgressClip.snapInterval = 0.004;
+				loadProgressClip.enabled = false;
+				loadProgressClip.value = 0;
 			}
 			addPlayerEvent();
 			onStateChangeHandler(null);
+		}
+		
+		private function onVolumeCtrlHandler(_value:Number):void {
+			if (player) {
+				player.volume = _value;
+			}
+		}
+		
+		private function onProgressCtrlHandler():void 
+		{
+			if (player) {
+				player.playProgress = barPlayProgress.value * 0.999;
+			}
 		}
 		
 		protected function addPlayerEvent():void {
@@ -160,18 +175,22 @@ package akdcl.media {
 		}
 
 		protected function playOrPause():void {
-			if (player.playState == PlayState.PLAY){
-				player.pause();
-			} else {
-				player.play();
+			if (player) {
+				if (player.isPlaying){
+					player.pause();
+				} else {
+					player.play();
+				}
 			}
 		}
 
 		protected function playOrStop():void {
-			if (player.playState == PlayState.PLAY){
-				player.stop();
-			} else {
-				player.play();
+			if (player) {
+				if (player.isPlaying){
+					player.stop();
+				} else {
+					player.play();
+				}
 			}
 		}
 
@@ -182,36 +201,41 @@ package akdcl.media {
 			return _str;
 		}
 
+		private static const BTN_SELECTED:String = "selected";
 		//
 		protected function onStateChangeHandler(_evt:MediaEvent):void {
-			if (btnPlay){
-				btnPlay.selected = player.playState == PlayState.PLAY;
+			if (btnPlay && BTN_SELECTED in btnPlay) {
+				btnPlay[BTN_SELECTED] = player.isPlaying;
 			}
-			if (btnPlayPause){
-				btnPlayPause.selected = player.playState == PlayState.PLAY;
+			if (btnPlayPause && BTN_SELECTED in btnPlayPause){
+				btnPlayPause[BTN_SELECTED] = player.isPlaying;
 			}
-			if (btnPlayStop){
-				btnPlayStop.selected = player.playState == PlayState.PLAY;
+			if (btnPlayStop && BTN_SELECTED in btnPlayStop){
+				btnPlayStop[BTN_SELECTED] = player.isPlaying;
 			}
-			if (btnPause){
-				btnPause.selected = player.playState == PlayState.PAUSE;
+			if (btnPause && BTN_SELECTED in btnPause){
+				btnPause[BTN_SELECTED] = player.playState == PlayState.PAUSE;
 			}
-			if (btnStop){
-				btnStop.selected = player.playState == PlayState.STOP;
+			/*
+			if (btnStop && BTN_SELECTED in btnStop){
+				btnStop[BTN_SELECTED] = player.playState == PlayState.STOP;
 			}
+			*/
 			onLoadProgressHandler(null);
 			onBufferProgressHandler(null);
 			onPlayProgressHandler(null);
 		}
 
 		protected function onVolumeChangeHandler(_evt:MediaEvent):void {
-			if (btnVolume){
-				btnVolume.selected = player.mute;
-				if (btnVolume.valueClip){
-					if (btnVolume.selected){
-						btnVolume.valueClip.gotoAndStop(1);
+			if (btnVolume) {
+				if (BTN_SELECTED in btnVolume) {
+					btnVolume[BTN_SELECTED] = player.mute;
+				}
+				if ("valueClip" in btnVolume) {
+					if (player.mute) {
+						btnVolume["valueClip"].gotoAndStop(1);
 					} else {
-						btnVolume.valueClip.gotoAndStop(1 + 1 + int(player.volume * (btnVolume.valueClip.totalFrames - 2)));
+						btnVolume["valueClip"].gotoAndStop(1 + 1 + int(player.volume * (btnVolume["valueClip"].totalFrames - 2)));
 					}
 				}
 			}
@@ -222,9 +246,6 @@ package akdcl.media {
 
 		protected function onPlayProgressHandler(_evt:MediaEvent):void {
 			if (barPlayProgress && !barPlayProgress.isHold){
-				if (!_evt) {
-					barPlayProgress.value = 1;
-				}
 				barPlayProgress.value = player.playProgress;
 			}
 		}

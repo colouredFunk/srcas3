@@ -18,7 +18,7 @@ package akdcl.manager {
 
 	import zero.net.FormVariables;
 
-	import akdcl.utils.traceObject;
+	import akdcl.utils.objectToString;
 
 	/**
 	 * ...
@@ -296,7 +296,7 @@ package akdcl.manager {
 			} else {
 				request.url = null;
 			}
-			lM.info(RequestManager, "resetRequest====>>>>\n" + traceObject(request));
+			lM.info(RequestManager, "resetRequest====>>>>\n" + objectToString(request));
 		}
 	}
 }

@@ -1,22 +1,26 @@
-package akdcl.media {
+﻿package akdcl.media {
 	import akdcl.utils.PageID;
+	import akdcl.events.MediaEvent;
+	import akdcl.media.providers.MediaProvider;
+	import akdcl.media.providers.ImageProvider;
+	import akdcl.media.providers.SoundProvider;
+	import akdcl.media.providers.VideoProvider;
+	import akdcl.media.providers.WMPProvider;
 
 	/**
 	 * ...
 	 * @author ...
 	 */
-	/// @eventType	akdcl.media.MediaEvent.LIST_CHANGE
-	[Event(name="listChange",type="akdcl.media.MediaEvent")]
+	/// @eventType	akdcl.events.MediaEvent.LIST_CHANGE
+	[Event(name="listChange",type="akdcl.events.MediaEvent")]
 
-	/// @eventType	akdcl.media.MediaEvent.PLAY_ITEM_CHANGE
-	[Event(name="playItemChange",type="akdcl.media.MediaEvent")]
+	/// @eventType	akdcl.events.MediaEvent.PLAY_ITEM_CHANGE
+	[Event(name="playItemChange",type="akdcl.events.MediaEvent")]
 
-	/// @eventType	akdcl.media.MediaEvent.DISPLAY_CHANGE
-	[Event(name="displayChange",type="akdcl.media.MediaEvent")]
+	/// @eventType	akdcl.events.MediaEvent.DISPLAY_CHANGE
+	[Event(name="displayChange",type="akdcl.events.MediaEvent")]
 
 	public class MediaPlayer extends MediaProvider {
-		public var name:String = "mediaPlayer";
-		
 		public var displayContent:Array;
 		public var onDisplayChange:Function;
 
@@ -112,6 +116,7 @@ package akdcl.media {
 
 		override protected function init():void {
 			super.init();
+			name = "mediaPlayer";
 			imagePD = new ImageProvider();
 			soundPD = new SoundProvider();
 			videoPD = new VideoProvider();
@@ -122,15 +127,17 @@ package akdcl.media {
 			pageID = new PageID();
 			pageID.onIDChange = onPlayIDChangeHandler;
 		}
-
-		override public function remove():void {
-			//playlist.remove();
+		
+		override protected function onRemoveHandler():void 
+		{
 			imagePD.remove();
 			soundPD.remove();
 			videoPD.remove();
 			wmpPD.remove();
 			pageID.remove();
 			super.remove();
+			//playlist.remove();
+			super.onRemoveHandler();
 			playlist = null;
 			imagePD = null;
 			soundPD = null;
@@ -141,7 +148,6 @@ package akdcl.media {
 			displayContent = null;
 			providers = null;
 			onDisplayChange = null;
-			
 		}
 
 		private function onPlayIDChangeHandler(_id:uint):void {
@@ -217,24 +223,29 @@ package akdcl.media {
 				playID = 0;
 				return;
 			}
-			for each (var _content:MediaProvider in playContent){
-				_content.play(_startTime);
-			}
 			super.play(_startTime);
 		}
+		
+		override protected function playHandler(_startTime:int = -1):void 
+		{
+			for each (var _content:MediaProvider in playContent) {
+				//调用play，调整playstate
+				_content.position = _startTime;
+			}
+		}
 
-		override public function pause():void {
+		override protected function pauseHandler():void 
+		{
 			for each (var _content:MediaProvider in playContent){
 				_content.pause();
 			}
-			super.pause();
 		}
-
-		override public function stop():void {
+		
+		override protected function stopHandler():void 
+		{
 			for each (var _content:MediaProvider in playContent){
 				_content.stop();
 			}
-			super.stop();
 		}
 
 		public function next():void {

@@ -1,8 +1,9 @@
 ﻿package ui {
-	import akdcl.events.InteractionEvent;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
-	import ui.manager.ButtonManager;
+	
+	import akdcl.manager.ButtonManager;
+	import akdcl.events.UIEvent;
 
 	/**
 	 * ...
@@ -53,43 +54,33 @@
 		public function get isHold():Boolean {
 			return timeHolded > 0;
 		}
-
-		
-		override public function set enabled(_enabled:Boolean):void{
-			super.enabled = _enabled;
-			if (_enabled) {
-				bM.addButton(this);
-			}else {
-				bM.removeButton(this);
-			}
-		}
 		
 		override protected function init():void {
 			super.init();
 			addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheelHandler);
-			addEventListener(InteractionEvent.PRESS, onPressHandler);
-			addEventListener(InteractionEvent.RELEASE, onReleaseHandler);
-			addEventListener(InteractionEvent.UPDATE_STYLE, onUpdateStyle);
+			addEventListener(UIEvent.PRESS, onPressHandler);
+			addEventListener(UIEvent.RELEASE, onReleaseHandler);
+			addEventListener(UIEvent.RELEASE_OUTSIDE, onReleaseHandler);
+			addEventListener(UIEvent.UPDATE_STYLE, onUpdateStyle);
+			bM.addButton(this);
 			buttonMode = true;
-			enabled = true;
 			if (txt){
 				txt.mouseEnabled = false;
-				if ("mouseChildren" in txt){
-					txt.mouseChildren = false;
-				}
 				mouseEnabled = false;
 			}
 		}
 		
-		override protected function onRemoveToStageHandler():void {
+		override protected function onRemoveHandler():void 
+		{
+			super.onRemoveHandler();
+			bM.removeButton(this);
 			rollOver = null;
 			rollOut = null;
 			press = null;
 			release = null;
-			super.onRemoveToStageHandler();
 		}
 
-		protected function onUpdateStyle(_e:InteractionEvent):void {
+		protected function onUpdateStyle(_e:UIEvent):void {
 			if (_e.isActive){
 				bM.setButtonClipPlay(thumb, true);
 				bM.setButtonClipPlay(bar, true);
@@ -101,13 +92,13 @@
 			}
 		}
 
-		protected function onPressHandler(_e:InteractionEvent):void {
+		protected function onPressHandler(_e:UIEvent):void {
 			timeHolded = 1;
 			onHoldingHandler(null);
 			addEventListener(Event.ENTER_FRAME, onHoldingHandler);
 		}
 		
-		protected function onReleaseHandler(_e:InteractionEvent):void {
+		protected function onReleaseHandler(_e:UIEvent):void {
 			timeHolded = 0;
 			removeEventListener(Event.ENTER_FRAME, onHoldingHandler);
 		}

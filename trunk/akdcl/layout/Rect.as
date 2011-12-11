@@ -1,7 +1,7 @@
 package akdcl.layout {
 	import flash.events.Event;
 
-	import ui.UIEventDispatcher;
+	import akdcl.events.UIEventDispatcher;
 
 	/**
 	 * ...
@@ -28,7 +28,7 @@ package akdcl.layout {
 		private var eventResize:Event;
 		private var eventScroll:Event;
 
-		public var autoUpdate:Boolean = true;
+		public var autoUpdate:Boolean;
 
 		public function get x():Number {
 			return __x;
@@ -99,11 +99,25 @@ package akdcl.layout {
 			} else {
 				percentHeight = _height;
 			}
+			super();
+		}
+		
+		override protected function init():void 
+		{
+			super.init();
+			autoUpdate = true;
 			isAverageWidth = !Boolean(__width);
 			isAverageHeight = !Boolean(__height);
 			eventResize = new Event(Event.RESIZE);
 			eventScroll = new Event(Event.SCROLL);
-			super();
+		}
+		
+		override protected function onRemoveHandler():void 
+		{
+			super.onRemoveHandler();
+			eventResize = null;
+			eventScroll = null;
+			userData = null;
 		}
 
 		public function setPoint(_x:Number, _y:Number, _dispathEvent:Boolean = true):void {
@@ -128,9 +142,9 @@ package akdcl.layout {
 			}
 		}
 
-		override public function remove():void {
-			super.remove();
-			eventResize = null;
+		public function update(_dispathEvent:Boolean = true):void {
+			updatePoint(_dispathEvent);
+			updateSize(_dispathEvent);
 		}
 
 		protected function updatePoint(_dispathEvent:Boolean = true):void {
@@ -143,11 +157,6 @@ package akdcl.layout {
 			if (_dispathEvent && hasEventListener(Event.RESIZE)){
 				dispatchEvent(eventResize);
 			}
-		}
-
-		public function update():void {
-			updatePoint(true);
-			updateSize(true);
 		}
 
 		override public function toString():String {

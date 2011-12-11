@@ -35,6 +35,14 @@ package akdcl.net.action {
 			y = _y;
 			super(_optionsXML);
 		}
+		
+		override protected function onRemoveHandler():void 
+		{
+			super.onRemoveHandler();
+			container = null;
+			style = null;
+			//不完善
+		}
 
 		override public function clear():void {
 			for each (var _field:Field in fields){

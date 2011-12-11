@@ -10,10 +10,10 @@
 			if (_visible) {
 				_clip.visible = _progress < 1 && _progress >= 0;
 			}
-			if ("text" in _clip){
-				_clip.text = Math.round(_progress * 100) + " %";
-			} else if ("value" in _clip){
+			if ("value" in _clip){
 				_clip.value = _progress;
+			} else if ("text" in _clip){
+				_clip.text = Math.round(_progress * 100) + " %";
 			} else if (_clip is MovieClip){
 				if (_progress < 1) {
 					_clip.play();

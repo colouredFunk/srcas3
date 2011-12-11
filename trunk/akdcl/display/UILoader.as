@@ -1,10 +1,12 @@
-package akdcl.media {
+package akdcl.display {
+	import flash.display.DisplayObject;
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
 
 	import akdcl.manager.RequestManager;
+	import akdcl.utils.setProgressClip;
 
 	/**
 	 * ...
@@ -14,23 +16,36 @@ package akdcl.media {
 	/// @eventType	flash.events.Event.COMPLETE
 	[Event(name="complete",type="flash.events.Event")]
 
-	public class DisplayLoader extends DisplayRect {
-		protected static var rM:RequestManager = RequestManager.getInstance();
+	public class UILoader extends UIDisplay {
+		protected static const rM:RequestManager = RequestManager.getInstance();
 
-		public var progressClip:*;
+		public var progressClip:DisplayObject;
 		public var sameChange:Boolean;
-		protected var loadProgress:Number = 0;
+		
+		protected var loadProgress:Number;
+		
+		private var eventComplete:Event;
+		private var source:String;
 
-		protected var eventComplete:Event = new Event(Event.COMPLETE);
-
-		public function DisplayLoader(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = -1){
+		public function UILoader(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = -1){
 			super(_rectWidth, _rectHeight, _bgColor);
-			label = null;
-			setProgressClip(false);
 		}
-
-		override protected function onRemoveToStageHandler():void {
-			super.onRemoveToStageHandler();
+		
+		override protected function init():void 
+		{
+			super.init();
+			loadProgress = 0;
+			eventComplete = new Event(Event.COMPLETE);
+			setProgressClip(progressClip, 1, true);
+		}
+		
+		override protected function onRemoveHandler():void 
+		{
+			super.onRemoveHandler();
+			if (source) {
+				rM.unloadDisplay(source, onCompleteHandler, onErrorHandler, onProgressHandler);
+				source = null;
+			}
 			progressClip = null;
 			eventComplete = null;
 		}
@@ -39,10 +54,13 @@ package akdcl.media {
 			if (!sameChange && _url && label == _url){
 				return;
 			}
-			rM.unloadDisplay(label, onCompleteHandler, onErrorHandler, onProgressHandler);
+			if (source) {
+				rM.unloadDisplay(source, onCompleteHandler, onErrorHandler, onProgressHandler);
+			}
 			setContent(null, tweenMode);
 			loadProgress = 0;
-			label = _url;
+			source = _url;
+			label = source;
 			alignXReady = _alignX;
 			alignYReady = _alignY;
 			scaleModeReady = _scaleMode;
@@ -51,7 +69,7 @@ package akdcl.media {
 		}
 
 		protected function onErrorHandler(_e:IOErrorEvent):void {
-			setProgressClip(false);
+			setProgressClip(progressClip, 1, true);
 		}
 
 		protected function onProgressHandler(_e:ProgressEvent):void {
@@ -65,11 +83,11 @@ package akdcl.media {
 			if (isNaN(loadProgress)){
 				loadProgress = 0;
 			}
-			setProgressClip(loadProgress);
+			setProgressClip(progressClip, loadProgress, true);
 		}
 
 		protected function onCompleteHandler(_data:*, _url:String = null):void {
-			setProgressClip(false);
+			setProgressClip(progressClip, 1, true);
 			setContent(_data, tweenMode, alignXReady, alignYReady, scaleModeReady);
 			if (hasEventListener(Event.COMPLETE)){
 				dispatchEvent(eventComplete);
@@ -81,31 +99,6 @@ package akdcl.media {
 
 			} else {
 				super.showContent();
-			}
-		}
-
-		protected function setProgressClip(_progress:*):void {
-			if (!progressClip){
-				return;
-			}
-			if (_progress is Number){
-				progressClip.visible = true;
-				if ("text" in progressClip){
-					progressClip.text = Math.round(_progress * 100) + " %";
-				} else if ("value" in progressClip){
-					progressClip.value = _progress;
-				} else if (progressClip is MovieClip){
-					progressClip.play();
-				}
-			} else {
-				progressClip.visible = _progress;
-				if (progressClip is MovieClip){
-					if (_progress){
-						progressClip.play();
-					} else {
-						progressClip.stop();
-					}
-				}
 			}
 		}
 	}

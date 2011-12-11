@@ -33,6 +33,7 @@
 package com.adobe.serialization.json 
 {
 
+	import flash.net.URLVariables;
 	import flash.utils.describeType;
 
 	/**
@@ -78,8 +79,10 @@ package com.adobe.serialization.json
 		private function convertToString( value:* ):String {
 			
 			// determine what value is and convert it based on it's type
-			if ( value is String ) {
-				
+			if ( value is String ||value is URLVariables) {
+				if (value is URLVariables) {
+					value = value.toString();
+				}
 				// escape the string so it's formatted correctly
 				return escapeString( value as String );
 				

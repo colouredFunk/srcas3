@@ -1,7 +1,10 @@
-﻿package ui {
+package akdcl.display {
 	import flash.display.MovieClip;
-	import flash.display.Sprite;
+	import flash.display.Stage;
+	
 	import flash.events.Event;
+	
+	import akdcl.interfaces.IBaseObject;
 	
 	import akdcl.manager.LoggerManager;
 	import akdcl.manager.EventManager;
@@ -10,26 +13,27 @@
 	 * ...
 	 * @author Akdcl
 	 */
-	public class UISprite extends Sprite {
+	public class UIMovieClip extends MovieClip implements IBaseObject{
 		protected static const lM:LoggerManager = LoggerManager.getInstance();
 		protected static const evtM:EventManager = EventManager.getInstance();
+		
+		public static var stageInstance:Stage;
+		
 		public var userData:Object;
-		private var __enabled:Boolean = true;
-
-		public function get enabled():Boolean {
+		
+		protected var __enabled:Boolean;
+		override public function get enabled():Boolean {
 			return __enabled;
 		}
-
-		public function set enabled(_enabled:Boolean):void {
-			mouseEnabled = mouseChildren = _enabled;
+		override public function set enabled(_enabled:Boolean):void {
 			__enabled = _enabled;
+			mouseEnabled = mouseChildren = _enabled;
 		}
-		private var __autoRemove:Boolean = true;
-
+		
+		private var __autoRemove:Boolean;
 		public function get autoRemove():Boolean {
 			return __autoRemove;
 		}
-
 		public function set autoRemove(_autoRemove:Boolean):void {
 			if (__autoRemove == _autoRemove){
 				return;
@@ -40,24 +44,31 @@
 			} else {
 				removeEventListener(Event.REMOVED_FROM_STAGE, onRemoveToStageDelayHandler);
 			}
-			setChildAutoRemove(__autoRemove);
+			setChildrenAutoRemove(__autoRemove);
 		}
+		
+		private var removed:Boolean;
 
-		public function UISprite(){
+		public function UIMovieClip() {
+			super()
 			init();
 		}
 
 		protected function init():void {
+			__enabled = true;
+			__autoRemove = true;
 			addEventListener(Event.ADDED_TO_STAGE, onAddedToStageHandler);
 		}
 
 		protected function onAddedToStageHandler(_evt:Event):void {
+			lM.info(this, Event.ADDED_TO_STAGE + " parent is " + parent + parent.name);
+			if (!stageInstance) {
+				stageInstance = stage;
+			}
 			removeEventListener(Event.ADDED_TO_STAGE, onAddedToStageHandler);
 			if (autoRemove){
 				addEventListener(Event.REMOVED_FROM_STAGE, onRemoveToStageDelayHandler);
 			}
-			
-			lM.info(this, Event.ADDED_TO_STAGE + " parent is " + parent + parent.name);
 		}
 
 		private function onRemoveToStageDelayHandler(_evt:Event):void {
@@ -70,31 +81,35 @@
 				if (stage){
 					return;
 				}
-				onRemoveToStageHandler();
+				onRemoveHandler();
 			}
 		}
 
-		protected function onRemoveToStageHandler():void {
-			lM.info(this, Event.REMOVED_FROM_STAGE);
-			
+		protected function onRemoveHandler():void {
+			lM.info(this, "remove");
+			removed = true;
+			stop();
+			//removeEventListener(Event.REMOVED_FROM_STAGE, onRemoveToStageDelayHandler);
 			evtM.removeTargetEvents(this);
 			__removeChildren();
 			scrollRect = null;
 			mask = null;
 			hitArea = null;
 			contextMenu = null;
-			enabled = false;
-
 			userData = null;
 		}
 
 		public function remove():void {
-			if (parent && stage){
-				autoRemove = true;
-				parent.removeChild(this);
-			} else {
-				onRemoveToStageHandler();
+			if (removed) {
+				return;
 			}
+			if (!stage) {
+				removed = true;
+				visible = false;
+				stageInstance.addChild(this);
+			}
+			autoRemove = true;
+			parent.removeChild(this);
 		}
 
 		private function __removeChildren():void {
@@ -114,7 +129,7 @@
 			}
 		}
 
-		private function setChildAutoRemove(_autoRemove:Boolean):void {
+		private function setChildrenAutoRemove(_autoRemove:Boolean):void {
 			var _displayContent:*;
 			for (var _i:uint = 0; _i < numChildren; _i++){
 				_displayContent = getChildAt(_i);

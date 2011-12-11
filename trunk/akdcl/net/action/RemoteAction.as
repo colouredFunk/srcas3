@@ -11,12 +11,12 @@
 	import zero.codec.JPEGEncoder;
 
 	import ui.Alert;
-	import ui.UIEventDispatcher;
 
 	import akdcl.manager.LoggerManager;
 	import akdcl.manager.RequestManager;
+	import akdcl.events.UIEventDispatcher;
 	import akdcl.net.gotoURL;
-	import akdcl.utils.traceObject;
+	import akdcl.utils.objectToString;
 	import akdcl.utils.stringToBoolean;
 	import akdcl.utils.replaceString;
 
@@ -59,8 +59,8 @@
 		public static const A_DATA_STRUCTURE:String = "dataStructure";
 		public static const A_DATA_TYPE:String = "dataType";
 
-		protected static var lM:LoggerManager = LoggerManager.getInstance();
-		protected static var rM:RequestManager = RequestManager.getInstance();
+		protected static const lM:LoggerManager = LoggerManager.getInstance();
+		protected static const rM:RequestManager = RequestManager.getInstance();
 
 		public static function replaceValue(_content:String, _str:String, _rep:String):String {
 			return replaceString(_content, "${" + _str + "}", _rep);
@@ -89,8 +89,6 @@
 		public var sendProxy:Object;
 		public var dataSend:Object;
 		public var dataSendFormated:Object;
-
-		public var name:String;
 		public var alert:Alert;
 
 		protected var options:XML;
@@ -111,9 +109,10 @@
 			}
 			super();
 		}
-
-		override public function remove():void {
-			super.remove();
+		
+		override protected function onRemoveHandler():void 
+		{
+			super.onRemoveHandler();
 			if (alert){
 				alert.remove();
 			}
@@ -183,10 +182,11 @@
 			}
 			//dataSend.random = Math.random();
 			var _str:String;
-			_str = traceObject("[" + name + " send]", dataSend, true);
+			_str = objectToString("[" + name + " send]", dataSend);
 			dataSendFormated = formatData(dataSend, optionsSend, true);
-			_str += "\n\n\n" + traceObject("[" + name + " remote send]", dataSendFormated, true);
+			_str += "\n" + objectToString("[" + name + " remote send]", dataSendFormated);
 			lM.info(this, "sendAndLoad()====>>>>\n" + _str);
+			trace(_str);
 			sendProxy.data = dataSendFormated;
 			rM.load(sendProxy, onCompleteHandler, onErrorHandler, null);
 			return true;
@@ -224,7 +224,7 @@
 				alert = Alert.show(_str);
 				return;
 			}
-			_str = traceObject("[" + name + " remote load]", rawData, true);
+			_str = objectToString("[" + name + " remote load]", rawData);
 			data = formatData(rawData, optionsLoad, false);
 
 			var _name:String;
@@ -238,10 +238,10 @@
 				}
 			}
 
-			_str += "\n\n\n" + traceObject("[" + name + " load]", data, true);
+			_str += "\n" + objectToString("[" + name + " load]", data);
 			
 			lM.info(this, "sendAndLoadComplete====>>>>\n" + _str);
-			
+			trace(_str);
 			if (alertXML){
 				showAlert(alertXML);
 			}

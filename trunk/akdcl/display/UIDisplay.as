@@ -1,4 +1,4 @@
-﻿package akdcl.media {
+﻿package akdcl.display {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
@@ -14,16 +14,16 @@
 
 	import com.greensock.TweenLite;
 
-	import ui.UISprite;
+	import akdcl.display.UISprite;
 
-	import akdcl.layout.DisplayProxy;
 	import akdcl.utils.addContextMenu;
+	import akdcl.layout.Display;
 
 	/**
 	 * ...
 	 * @author ...
 	 */
-	public class DisplayRect extends UISprite {
+	public class UIDisplay extends UISprite {
 		protected static const TWEEN_FRAME:uint = 10;
 
 		private static var sourceLabel:String;
@@ -55,7 +55,7 @@
 
 		public var label:String = "Size";
 		public var moveRect:Boolean;
-		public var proxy:DisplayProxy;
+		public var proxy:Display;
 
 		public var container:DisplayObjectContainer;
 
@@ -82,9 +82,6 @@
 		protected var tweenOutVar:Object;
 		protected var tweenInVar:Object;
 
-		protected var eventChange:Event = new Event(Event.CHANGE);
-		protected var eventResize:Event = new Event(Event.RESIZE);
-
 		protected var bitmap:Bitmap;
 		protected var content:Object;
 		protected var contentReady:Object;
@@ -93,16 +90,18 @@
 		protected var useScroll:Boolean;
 		protected var useMask:Boolean;
 
-		protected var isHidding:Boolean = false;
+		protected var isHidding:Boolean;
 		protected var tweenMode:int;
 
 		protected var alignXReady:Number;
 		protected var alignYReady:Number;
 		protected var scaleModeReady:Number;
 
-		protected var scrollRectCopy:Rectangle;
+		private var eventChange:Event;
+		private var eventResize:Event;
+		private var scrollRectCopy:Rectangle;
 
-		public function DisplayRect(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = 0) {
+		public function UIDisplay(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = 0) {
 			if (container){
 				_rectWidth = _rectWidth || container.width;
 				_rectHeight = _rectHeight || container.height;
@@ -111,23 +110,19 @@
 				_rectHeight = _rectHeight || getHeight();
 				container = this;
 			}
-			proxy = new DisplayProxy(0, 0, _rectWidth||2, _rectHeight||2);
+			//w,h为0会启动isAverageWH，<=1会启动percentWH
+			proxy = new Display(0, 0, _rectWidth || 2, _rectHeight || 2);
 			if (_bgColor >= 0){
 				setUseScroll(true, _bgColor)
 			}
 			super();
 		}
-		
-		private function getWidth():Number {
-			return super.width;
-		}
-		
-		private function getHeight():Number {
-			return super.height;
-		}
 
 		override protected function init():void {
 			super.init();
+			eventChange = new Event(Event.CHANGE);
+			eventResize = new Event(Event.RESIZE);
+			isHidding = false;
 			tweenOutVar = {alpha: 0, useFrames: true, onComplete: onHideCompleteHandler};
 			tweenInVar = {alpha: 1, useFrames: true};
 			bitmap = new Bitmap();
@@ -137,12 +132,13 @@
 			proxy.addEventListener(Event.RESIZE, onProxyResizeHandler);
 
 		}
-
-		override protected function onRemoveToStageHandler():void {
+		
+		override protected function onRemoveHandler():void 
+		{
+			super.onRemoveHandler();
 			TweenLite.killTweensOf(displayContent);
 			bitmap.bitmapData = null;
 			proxy.remove();
-			super.onRemoveToStageHandler();
 			proxy = null;
 			bitmap = null;
 			content = null;
@@ -152,6 +148,7 @@
 			tweenInVar = null;
 			eventChange = null;
 			eventResize = null;
+			label = null;
 		}
 
 		public function setUseMask(_useMask:Boolean):void {
@@ -164,13 +161,13 @@
 				maskShape.visible = false;
 				addChildAt(maskShape, 0);
 			}
-			onProxyResizeHandler();
 			if (useMask){
 				container.mask = maskShape;
 				container.scrollRect = null;
 			} else {
 				container.mask = null;
 			}
+			onProxyResizeHandler();
 		}
 
 		public function setUseScroll(_useScroll:Boolean, _color:int = -1):void {
@@ -183,8 +180,8 @@
 			} else {
 				container.scrollRect = null;
 			}
+			container.opaqueBackground = (useScroll && _color >= 0) ? _color : null;
 			onProxyResizeHandler();
-			container.opaqueBackground = (_useScroll && _color >= 0) ? _color : null;
 		}
 
 		public function setContent(_content:Object = null, _tweenMode:int = 2, _alignX:Number = 0.5, _alignY:Number = 0.5, _scaleMode:Number = 1):void {
@@ -239,7 +236,7 @@
 				onProxyResizeHandler();
 			}
 		}
-
+		
 		protected function onProxyResizeHandler(_e:Event = null):void {
 			if (useScroll){
 				scrollRectCopy.width = proxy.width;
@@ -251,6 +248,14 @@
 				maskShape.width = proxy.width;
 				maskShape.height = proxy.height;
 			}
+		}
+		
+		private function getWidth():Number {
+			return super.width;
+		}
+		
+		private function getHeight():Number {
+			return super.height;
 		}
 	}
 }

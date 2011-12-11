@@ -3,6 +3,8 @@ package ui{
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
+	
+	import akdcl.display.UISprite;
 	/**
 	 * ...
 	 * @author Akdcl
@@ -49,8 +51,10 @@ package ui{
 			txt.multiline = false;
 			txt.wordWrap = false;
 		}
-		override protected function onRemoveToStageHandler():void {
-			super.onRemoveToStageHandler();
+		
+		override protected function onRemoveHandler():void 
+		{
+			super.onRemoveHandler();
 			txt = null;
 		}
 		protected function fixScrollRect():void {

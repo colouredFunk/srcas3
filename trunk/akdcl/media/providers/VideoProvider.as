@@ -1,5 +1,4 @@
-package akdcl.media {
-
+﻿package akdcl.media.providers {
 	import flash.display.DisplayObject;
 	import flash.geom.Rectangle;
 
@@ -8,20 +7,19 @@ package akdcl.media {
 	import com.greensock.layout.ScaleMode;
 
 	import akdcl.manager.SourceManager;
+	import akdcl.events.MediaEvent;
 
 	/**
 	 * ...
 	 * @author akdcl
 	 */
-	/// @eventType	akdcl.media.MediaEvent.DISPLAY_CHANGE
-	[Event(name="displayChange",type="akdcl.media.MediaEvent")]
+	/// @eventType	akdcl.events.MediaEvent.DISPLAY_CHANGE
+	[Event(name="displayChange",type="akdcl.events.MediaEvent")]
 	final public class VideoProvider extends MediaProvider {
-		private static const DEFAULT_PARAMS:Object = {autoPlay: false, scaleMode: ScaleMode.PROPORTIONAL_INSIDE, bgColor: 0x000000};
 		private static const VIDEOLOADER_GROUP:String = "VideoLoader";
+		private static const DEFAULT_PARAMS:Object = {autoPlay: false, scaleMode: ScaleMode.PROPORTIONAL_INSIDE, bgColor: 0x000000};
 
 		private static var sM:SourceManager = SourceManager.getInstance();
-
-		public var name:String = "videoProvider";
 
 		public var displayContent:DisplayObject;
 
@@ -52,10 +50,18 @@ package akdcl.media {
 				playContent.volume = volume;
 			}
 		}
-
-		override public function remove():void {
+		
+		override protected function init():void 
+		{
+			super.init();
+			name = "videoProvider";
+		}
+		
+		override protected function onRemoveHandler():void 
+		{
 			removeContentListener();
-			super.remove();
+			super.onRemoveHandler();
+			displayContent = null;
 		}
 
 		override protected function loadHandler():void {

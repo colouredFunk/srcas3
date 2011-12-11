@@ -1,16 +1,17 @@
 package ui {
 	import flash.events.Event;
-	import ui.manager.ButtonManager;
 
+	import akdcl.manager.ButtonManager;
 	import akdcl.media.DisplayLoader;
-	import akdcl.events.InteractionEvent;
+	
+	import akdcl.events.UIEvent;
 
 	/**
 	 * ...
 	 * @author akdcl
 	 */
 	public class ScrollContainer extends DisplayLoader {
-		private static const bM:ButtonManager = ButtonManager.getInstance();
+		private static const btnM:ButtonManager = ButtonManager.getInstance();
 
 		public var lockX:Boolean = true;
 		public var lockY:Boolean;
@@ -27,37 +28,43 @@ package ui {
 
 		override protected function onAddedToStageHandler(_evt:Event):void {
 			super.onAddedToStageHandler(_evt);
-			addEventListener(InteractionEvent.PRESS, onPressHandler);
-			addEventListener(InteractionEvent.DRAG_MOVE, onDragMoveHandler);
-			addEventListener(InteractionEvent.RELEASE, onReleaseHandler);
-			bM.addButton(this);
+			addEventListener(UIEvent.PRESS, onPressHandler);
+			addEventListener(UIEvent.DRAG_MOVE, onDragMoveHandler);
+			addEventListener(UIEvent.RELEASE, onReleaseHandler);
+			btnM.addButton(this);
+		}
+		
+		override protected function onRemoveToStageHandler():void 
+		{
+			super.onRemoveToStageHandler();
+			btnM.removeButton(this);
 		}
 
-		override public function updateRect():void {
+		/*override public function updateRect():void {
 			super.updateRect();
 			scaleWidth = Math.max(scaleWidth, rect.width * 0.99999999);
 			scaleHeight = Math.max(scaleHeight, rect.height * 0.99999999);
-		}
+		}*/
 
-		private function onPressHandler(_e:InteractionEvent):void {
+		private function onPressHandler(_e:UIEvent):void {
 			if (!lockX){
-				startScrollX = scrollX;
+				startScrollX = proxy.scrollX;
 			}
 			if (!lockY){
-				startScrollY = scrollY;
+				startScrollY = proxy.scrollY;
 			}
 			removeEventListener(Event.ENTER_FRAME, onEnterFrameHandler);
 		}
 
-		private function onDragMoveHandler(_e:InteractionEvent):void {
+		private function onDragMoveHandler(_e:UIEvent):void {
 			if (!lockX){
-				var _dx:int = bM.lastX - bM.startX;
-				scrollX = _dx + startScrollX;
+				var _dx:int = btnM.lastX - btnM.startX;
+				proxy.scrollX = _dx + startScrollX;
 			}
 
 			if (!lockY){
-				var _dy:int = bM.lastY - bM.startY;
-				scrollY = _dy + startScrollY;
+				var _dy:int = btnM.lastY - btnM.startY;
+				proxy.scrollY = _dy + startScrollY;
 			}
 			if (mouseChildren){
 				needMouseChildren = true;
@@ -65,14 +72,13 @@ package ui {
 			}
 		}
 
-		private function onReleaseHandler(_e:InteractionEvent):void {
+		private function onReleaseHandler(_e:UIEvent):void {
 			if (!lockX){
-				speedX = bM.speedX * 2;
+				speedX = btnM.speedX * 2;
 			}
 			if (!lockY){
-				speedY = bM.speedY * 2;
+				speedY = btnM.speedY * 2;
 			}
-
 			addEventListener(Event.ENTER_FRAME, onEnterFrameHandler);
 		}
 
@@ -82,21 +88,21 @@ package ui {
 				mouseChildren = true;
 			}
 			if (!lockX){
-				scrollX += speedX;
-				var _isOutX:Boolean = alignX < 0 || alignX > 1;
+				proxy.scrollX += speedX;
+				var _isOutX:Boolean = proxy.alignX < 0 || proxy.alignX > 1;
 				if (_isOutX){
 					speedX *= 0.5;
 				} else {
-					speedX *= 0.95;
+					speedX *= 0.9;
 				}
 			}
 			if (!lockY){
-				scrollY += speedY;
-				var _isOutY:Boolean = alignY < 0 || alignY > 1;
+				proxy.scrollY += speedY;
+				var _isOutY:Boolean = proxy.alignY < 0 || proxy.alignY > 1;
 				if (_isOutY){
 					speedY *= 0.5;
 				} else {
-					speedY *= 0.95;
+					speedY *= 0.9;
 				}
 			}
 			if (_isOutX || _isOutY){
