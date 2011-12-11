@@ -2,11 +2,15 @@ package akdcl.media {
 	import flash.display.InteractiveObject;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.text.TextField;
 	
 	import akdcl.display.UISprite;
 	import akdcl.events.MediaEvent;
 	import akdcl.utils.setProgressClip;
 	import akdcl.media.providers.MediaProvider;
+	import akdcl.display.UIDisplay;
+	
+	import ui.Slider;
 
 	/**
 	 * ...
@@ -46,11 +50,13 @@ package akdcl.media {
 		public var btnNext:InteractiveObject;
 		public var btnVolume:InteractiveObject;
 		
-		public var barVolume:*;
-		public var barPlayProgress:*;
-		public var txtPlayProgress:*;
+		public var barVolume:Slider;
+		public var barPlayProgress:Slider;
+		public var txtPlayProgress:TextField;
 		public var loadProgressClip:*;
 		public var bufferProgressClip:*;
+		
+		public var displayContainer:UIDisplay;
 		
 		protected var player:MediaProvider;
 		
@@ -114,11 +120,11 @@ package akdcl.media {
 				barVolume.change = onVolumeCtrlHandler;
 			}
 			if (barPlayProgress){
-				if (barPlayProgress.track && "value" in barPlayProgress.track) {
+				/*if (barPlayProgress.track && "value" in barPlayProgress.track) {
 					loadProgressClip = barPlayProgress.track;
 				} else if (barPlayProgress.progressClip){
 					loadProgressClip = barPlayProgress.progressClip;
-				}
+				}*/
 				if (txtPlayProgress){
 					barPlayProgress.txt = txtPlayProgress; 
 				}
@@ -135,6 +141,7 @@ package akdcl.media {
 				loadProgressClip.enabled = false;
 				loadProgressClip.value = 0;
 			}
+			
 			addPlayerEvent();
 			onStateChangeHandler(null);
 		}
@@ -160,6 +167,7 @@ package akdcl.media {
 				player.addEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
 				player.addEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 				player.addEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
+				player.addEventListener(MediaEvent.DISPLAY_CHANGE, onDisplayChangeHandler);
 			}
 		}
 		
@@ -171,6 +179,7 @@ package akdcl.media {
 				player.removeEventListener(MediaEvent.LOAD_PROGRESS, onLoadProgressHandler);
 				player.removeEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 				player.removeEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
+				player.removeEventListener(MediaEvent.DISPLAY_CHANGE, onDisplayChangeHandler);
 			}
 		}
 
@@ -262,6 +271,17 @@ package akdcl.media {
 			onLoadProgressHandler(null);
 			onBufferProgressHandler(null);
 			onPlayProgressHandler(null);
+		}
+		
+		protected function onDisplayChangeHandler(e:MediaEvent):void 
+		{
+			if (displayContainer) {
+				if (player["displayContent"] is Array) {
+					displayContainer.setContent(player["displayContent"][0]);
+				}else {
+					displayContainer.setContent(player["displayContent"]);
+				}
+			}
 		}
 	}
 

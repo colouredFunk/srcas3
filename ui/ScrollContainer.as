@@ -2,7 +2,7 @@ package ui {
 	import flash.events.Event;
 
 	import akdcl.manager.ButtonManager;
-	import akdcl.media.DisplayLoader;
+	import akdcl.display.UILoader;
 	
 	import akdcl.events.UIEvent;
 
@@ -10,8 +10,8 @@ package ui {
 	 * ...
 	 * @author akdcl
 	 */
-	public class ScrollContainer extends DisplayLoader {
-		private static const btnM:ButtonManager = ButtonManager.getInstance();
+	public class ScrollContainer extends UILoader {
+		protected static const btnM:ButtonManager = ButtonManager.getInstance();
 
 		public var lockX:Boolean = true;
 		public var lockY:Boolean;
@@ -31,12 +31,13 @@ package ui {
 			addEventListener(UIEvent.PRESS, onPressHandler);
 			addEventListener(UIEvent.DRAG_MOVE, onDragMoveHandler);
 			addEventListener(UIEvent.RELEASE, onReleaseHandler);
+			addEventListener(UIEvent.RELEASE_OUTSIDE, onReleaseHandler);
 			btnM.addButton(this);
 		}
 		
-		override protected function onRemoveToStageHandler():void 
+		override protected function onRemoveHandler():void 
 		{
-			super.onRemoveToStageHandler();
+			super.onRemoveHandler();
 			btnM.removeButton(this);
 		}
 

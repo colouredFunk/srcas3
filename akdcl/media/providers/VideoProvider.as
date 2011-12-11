@@ -145,11 +145,6 @@
 			super.onLoadProgressHandler(_evt);
 		}
 
-		override protected function onPlayCompleteHandler(_evt:* = null):void {
-			removeContentListener();
-			super.onPlayCompleteHandler(_evt);
-		}
-
 		private function removeContentListener():void {
 			if (playContent){
 				//卸载playContent

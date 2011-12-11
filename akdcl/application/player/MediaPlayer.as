@@ -4,7 +4,7 @@
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
 	
-	import ui.UIEventDispatcher;
+	import akdcl.events.UIEventDispatcher;
 	
 	import akdcl.utils.PageID;
 	/**

@@ -104,7 +104,7 @@
 		}
 
 		//0:不循环，1:单首循环，2:顺序循环(全部播放完毕后停止)，3:顺序循环，4:随机播放
-		private var __repeat:uint = 3;
+		private var __repeat:uint;
 
 		public function get repeat():uint {
 			return __repeat;
@@ -116,6 +116,7 @@
 
 		override protected function init():void {
 			super.init();
+			__repeat = 3;
 			name = "mediaPlayer";
 			imagePD = new ImageProvider();
 			soundPD = new SoundProvider();
@@ -154,6 +155,7 @@
 			if (!playlist) {
 				return;
 			}
+			
 			var _content:MediaProvider;
 			for each (_content in playContent){
 				_content.removeEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
@@ -162,11 +164,8 @@
 				_content.removeEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
 				_content.removeEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);
 				_content.removeEventListener(MediaEvent.DISPLAY_CHANGE, onDisplayChangeHandler);
-
-				if (_content.playState != PlayState.COMPLETE){
-					_content.stop();
-				}
 			}
+			stop();
 
 			displayContent = [];
 
@@ -211,7 +210,7 @@
 				}
 			}
 			dispatchEvent(new MediaEvent(MediaEvent.PLAY_ITEM_CHANGE));
-			play(0);
+			play(-1);
 		}
 
 		override public function load(_item:*):void {
