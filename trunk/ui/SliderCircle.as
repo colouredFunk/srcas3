@@ -40,15 +40,15 @@ package ui {
 			scale = length * snapInterval / (maximum - minimum);
 			return scale * (value - minimum) / snapInterval - angleOffset;
 		}
-
-		override protected function setClips(_value:Number):void {
+		override protected function setThumbStyle(_x:Number):void 
+		{
 			if (rotThumb){
 				thumb.rotation = _value;
 			}
 			thumb.x = Math.cos(_value / RTA) * radius;
 			thumb.y = Math.sin(_value / RTA) * radius;
 		}
-
+		
 		override protected function onHoldingHandler(_evt:Event):void {
 			var _radian:Number = Math.atan2(mouseY, mouseX);
 			if (_radian < -angleOffset / RTA){

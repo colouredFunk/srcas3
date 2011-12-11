@@ -20,32 +20,28 @@
 		protected var timeHolded:uint;
 		protected var scale:Number;
 
-		private var __maximum:Number = 100;
-
+		protected var __maximum:Number = 100;
 		public function get maximum():Number {
 			return __maximum;
 		}
-
 		public function set maximum(_maximum:Number):void {
 			__maximum = _maximum;
 			setStyle();
 		}
-		private var __minimum:Number = 0;
-
+		
+		protected var __minimum:Number = 0;
 		public function get minimum():Number {
 			return __minimum;
 		}
-
 		public function set minimum(_minimum:Number):void {
 			__minimum = _minimum;
 			setStyle();
 		}
-		private var __snapInterval:Number = 1;
-
+		
+		protected var __snapInterval:Number = 1;
 		public function get snapInterval():Number {
 			return __snapInterval;
 		}
-
 		public function set snapInterval(_snapInterval:Number):void {
 			__snapInterval = _snapInterval;
 			setStyle();
@@ -105,15 +101,15 @@
 
 		protected function onMouseWheelHandler(_e:MouseEvent):void {
 			if (mouseWheelEnabled && timeHolded == 0){
-				value += (_e.delta > 0 ? 10 : -10) * snapInterval;
+				value += (_e.delta > 0 ? 10 : -10) * __snapInterval;
 			}
 		}
 
 		protected function onHoldingHandler(_evt:Event):void {
 			if (bar){
-				value = Math.round((mouseX - bar.x + offXThumb) / scale / snapInterval) * snapInterval + minimum;
+				value = Math.round((mouseX - bar.x + offXThumb) / scale / __snapInterval) * __snapInterval + __minimum;
 			} else {
-				value = Math.round(mouseX / scale / snapInterval) * snapInterval + minimum;
+				value = Math.round(mouseX / scale / __snapInterval) * __snapInterval + __minimum;
 			}
 			timeHolded++;
 		}
@@ -122,21 +118,21 @@
 			if (isNaN(_value)){
 				_value = 0;
 			}
-			if (_value < minimum){
-				_value = minimum;
-			} else if (_value > maximum){
-				_value = maximum;
+			if (_value < __minimum){
+				_value = __minimum;
+			} else if (_value > __maximum){
+				_value = __maximum;
 			}
 			return _value;
 		}
 
 		override protected function getClipsValue():Number {
-			scale = length / (maximum - minimum);
-			return Math.round((value - minimum) * scale);
+			scale = __length / (__maximum - __minimum);
+			return (__value - __minimum) * scale;
 		}
 		
-		override protected function setLabel(_value:Number):String {
-			return Math.round(value)+"";
+		override protected function defaultLabelFunction(_value:Number):String {
+			return Math.round(__value)+"";
 		}
 	}
 }

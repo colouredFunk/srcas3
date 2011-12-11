@@ -18,33 +18,33 @@ package ui{
 		public var maskClip:DisplayObject;
 		public var track:DisplayObject;
 		
-		protected var offXThumb:int;
-		protected var offWidthMaskClip:int;
-		protected var offWidthTrack:int;
+		protected var offXThumb:Number=0;
+		protected var offWidthMaskClip:Number=0;
+		protected var offWidthTrack:Number=0;
 		
-		private var __roundShow:Boolean;
-		public function get roundShow():Boolean{
-			return __roundShow;
+		protected var __rounded:Boolean=true;
+		public function get rounded():Boolean{
+			return __rounded;
 		}
-		public function set roundShow(_roundShow:Boolean):void{
-			__roundShow = _roundShow;
+		public function set rounded(_roundShow:Boolean):void{
+			__rounded = _roundShow;
+			setMaskStyle();
+			setTrackStyle();
 			setStyle();
 		}
-		private var __length:uint;
-		public function get length():uint {
+		
+		protected var __length:Number;
+		public function get length():Number {
 			return __length;
 		}
-		public function set length(_length:uint):void {
+		public function set length(_length:Number):void {
 			__length = _length;
-			if (maskClip && bar) {
-				maskClip.width = offWidthMaskClip +__length;
-			}
-			if (track) {
-				track.width = offWidthTrack +__length - offXThumb * 2;
-			}
+			setMaskStyle();
+			setTrackStyle();
 			setStyle();
 		}
-		private var __value:Number = 0;
+		
+		protected var __value:Number = 0;
 		public function get value():Number {
 			return __value;
 		}
@@ -59,6 +59,7 @@ package ui{
 			}
 			setStyle();
 		}
+		
 		override protected function init():void {
 			super.init();
 			if (track) {
@@ -82,11 +83,11 @@ package ui{
 			}
 			if (thumb && bar) {
 				offXThumb = thumb.x - bar.width - bar.x;
-				length = Math.round((thumb.x - bar.x + offXThumb)  * scaleX);
+				length = (thumb.x - bar.x + offXThumb) * scaleX;
 			}else if (bar) {
-				length = Math.round(bar.width * scaleX);
+				length = bar.width * scaleX;
 			}else {
-				length = Math.round(thumb.x  * scaleX);
+				length = thumb.x  * scaleX;
 			}
 			scaleX = 1;
 			value = 0;
@@ -103,6 +104,17 @@ package ui{
 			maskClip = null;
 			track = null;
 		}
+		public function setStyle():void {
+			var _value:Number = getClipsValue();
+			if (thumb && bar) {
+				setThumbStyle(_value + bar.x - offXThumb);
+				setBatStyle(Math.max(0, _value - 2 * offXThumb));
+			}else {
+				setThumbStyle(_value);
+				setBatStyle(_value);
+			}
+			setTxtStyle();
+		}
 		protected function formatValue(_value:Number):Number {
 			if (isNaN(_value)) {
 				_value = 0;
@@ -115,37 +127,52 @@ package ui{
 			return _value;
 		}
 		protected function getClipsValue():Number {
-			return value * length;
+			return __value * __length;
 		}
-		public function setStyle():void {
-			setClips(getClipsValue());
-			if (txt) {
-				txt.text = (labelFunction!=null)?labelFunction(value):setLabel(value);
-			}
-		}
-		protected function setClips(_value:Number):void {
-			if (thumb && bar) {
-				thumb.x = _value + bar.x - offXThumb;
-				var _width:int = Math.round(_value - 2 * offXThumb);
-				if (_width<0) {
-					_width = 0;
-				}
-				bar.width = _width;
-			}else if(bar){
-				bar.width = _value;
-			}else {
-				thumb.x = _value;
-			}
-			if (roundShow) {
-				if (thumb) {
+		
+		protected function setThumbStyle(_x:Number):void {
+			if (thumb) {
+				thumb.x = _x;
+				if (__rounded) {
 					thumb.x = Math.round(thumb.x);
 				}
-				if (bar) {
-					bar.x = Math.round(bar.x);
+			}
+		}
+		
+		protected function setBatStyle(_w:Number):void {
+			if (bar) {
+				bar.width = _w;
+				if (__rounded) {
+					bar.width = Math.round(bar.width);
 				}
 			}
 		}
-		protected function setLabel(_value:Number):String {
+		
+		protected function setTxtStyle():void {
+			if (txt) {
+				txt.text = (labelFunction!=null)?labelFunction(__value):defaultLabelFunction(__value);
+			}
+		}
+		
+		protected function setMaskStyle():void {
+			if (maskClip && bar) {
+				maskClip.width = offWidthMaskClip +__length;
+				if (__rounded) {
+					maskClip.width = Math.round(maskClip.width);
+				}
+			}
+		}
+		
+		protected function setTrackStyle():void {
+			if (track) {
+				track.width = offWidthTrack +__length - offXThumb * 2;
+				if (__rounded) {
+					track.width = Math.round(track.width);
+				}
+			}
+		}
+		
+		protected function defaultLabelFunction(_value:Number):String {
 			return Math.round(value * 100) + " %";
 		}
 	}
