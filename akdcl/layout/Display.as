@@ -185,17 +185,17 @@ package akdcl.layout {
 			}
 		}
 		
-		public function getScaleWidth():uint {
+		public function getScaleWidth():int {
 			return scaleWidth;
 		}
-		public function getScaleHeight():uint {
+		public function getScaleHeight():int {
 			return scaleHeight;
 		}
 		
-		public function getOriginalWidth():uint {
+		public function getOriginalWidth():int {
 			return originalWidth;
 		}
-		public function getOriginalHeight():uint {
+		public function getOriginalHeight():int {
 			return originalHeight;
 		}
 
