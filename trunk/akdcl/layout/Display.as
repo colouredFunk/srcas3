@@ -23,11 +23,9 @@ package akdcl.layout {
 		private var scaleY:Number;
 
 		private var __scrollX:Number;
-
 		public function get scrollX():Number {
 			return __scrollX;
 		}
-
 		public function set scrollX(_value:Number):void {
 			if (_value < -scaleWidth){
 				_value = -scaleWidth;
@@ -59,11 +57,9 @@ package akdcl.layout {
 		}
 
 		private var __scrollY:Number;
-
 		public function get scrollY():Number {
 			return __scrollY;
 		}
-
 		public function set scrollY(_value:Number):void {
 			if (_value < -scaleHeight){
 				_value = -scaleHeight;
@@ -96,11 +92,9 @@ package akdcl.layout {
 
 		//alignX,alignY 0~1
 		private var __alignX:Number;
-
 		public function get alignX():Number {
 			return __alignX;
 		}
-
 		public function set alignX(_value:Number):void {
 			if (__alignX == _value){
 				return;
@@ -113,11 +107,9 @@ package akdcl.layout {
 		}
 
 		private var __alignY:Number;
-
 		public function get alignY():Number {
 			return __alignY;
 		}
-
 		public function set alignY(_value:Number):void {
 			if (__alignY == _value){
 				return;
@@ -132,12 +124,11 @@ package akdcl.layout {
 		//-1:outside,0:noscale,1:inside;
 		//>1||<-1:scale
 		//NaN:stretch,10:onlywidth,-10:onlyheight;
+		//11:onlywidth and ratio,-11:onlyheight and ratio;
 		private var __scaleMode:Number;
-
 		public function get scaleMode():Number {
 			return __scaleMode;
 		}
-
 		public function set scaleMode(_value:Number):void {
 			if (__scaleMode == _value){
 				return;
@@ -171,14 +162,6 @@ package akdcl.layout {
 			eventChange = null;
 		}
 
-		override protected function updatePoint(_dispathEvent:Boolean = true):void {
-			if (content){
-				content.x = __x + __scrollX;
-				content.y = __y + __scrollY;
-			}
-			super.updatePoint(_dispathEvent);
-		}
-
 		public function setContent(_content:Object, _alignX:Number = 0, _alignY:Number = 0, _scaleMode:Number = NaN):void {
 			__alignX = _alignX;
 			__alignY = _alignY;
@@ -201,6 +184,28 @@ package akdcl.layout {
 				dispatchEvent(eventChange);
 			}
 		}
+		
+		public function getScaleWidth():uint {
+			return scaleWidth;
+		}
+		public function getScaleHeight():uint {
+			return scaleHeight;
+		}
+		
+		public function getOriginalWidth():uint {
+			return originalWidth;
+		}
+		public function getOriginalHeight():uint {
+			return originalHeight;
+		}
+
+		override protected function updatePoint(_dispathEvent:Boolean = true):void {
+			if (content){
+				content.x = __x + __scrollX;
+				content.y = __y + __scrollY;
+			}
+			super.updatePoint(_dispathEvent);
+		}
 
 		override protected function updateSize(_dispathEvent:Boolean = true):void {
 			var _scaleABS:Number = Math.abs(__scaleMode);
@@ -221,6 +226,18 @@ package akdcl.layout {
 
 					scaleHeight = __height;
 					//scaleWidth = originalWidth;
+				}
+			} else if (_scaleABS == 11){
+				if (__scaleMode > 0){
+					scaleY = scaleX = __width / originalWidth;
+
+					scaleWidth = __width;
+					scaleHeight = originalHeight * scaleX;
+				} else {
+					scaleX = scaleY = __height / originalHeight;
+
+					scaleHeight = __height;
+					scaleWidth = originalWidth * scaleY;
 				}
 			} else {
 				var _scale:Number;
