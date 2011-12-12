@@ -5,7 +5,7 @@ package akdcl.utils {
 	 * @author Akdcl
 	 */
 
-	public function setDisplayWH(_display:*, _width:uint=0, _height:uint=0, _wK:String = null, _hK:String = null):void {
+	public function setDisplayWH(_display:Object, _width:uint=0, _height:uint=0, _wK:String = null, _hK:String = null):void {
 		var _wOrg:Number = _wK ? _display[_wK] : _display.width;
 		var _hOrg:Number = _hK ? _display[_hK] : _display.height;
 		var _aspectRatioOrg:Number = _wOrg / _hOrg;

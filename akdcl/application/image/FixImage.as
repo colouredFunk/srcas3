@@ -1,6 +1,9 @@
 ﻿package akdcl.application.image {
+	import akdcl.layout.Display;
+	import akdcl.media.CameraUI;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display.DisplayObject;
 	import flash.display.Graphics;
 	import flash.display.Shape;
 	import flash.display.Sprite;
@@ -12,14 +15,10 @@
 	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
 
-	import ui.Alert;
-	import ui.UISprite;
-	import ui.transformTool.TransformTool;
+	import akdcl.display.UISprite;
+	import akdcl.display.UIDisplay;
 
-	import akdcl.net.FileRef;
-	import akdcl.media.DisplayRect;
-	import akdcl.media.CameraProvider;
-	import akdcl.events.MediaEvent;
+	import ui.transformTool.TransformTool;
 
 	/**
 	 * ...
@@ -29,110 +28,121 @@
 		private static const MATRIX:Matrix = new Matrix();
 
 		public var backgroundColor:uint = 0xffffff;
-		public var frameBorder:uint = 10;
-		public var maxImageWidth:uint;
-		public var maxImageHeight:uint;
+
 		public var imageWidth:uint;
 		public var imageHeight:uint;
 
-		public var frameArea:*;
-		public var frameShow:*;
-		public var onChanging:Function;
-		public var onLoaded:Function;
+		protected var iconWidth:uint;
+		protected var iconHeight:uint;
 
-		protected var displayRect:DisplayRect;
+		protected var areaWidth:uint;
+		protected var areaHeight:uint;
+
+		public var frameBorder:uint = 0;
+
+		public var frameArea:DisplayObject;
+		public var frameIcon:DisplayObject;
+
+		protected var displayArea:UIDisplay;
+		protected var proxyIcon:Display;
+
 		protected var shapeMask:Shape;
+		//shapeMove需要鼠标事件不能用Shape
 		protected var shapeMove:UISprite;
 		protected var shapesContainer:UISprite;
 
-		protected var cameraProvider:CameraProvider;
-		protected var fileRef:FileRef;
 		protected var transformTool:TransformTool;
 		protected var bitmap:Bitmap;
 		protected var bitmapData:BitmapData;
 		protected var orgBitmapData:BitmapData;
 
-		public var isCamera:Boolean;
-
 		override protected function init():void {
 			super.init();
 
-			fileRef = new FileRef();
-			fileRef.onFailed = onImageFailedHandler;
-			fileRef.onLoadComplete = onImageCompleteHandler;
+			areaWidth = frameArea.width - frameBorder * 2;
+			areaHeight = frameArea.height - frameBorder * 2;
 
-			cameraProvider = new CameraProvider();
-			cameraProvider.addEventListener(MediaEvent.DISPLAY_CHANGE, onCameraOpenHandler);
-			cameraProvider.addEventListener(MediaEvent.PLAY_PROGRESS, onCameraPlayingHandler);
-			cameraProvider.addEventListener(MediaEvent.LOAD_ERROR, onCameraFailedHandler);
+			iconWidth = frameIcon.width - frameBorder * 2;
+			iconHeight = frameIcon.height - frameBorder * 2;
 
-			imageWidth = maxImageWidth = frameShow.width - frameBorder * 2;
-			imageHeight = maxImageHeight = frameShow.height - frameBorder * 2;
-
-			displayRect = new DisplayRect(frameArea.width - frameBorder * 2, frameArea.height - frameBorder * 2, -1);
 			shapesContainer = new UISprite();
 			shapeMask = new Shape();
 			shapeMove = new UISprite();
+			
 			bitmap = new Bitmap();
 
+			displayArea = new UIDisplay(areaWidth, areaHeight, -1);
+			proxyIcon = new Display(frameIcon.x + frameBorder, frameIcon.y + frameBorder, iconWidth, iconHeight);
+			
 			shapesContainer.blendMode = BlendMode.LAYER;
 			shapeMove.blendMode = BlendMode.ERASE;
-			displayRect.x = shapesContainer.x = frameArea.x + frameBorder;
-			displayRect.y = shapesContainer.y = frameArea.y + frameBorder;
-			bitmap.x = frameShow.x + frameBorder;
-			bitmap.y = frameShow.y + frameBorder;
+			
+			shapeMask.graphics.beginFill(0x000000, 0.5);
+			shapeMask.graphics.drawRect(0, 0, areaWidth, areaHeight);
 
-			addChildAt(displayRect, getChildIndex(frameArea) + 1);
-			addChildAt(shapesContainer, getChildIndex(displayRect) + 1);
-			addChildAt(bitmap, getChildIndex(frameShow) + 1);
-
-			shapesContainer.addChild(shapeMask);
-			shapesContainer.addChild(shapeMove);
+			displayArea.x = shapesContainer.x = frameArea.x + frameBorder;
+			displayArea.y = shapesContainer.y = frameArea.y + frameBorder;
+			
+			addChildAt(displayArea, getChildIndex(frameArea) + 1);
+			addChildAt(shapesContainer, getChildIndex(displayArea) + 1);
+			addChildAt(bitmap, getChildIndex(frameIcon) + 1);
 
 			transformTool = new TransformTool(shapesContainer);
+			transformTool.area = new Rectangle(0, 0, areaWidth, areaHeight);
 			transformTool.onChanging = updateBMD;
-			transformTool.area = new Rectangle(0, 0, displayRect.rectWidth, displayRect.rectHeight);
+			transformTool.Init();
+
 			shapesContainer.scrollRect = transformTool.area;
+			shapesContainer.addChild(shapeMask);
+			shapesContainer.addChild(shapeMove);
+		}
+
+		public function setImageSize(_width:uint, _height:uint):void {
+			imageWidth = _width;
+			imageHeight = _height;
+
+			shapeMove.graphics.clear();
+			shapeMove.graphics.beginFill(backgroundColor);
+			shapeMove.graphics.drawRect(0, 0, imageWidth, imageHeight);
+
+			proxyIcon.setContent(shapeMove, 0, 0, 11);
+			
+			iconWidth = proxyIcon.getScaleWidth();
+			iconHeight = proxyIcon.getScaleHeight();
+			
+			frameIcon.width = iconWidth + frameBorder * 2;
+			frameIcon.height = iconHeight + frameBorder * 2;
+			
+			shapeMove.x = int((areaWidth - iconWidth) * 0.5);
+			shapeMove.y = int((areaHeight - iconHeight) * 0.5);
+			
+			//
+			transformTool.RemoveControl(shapeMove);
+			transformTool.AddControl(shapeMove, true);
+			transformTool.SetStyle(shapeMove, {eqScale: true, enSetMidPoint: false});
 
 			enabled = false;
 		}
 
-		override protected function onRemoveToStageHandler():void {
+		override protected function onRemoveHandler():void {
+			super.onRemoveHandler();
 			clear();
 			transformTool.Clear();
-			fileRef.remove();
-			cameraProvider.remove();
-			super.onRemoveToStageHandler();
 			frameArea = null;
-			frameShow = null;
-			onChanging = null;
-			onLoaded = null;
-			displayRect = null;
+			frameIcon = null;
+			displayArea = null;
 			shapeMask = null;
 			shapeMove = null;
 			shapesContainer = null;
-			cameraProvider = null;
-			fileRef = null;
 			transformTool = null;
 			bitmap = null;
 			bitmapData = null;
 			orgBitmapData = null;
 		}
 
-		public function browse():void {
-			fileRef.browseFile();
-		}
-
-		public function useCamera():void {
-			cameraProvider.pause();
-			cameraProvider.load(null);
-		}
-
 		public function clear():void {
 			reset();
 			transformTool.ArrowClear();
-			cameraProvider.stop();
-
 			if (bitmapData){
 				bitmapData.dispose();
 				bitmapData = null;
@@ -146,24 +156,8 @@
 			updateBMD();
 		}
 
-		public function activate():void {
-			if (isCamera){
-				cameraProvider.play();
-			}
-		}
-
-		public function deactivate():void {
-			if (isCamera){
-				cameraProvider.pause();
-			}
-		}
-
 		public function getOrgBitmapData():BitmapData {
 			return orgBitmapData;
-		}
-
-		public function getOrgFile():ByteArray {
-			return isCamera ? null : fileRef.data;
 		}
 
 		//设置 width 和 height 后注意回收bitmapData;
@@ -175,123 +169,53 @@
 				return bitmapData;
 			}
 			var _bmd:BitmapData;
-			bitmap.scaleY = bitmap.scaleX = 1;
 
 			var _aspectRatio:Number = _width / _height;
-			var _aspectRatioOrg:Number = bitmapData.width / bitmapData.height;
+			var _aspectRatioOrg:Number = imageWidth / imageHeight;
+
 			if (_width * _height > 0 ? (_aspectRatio < _aspectRatioOrg) : (_width > 0)){
 				if (_width <= 1){
-					bitmap.width = bitmap.width * _width;
-				} else {
-					bitmap.width = _width;
+					_width = imageWidth * _width;
 				}
-				bitmap.scaleY = bitmap.scaleX;
-				bitmap.height = Math.round(bitmap.height);
-				MATRIX.d = MATRIX.a = bitmap.scaleX;
+				_height = _width / _aspectRatioOrg;
+				MATRIX.d = MATRIX.a = _width / imageWidth;
 			} else {
 				if (_height <= 1){
-					bitmap.height = bitmap.height * _height;
-				} else {
-					bitmap.height = _height;
+					_height = imageHeight * _height;
 				}
-				bitmap.scaleX = bitmap.scaleY;
-				bitmap.width = Math.round(bitmap.width);
-				MATRIX.d = MATRIX.a = bitmap.scaleY;
+				_width = _height * _aspectRatioOrg;
+				MATRIX.d = MATRIX.a = _height / imageHeight;
 			}
 
-			_bmd = new BitmapData(bitmap.width, bitmap.height, false, backgroundColor);
-			_bmd.draw(bitmap, MATRIX);
-			//还原
-			bitmap.width = imageWidth;
-			bitmap.height = imageHeight;
+			_bmd = new BitmapData(_width, _height, false, backgroundColor);
+			_bmd.draw(bitmapData, MATRIX);
+
 			//_bmd.dispose();
 
 			return _bmd;
 		}
 
-		protected function onImageCompleteHandler(_data:*):void {
-			if (isCamera){
-				if (orgBitmapData){
-					orgBitmapData.dispose();
-				}
-				isCamera = false;
-				cameraProvider.stop();
-			}
+		public function setImage(_bmd:BitmapData):void {
 			enabled = true;
-			setShapes();
-			orgBitmapData = _data;
-			displayRect.setContent(_data, 0);
+			
+			if (orgBitmapData) {
+				orgBitmapData.dispose();
+			}
+			
+			orgBitmapData = _bmd;
+			displayArea.setContent(orgBitmapData, 0);
 			reset();
-			if (onLoaded != null){
-				onLoaded();
-			}
+			proxyIcon.setContent(bitmap, 0, 0, 11);
 		}
-
-		protected function onImageFailedHandler(_str:String):void {
-			Alert.show(_str);
-		}
-
-		protected function onCameraOpenHandler(_e:* = null):void {
-			if (!isCamera){
-				orgBitmapData = null;
-				isCamera = true;
-			}
-			enabled = true;
-			setShapes();
-			displayRect.setContent(cameraProvider.playContent, 0);
-			reset();
-			if (onLoaded != null){
-				onLoaded();
-			}
-		}
-
-		protected function onCameraPlayingHandler(_e:Event):void {
-			if (!orgBitmapData){
-				orgBitmapData = new BitmapData(cameraProvider.playContent.width, cameraProvider.playContent.height, false, backgroundColor);
-			}
-			MATRIX.d = MATRIX.a = cameraProvider.playContent.scaleX;
-			orgBitmapData.draw(cameraProvider.playContent, MATRIX);
-			updateBMD();
-		}
-
-		protected function onCameraFailedHandler(_e:* = null){
-			Alert.show("请允许使用摄像头或检查摄像头是否正常！");
-		}
-
-		protected function setShapes():void {
-			if (shapeMove.width == 0){
-				shapeMask.graphics.beginFill(0x000000, 0.5);
-				shapeMask.graphics.drawRect(0, 0, displayRect.rectWidth, displayRect.rectHeight);
-				shapeMove.graphics.beginFill(backgroundColor);
-				shapeMove.graphics.drawRect(0, 0, maxImageWidth, maxImageHeight);
-
-				shapeMove.width = imageWidth;
-				shapeMove.height = imageHeight;
-				shapeMove.x = int((shapesContainer.scrollRect.width - imageWidth) * 0.5);
-				shapeMove.y = int((shapesContainer.scrollRect.height - imageHeight) * 0.5);
-
-				transformTool.Init();
-				transformTool.AddControl(shapeMove, true);
-				transformTool.SetStyle(shapeMove, {eqScale: true, enSetMidPoint: false});
-			}
-		}
-
 
 		protected function updateBMD():void {
 			if (bitmapData){
 				bitmapData.dispose();
 			}
-			bitmapData = getContainBmd(shapeMove, displayRect, backgroundColor);
+			bitmapData = getContainBmd(shapeMove, displayArea, backgroundColor);
 
 			bitmap.bitmapData = bitmapData;
 			bitmap.smoothing = true;
-			if (bitmap.width > 0 && bitmap.width != imageWidth){
-				bitmap.width = imageWidth;
-				bitmap.height = imageHeight;
-			}
-			if (onChanging != null){
-				onChanging();
-			}
 		}
 
 		private static function getContainBmd(_obj:*, _bg:*, _bgColor:uint = 0):BitmapData {

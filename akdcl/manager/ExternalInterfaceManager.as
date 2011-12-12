@@ -1,4 +1,5 @@
 ﻿package akdcl.manager {
+	import akdcl.utils.objectToString;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.external.ExternalInterface;
@@ -87,14 +88,21 @@
 			return false;
 		}
 
-		public function callInterface(_funName:String, ... args):* {
-			lM.info(ExternalInterfaceManager, "callInterface(funName:{2}, args:{3}) isAvailable:{0} objectID:{1}", null, isAvailable, objectID, _funName, args);
+		public function callInterface(_funName:String, ... args):Object {
+			var _object:Object;
 			if (isAvailable && hasInterface(_funName)){
 				if (args){
-					return ExternalInterface.call.apply(ExternalInterface, [_funName].concat(args));
+					_object = ExternalInterface.call.apply(ExternalInterface, [_funName].concat(args));
 				}
-				return ExternalInterface.call(_funName);
+				_object = ExternalInterface.call(_funName);
 			}
+			var _str:String = "callInterface(funName:{2}, args:{3}) isAvailable:{0} objectID:{1}";
+			if (_object) {
+				_str += "====>>>>\n" + objectToString(_object);
+			}
+			
+			lM.info(ExternalInterfaceManager, _str, null, isAvailable, objectID, _funName, args);
+			return _object;
 		}
 
 		//广播as调用js的事件
