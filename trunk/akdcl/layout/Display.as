@@ -23,9 +23,31 @@ package akdcl.layout {
 		private var scaleY:Number;
 
 		private var __scrollX:Number;
+		private var __scrollY:Number;
+		//-1:outside,0:noscale,1:inside;
+		//>1||<-1:scale
+		//NaN:stretch,10:onlywidth,-10:onlyheight;
+		//11:onlywidth and ratio,-11:onlyheight and ratio;
+		private var __scaleMode:Number;
+
+		override public function get width():Number {
+			if (__scaleMode == -11 || __scaleMode == -10) {
+				return scaleWidth + border * 2;
+			}
+			return __width;
+		}
+
+		override public function get height():Number {
+			if (__scaleMode == 11 || __scaleMode == 10) {
+				return scaleHeight + border * 2;
+			}
+			return __height;
+		}
+
 		public function get scrollX():Number {
 			return __scrollX;
 		}
+
 		public function set scrollX(_value:Number):void {
 			if (_value < -scaleWidth){
 				_value = -scaleWidth;
@@ -56,10 +78,10 @@ package akdcl.layout {
 			}
 		}
 
-		private var __scrollY:Number;
 		public function get scrollY():Number {
 			return __scrollY;
 		}
+
 		public function set scrollY(_value:Number):void {
 			if (_value < -scaleHeight){
 				_value = -scaleHeight;
@@ -90,82 +112,44 @@ package akdcl.layout {
 			}
 		}
 
-		//alignX,alignY 0~1
-		private var __alignX:Number;
-		public function get alignX():Number {
-			return __alignX;
-		}
-		public function set alignX(_value:Number):void {
-			if (__alignX == _value){
-				return;
-			}
-			__alignX = _value;
-			__scrollX = (__width - scaleWidth) * __alignX;
-			if (autoUpdate){
-				updatePoint(true);
-			}
-		}
-
-		private var __alignY:Number;
-		public function get alignY():Number {
-			return __alignY;
-		}
-		public function set alignY(_value:Number):void {
-			if (__alignY == _value){
-				return;
-			}
-			__alignY = _value;
-			__scrollY = (__height - scaleHeight) * __alignY;
-			if (autoUpdate){
-				updatePoint(true);
-			}
-		}
-
-		//-1:outside,0:noscale,1:inside;
-		//>1||<-1:scale
-		//NaN:stretch,10:onlywidth,-10:onlyheight;
-		//11:onlywidth and ratio,-11:onlyheight and ratio;
-		private var __scaleMode:Number;
 		public function get scaleMode():Number {
 			return __scaleMode;
 		}
+
 		public function set scaleMode(_value:Number):void {
 			if (__scaleMode == _value){
 				return;
 			}
 			__scaleMode = _value;
-			if (autoUpdate) {
+			if (autoUpdate){
 				//未改变__width, __height不需要发出事件
 				updateSize(false);
 			}
 		}
 
-		public function Display(_x:Number, _y:Number, _width:Number, _height:Number):void {
-			super(_x, _y, _width, _height);
+		public function Display(_x:Number, _y:Number, _width:Number, _height:Number, _alignX:Number = 0, _alignY:Number = 0, _scaleMode:Number = NaN):void {
+			__scaleMode = _scaleMode;
+			super(_x, _y, _width, _height, _alignX, _alignY);
 		}
-		
-		override protected function init():void 
-		{
+
+		override protected function init():void {
 			super.init();
+			name = "display";
 			__scrollX = 0;
 			__scrollY = 0;
-			__alignX = 0;
-			__alignY = 0;
-			__scaleMode = NaN;
 			eventChange = new Event(Event.CHANGE);
 		}
-		
-		override protected function onRemoveHandler():void 
-		{
+
+		override protected function onRemoveHandler():void {
 			super.onRemoveHandler();
 			content = null;
 			eventChange = null;
 		}
 
 		public function setContent(_content:Object, _alignX:Number = 0, _alignY:Number = 0, _scaleMode:Number = NaN):void {
-			__alignX = _alignX;
+			/*__alignX = _alignX;
 			__alignY = _alignY;
-			__scaleMode = _scaleMode;
+			__scaleMode = _scaleMode;*/
 			content = _content;
 			if (content is Loader){
 				originalWidth = content.contentLoaderInfo.width;
@@ -178,28 +162,32 @@ package akdcl.layout {
 				originalHeight = content.height;
 			}
 			aspectRatio = originalWidth / originalHeight;
-			//未改变__width, __height不需要发出事件
-			updateSize(false);
+			//未改变__width, __height不需要发出事件?
+			updateSize(__scaleMode == 11 || __scaleMode == -11 || __scaleMode == 10 || __scaleMode == -10);
 			if (hasEventListener(Event.CHANGE)){
 				dispatchEvent(eventChange);
 			}
 		}
-		
+
 		public function getScaleWidth():int {
 			return scaleWidth;
 		}
+
 		public function getScaleHeight():int {
 			return scaleHeight;
 		}
-		
+
 		public function getOriginalWidth():int {
 			return originalWidth;
 		}
+
 		public function getOriginalHeight():int {
 			return originalHeight;
 		}
 
 		override protected function updatePoint(_dispathEvent:Boolean = true):void {
+			__scrollX = (__width - scaleWidth) * __alignX - (__alignX * 2 - 1) * border;
+			__scrollY = (__height - scaleHeight) * __alignY - (__alignY * 2 - 1) * border;
 			if (content){
 				content.x = __x + __scrollX;
 				content.y = __y + __scrollY;
@@ -209,43 +197,45 @@ package akdcl.layout {
 
 		override protected function updateSize(_dispathEvent:Boolean = true):void {
 			var _scaleABS:Number = Math.abs(__scaleMode);
+			var _width:Number = __width - border * 2;
+			var _height:Number = __height - border * 2;
 			if (isNaN(_scaleABS)){
-				scaleX = __width / originalWidth;
-				scaleY = __height / originalHeight;
+				scaleX = _width / originalWidth;
+				scaleY = _height / originalHeight;
 
-				scaleWidth = __width;
-				scaleHeight = __height;
+				scaleWidth = _width;
+				scaleHeight = _height;
 			} else if (_scaleABS == 10){
 				if (__scaleMode > 0){
-					scaleX = __width / originalWidth;
+					scaleX = _width / originalWidth;
 
-					scaleWidth = __width;
-					//scaleHeight = originalHeight;
+					scaleWidth = _width;
+					scaleHeight = originalHeight;
 				} else {
-					scaleY = __height / originalHeight;
+					scaleY = _height / originalHeight;
 
-					scaleHeight = __height;
-					//scaleWidth = originalWidth;
+					scaleHeight = _height;
+					scaleWidth = originalWidth;
 				}
 			} else if (_scaleABS == 11){
 				if (__scaleMode > 0){
-					scaleY = scaleX = __width / originalWidth;
+					scaleY = scaleX = _width / originalWidth;
 
-					scaleWidth = __width;
+					scaleWidth = _width;
 					scaleHeight = originalHeight * scaleX;
 				} else {
-					scaleX = scaleY = __height / originalHeight;
+					scaleX = scaleY = _height / originalHeight;
 
-					scaleHeight = __height;
+					scaleHeight = _height;
 					scaleWidth = originalWidth * scaleY;
 				}
 			} else {
 				var _scale:Number;
-				if (__scaleMode < 0 ? (__width / __height > aspectRatio) : (__width / __height < aspectRatio)){
-					_scale = __width / originalWidth;
-					scaleWidth = __width;
+				if (__scaleMode < 0 ? (_width / _height > aspectRatio) : (_width / _height < aspectRatio)){
+					_scale = _width / originalWidth;
+					scaleWidth = _width;
 				} else {
-					_scale = __height / originalHeight;
+					_scale = _height / originalHeight;
 				}
 				if (_scaleABS <= 1){
 					_scale = 1 + (_scale - 1) * _scaleABS;
@@ -258,18 +248,15 @@ package akdcl.layout {
 				scaleHeight = originalHeight * scaleY;
 			}
 
-			if (content) {
-				if (content is Loader) {
+			if (content){
+				if (content is Loader){
 					content.scaleX = scaleX;
 					content.scaleY = scaleY;
-				}else {
+				} else {
 					content.width = scaleWidth;
 					content.height = scaleHeight;
 				}
 			}
-
-			__scrollX = (__width - scaleWidth) * __alignX;
-			__scrollY = (__height - scaleHeight) * __alignY;
 			updatePoint(_dispathEvent);
 			super.updateSize(_dispathEvent);
 		}

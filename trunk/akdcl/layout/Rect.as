@@ -17,18 +17,22 @@ package akdcl.layout {
 		internal var isAverageWidth:Boolean;
 		internal var isAverageHeight:Boolean;
 
-		internal var __x:Number = 0;
-		internal var __y:Number = 0;
-		internal var __width:Number = 0;
-		internal var __height:Number = 0;
+		internal var __x:Number;
+		internal var __y:Number;
+		internal var __width:Number;
+		internal var __height:Number;
+		//alignX,alignY 0~1
+		internal var __alignX:Number;
+		internal var __alignY:Number;
 
-		internal var percentWidth:Number = 0;
-		internal var percentHeight:Number = 0;
+		internal var percentWidth:Number;
+		internal var percentHeight:Number;
 
 		private var eventResize:Event;
 		private var eventScroll:Event;
 
 		public var autoUpdate:Boolean;
+		public var border:int;
 
 		public function get x():Number {
 			return __x;
@@ -63,6 +67,9 @@ package akdcl.layout {
 		}
 
 		public function set width(_value:Number):void {
+			if (_value < 0) {
+				_value = 0;
+			}
 			if (__width == _value){
 				return;
 			}
@@ -77,6 +84,9 @@ package akdcl.layout {
 		}
 
 		public function set height(_value:Number):void {
+			if (_value < 0) {
+				_value = 0;
+			}
 			if (__height == _value){
 				return;
 			}
@@ -86,34 +96,66 @@ package akdcl.layout {
 			}
 		}
 
-		public function Rect(_x:Number, _y:Number, _width:Number, _height:Number):void {
+		public function get alignX():Number {
+			return __alignX;
+		}
+
+		public function set alignX(_value:Number):void {
+			if (__alignX == _value){
+				return;
+			}
+			__alignX = _value;
+			if (autoUpdate){
+				updatePoint(true);
+			}
+		}
+
+		public function get alignY():Number {
+			return __alignY;
+		}
+
+		public function set alignY(_value:Number):void {
+			if (__alignY == _value){
+				return;
+			}
+			__alignY = _value;
+			if (autoUpdate){
+				updatePoint(true);
+			}
+		}
+
+		public function Rect(_x:Number, _y:Number, _width:Number, _height:Number, _alignX:Number = 0, _alignY:Number = 0):void {
 			__x = _x;
 			__y = _y;
 			if (_width > 1){
 				__width = _width;
+				percentWidth = 0;
 			} else {
 				percentWidth = _width;
 			}
 			if (_height > 1){
 				__height = _height;
+				percentHeight = 0;
 			} else {
 				percentHeight = _height;
 			}
+			__alignX = _alignX;
+			__alignY = _alignY;
 			super();
 		}
-		
-		override protected function init():void 
-		{
+
+		override protected function init():void {
 			super.init();
+			name = "rect";
+			border = 0;
 			autoUpdate = true;
-			isAverageWidth = !Boolean(__width);
-			isAverageHeight = !Boolean(__height);
+			isAverageWidth = !Boolean(__width) && !Boolean(percentWidth);
+			isAverageHeight = !Boolean(__height) && !Boolean(percentHeight);
 			eventResize = new Event(Event.RESIZE);
 			eventScroll = new Event(Event.SCROLL);
 		}
-		
-		override protected function onRemoveHandler():void 
-		{
+
+		override protected function onRemoveHandler():void {
 			super.onRemoveHandler();
 			eventResize = null;
 			eventScroll = null;
@@ -160,11 +202,11 @@ package akdcl.layout {
 		}
 
 		override public function toString():String {
-			var _str:String = "";
-			_str += "x:" + x + ", ";
-			_str += "y:" + y + ", ";
-			_str += "width:" + width + ", ";
-			_str += "height:" + height + "\n";
+			var _str:String = "name:" + name + ", "
+			+ "x:" + x + ", "
+			+ "y:" + y + ", "
+			+ "width:" + width + ", "
+			+ "height:" + height + "\n";
 			return _str;
 		}
 	}

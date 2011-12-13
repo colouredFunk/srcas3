@@ -12,16 +12,21 @@ package akdcl.layout {
 				case "Group":
 				case "HGroup":
 				case "VGroup":
-					_rect = new Group(0, 0, Number(_xml.@w), Number(_xml.@h), GROUP_VALUES[_xml.localName()]);
+					_rect = new Group(0, 0, Number(_xml.@width), Number(_xml.@height), Number(_xml.@alignX), Number(_xml.@alignY));
+					_rect.interval = Number(_xml.@interval);
+					_rect.border = Number(_xml.@border);
+					_rect.type = GROUP_VALUES[_xml.localName()];
 					_rect.userData = {xml: _xml};
 					break;
 				case "Display":
-					_rect = new Display(0, 0, Number(_xml.@w), Number(_xml.@h));
+					_rect = new Display(0, 0, Number(_xml.@width), Number(_xml.@height), Number(_xml.@alignX), Number(_xml.@alignY), _xml.@scaleMode.length() > 0?Number(_xml.@scaleMode):NaN);
+					_rect.border = Number(_xml.@border);
 					_rect.userData = {xml: _xml};
 					return _rect;
 				case "Rect":
 				default:
-					_rect = new Rect(0, 0, Number(_xml.@w), Number(_xml.@h));
+					_rect = new Rect(0, 0, Number(_xml.@width), Number(_xml.@height), Number(_xml.@alignX), Number(_xml.@alignY));
+					_rect.border = Number(_xml.@border);
 					_rect.userData = {xml: _xml};
 					return _rect;
 			}
@@ -37,52 +42,37 @@ package akdcl.layout {
 
 		private static const GROUP_VALUES:Object = {Group: GROUP, HGroup: HGROUP, VGroup: VGROUP};
 
-		public var intervalH:Number;
-		public var intervalV:Number;
+		public var interval:int;
 		public var type:int;
 
-		//alignX,alignY -1 0 1
-		private var __alignX:int;
-		public function get alignX():int {
-			return __alignX;
-		}
-		public function set alignX(_value:int):void {
-			if (__alignX == _value){
-				return;
-			}
-			__alignX = _value;
+		override public function get width():Number {
+			return Math.max(__width, childrenWidth);
 		}
 
-		private var __alignY:int;
-		public function get alignY():int {
-			return __alignY;
+		override public function get height():Number {
+			return Math.max(__height, childrenHeight);
 		}
-		public function set alignY(_value:int):void {
-			if (__alignY == _value){
-				return;
-			}
-			__alignY = _value;
-		}
-		private var numChildren:uint;
-		private var children:Array;
+
 		private var childrenWidth:int;
 		private var childrenHeight:int;
+		private var numChildren:uint;
+		private var children:Array;
 
-		public function Group(_x:Number, _y:Number, _width:Number, _height:Number, _type:int = 0){
-			type = _type;
-			super(_x, _y, _width, _height);
+		public function Group(_x:Number, _y:Number, _width:Number, _height:Number, _alignX:Number = 0, _alignY:Number = 0){
+			super(_x, _y, _width, _height, _alignX, _alignY);
 		}
-		
-		override protected function init():void 
-		{
+
+		override protected function init():void {
 			super.init();
-			intervalH = 10;
-			intervalV = 10;
+			name = "group";
+			childrenWidth = 0;
+			childrenHeight = 0;
+			numChildren = 0;
+			interval = 0;
 			children = [];
 		}
 
-		override protected function onRemoveHandler():void 
-		{
+		override protected function onRemoveHandler():void {
 			super.onRemoveHandler();
 			for each (var _child:Rect in children){
 				_child.remove();
@@ -97,6 +87,10 @@ package akdcl.layout {
 			if (autoUpdate){
 				updateSize(_dispathEvent);
 			}
+		}
+
+		public function removeChild(_child:Rect, _dispathEvent:Boolean = true):void {
+
 		}
 
 		public function forEachGroup(_fun:Function, ... args){
@@ -116,7 +110,7 @@ package akdcl.layout {
 
 		public function forEachChild(_fun:Function, ... args){
 			var _arr1:Array;
-			
+
 			var _arrn:Array = args.concat();
 			_arrn.unshift(_fun);
 
@@ -138,111 +132,100 @@ package akdcl.layout {
 			var _prevChild:Rect;
 			var _off:int;
 			var _i:uint = 0;
-			
-			if (type==GROUP) {
-				for (; _i < numChildren; _i++ ) {
-					_child = children[_i];
-					if (__alignX < 0) {
-						_x = __x;
-					}else if (__alignX == 0) {
-						_x = __x + int((__width - _child.__width) * 0.5);
-					}else {
-						_x = __x + __width - _child.__width;
-					}
-					if (__alignY < 0) {
-						_y = __y;
-					}else if (__alignY == 0) {
-						_y = __y + int((__height - _child.__height) * 0.5);
-					}else {
-						_y = __y + __height - _child.__height;
-					}
-					_child.setPoint(_x, _y, false);
-					_prevChild = _child;
-				}
-			}else if (type==HGROUP) {
-				if (__alignX < 0) {
-					_off = 0;
-				}else if (__alignX == 0) {
-					_off = int((__width - childrenWidth - intervalH * (numChildren - 1)) * 0.5);
-				}else {
-					_off = __width - childrenWidth - intervalH * (numChildren - 1);
-				}
-				for (; _i < numChildren; _i++ ) {
-					_child = children[_i];
-					_x = _i == 0?__x + _off:_prevChild.__x + _prevChild.__width + intervalH;
-					if (__alignY < 0) {
-						_y = __y;
-					}else if (__alignY == 0) {
-						_y = __y + int((__height - _child.__height) * 0.5);
-					}else {
-						_y = __y + __height - _child.__height;
-					}
-					_child.setPoint(_x, _y, false);
-					_prevChild = _child;
-				}
-			}else {
-				if (__alignY < 0) {
-					_off = 0;
-				}else if (__alignY == 0) {
-					_off = int((__height - childrenHeight - intervalV * (numChildren - 1)) * 0.5);
-				}else {
-					_off = __height - childrenHeight - intervalV * (numChildren - 1);
-				}
-				for (; _i < numChildren; _i++ ) {
-					_child = children[_i];
-					if (__alignX < 0) {
-						_x = __x;
-					}else if (__alignX == 0) {
-						_x = __x + int((__width - _child.__width) * 0.5);
-					}else {
-						_x = __x + __width - _child.__width;
-					}
-					_y = _i == 0?__y + _off:_prevChild.__y + _prevChild.__height + intervalV;
-					_child.setPoint(_x, _y, false);
-					_prevChild = _child;
-				}
+
+			if (type == HGROUP) {
+				//使用width而不是__width来计算对齐偏移量，目的是保证width - childrenWidth>=0
+				_off = border + (width - border * 2 - childrenWidth) * __alignX;
+			} else if (type == VGROUP){
+				//同上
+				_off = border + (height - border * 2 - childrenHeight) * __alignY;
 			}
+
+			for (; _i < numChildren; _i++){
+				_child = children[_i];
+				if (type == HGROUP){
+					_x = _i == 0 ? __x + _off : _prevChild.__x + _prevChild.width + interval;
+				} else {
+					_x = int(__x + (__width - _child.width) * __alignX - (__alignX * 2 - 1) * border);
+				}
+				if (type == VGROUP){
+					_y = _i == 0 ? __y + _off : _prevChild.__y + _prevChild.height + interval;
+				} else {
+					_y = int(__y + (__height - _child.height) * __alignY - (__alignY * 2 - 1) * border);
+				}
+				_child.setPoint(_x, _y, false);
+				_prevChild = _child;
+			}
+
 			super.updatePoint(_dispathEvent);
 		}
 
 		override protected function updateSize(_dispathEvent:Boolean = true):void {
 			var _child:Rect;
-			var _value:Number;
 			var _width:Number;
 			var _height:Number;
+			var _unX:Boolean;
+			var _unY:Boolean;
 			var _percent:Number = 0;
 			var _averageCount:Number = 0;
-			var _i:uint=0;
+			var _i:uint = 0;
 			
-			switch(type) {
+			var _value:Number;
+			var _valueD:Number;
+			var _widthD:Number = __width - border * 2;
+			var _heightD:Number = __height - border * 2;
+			_value = _valueD = (numChildren - 1) * interval;
+
+			childrenWidth = 0;
+			childrenHeight = 0;
+			switch (type){
 				case GROUP:
-					for each (_child in children){
-						if (_child.isAverageHeight){
-							_width = __width;
-						} else if (_child.percentWidth){
-							_width = _child.percentWidth * __width;
+					for each (_child in children) {
+						_unX = true;
+						_unY = true;
+						if (_child.isAverageWidth) {
+							//未设置
+							_width = _widthD;
+						} else if (_child.percentWidth) {
+							//百分比
+							_width = _child.percentWidth * (_widthD);
 						} else {
-							_width = _child.__width;
+							//预设
+							_width = _child.width;
+							_unX = false;
 						}
 						if (_child.isAverageHeight){
-							_height = __height;
+							//未设置
+							_height = _heightD;
 						} else if (_child.percentHeight){
-							_height = _child.percentHeight * __height;
+							//百分比
+							_height = _child.percentHeight * (_heightD);
 						} else {
-							_height = _child.__height;
+							//预设
+							_height = _child.height;
+							_unY = false;
 						}
-						_child.setSize(_width, _height,false);
+						if (_unX || _unY) {
+							//未设置或百分比
+							_child.setSize(_width, _height, false);
+						}
+						childrenWidth = Math.max(_child.width, childrenWidth);
+						childrenHeight = Math.max(_child.height, childrenHeight);
 					}
 					break;
 				case HGROUP:
-					_value = (numChildren - 1) * intervalH;
 					for each (_child in children){
 						if (_child.isAverageWidth){
+							//未设置
 							_averageCount++;
 						} else if (_child.percentWidth > 0){
+							//百分比
 							_percent += _child.percentWidth;
 						} else {
-							_value += _child.__width;
+							//预设
+							_width = _child.width;
+							//_percent += _width / _widthD;
+							_value += _width;
 						}
 					}
 					if (_percent < 1){
@@ -251,41 +234,54 @@ package akdcl.layout {
 						}
 						_percent = 1;
 					}
-					childrenWidth = 0;
-					_value = Math.max(0, __width - _value);
-					for (_i = 0; _i < numChildren; _i++) {
+					_value = Math.max(0, _widthD - _value);
+					for (_i = 0; _i < numChildren; _i++){
+						_unX = true;
+						_unY = true;
 						_child = children[_i];
-						if (_child.isAverageHeight) {
-							_height = __height;
+						if (_child.isAverageHeight){
+							//未设置
+							_height = _heightD;
 						} else if (_child.percentHeight){
-							_height = _child.percentHeight * __height;
+							//百分比
+							_height = _child.percentHeight * (_heightD);
 						} else {
-							_height = _child.__height;
+							//预设
+							_height = _child.height;
+							_unY = false;
 						}
-						if (_child.isAverageWidth) {
+						if (_child.isAverageWidth||_child.percentWidth){
+							//未设置
 							if (_i == numChildren - 1) {
-								_width = __width - childrenWidth-(numChildren - 1) * intervalH;
-							}else {
+								//最后一个需要取整
+								_width = _widthD - childrenWidth - _valueD;
+							} else {
 								_width = _value * (_child.isAverageWidth ? _averageCount : _child.percentWidth) / _percent;
 							}
-						}else {
-							_width = _child.__width;
+						} else {
+							//预设
+							_width = _child.width;
+							_unX = false;
 						}
-						if (_child.isAverageWidth || _child.isAverageHeight) {
+						if (_unX || _unY) {
+							//未设置或百分比
 							_child.setSize(_width, _height, false);
 						}
-						childrenWidth += _child.__width;
+						childrenWidth += _child.width;
 					}
+					childrenWidth += _valueD;
 					break;
 				case VGROUP:
-					_value = (numChildren - 1) * intervalV;
 					for each (_child in children){
 						if (_child.isAverageHeight){
+							//未设置
 							_averageCount++;
 						} else if (_child.percentHeight > 0){
+							//百分比
 							_percent += _child.percentHeight;
 						} else {
-							_value += _child.__height;
+							//预设
+							_value += _child.height;
 						}
 					}
 					if (_percent < 1){
@@ -294,32 +290,42 @@ package akdcl.layout {
 						}
 						_percent = 1;
 					}
-					childrenHeight = 0;
-					_value = Math.max(0, __height - _value);
-					for (_i = 0; _i < numChildren; _i++) {
+					_value = Math.max(0, _heightD - _value);
+					for (_i = 0; _i < numChildren; _i++){
+						_unX = true;
+						_unY = true;
 						_child = children[_i];
 						if (_child.isAverageWidth){
-							_width = __width;
+							//未设置
+							_width = _widthD;
 						} else if (_child.percentWidth){
-							_width = _child.percentWidth * __width;
+							//百分比
+							_width = _child.percentWidth * (_widthD);
 						} else {
-							_width = _child.__width;
+							//预设
+							_width = _child.width;
+							_unX = false;
 						}
-						
-						if (_child.isAverageHeight) {
-							if (_i == numChildren - 1) {
-								_height = __height - childrenHeight-(numChildren - 1) * intervalV;
-							}else {
+
+						if (_child.isAverageHeight||_child.percentHeight){
+							//未设置
+							if (_i == numChildren - 1){
+								_height = _heightD - childrenHeight - _valueD;
+							} else {
 								_height = _value * (_child.isAverageHeight ? _averageCount : _child.percentHeight) / _percent;
 							}
-						}else {
-							_height = _child.__height;
+						} else {
+							//预设
+							_height = _child.height;
+							_unY = false;
 						}
-						if (_child.isAverageWidth || _child.isAverageHeight) {
+						if (_unX || _unY) {
+							//未设置或百分比
 							_child.setSize(_width, _height, false);
 						}
-						childrenHeight += _child.__height;
+						childrenHeight += _child.height;
 					}
+					childrenHeight += _valueD;
 					break;
 			}
 			updatePoint(_dispathEvent);
