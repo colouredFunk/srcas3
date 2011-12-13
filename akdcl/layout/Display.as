@@ -146,10 +146,16 @@ package akdcl.layout {
 			eventChange = null;
 		}
 
-		public function setContent(_content:Object, _alignX:Number = 0, _alignY:Number = 0, _scaleMode:Number = NaN):void {
-			/*__alignX = _alignX;
-			__alignY = _alignY;
-			__scaleMode = _scaleMode;*/
+		public function setContent(_content:Object, _alignX:Number = NaN, _alignY:Number = NaN, _scaleMode:Number = NaN):void {
+			if (_alignX) {
+				__alignX = _alignX;
+			}
+			if (_alignY) {
+				__alignY = _alignY;
+			}
+			if (!isNaN(_scaleMode)) {
+				__scaleMode = _scaleMode;
+			}
 			content = _content;
 			if (content is Loader){
 				originalWidth = content.contentLoaderInfo.width;
@@ -229,6 +235,7 @@ package akdcl.layout {
 					scaleHeight = _height;
 					scaleWidth = originalWidth * scaleY;
 				}
+				trace(scaleWidth, scaleHeight, originalWidth, originalHeight);
 			} else {
 				var _scale:Number;
 				if (__scaleMode < 0 ? (_width / _height > aspectRatio) : (_width / _height < aspectRatio)){

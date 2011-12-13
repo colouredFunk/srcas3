@@ -90,7 +90,15 @@ package akdcl.layout {
 		}
 
 		public function removeChild(_child:Rect, _dispathEvent:Boolean = true):void {
-
+			var _id:int = children.indexOf(_child);
+			if (_id>=0) {
+				_child.removeEventListener(Event.RESIZE, onChildResizeHandler);
+				children.splice(_id, 1);
+				numChildren = children.length;
+				if (autoUpdate){
+					updateSize(_dispathEvent);
+				}
+			}
 		}
 
 		public function forEachGroup(_fun:Function, ... args){

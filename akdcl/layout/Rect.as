@@ -159,7 +159,6 @@ package akdcl.layout {
 			super.onRemoveHandler();
 			eventResize = null;
 			eventScroll = null;
-			userData = null;
 		}
 
 		public function setPoint(_x:Number, _y:Number, _dispathEvent:Boolean = true):void {
