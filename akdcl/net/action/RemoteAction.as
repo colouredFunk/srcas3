@@ -245,7 +245,10 @@
 			if (alertXML){
 				showAlert(alertXML);
 			}
-			if (actionXML){
+			if (actionXML) {
+				for (var _i:String in data){
+					actionXML = XML(replaceValue(actionXML.toXMLString(), _i, data[_i]));
+				}
 				gotoURL(actionXML);
 			}
 			if (hasEventListener(Event.COMPLETE)) {
