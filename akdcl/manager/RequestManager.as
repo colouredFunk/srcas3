@@ -7,7 +7,7 @@ package akdcl.manager {
 	import flash.net.URLVariables;
 	import flash.net.URLRequestMethod;
 	import flash.net.ObjectEncoding;
-	import flash.events.ProgressEvent;
+	//import flash.events.ProgressEvent;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
@@ -52,7 +52,9 @@ package akdcl.manager {
 			sM = SourceManager.getInstance();
 
 			request = new URLRequest();
-
+			
+			//eventProgressComplete = new ProgressEvent(ProgressEvent.PROGRESS, false, false, 1, 1);
+			
 			loaderDic = {};
 			urlLoaderDic = {};
 		}
@@ -77,6 +79,7 @@ package akdcl.manager {
 		private var urlLoaderDic:Object;
 
 		private var dataFormat:String;
+		//private var eventProgressComplete:ProgressEvent;
 
 		public function loadDisplay(_url:String, _onCompleteHandler:Function = null, _onErrorHandler:Function = null, _onProgressHandler:Function = null, ... args):Loader {
 			resetRequest(_url);
@@ -91,7 +94,7 @@ package akdcl.manager {
 			var _bmd:BitmapData = sM.getSource(SourceManager.BITMAPDATA_GROUP, _url);
 			if (_bmd){
 				if (_onProgressHandler != null){
-					_onProgressHandler(1);
+					//_onProgressHandler(1);
 				}
 				if (_onCompleteHandler != null){
 					switch (_onCompleteHandler.length){
