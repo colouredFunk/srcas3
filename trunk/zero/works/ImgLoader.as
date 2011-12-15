@@ -166,6 +166,10 @@ package zero.works{
 					loader.x=-loader.contentLoaderInfo.width/2;
 					loader.y=-loader.contentLoaderInfo.height/2;
 				break;
+				case "bottom":
+					loader.x=-loader.contentLoaderInfo.width/2;
+					loader.y=-loader.contentLoaderInfo.height;
+				break;
 			}
 			
 			if(xml.@smoothing.toString()=="true"){
