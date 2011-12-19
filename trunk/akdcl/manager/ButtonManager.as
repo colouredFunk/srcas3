@@ -179,7 +179,7 @@ package akdcl.manager {
 			}else {
 				buttonInDic[buttonTarget] = buttonTarget;
 				buttonTarget.addEventListener(MouseEvent.ROLL_OUT, onRollOutHandler);
-				if (_e.buttonDown) {
+				if (_e is MouseEvent?_e.buttonDown:false) {
 					if (buttonTarget.hasEventListener(UIEvent.DRAG_OVER)) {
 						buttonTarget.dispatchEvent(new UIEvent(UIEvent.DRAG_OVER));
 					}

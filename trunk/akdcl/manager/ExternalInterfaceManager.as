@@ -91,10 +91,11 @@
 		public function callInterface(_funName:String, ... args):Object {
 			var _object:Object;
 			if (isAvailable && hasInterface(_funName)){
-				if (args){
+				if (args && args.length > 0) {
 					_object = ExternalInterface.call.apply(ExternalInterface, [_funName].concat(args));
+				}else {
+					_object = ExternalInterface.call(_funName);
 				}
-				_object = ExternalInterface.call(_funName);
 			}
 			var _str:String = "callInterface(funName:{2}, args:{3}) isAvailable:{0} objectID:{1}";
 			if (_object) {
@@ -108,7 +109,7 @@
 		//广播as调用js的事件
 		public function dispatchSWFEvent(_type:String, ... args):void {
 			if (isAvailable){
-				if (args){
+				if (args && args.length > 0) {
 					callInterface.apply(ExternalInterfaceManager, [EXTERNAL_LISTENER, objectID, _type].concat(args));
 				} else {
 					callInterface(EXTERNAL_LISTENER, objectID, _type);
@@ -125,7 +126,7 @@
 		//addEventListener(__eventType);
 		private function swfInterface(_type:String, ... args):void {
 			__eventType = _type;
-			if (args){
+			if (args && args.length > 0) {
 				eventParams = args;
 			} else {
 				eventParams = null;
