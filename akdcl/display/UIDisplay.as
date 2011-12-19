@@ -232,9 +232,7 @@
 					_display.alpha = 0;
 					TweenLite.to(_display, tweenMode > 2 ? tweenMode : TWEEN_FRAME, tweenInVar);
 				}
-				trace(_display.width,_display.height,"!!!!");
 				proxy.setContent(_display, alignXReady, alignYReady, scaleModeReady);
-				trace(width,height,"!!!!!!!!!!!!!!!!!!!");
 				onProxyResizeHandler();
 			}
 		}

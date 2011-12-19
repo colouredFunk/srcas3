@@ -24,6 +24,7 @@ package akdcl.layout {
 
 		private var __scrollX:Number;
 		private var __scrollY:Number;
+		
 		//-1:outside,0:noscale,1:inside;
 		//>1||<-1:scale
 		//NaN:stretch,10:onlywidth,-10:onlyheight;
@@ -134,7 +135,6 @@ package akdcl.layout {
 
 		override protected function init():void {
 			super.init();
-			name = "display";
 			__scrollX = 0;
 			__scrollY = 0;
 			eventChange = new Event(Event.CHANGE);
@@ -205,44 +205,43 @@ package akdcl.layout {
 			var _scaleABS:Number = Math.abs(__scaleMode);
 			var _width:Number = __width - border * 2;
 			var _height:Number = __height - border * 2;
+			
 			if (isNaN(_scaleABS)){
 				scaleX = _width / originalWidth;
 				scaleY = _height / originalHeight;
-
 				scaleWidth = _width;
 				scaleHeight = _height;
 			} else if (_scaleABS == 10){
 				if (__scaleMode > 0){
 					scaleX = _width / originalWidth;
-
 					scaleWidth = _width;
+					scaleY = 1;
 					scaleHeight = originalHeight;
 				} else {
 					scaleY = _height / originalHeight;
-
 					scaleHeight = _height;
+					scaleX = 1;
 					scaleWidth = originalWidth;
 				}
 			} else if (_scaleABS == 11){
 				if (__scaleMode > 0){
 					scaleY = scaleX = _width / originalWidth;
-
 					scaleWidth = _width;
-					scaleHeight = originalHeight * scaleX;
+					scaleHeight = originalHeight * scaleY;
 				} else {
 					scaleX = scaleY = _height / originalHeight;
-
 					scaleHeight = _height;
-					scaleWidth = originalWidth * scaleY;
+					scaleWidth = originalWidth * scaleX;
 				}
-				trace(scaleWidth, scaleHeight, originalWidth, originalHeight);
 			} else {
 				var _scale:Number;
+				var _roundWidth:Boolean;
 				if (__scaleMode < 0 ? (_width / _height > aspectRatio) : (_width / _height < aspectRatio)){
 					_scale = _width / originalWidth;
-					scaleWidth = _width;
+					_roundWidth = true;
 				} else {
 					_scale = _height / originalHeight;
+					_roundWidth = false;
 				}
 				if (_scaleABS <= 1){
 					_scale = 1 + (_scale - 1) * _scaleABS;
@@ -250,9 +249,13 @@ package akdcl.layout {
 					_scale = (1 + (_scale - 1)) * _scaleABS;
 				}
 				scaleY = scaleX = _scale;
-
-				scaleWidth = originalWidth * scaleX;
-				scaleHeight = originalHeight * scaleY;
+				if (_roundWidth) {
+					scaleWidth = _width;
+					scaleHeight = originalHeight * scaleY;
+				}else {
+					scaleHeight = _height;
+					scaleWidth = originalWidth * scaleX;
+				}
 			}
 
 			if (content){

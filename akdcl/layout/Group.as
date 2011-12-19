@@ -31,7 +31,7 @@ package akdcl.layout {
 					return _rect;
 			}
 			for each (var _xml:XML in _xml.children()){
-				_rect.addChild(createGroup(_xml, _index + 1), false);
+				_rect.addChild(createGroup(_xml, _index + 1));
 			}
 			return _rect;
 		}
@@ -64,7 +64,6 @@ package akdcl.layout {
 
 		override protected function init():void {
 			super.init();
-			name = "group";
 			childrenWidth = 0;
 			childrenHeight = 0;
 			numChildren = 0;
@@ -80,13 +79,25 @@ package akdcl.layout {
 			children = null;
 		}
 
-		public function addChild(_child:Rect, _dispathEvent:Boolean = true):void {
+		public function addChild(_child:Rect):void {
 			_child.addEventListener(Event.RESIZE, onChildResizeHandler);
 			children.push(_child);
+			if (!_child.name) {
+				_child.name = "child" + numChildren;
+			}
 			numChildren = children.length;
 			if (autoUpdate){
-				updateSize(_dispathEvent);
+				updateSize(false);
 			}
+		}
+		
+		public function getChildByName(_name:String):Rect {
+			for each (var _child:Rect in children) {
+				if (_child.name == _name) {
+					return _child;
+				}
+			}
+			return null;
 		}
 
 		public function removeChild(_child:Rect, _dispathEvent:Boolean = true):void {

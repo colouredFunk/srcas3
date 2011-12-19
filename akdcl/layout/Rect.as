@@ -146,7 +146,6 @@ package akdcl.layout {
 
 		override protected function init():void {
 			super.init();
-			name = "rect";
 			border = 0;
 			autoUpdate = true;
 			isAverageWidth = !Boolean(__width) && !Boolean(percentWidth);
