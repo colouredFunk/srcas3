@@ -226,15 +226,21 @@ package akdcl.manager {
 			}
 		}
 		private function buttonCallBack(_button:Object, _method:*):void {
+			var _methodName:String;
 			try {
 				if (_method is String && (_method in _button)) {
+					_methodName = _method;
 					_method = _button[_method];
 				}
 			}catch (_error:Error) {
 				
 			}
 			if (_method is Function) {
-				_method();
+				if (_methodName) {
+					_button[_methodName]();
+				}else {
+					_method();
+				}
 			}
 		}
 		

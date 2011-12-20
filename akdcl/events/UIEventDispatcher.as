@@ -1,7 +1,7 @@
 package akdcl.events {
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
-	
+
 	import akdcl.interfaces.IBaseObject;
 
 	import akdcl.manager.LoggerManager;
@@ -14,13 +14,13 @@ package akdcl.events {
 	public class UIEventDispatcher extends EventDispatcher implements IBaseObject {
 		protected static const lM:LoggerManager = LoggerManager.getInstance();
 		protected static const evtM:EventManager = EventManager.getInstance();
-		
+
 		public var name:String;
 		public var userData:Object;
-		
+
 		private var removed:Boolean;
 
-		public function UIEventDispatcher() {
+		public function UIEventDispatcher(){
 			super();
 			init();
 		}
@@ -28,15 +28,15 @@ package akdcl.events {
 		protected function init():void {
 			lM.info(this, "init");
 		}
-		
-		public function remove():void {
-			if (removed) {
+
+		public final function remove():void {
+			if (removed){
 				return;
 			}
 			removed = true;
 			onRemoveHandler();
 		}
-		
+
 		protected function onRemoveHandler():void {
 			lM.info(this, "remove");
 			evtM.removeTargetEvents(this);
