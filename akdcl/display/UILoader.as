@@ -72,7 +72,7 @@ package akdcl.display {
 			setProgressClip(progressClip, 1, true);
 		}
 
-		protected function onProgressHandler(_e:ProgressEvent):void {
+		protected function onProgressHandler(_e:Object):void {
 			if (_e is ProgressEvent){
 				loadProgress = _e.bytesLoaded / _e.bytesTotal;
 			} else if(_e is Number){
