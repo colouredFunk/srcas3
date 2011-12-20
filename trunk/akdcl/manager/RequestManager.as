@@ -94,7 +94,7 @@ package akdcl.manager {
 			var _bmd:BitmapData = sM.getSource(SourceManager.BITMAPDATA_GROUP, _url);
 			if (_bmd){
 				if (_onProgressHandler != null){
-					//_onProgressHandler(1);
+					_onProgressHandler(1);
 				}
 				if (_onCompleteHandler != null){
 					switch (_onCompleteHandler.length){

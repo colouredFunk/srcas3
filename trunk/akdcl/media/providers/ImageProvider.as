@@ -1,5 +1,4 @@
 ﻿package akdcl.media.providers {
-	import flash.display.BitmapData;
 	import flash.events.Event;
 
 	import akdcl.manager.RequestManager;
@@ -13,11 +12,11 @@
 	/// @eventType	akdcl.events.MediaEvent.DISPLAY_CHANGE
 	[Event(name="displayChange",type="akdcl.events.MediaEvent")]
 	final public class ImageProvider extends MediaProvider {
-		private static const DEFAULT_TOTAL_TIME:uint = 5000;
+		public static var defaultTotalTime:uint = 5000;
 
 		protected static var rM:RequestManager = RequestManager.getInstance();
 
-		public var displayContent:BitmapData;
+		public var displayContent:Object;
 		private var lastSource:String;
 		private var __loadProgress:Number = 0;
 
@@ -38,15 +37,13 @@
 		override public function get position():uint {
 			return timer.currentCount * timer.delay;
 		}
-		
-		override protected function init():void 
-		{
+
+		override protected function init():void {
 			super.init();
 			name = "imageProvider";
 		}
-		
-		override protected function onRemoveHandler():void 
-		{	
+
+		override protected function onRemoveHandler():void {
 			if (lastSource){
 				rM.unloadDisplay(lastSource, onLoadCompleteHandler, onLoadErrorHandler, onLoadProgressHandler);
 			}
@@ -65,9 +62,9 @@
 			rM.loadDisplay(lastSource, onLoadCompleteHandler, onLoadErrorHandler, onLoadProgressHandler);
 			timer.stop();
 		}
-		
+
 		override protected function playHandler(_startTime:int = -1):void {
-			if (position == totalTime) {
+			if (position == totalTime){
 				timer.reset();
 				timer.start();
 			}
@@ -85,9 +82,9 @@
 		override protected function onLoadProgressHandler(_evt:* = null):void {
 			if (_evt is Event){
 				__loadProgress = _evt.bytesLoaded / _evt.bytesTotal;
-			} else if (_evt is Number) {
+			} else if (_evt is Number){
 				__loadProgress = _evt;
-			} else{
+			} else {
 				__loadProgress = 0;
 			}
 			if (isNaN(__loadProgress)){
@@ -98,10 +95,10 @@
 		}
 
 		override protected function onLoadCompleteHandler(_evt:* = null):void {
-			__totalTime = DEFAULT_TOTAL_TIME;
+			__totalTime = defaultTotalTime;
 			playContent = _evt;
 			onDisplayChange();
-			if (isPlaying) {
+			if (isPlaying){
 				timer.start();
 			}
 			super.onLoadCompleteHandler(null);
@@ -109,10 +106,9 @@
 
 		override protected function onPlayProgressHander(_evt:* = null):void {
 			if (loadProgress == 1) {
-				if (position >= totalTime && __playState != PlayState.COMPLETE) {
+				super.onPlayProgressHander(_evt);
+				if (position >= totalTime && __playState != PlayState.COMPLETE){
 					onPlayCompleteHandler();
-				} else {
-					super.onPlayProgressHander(_evt);
 				}
 			} else {
 				//loadProgress为1以前，都不播放

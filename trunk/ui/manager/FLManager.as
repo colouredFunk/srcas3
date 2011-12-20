@@ -57,8 +57,9 @@ package ui.manager {
 					StyleManager.setComponentStyle(Button, TEXT_FORMAT, _textFormat);
 					break;
 				case "ComboBox":
-					StyleManager.setComponentStyle(CellRenderer, TEXT_FORMAT, _textFormat);
+					//StyleManager.setComponentStyle(CellRenderer, TEXT_FORMAT, _textFormat);
 					StyleManager.setComponentStyle(ComboBox, TEXT_FORMAT, _textFormat);
+					StyleManager.setComponentStyle(TextInput, TEXT_FORMAT, _textFormat);
 					break;
 				case "CheckBox":
 					StyleManager.setComponentStyle(CheckBox, TEXT_FORMAT, _textFormat);
