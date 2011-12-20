@@ -99,7 +99,7 @@ package akdcl.display {
 			userData = null;
 		}
 
-		public function remove():void {
+		public final function remove():void {
 			if (removed) {
 				return;
 			}
