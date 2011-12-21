@@ -23,6 +23,11 @@ package zero.works{
 		private var version:String="";
 		private var wid:int=-1;
 		private var hei:int=-1;
+		private var loaderX:int=0;
+		private var loaderY:int=0;
+		
+		[Inspectable(name="素材",defaultValue="")]
+		public var src:String="";
 		
 		[Inspectable(name="链接",defaultValue="http://www.wanmei.com")]
 		public var href:String="http://www.wanmei.com";
@@ -36,6 +41,7 @@ package zero.works{
 		private var delayTime:int;
 		
 		private var xmlLoader:URLLoader;
+		private var graLoader:Loader;
 		
 		public function SingleBtn(){
 			this.addEventListener(Event.ENTER_FRAME,init);
@@ -174,10 +180,19 @@ package zero.works{
 			}
 		}
 		private function initBtn():void{
+			graLoader=new Loader();
+			(btn.getChildAt(0) as Sprite).addChild(graLoader);
+			graLoader.x=loaderX;
+			graLoader.y=loaderY;
+			if(src){
+				graLoader.load(new URLRequest(src));
+			}else{
+				graLoader.loadBytes(new (getDefinitionByName("GraData"))());
+			}
 			if(href){
-				btn.hrefXML=<xml href={href} target={target||"_blank"}/>;
+				btn.href=<xml href={href} target={target||"_blank"}/>;
 			}else if(js){
-				btn.hrefXML=<xml js={js}/>;
+				btn.href=<xml js={js}/>;
 			}
 		}
 	}

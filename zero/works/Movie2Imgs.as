@@ -25,9 +25,22 @@ package zero.works{
 		private var frame:int;
 		private var bmd:BitmapData;
 		public function Movie2Imgs(){
+			this.addEventListener(Event.ENTER_FRAME,init);
+		}
+		private function init(event:Event):void{
+			try{
+				bmd=new BitmapData(this.loaderInfo.width,this.loaderInfo.height,true,0x00000000);
+			}catch(e:Error){
+				return;
+			}
+			
+			trace("bmd.width="+bmd.width);
+			trace("bmd.height="+bmd.height);
+			
+			this.removeEventListener(Event.ENTER_FRAME,init);
+			
 			dataBySizeArr=new Array();
 			zipArchive=new ZipArchive();
-			bmd=new BitmapData(this.width,this.height,true,0x00000000);
 			frame=0;
 			this.addEventListener(Event.ENTER_FRAME,enterFrame);
 		}
@@ -35,21 +48,27 @@ package zero.works{
 			if(++frame>this.totalFrames){
 				this.removeEventListener(Event.ENTER_FRAME,enterFrame);
 				new FileReference().save(zipArchive.output(),"pngs.zip");
-				for each(var subArr:Array in dataBySizeArr){
-					trace(dataBySizeArr.indexOf(subArr),"frames="+subArr);
-				}
+				//for each(var subArr:Array in dataBySizeArr){
+				//	trace(dataBySizeArr.indexOf(subArr),"frames="+subArr);
+				//}
 				return;
 			}
 			this.gotoAndStop(frame);
 			bmd.fillRect(bmd.rect,0x00000000);
 			bmd.draw(this);
-			var pngData:ByteArray=PNGEncoder.encode(bmd);
+			
+			//var pngData:ByteArray=PNGEncoder.encode(bmd);
+			
+			var bmd2:BitmapData=new BitmapData(bmd.width,bmd.height,true,0xffffffff);
+			bmd2.copyChannel(bmd,bmd.rect,new Point(),BitmapDataChannel.RED,BitmapDataChannel.ALPHA);
+			var pngData:ByteArray=PNGEncoder.encode(bmd2);
+			
 			if(dataBySizeArr[pngData.length]){
 			}else{
 				dataBySizeArr[pngData.length]=new Array();
 			}
 			dataBySizeArr[pngData.length].push(frame);
-			zipArchive.addFileFromBytes((10000+frame).toString().substr(1)+".png",pngData);
+			zipArchive.addFileFromBytes("粒子"+(10000+frame).toString().substr(1)+".png",pngData);
 		}
 	}
 }
