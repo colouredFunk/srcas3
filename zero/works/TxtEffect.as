@@ -9,12 +9,11 @@ TxtEffect
 package zero.works{
 	import flash.display.*;
 	import flash.events.*;
-	import flash.utils.*;
-	import flash.text.*;
-	import flash.net.*;
-	
 	import flash.geom.*;
+	import flash.net.*;
 	import flash.system.*;
+	import flash.text.*;
+	import flash.utils.*;
 	
 	public class TxtEffect extends MovieClip{
 		
@@ -22,19 +21,14 @@ package zero.works{
 		public var num2:Sprite;
 		public var bg:Sprite;
 		
-		private var txt1:TextField;
-		private var txt2:TextField;
+		private var bgWid:int;
+		private var bgHei:int;
 		
-		private var bgWid:int=-1;
-		private var bgHei:int=-1;
-		private var size:int=-1;
-		private var isBold:Boolean=false;
+		private var size:int;
+		private var color:int;
+		private var bold:Boolean;
 		
 		public function TxtEffect(){
-			txt1=num1["txt"];
-			txt2=num2["txt"];
-			setTxt(txt1,"0");
-			setTxt(txt2,"0");
 			this.stop();
 			this.addFrameScript(this.totalFrames-1,update);
 			
@@ -44,16 +38,41 @@ package zero.works{
 			if(bgHei>0){
 				bg.height=bgHei;
 			}
+			
+			if(num1.numChildren&&num2.numChildren){
+			}//else{
+			//	initTxts(new TextField(),new TextField());
+			//}
+		}
+		
+		public function initTxts(txt1:TextField,txt2:TextField):void{
+			var i:int;
+			
+			i=num1.numChildren;
+			while(--i>=0){
+				num1.removeChildAt(i);
+			}
+			num1.addChild(txt1);
+			
+			i=num2.numChildren;
+			while(--i>=0){
+				num2.removeChildAt(i);
+			}
+			num2.addChild(txt2);
+			
+			setTxt(txt1,"0");
+			setTxt(txt2,"0");
 		}
 		
 		private function setTxt(txt:TextField,htmlText:String):void{
 			if(size>0){
-				htmlText='<font size="'+size+'">'+htmlText+'</font>';
+				htmlText='<font size="'+size+'" color="#'+(0x1000000+color).toString(16).substr(1)+'">'+htmlText+'</font>';
 			}
-			if(isBold){
+			if(bold){
 				htmlText="<b>"+htmlText+"</b>";
 			}
 			txt.htmlText=htmlText;
+			
 			txt.autoSize=TextFieldAutoSize.CENTER;
 			txt.x=-txt.width/2;
 			txt.y=-txt.height/2;
@@ -68,12 +87,14 @@ package zero.works{
 				return;
 			}
 			__value=_value;
-			this.gotoAndPlay(2);
-			setTxt(txt2,__value.toString());
+			if(num2.numChildren){
+				this.gotoAndPlay(2);
+				setTxt(num2.getChildAt(0) as TextField,__value.toString());
+			}
 		}
 		private function update():void{
 			this.gotoAndStop(1);
-			setTxt(txt1,txt2.text);
+			setTxt(num1.getChildAt(0) as TextField,(num2.getChildAt(0) as TextField).text);
 		}
 	}
 }
