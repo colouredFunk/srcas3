@@ -17,40 +17,33 @@ package zero.works{
 	
 	public class ServerDate{
 		
-		////===
-		//加载 getTime
-		//创建时间：2011年5月11日 15:29:43
-		private var getTimeLoader:URLLoader;
+		private static var getTimeLoader:URLLoader;
+		private static var onGetTimeComplete:Function;
+		private static var startDateTime:Number;
+		private static var startTime:Number;//
 		
-		private var onGetTimeComplete:Function;
-		
-		public function ServerDate(){
-		}
-		public function init(_onGetTimeComplete:Function):void{
+		public static function init(_onGetTimeComplete:Function):void{
+			
+			if(startDateTime>0){
+				if(_onGetTimeComplete==null){
+				}else{
+					_onGetTimeComplete();
+				}
+				return;
+			}
 			
 			onGetTimeComplete=_onGetTimeComplete;
 			
-			//加载 getTime
-			//创建时间：2011年5月11日 15:29:43
 			getTimeLoader=new URLLoader();
-			//getTimeLoader.addEventListener(ProgressEvent.PROGRESS,getTimeLoadProgress);
 			getTimeLoader.addEventListener(Event.COMPLETE,getTimeLoadComplete);
 			getTimeLoader.addEventListener(IOErrorEvent.IO_ERROR,getTimeLoadError);
 			getTimeLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR,getTimeLoadError);
-			//getTimeLoader.dataFormat=URLLoaderDataFormat.BINARY;
 			
 			switch(Security.sandboxType){
 				case Security.REMOTE:
 					try{
 						getTimeLoader.load(new URLRequest("http://event21.wanmei.com/demo/flash/systime.jsp?"+Math.random()));
 					}catch(e:Error){
-						
-						//getTimeLoader.removeEventListener(ProgressEvent.PROGRESS,getTimeLoadProgress);
-						getTimeLoader.removeEventListener(Event.COMPLETE,getTimeLoadComplete);
-						getTimeLoader.removeEventListener(IOErrorEvent.IO_ERROR,getTimeLoadError);
-						getTimeLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,getTimeLoadError);
-						getTimeLoader=null;
-						
 						getTimeComplete(new Date());
 					}
 				break;
@@ -62,26 +55,11 @@ package zero.works{
 					getTimeComplete(new Date());
 				break;
 			}
-			
-			
-			////===
 		}
 		
-		////===
-		//加载 getTime
-		//创建时间：2011年5月11日 15:29:43
-		//private function getTimeLoadProgress(event:ProgressEvent):void{
-		//	trace("加载进度");
-		//}
-		private function getTimeLoadComplete(event:Event):void{
-			trace("getTimeLoader.data="+getTimeLoader.data);
+		private static function getTimeLoadComplete(event:Event):void{
+			trace("getTimeLoadComplete getTimeLoader.data="+getTimeLoader.data);
 			var execResult:Array=/(\d\d\d\d)\-(\d\d)\-(\d\d) (\d\d)\:(\d\d)\:(\d\d)/.exec(getTimeLoader.data);
-			
-			//getTimeLoader.removeEventListener(ProgressEvent.PROGRESS,getTimeLoadProgress);
-			getTimeLoader.removeEventListener(Event.COMPLETE,getTimeLoadComplete);
-			getTimeLoader.removeEventListener(IOErrorEvent.IO_ERROR,getTimeLoadError);
-			getTimeLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,getTimeLoadError);
-			getTimeLoader=null;
 			
 			getTimeComplete(new Date(
 				int(execResult[1]),
@@ -92,9 +70,9 @@ package zero.works{
 				int(execResult[6])
 			));
 		}
-		private function getTimeLoadError(event:Event):void{
-			trace("加载 getTime 失败");
-			//getTimeLoader.removeEventListener(ProgressEvent.PROGRESS,getTimeLoadProgress);
+		private static function getTimeLoadError(event:Event):void{
+			trace("getTimeLoadError");
+			
 			getTimeLoader.removeEventListener(Event.COMPLETE,getTimeLoadComplete);
 			getTimeLoader.removeEventListener(IOErrorEvent.IO_ERROR,getTimeLoadError);
 			getTimeLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,getTimeLoadError);
@@ -102,11 +80,15 @@ package zero.works{
 			
 			getTimeComplete(new Date());
 		}
-		////===
 		
-		private var startDateTime:Number;
-		private var startTime:Number;//
-		private function getTimeComplete(date:Date):void{
+		private static function getTimeComplete(date:Date):void{
+			
+			if(getTimeLoader){
+				getTimeLoader.removeEventListener(Event.COMPLETE,getTimeLoadComplete);
+				getTimeLoader.removeEventListener(IOErrorEvent.IO_ERROR,getTimeLoadError);
+				getTimeLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,getTimeLoadError);
+				getTimeLoader=null;
+			}
 			
 			startDateTime=date.time;
 			startTime=getTimer();
@@ -118,7 +100,7 @@ package zero.works{
 			}
 		}
 		
-		public function getDate():Date{
+		public static function getDate():Date{
 			//获取和服务器同步的 Date
 			if(startDateTime>0){
 				return new Date((getTimer()-startTime)+startDateTime);
