@@ -57,6 +57,9 @@ package akdcl.layout {
 		private var childrenHeight:int;
 		private var numChildren:uint;
 		private var children:Array;
+		
+		private var isUpdateSize:Boolean;
+		private var isUpdatePoint:Boolean;
 
 		public function Group(_x:Number, _y:Number, _width:Number, _height:Number, _alignX:Number = 0, _alignY:Number = 0){
 			super(_x, _y, _width, _height, _alignX, _alignY);
@@ -81,10 +84,10 @@ package akdcl.layout {
 
 		public function addChild(_child:Rect):void {
 			_child.addEventListener(Event.RESIZE, onChildResizeHandler);
-			children.push(_child);
 			if (!_child.name) {
 				_child.name = "child" + numChildren;
 			}
+			children.push(_child);
 			numChildren = children.length;
 			if (autoUpdate){
 				updateSize(false);
@@ -100,14 +103,14 @@ package akdcl.layout {
 			return null;
 		}
 
-		public function removeChild(_child:Rect, _dispathEvent:Boolean = true):void {
+		public function removeChild(_child:Rect):void {
 			var _id:int = children.indexOf(_child);
 			if (_id>=0) {
 				_child.removeEventListener(Event.RESIZE, onChildResizeHandler);
 				children.splice(_id, 1);
 				numChildren = children.length;
 				if (autoUpdate){
-					updateSize(_dispathEvent);
+					updateSize(false);
 				}
 			}
 		}
@@ -145,6 +148,10 @@ package akdcl.layout {
 		}
 
 		override protected function updatePoint(_dispathEvent:Boolean = true):void {
+			if (isUpdatePoint) {
+				return;
+			}
+			isUpdatePoint = true;
 			var _x:Number;
 			var _y:Number;
 			var _child:Rect;
@@ -172,14 +179,18 @@ package akdcl.layout {
 				} else {
 					_y = int(__y + (__height - _child.height) * __alignY - (__alignY * 2 - 1) * border);
 				}
-				_child.setPoint(_x, _y, false);
+				_child.setPoint(_x, _y);
 				_prevChild = _child;
 			}
-
+			isUpdatePoint = false;
 			super.updatePoint(_dispathEvent);
 		}
 
 		override protected function updateSize(_dispathEvent:Boolean = true):void {
+			if (isUpdateSize) {
+				return;
+			}
+			isUpdateSize = true;
 			var _child:Rect;
 			var _width:Number;
 			var _height:Number;
@@ -226,7 +237,7 @@ package akdcl.layout {
 						}
 						if (_unX || _unY) {
 							//未设置或百分比
-							_child.setSize(_width, _height, false);
+							_child.setSize(_width, _height);
 						}
 						childrenWidth = Math.max(_child.width, childrenWidth);
 						childrenHeight = Math.max(_child.height, childrenHeight);
@@ -284,7 +295,7 @@ package akdcl.layout {
 						}
 						if (_unX || _unY) {
 							//未设置或百分比
-							_child.setSize(_width, _height, false);
+							_child.setSize(_width, _height);
 						}
 						childrenWidth += _child.width;
 					}
@@ -340,13 +351,14 @@ package akdcl.layout {
 						}
 						if (_unX || _unY) {
 							//未设置或百分比
-							_child.setSize(_width, _height, false);
+							_child.setSize(_width, _height);
 						}
 						childrenHeight += _child.height;
 					}
 					childrenHeight += _valueD;
 					break;
 			}
+			isUpdateSize = false;
 			updatePoint(_dispathEvent);
 			super.updateSize(_dispathEvent);
 		}
