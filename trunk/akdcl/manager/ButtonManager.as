@@ -122,7 +122,6 @@ package akdcl.manager {
 			//trace(_e.target, _e.currentTarget, buttonTarget);
 			//var _parent:DisplayObjectContainer;
 			if (_e && _e.target != stage) {
-				//buttonTarget = _e.target;
 				buttonTarget = _e.target as InteractiveObject;
 				while (buttonTarget) {
 					if (buttonInDic[buttonTarget] && !buttonDownDic[buttonTarget]) {
@@ -162,6 +161,7 @@ package akdcl.manager {
 					}
 					*/
 				}
+				
 				setButtonStyle(buttonTarget);
 			}
 		}

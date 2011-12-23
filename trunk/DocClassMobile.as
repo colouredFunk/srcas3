@@ -51,7 +51,6 @@ package {
 			if (stage){
 				stage.align = StageAlign.TOP_LEFT;
 				stage.scaleMode = StageScaleMode.NO_SCALE;
-				//stage.scaleMode = StageScaleMode.SHOW_ALL;
 			}
 			tabChildren = false;
 

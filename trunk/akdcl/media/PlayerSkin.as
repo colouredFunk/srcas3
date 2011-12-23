@@ -5,10 +5,10 @@ package akdcl.media {
 	import flash.text.TextField;
 	
 	import akdcl.display.UISprite;
-	import akdcl.events.MediaEvent;
-	import akdcl.utils.setProgressClip;
-	import akdcl.media.providers.MediaProvider;
 	import akdcl.display.UIDisplay;
+	import akdcl.events.MediaEvent;
+	import akdcl.media.providers.MediaProvider;
+	import akdcl.utils.setProgressClip;
 	
 	import ui.Slider;
 

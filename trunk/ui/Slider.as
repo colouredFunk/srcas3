@@ -63,6 +63,8 @@
 			if (txt){
 				txt.mouseEnabled = false;
 				mouseEnabled = false;
+			}else {
+				mouseChildren = false;
 			}
 		}
 		
