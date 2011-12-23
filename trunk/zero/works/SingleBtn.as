@@ -19,27 +19,31 @@ package zero.works{
 	
 	public class SingleBtn extends BaseCom{
 		
-		public var defaultXMLStr:String='<xml href="http://www.wanmei.com" target="_blank" js="" btnGra=""/>';
+		public var defaultXMLStr:String='<xml href="http://zero.flashwing.net" target="_blank" js="" btnGra=""/>';
+		
+		public var btn:Btn;
 		
 		public function SingleBtn(){
 		}
-		private function initBtn():void{
-			/*
-			graLoader=new Loader();
-			(btn.getChildAt(0) as Sprite).addChild(graLoader);
-			graLoader.x=loaderX;
-			graLoader.y=loaderY;
-			if(src){
-				graLoader.load(new URLRequest(src));
-			}else{
-				graLoader.loadBytes(new (getDefinitionByName("GraData"))());
+		public function initComplete():void{
+			if(xml.@btnGra.toString()){
+				loadAsset(xml.@btnGra.toString(),loadBtnGraDataComplete);
+			}else if(assets&&assets.btnGraData){
+				loadAsset("btnGraData",loadBtnGraDataComplete);
 			}
-			if(href){
-				btn.href=<xml href={href} target={target||"_blank"}/>;
-			}else if(js){
-				btn.href=<xml js={js}/>;
+		}
+		private function loadBtnGraDataComplete(btnGraLoader:Loader):void{
+			trace("btn.numChildren="+btn.numChildren);
+			trace("btn.getChildAt(0)['numChildren']="+btn.getChildAt(0)['numChildren']);
+			((btn.getChildAt(0) as Sprite).getChildAt(0) as Sprite).addChild(btnGraLoader);
+			btnGraLoader.x=-btnGraLoader.contentLoaderInfo.width/2;
+			btnGraLoader.y=-btnGraLoader.contentLoaderInfo.height/2;
+			
+			if(xml.@href.toString()){
+				btn.href=<xml href={xml.@href.toString()} target={xml.@target.toString()||"_blank"}/>;
+			}else if(xml.@js.toString()){
+				btn.href=<xml js={xml.@js.toString()}/>;
 			}
-			*/
 		}
 	}
 }
