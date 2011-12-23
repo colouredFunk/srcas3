@@ -26,7 +26,7 @@ package zero.works{
 		public var xml:XML;
 		private var xmlLoader:URLLoader;
 		
-		private var assets:Object;
+		protected var assets:Object;
 		private var assetLoader:Loader;
 		private var onLoadAssetComplete:Function;
 		
@@ -84,7 +84,7 @@ package zero.works{
 		private function clickMenuItem(event:ContextMenuEvent):void{
 			System.setClipboard(getHTMLCode());
 		}
-		public function getHTMLCode(src:String=null):String{
+		public function getHTMLCode(src:String=null,bgSrc:String=null):String{
 			if(src){
 			}else{
 				var urlArr:Array=this.loaderInfo.url.replace(/^(.*)\?.*$/,"$1").split("/");
@@ -94,10 +94,14 @@ package zero.works{
 				//}while(url2=="[[DYNAMIC]]");
 				src=url2+"/"+url1;
 			}
+			var _xml:XML=xml.copy();
+			if(bgSrc){
+				_xml.@bg=bgSrc;
+			}
 			return '<script src="http://www.wanmei.com/public/js/swfobject.js" type="text/javascript"></script>\n'+
 				'<div id="containerID"></div>\n'+
 				'<script type="text/javascript">\n'+
-				'	addSWF("'+src+'","containerID",'+wid+','+hei+',{xml:"'+xml.toXMLString().replace(/"/g,"'")+'"});\n'+
+				'	addSWF("'+src+'","containerID",'+wid+','+hei+',{xml:"'+_xml.toXMLString().replace(/"/g,"'")+'"});\n'+
 				'</script>\n';
 		}
 		

@@ -32,8 +32,6 @@ package zero.works{
 		private var x3:int;
 		private var x4:int;
 		
-		private var txtLoader:Loader;
-		
 		public function TxtEffectsClock(){
 			for(var i:int=0;i<5;i++){
 				if(this["x"+i]>0){
@@ -44,27 +42,15 @@ package zero.works{
 			if(txt4){
 				txt4.txt2.visible=false;
 			}
-			
-			var txtSWFData:ByteArray;
-			try{
-				txtSWFData=new (getDefinitionByName("TxtSWFData"))();
-				if(txtSWFData.length){
-				}else{
-					txtSWFData=null;
-				}
-			}catch(e:Error){
-				txtSWFData=null;
-			}
-			if(txtSWFData){
-				txtLoader=new Loader();
-				txtLoader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadTxtComplete);
-				txtLoader.loadBytes(txtSWFData);
+		}
+		public function initComplete():void{
+			if(assets&&assets.txtSWFData){
+				loadAsset("txtSWFData",loadTxtSWFComplete);
 			}else{
 				ServerDate.init(getTimeComplete);
 			}
 		}
-		private function loadTxtComplete(event:Event):void{
-			txtLoader.contentLoaderInfo.removeEventListener(Event.COMPLETE,loadTxtComplete);
+		private function loadTxtSWFComplete(txtLoader:Loader):void{
 			var TxtSWFClass:Class=txtLoader.contentLoaderInfo.applicationDomain.getDefinition("TxtSWF") as Class;
 			txtLoader=null;
 			for(var i:int=0;i<5;i++){
