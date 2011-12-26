@@ -35,6 +35,9 @@
 		}
 
 		public function PlayItem(_source:*){
+			if(_source is XMLList){
+				_source=_source[0];
+			}
 			if (_source is XML){
 				__source = String(_source.attribute(SOURCE));
 				__type = String(_source.attribute(TYPE));
@@ -47,7 +50,6 @@
 			if (!__type){
 				__type = String(__source.split("?")[0].split(".").pop()).toLowerCase();
 			}
-
 		}
 	}
 
