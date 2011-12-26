@@ -124,7 +124,9 @@ package akdcl.manager {
 				_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderCompleteOrErrorHandler);
 				_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onLoaderCompleteOrErrorHandler);
 				_loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onLoaderCompleteOrErrorHandler);
-				loaderDic[_url] = _loader;
+				if (_url.indexOf(".swf") < 0) {
+					loaderDic[_url] = _loader;
+				}
 				_loader.params = args;
 			}
 			//
