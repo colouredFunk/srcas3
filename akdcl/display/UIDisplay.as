@@ -103,11 +103,11 @@
 
 		public function UIDisplay(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = 0) {
 			if (container){
-				_rectWidth = _rectWidth || container.width;
-				_rectHeight = _rectHeight || container.height;
+				_rectWidth = _rectWidth || container.width / container.scaleX;
+				_rectHeight = _rectHeight || container.height / container.scaleY;
 			} else {
-				_rectWidth = _rectWidth || getWidth();
-				_rectHeight = _rectHeight || getHeight();
+				_rectWidth = _rectWidth || getWidth() / scaleX;
+				_rectHeight = _rectHeight || getHeight() / scaleY;
 				container = this;
 			}
 			//w,h为0会启动isAverageWH，<=1会启动percentWH
