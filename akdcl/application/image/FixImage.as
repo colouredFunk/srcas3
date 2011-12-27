@@ -74,7 +74,6 @@
 			displayArea = new UIDisplay(areaWidth, areaHeight, -1);
 			proxyIcon = new Display(frameIcon.x + frameBorder, frameIcon.y + frameBorder, iconWidth, iconHeight);
 			
-			shapesContainer.blendMode = BlendMode.LAYER;
 			shapeMove.blendMode = BlendMode.ERASE;
 			
 			shapeMask.graphics.beginFill(0x000000, 0.5);
@@ -197,7 +196,7 @@
 
 		public function setImage(_bmd:BitmapData):void {
 			enabled = true;
-			
+			shapesContainer.blendMode = BlendMode.LAYER;
 			if (orgBitmapData) {
 				orgBitmapData.dispose();
 			}
