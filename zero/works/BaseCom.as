@@ -1,4 +1,4 @@
-/***
+﻿/***
 BaseCom
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
 创建时间：2011年12月20日 19:55:18
@@ -82,27 +82,20 @@ package zero.works{
 			}
 		}
 		private function clickMenuItem(event:ContextMenuEvent):void{
-			System.setClipboard(getHTMLCode());
-		}
-		public function getHTMLCode(src:String=null,bgSrc:String=null):String{
-			if(src){
-			}else{
-				var urlArr:Array=this.loaderInfo.url.replace(/^(.*)\?.*$/,"$1").split("/");
-				//do{
-					var url1:String=urlArr.pop();
-					var url2:String=urlArr.pop();
-				//}while(url2=="[[DYNAMIC]]");
-				src=url2+"/"+url1;
-			}
-			var _xml:XML=xml.copy();
-			if(bgSrc){
-				_xml.@bg=bgSrc;
-			}
-			return '<script src="http://www.wanmei.com/public/js/swfobject.js" type="text/javascript"></script>\n'+
+			var urlArr:Array=this.loaderInfo.url.replace(/^(.*)\?.*$/,"$1").split("/");
+			//do{
+				var url1:String=urlArr.pop();
+				var url2:String=urlArr.pop();
+			//}while(url2=="[[DYNAMIC]]");
+			var src:String=url2+"/"+url1;
+			
+			System.setClipboard(
+				'<script src="http://www.wanmei.com/public/js/swfobject.js" type="text/javascript"></script>\n'+
 				'<div id="containerID"></div>\n'+
 				'<script type="text/javascript">\n'+
-				'	addSWF("'+src+'","containerID",'+wid+','+hei+',{xml:"'+_xml.toXMLString().replace(/"/g,"'")+'"});\n'+
-				'</script>\n';
+				'	addSWF("'+src+'","containerID",'+wid+','+hei+',{xml:"'+xml.toXMLString().replace(/"/g,"'")+'"});\n'+
+				'</script>\n'
+			);
 		}
 		
 		private function initProperty():void{
@@ -204,6 +197,9 @@ package zero.works{
 		}
 		private function loadAssetComplete(event:Event):void{
 			assetLoader.contentLoaderInfo.removeEventListener(Event.COMPLETE,loadAssetComplete);
+			if(assetLoader.content is Bitmap){
+				(assetLoader.content as Bitmap).smoothing=true;
+			}
 			var _assetLoader:Loader=assetLoader;
 			var _onLoadAssetComplete:Function=onLoadAssetComplete;
 			assetLoader=null;
