@@ -7,6 +7,7 @@ package akdcl.manager {
 	 * @author ...
 	 */
 	final public class ShareObjectManager {
+		private static const ERROR:String = "RequestManager Singleton already constructed!";
 		public static var instance:ShareObjectManager;
 
 		public static function getInstance():ShareObjectManager {
@@ -18,33 +19,74 @@ package akdcl.manager {
 		}
 
 		public function ShareObjectManager(){
+			lM = LoggerManager.getInstance();
 			if (instance){
-				throw new Error("ERROR:ShareObjectManager Singleton already constructed!");
+				lM.fatal(ShareObjectManager, ERROR);
+				throw new Error("[ERROR]:" + ERROR);
 			}
 			instance = this;
+			lM.info(ShareObjectManager, "init");
+
+			setLocal(LOCAL_DOMAIN);
 		}
 
+		private static const LOCAL_DOMAIN:String = "akdcl/shareLocal";
+
+		private var lM:LoggerManager;
+
 		private var shareObject:SharedObject;
+		private var shareObjectGroup:Object;
 
 		public function setLocal(_domain:String):void {
 			shareObject = SharedObject.getLocal(_domain);
 		}
 
+		public function setGroup(_group:String):void {
+			if (_group){
+				shareObjectGroup = shareObject.data[_group];
+				if (!shareObjectGroup){
+					shareObjectGroup = shareObject.data[_group] = {};
+				}
+			} else {
+				shareObjectGroup = null;
+			}
+		}
+
 		public function getValue(_key:String):Object {
-			return shareObject.data[_key];
+			if (shareObjectGroup){
+				return shareObjectGroup[_key];
+			} else {
+				return shareObject.data[_key];
+			}
 		}
 
 		public function setValue(_key:String, _value:Object):void {
-			shareObject.data[_key] = _object;
+			if (shareObjectGroup){
+				shareObjectGroup[_key] = _value;
+			} else {
+				shareObject.data[_key] = _value;
+			}
 		}
 
 		public function getValueCopy(_key:String):Object {
-			var _object:Object = shareObject.data[_key];
-			return copyObject(_object);
+			var _object:Object;
+			if (shareObjectGroup){
+				_object = shareObjectGroup[_key];
+			} else {
+				_object = shareObject.data[_key];
+			}
+			return _object ? copyObject(_object) : null;
 		}
 
 		public function setValueCopy(_key:String, _value:Object):void {
-			shareObject.data[_key] = copyObject(_object);
+			if (!_value){
+				return;
+			}
+			if (shareObjectGroup){
+				shareObjectGroup[_key] = copyObject(_value);
+			} else {
+				shareObject.data[_key] = copyObject(_value);
+			}
 		}
 
 		public function flush():void {

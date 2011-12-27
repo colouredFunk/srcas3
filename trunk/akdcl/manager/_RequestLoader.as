@@ -16,6 +16,8 @@ package akdcl.manager {
 	 * @author akdcl
 	 */
 	final internal class _RequestLoader extends Loader {
+		private static const LOADER_CONTEXT:LoaderContext = new LoaderContext(true);
+
 		internal var url:String;
 		internal var params:Array;
 
@@ -31,7 +33,7 @@ package akdcl.manager {
 
 		override public function load(request:URLRequest, context:LoaderContext = null):void {
 			url = request.url;
-			super.load(request, context);
+			super.load(request, context || LOADER_CONTEXT);
 		}
 
 		internal function clear():Boolean {
