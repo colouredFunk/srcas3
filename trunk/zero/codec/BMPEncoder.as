@@ -43,8 +43,6 @@ package zero.codec{
 			var biHeight:int=bmd.height;
 			var bmpData:ByteArray=new ByteArray();
 			
-			throw new Error("已坏");
-			
 			//BMP文件头
 			//typedef struct tagBITMAPFILEHEADER {
 			//	WORD	bfType;			// 位图文件的类型，必须为BM
