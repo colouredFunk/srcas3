@@ -1,76 +1,120 @@
-package ui{
+package ui {
 	import flash.events.Event;
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
-	
+
 	import akdcl.display.UISprite;
+
 	/**
 	 * ...
 	 * @author Akdcl
 	 */
-	public class  TxtAutoRoll extends UISprite{
+	public class TxtAutoRoll extends UISprite {
 		public var txt:TextField;
 		public var rollSpeed:Number = 1;
-		private var __textWidth:Number;
-		public function get textWidth():Number{
-			return __textWidth;
+
+		public var isVertical:Boolean=true;
+
+		private var __rollArea:Number = 100;
+
+		private var rect:Rectangle;
+
+		public function get rollArea():Number {
+			return __rollArea;
 		}
-		public function set textWidth(_textWidth:Number):void{
-			__textWidth = _textWidth;
+
+		public function set rollArea(_rollArea:Number):void {
+			__rollArea = _rollArea;
 			fixScrollRect();
 		}
+
 		private var __text:String;
+
 		public function get text():String {
 			return __text;
 		}
+
 		public function set text(_text:String):void {
-			if (__text != _text) {
+			if (__text != _text){
 				__text = _text;
 				txt.text = __text;
 				txt.autoSize = TextFieldAutoSize.LEFT;
-				if (__text && txt.width > textWidth) {
-					txt.x = textWidth;
-					fixScrollRect();
-					addEventListener(Event.ENTER_FRAME, onRollingHandler);
-				}else {
-					txt.x = int((textWidth - txt.width) * 0.5);
-					removeEventListener(Event.ENTER_FRAME, onRollingHandler);
+				if (isVertical){
+					if (__text && txt.height > __rollArea){
+						txt.y = __rollArea;
+						fixScrollRect();
+						addEventListener(Event.ENTER_FRAME, onRollingHandler);
+					} else {
+						txt.y = int((__rollArea - txt.height) * 0.5);
+						removeEventListener(Event.ENTER_FRAME, onRollingHandler);
+					}
+				} else {
+					if (__text && txt.width > __rollArea){
+						txt.x = __rollArea;
+						fixScrollRect();
+						addEventListener(Event.ENTER_FRAME, onRollingHandler);
+					} else {
+						txt.x = int((__rollArea - txt.width) * 0.5);
+						removeEventListener(Event.ENTER_FRAME, onRollingHandler);
+					}
 				}
 			}
 		}
-		override protected function init():void {
-			super.init();
-			if (txt) {
-				textWidth = txt.width;
-			}else {
+
+		override protected function onAddedToStageHandler(_evt:Event):void {
+			super.onAddedToStageHandler(_evt);
+			rect = new Rectangle();
+			if (txt){
+				if (isVertical){
+					rollArea = txt.height;
+				} else {
+					rollArea = txt.width;
+				}
+			} else {
 				txt = new TextField();
 				addChild(txt);
-				textWidth = 100;
+				fixScrollRect();
 			}
-			txt.multiline = false;
-			txt.wordWrap = false;
 		}
-		
-		override protected function onRemoveHandler():void 
-		{
+
+		override protected function onRemoveHandler():void {
 			super.onRemoveHandler();
 			txt = null;
 		}
+
 		protected function fixScrollRect():void {
-			if (scrollRect) {
-				scrollRect.width = textWidth;
-				scrollRect.height = txt.height;
-			}else {
-				scrollRect = new Rectangle(0, 0, __textWidth, txt.height);
+			if (isVertical){
+				rect.width = txt.width;
+				rect.height = __rollArea;
+			} else {
+				rect.width = __rollArea;
+				rect.height = txt.height;
+			}
+			scrollRect = rect;
+
+			if (isVertical){
+				txt.multiline = true;
+				txt.wordWrap = true;
+			} else {
+				txt.multiline = false;
+				txt.wordWrap = false;
 			}
 		}
+
 		protected function onRollingHandler(_evt:Event):void {
-			txt.x -= rollSpeed;
-			if (txt.x + txt.width < 0) {
-				txt.x = textWidth;
+			if (isVertical){
+				txt.y -= rollSpeed;
+				if (txt.y + txt.height < 0){
+					txt.y = __rollArea;
+				}
+			} else {
+				txt.x -= rollSpeed;
+				if (txt.x + txt.width < 0){
+					txt.x = __rollArea;
+				}
 			}
 		}
 	}
-	
+
 }
