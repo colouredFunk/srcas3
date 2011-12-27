@@ -97,7 +97,12 @@ package akdcl.media {
 		}
 
 		private function onAlertHandler(_b:Boolean):void {
-			if (_b){
+			if (_b) {
+				try{
+					data.width;
+				}catch (_e:Error) {
+					data = null;
+				}
 				if (!data || data.width != cameraP.displayContent.width || data.height != cameraP.displayContent.height){
 					if (data){
 						data.dispose();
