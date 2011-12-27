@@ -242,7 +242,7 @@ public class PNGEncoder
 			}
 		}else{
 			for (y = 0; y < height; y++){
-				IDAT.writeByte(0); // no filter
+				IDAT[offset++]=0; // no filter
 				for (x = 0; x < width; x++){
 					IDAT[offset++]=sourceByteArray[sourceOffset+1];
 					IDAT[offset++]=sourceByteArray[sourceOffset+2];
