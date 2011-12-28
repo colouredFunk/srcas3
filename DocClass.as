@@ -31,13 +31,15 @@
 
 		public function DocClass(_key:String = "main"){
 			stop();
-			if (instanceMap[_key] != null) {
-				var _str:String = "DocClass(@" + _key + ") Singleton already constructed!";
+			docClassKey = _key;
+			if (instanceMap[docClassKey] != null) {
+				var _str:String = "DocClass(@" + docClassKey + ") Singleton already constructed!";
 				lM.fatal(DocClass, _str);
 				throw new Error("[ERROR]:" + _str);
 			}
-			instanceMap[_key] = this;
+			instanceMap[docClassKey] = this;
 			loaderInfo.addEventListener(Event.INIT, onInitHandler);
+			addEventListener(Event.REMOVED_FROM_STAGE, onRemoveHandler);
 		}
 		
 		private static const STATUS_LOAD:String = "load";
@@ -50,6 +52,8 @@
 		public var lM:LoggerManager;
 		public var rM:RequestManager;
 		public var eiM:ExternalInterfaceManager;
+		
+		protected var docClassKey:String;
 
 		protected var loadDelay:Number = 1;
 		protected var optionsXMLPath:String;
@@ -215,6 +219,12 @@
 				eiM.debugMessage(_str);
 			} else {
 				throw new Error(_str);
+			}
+		}
+		
+		protected function onRemoveHandler(_e:Event):void {
+			if (instanceMap[docClassKey] == this) {
+				instanceMap[docClassKey] = null;
 			}
 		}
 

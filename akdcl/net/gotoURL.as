@@ -70,6 +70,7 @@
 					_browserName = "Unknown";
 				}
 			}
+			LoggerManager.getInstance().info(this, "toURL(url:{0}, target:{1})", null, _request.url, _target);
 			var _features:String = "";
 			switch (_browserName){
 				case "Firefox":
@@ -88,7 +89,6 @@
 					navigateToURL(_request, _target);
 					break;
 			}
-			LoggerManager.getInstance().info(this, "toURL(url:{0}, target:{1})", null, _request.url, _target);
 		}
 	}
 }

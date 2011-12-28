@@ -61,11 +61,13 @@ package akdcl.display {
 			loadProgress = 0;
 			source = _url;
 			label = source;
-			alignXReady = _alignX;
-			alignYReady = _alignY;
-			scaleModeReady = _scaleMode;
-			tweenMode = _tweenMode;
-			rM.loadDisplay(_url, onCompleteHandler, onErrorHandler, onProgressHandler);
+			if (source) {
+				alignXReady = _alignX;
+				alignYReady = _alignY;
+				scaleModeReady = _scaleMode;
+				tweenMode = _tweenMode;
+				rM.loadDisplay(source, onCompleteHandler, onErrorHandler, onProgressHandler);
+			}
 		}
 
 		protected function onErrorHandler(_e:IOErrorEvent):void {

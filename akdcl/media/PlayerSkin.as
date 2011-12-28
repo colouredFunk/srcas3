@@ -58,6 +58,10 @@ package akdcl.media {
 		
 		public var displayContainer:UIDisplay;
 		
+		public var displayAlignX:Number = 0.5;
+		public var displayAlignY:Number = 0.5;
+		public var displayScaleMode:Number = 1;
+		
 		protected var player:MediaProvider;
 		
 		override protected function onAddedToStageHandler(_evt:Event):void 
@@ -273,13 +277,12 @@ package akdcl.media {
 			onPlayProgressHandler(null);
 		}
 		
-		protected function onDisplayChangeHandler(e:MediaEvent):void 
-		{
+		protected function onDisplayChangeHandler(e:MediaEvent):void {
 			if (displayContainer) {
 				if (player["displayContent"] is Array) {
-					displayContainer.setContent(player["displayContent"][0]);
+					displayContainer.setContent(player["displayContent"][0], 2, displayAlignX, displayAlignY, displayScaleMode);
 				}else {
-					displayContainer.setContent(player["displayContent"]);
+					displayContainer.setContent(player["displayContent"], 2, displayAlignX, displayAlignY, displayScaleMode);
 				}
 			}
 		}
