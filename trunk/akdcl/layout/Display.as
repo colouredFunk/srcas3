@@ -147,6 +147,10 @@ package akdcl.layout {
 		}
 
 		public function setContent(_content:Object, _alignX:Number = NaN, _alignY:Number = NaN, _scaleMode:Number = NaN):void {
+			if (!_content) {
+				content = null;
+				return;
+			}
 			if (_alignX) {
 				__alignX = _alignX;
 			}

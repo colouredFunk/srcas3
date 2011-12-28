@@ -59,7 +59,7 @@
 			__loadProgress = 0;
 			lastSource = playItem.source;
 			//判断是否是bmd并加载完毕，将onLoadCompleteHandler移入waitHandler
-			rM.loadDisplay(lastSource, onLoadCompleteHandler, onLoadErrorHandler, onLoadProgressHandler);
+			rM.loadDisplay(lastSource, onLoadCompleteHandler, onLoadErrorHandler, onLoadProgressHandler, playItem.flashVars);
 			timer.stop();
 		}
 
