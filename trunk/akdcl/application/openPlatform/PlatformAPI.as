@@ -1,56 +1,86 @@
 package akdcl.application.openPlatform {
-	import flash.display.Stage;
 	import flash.events.Event;
-	import flash.geom.Rectangle;
-	import flash.media.StageWebView;
-	import flash.net.SharedObject;
-	
 	import akdcl.events.UIEventDispatcher;
+	import akdcl.manager.ShareObjectManager;
 
 	/**
 	 * ...
 	 * @author ...
 	 */
-	public class PlatformAPI extends UIEventDispatcher {
-		public static const PLATFORM_DATA:String = "akdcl/platformData";
+	public class Platform extends UIEventDispatcher {
+		private static const PLATFORM_DATA:String = "akdcl/platformData";
+		
+		private static const APPLICATION_NAME:String = "applicationName";
+		private static const LAST_USER:String = "lastUser";
 
-		public var onLogin:Function;
+		private static const USERS:String = "users";
+		private static const ACCESS_TOKEN:String = "accessToken";
+		private static const RECOED_SECONDS:String = "recordSeconds";
+		private static const EXPIRES_IN:String = "expiresIn";
 
-		protected var shareObject:SharedObject;
+		protected static const soM:ShareObjectManager = ShareObjectManager.getInstance();
 
-		protected var stage:Stage;
-		protected var webView:StageWebView;
-
-		protected var name:String;
+		protected var name:String = "platformName";
 
 		protected var consumerKey:String;
 		protected var consumerSecret:String;
-		protected var pin:String = "";
 
-		protected var accessTokenKey:String = "";
-		protected var accessTokenSecrect:String = "";
-
-		public function get authorized():Boolean {
-			return false;
-		}
-
-		public function PlatformAPI(_stage:Stage, _appKey:String, _appSecret:String, _viewPort:Rectangle=null):void {
-			stage = _stage;
+		public function PlatformAPI(_appKey:String, _appSecret:String):void {
 			consumerKey = _appKey;
 			consumerSecret = _appSecret;
-
-			shareObject = SharedObject.getLocal(PLATFORM_DATA);
-
-			webView = new StageWebView();
-			webView.viewPort = _viewPort||new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
-			webView.addEventListener(Event.LOCATION_CHANGE, onWebViewLocationChangeHandler);
 			super();
 		}
 
-		public function setAccessToken(_key:String, _secret:String):void {
-			accessTokenKey = _key;
-			accessTokenSecrect = _secret;
-			updateShareObject();
+		override protected function init():void {
+			super.init();
+			soM.setLocal(PLATFORM_DATA);
+			soM.setGroup(name +"_" + consumerKey);
+		}
+		
+
+		protected function getAccessToken():String {
+			//创建用户列表
+			soM.autoValue(USERS, { } );
+			
+			var _userID:String;
+			
+			var _lastUserID:String;
+			var _user:Object;
+			
+			var _accessToken:String;
+			_lastUserID = soM.getValue(LAST_USER);
+			
+			if (_lastUserID) {
+				getUserAccessToken(_lastUserID);
+			}
+			return null;
+		}
+		
+		protected function getUserAccessToken(_userID:String):String {
+			//创建用户列表
+			soM.autoValue(USERS, { } );
+			var _users:Object = soM.getValue(USERS);
+			var _user:Object;
+			var _accessToken:String;
+			if (_users) {
+				_user = _users[_lastUserID];
+				if (_user) {
+					_accessToken = _user[ACCESS_TOKEN];
+					if (_accessToken) {
+						if (new Date().time * 0.001 - int(_user[RECOED_SECONDS]) < int(_user[EXPIRES_IN])) {
+							return _accessToken;
+						}
+					}
+				}
+			}
+			return null;
+		}
+
+		private function setAccessToken(_accessToken:String, _expiresIn:String):void {
+			soM.setValue("recordIn", int(new Date().time * 0.001));
+			soM.setValue("accessToken", _accessToken);
+			soM.setValue("expiresIn", _expiresIn);
+			soM.flush();
 		}
 
 		public function login():void {
@@ -62,31 +92,7 @@ package akdcl.application.openPlatform {
 		}
 
 		public function logout():void {
-			updateShareObject(true);
-		}
 
-		protected function updateShareObject(_logout:Boolean = false):void {
-			if (!shareObject.data[name]){
-				shareObject.data[name] = {};
-			}
-			if (!shareObject.data[name][consumerKey]){
-				shareObject.data[name][consumerKey] = {key: "", secret: ""};
-			}
-			if (_logout){
-				delete shareObject.data[name][consumerKey];
-				accessTokenKey = "";
-				accessTokenSecrect = "";
-			} else {
-				if (accessTokenKey){
-					shareObject.data[name][consumerKey].key = accessTokenKey;
-				}
-				if (accessTokenSecrect){
-					shareObject.data[name][consumerKey].secret = accessTokenSecrect;
-				}
-				accessTokenKey = shareObject.data[name][consumerKey].key;
-				accessTokenSecrect = shareObject.data[name][consumerKey].secret;
-			}
-			shareObject.flush();
 		}
 
 		protected function requestAuthorize():void {
@@ -99,25 +105,25 @@ package akdcl.application.openPlatform {
 
 		public function removeWebView(_success:Boolean = false):void {
 			var hasStage:Boolean;
-			try{
-				if(webView.stage){
-					hasStage=true;
-				}else{
-					hasStage=false;
+			try {
+				if (webView.stage){
+					hasStage = true;
+				} else {
+					hasStage = false;
 				}
-			}catch(e:Error){
-				hasStage=false;
+			} catch (e:Error){
+				hasStage = false;
 			}
 			if (hasStage){
 				webView.stage = null;
 				if (_success){
 					webView.removeEventListener(Event.LOCATION_CHANGE, onWebViewLocationChangeHandler);
 					webView.dispose();
-				}else{
+				} else {
 					accessTokenKey = "";
 					accessTokenSecrect = "";
 				}
-			}else{
+			} else {
 				accessTokenKey = "";
 				accessTokenSecrect = "";
 			}
