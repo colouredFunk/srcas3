@@ -38,7 +38,7 @@ package ui {
 		public function set text(_text:String):void {
 			if (__text != _text){
 				__text = _text;
-				txt.text = __text;
+				txt.htmlText = __text;
 				txt.autoSize = TextFieldAutoSize.LEFT;
 				if (isVertical){
 					if (__text && txt.height > __rollArea){
