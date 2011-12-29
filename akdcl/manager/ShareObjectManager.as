@@ -67,26 +67,20 @@ package akdcl.manager {
 				shareObject.data[_key] = _value;
 			}
 		}
+		
+		public function autoValue(_key:String, _value:Object):void {
+			if (_value && !getValue(_key)) {
+				setValue(_key, _value);
+			}
+		}
 
 		public function getValueCopy(_key:String):Object {
-			var _object:Object;
-			if (shareObjectGroup){
-				_object = shareObjectGroup[_key];
-			} else {
-				_object = shareObject.data[_key];
-			}
+			var _object:Object = getValue(_key);
 			return _object ? copyObject(_object) : null;
 		}
 
 		public function setValueCopy(_key:String, _value:Object):void {
-			if (!_value){
-				return;
-			}
-			if (shareObjectGroup){
-				shareObjectGroup[_key] = copyObject(_value);
-			} else {
-				shareObject.data[_key] = copyObject(_value);
-			}
+			setValue(_key, _value ? copyObject(_value) : null);
 		}
 
 		public function flush():void {

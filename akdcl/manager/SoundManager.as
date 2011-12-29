@@ -27,8 +27,8 @@ package akdcl.manager {
 			instance = this;
 		}
 
-		private static const SOUNDITEMS_GROUP:String = "SoundItems";
-		private static const DEFAULT_GROUP:String = "SoundEffects";
+		private static const SOUND_ITEMS_GROUP:String = "soundItems";
+		private static const DEFAULT:String = "soundEffects";
 
 		private static var sM:SourceManager = SourceManager.getInstance();
 
@@ -42,19 +42,19 @@ package akdcl.manager {
 					sM.addSource(SourceManager.SOUND_GROUP, _asID, _sound);
 				}
 				var _soundItem:SoundEmbedItem = new SoundEmbedItem(_sound, _maxVolume);
-				_groupID = _groupID || DEFAULT_GROUP;
-				var _soundItems:SoundItems = sM.getSource(SOUNDITEMS_GROUP, _groupID);
+				_groupID = _groupID || DEFAULT;
+				var _soundItems:SoundItems = sM.getSource(SOUND_ITEMS_GROUP, _groupID);
 				if (!_soundItems){
 					_soundItems = new SoundItems();
-					sM.addSource(SOUNDITEMS_GROUP, _groupID, _soundItems);
+					sM.addSource(SOUND_ITEMS_GROUP, _groupID, _soundItems);
 				}
 				_soundItems.addSound(_soundItem, _keyID || _asID);
 			}
 		}
 
 		public function getVolume(_groupID:String = null):Number {
-			_groupID = _groupID || DEFAULT_GROUP;
-			var _soundItems:SoundItems = sM.getSource(SOUNDITEMS_GROUP, _groupID);
+			_groupID = _groupID || DEFAULT;
+			var _soundItems:SoundItems = sM.getSource(SOUND_ITEMS_GROUP, _groupID);
 			if (_soundItems){
 				return _soundItems.getVolume();
 			}
@@ -62,16 +62,16 @@ package akdcl.manager {
 		}
 
 		public function setVolume(_volume:Number, _groupID:String = null):void {
-			_groupID = _groupID || DEFAULT_GROUP;
-			var _soundItems:SoundItems = sM.getSource(SOUNDITEMS_GROUP, _groupID);
+			_groupID = _groupID || DEFAULT;
+			var _soundItems:SoundItems = sM.getSource(SOUND_ITEMS_GROUP, _groupID);
 			if (_soundItems){
 				_soundItems.setVolume(_volume);
 			}
 		}
 
 		public function playSound(_keyID:String, _groupID:String = null, _startTime:Number = 0, _loops:uint = 0, _tempVolume:Number = 1, _tweenIn:Number = 0, _tweenOut:Number = 0):SoundEmbedItem {
-			_groupID = _groupID || DEFAULT_GROUP;
-			var _soundItems:SoundItems = sM.getSource(SOUNDITEMS_GROUP, _groupID);
+			_groupID = _groupID || DEFAULT;
+			var _soundItems:SoundItems = sM.getSource(SOUND_ITEMS_GROUP, _groupID);
 			if (_soundItems){
 				var _sound:SoundEmbedItem = _soundItems.getSound(_keyID);
 				if (_sound){
