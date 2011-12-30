@@ -11,30 +11,28 @@ package zero.utils{
 	import flash.display.DisplayObjectContainer;
 	import flash.utils.Dictionary;
 	import flash.geom.Matrix;
-	public function getM(dspObj0:DisplayObject,dspObj1:DisplayObject,useSameParentMatrix:Boolean):Matrix{
-		//求得 m，此 m 的功能具体描述就是：假如进行以下操作：dspObj1.addChild(dspObj0);dspObj0.transform.matrix=m; 那么 dspObj0 将会和操作前看上去一样
-		//
-		/*
-		//此算法可简单描述为：
-		var m:Matrix=dspObj0.transform.concatenatedMatrix;
-		var m1:Matrix=dspObj1.transform.concatenatedMatrix;
-		m1.invert();
-		m.concat(m1);
-		return m;
-		//由于 concatenatedMatrix 不总是能获取，所以不采用此算法
-		//*/
-		
+	/**
+	 * 求得 m，此 m 的功能具体描述就是：假如进行以下操作：cankaoDspObj.addChild(dspObj);dspObj.transform.matrix=m; 那么 dspObj 将会和操作前看上去一样
+	 * 此算法可简单描述为：
+	 * var m:Matrix=dspObj.transform.concatenatedMatrix;
+	 * var m1:Matrix=cankaoDspObj.transform.concatenatedMatrix;
+	 * m1.invert();
+	 * m.concat(m1);
+	 * return m;
+	 * 由于 concatenatedMatrix 不总是能获取，所以不采用此算法
+	 */	
+	public function getM(dspObj:DisplayObject,cankaoDspObj:DisplayObject,useSameParentMatrix:Boolean):Matrix{
 		//找到共同的 parent
 		var sameParent:DisplayObjectContainer=null;
 		var parentDict:Dictionary=new Dictionary();
 		var parent:DisplayObjectContainer;
 		
-		parent=dspObj0.parent;
+		parent=dspObj.parent;
 		while(parent){
 			parentDict[parent]=true;
 			parent=parent.parent;
 		}
-		parent=dspObj1.parent;
+		parent=cankaoDspObj.parent;
 		while(parent){
 			if(parentDict[parent]){
 				sameParent=parent;
@@ -45,9 +43,9 @@ package zero.utils{
 		//
 		
 		if(sameParent){
-			var m:Matrix=dspObj0.transform.matrix;
+			var m:Matrix=dspObj.transform.matrix;
 			if(m){
-				parent=dspObj0.parent;
+				parent=dspObj.parent;
 				while(parent){
 					if(parent==sameParent){
 						break;
@@ -64,9 +62,9 @@ package zero.utils{
 					}
 				}
 				
-				var m1:Matrix=dspObj1.transform.matrix;
+				var m1:Matrix=cankaoDspObj.transform.matrix;
 				if(m1){
-					parent=dspObj1.parent;
+					parent=cankaoDspObj.parent;
 					while(parent){
 						if(parent==sameParent){
 							break;

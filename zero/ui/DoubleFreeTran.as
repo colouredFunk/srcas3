@@ -7,6 +7,7 @@ DoubleFreeTran
 */
 
 package zero.ui{
+	
 	import flash.display.*;
 	import flash.events.*;
 	import flash.geom.*;
@@ -14,6 +15,8 @@ package zero.ui{
 	import flash.system.*;
 	import flash.text.*;
 	import flash.utils.*;
+	
+	import zero.utils.getM;
 	
 	public class DoubleFreeTran extends Sprite{
 		
@@ -98,7 +101,7 @@ package zero.ui{
 				m.concat(freeTran1.transform.matrix);
 				rect1.transform.matrix=m;
 				freeTran1.setPic(rect1);
-				chankaoM=FreeTran.getM(rect1,__pic,false);
+				chankaoM=getM(rect1,__pic,false);
 				tran1();
 			}else{
 				this.visible=false;
@@ -137,7 +140,7 @@ package zero.ui{
 			if(__pic){
 				var m:Matrix=chankaoM.clone();
 				m.invert();
-				var m2:Matrix=FreeTran.getM(__pic.parent,rect1,true);
+				var m2:Matrix=getM(__pic.parent,rect1,true);
 				m2.invert();
 				m.concat(m2);
 				__pic.transform.matrix=m;
@@ -181,7 +184,7 @@ package zero.ui{
 			freeTran1.mouseEnabled=freeTran1.mouseChildren=true;
 			
 			if(__pic){
-				chankaoM=FreeTran.getM(rect1,__pic,false);
+				chankaoM=getM(rect1,__pic,false);
 			}
 		}
 	}
