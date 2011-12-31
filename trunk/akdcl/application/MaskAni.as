@@ -4,7 +4,7 @@
 	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.geom.Rectangle;
-	import ui.UIMovieClip;
+	import akdcl.display.UIMovieClip;
 	
 	/**
 	 * ...
@@ -21,8 +21,8 @@
 		public var playBack:Boolean;
 		private var isTempAsBmp:Boolean;
 		private var masked:DisplayObject;
-		override protected function onRemoveToStageHandler():void {
-			super.onRemoveToStageHandler();
+		override protected function onRemoveHandler():void {
+			super.onRemoveHandler();
 			if (masked) {
 				masked.mask = null;
 				if (isTempAsBmp) {
