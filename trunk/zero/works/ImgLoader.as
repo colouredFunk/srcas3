@@ -52,7 +52,7 @@ package zero.works{
 		}
 		
 		public function init(
-			xmlOrSrc:*=null,
+			xmlOrSrcOrData:*=null,
 			_onLoadComplete:Function=null,
 			_onLoadError:Function=null,
 			_onFadeComplete:Function=null,
@@ -67,10 +67,12 @@ package zero.works{
 				container2.addChild(_loader);
 			}
 			
-			if(xmlOrSrc is XML){
-				xml=xmlOrSrc;
+			if(xmlOrSrcOrData is ByteArray){
+				xml=<img/>;
+			}else if(xmlOrSrcOrData is XML){
+				xml=xmlOrSrcOrData;
 			}else{
-				xml=<img src={xmlOrSrc}/>;
+				xml=<img src={xmlOrSrcOrData}/>;
 			}
 			
 			onLoadComplete=_onLoadComplete;
@@ -94,7 +96,11 @@ package zero.works{
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadComplete);
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,loadError);
 			loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR,loadError);
-			loader.load(new URLRequest(xml.@src.toString()));
+			if(xml.@src.toString()){
+				loader.load(new URLRequest(xml.@src.toString()));
+			}else{
+				loader.loadBytes(xmlOrSrcOrData);
+			}
 		}
 		
 		public function unload():void{
