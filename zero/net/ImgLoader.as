@@ -6,7 +6,7 @@ ImgLoader
 用法举例：这家伙还是很懒什么都没写。
 */
 
-package zero.works{
+package zero.net{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.geom.*;
@@ -18,107 +18,31 @@ package zero.works{
 	import zero.utils.stopAll;
 	
 	public class ImgLoader extends Sprite{
+		
 		private var xml:XML;
+		
 		public var loader:Loader;
-		public var container:Sprite;
-		public var container2:Sprite;
-		private var onLoadComplete:Function;
-		private var onLoadError:Function;
-		private var onFadeComplete:Function;
-		private var mask_mc:MovieClip;
-		public function ImgLoader(
-			xmlOrSrc:*=null,
-			_onLoadComplete:Function=null,
-			_onLoadError:Function=null,
-			_onFadeComplete:Function=null,
-			_mask_mc:MovieClip=null
-		):void{
-			
+		private var container:Sprite;
+		private var container2:Sprite;
+		
+		public var onLoadProgress:Function;
+		public var onLoadComplete:Function;
+		public var onLoadError:Function;
+		public var onFadeComplete:Function;
+		
+		public var mask_mc:MovieClip;
+		
+		public function ImgLoader():void{
 			container2=new Sprite();
 			this.addChild(container2);
 			container2.mouseEnabled=container2.mouseChildren=false;
 			container=new Sprite();
 			this.addChild(container);
-			
-			if(xmlOrSrc){
-				init(
-					xmlOrSrc,
-					_onLoadComplete,
-					_onLoadError,
-					_onFadeComplete,
-					_mask_mc
-				);
-			}
-		}
-		
-		public function init(
-			xmlOrSrcOrData:*=null,
-			_onLoadComplete:Function=null,
-			_onLoadError:Function=null,
-			_onFadeComplete:Function=null,
-			_mask_mc:MovieClip=null
-		):void{
-			
-			var _loader:Loader=loader;
-			clear();
-			
-			if(_loader){
-				stopAll(_loader);
-				container2.addChild(_loader);
-			}
-			
-			if(xmlOrSrcOrData is ByteArray){
-				xml=<img/>;
-			}else if(xmlOrSrcOrData is XML){
-				xml=xmlOrSrcOrData;
-			}else{
-				xml=<img src={xmlOrSrcOrData}/>;
-			}
-			
-			onLoadComplete=_onLoadComplete;
-			onLoadError=_onLoadError;
-			onFadeComplete=_onFadeComplete;
-			
-			clearMaskMc();
-			
-			if(_mask_mc){
-				mask_mc=_mask_mc;
-				this.addChild(mask_mc);
-				mask_mc.gotoAndStop(1);
-				mask_mc.addFrameScript(mask_mc.totalFrames-1,mask_mc_lastFrame);
-				mask_mc.cacheAsBitmap=true;
-				mask_mc.mouseEnabled=mask_mc.mouseChildren=false;
-				container.cacheAsBitmap=true;
-				container.mask=mask_mc;
-			}
-			
-			loader=new Loader();
-			loader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadComplete);
-			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,loadError);
-			loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR,loadError);
-			if(xml.@src.toString()){
-				loader.load(new URLRequest(xml.@src.toString()));
-			}else{
-				loader.loadBytes(xmlOrSrcOrData);
-			}
-		}
-		
-		public function unload():void{
-			if(loader){
-				loader.contentLoaderInfo.removeEventListener(Event.COMPLETE,loadComplete);
-				loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,loadError);
-				loader.contentLoaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,loadError);
-				loader.unload();
-				loader=null;
-			}
 		}
 		public function clear():void{
-			if(loader){
-				loader.contentLoaderInfo.removeEventListener(Event.COMPLETE,loadComplete);
-				loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,loadError);
-				loader.contentLoaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,loadError);
-				loader=null;
-			}
+			
+			clearLoader();
+			clearMaskMc();
 			
 			var i:int;
 			
@@ -134,13 +58,22 @@ package zero.works{
 			
 			this.removeEventListener(Event.ENTER_FRAME,showContainer_step);
 			
+			onLoadProgress=null;
 			onLoadComplete=null;
 			onLoadError=null;
 			onFadeComplete=null;
-			
-			clearMaskMc();
 		}
-		private function clearMaskMc():void{
+		public function clearLoader():void{
+			if(loader){
+				loader.contentLoaderInfo.removeEventListener(ProgressEvent.PROGRESS,loadProgress);
+				loader.contentLoaderInfo.removeEventListener(Event.COMPLETE,loadComplete);
+				loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,loadError);
+				loader.contentLoaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,loadError);
+				loader.unload();
+				loader=null;
+			}
+		}
+		public function clearMaskMc():void{
 			if(mask_mc){
 				mask_mc.stop();
 				mask_mc.addFrameScript(mask_mc.totalFrames-1,null);
@@ -152,7 +85,59 @@ package zero.works{
 			container.cacheAsBitmap=false;
 			container.mask=null;
 		}
+		
+		public function load(data:*,_mask_mc:MovieClip=null):void{
+			if(loader){
+				loader.contentLoaderInfo.removeEventListener(ProgressEvent.PROGRESS,loadProgress);
+				loader.contentLoaderInfo.removeEventListener(Event.COMPLETE,loadComplete);
+				loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,loadError);
+				loader.contentLoaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,loadError);
+				stopAll(loader);
+				container2.addChild(loader);
+			}
+			
+			clearMaskMc();
+			
+			if(data is ByteArray){
+				xml=<img/>;
+			}else if(data is XML){
+				xml=data;
+			}else{
+				xml=<img src={data}/>;
+			}
+			
+			mask_mc=_mask_mc;
+			if(mask_mc){
+				this.addChild(mask_mc);
+				mask_mc.gotoAndStop(1);
+				mask_mc.addFrameScript(mask_mc.totalFrames-1,mask_mc_lastFrame);
+				mask_mc.cacheAsBitmap=true;
+				mask_mc.mouseEnabled=mask_mc.mouseChildren=false;
+				container.cacheAsBitmap=true;
+				container.mask=mask_mc;
+			}
+			
+			loader=new Loader();
+			loader.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS,loadProgress);
+			loader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadComplete);
+			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,loadError);
+			loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR,loadError);
+			if(xml.@src.toString()){
+				loader.load(new URLRequest(xml.@src.toString()));
+			}else{
+				loader.loadBytes(data);
+			}
+		}
+		private function loadProgress(event:ProgressEvent):void{
+			if(onLoadProgress==null){
+			}else{
+				if(event.bytesTotal>0){
+					onLoadProgress(event.bytesLoaded/event.bytesTotal);
+				}
+			}
+		}
 		private function loadComplete(event:Event):void{
+			loader.contentLoaderInfo.removeEventListener(ProgressEvent.PROGRESS,loadProgress);
 			loader.contentLoaderInfo.removeEventListener(Event.COMPLETE,loadComplete);
 			loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,loadError);
 			loader.contentLoaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,loadError);
@@ -171,6 +156,10 @@ package zero.works{
 				case "center":
 					loader.x=-loader.contentLoaderInfo.width/2;
 					loader.y=-loader.contentLoaderInfo.height/2;
+				break;
+				case "top":
+					loader.x=-loader.contentLoaderInfo.width/2;
+					loader.y=0;
 				break;
 				case "bottom":
 					loader.x=-loader.contentLoaderInfo.width/2;
@@ -225,7 +214,6 @@ package zero.works{
 			if(onFadeComplete==null){
 			}else{
 				onFadeComplete();
-				onFadeComplete=null;
 			}
 		}
 	}
