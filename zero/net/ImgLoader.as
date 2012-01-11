@@ -152,19 +152,20 @@ package zero.net{
 				this.addEventListener(Event.ENTER_FRAME,showContainer_step);
 			}
 			
-			switch(xml.@align.toString()){
-				case "center":
-					loader.x=-loader.contentLoaderInfo.width/2;
-					loader.y=-loader.contentLoaderInfo.height/2;
-				break;
-				case "top":
-					loader.x=-loader.contentLoaderInfo.width/2;
-					loader.y=0;
-				break;
-				case "bottom":
-					loader.x=-loader.contentLoaderInfo.width/2;
+			var align:String=xml.@align.toString();
+			if(align){
+				if(align.indexOf("top")>-1){
+				}else if(align.indexOf("bottom")>-1){
 					loader.y=-loader.contentLoaderInfo.height;
-				break;
+				}else{
+					loader.y=-loader.contentLoaderInfo.height/2;
+				}
+				if(align.indexOf("left")>-1){
+				}else if(align.indexOf("right")>-1){
+					loader.x=-loader.contentLoaderInfo.width;
+				}else{
+					loader.x=-loader.contentLoaderInfo.width/2;
+				}
 			}
 			
 			if(xml.@smoothing.toString()=="true"){

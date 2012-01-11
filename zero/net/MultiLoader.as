@@ -132,6 +132,19 @@ package zero.net{
 			loadId=-1;
 			loadNext();
 		}
+		public function stop():void{
+			var target:EventDispatcher;
+			for each(var loadObj:EventDispatcher in loadObjV){
+				if(loadObj is Loader){
+					(loadObj as Loader).unloadAndStop();
+				}else{
+					try{
+						(loadObj as URLLoader).close();
+					}catch(e:Error){}
+				}
+			}
+			clearLoadObjs();
+		}
 		private function loadNext():void{
 			var type:String;
 			

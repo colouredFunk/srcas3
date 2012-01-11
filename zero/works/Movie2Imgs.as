@@ -1,4 +1,4 @@
-/***
+﻿/***
 Movie2Imgs
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
 创建时间：2011年12月9日 13:53:37
@@ -57,18 +57,22 @@ package zero.works{
 			bmd.fillRect(bmd.rect,0x00000000);
 			bmd.draw(this);
 			
-			//var pngData:ByteArray=PNGEncoder.encode(bmd);
+			//1
+			var pngData:ByteArray=PNGEncoder.encode(bmd);
 			
+			/*
+			//2
 			var bmd2:BitmapData=new BitmapData(bmd.width,bmd.height,true,0xffffffff);
 			bmd2.copyChannel(bmd,bmd.rect,new Point(),BitmapDataChannel.RED,BitmapDataChannel.ALPHA);
 			var pngData:ByteArray=PNGEncoder.encode(bmd2);
+			//*/
 			
 			if(dataBySizeArr[pngData.length]){
 			}else{
 				dataBySizeArr[pngData.length]=new Array();
 			}
 			dataBySizeArr[pngData.length].push(frame);
-			zipArchive.addFileFromBytes("粒子"+(10000+frame).toString().substr(1)+".png",pngData);
+			zipArchive.addFileFromBytes("logo"+(10000+frame).toString().substr(1)+".png",pngData);
 		}
 	}
 }
