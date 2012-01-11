@@ -264,7 +264,9 @@
 			idPart = new PageID();
 			idPart.onIDChange = onPlayIDChangeHandler;
 		}
-		override public function remove():void {
+		
+		override protected function onRemoveHandler():void 
+		{
 			stop();
 			timer = null;
 			idPart.remove();
@@ -275,7 +277,7 @@
 				__content.remove();
 			}
 			__content = null;
-			super.remove();
+			super.onRemoveHandler();
 		}
 		//
 		public function getMediaByID(_playID:int):String {
