@@ -137,12 +137,12 @@
 				resolveLoad(optionsLoad);
 
 				sendProxy.url = String(options.attribute(A_SOURCE)[0]);
-				sendProxy.method = String(options.attribute(A_METHOD)[0] || URLRequestMethod.POST);
+				sendProxy.method = String(options.attribute(A_METHOD)[0] || URLRequestMethod.POST).toLocaleUpperCase();
 				//json,form,amf3
-				sendProxy.sendFormat = String(optionsSend.attribute(A_DATA_STRUCTURE)[0] || "");
+				sendProxy.sendFormat = String(optionsSend.attribute(A_DATA_STRUCTURE)[0] || "").toLocaleLowerCase();
 				//binary,variables,text,json,xml,amf3
-				sendProxy.loadFormat = String(optionsLoad.attribute(A_DATA_STRUCTURE)[0] || "");
-				sendProxy.random = true;
+				sendProxy.loadFormat = String(optionsLoad.attribute(A_DATA_STRUCTURE)[0] || "").toLocaleLowerCase();
+				//sendProxy.random = true;
 				//sendProxy.contentType
 				lM.info(this, "setOptions====>>>>\n" + _optionsXML.toXMLString());
 			} else {
