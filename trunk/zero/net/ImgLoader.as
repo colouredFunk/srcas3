@@ -180,6 +180,12 @@ package zero.net{
 				}
 			}
 			
+			//20110111
+			//this.graphics.clear();
+			//this.graphics.beginFill(0xff0000,1);
+			//this.graphics.drawRect(loader.x,loader.y,loader.contentLoaderInfo.width,loader.contentLoaderInfo.height);
+			//this.graphics.endFill();
+			
 			if(onLoadComplete==null){
 			}else{
 				onLoadComplete();
