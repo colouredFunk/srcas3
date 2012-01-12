@@ -50,10 +50,9 @@ package zero.works{
 			}
 		}
 		private function startDragThumb(event:MouseEvent):void{
-			trace("startDragThumb");
 			stage.addEventListener(MouseEvent.MOUSE_UP,stopDragThumb);
 			this.addEventListener(Event.ENTER_FRAME,updateThumb);
-			thumb.startDrag(false,new Rectangle(bar.x,bar.y,bar.x,bar.height-thumb.height));
+			thumb.startDrag(false,new Rectangle(0,bar.y,0,bar.height-thumb.height));
 		}
 		private function updateThumb(...args):void{
 			if(thumb.y<bar.y){
@@ -65,7 +64,6 @@ package zero.works{
 			content.y=this.y-(thumb.y-bar.y)/bar.height*content.height;
 		}
 		private function stopDragThumb(event:MouseEvent):void{
-			trace("stopDragThumb");
 			stage.removeEventListener(MouseEvent.MOUSE_UP,stopDragThumb);
 			this.removeEventListener(Event.ENTER_FRAME,updateThumb);
 			stopDrag();
