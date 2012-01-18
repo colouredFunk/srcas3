@@ -18,7 +18,7 @@ package zero.works{
 	
 	public class TxtEffectsClock extends BaseCom{
 		
-		public var defaultXMLStr:String='<xml startTime="2011-10-17 16:15:00" endTime="2012-12-21 15:14:35"/>';
+		public var defaultXMLStr:String='<xml startTime="2012-01-17 00:00:00" endTime="2012-02-21 15:14:35"/>';
 		
 		public var txt0:TxtEffects;
 		public var txt1:TxtEffects;

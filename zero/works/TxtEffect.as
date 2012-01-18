@@ -40,6 +40,8 @@ package zero.works{
 			}
 			
 			if(num1.numChildren&&num2.numChildren){
+				(num1.getChildAt(0) as TextField).text="0";
+				(num2.getChildAt(0) as TextField).text="0";
 			}//else{
 			//	initTxts(new TextField(),new TextField());
 			//}
