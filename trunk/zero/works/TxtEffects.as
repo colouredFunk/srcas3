@@ -20,8 +20,8 @@ package zero.works{
 		public var txt2:TxtEffect;
 		public function TxtEffects(){
 			value=0;
-			txt1.x=-(txt1.width/2+1);
-			txt2.x=(txt2.width/2+1);
+			//txt1.x=-(txt1.width/2+1);
+			//txt2.x=(txt2.width/2+1);
 		}
 		
 		private var __value:int;
