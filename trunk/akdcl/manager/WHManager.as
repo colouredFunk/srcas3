@@ -46,7 +46,7 @@ package akdcl.manager {
 		}
 
 		private static function getTargetLevel(_target:*):int {
-			var _parent = _target.parent;
+			var _parent:* = _target.parent;
 			var _level:int = 0;
 			while (_parent){
 				_parent = _parent.parent;

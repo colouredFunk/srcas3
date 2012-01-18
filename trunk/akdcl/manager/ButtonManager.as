@@ -49,7 +49,6 @@ package akdcl.manager {
 		public static var mobileMode:Boolean;
 		public static var moveAccuracy:int = 0;
 		
-		private var stage:Stage;
 		private var buttonDic:Dictionary;
 		private var buttonInDic:Dictionary;
 		private var buttonDownDic:Dictionary;
@@ -57,6 +56,7 @@ package akdcl.manager {
 		private var intervalID:uint;
 		private var buttonTarget:InteractiveObject;
 		
+		public var stage:Stage;
 		public var startX:int;
 		public var startY:int;
 		public var lastX:int;
