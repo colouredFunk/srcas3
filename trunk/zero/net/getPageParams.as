@@ -63,14 +63,14 @@ package zero.net{
 					params.pageURL=null;
 				}else{
 					try{
-						params.pageURL=ExternalInterface.call("top.location.href.toString")
+						params.pageURL=ExternalInterface.call("top.location.href.toString");
 					}catch(e:Error){
 						params.pageURL=null;
 					}
 					if(params.pageURL){
 					}else{
 						try{
-							params.pageURL=ExternalInterface.call("window.location.href.toString")
+							params.pageURL=ExternalInterface.call("window.location.href.toString");
 						}catch(e:Error){
 							params.pageURL=null;
 						}
