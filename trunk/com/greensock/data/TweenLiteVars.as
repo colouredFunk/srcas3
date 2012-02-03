@@ -1,6 +1,6 @@
 /**
- * VERSION: 5.1
- * DATE: 2010-12-09
+ * VERSION: 5.2
+ * DATE: 2011-12-23
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/tweenvars/
  **/
@@ -27,19 +27,19 @@ package com.greensock.data {
  * <code>TweenLite.to(mc, 1, {x:300, y:100, tint:0xFF0000, onComplete:myFunction, onCompleteParams:[mc]})</code><br /><br />
  * 
  * <b>With TweenLiteVars</b><br />
- * <code>TweenLite.to(mc, 1, new TweenLiteVars().prop("x", 300).prop("y", 100).tint(0xFF0000).onComplete(myFunction, [mc]));</code><br /><br />
+ * <code>TweenLite.to(mc, 1, new TweenLiteVars().move(300, 100).tint(0xFF0000).onComplete(myFunction, [mc]));</code><br /><br />
  *
- * You can use the prop() method to set individual generic properties (like "x" and "y" in the example above) or you can 
+ * You can use the prop() method to set individual generic properties (like "myCustomProperty" or "rotationY") or you can 
  * pass a generic Object into the constructor to make it a bit more concise, like this:<br /><br />
  * 
- * <code>TweenLite.to(mc, 1, new TweenLiteVars({x:300, y:100}).tint(0xFF0000).onComplete(myFunction, [mc]));</code><br /><br />
+ * <code>TweenLite.to(mc, 1, new TweenLiteVars({myCustomProperty:300, rotationY:100}).tint(0xFF0000).onComplete(myFunction, [mc]));</code><br /><br />
  * 
  * <b>NOTES:</b><br />
  * <ul>
  *	<li> To get the generic vars object that TweenLiteVars builds internally, simply access its "vars" property.
  * 		 In fact, if you want maximum backwards compatibility, you can tack ".vars" onto the end of your chain like this:<br /><code>
  * 		 TweenLite.to(mc, 1, new TweenLiteVars({x:300, y:100}).tint(0xFF0000).onComplete(myFunction, [mc]).vars);</code></li>
- *	<li> This class adds about 5kb to your published SWF (not including TweenLite or any plugins).</li>
+ *	<li> This class adds about 5.5kb to your published SWF (not including TweenLite or any plugins).</li>
  *	<li> Using TweenLiteVars is completely optional. If you prefer the shorter generic object synatax, feel
  *	  	 free to use it. The purpose of this utility is simply to enable code hinting and to allow for strict datatyping.</li>
  * </ul>
@@ -50,7 +50,7 @@ package com.greensock.data {
  */	 
 	public class TweenLiteVars {
 		/** @private **/
-		public static const version:Number = 5.1;
+		public static const version:Number = 5.2;
 		
 		/** @private **/
 		protected var _vars:Object;
@@ -228,14 +228,62 @@ package com.greensock.data {
 		}
 		
 
-//---- PLUGIN REQUIRED -------------------------------------------------------------------------------------------
+//---- COMMON CONVENIENCE PROPERTIES (NO PLUGIN REQUIRED) -------------------------------------------------------------------
 		
+		/** Tweens the "x" and "y" properties of the target **/
+		public function move(x:Number, y:Number, relative:Boolean=false):TweenLiteVars {
+			prop("x", x, relative);
+			return prop("y", y, relative);
+		}
+		
+		/** Tweens the "scaleX" and "scaleY" properties of the target **/
+		public function scale(value:Number, relative:Boolean=false):TweenLiteVars {
+			prop("scaleX", value, relative);
+			return prop("scaleY", value, relative);
+		}
+		
+		/** Tweens the "rotation" property of the target **/
+		public function rotation(value:Number, relative:Boolean=false):TweenLiteVars {
+			return prop("rotation", value, relative);
+		}
+		
+		/** Tweens the "scaleX" property of the target **/
+		public function scaleX(value:Number, relative:Boolean=false):TweenLiteVars {
+			return prop("scaleX", value, relative);
+		}
+		
+		/** Tweens the "scaleY" property of the target **/
+		public function scaleY(value:Number, relative:Boolean=false):TweenLiteVars {
+			return prop("scaleY", value, relative);
+		}
+		
+		/** Tweens the "width" property of the target **/
+		public function width(value:Number, relative:Boolean=false):TweenLiteVars {
+			return prop("width", value, relative);
+		}
+		
+		/** Tweens the "height" property of the target **/
+		public function height(value:Number, relative:Boolean=false):TweenLiteVars {
+			return prop("height", value, relative);
+		}
+		
+		/** Tweens the "x" property of the target **/
+		public function x(value:Number, relative:Boolean=false):TweenLiteVars {
+			return prop("x", value, relative);
+		}
+		
+		/** Tweens the "y" property of the target **/
+		public function y(value:Number, relative:Boolean=false):TweenLiteVars {
+			return prop("y", value, relative);
+		}
+		
+
+//---- PLUGIN REQUIRED -------------------------------------------------------------------------------------------
 		
 		/** Same as changing the "alpha" property but with the additional feature of toggling the "visible" property to false whenever alpha is 0, thus improving rendering performance in the Flash Player. **/
 		public function autoAlpha(alpha:Number):TweenLiteVars {
 			return _set("autoAlpha", alpha, true);
 		}
-		
 		
 		/**
 		 * Tweens a BevelFilter
@@ -937,6 +985,45 @@ package com.greensock.data {
 				after = stage.quality;
 			}
 			return _set("stageQuality", {stage:stage, during:during, after:after}, true);
+		}
+		
+		/** 
+		 * Allows you to define an initial velocity at which a property (or multiple properties) will start tweening, 
+		 * as well as [optional] maximum and/or minimum end values and then it will calculate the appropriate landing 
+		 * position and plot a smooth course to it based on the easing equation you define (Quad.easeOut by default, 
+		 * as set in TweenLite). This is perfect for flick-scrolling or animating things as though they are being thrown.<br /><br />
+		 * 
+		 * In its simplest form, you can pass just the initial velocity for each property like this:<br /><br /><code>
+		 * {x:500, y:-300}</code><br /><br />
+		 * 
+		 * In the above example, <code>x</code> will animate at 500 pixels per second initially and 
+		 * <code>y</code> will animate at -300 pixels per second. Both will decelerate smoothly 
+		 * until they come to rest based on the tween's duration. <br /><br /> 
+		 * 
+		 * To impose maximum and minimum boundaries on the end values, use the nested object syntax 
+		 * with the <code>max</code> and <code>min</code> special properties like this:<br /><br /><code>
+		 * {x:{velocity:500, max:1024, min:0}, y:{velocity:-300, max:720, min:0}};
+		 * </code><br /><br />
+		 * 
+		 * Notice the nesting of the objects ({}). The <code>max</code> and <code>min</code> values refer
+		 * to the range for the final resting position (coordinates in this case), NOT the velocity. 
+		 * So <code>x</code> would always land between 0 and 1024 in this case, and <code>y</code> 
+		 * would always land between 0 and 720. If you want the target object to land on a specific value 
+		 * rather than within a range, simply set <code>max</code> and <code>min</code> to identical values. 
+		 * Also notice that you must define a <code>velocity</code> value for each property in the object syntax.<br /><br />
+		 * 
+		 * <code>throwProps</code> isn't just for tweening x and y coordinates. It works with any numeric 
+		 * property, so you could use it for spinning the <code>rotation</code> of an object as well. Or the 
+		 * <code>scaleX</code>/<code>scaleY</code> properties. Maybe the user drags to spin a wheel and
+		 * lets go and you want it to continue increasing the <code>rotation</code> at that velocity, 
+		 * decelerating smoothly until it stops.<br /><br />
+		 * 
+		 * ThrowPropsPlugin is a <a href="http://www.greensock.com/club/">Club GreenSock</a> membership benefit. 
+		 * You must have a valid membership to use this class without violating the terms of use. Visit 
+		 * <a href="http://www.greensock.com/club/">http://www.greensock.com/club/</a> to sign up or get more details.<br /><br />
+		 **/
+		public function throwProps(props:Object):TweenLiteVars {
+			return _set("throwProps", props, true);
 		}
 		
 		/** 

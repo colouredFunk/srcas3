@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.894
- * DATE: 2011-11-26
+ * VERSION: 1.899
+ * DATE: 2012-01-25
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -186,7 +186,7 @@ function errorHandler(event:LoaderEvent):void {
 }
  </listing>
  * 
- * <b>Copyright 2011, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
+ * <b>Copyright 2010-2012, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
  * 
  * @see com.greensock.loading.data.VideoLoaderVars
  * 
@@ -993,16 +993,16 @@ function errorHandler(event:LoaderEvent):void {
 		/** @private **/
 		override protected function _closeStream():void {
 			if (_auditNS != null) {
+				_auditNS.client = {};
+				_auditNS.removeEventListener(NetStatusEvent.NET_STATUS, _auditHandler);
+				_auditNS.removeEventListener("ioError", _auditHandler);
+				_auditNS.removeEventListener("asyncError", _auditHandler);
 				_auditNS.pause();
 				try {
 					_auditNS.close();
 				} catch (error:Error) {
 					
 				}
-				_auditNS.client = {};
-				_auditNS.removeEventListener(NetStatusEvent.NET_STATUS, _auditHandler);
-				_auditNS.removeEventListener("ioError", _auditHandler);
-				_auditNS.removeEventListener("asyncError", _auditHandler);
 				_auditNS = null;
 			} else {
 				super._closeStream();

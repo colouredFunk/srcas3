@@ -1,6 +1,6 @@
 /**
- * VERSION: 0.5
- * DATE: 2011-11-29
+ * VERSION: 0.6
+ * DATE: 2012-01-20
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -82,13 +82,13 @@ package com.greensock {
  * 			be better off just turning off bitmapMode during that animation sequence.</li>
  * </ul><br /><br />
  * 
- * <b>Copyright 2011, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
+ * <b>Copyright 2011-2012, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
  * 
  * @author Jack Doyle, jack@greensock.com
  **/
 	public class FlexBlitMask extends UIComponent {
 		/** @private **/
-		public static var version:Number = 0.5;
+		public static var version:Number = 0.6;
 		
 		// In order to conserve memory and improve performance, we create a few instances of Rectangles, Sprites, Points, Matrices, and Arrays and reuse them rather than creating new instances over and over.
 		/** @private **/
@@ -306,6 +306,9 @@ package com.greensock {
 					_render();
 				} else if (m.tx != _prevMatrix.tx || m.ty != _prevMatrix.ty) {
 					_render();
+				} else if (_bitmapMode && _target != null) {
+					this.filters = _target.filters;
+					this.transform.colorTransform = _transform.colorTransform;
 				}
 				_prevMatrix = m;
 			}

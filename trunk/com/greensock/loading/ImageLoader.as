@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.89
- * DATE: 2011-10-20
+ * VERSION: 1.897
+ * DATE: 2012-01-14
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -277,7 +277,7 @@ package com.greensock.loading {
 				var i:int = loaders.length;
 				while (--i > -1) {
 					loader = loaders[i];
-					if (loader.url == _url && loader != this && loader.status == LoaderStatus.COMPLETED && loader is ImageLoader) {
+					if (loader.url == _url && loader != this && loader.status == LoaderStatus.COMPLETED && loader is ImageLoader && ImageLoader(loader).rawContent is Bitmap) {
 						_closeStream();
 						_content = new Bitmap(ImageLoader(loader).rawContent.bitmapData, "auto", Boolean(this.vars.smoothing != false));
 						Object(_sprite).rawContent = (_content as DisplayObject);
