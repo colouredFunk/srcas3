@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 11.694
- * DATE: 2011-12-06
+ * VERSION: 11.695
+ * DATE: 2011-12-08
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com 
  **/
@@ -296,7 +296,7 @@ package com.greensock {
  */
 	public class TweenMax extends TweenLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:Number = 11.694;
+		public static const version:Number = 11.695;
 		
 		TweenPlugin.activate([
 			
@@ -566,7 +566,7 @@ package com.greensock {
 				if (time < 0) {
 					this.active = false;
 					if (this.cachedDuration == 0) { //zero-duration tweens are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
-						if (_rawPrevTime >= 0) {
+						if (_rawPrevTime > 0) {
 							force = true;
 							isComplete = true;
 						}

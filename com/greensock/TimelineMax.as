@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.694
- * DATE: 2011-11-08
+ * VERSION: 1.695
+ * DATE: 2011-12-08
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinemax/
  **/
@@ -146,7 +146,7 @@ package com.greensock {
  **/
 	public class TimelineMax extends TimelineLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:Number = 1.694;
+		public static const version:Number = 1.695;
 		
 		/** @private **/
 		protected var _repeat:int;
@@ -454,7 +454,7 @@ package com.greensock {
 			} else if (time <= 0) {
 				if (time < 0) {
 					this.active = false; 
-					if (this.cachedDuration == 0 && _rawPrevTime >= 0) { //In order to accommodate zero-duration timelines, we must discern the momentum/direction of time in order to render values properly when the "playhead" goes past 0 in the forward direction or lands directly on it, and also when it moves past it in the backward direction (from a postitive time to a negative time).
+					if (this.cachedDuration == 0 && _rawPrevTime > 0) { //In order to accommodate zero-duration timelines, we must discern the momentum/direction of time in order to render values properly when the "playhead" goes past 0 in the forward direction or lands directly on it, and also when it moves past it in the backward direction (from a postitive time to a negative time).
 						force = true;
 						isComplete = true;
 					}

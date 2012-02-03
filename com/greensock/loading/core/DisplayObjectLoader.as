@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.894
- * DATE: 2011-11-23
+ * VERSION: 1.898
+ * DATE: 2012-01-19
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -17,17 +17,19 @@ package com.greensock.loading.core {
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
 	import flash.net.LocalConnection;
+	import flash.net.URLRequest;
 	import flash.system.ApplicationDomain;
 	import flash.system.Capabilities;
 	import flash.system.LoaderContext;
 	import flash.system.Security;
 	import flash.system.SecurityDomain;
+
 /**
  * Serves as the base class for SWFLoader and ImageLoader. There is no reason to use this class on its own. 
  * Please refer to the documentation for the other classes.
  * <br /><br />
  * 
- * <b>Copyright 2011, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
+ * <b>Copyright 2012, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
  * 
  * @author Jack Doyle, jack@greensock.com
  */	
@@ -48,6 +50,8 @@ package com.greensock.loading.core {
 		protected var _initted:Boolean;
 		/** @private used by SWFLoader when the loader is canceled before the SWF ever had a chance to init which causes garbage collection issues. We slip into stealthMode at that point, wait for it to init, and then cancel the _loader's loading.**/
 		protected var _stealthMode:Boolean;
+		/** @private allows us to apply a LoaderContext to the file size audit (only if necessary - URLStream is better/faster/smaller and works great unless we run into security errors because of a missing crossdomain.xml file) **/
+		protected var _fallbackAudit:Loader;
 		
 		/**
 		 * Constructor
@@ -76,7 +80,6 @@ package com.greensock.loading.core {
 		/** @private **/
 		override protected function _load():void {
 			_prepRequest();
-			
 			if (this.vars.context is LoaderContext) {
 				_context = this.vars.context;
 			} else if (_context == null) {
@@ -92,8 +95,65 @@ package com.greensock.loading.core {
 			if (Capabilities.playerType != "Desktop") { //AIR apps will choke on Security.allowDomain()
 				Security.allowDomain(_url); 
 			}
-			
 			_loader.load(_request, _context);
+		}
+		
+		/** @inheritDoc **/
+		override public function auditSize():void {
+			if (Capabilities.playerType != "Desktop") { //AIR apps will choke on Security.allowDomain()
+				Security.allowDomain(_url); 
+			}
+			super.auditSize();
+		}
+		
+		override protected function _closeStream():void {
+			_closeFallbackAudit();
+			super._closeStream();
+		}
+		
+		protected function _closeFallbackAudit():void {
+			if (_fallbackAudit != null) {
+				_fallbackAudit.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS, _auditStreamHandler, false, 0, true);
+				_fallbackAudit.contentLoaderInfo.addEventListener(Event.COMPLETE, _auditStreamHandler, false, 0, true);
+				_fallbackAudit.contentLoaderInfo.addEventListener("ioError", _auditStreamHandler, false, 0, true);
+				_fallbackAudit.contentLoaderInfo.addEventListener("securityError", _auditStreamHandler, false, 0, true);
+				try {
+					_fallbackAudit.close();
+				} catch (error:Error) {
+					
+				}
+				_fallbackAudit = null;
+			}
+		}
+		
+		/** @private **/
+		override protected function _auditStreamHandler(event:Event):void {
+			//If a security error is thrown because of a missing crossdomain.xml file for example and the user didn't define a specific LoaderContext, we'll try again without checking the policy file, accepting the restrictions that come along with it because typically people would rather have the content show up on the screen rather than just error out (and they can always check the scriptAccessDenied property if they need to figure out whether it's safe to do BitmapData stuff on it, etc.)
+			if (event.type == "securityError") {
+				if (_fallbackAudit == null) {
+					_context = new LoaderContext(false);
+					_scriptAccessDenied = true;
+					dispatchEvent(new LoaderEvent(LoaderEvent.SCRIPT_ACCESS_DENIED, this, ErrorEvent(event).text));
+					_errorHandler(event);
+					_fallbackAudit = new Loader(); //so that we can apply a LoaderContext. We don't want to use a Loader initially because they are more memory-intensive than URLStream and they can tend to have more problems with garbage collection.
+					_fallbackAudit.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS, _auditStreamHandler, false, 0, true);
+					_fallbackAudit.contentLoaderInfo.addEventListener(Event.COMPLETE, _auditStreamHandler, false, 0, true);
+					_fallbackAudit.contentLoaderInfo.addEventListener("ioError", _auditStreamHandler, false, 0, true);
+					_fallbackAudit.contentLoaderInfo.addEventListener("securityError", _auditStreamHandler, false, 0, true);
+					var request:URLRequest = new URLRequest();
+					request.data = _request.data;
+					request.method = _request.method;
+					_setRequestURL(request, _url, (!_isLocal || _url.substr(0, 4) == "http") ? "gsCacheBusterID=" + (_cacheID++) + "&purpose=audit" : "");
+					if (Capabilities.playerType != "Desktop") { //AIR apps will choke on Security.allowDomain()
+						Security.allowDomain(_url); 
+					}
+					_fallbackAudit.load(request, _context);
+					return;
+				} else {
+					_closeFallbackAudit();
+				}
+			}
+			super._auditStreamHandler(event);
 		}
 		
 		/** @private **/

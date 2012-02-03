@@ -1,6 +1,29 @@
 CHANGE LOG : GREENSOCK LOADERMAX SYSTEM
 ----------------------------------------
 
+2012-01-25
+----------------------------------------
+LoaderMax			1.899
+VideoLoader			1.899
+	- Fixed issue in VideoLoader that could cause an error during its auditing process (if estimatedBytes isn't defined and auditSize in the parent LoaderMax isn't set to false). 
+
+2012-01-19
+----------------------------------------
+LoaderMax			1.898
+DisplayObjectLoader	1.898
+	- Fixed issue that could cause an ImageLoader or SWFLoader to fail during the auditing process inside a LoaderMax if the URL is from another domain and there is no crossdomain.xml policy file in place. Now it simply tries again with a higher security threshold (script access will be denied of course due to Flash's security policies).
+
+2012-01-14
+----------------------------------------
+LoaderMax			1.897
+ImageLoader			1.897
+	- Fixed issue that could cause an error if an ImageLoader with an identical url is loaded after the other has finished loading which encountered a security error (thus its rawContent was a Loader instead of a Bitmap, making it impossible to copy the BitmapData). Only happens if noCache is false.
+
+2012-01-10
+----------------------------------------
+LoaderMax			1.896
+	- Fixed issue that could cause a null object reference and/or a loader to be skipped in a LoaderMax queue in a very rare scenario where an ImageLoader is loaded after another ImageLoader with an identical URL has finished loading (and noCache is false). 
+
 2011-11-27
 ----------------------------------------
 LoaderMax			1.895

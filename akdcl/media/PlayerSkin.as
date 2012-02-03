@@ -27,18 +27,22 @@ package akdcl.media {
 
 		//格式化时间
 		protected static function formatTime(_n:uint):String {
+			var hours:uint;
 			var minutes:uint;
 			var seconds:uint;
-			if (_n < 60){
-				minutes = 0;
-				seconds = _n;
-			} else if (_n < 3600){
-				minutes = Math.floor(_n / 60);
-				seconds = _n % 60;
-			}
+			hours = Math.floor(_n / 3600);
+			minutes = Math.floor((_n % 3600) / 60);
+			seconds = _n % 60;
+			var s_h:String = hours < 10 ? "0" + String(hours) : String(hours);
 			var s_m:String = minutes < 10 ? "0" + String(minutes) : String(minutes);
 			var s_s:String = seconds < 10 ? "0" + String(seconds) : String(seconds);
-			return s_m + ":" + s_s;
+			if (hours > 0) {
+				return s_h + ":" + s_m + ":" + s_s;
+			}else {
+				return s_m + ":" + s_s;
+			}
+			
+			
 		}
 
 		public var btnPlay:InteractiveObject;

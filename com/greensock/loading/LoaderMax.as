@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 1.895
- * DATE: 2011-11-27
+ * VERSION: 1.899
+ * DATE: 2012-01-25
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -135,7 +135,7 @@ function errorHandler(event:LoaderEvent):void {
  * instead of a generic object to define your <code>vars</code> is a bit more verbose but provides 
  * code hinting and improved debugging because it enforces strict data typing. Use whichever one you prefer.<br /><br />
  * 
- * <b>Copyright 2011, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
+ * <b>Copyright 2010-2012, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for corporate Club GreenSock members, the software agreement that was issued with the corporate membership.
  * 
  * @see com.greensock.loading.data.LoaderMaxVars
  * 
@@ -143,7 +143,7 @@ function errorHandler(event:LoaderEvent):void {
  */	
 	public class LoaderMax extends LoaderCore {		
 		/** @private **/
-		public static const version:Number = 1.895;
+		public static const version:Number = 1.898;
 		/** The default value that will be used for the <code>estimatedBytes</code> on loaders that don't declare one in the <code>vars</code> parameter of the constructor. **/
 		public static var defaultEstimatedBytes:uint = 20000;
 		/** Controls the default value of <code>auditSize</code> in LoaderMax instances (normally <code>true</code>). For most situations, the auditSize feature is very convenient for ensuring that the overall progress of LoaderMax instances is reported accurately, but when working with very large quantities of files that have no <code>estimatedBytes</code> defined, some developers prefer to turn auditSize off by default. Of course you can always override the default for individual LoaderMax instances by defining an <code>auditSize</code> value in the <code>vars</code> parameter of the constructor. **/
@@ -790,12 +790,10 @@ function completeHandler(event:LoaderEvent):void {
 					return;
 				}
 				
-				var loader:LoaderCore;
-				var l:uint = _loaders.length;
-				var activeCount:uint = 0;
+				var loader:LoaderCore, loaders:Array = _loaders.concat(), l:int = loaders.length, activeCount:uint = 0; //use _loaders.concat() because in some rare situations, a loader's COMPLETE event might occur immediately and if autoDispose is true, the length of the array could change mid-loop causing a skip.
 				_calculateProgress();
 				for (var i:int = 0; i < l; i++) {
-					loader = _loaders[i];
+					loader = loaders[i];
 					if (!this.skipPaused && loader.status == LoaderStatus.PAUSED) {
 						super._failHandler(new LoaderEvent(LoaderEvent.FAIL, this, "Did not complete LoaderMax because skipPaused was false and " + loader.toString() + " was paused."), false);
 						return;

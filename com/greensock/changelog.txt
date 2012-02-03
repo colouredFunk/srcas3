@@ -1,6 +1,31 @@
 CHANGE LOG : GREENSOCK TWEENING PLATFORM
 ----------------------------------------
 
+2012-01-20
+---------------------------------------------
+BlitMask			0.6
+FlexBlitMask			0.6
+	- Fixed issue that could cause a BlitMask/FlexBlitMask not to correctly reflect changes to its target's filters and/or tint/colorTransform when update() was called but the x and y values hadn't changed at all. For example, if you do a colorMatrixFilter tween on the target when it is stationary and BlitMask's bitmapMode is true, it wouldn't display the changes even when update() was called. 
+
+2012-01-19
+---------------------------------------------
+TweenLite			1.696
+	- Fixed issue that could cause an error if you set a "reversed" value in the vars parameter (like reversed:true) and the target was non-dynamic.
+
+2011-12-23
+---------------------------------------------
+TweenLiteVars			5.2
+TweenMaxVars			5.2
+	- Added convenience methods like move(), scale(), scaleX(), scaleY(), rotation(), x(), y(), width(), and height() to TweenLiteVars and TweenMaxVars.
+
+2011-12-08
+---------------------------------------------
+TweenLite			1.695
+TweenMax			1.695
+TimelineLite		1.695
+TimelineMax			1.695
+	- Fixed issue that could cause a delayedCall(), zero-duration tween, or a callback added to TimelineMax with its addCallback() method to be called an extra time when playing in reverse (and only when the parent TimelineMax renders EXACTLY on that callback's startTime before moving on). 
+
 2011-12-06
 ---------------------------------------------
 TimelineMax			1.694

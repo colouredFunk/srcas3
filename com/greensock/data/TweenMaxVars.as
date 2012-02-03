@@ -1,6 +1,6 @@
 /**
- * VERSION: 5.14
- * DATE: 2011-07-07
+ * VERSION: 5.2
+ * DATE: 2011-12-23
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/tweenvars/
  **/
@@ -28,19 +28,19 @@ package com.greensock.data {
  * <code>TweenMax.to(mc, 1, {x:300, y:100, tint:0xFF0000, onComplete:myFunction, onCompleteParams:[mc]})</code><br /><br />
  * 
  * <b>With TweenMaxVars</b><br />
- * <code>TweenMax.to(mc, 1, new TweenMaxVars().prop("x", 300).prop("y", 100).tint(0xFF0000).onComplete(myFunction, [mc]));</code><br /><br />
+ * <code>TweenMax.to(mc, 1, new TweenMaxVars().move(300, 100).tint(0xFF0000).onComplete(myFunction, [mc]));</code><br /><br />
  *
- * You can use the prop() method to set individual generic properties (like "x" and "y" in the example above) or you can 
+ * You can use the prop() method to set individual generic properties (like "myCustomProperty" or "rotationY") or you can 
  * pass a generic Object into the constructor to make it a bit more concise, like this:<br /><br />
  * 
- * <code>TweenMax.to(mc, 1, new TweenMaxVars({x:300, y:100}).tint(0xFF0000).onComplete(myFunction, [mc]));</code><br /><br />
+ * <code>TweenMax.to(mc, 1, new TweenMaxVars({myCustomProperty:300, rotationY:100}).tint(0xFF0000).onComplete(myFunction, [mc]));</code><br /><br />
  * 
  * <b>NOTES:</b><br />
  * <ul>
  *	<li> To get the generic vars object that TweenMaxVars builds internally, simply access its "vars" property.
  * 		 In fact, if you want maximum backwards compatibility, you can tack ".vars" onto the end of your chain like this:<br /><code>
  * 		 TweenMax.to(mc, 1, new TweenMaxVars({x:300, y:100}).tint(0xFF0000).onComplete(myFunction, [mc]).vars);</code></li>
- *	<li> This class adds about 5kb to your published SWF (not including TweenMax or any plugins).</li>
+ *	<li> This class adds about 5.5kb to your published SWF (not including TweenMax or any plugins).</li>
  *	<li> Using TweenMaxVars is completely optional. If you prefer the shorter generic object synatax, feel
  *	  	 free to use it. The purpose of this utility is simply to enable code hinting and to allow for strict datatyping.</li>
  * </ul>
@@ -51,7 +51,7 @@ package com.greensock.data {
  */	 
 	public class TweenMaxVars {
 		/** @private **/
-		public static const version:Number = 5.14;
+		public static const version:Number = 5.2;
 		
 		/** @private **/
 		protected var _vars:Object;
@@ -299,15 +299,64 @@ package com.greensock.data {
 		public function yoyo(value:Boolean):TweenMaxVars {
 			return _set("yoyo", value);
 		}
+		
+		//---- COMMON CONVENIENCE PROPERTIES (NO PLUGIN REQUIRED) -------------------------------------------------------------------
+		
+		/** Tweens the "x" and "y" properties of the target **/
+		public function move(x:Number, y:Number, relative:Boolean=false):TweenMaxVars {
+			prop("x", x, relative);
+			return prop("y", y, relative);
+		}
+		
+		/** Tweens the "scaleX" and "scaleY" properties of the target **/
+		public function scale(value:Number, relative:Boolean=false):TweenMaxVars {
+			prop("scaleX", value, relative);
+			return prop("scaleY", value, relative);
+		}
+		
+		/** Tweens the "rotation" property of the target **/
+		public function rotation(value:Number, relative:Boolean=false):TweenMaxVars {
+			return prop("rotation", value, relative);
+		}
+		
+		/** Tweens the "scaleX" property of the target **/
+		public function scaleX(value:Number, relative:Boolean=false):TweenMaxVars {
+			return prop("scaleX", value, relative);
+		}
+		
+		/** Tweens the "scaleY" property of the target **/
+		public function scaleY(value:Number, relative:Boolean=false):TweenMaxVars {
+			return prop("scaleY", value, relative);
+		}
+		
+		/** Tweens the "width" property of the target **/
+		public function width(value:Number, relative:Boolean=false):TweenMaxVars {
+			return prop("width", value, relative);
+		}
+		
+		/** Tweens the "height" property of the target **/
+		public function height(value:Number, relative:Boolean=false):TweenMaxVars {
+			return prop("height", value, relative);
+		}
+		
+		/** Tweens the "x" property of the target **/
+		public function x(value:Number, relative:Boolean=false):TweenMaxVars {
+			return prop("x", value, relative);
+		}
+		
+		/** Tweens the "y" property of the target **/
+		public function y(value:Number, relative:Boolean=false):TweenMaxVars {
+			return prop("y", value, relative);
+		}
+		
+		
 
 //---- PLUGIN REQUIRED -------------------------------------------------------------------------------------------
-		
 		
 		/** Same as changing the "alpha" property but with the additional feature of toggling the "visible" property to false whenever alpha is 0, thus improving rendering performance in the Flash Player. **/
 		public function autoAlpha(alpha:Number):TweenMaxVars {
 			return _set("autoAlpha", alpha, true);
 		}
-		
 		
 		/**
 		 * Tweens a BevelFilter
