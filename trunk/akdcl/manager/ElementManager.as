@@ -22,44 +22,51 @@ package akdcl.manager {
 			instance = this;
 			lM.info(ElementManager, "init");
 			
-			sM = SourceManager.getInstance();
+			elementsDic = { };
 		}
 
-		private static const ELEMENTS_GROUP:String = "Elements";
-
 		private var lM:LoggerManager;
-		private var sM:SourceManager;
+		
+		private var elementsDic:Object;
 
 		public function recycle(_element:*):void {
 			var _success:Boolean;
-			for each (var _elements:Elements in sM.getGroup(ELEMENTS_GROUP)){
+			for each (var _elements:Elements in elementsDic){
 				if (_elements.recycle(_element)) {
 					_success = true;
 					break;
 				}
 			}
-			lM.info(ElementManager, "recycle({0}) success:{1} length:{2}", null, _element, _success, _elements.getElementsLength());
+			lM.info(ElementManager, "recycle({0}) success:{1} length:{2}", null, _element, _success, _elements.getLength());
 		}
 
 		public function register(_elementID:String, _ElementClass:Class):void {
-			if (sM.getSource(ELEMENTS_GROUP, _elementID)){
+			if (elementsDic[_elementID]) {
+				//trace("[WARNNING]:");
 				return;
 			}
 			if (_ElementClass) {
 				lM.info(ElementManager, "register(id:{0}, class:{1})", null, _elementID, _ElementClass);
-				sM.addSource(ELEMENTS_GROUP, _elementID, new Elements(_ElementClass));
+				elementsDic[_elementID] = new Elements(_ElementClass);
 			} else {
 				var _str:String = "ElementManager.register(id, class), class is null!";
 				lM.warn(ElementManager, _str);
 				trace("[WARNNING]:" + _str);
 			}
 		}
+		
+		public function unregister(_elementID:String):void {
+			var _elements:Elements = elementsDic[_elementID];
+			if (_elements) {
+				delete elementsDic[_elementID];
+				_elements.remove();
+			}
+		}
 
 		public function getElement(_elementID:String):* {
-			var _elements:Elements = sM.getSource(ELEMENTS_GROUP, _elementID);
+			var _elements:Elements = elementsDic[_elementID];
 			if (_elements) {
-				;
-				lM.info(ElementManager, "getElement(id:{0}) length:{1}", null, _elementID, Math.max(_elements.getElementsLength() - 1, 0));
+				lM.info(ElementManager, "getElement(id:{0}) length:{1}", null, _elementID, Math.max(_elements.getLength() - 1, 0));
 				return _elements.getElement();
 			}
 			
@@ -68,14 +75,6 @@ package akdcl.manager {
 			trace("[WARNNING]:" + _str);
 			return null;
 		}
-
-		public function getElementsLength(_elementID:String):uint {
-			var _elements:Elements = sM.getSource(ELEMENTS_GROUP, _elementID);
-			if (_elements){
-				return _elements.getElementsLength();
-			}
-			return 0;
-		}
 	}
 }
 
@@ -83,19 +82,17 @@ class Elements extends Object {
 	private var ElementClass:Class;
 	private var elementPrepared:Array;
 
-	function Elements(_ElementClass:Class):void {
+	public function Elements(_ElementClass:Class):void {
 		ElementClass = _ElementClass;
 		elementPrepared = [];
 	}
 
 	public function getElement():* {
-		if (elementPrepared.length > 0){
-			return elementPrepared.pop();
-		}
-		return new ElementClass();
+		var _element:* = elementPrepared.length > 0?elementPrepared.pop():new ElementClass();
+		return _element;
 	}
 
-	public function getElementsLength():uint {
+	public function getLength():uint {
 		return elementPrepared.length;
 	}
 
@@ -105,5 +102,10 @@ class Elements extends Object {
 			return true;
 		}
 		return false;
+	}
+	
+	public function remove():void {
+		ElementClass = null;
+		elementPrepared = null;
 	}
 }

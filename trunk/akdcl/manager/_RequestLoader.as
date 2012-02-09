@@ -48,15 +48,16 @@ package akdcl.manager {
 			for each (_fun in completeHandlers){
 				delete completeHandlers[_fun];
 			}
-			if (content is DisplayObject){
+			if (content is Bitmap){
+				url = null;
+				params = null;
+				unload();
+				unloadAndStop();
+				return true;
+			}else {
 				//content不是bitmap而是DisplayObject，则不回收Loader;
 				return false;
 			}
-			url = null;
-			params = null;
-			unload();
-			unloadAndStop();
-			return true;
 		}
 
 		internal function addEvents(_onProgressHandler:Function, _onErrorHandler:Function, _onCompleteHandler:Function):void {
@@ -91,15 +92,14 @@ package akdcl.manager {
 					case 0:
 						_onError();
 						break;
+					case 1:
+						_onError(_evt);
+						break;
 					case 2:
 						_onError(_evt, url);
 						break;
 					case 3:
 						_onError(_evt, url, params);
-						break;
-					case 1:
-					default:
-						_onError(_evt);
 						break;
 				}
 			}
@@ -117,15 +117,14 @@ package akdcl.manager {
 					case 0:
 						_onComplete();
 						break;
+					case 1:
+						_onComplete(_content);
+						break;
 					case 2:
 						_onComplete(_content, url);
 						break;
 					case 3:
 						_onComplete(_content, url, params);
-						break;
-					case 1:
-					default:
-						_onComplete(_content);
 						break;
 				}
 			}

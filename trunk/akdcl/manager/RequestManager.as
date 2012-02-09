@@ -55,7 +55,8 @@ package akdcl.manager {
 			
 			//eventProgressComplete = new ProgressEvent(ProgressEvent.PROGRESS, false, false, 1, 1);
 			
-			loaderDic = {};
+			loaderDicForImage = {};
+			loaderDicForSWF = {};
 			urlLoaderDic = {};
 		}
 
@@ -75,7 +76,8 @@ package akdcl.manager {
 
 		private var request:URLRequest;
 
-		private var loaderDic:Object;
+		private var loaderDicForImage:Object;
+		private var loaderDicForSWF:Object;
 		private var urlLoaderDic:Object;
 
 		private var dataFormat:String;
@@ -101,31 +103,32 @@ package akdcl.manager {
 						case 0:
 							_onCompleteHandler();
 							break;
+						case 1:
+							_onCompleteHandler(_bmd);
+							break;
 						case 2:
 							_onCompleteHandler(_bmd, _url);
 							break;
 						case 3:
 							_onCompleteHandler(_bmd, _url, args);
 							break;
-						case 1:
-						default:
-							_onCompleteHandler(_bmd);
-							break;
 					}
 				}
 				return null;
 			}
 			//
-			var _loader:_RequestLoader = loaderDic[_url];
+			var _loader:_RequestLoader = loaderDicForImage[_url];
 			if (_loader){
 			} else {
 				_loader = eM.getElement(REQUESTLOADER);
-				_loader.contentLoaderInfo.addEventListener(Event.INIT, onLoaderInitHandler);
 				_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderCompleteOrErrorHandler);
 				_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onLoaderCompleteOrErrorHandler);
 				_loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onLoaderCompleteOrErrorHandler);
 				if (_url.indexOf(".swf") < 0) {
-					loaderDic[_url] = _loader;
+					loaderDicForImage[_url] = _loader;
+				}else {
+					//如果是swf，则队列里不能放置
+					_loader.contentLoaderInfo.addEventListener(Event.INIT, onLoaderInitHandler);
 				}
 				_loader.params = args;
 			}
@@ -145,7 +148,7 @@ package akdcl.manager {
 				return;
 			}
 			//
-			var _loader:_RequestLoader = loaderDic[_url];
+			var _loader:_RequestLoader = loaderDicForImage[_url];
 			if (_loader){
 				_loader.removeEvents(_onProgressHandler, _onErrorHandler, _onCompleteHandler);
 			} else {
@@ -183,7 +186,7 @@ package akdcl.manager {
 				}
 				_loader.onCompleteHandler();
 			}
-			delete loaderDic[_loader.url];
+			delete loaderDicForImage[_loader.url];
 			if (_loader.clear()){
 				eM.recycle(_loader);
 			}
