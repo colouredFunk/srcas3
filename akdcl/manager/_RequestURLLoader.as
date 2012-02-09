@@ -32,14 +32,15 @@ package akdcl.manager {
 
 		override public function load(request:URLRequest):void {
 			url = request.url;
-			var _type:String = url.split(".").pop().toLowerCase();
 			if (dataFormat){
 			} else {
+				var _type:String = url.split(".").pop().toLowerCase();
 				switch (_type){
 					case "jpg":
 					case "png":
 					case "gif":
 					case "swf":
+					case "bmp":
 						dataFormat = URLLoaderDataFormat.BINARY;
 						break;
 					case "xml":
@@ -137,15 +138,14 @@ package akdcl.manager {
 					case 0:
 						_onError();
 						break;
+					case 1:
+						_onError(_evt);
+						break;
 					case 2:
 						_onError(_evt, url);
 						break;
 					case 3:
 						_onError(_evt, url, params);
-						break;
-					case 1:
-					default:
-						_onError(_evt);
 						break;
 				}
 			}
@@ -158,15 +158,14 @@ package akdcl.manager {
 					case 0:
 						_onComplete();
 						break;
+					case 1:
+						_onComplete(_data);
+						break;
 					case 2:
 						_onComplete(_data, url);
 						break;
 					case 3:
 						_onComplete(_data, url, params);
-						break;
-					case 1:
-					default:
-						_onComplete(_data);
 						break;
 				}
 			}
