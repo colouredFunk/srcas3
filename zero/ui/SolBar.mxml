@@ -31,7 +31,7 @@ SolBar
 			public var title:String="配置";
 			public var btnLabel:String="保存配置";
 			
-			private var onChangeSetting:Function;
+			public var onChangeSetting:Function;
 			
 			public function init(nameOrSoXMLFile:*=null,_version:String="",_onChangeSetting:Function=null,onChangeValue:Function=null):void{
 				
