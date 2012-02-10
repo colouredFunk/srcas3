@@ -17,7 +17,7 @@ package zero.works{
 	
 	public class NumIncreaser extends BaseCom{
 		
-		public var defaultXMLStr:String='<xml startTime="2011-10-17 16:15:00" endTime="2012-12-21 15:14:35" startNum="0" endNum="1000000"/>';
+		public var defaultXMLStr:String='<xml startTime="2012-02-10 00:00:00" endTime="2012-03-03 00:00:00" startNum="0" endNum="1000000"/>';
 		
 		private var ranArrStr:String="1211111323112121122132222212122212121211211211121222212311212221112221112222221222221122212221121211";
 		
@@ -50,6 +50,11 @@ package zero.works{
 			txt=_txt;
 			txt.text="";
 			ServerDate.init(getTimeComplete);
+		}
+		public function update():void{
+			if(xml){
+				getTimeComplete();
+			}
 		}
 		private function getTimeComplete():void{
 			
