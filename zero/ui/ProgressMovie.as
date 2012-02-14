@@ -23,6 +23,8 @@ package zero.ui{
 		
 		public var progressClip:MovieClip;
 		
+		private var onHideComplete:Function;
+		
 		public function ProgressMovie(){
 			this.mouseEnabled=this.mouseChildren=false;
 			this.alpha=0;
@@ -57,7 +59,8 @@ package zero.ui{
 				this.removeEventListener(Event.ENTER_FRAME,showRun);
 			}
 		}
-		public function hide():void{
+		public function hide(_onHideComplete:Function):void{
+			onHideComplete=_onHideComplete;
 			this.removeEventListener(Event.ENTER_FRAME,showRun);
 			this.addEventListener(Event.ENTER_FRAME,hideRun);
 			stopAll(progressClip);
@@ -66,6 +69,11 @@ package zero.ui{
 			if((this.alpha-=0.1)<0.05){
 				this.alpha=0;
 				this.removeEventListener(Event.ENTER_FRAME,hideRun);
+				if(onHideComplete==null){
+				}else{
+					onHideComplete();
+					onHideComplete=null;
+				}
 			}
 		}
 	}

@@ -56,7 +56,7 @@ package zero.works{
 				getTimeComplete();
 			}
 		}
-		private function getTimeComplete():void{
+		public function getTimeComplete():void{
 			
 			var startTime:int=getDateByDateStr(xml.@startTime.toString()).time/1000;
 			var endTime:int=getDateByDateStr(xml.@endTime.toString()).time/1000;
