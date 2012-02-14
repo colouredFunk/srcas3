@@ -46,8 +46,8 @@ package akdcl.manager {
 			lM.info(RequestManager, "init");
 
 			eM = ElementManager.getInstance();
-			eM.register(REQUESTLOADER, _RequestLoader);
-			eM.register(REQUESTURLLOADER, _RequestURLLoader);
+			eM.register(REQUEST_LOADER, _RequestLoader);
+			eM.register(REQUEST_URLLOADER, _RequestURLLoader);
 
 			sM = SourceManager.getInstance();
 
@@ -65,8 +65,8 @@ package akdcl.manager {
 		public static const DATAFORMAT_FORM:String = "form";
 		public static const DATAFORMAT_AMF3:String = "amf3";
 
-		private static const REQUESTLOADER:String = "_RequestLoader";
-		private static const REQUESTURLLOADER:String = "_RequestURLLoader";
+		private static const REQUEST_LOADER:String = "_RequestLoader";
+		private static const REQUEST_URLLOADER:String = "_RequestURLLoader";
 
 		private static const CONTENT_TYPE_STREAM:String = "application/octet-stream";
 
@@ -93,97 +93,104 @@ package akdcl.manager {
 			}
 			lM.info(RequestManager, "loadDisplay(url:{0})", null, _url);
 			//
-			var _bmd:BitmapData = sM.getSource(SourceManager.BITMAPDATA_GROUP, _url);
-			if (_bmd){
-				if (_onProgressHandler != null){
-					_onProgressHandler(1);
+			
+			var _type:String = _url.split("?").shift().split(".").pop().toLowerCase();
+			if (_type=="swf") {
+				if (loaderDicForSWF[_url]) {
+					_loader = eM.getElement(REQUEST_LOADER);
+					//loaderDicForImage[_url] = _loader;
+					//_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderCompleteOrErrorHandler);
+					//_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onLoaderCompleteOrErrorHandler);
+					//_loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onLoaderCompleteOrErrorHandler);
 				}
-				if (_onCompleteHandler != null){
-					switch (_onCompleteHandler.length){
-						case 0:
-							_onCompleteHandler();
-							break;
-						case 1:
-							_onCompleteHandler(_bmd);
-							break;
-						case 2:
-							_onCompleteHandler(_bmd, _url);
-							break;
-						case 3:
-							_onCompleteHandler(_bmd, _url, args);
-							break;
+				_loader.addEvents(_onProgressHandler, _onErrorHandler, _onCompleteHandler);
+				_loader.load(request);
+				return _loader;
+			}else {
+				var _bmd:BitmapData = sM.getSource(SourceManager.BITMAPDATA_GROUP, _url);
+				if (_bmd){
+					if (_onProgressHandler != null){
+						_onProgressHandler(1);
 					}
+					if (_onCompleteHandler != null){
+						switch (_onCompleteHandler.length){
+							case 0:
+								_onCompleteHandler();
+								break;
+							case 1:
+								_onCompleteHandler(_bmd);
+								break;
+							case 2:
+								_onCompleteHandler(_bmd, _url);
+								break;
+							case 3:
+								_onCompleteHandler(_bmd, _url, args);
+								break;
+						}
+					}
+					return null;
 				}
-				return null;
-			}
-			//
-			var _loader:_RequestLoader = loaderDicForImage[_url];
-			if (_loader){
-			} else {
-				_loader = eM.getElement(REQUESTLOADER);
-				_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderCompleteOrErrorHandler);
-				_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onLoaderCompleteOrErrorHandler);
-				_loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onLoaderCompleteOrErrorHandler);
-				if (_url.indexOf(".swf") < 0) {
+				var _loader:_RequestLoader = loaderDicForImage[_url];
+				if (_loader){
+				} else {
+					_loader = eM.getElement(REQUEST_LOADER);
 					loaderDicForImage[_url] = _loader;
-				}else {
-					//如果是swf，则队列里不能放置
-					_loader.contentLoaderInfo.addEventListener(Event.INIT, onLoaderInitHandler);
+					_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onImageCompleteOrErrorHandler);
+					_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onImageCompleteOrErrorHandler);
+					_loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onImageCompleteOrErrorHandler);
 				}
-				_loader.params = args;
+				_loader.addEvents(_onProgressHandler, _onErrorHandler, _onCompleteHandler);
+				_loader.load(request);
+				return _loader;
 			}
-			//
-			_loader.addEvents(_onProgressHandler, _onErrorHandler, _onCompleteHandler);
-			_loader.load(request);
-			return _loader;
+			return null;
 		}
 
 		public function unloadDisplay(_url:String, _onCompleteHandler:Function = null, _onErrorHandler:Function = null, _onProgressHandler:Function = null):void {
 			if (!_url){
 				return;
 			}
-			//
-			var _bmd:BitmapData = sM.getSource(SourceManager.BITMAPDATA_GROUP, _url);
-			if (_bmd){
-				return;
-			}
-			//
-			var _loader:_RequestLoader = loaderDicForImage[_url];
-			if (_loader){
-				_loader.removeEvents(_onProgressHandler, _onErrorHandler, _onCompleteHandler);
-			} else {
-				return;
+			var _type:String = _url.split("?").shift().split(".").pop().toLowerCase();
+			var _loader:_RequestLoader;
+			if (_type == "swf") {
+				if (loaderDicForSWF[_url]) {
+					
+				}
+			}else {
+				if (sM.getSource(SourceManager.BITMAPDATA_GROUP, _url) as BitmapData){
+					return;
+				}
+				//
+				_loader = loaderDicForImage[_url];
+				if (_loader) {
+					_loader.removeEvents(_onProgressHandler, _onErrorHandler, _onCompleteHandler);
+				}
 			}
 		}
 
 		private function onLoaderInitHandler(_evt:Event):void {
 			var _loaderInfo:LoaderInfo = (_evt.currentTarget as LoaderInfo);
 			var _loader:_RequestLoader = _loaderInfo.loader as _RequestLoader;
-			if (_loader.params && _loader.content && ("flashVars" in _loader.content)){
+			if (_loader.params && _loader.content && ("flashVars" in _loader.content)) {
 				lM.info(RequestManager, "设置{0}flashVars{1}", null, _loader.content, _loader.params[0]);
 				_loader.content["flashVars"] = _loader.params[0];
 			}
 		}
 
-		private function onLoaderCompleteOrErrorHandler(_evt:Event):void {
+		private function onImageCompleteOrErrorHandler(_evt:Event):void {
 			var _loaderInfo:LoaderInfo = (_evt.currentTarget as LoaderInfo);
 			var _loader:_RequestLoader = _loaderInfo.loader as _RequestLoader;
-			_loaderInfo.removeEventListener(Event.INIT, onLoaderInitHandler);
-			_loaderInfo.removeEventListener(Event.COMPLETE, onLoaderCompleteOrErrorHandler);
-			_loaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onLoaderCompleteOrErrorHandler);
-			_loaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onLoaderCompleteOrErrorHandler);
+			_loaderInfo.removeEventListener(Event.COMPLETE, onImageCompleteOrErrorHandler);
+			_loaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onImageCompleteOrErrorHandler);
+			_loaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onImageCompleteOrErrorHandler);
 
 			if (_evt is IOErrorEvent || _evt is SecurityError){
 				lM.error(RequestManager, _evt.toString());
 				trace("[ERROR:]" + _evt);
 				_loader.onErrorHandler(_evt);
 			} else {
-				lM.info(RequestManager, "loadDisplayComplete:" + _loader.url);
-				if (_loader.content is Bitmap){
-					sM.addSource(SourceManager.BITMAPDATA_GROUP, _loader.url, (_loader.content as Bitmap).bitmapData);
-				} else {
-					//swf
-				}
+				lM.info(RequestManager, "imageComplete:" + _loader.url);
+				sM.addSource(SourceManager.BITMAPDATA_GROUP, _loader.url, (_loader.content as Bitmap).bitmapData);
 				_loader.onCompleteHandler();
 			}
 			delete loaderDicForImage[_loader.url];
@@ -192,7 +199,7 @@ package akdcl.manager {
 			}
 		}
 
-		public function load(_url:*, _onCompleteHandler:Function = null, _onErrorHandler:Function = null, _onProgressHandler:Function = null, ... args):void {
+		public function load(_url:*, _onCompleteHandler:Function = null, _onErrorHandler:Function = null, _onProgressHandler:Function = null):void {
 			resetRequest(_url);
 			_url = request.url;
 			if (!_url){
@@ -206,13 +213,12 @@ package akdcl.manager {
 			var _loader:_RequestURLLoader = urlLoaderDic[_url];
 			if (_loader){
 			} else {
-				_loader = eM.getElement(REQUESTURLLOADER);
+				_loader = eM.getElement(REQUEST_URLLOADER);
 				_loader.addEventListener(Event.COMPLETE, onURLLoaderCompleteOrErrorHandler);
 				_loader.addEventListener(IOErrorEvent.IO_ERROR, onURLLoaderCompleteOrErrorHandler);
 				_loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onURLLoaderCompleteOrErrorHandler);
 				urlLoaderDic[_url] = _loader;
 				_loader.dataFormat = dataFormat;
-				_loader.params = args;
 			}
 			//
 			_loader.addEvents(_onProgressHandler, _onErrorHandler, _onCompleteHandler);
@@ -290,8 +296,7 @@ package akdcl.manager {
 							break;
 					}
 				} else {
-					request.url += "?random=" + Math.random();
-					request.data = null;
+					request.data = { random:Math.random() };
 					request.contentType = null;
 					request.method = URLRequestMethod.GET;
 				}
