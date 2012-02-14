@@ -18,7 +18,6 @@ package akdcl.manager {
 	 */
 	final internal class _RequestURLLoader extends URLLoader {
 		internal var url:String;
-		internal var params:Array;
 
 		private var errorHandlers:Dictionary;
 		private var progressHandlers:Dictionary;
@@ -34,7 +33,7 @@ package akdcl.manager {
 			url = request.url;
 			if (dataFormat){
 			} else {
-				var _type:String = url.split(".").pop().toLowerCase();
+				var _type:String = url.split("?").shift().split(".").pop().toLowerCase();
 				switch (_type){
 					case "jpg":
 					case "png":
@@ -64,7 +63,6 @@ package akdcl.manager {
 				delete completeHandlers[_fun];
 			}
 			url = null;
-			params = null;
 			data = null;
 			dataFormat = null;
 		}
@@ -144,9 +142,6 @@ package akdcl.manager {
 					case 2:
 						_onError(_evt, url);
 						break;
-					case 3:
-						_onError(_evt, url, params);
-						break;
 				}
 			}
 		}
@@ -163,9 +158,6 @@ package akdcl.manager {
 						break;
 					case 2:
 						_onComplete(_data, url);
-						break;
-					case 3:
-						_onComplete(_data, url, params);
 						break;
 				}
 			}
