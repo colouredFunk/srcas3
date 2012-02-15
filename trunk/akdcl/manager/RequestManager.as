@@ -55,8 +55,8 @@ package akdcl.manager {
 			
 			//eventProgressComplete = new ProgressEvent(ProgressEvent.PROGRESS, false, false, 1, 1);
 			
-			loaderDicForImage = {};
-			loaderDicForSWF = {};
+			loaderDicForImage = { };
+			
 			urlLoaderDic = {};
 		}
 
@@ -77,7 +77,7 @@ package akdcl.manager {
 		private var request:URLRequest;
 
 		private var loaderDicForImage:Object;
-		private var loaderDicForSWF:Object;
+		
 		private var urlLoaderDic:Object;
 
 		private var dataFormat:String;
@@ -95,16 +95,18 @@ package akdcl.manager {
 			//
 			
 			var _type:String = _url.split("?").shift().split(".").pop().toLowerCase();
-			if (_type=="swf") {
-				if (loaderDicForSWF[_url]) {
+			var _loader:_RequestLoader;
+			
+			if (_type == "swf") {
+				
 					_loader = eM.getElement(REQUEST_LOADER);
-					//loaderDicForImage[_url] = _loader;
-					//_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderCompleteOrErrorHandler);
-					//_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onLoaderCompleteOrErrorHandler);
-					//_loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onLoaderCompleteOrErrorHandler);
-				}
-				_loader.addEvents(_onProgressHandler, _onErrorHandler, _onCompleteHandler);
-				_loader.load(request);
+					_loader.contentLoaderInfo.addEventListener(Event.INIT, onSWFInitHandler);
+					_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onSWFCompleteOrErrorHandler);
+					_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onSWFCompleteOrErrorHandler);
+					_loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onSWFCompleteOrErrorHandler);
+					_loader.addEvents(_onProgressHandler, _onErrorHandler, _onCompleteHandler);
+					_loader.load(request);
+					
 				return _loader;
 			}else {
 				var _bmd:BitmapData = sM.getSource(SourceManager.BITMAPDATA_GROUP, _url);
@@ -130,7 +132,7 @@ package akdcl.manager {
 					}
 					return null;
 				}
-				var _loader:_RequestLoader = loaderDicForImage[_url];
+				_loader = loaderDicForImage[_url];
 				if (_loader){
 				} else {
 					_loader = eM.getElement(REQUEST_LOADER);
@@ -153,9 +155,7 @@ package akdcl.manager {
 			var _type:String = _url.split("?").shift().split(".").pop().toLowerCase();
 			var _loader:_RequestLoader;
 			if (_type == "swf") {
-				if (loaderDicForSWF[_url]) {
-					
-				}
+				
 			}else {
 				if (sM.getSource(SourceManager.BITMAPDATA_GROUP, _url) as BitmapData){
 					return;
@@ -168,12 +168,33 @@ package akdcl.manager {
 			}
 		}
 
-		private function onLoaderInitHandler(_evt:Event):void {
+		private function onSWFInitHandler(_evt:Event):void {
 			var _loaderInfo:LoaderInfo = (_evt.currentTarget as LoaderInfo);
 			var _loader:_RequestLoader = _loaderInfo.loader as _RequestLoader;
 			if (_loader.params && _loader.content && ("flashVars" in _loader.content)) {
 				lM.info(RequestManager, "设置{0}flashVars{1}", null, _loader.content, _loader.params[0]);
 				_loader.content["flashVars"] = _loader.params[0];
+			}
+		}
+		
+		private function onSWFCompleteOrErrorHandler(_evt:Event):void {
+			var _loaderInfo:LoaderInfo = (_evt.currentTarget as LoaderInfo);
+			var _loader:_RequestLoader = _loaderInfo.loader as _RequestLoader;
+			_loaderInfo.removeEventListener(Event.INIT, onSWFInitHandler);
+			_loaderInfo.removeEventListener(Event.COMPLETE, onSWFCompleteOrErrorHandler);
+			_loaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onSWFCompleteOrErrorHandler);
+			_loaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onSWFCompleteOrErrorHandler);
+
+			if (_evt is IOErrorEvent || _evt is SecurityError){
+				lM.error(RequestManager, _evt.toString());
+				trace("[ERROR:]" + _evt);
+				_loader.onErrorHandler(_evt);
+			} else {
+				lM.info(RequestManager, "swfComplete:" + _loader.url);
+				_loader.onCompleteHandler();
+			}
+			if (_loader.clear()){
+				eM.recycle(_loader);
 			}
 		}
 
@@ -199,7 +220,7 @@ package akdcl.manager {
 			}
 		}
 
-		public function load(_url:*, _onCompleteHandler:Function = null, _onErrorHandler:Function = null, _onProgressHandler:Function = null):void {
+		public function load(_url:*, _onCompleteHandler:Function = null, _onErrorHandler:Function = null, _onProgressHandler:Function = null, ...args):void {
 			resetRequest(_url);
 			_url = request.url;
 			if (!_url){
@@ -219,6 +240,7 @@ package akdcl.manager {
 				_loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onURLLoaderCompleteOrErrorHandler);
 				urlLoaderDic[_url] = _loader;
 				_loader.dataFormat = dataFormat;
+				_loader.params = args;
 			}
 			//
 			_loader.addEvents(_onProgressHandler, _onErrorHandler, _onCompleteHandler);
