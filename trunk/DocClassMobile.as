@@ -96,7 +96,6 @@ package {
 						onLoaded();
 						break;
 					case 1:
-					default:
 						onLoaded(this);
 						break;
 				}
