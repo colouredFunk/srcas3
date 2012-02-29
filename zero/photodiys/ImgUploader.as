@@ -14,15 +14,13 @@ package zero.photodiys{
 	import flash.net.*;
 	import flash.utils.*;
 	
-	import mx.graphics.codec.*;
-	
-	import zero.paths.*;
-	
 	import zero.*;
+	import zero.codec.*;
 	import zero.net.*;
+	import zero.paths.*;
 	public class ImgUploader{
 		
-		private var uploader:DataLoader;
+		private var uploader:URLLoader;
 		private var onUploadComplete:Function;
 		
 		public function ImgUploader(
@@ -30,14 +28,16 @@ package zero.photodiys{
 			imgData:ByteArray,
 			name:String,
 			folderId:int,
+			bmpDecEnc:Class,//20120227
 			_onUploadComplete:Function
 		){
 			onUploadComplete=_onUploadComplete;
 			var uploadURL:String=path_photodiy_album_uploadFile+"?name="+escape(name);
 			
-			uploader=new DataLoader();
-			uploader.onLoadComplete=uploadComplete;
-			uploader.onLoadError=uploadError;
+			uploader=new URLLoader();
+			uploader.addEventListener(IOErrorEvent.IO_ERROR,uploadError);
+			uploader.addEventListener(SecurityErrorEvent.SECURITY_ERROR,uploadError);
+			uploader.addEventListener(Event.COMPLETE,uploadComplete);
 			
 			var iconWid:int=40;
 			var iconHei:int=40;
@@ -55,8 +55,13 @@ package zero.photodiys{
 					data.writeBytes(imgData);
 				break;
 				case FileTypes.BMP:
-					data.writeBytes(new PNGEncoder().encode(bmd));
-					uploadURL+=".png";
+					if(bmpDecEnc){
+						imgData=bmpDecEnc["encode"](BMPEncoder.decode(imgData));
+						data.writeBytes(imgData);
+						uploadURL+="."+FileTypes.getType(imgData);
+					}else{
+						throw new Error("请传递 bmpDecEnc，（推荐使用 zero.codec.PNGEncoder 或 zero.codec.JPEGEncoder）");
+					}
 				break;
 				default:
 					throw new Error("不支持的文件类型");
@@ -69,18 +74,23 @@ package zero.photodiys{
 			
 			uploadURL+="&iconPos="+data.length;
 			uploadURL+="&iconName=icon.jpg";
-			data.writeBytes(new JPEGEncoder().encode(iconBmd));//缩略图
+			data.writeBytes(JPEGEncoder.encode(iconBmd));//缩略图
 			
-			uploader.load(
-				uploadURL,
-				data
-			);
+			var urlRequest:URLRequest=new URLRequest(uploadURL);
+			urlRequest.contentType="application/octet-stream";
+			urlRequest.method=URLRequestMethod.POST;
+			urlRequest.data=data;
+			uploader.load(urlRequest);
 		}
 		
-		private function uploadComplete(data:String):void{
+		private function uploadComplete(...args):void{
 			var xml:XML;
 			try{
-				xml=new XML(data);
+				xml=new XML(uploader.data);
+				if(xml.name().toString()){
+				}else{
+					xml=null;
+				}
 			}catch(e:Error){
 				xml=null;
 			}
@@ -94,13 +104,15 @@ package zero.photodiys{
 			uploadError();
 			
 		}
-		private function uploadError():void{
+		private function uploadError(...args):void{
 			stop();
 			onUploadComplete(null);
 		}
 		
 		public function stop():void{
-			uploader.clear();
+			try{
+				uploader.close();
+			}catch(e:Error){}
 			onUploadComplete=null;
 		}
 	}
