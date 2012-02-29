@@ -18,7 +18,7 @@ package zero.works{
 	
 	public class TxtEffectsClock extends BaseCom{
 		
-		public var defaultXMLStr:String='<xml startTime="2012-01-17 00:00:00" endTime="2012-02-21 15:14:35"/>';
+		public var defaultXMLStr:String='<xml startTime="2012-02-27 00:00:00" endTime="2012-05-29 00:00:00"/>';
 		
 		public var txt0:TxtEffects;
 		public var txt1:TxtEffects;
@@ -39,9 +39,9 @@ package zero.works{
 					this["txt"+i].y=hei/2;
 				}
 			}
-			if(txt4){
-				txt4.txt2.visible=false;
-			}
+			//if(txt4){
+			//	txt4.txt2.visible=false;
+			//}
 		}
 		public function initComplete():void{
 			if(assets&&assets.txtSWFData){
@@ -112,6 +112,21 @@ package zero.works{
 			}
 			if(txt4){
 				txt4.value=mss*10;
+				
+				txt4.txt2.num1.getChildAt(0)["text"]=int(Math.random()*10).toString();
+//这个能后一位也变化么？
+//weishenchu00966(魏慎初（金花）ENTJ) 17:01:41
+//弄个假的　
+//weishenchu00966(魏慎初（金花）ENTJ) 17:01:46
+//随便变变　就行
+//weishenchu00966(魏慎初（金花）ENTJ) 17:01:47
+//可以么
+//luzhibin(陆志斌) 17:02:12
+//可以啊
+//weishenchu00966(魏慎初（金花）ENTJ) 17:02:24
+//那帮忙弄一下吧　谢谢了
+
+
 			}
 		}
 	}
