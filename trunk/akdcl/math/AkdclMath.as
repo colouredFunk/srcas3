@@ -28,7 +28,7 @@
 			var ran:uint;
 			var temp:*;
 			for (var i:uint = 0; i < L; i++){
-				ran = random(L);
+				ran = Math.random() * L;
 				temp = arr[i];
 				arr[i] = arr[ran];
 				arr[ran] = temp;
