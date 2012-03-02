@@ -47,18 +47,17 @@ package zero.managers{
 		//*/
 		
 		///*//加密
-		private static const key:String="pwrd20110524";
 		public function getValue(name:String):int{
 			var code:ByteArray=mark[name];
 			if(code){
-				var keyI:int=key.length;
+				var keyI:int=scoreManager_key.length;
 				var L:int=code.length;
 				var valueStr:String="";
 				for(var i:int=0;i<L;i++){
 					if(--keyI<0){
-						keyI=key.length-1;
+						keyI=scoreManager_key.length-1;
 					}
-					valueStr+=String.fromCharCode(code[i]^key.charCodeAt(keyI));
+					valueStr+=String.fromCharCode(code[i]^scoreManager_key.charCodeAt(keyI));
 				}
 				return int(valueStr);
 			}
@@ -72,14 +71,14 @@ package zero.managers{
 				value=0;
 			}
 			var valueStr:String=value.toString();
-			var keyI:int=key.length;
+			var keyI:int=scoreManager_key.length;
 			var L:int=valueStr.length;
 			var code:ByteArray=new ByteArray();
 			for(var i:int=0;i<L;i++){
 				if(--keyI<0){
-					keyI=key.length-1;
+					keyI=scoreManager_key.length-1;
 				}
-				code[i]=valueStr.charCodeAt(i)^key.charCodeAt(keyI);
+				code[i]=valueStr.charCodeAt(i)^scoreManager_key.charCodeAt(keyI);
 			}
 			//trace("code="+code);
 			mark[name]=code;
