@@ -7,5 +7,5 @@ path_photodiy
 */
 
 package zero.paths{
-	public var path_photodiy:String="http://"+zeroDomain+"/photodiy/";
+	public const path_photodiy:String="http://"+zeroDomain+"/photodiy/";
 }

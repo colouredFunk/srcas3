@@ -7,5 +7,5 @@ path_BottomBar
 */
 
 package zero.paths{
-	public var path_BottomBar:String=path_common+"BottomBar.swf";
+	public const path_BottomBar:String=path_common+"BottomBar.swf";
 }

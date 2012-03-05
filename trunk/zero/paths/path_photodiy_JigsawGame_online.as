@@ -7,5 +7,5 @@ path_photodiy_JigsawGame_online
 */
 
 package zero.paths{
-	public var path_photodiy_JigsawGame_online:String=path_photodiy_JigsawGame+"online.htm";
+	public const path_photodiy_JigsawGame_online:String=path_photodiy_JigsawGame+"online.htm";
 }

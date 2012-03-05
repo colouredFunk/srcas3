@@ -7,5 +7,5 @@ path_photodiy_tackfilm_online
 */
 
 package zero.paths{
-	public var path_photodiy_tackfilm_online:String=path_photodiy_tackfilm+"online.htm";
+	public const path_photodiy_tackfilm_online:String=path_photodiy_tackfilm+"online.htm";
 }

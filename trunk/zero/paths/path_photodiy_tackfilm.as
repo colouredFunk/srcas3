@@ -7,5 +7,5 @@ path_photodiy_tackfilm
 */
 
 package zero.paths{
-	public var path_photodiy_tackfilm:String=path_photodiy+"tackfilm/";
+	public const path_photodiy_tackfilm:String=path_photodiy+"tackfilm/";
 }

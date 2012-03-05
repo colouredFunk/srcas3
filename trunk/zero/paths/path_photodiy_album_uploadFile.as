@@ -7,5 +7,5 @@ path_photodiy_album_uploadFile
 */
 
 package zero.paths{
-	public var path_photodiy_album_uploadFile:String=path_photodiy_album+"uploadFile.php";
+	public const path_photodiy_album_uploadFile:String=path_photodiy_album+"uploadFile.php";
 }

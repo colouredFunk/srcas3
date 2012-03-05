@@ -7,5 +7,5 @@ path_photodiy_Card2011_online
 */
 
 package zero.paths{
-	public var path_photodiy_Card2011_online:String=path_photodiy_Card2011+"online.htm";
+	public const path_photodiy_Card2011_online:String=path_photodiy_Card2011+"online.htm";
 }

@@ -7,5 +7,5 @@ path_photodiy_album
 */
 
 package zero.paths{
-	public var path_photodiy_album:String=path_photodiy+"album/";
+	public const path_photodiy_album:String=path_photodiy+"album/";
 }

@@ -7,5 +7,5 @@ path_photodiy_Card2011_uploadFiles
 */
 
 package zero.paths{
-	public var path_photodiy_Card2011_uploadFiles:String=path_photodiy_Card2011+"uploadFiles.php";
+	public const path_photodiy_Card2011_uploadFiles:String=path_photodiy_Card2011+"uploadFiles.php";
 }
