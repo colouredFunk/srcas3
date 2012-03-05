@@ -23,7 +23,6 @@
 
 		public var area:*;
 		public var hrefTarget:String = "_blank";
-		public var eEval:String;
 		
 		private var __href:Object;
 		public function get href():Object 
@@ -116,17 +115,14 @@
 			release = null;
 			select = null;
 
-			eEval = null;
 			hrefTarget = null;
 			area = null;
 			__href = null;
 		}
 
 		private function onReleaseHandler(_e:UIEvent):void {
-			if (__href){
+			if (__href) {
 				gotoURL(__href, hrefTarget);
-			} else if (eEval){
-				ExternalInterface.call("eval", eEval);
 			}
 		}
 	}
