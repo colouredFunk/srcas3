@@ -7,5 +7,5 @@ path_ZeroPrevLoader
 */
 
 package zero.paths{
-	public var path_ZeroPrevLoader:String=path_common+"ZeroPrevLoader.swf";
+	public const path_ZeroPrevLoader:String=path_common+"ZeroPrevLoader.swf";
 }

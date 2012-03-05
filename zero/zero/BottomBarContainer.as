@@ -71,7 +71,7 @@ package zero.zero{
 			
 			try{
 				loader.load(new URLRequest(path_BottomBar+"?"+so.data.time));
-				//loader.load(new URLRequest(ZeroCommon.path_BottomBar+"?"+Math.random()));trace("测试，添加随机数字");
+				//loader.load(new URLRequest(path_BottomBar+"?"+Math.random()));trace("测试，添加随机数字");
 			}catch(e:Error){}
 			////
 			

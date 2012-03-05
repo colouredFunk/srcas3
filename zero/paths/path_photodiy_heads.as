@@ -7,5 +7,5 @@ path_photodiy_heads
 */
 
 package zero.paths{
-	public var path_photodiy_heads:String=path_photodiy+"heads/";
+	public const path_photodiy_heads:String=path_photodiy+"heads/";
 }

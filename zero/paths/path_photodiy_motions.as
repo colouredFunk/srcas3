@@ -7,5 +7,5 @@ path_photodiy_motions
 */
 
 package zero.paths{
-	public var path_photodiy_motions:String=path_photodiy+"motions/";
+	public const path_photodiy_motions:String=path_photodiy+"motions/";
 }

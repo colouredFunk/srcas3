@@ -7,5 +7,5 @@ path_photodiy_hero_online
 */
 
 package zero.paths{
-	public var path_photodiy_hero_online:String=path_photodiy_hero+"online_1.0.1.htm";
+	public const path_photodiy_hero_online:String=path_photodiy_hero+"online_1.0.1.htm";
 }

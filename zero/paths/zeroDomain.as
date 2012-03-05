@@ -7,6 +7,6 @@ zeroDomain
 */
 
 package zero.paths{
-	public var zeroDomain:String="zero.flashwing.net";
-	//public var zeroDomain:String="localhost/zero.flashwing.net";
+	//public const zeroDomain:String="zero.flashwing.net";
+	public const zeroDomain:String="localhost/zero.flashwing.net";trace("本地测试");
 }
