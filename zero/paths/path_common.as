@@ -7,5 +7,5 @@ path_common
 */
 
 package zero.paths{
-	public const path_common:String="http://"+zeroDomain+"/common/";
+	public const path_common:String="http://"+zeroDomain()+"/common/";
 }

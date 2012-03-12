@@ -7,5 +7,5 @@ path_ZeroSWFEncrypt
 */
 
 package zero.paths{
-	public const path_ZeroSWFEncrypt:String="http://"+zeroDomain+"/ZeroSWFEncrypt/";
+	public const path_ZeroSWFEncrypt:String="http://"+zeroDomain()+"/ZeroSWFEncrypt/";
 }
