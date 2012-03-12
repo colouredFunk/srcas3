@@ -16,27 +16,24 @@ package zero.managers{
 	import flash.utils.*;
 	
 	public class ScoreManager{
-		private static var instance:ScoreManager;
-		public static function getInstance():ScoreManager{
-			if(instance){
-			}else{
-				instance=new ScoreManager();
-				instance.mark=new Object();
-			}
-			return instance;
+		
+		private static var mark:Object;
+		private static var key:String;
+		
+		public static function init(_key:String):void{
+			key=_key;
+			mark=new Object();
 		}
 		
-		private var mark:Object;
-		
 		/*//未加密
-		public function getValue(name:String):int{
+		public static function getValue(name:String):int{
 			if(mark[name]>-1){
 				return mark[name];
 			}
 			throw new Error(this+" 找不到分数："+name);
 			return 0;
 		}
-		public function setValue(name:String,value:int):void{
+		public static function setValue(name:String,value:int):void{
 			if(value>-1){
 			}else{
 				trace(this+" "+value+"，自动处理成0");
@@ -47,48 +44,48 @@ package zero.managers{
 		//*/
 		
 		///*//加密
-		public function getValue(name:String):int{
+		public static function getValue(name:String):int{
 			var code:ByteArray=mark[name];
 			if(code){
-				var keyI:int=scoreManager_key.length;
+				var keyI:int=key.length;
 				var L:int=code.length;
 				var valueStr:String="";
 				for(var i:int=0;i<L;i++){
 					if(--keyI<0){
-						keyI=scoreManager_key.length-1;
+						keyI=key.length-1;
 					}
-					valueStr+=String.fromCharCode(code[i]^scoreManager_key.charCodeAt(keyI));
+					valueStr+=String.fromCharCode(code[i]^key.charCodeAt(keyI));
 				}
 				return int(valueStr);
 			}
-			throw new Error(this+" 找不到分数："+name);
+			//throw new Error(this+" 找不到分数："+name);
 			return 0;
 		}
-		public function setValue(name:String,value:int):void{
+		public static function setValue(name:String,value:int):void{
 			if(value>-1){
 			}else{
-				trace(this+" "+value+"，自动处理成0");
+				//trace(this+" "+value+"，自动处理成0");
 				value=0;
 			}
 			var valueStr:String=value.toString();
-			var keyI:int=scoreManager_key.length;
+			var keyI:int=key.length;
 			var L:int=valueStr.length;
 			var code:ByteArray=new ByteArray();
 			for(var i:int=0;i<L;i++){
 				if(--keyI<0){
-					keyI=scoreManager_key.length-1;
+					keyI=key.length-1;
 				}
-				code[i]=valueStr.charCodeAt(i)^scoreManager_key.charCodeAt(keyI);
+				code[i]=valueStr.charCodeAt(i)^key.charCodeAt(keyI);
 			}
 			//trace("code="+code);
 			mark[name]=code;
 		}
 		//*/
 		
-		public function add(name:String,value:int):void{
+		public static function add(name:String,value:int):void{
 			setValue(name,getValue(name)+value);
 		}
-		public function subtract(name:String,value:int):void{
+		public static function subtract(name:String,value:int):void{
 			setValue(name,getValue(name)-value);
 		}
 	}
