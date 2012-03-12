@@ -142,7 +142,7 @@ package zero.zero{
 		
 		private static function activate(...args):void{
 			clearTimeout(timeoutId);
-			timeoutId=setTimeout(autoPlay,5000);
+			timeoutId=setTimeout(autoPlay,10000);
 		}
 		private static function autoPlay():void{
 			mode=AUTO_PLAY;
@@ -165,7 +165,7 @@ package zero.zero{
 			if(playing){
 			}else{
 				if(so.data.recordBytes||bestBytes){
-					timeoutId=setTimeout(autoPlay,5000);
+					activate();
 					__stage.addEventListener(MouseEvent.MOUSE_MOVE,activate);
 					__stage.addEventListener(MouseEvent.MOUSE_DOWN,activate);
 					__stage.addEventListener(KeyboardEvent.KEY_DOWN,activate);
@@ -222,6 +222,7 @@ package zero.zero{
 					recordBytes.uncompress();
 					recordBytes.position=0;
 					recorder.dataArr=recordBytes.readObject();
+					//trace("recorder.dataArr="+recorder.dataArr);
 					recorder.replay(__stage,null,recordParams);
 					playing=true;
 				break;
