@@ -104,7 +104,7 @@
 			if (r > Math.PI){
 				r -= 2 * Math.PI;
 			}
-			if (r < -Math.PI){
+			if (r <= -Math.PI){
 				r += 2 * Math.PI;
 			}
 			return r;
@@ -115,7 +115,7 @@
 			if (r > 180){
 				r -= 2 * 180;
 			}
-			if (r < -180){
+			if (r <= -180){
 				r += 2 * 180;
 			}
 			return r;

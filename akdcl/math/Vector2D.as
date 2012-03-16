@@ -42,8 +42,8 @@
 			x = _x;
 			y = _y;
 		}
-
-		public function setPosition(_x:Number = 0, _y:Number = 0):void {
+		
+		public function setPosition(_x:Number = 0, _y:Number = 0){
 			x = _x;
 			y = _y;
 		}
