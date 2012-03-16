@@ -14,17 +14,17 @@ package akdcl.utils
 		
 		//hitTestPoint需要global
 		//getPixel32需要bitmapData容器的local坐标
-		public static function hitTest(_isHit:Object, _x:Number, _y:Number):Boolean {
-			if(_isHit is DisplayObject){
-				return _isHit.hitTestPoint(_x, _y, true);
-			}else if (_isHit is BitmapData) {
-				return _isHit.getPixel32(_x, _y);
+		public static function hitTest(_display:Object, _x:Number, _y:Number):Boolean {
+			if(_display is DisplayObject){
+				return _display.hitTestPoint(_x, _y, true);
+			}else if (_display is BitmapData) {
+				return _display.getPixel32(_x, _y);
 			}
 			return false;
 		}
 		
 		//x0,y0开始为没有撞倒的点
-		public static function crossPoint(_x0:Number, _y0:Number, _xt:Number, _yt:Number, _display:Object, _minStep:Number = 1):Object {
+		public static function hitTestCross(_x0:Number, _y0:Number, _xt:Number, _yt:Number, _display:Object, _minStep:Number = 1):Boolean {
 			var _isHit:Boolean = false;
 			var _x:Number;
 			var _y:Number;
@@ -38,7 +38,9 @@ package akdcl.utils
 			}
 			
 			if (hitTest(_display, _xt, _yt)) {
-				while (sideMax(_x0, _y0, _xt, _yt) > _minStep && _i++ < 100){
+				//初始点未碰撞，而目标点碰撞，则采用二分法
+				//仍有穿透障碍物的可能
+				while (sideMax(_x0, _y0, _xt, _yt) > _minStep && _i++ < 50){
 					_x = (_x0 + _xt) * 0.5;
 					_y = (_y0 + _yt) * 0.5;
 					if (hitTest(_display, _x, _y)) {
@@ -51,6 +53,7 @@ package akdcl.utils
 					}
 				}
 			}else {
+				//逼近检测
 				var _dis:Number = int(distance(_x0, _y0, _xt, _yt));
 				_x = (_xt - _x0) / _dis * _minStep;
 				_y = (_yt - _y0) / _dis * _minStep;
@@ -71,10 +74,10 @@ package akdcl.utils
 			return _isHit;
 		}
 		
-		//获得hitTest点的切面角弧度，未碰撞返回NaN
+		//获得hitTest点的切面弧度，未碰撞返回NaN
 		public static function hitTestRadian(_x0:Number, _y0:Number, _xt:Number, _yt:Number, _display:Object, _radius:uint = 10):Number {
 			var _isHit:Boolean;
-			_isHit = crossPoint(_x0, _y0, _xt, _yt, _display);
+			_isHit = hitTestCross(_x0, _y0, _xt, _yt, _display);
 			if (_isHit) {
 				var _hitX:Number = hitPoint.x;
 				var _hitY:Number = hitPoint.y;
@@ -90,13 +93,13 @@ package akdcl.utils
 				var _rY:Number;
 				var _lX:Number;
 				var _lY:Number;
-				if (!crossPoint(_hitX - _dX, _hitY - _dY, _hitX + _dY, _hitY - _dX, _display)) {
-					crossPoint(_hitX + _dY, _hitY - _dX, _hitX + _dX, _hitY + _dY, _display);
+				if (!hitTestCross(_hitX - _dX, _hitY - _dY, _hitX + _dY, _hitY - _dX, _display)) {
+					hitTestCross(_hitX + _dY, _hitY - _dX, _hitX + _dX, _hitY + _dY, _display);
 				}
 				_rX = hitPoint.x;
 				_rY = hitPoint.y;
-				if (!crossPoint(_hitX - _dX, _hitY - _dY, _hitX - _dY, _hitY + _dX, _display)) {
-					crossPoint(_hitX - _dY, _hitY + _dX, _hitX + _dX, _hitY + _dY, _display);
+				if (!hitTestCross(_hitX - _dX, _hitY - _dY, _hitX - _dY, _hitY + _dX, _display)) {
+					hitTestCross(_hitX - _dY, _hitY + _dX, _hitX + _dX, _hitY + _dY, _display);
 				}
 				_lX = hitPoint.x;
 				_lY = hitPoint.y;
