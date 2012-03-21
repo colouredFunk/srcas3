@@ -783,7 +783,9 @@ package zero.ui{
 			}
 			userMouse.graphics.clear();
 			Mouse.show();
-			userMouse.gotoAndStop(1);
+			if(userMouse.totalFrames>1){
+				userMouse.gotoAndStop(1);
+			}
 		}
 		private function __updateByPic():void{
 			updateByPic(__pic);

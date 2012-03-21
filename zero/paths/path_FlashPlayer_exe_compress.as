@@ -8,5 +8,4 @@ path_FlashPlayer_exe_compress
 
 package zero.paths{
 	public const path_FlashPlayer_exe_compress:String=path_common+"FlashPlayer.exe.compress";
-	}
 }

@@ -50,8 +50,14 @@ package zero.net{
 		public function addString(name:String,string:String):void{
 			values[name]=string;
 		}
-		public function addFile(name:String,fileData:ByteArray,filename:String=null):void{
-			values[name]=fileData;
+		public function addFile(name:String,fileData:*,filename:String=null):void{
+			if(fileData is ByteArray){
+				values[name]=fileData;
+			}else{
+				var _fileData:ByteArray=new ByteArray();
+				_fileData.writeUTFBytes(fileData);
+				values[name]=_fileData;
+			}
 			if(filename){
 				filenames[name]=filename;
 			}//else{
