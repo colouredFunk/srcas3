@@ -2,7 +2,8 @@ package akdcl.utils
 {
 	import flash.display.DisplayObject;
 	import flash.display.BitmapData;
-	import flash.geom.Point;
+	
+	import akdcl.math.Vector2D;
 	
 	/**
 	 * ...
@@ -10,17 +11,15 @@ package akdcl.utils
 	 */
 	public class HitTest
 	{
-		public static var hitPoint:Point = new Point();
-		
+		public static var hitPoint:Vector2D = new Vector2D();
+		public static var hitTest:Function = hitTestPoint;
 		//hitTestPoint需要global
 		//getPixel32需要bitmapData容器的local坐标
-		public static function hitTest(_display:Object, _x:Number, _y:Number):Boolean {
-			if(_display is DisplayObject){
-				return _display.hitTestPoint(_x, _y, true);
-			}else if (_display is BitmapData) {
-				return _display.getPixel32(_x, _y);
-			}
-			return false;
+		public static function hitTestPoint(_display:DisplayObject, _x:Number, _y:Number):Boolean {
+			return _display.hitTestPoint(_x, _y, true);
+		}
+		public static function hitTestPixel(_display:BitmapData, _x:Number, _y:Number):Boolean {
+			return _display.getPixel32(_x, _y);
 		}
 		
 		//x0,y0开始为没有撞倒的点
