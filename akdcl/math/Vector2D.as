@@ -64,6 +64,11 @@
 			y = _v2.y;
 			return this;
 		}
+		
+		override public function clone():flash.geom.Point 
+		{
+			return new Vector2D(x, y);
+		}
 
 		/**
 		 * Sets this vector's x and y values, and thus length, to zero.
