@@ -15,11 +15,11 @@ package akdcl.utils
 		public static var hitTest:Function = hitTestPoint;
 		//hitTestPoint需要global
 		//getPixel32需要bitmapData容器的local坐标
-		public static function hitTestPoint(_display:DisplayObject, _x:Number, _y:Number):Boolean {
+		public static function hitTestPoint(_x:Number, _y:Number, _display:DisplayObject):Boolean {
 			return _display.hitTestPoint(_x, _y, true);
 		}
-		public static function hitTestPixel(_display:BitmapData, _x:Number, _y:Number):Boolean {
-			return _display.getPixel32(_x, _y);
+		public static function hitTestPixel(_x:Number, _y:Number, _display:BitmapData):Boolean {
+			return _display.getPixel32(_x, _y) >>> 8 != 0;
 		}
 		
 		//x0,y0开始为没有撞倒的点
@@ -29,20 +29,20 @@ package akdcl.utils
 			var _y:Number;
 			var _i:int = 0;
 			
-			if (hitTest(_display, _x0, _y0)) {
+			if (hitTest(_x0, _y0, _display)) {
 				//应该反向查找
 				hitPoint.x = _x0;
 				hitPoint.y = _y0;
 				return true;
 			}
 			
-			if (hitTest(_display, _xt, _yt)) {
+			if (hitTest(_xt, _yt, _display)) {
 				//初始点未碰撞，而目标点碰撞，则采用二分法
 				//仍有穿透障碍物的可能
 				while (sideMax(_x0, _y0, _xt, _yt) > _minStep && _i++ < 50){
 					_x = (_x0 + _xt) * 0.5;
 					_y = (_y0 + _yt) * 0.5;
-					if (hitTest(_display, _x, _y)) {
+					if (hitTest(_x, _y, _display)) {
 						_isHit = true;
 						_xt = _x;
 						_yt = _y;
@@ -57,7 +57,7 @@ package akdcl.utils
 				_x = (_xt - _x0) / _dis * _minStep;
 				_y = (_yt - _y0) / _dis * _minStep;
 				while (_i++ < _dis) {
-					_isHit = hitTest(_display, _x0 + _x, _y0 + _y);
+					_isHit = hitTest(_x0 + _x, _y0 + _y, _display);
 					if (_isHit) {
 						break;
 					}
