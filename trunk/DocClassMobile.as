@@ -58,7 +58,9 @@ package {
 
 			if (onLoaded == null){
 				onLoaded = function():void {
-					if (currentFrame == 1){
+					if (currentFrame == 1) {
+						//
+						gotoAndStop(2);
 						gotoAndStop(3);
 					}
 				}
