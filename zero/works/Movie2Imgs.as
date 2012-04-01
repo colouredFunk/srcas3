@@ -58,7 +58,7 @@ package zero.works{
 			bmd.draw(this);
 			
 			//1
-			var pngData:ByteArray=PNGEncoder.encode(bmd);
+			//var pngData:ByteArray=PNGEncoder.encode(bmd);
 			
 			/*
 			//2
@@ -67,12 +67,35 @@ package zero.works{
 			var pngData:ByteArray=PNGEncoder.encode(bmd2);
 			//*/
 			
+			///*
+			//3 适用于白底的单色动画
+			var bmd2:BitmapData=new BitmapData(bmd.width,bmd.height,true,0x00000000);
+			var redArr:Array=new Array();
+			var greenArr:Array=new Array();
+			var blueArr:Array=new Array();
+			var alphaArr:Array=new Array();
+			for(var i:int=0;i<256;i++){
+				redArr[i]=0x00000000;
+				greenArr[i]=0x00000000;
+				if(i>=0xf0){
+					//有时候底不够白
+					blueArr[i]=0x00000000;
+				}else{
+					blueArr[i]=(255-i)<<24;
+				}
+				alphaArr[i]=0x00000000;
+			}
+			
+			bmd2.paletteMap(bmd,bmd.rect,new Point(),redArr,greenArr,blueArr,alphaArr);
+			var pngData:ByteArray=PNGEncoder.encode(bmd2);
+			//*/
+			
 			if(dataBySizeArr[pngData.length]){
 			}else{
 				dataBySizeArr[pngData.length]=new Array();
 			}
 			dataBySizeArr[pngData.length].push(frame);
-			zipArchive.addFileFromBytes("logo"+(10000+frame).toString().substr(1)+".png",pngData);
+			zipArchive.addFileFromBytes("喷出方块"+(10000+frame).toString().substr(1)+".png",pngData);
 		}
 	}
 }

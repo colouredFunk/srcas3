@@ -66,11 +66,11 @@ package zero{
 				return type;
 			}
 			
-			trace("无法仅通过分析 fileData 获取文件类型");
+			//无法仅通过分析 fileData 获取文件类型
 			if(fileName){
 				var dotId:int=fileName.indexOf(".")+1;
 				if(dotId>0){
-					trace("获取文件后缀作为文件类型");
+					//获取文件后缀作为文件类型
 					return fileName.substr(dotId).toLowerCase();
 				}
 			}
