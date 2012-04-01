@@ -36,6 +36,7 @@ package zero.net{
 		public var onLoadError:Function;
 		
 		private var loadId:int;
+		public var currLoadingSrc:String;
 		
 		public function MultiLoader(){
 		}
@@ -199,7 +200,8 @@ package zero.net{
 			target.addEventListener(IOErrorEvent.IO_ERROR,loadOneError);
 			target.addEventListener(SecurityErrorEvent.SECURITY_ERROR,loadOneError);
 			
-			loadObjV[loadId]["load"](new URLRequest(itemXMLV[loadId].@src.toString()));
+			currLoadingSrc=itemXMLV[loadId].@src.toString();
+			loadObjV[loadId]["load"](new URLRequest(currLoadingSrc));
 		}
 		private function loadOneProgress(event:ProgressEvent):void{
 			if(event.bytesTotal>0){
