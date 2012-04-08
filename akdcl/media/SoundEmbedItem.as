@@ -12,7 +12,7 @@ package akdcl.media {
 
 	/**
 	 * ...
-	 * @author ...
+	 * @author Akdcl
 	 */
 
 	final public class SoundEmbedItem {
