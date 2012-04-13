@@ -1,157 +1,180 @@
-package tools
-{
+package akdcl.silhouette{
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.MovieClip;
 	import flash.display.FrameLabel;
+	import flash.geom.Rectangle;
 	
 	import flash.geom.Point;
-	import flash.utils.getQualifiedClassName;
 	
-	import game.model.ModelData;
-	
-	import akdcl.utils.objectToString;
+	import akdcl.utils.localToLocal;
 	
 	/**
 	 * ...
 	 * @author Akdcl
 	 */
-	dynamic public class  ModelFix extends MovieClip
-	{
-		new ModelData();
-		
-		private static function localToLocal(_localFrom:DisplayObject, _localTo:DisplayObject, _x:*= 0, _y:Number = 0):Point {
-			var _point:Point;
-			if (_x is Point) {
-				_point = _x;
-			}else {
-				_point = new Point(_x, _y);
+	dynamic public class ModelFix extends MovieClip{
+		private static var pointTemp:Point = new Point();
+		private static function generateModelConstruct(_model:MovieClip, _xml:XML, _jointXMLDic:Object = null):Object {
+			if (!_jointXMLDic) {
+				_jointXMLDic = {};
 			}
-			return _localTo.globalToLocal(_localFrom.localToGlobal(_point));
-		}
-		
-		private static function generateModelConstruct(_model:MovieClip, _xml:XML, _partXMLDic:Object = null):Object {
-			if (!_partXMLDic) {
-				_partXMLDic = {};
-			}
-			var _parent:DisplayObject;
-			var _part:DisplayObject;
-			var _point:Point;
 			
-			for each(var _partXML:XML in _xml.children()) {
-				_part = _model.getChildByName(_partXML.name());
-				if (_partXML.@lock.length() > 0) {
-					_parent = _model.getChildByName(_partXML.@lock);
+			var _parent:DisplayObject;
+			var _joint:DisplayObject;
+			var _point:Point;
+			var _rect:Rectangle;
+			
+			for each(var _jointXML:XML in _xml.children()) {
+				_joint = _model.getChildByName(_jointXML.name());
+				if (_jointXML.@link.length() > 0) {
+					_parent = _model.getChildByName(_jointXML.@link);
 				}else {
-					_parent = _model.getChildByName(_partXML.parent().name());
+					_parent = _model.getChildByName(_jointXML.parent().name());
 				}
-				if (_part) {
+				if (_joint) {
+					_rect = _joint.getRect(_joint);
+					_jointXML.@pX = Math.round(_rect.left * 100) /100;
+					_jointXML.@pY = Math.round(_rect.top * 100) /100;
 					if (_parent) {
-						_point = localToLocal(_part, _parent);
-						_partXML.@x = Math.round(_point.x);
-						_partXML.@y = Math.round(_point.y);
+						pointTemp.x = 0;
+						pointTemp.y = 0;
+						_point = localToLocal(_joint, _parent, pointTemp);
+						_jointXML.@x = Math.round(_point.x * 100) /100;
+						_jointXML.@y = Math.round(_point.y * 100) /100;
+						if (_model.getChildIndex(_joint) < _model.getChildIndex(_parent)) {
+							_jointXML.@z = "0";
+						}
 					}else {
-						_partXML.@x = Math.round(_part.x);
-						_partXML.@y = Math.round(_part.y);
+						_jointXML.@x = Math.round(_joint.x * 100) /100;
+						_jointXML.@y = Math.round(_joint.y * 100) /100;
 					}
-					_partXML.@constructor = getQualifiedClassName(_part);
 					
-					_partXMLDic[_partXML.name()] = _partXML;
+					_jointXMLDic[_jointXML.name()] = _jointXML;
 					
-					if (_partXML.@footX.length() > 0) {
+					/*
+					if (_jointXML.@footX.length() > 0) {
 						while (_xml) {
 							if (_xml.parent().name() != _model.name) {
 								_xml = _xml.parent();
 							}else {
-								_xml.parent().@y = localToLocal(_part, _model, int(_partXML.@footX), int(_partXML.@footY)).y;
+								pointTemp.x = int(_jointXML.@footX);
+								pointTemp.y = int(_jointXML.@footY);
+								_xml.parent().@y = localToLocal(_joint, _model, pointTemp).y;
 								_xml = null;
 							}
 						}
 					}
+					*/
 				}else {
-					trace(_partXML.name(), "no part in model!!!");
+					trace(_jointXML.name(), "no part in model!!!");
 				}
-				if (_partXML.children().length() > 0) {
-					generateModelConstruct(_model, _partXML, _partXMLDic);
+				if (_jointXML.children().length() > 0) {
+					generateModelConstruct(_model, _jointXML, _jointXMLDic);
 				}
 			}
-			return _partXMLDic;
+			return _jointXMLDic;
 		}
 		
-		protected static function generateModelAnimation(_model:MovieClip, _partXMLDic:Object):XML {
-			var _animationXML:XML = <{_model.name}/>;
+		private static function generateModelAnimation(_model:MovieClip, _jointXMLDic:Object):XML {
+			var _animationXML:XML = <animation/>;
+			var _jointXML:XML;
 			var _frameXML:XML;
-			var _frameListXML:XML;
-			var _partXML:XML;
+			var _frameXMLList:XMLList;
 			
 			var _frameLabel:FrameLabel;
 			
 			var _parent:DisplayObjectContainer;
-			var _part:DisplayObject;
+			var _joint:DisplayObject;
 			var _x:Number;
 			var _y:Number;
 			var _rotation:int;
 			var _point:Point;
+			
+			var _labelFrameLength:uint;
+			
 			var _arr:Array;
 			
+			var _length:uint = _model.currentLabels.length;
 			
-			for (var _i:uint = 0; _i < _model.currentLabels.length; _i++ ) {
+			for (var _i:uint = 0; _i < _length; _i++ ) {
 				_frameLabel = _model.currentLabels[_i];
+				//忽略第一帧的帧标签
 				if (_frameLabel.frame == 1) {
 					continue;
 				}
-				if (_frameLabel.name.indexOf("_") >= 0) {
-					_arr = _frameLabel.name.split("_");
-					_frameListXML = _animationXML.elements(_arr[0])[0];
-					if (_frameListXML) {
-					}else {
-						_frameListXML = <{_arr[0]} frame={_frameLabel.frame}/>;
-						_animationXML.appendChild(_frameListXML);
-					}
-					_frameXML =<node id={_arr[1]} frame={_frameLabel.frame}/>;
-					_frameListXML.appendChild(_frameXML);
+				
+				//获取带标签的帧的长度
+				if (_i + 1 == _length) {
+					_labelFrameLength = _model.totalFrames - _frameLabel.frame + 1;
 				}else {
-					_frameXML = <{_frameLabel.name} frame={_frameLabel.frame}/>;
-					_animationXML.appendChild(_frameXML);
+					_labelFrameLength = _model.currentLabels[_i + 1].frame - _frameLabel.frame;
 				}
+				
 				_model.gotoAndStop(_frameLabel.name);
-				
-				for (var _j:uint = 0; _j < _model.numChildren; _j++ ) {
-					_part = _model.getChildAt(_j);
-					_partXML = _partXMLDic[_part.name];
-					if (!_partXML) {
-						continue;
-					}
-					_parent = (_model.getChildByName(_partXML.parent().name()) || _model) as DisplayObjectContainer;
+				for (var _k:uint = 0; _k < _labelFrameLength; _k++ ) {
 					
-					if (_partXML.@lock.length() > 0) {
-						_point = localToLocal(_part, _model.getChildByName(_partXML.@lock));
-						_x = Math.round(_point.x - int(_partXML.@x));
-						_y = Math.round(_point.y - int(_partXML.@y));
-						_rotation = _part.rotation;
-					}else if (_part.parent != _parent) {
-						_point = localToLocal(_part, _parent);
-						_x = Math.round(_point.x);
-						_y = Math.round(_point.y);
-						_rotation = _part.rotation - _parent.rotation;
-					}else {
-						_x = Math.round(_part.x);
-						_y = Math.round(_part.y);
-						_rotation = _part.rotation;
+					for (var _j:uint = 0; _j < _model.numChildren; _j++ ) {
+						_joint = _model.getChildAt(_j);
+						_jointXML = _jointXMLDic[_joint.name];
+						if (!_jointXML) {
+							//没有配置xml的元件忽略
+							continue;
+						}
+						_parent = (_model.getChildByName(_jointXML.parent().name()) || _model) as DisplayObjectContainer;
+						
+						if (_jointXML.@link.length() > 0) {
+							pointTemp.x = 0;
+							pointTemp.y = 0;
+							_point = localToLocal(_joint, _model.getChildByName(_jointXML.@link),pointTemp);
+							_x = Math.round((_point.x - int(_jointXML.@x)) * 100) /100;
+							_y = Math.round((_point.y - int(_jointXML.@y)) * 100) /100;
+							_rotation = Math.round(_joint.rotation * 100) /100;
+						}else if (_joint.parent != _parent) {
+							pointTemp.x = 0;
+							pointTemp.y = 0;
+							_point = localToLocal(_joint, _parent,pointTemp);
+							_x = Math.round(_point.x * 100) /100;
+							_y = Math.round(_point.y * 100) /100;
+							_rotation = Math.round((_joint.rotation - _parent.rotation) * 100) /100;
+						}else {
+							_x = Math.round(_joint.x * 100) /100;
+							_y = Math.round(_joint.y * 100) /100;
+							_rotation = Math.round(_joint.rotation * 100) /100;
+						}
+						
+						_jointXML = _animationXML.elements(_joint.name)[0];
+						if (!_jointXML) {
+							_jointXML = <{_joint.name}/>;
+							_animationXML.appendChild(_jointXML);
+						}
+						
+						_frameXMLList = _jointXML.elements(_frameLabel.name);
+						if (_frameXMLList.length() > 0) {
+							_frameXML = _frameXMLList[_frameXMLList.length() - 1];
+						}
+						
+						if (_frameXML && int(_frameXML.@x) == int(_x) && int(_frameXML.@y) == int(_y) && int(_frameXML.@r) == int(_rotation)) {
+							_frameXML.@f = int(_frameXML.@f) + 1;
+						}else {
+							_frameXML =<{_frameLabel.name} x={_x} y={_y} r={_rotation} f="1"/>;
+							_jointXML.appendChild(_frameXML);
+						}
 					}
-					_frameXML.appendChild(<{_part.name} x={_x} y={_y} rotation={_rotation}/>);
+					_model.nextFrame();
 				}
-				
-				//Math.max(_clip.forepawR.localToTarget(_clip, bootPoint).y, _clip.forepawL.localToTarget(_clip, bootPoint).y);
 			}
+			
+			//Math.max(_clip.forepawR.localToTarget(_clip, bootPoint).y, _clip.forepawL.localToTarget(_clip, bootPoint).y);
 			return _animationXML;
 		}
 		
 		private var xml:XML;
 		public function ModelFix() {
 			stop();
-			//xml = XML(ModelData.data.toXMLString());
-			xml = ModelData.data;
+			xml = <root/>;
+			xml.appendChild(<models/>);
+			
 			var _i:uint = 0;
 			do {
 				eachFrame();
@@ -169,10 +192,11 @@ package tools
 		}
 		
 		private function generateModelData(_model:MovieClip):void {
-			var _xml:XML = xml.models.elements(_model.name)[0];
-			var _animationXML:XML;
-			if (_xml) {
-				_animationXML = generateModelAnimation(_model, generateModelConstruct(_model, _xml));
+			var _dic:Object = generateModelConstruct(_model, _model.xml);
+			if (_dic) {
+				xml.models[_model.xml.name()][0] = _model.xml;
+				var _animationXML:XML = generateModelAnimation(_model, _dic);
+				_animationXML.setName(_model.xml.name());
 				xml.animations[_animationXML.name()][0] = _animationXML;
 			}
 			trace(xml.toXMLString());
