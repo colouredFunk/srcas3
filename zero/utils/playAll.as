@@ -17,7 +17,11 @@ package zero.utils{
 		}
 		var i:int=obj.numChildren;
 		while(--i>=0){
-			var child:DisplayObject=obj.getChildAt(i);
+			try{
+				var child:DisplayObject=obj.getChildAt(i);
+			}catch(e:Error){
+				continue;
+			}
 			if(child is DisplayObjectContainer){
 				playAll(child as DisplayObjectContainer);
 			}
