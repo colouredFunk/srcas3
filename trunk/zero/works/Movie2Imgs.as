@@ -20,16 +20,28 @@ package zero.works{
 	import zero.codec.PNGEncoder;
 	
 	public class Movie2Imgs extends MovieClip{
+		
 		private var dataBySizeArr:Array;//用于比较相同的图片
 		private var zipArchive:ZipArchive;
 		private var frame:int;
 		private var bmd:BitmapData;
+		
+		public var boundsRect:Sprite;
+		
 		public function Movie2Imgs(){
+			if(boundsRect){
+				boundsRect.visible=false;
+			}
 			this.addEventListener(Event.ENTER_FRAME,init);
 		}
 		private function init(event:Event):void{
+			
 			try{
-				bmd=new BitmapData(this.loaderInfo.width,this.loaderInfo.height,true,0x00000000);
+				bmd=new BitmapData(
+					boundsRect?boundsRect.width:this.loaderInfo.width,
+					boundsRect?boundsRect.height:this.loaderInfo.height,
+					true,0x00000000
+				);
 			}catch(e:Error){
 				return;
 			}
@@ -55,10 +67,14 @@ package zero.works{
 			}
 			this.gotoAndStop(frame);
 			bmd.fillRect(bmd.rect,0x00000000);
-			bmd.draw(this);
+			if(boundsRect){
+				bmd.draw(this,new Matrix(1,0,0,1,-boundsRect.x,-boundsRect.y));
+			}else{
+				bmd.draw(this);
+			}
 			
 			//1
-			//var pngData:ByteArray=PNGEncoder.encode(bmd);
+			var pngData:ByteArray=PNGEncoder.encode(bmd);
 			
 			/*
 			//2
@@ -67,7 +83,7 @@ package zero.works{
 			var pngData:ByteArray=PNGEncoder.encode(bmd2);
 			//*/
 			
-			///*
+			/*
 			//3 适用于白底的单色动画
 			var bmd2:BitmapData=new BitmapData(bmd.width,bmd.height,true,0x00000000);
 			var redArr:Array=new Array();
@@ -95,7 +111,7 @@ package zero.works{
 				dataBySizeArr[pngData.length]=new Array();
 			}
 			dataBySizeArr[pngData.length].push(frame);
-			zipArchive.addFileFromBytes("喷出方块"+(10000+frame).toString().substr(1)+".png",pngData);
+			zipArchive.addFileFromBytes(decodeURI(this.loaderInfo.url).split("/").pop().split(".")[0]+(10000+frame).toString().substr(1)+".png",pngData);
 		}
 	}
 }
