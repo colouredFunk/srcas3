@@ -4,7 +4,7 @@ package akdcl.utils {
 	 * ...
 	 * @author Akdcl
 	 */
-	public function localToLocal(_from:Object, _to:Object , _point:Object):Point {
+	public function localToLocal(_from:Object, _to:Object , _point:Point):Point {
 		return _to.globalToLocal(_from.localToGlobal(_point));
 	}
 }

@@ -10,8 +10,7 @@ package akdcl.silhouette
 	 * ...
 	 * @author Akdcl
 	 */
-	public class AnimationPart extends Sprite
-	{
+	public class AnimationPart extends Sprite{
 		protected var animationData:Object;
 		protected var partDic:Object;
 		

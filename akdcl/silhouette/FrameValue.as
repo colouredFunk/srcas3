@@ -21,24 +21,24 @@ package akdcl.silhouette
 			x = _x;
 			y = _y;
 			rotation = _rotation;
-			scaleX = _scaleX;
-			scaleY = _scaleY;
+			//scaleX = _scaleX;
+			//scaleY = _scaleY;
 		}
 		
 		public function betweenValue(_from:FrameValue, _to:FrameValue, _k:Number):void {
 			x = _from.x + (_to.x - _from.x) * _k;
 			y = _from.y + (_to.y - _from.y) * _k;
 			rotation = _from.rotation + (_to.rotation - _from.rotation) * _k;
-			scaleX = _from.scaleX + (_to.scaleX - _from.scaleX) * _k;
-			scaleY = _from.scaleY + (_to.scaleY - _from.scaleY) * _k;
+			//scaleX = _from.scaleX + (_to.scaleX - _from.scaleX) * _k;
+			//scaleY = _from.scaleY + (_to.scaleY - _from.scaleY) * _k;
 		}
 		
 		public function copy(_fV:FrameValue):void {
 			x = _fV.x;
 			y = _fV.y;
 			rotation = _fV.rotation;
-			scaleX = _fV.scaleX;
-			scaleY = _fV.scaleY;
+			//scaleX = _fV.scaleX;
+			//scaleY = _fV.scaleY;
 			frame = _fV.frame;
 		}
 		
