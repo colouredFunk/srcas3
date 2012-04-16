@@ -11,13 +11,13 @@ package akdcl.silhouette
 		public var x:Number;
 		public var y:Number;
 		public var rotation:Number;
-		public var scaleX:Number;
-		public var scaleY:Number;
+		//public var scaleX:Number;, _scaleX:Number = 1, _scaleY:Number = 1,_scaleX,_scaleY
+		//public var scaleY:Number;, _scaleX:Number = 1, _scaleY:Number = 1
 		public var frame:uint;
-		public function FrameValue(_x:Number = 0, _y:Number = 0, _rotation:Number = 0, _scaleX:Number = 1, _scaleY:Number = 1) {
-			setValue(_x, _y, _rotation,_scaleX,_scaleY);
+		public function FrameValue(_x:Number = 0, _y:Number = 0, _rotation:Number = 0) {
+			setValue(_x, _y, _rotation);
 		}
-		public function setValue(_x:Number, _y:Number, _rotation:Number, _scaleX:Number = 1, _scaleY:Number = 1):void {
+		public function setValue(_x:Number, _y:Number, _rotation:Number):void {
 			x = _x;
 			y = _y;
 			rotation = _rotation;

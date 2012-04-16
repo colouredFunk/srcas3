@@ -15,12 +15,12 @@ package akdcl.silhouette
 			var _frames:Array;
 			var _frameValue:FrameValue;
 			for each(var _jointXML:XML in _xml.children()) {
-				_joint = _data[_jointXML.name()] = _joint;
+				_joint = _data[_jointXML.name()] = {};
 				for each(var _frameXML:XML in _jointXML.children()) {
-					_frameXMLList = _xml.elements(_frameXML.name());
+					_frameXMLList = _jointXML.elements(_frameXML.name());
 					if (_frameXMLList.length() > 1) {
 						_frames = [];
-						for each(_frameXML in _frameXMLList.children()) {
+						for each(_frameXML in _frameXMLList) {
 							_frameValue = new FrameValue(int(_frameXML.@x), int(_frameXML.@y), int(_frameXML.@r));
 							_frames.push(_frameValue);
 						}
@@ -35,7 +35,7 @@ package akdcl.silhouette
 			return _data;
 		}
 		
-		protected function fixPart(_xml:XML, _level:uint = 0):void {
+		/*protected function fixPart(_xml:XML, _level:uint = 0):void {
 			var _xmlList:XMLList = _xml.children();
 			var _part:Object;
 			var _parent:Object;
@@ -68,7 +68,7 @@ package akdcl.silhouette
 					}
 				}
 			}
-		}
+		}*/
 		
 		protected var animationDic:Dictionary;
 		public function Silhouette() {
