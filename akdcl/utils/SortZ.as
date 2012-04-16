@@ -5,7 +5,7 @@ package akdcl.utils {
 	 * ...
 	 * @author Akdcl
 	 */
-	public class SortZ {
+	final public class SortZ {
 		public static function createList(_container:DisplayObjectContainer):Vector.<Object> {
 			var _i:int = _container.numChildren;
 			var _list:Vector.<Object> = new Vector.<Object>(_i);

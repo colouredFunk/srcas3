@@ -9,7 +9,7 @@ package akdcl.utils
 	 * ...
 	 * @author Akdcl
 	 */
-	public class HitTest
+	final public class HitTest
 	{
 		public static var hitPoint:Vector2D = new Vector2D();
 		public static var hitTest:Function = hitTestPoint;
