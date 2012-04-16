@@ -3,7 +3,7 @@
 	import flash.xml.XMLNode;
 	import flash.xml.XMLNodeType;
 
-	public class XMLToObject {
+	final public class XMLToObject {
 		public var data:Object;
 		private var doc:XMLDocument;
 
