@@ -24,6 +24,8 @@ package akdcl.silhouette{
 			var _joint:DisplayObject;
 			var _point:Point;
 			var _rect:Rectangle;
+			var _x:Number;
+			var _y:Number;
 			
 			for each(var _jointXML:XML in _xml.children()) {
 				_joint = _model.getChildByName(_jointXML.name());
@@ -40,16 +42,17 @@ package akdcl.silhouette{
 						pointTemp.x = 0;
 						pointTemp.y = 0;
 						_point = localToLocal(_joint, _parent, pointTemp);
-						_jointXML.@x = Math.round(_point.x * 100) /100;
-						_jointXML.@y = Math.round(_point.y * 100) /100;
+						_x = _point.x;
+						_y = _point.y;
 						if (_model.getChildIndex(_joint) < _model.getChildIndex(_parent)) {
 							_jointXML.@z = "0";
 						}
 					}else {
-						_jointXML.@x = Math.round(_joint.x * 100) /100;
-						_jointXML.@y = Math.round(_joint.y * 100) /100;
+						_x = _joint.x;
+						_y = _joint.y;
 					}
-					
+					_jointXML.@x = Math.round(_x * 100) /100;
+					_jointXML.@y = Math.round(_y * 100) /100;
 					_jointXMLDic[_jointXML.name()] = _jointXML;
 					
 					/*
@@ -88,7 +91,7 @@ package akdcl.silhouette{
 			var _joint:DisplayObject;
 			var _x:Number;
 			var _y:Number;
-			var _rotation:int;
+			var _r:Number;
 			var _point:Point;
 			
 			var _labelFrameLength:uint;
@@ -126,21 +129,34 @@ package akdcl.silhouette{
 						if (_jointXML.@link.length() > 0) {
 							pointTemp.x = 0;
 							pointTemp.y = 0;
-							_point = localToLocal(_joint, _model.getChildByName(_jointXML.@link),pointTemp);
-							_x = Math.round((_point.x - int(_jointXML.@x)) * 100) /100;
-							_y = Math.round((_point.y - int(_jointXML.@y)) * 100) /100;
-							_rotation = Math.round(_joint.rotation * 100) /100;
+							_point = localToLocal(_joint, _model.getChildByName(_jointXML.@link), pointTemp);
+							_x = _point.x;
+							_y = _point.y;
+							_r = _joint.rotation;
 						}else if (_joint.parent != _parent) {
 							pointTemp.x = 0;
 							pointTemp.y = 0;
-							_point = localToLocal(_joint, _parent,pointTemp);
-							_x = Math.round(_point.x * 100) /100;
-							_y = Math.round(_point.y * 100) /100;
-							_rotation = Math.round((_joint.rotation - _parent.rotation) * 100) /100;
+							_point = localToLocal(_joint, _parent, pointTemp);
+							_x = _point.x;
+							_y = _point.y;
+							_r = _joint.rotation - _parent.rotation;
 						}else {
-							_x = Math.round(_joint.x * 100) /100;
-							_y = Math.round(_joint.y * 100) /100;
-							_rotation = Math.round(_joint.rotation * 100) /100;
+							_x = _joint.x;
+							_y = _joint.y;
+							_r = _joint.rotation;
+						}
+						
+						_x = Math.round((_x - Number(_jointXML.@x)) * 100) / 100;
+						_y = Math.round((_y - Number(_jointXML.@y)) * 100) / 100;
+						_r = Math.round(_r * 100) / 100;
+						if (Math.abs(_x) < 1) {
+							_x = 0;
+						}
+						if (Math.abs(_y) < 1) {
+							_y = 0;
+						}
+						if (Math.abs(_r) < 1) {
+							_r = 0;
 						}
 						
 						_jointXML = _animationXML.elements(_joint.name)[0];
@@ -154,10 +170,10 @@ package akdcl.silhouette{
 							_frameXML = _frameXMLList[_frameXMLList.length() - 1];
 						}
 						
-						if (_frameXML && int(_frameXML.@x) == int(_x) && int(_frameXML.@y) == int(_y) && int(_frameXML.@r) == int(_rotation)) {
+						if (_frameXML && int(_frameXML.@x) == int(_x) && int(_frameXML.@y) == int(_y) && int(_frameXML.@r) == int(_r)) {
 							_frameXML.@f = int(_frameXML.@f) + 1;
 						}else {
-							_frameXML =<{_frameLabel.name} x={_x} y={_y} r={_rotation} f="1"/>;
+							_frameXML =<{_frameLabel.name} x={_x} y={_y} r={_r} f="1"/>;
 							_jointXML.appendChild(_frameXML);
 						}
 					}
