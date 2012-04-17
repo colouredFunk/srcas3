@@ -11,8 +11,7 @@ package akdcl.utils
 	 * ...
 	 * @author Akdcl
 	 */
-	public class TexturePacker
-	{
+	final public class TexturePacker{
 		private static var instance:TexturePacker;
 		public static function getInstance():TexturePacker {
 			if (instance) {
@@ -71,9 +70,9 @@ package akdcl.utils
 			_widthMax = getNearest2N(Math.max(textureDic[textureList[0]].width, _widthMax));
 			var _heightMax:uint = 2048;
 			
+			fitRectDic = { };
 			remainRectList.length = 0;
 			remainRectList.push(new Rectangle(0, 0, _widthMax, _heightMax));
-			fitRectDic = { };
 			
 			var _textureListCopy:Array = textureList.slice();
 			var _rect:Rectangle;
@@ -134,7 +133,6 @@ package akdcl.utils
 			
 			_heightMax = getNearest2N(_heightMax - getLowestRect().height);
 			
-			remainRectList.length = 0;
 			
 			if (bitmapData) {
 				bitmapData.dispose();
@@ -158,6 +156,9 @@ package akdcl.utils
 				xml.appendChild(<{_textureID} x={_rectNext.x} y={_rectNext.y} w={_rectNext.width} h={_rectNext.height}/>);
 				bitmapData.draw(_texture as IBitmapDrawable, matrix, null, null, _rectNext);
 			}
+			
+			fitRectDic = { };
+			remainRectList.length = 0;
 		}
 		
 		private function getHighestRect():Rectangle {
