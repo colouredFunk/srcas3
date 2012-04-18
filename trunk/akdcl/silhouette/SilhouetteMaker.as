@@ -52,12 +52,14 @@ package akdcl.silhouette{
 			var _y:Number;
 			var _jointXML:XML;
 			
+			//按照深度顺序检索
 			for (var _i:uint = 0; _i < _model.numChildren; _i++ ) {
 				_joint = _model.getChildAt(_i);
 				_jointXML = _xml.elements(_joint.name)[0];
 				if (_jointXML) {
-					delete _xml[_joint.name];
-					_xml.insertChildBefore(_xml.children()[0], _jointXML);
+					
+					//delete _xml[_joint.name];
+					//_xml.insertChildBefore(_xml.children()[0], _jointXML);
 					if (_jointXML.@link.length() > 0) {
 						_parent = _model.getChildByName(_jointXML.@link);
 					}else {
@@ -181,6 +183,7 @@ package akdcl.silhouette{
 						}
 						
 						if (_frameXML && int(_frameXML.@x) == int(_x) && int(_frameXML.@y) == int(_y) && int(_frameXML.@r) == int(_r)) {
+							//忽略相同的节点
 							_frameXML.@f = int(_frameXML.@f) + 1;
 						}else {
 							_frameXML =<{_frameLabel.name} x={_x} y={_y} r={_r} f="1"/>;
