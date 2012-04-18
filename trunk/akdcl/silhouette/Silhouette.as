@@ -1,14 +1,14 @@
 package akdcl.silhouette
 {
 	import flash.geom.Point;
-	import flash.utils.Dictionary;
 	
 	/**
 	 * ...
 	 * @author Akdcl
 	 */
 	public class Silhouette {
-		public static function formatAnimation(_xml:XML):Object {
+		protected static var animationData:Object = { };
+		protected static function formatAnimation(_xml:XML):Object {
 			var _data:Object = { };
 			var _joint:Object;
 			var _frameXMLList:XMLList;
@@ -32,76 +32,99 @@ package akdcl.silhouette
 					
 				}
 			}
+			animationData[_xml.@name] = _data;
 			return _data;
 		}
 		
-		/*protected function fixPart(_xml:XML, _level:uint = 0):void {
-			var _xmlList:XMLList = _xml.children();
-			var _part:Object;
+		protected var aData:Object;
+		protected var container:Object;
+		protected var aniList:Array;
+		protected var jointDic:Object;
+		
+		public function Silhouette(_container:Object) {
+			super();
+			aniList = [];
+			jointDic = { };
+			container = _container;
+		}
+		
+		public function formatSilhouette(_xml:XML):void {
+			aData = formatAnimation(_xml);
+			
+			var _joint:Object;
 			var _parent:Object;
-			for each(var _jointXML:XML in _xmlList) {
-				_Class = getDefinitionByName(_jointXML.@constructor) as Class;
-				_part = new _Class() as ModelPart;
-				_part.name = _jointXML.name();
-				partDic[_jointXML.name()] = _part;
-				_parent = partDic[_jointXML.parent().name()];
+			var _ani:Animation;
+			var _name:String;
+			var _index:int;
+			
+			for each(var _jointXML:XML in _xml.children()) {
+				_name = _jointXML.name();
+				_joint = jointDic[_name];
+				if (!_joint) {
+					continue;
+				}
+				_ani = new Animation(_name);
+				_parent = jointDic[_jointXML.@parent];
+				_ani.joint = _joint;
 				
-				//还有lock的情况
+				//根据z修改深度
 				if (_parent) {
-					_parent.addPart(_part, int(_jointXML.@x), int(_jointXML.@y), _jointXML.@d.length() > 0?int(_jointXML.@d): -1);
-				}else {
-					addChild(_part);
-					_part.x = int(_jointXML.@x);
-					_part.y = int(_jointXML.@y);
-				}
-				
-				fixPart(_jointXML, _level + 1);
-			}
-			if (_level == 0) {
-				var _lock:ModelPart;
-				for each(_jointXML in _xmlList) {
-					if (_jointXML.@lock.length() > 0) {
-						_part = partDic[_jointXML.name()];
-						_lock = partDic[_jointXML.@lock];
-						_lock.addFrom(_part);
-						_part.lockPoint = new Point(int(_jointXML.@x), int(_jointXML.@y));
+					//根据z修改深度
+					_index = _jointXML.@z.length() > 0?int(_jointXML.@z): -1;
+					if (_index < 0) {
+						_parent.addChild(_joint);
+					}else {
+						_parent.addChildAt(_joint, _index);
 					}
+				}else {
+					//根据z修改深度
+					container.addChild(_joint);
+				}
+				_ani.offset.x = _joint.x = int(_jointXML.@x);
+				_ani.offset.y = _joint.y = int(_jointXML.@y);
+				//按照link和parent排序
+				aniList.push(_ani);
+			}
+			/*
+			var _lock:ModelPart;
+			for each(_jointXML in _xmlList) {
+				if (_jointXML.@lock.length() > 0) {
+					_joint = partDic[_jointXML.name()];
+					_lock = partDic[_jointXML.@lock];
+					_lock.addFrom(_joint);
+					_joint.lockPoint = new Point(int(_jointXML.@x), int(_jointXML.@y));
 				}
 			}
-		}*/
-		
-		protected var animationDic:Dictionary;
-		public function Silhouette() {
-			animationDic = new Dictionary();
+			*/
+		}
+		public function addJoint(_joint:Object, _id:String):void {
+			jointDic[_id] = _joint;
 		}
 		
-		protected function addJoint(_parent:*, _child:*, _x:int, _y:int, _index:int = -1):void {
-			_child.x = _x;
-			_child.y = _y;
-			if (_index < 0) {
-				_parent.addChild(_child);
-			}else {
-				_parent.addChildAt(_child, _index);
-			}
-			var _a:Animation = new Animation();
-			_a.clip = _child;
-			animationDic[_child] = _a;
-		}
-		
-		protected function addLinked(_child:Object):void {
+		public function addLinked(_joint:Object):void {
 			
 		}
 		
+		public function playTo(_frameLabel:String, _toFrame:uint, _listFrame:uint = 0, _isLoop:Boolean = false ):void {
+			var _data:Object;
+			for each(var _a:Animation in aniList) {
+				_data = aData[_a.name][_frameLabel];
+				_a.playTo(_data, _toFrame, _listFrame, _isLoop);
+			}
+		}
+		
 		public function update():void {
-			for each(var _a:Animation in animationDic) {
+			for each(var _a:Animation in aniList) {
 				_a.update();
 			}
-			/*for each(var _part:ModelPart in lockFrom) {
-				pointTemp = localToTarget(_part.parent, _part.lockPoint);
-				_part.control.x = pointTemp.x;
-				_part.control.y = pointTemp.y;
-				//_part.update();
-			}*/
+			/*
+			for each(var _joint:ModelPart in lockFrom) {
+				pointTemp = localToTarget(_joint.parent, _joint.lockPoint);
+				_joint.control.x = pointTemp.x;
+				_joint.control.y = pointTemp.y;
+				//_joint.update();
+			}
+			*/
 		}
 	}
 	
