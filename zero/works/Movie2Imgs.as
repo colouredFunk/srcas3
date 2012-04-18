@@ -7,6 +7,7 @@ Movie2Imgs
 */
 
 package zero.works{
+	
 	import flash.display.*;
 	import flash.events.*;
 	import flash.geom.*;
@@ -17,7 +18,8 @@ package zero.works{
 	
 	import riaidea.utils.zip.ZipArchive;
 	
-	import zero.codec.PNGEncoder;
+	import zero.*;
+	import zero.codec.*;
 	
 	public class Movie2Imgs extends MovieClip{
 		
@@ -59,7 +61,7 @@ package zero.works{
 		private function enterFrame(event:Event):void{
 			if(++frame>this.totalFrames){
 				this.removeEventListener(Event.ENTER_FRAME,enterFrame);
-				new FileReference().save(zipArchive.output(),"pngs.zip");
+				new FileReference().save(zipArchive.output(),decodeURI(this.loaderInfo.url).split("/").pop().split(".")[0]+".zip");
 				//for each(var subArr:Array in dataBySizeArr){
 				//	trace(dataBySizeArr.indexOf(subArr),"frames="+subArr);
 				//}
@@ -74,17 +76,26 @@ package zero.works{
 			}
 			
 			//1
-			var pngData:ByteArray=PNGEncoder.encode(bmd);
+			var imgData:ByteArray=PNGEncoder.encode(bmd);
 			
 			/*
-			//2
+			//2 透明 png
 			var bmd2:BitmapData=new BitmapData(bmd.width,bmd.height,true,0xffffffff);
 			bmd2.copyChannel(bmd,bmd.rect,new Point(),BitmapDataChannel.RED,BitmapDataChannel.ALPHA);
-			var pngData:ByteArray=PNGEncoder.encode(bmd2);
+			var imgData:ByteArray=PNGEncoder.encode(bmd2);
 			//*/
 			
 			/*
-			//3 适用于白底的单色动画
+			//3 黑底 jpg
+			var bmd2:BitmapData=new BitmapData(bmd.width,bmd.height,false,0x000000);
+			bmd2.copyChannel(bmd,bmd.rect,new Point(),BitmapDataChannel.RED,BitmapDataChannel.RED);
+			bmd2.copyChannel(bmd,bmd.rect,new Point(),BitmapDataChannel.RED,BitmapDataChannel.GREEN);
+			bmd2.copyChannel(bmd,bmd.rect,new Point(),BitmapDataChannel.RED,BitmapDataChannel.BLUE);
+			var imgData:ByteArray=JPEGEncoder.encode(bmd2,20);
+			//*/
+			
+			/*
+			//4 适用于白底的单色动画
 			var bmd2:BitmapData=new BitmapData(bmd.width,bmd.height,true,0x00000000);
 			var redArr:Array=new Array();
 			var greenArr:Array=new Array();
@@ -103,15 +114,15 @@ package zero.works{
 			}
 			
 			bmd2.paletteMap(bmd,bmd.rect,new Point(),redArr,greenArr,blueArr,alphaArr);
-			var pngData:ByteArray=PNGEncoder.encode(bmd2);
+			var imgData:ByteArray=PNGEncoder.encode(bmd2);
 			//*/
 			
-			if(dataBySizeArr[pngData.length]){
+			if(dataBySizeArr[imgData.length]){
 			}else{
-				dataBySizeArr[pngData.length]=new Array();
+				dataBySizeArr[imgData.length]=new Array();
 			}
-			dataBySizeArr[pngData.length].push(frame);
-			zipArchive.addFileFromBytes(decodeURI(this.loaderInfo.url).split("/").pop().split(".")[0]+(10000+frame).toString().substr(1)+".png",pngData);
+			dataBySizeArr[imgData.length].push(frame);
+			zipArchive.addFileFromBytes(decodeURI(this.loaderInfo.url).split("/").pop().split(".")[0]+"/"+decodeURI(this.loaderInfo.url).split("/").pop().split(".")[0]+(10000+frame).toString().substr(1)+"."+FileTypes.getType(imgData),imgData);
 		}
 	}
 }
