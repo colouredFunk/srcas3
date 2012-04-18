@@ -6,9 +6,10 @@ package akdcl.silhouette
 	 * @author Akdcl
 	 */
 	final public class Animation {
-		public var clip:Object;
+		public var name:String;
+		public var joint:Object;
 		
-		public var now:FrameValue;
+		public var value:FrameValue;
 		public var offset:FrameValue;
 		
 		private var from:FrameValue;
@@ -29,8 +30,9 @@ package akdcl.silhouette
 		
 		private var complete:Boolean;
 		
-		public function Animation() {
-			now = new FrameValue();
+		public function Animation(_name:String) {
+			name = _name;
+			value = new FrameValue();
 			offset = new FrameValue();
 			from = new FrameValue();
 			to = new FrameValue();
@@ -40,7 +42,7 @@ package akdcl.silhouette
 			complete = false;
 			totalFrames = _toFrame;
 			currentFrame = 0;
-			from.copy(now);
+			from.copy(value);
 			
 			if (_to is FrameValue) {
 				list = null;
@@ -107,12 +109,12 @@ package akdcl.silhouette
 				_k = 1 - (playedFrames - _playedFrames ) / betweenFrames;
 			}
 			
-			now.betweenValue(from, to, _k);
+			value.betweenValue(from, to, _k);
 			
-			if (clip) {
-				clip.x = now.x + offset.x;
-				clip.y = now.y + offset.y;
-				clip.rotation = now.rotation + offset.rotation;
+			if (joint) {
+				joint.x = value.x + offset.x;
+				joint.y = value.y + offset.y;
+				joint.rotation = value.rotation + offset.rotation;
 			}
 			
 			if (_k == 1) {

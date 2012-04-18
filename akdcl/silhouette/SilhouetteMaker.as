@@ -3,7 +3,6 @@ package akdcl.silhouette{
 	import flash.display.DisplayObjectContainer;
 	import flash.display.MovieClip;
 	import flash.display.FrameLabel;
-	import flash.geom.Rectangle;
 	
 	import flash.geom.Point;
 	
@@ -23,8 +22,83 @@ package akdcl.silhouette{
 			return instance;
 		}
 		
-		/*private static function generateModelAnimation(_model:MovieClip, _jointXMLDic:Object):XML {
-			var _animationXML:XML = <animation/>;
+		private var pointTemp:Point;
+		public function SilhouetteMaker() {
+			if (instance) {
+				throw new Error("[ERROR]:SilhouetteMaker Singleton already constructed!");
+			}
+			instance = this;
+			init();
+		}
+		
+		private function init():void {
+			pointTemp = new Point();
+		}
+		
+		public function makeSilhouetteData(_model:MovieClip):XML {
+			_model.gotoAndStop(1);
+			var _xml:XML = <Silhouette/>;
+			_xml.@name = _model.xml.name();
+			formatModelXML(_model.xml, _xml);
+			generateConstructor(_model, _xml);
+			generateAnimation(_model, _xml);
+			return _xml;
+		}
+		
+		private function generateConstructor(_model:MovieClip, _xml:XML):void {
+			var _parent:DisplayObject;
+			var _joint:DisplayObject;
+			var _x:Number;
+			var _y:Number;
+			var _jointXML:XML;
+			
+			for (var _i:uint = 0; _i < _model.numChildren; _i++ ) {
+				_joint = _model.getChildAt(_i);
+				_jointXML = _xml.elements(_joint.name)[0];
+				if (_jointXML) {
+					delete _xml[_joint.name];
+					_xml.insertChildBefore(_xml.children()[0], _jointXML);
+					if (_jointXML.@link.length() > 0) {
+						_parent = _model.getChildByName(_jointXML.@link);
+					}else {
+						_parent = _model.getChildByName(_jointXML.@parent);
+					}
+					if (_parent) {
+						pointTemp.x = 0;
+						pointTemp.y = 0;
+						pointTemp = localToLocal(_joint, _parent, pointTemp);
+						_x = pointTemp.x;
+						_y = pointTemp.y;
+						if (_model.getChildIndex(_joint) < _model.getChildIndex(_parent)) {
+							_jointXML.@z = "0";
+						}
+						/*
+						if (_jointXML.@footX.length() > 0) {
+							while (_xml) {
+								if (_xml.parent().name() != _model.name) {
+									_xml = _xml.parent();
+								}else {
+									pointTemp.x = int(_jointXML.@footX);
+									pointTemp.y = int(_jointXML.@footY);
+									_xml.parent().@y = localToLocal(_joint, _model, pointTemp).y;
+									_xml = null;
+								}
+							}
+						}
+						*/
+					}else {
+						_x = _joint.x;
+						_y = _joint.y;
+					}
+					_jointXML.@x = Math.round(_x * 100) /100;
+					_jointXML.@y = Math.round(_y * 100) /100;
+				}else {
+					trace("model:" + _model.name, "joint:" + _joint.name, "未找到对应的配置XML节点");
+				}
+			}
+		}
+		
+		private function generateAnimation(_model:MovieClip, _trussXML:XML):void {
 			var _jointXML:XML;
 			var _frameXML:XML;
 			var _frameXMLList:XMLList;
@@ -36,7 +110,6 @@ package akdcl.silhouette{
 			var _x:Number;
 			var _y:Number;
 			var _r:Number;
-			var _point:Point;
 			
 			var _labelFrameLength:uint;
 			
@@ -63,26 +136,26 @@ package akdcl.silhouette{
 					
 					for (var _j:uint = 0; _j < _model.numChildren; _j++ ) {
 						_joint = _model.getChildAt(_j);
-						_jointXML = _jointXMLDic[_joint.name];
+						_jointXML = _trussXML.elements(_joint.name)[0];
 						if (!_jointXML) {
 							//没有配置xml的元件忽略
 							continue;
 						}
-						_parent = (_model.getChildByName(_jointXML.parent().name()) || _model) as DisplayObjectContainer;
+						_parent = (_model.getChildByName(_jointXML.@parent) || _model) as DisplayObjectContainer;
 						
 						if (_jointXML.@link.length() > 0) {
 							pointTemp.x = 0;
 							pointTemp.y = 0;
-							_point = localToLocal(_joint, _model.getChildByName(_jointXML.@link), pointTemp);
-							_x = _point.x;
-							_y = _point.y;
+							pointTemp = localToLocal(_joint, _model.getChildByName(_jointXML.@link), pointTemp);
+							_x = pointTemp.x;
+							_y = pointTemp.y;
 							_r = _joint.rotation;
 						}else if (_joint.parent != _parent) {
 							pointTemp.x = 0;
 							pointTemp.y = 0;
-							_point = localToLocal(_joint, _parent, pointTemp);
-							_x = _point.x;
-							_y = _point.y;
+							pointTemp = localToLocal(_joint, _parent, pointTemp);
+							_x = pointTemp.x;
+							_y = pointTemp.y;
 							_r = _joint.rotation - _parent.rotation;
 						}else {
 							_x = _joint.x;
@@ -102,13 +175,6 @@ package akdcl.silhouette{
 						if (Math.abs(_r) < 1) {
 							_r = 0;
 						}
-						
-						_jointXML = _animationXML.elements(_joint.name)[0];
-						if (!_jointXML) {
-							_jointXML = <{_joint.name}/>;
-							_animationXML.appendChild(_jointXML);
-						}
-						
 						_frameXMLList = _jointXML.elements(_frameLabel.name);
 						if (_frameXMLList.length() > 0) {
 							_frameXML = _frameXMLList[_frameXMLList.length() - 1];
@@ -120,42 +186,16 @@ package akdcl.silhouette{
 							_frameXML =<{_frameLabel.name} x={_x} y={_y} r={_r} f="1"/>;
 							_jointXML.appendChild(_frameXML);
 						}
+						_frameXML = null;
 					}
 					_model.nextFrame();
 				}
 			}
 			
 			//Math.max(_clip.forepawR.localToTarget(_clip, bootPoint).y, _clip.forepawL.localToTarget(_clip, bootPoint).y);
-			return _animationXML;
-		}*/
-		
-		private var pointTemp:Point;
-		private var xml:XML;
-		public function SilhouetteMaker() {
-			if (instance) {
-				throw new Error("[ERROR]:SilhouetteMaker Singleton already constructed!");
-			}
-			instance = this;
-			init();
 		}
 		
-		private function init():void {
-			pointTemp = new Point();
-			xml = <root/>;
-			xml.appendChild(<models/>);
-			
-			/*var _i:uint = 0;
-			do {
-				eachFrame();
-			}while (++_i<totalFrames);*/
-		}
-		
-		public function makeSilhouetteData(_model:MovieClip):void {
-			_model.gotoAndStop(1);
-			generateModelConstruct(_model);
-		}
-		
-		private function formatModelXML(_xml:XML, _xmlCopy:XML, _level:uint = 0):void {
+		private function formatModelXML(_xml:XML, _xmlCopy:XML = null, _level:uint = 0):XML {
 			var _jointXMLCopy:XML;
 			for each(var _jointXML:XML in _xml.children()) {
 				if (_jointXML.@link.length() > 0) {
@@ -173,85 +213,7 @@ package akdcl.silhouette{
 					formatModelXML(_jointXML, _xmlCopy, _level+1);
 				}
 			}
-		}
-		
-		private function generateModelConstruct(_model:MovieClip):Object {
-			var _xml:XML = _model.xml;
-			var _xmlData:XML = _xml.copy();
-			delete _xmlData.*;
-			formatModelXML(_xml, _xmlData);
-			
-			trace(_xmlData.toXMLString());
-			
-			var _parent:DisplayObject;
-			var _joint:DisplayObject;
-			var _point:Point;
-			var _rect:Rectangle;
-			var _x:Number;
-			var _y:Number; 
-			
-			for each(var _jointXML:XML in _xml.children()) {
-				_joint = _model.getChildByName(_jointXML.name());
-				if (_jointXML.@link.length() > 0) {
-					_parent = _model.getChildByName(_jointXML.@link);
-				}else {
-					_parent = _model.getChildByName(_jointXML.parent().name());
-				}
-				if (_joint) {
-					_rect = _joint.getRect(_joint);
-					_jointXML.@pX = Math.round(_rect.left * 100) /100;
-					_jointXML.@pY = Math.round(_rect.top * 100) /100;
-					if (_parent) {
-						pointTemp.x = 0;
-						pointTemp.y = 0;
-						_point = localToLocal(_joint, _parent, pointTemp);
-						_x = _point.x;
-						_y = _point.y;
-						if (_model.getChildIndex(_joint) < _model.getChildIndex(_parent)) {
-							_jointXML.@z = "0";
-						}
-					}else {
-						_x = _joint.x;
-						_y = _joint.y;
-					}
-					_jointXML.@x = Math.round(_x * 100) /100;
-					_jointXML.@y = Math.round(_y * 100) /100;
-					_jointXMLDic[_jointXML.name()] = _jointXML;
-					
-					
-					if (_jointXML.@footX.length() > 0) {
-						while (_xml) {
-							if (_xml.parent().name() != _model.name) {
-								_xml = _xml.parent();
-							}else {
-								pointTemp.x = int(_jointXML.@footX);
-								pointTemp.y = int(_jointXML.@footY);
-								_xml.parent().@y = localToLocal(_joint, _model, pointTemp).y;
-								_xml = null;
-							}
-						}
-					}
-				}else {
-					trace(_jointXML.name(), "no part in model!!!");
-				}
-				if (_jointXML.children().length() > 0) {
-					generateModelConstruct(_model, _jointXML, _jointXMLDic);
-				}
-			}
-			/*return _jointXMLDic;*/
-		}
-		
-		private function generateModelData(_model:MovieClip):void {
-			//var _dic:Object = 
-			generateModelConstruct(_model);
-			/*if (_dic) {
-				xml.models[_model.xml.name()][0] = _model.xml;
-				var _animationXML:XML = generateModelAnimation(_model, _dic);
-				_animationXML.setName(_model.xml.name());
-				xml.animations[_animationXML.name()][0] = _animationXML;
-			}*/
-			//trace(xml.toXMLString());
+			return _xmlCopy;
 		}
 	}
-	
 }
