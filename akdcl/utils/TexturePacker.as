@@ -52,9 +52,16 @@ package akdcl.utils
 		}
 		
 		//displayObject bitmapData
-		public function addTexture(_texture:Object, _id:String = null):void {
+		public function addTexture(_texture:Object, _prefix:String = null, _id:String = null):void {
 			if (!_id && ("name" in _texture)) {
 				_id = _texture.name;
+			}
+			if (_id) {
+				if (_prefix) {
+					_id = _prefix + "_" + _id;
+				}
+			}else {
+				return;
 			}
 			textureDic[_id] = _texture;
 			textureList.push(_id);
@@ -98,7 +105,7 @@ package akdcl.utils
 					_width = Math.ceil(_texture.width) + _interval;
 					_height = Math.ceil(_texture.height) + _interval;
 					if (_rect.width >= _width && _rect.height >= _height) {
-						if (_verticalSide?(_texture.height > _texture.width?(_rectID > 0?(_rect.height - _height >= remainRectList[_rectID-1].height):true):true):true) {
+						if (_verticalSide?(_texture.height > _texture.width*4?(_rectID > 0?(_rect.height - _height >= remainRectList[_rectID-1].height):true):true):true) {
 							_isFit = true;
 							break;
 						}
@@ -138,8 +145,9 @@ package akdcl.utils
 				bitmapData.dispose();
 			}
 			bitmapData = new BitmapData(_widthMax, _heightMax, _transparent, 0xFF00FF);
-			xml =<texture/>;
 			
+			xml =<TextureAtlas/>;
+			var _textureXML:XML;
 			_len = textureList.length;
 			for (_i = 0; _i < _len; _i++) {
 				_textureID = textureList[_i];
@@ -153,8 +161,20 @@ package akdcl.utils
 					matrix.tx = _rectNext.x;
 					matrix.ty = _rectNext.y;
 				}
-				xml.appendChild(<{_textureID} x={_rectNext.x} y={_rectNext.y} w={_rectNext.width} h={_rectNext.height}/>);
 				bitmapData.draw(_texture as IBitmapDrawable, matrix, null, null, _rectNext);
+				
+				_textureXML =<SubTexture/>;
+				_textureXML.@name = _textureID;
+				_textureXML.@x = _rectNext.x;
+				_textureXML.@y = _rectNext.y;
+				_textureXML.@width = _rectNext.width;
+				_textureXML.@height = _rectNext.height;
+				
+				_textureXML.@frameX = _rect.x;
+				_textureXML.@frameY = _rect.y;
+				//_textureXML.@frameWidth = ;
+				//_textureXML.@frameHeight = ;
+				xml.appendChild(_textureXML);
 			}
 			
 			fitRectDic = { };

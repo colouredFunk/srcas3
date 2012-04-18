@@ -51,13 +51,17 @@ package akdcl.silhouette
 		public function formatSilhouette(_xml:XML):void {
 			aData = formatAnimation(_xml);
 			
+			var _ani:Animation;
 			var _joint:Object;
 			var _parent:Object;
-			var _ani:Animation;
+			var _jointXML:XML;
 			var _name:String;
 			var _index:int;
 			
-			for each(var _jointXML:XML in _xml.children()) {
+			
+			//按照link和parent优先索引
+			
+			for (var _i:uint = 0; :XML in _xml.children()) {
 				_name = _jointXML.name();
 				_joint = jointDic[_name];
 				if (!_joint) {
@@ -82,8 +86,14 @@ package akdcl.silhouette
 				}
 				_ani.offset.x = _joint.x = int(_jointXML.@x);
 				_ani.offset.y = _joint.y = int(_jointXML.@y);
+				
+				if (_jointXML.@link.length() > 0) {
+					
+				}
 				//按照link和parent排序
 				aniList.push(_ani);
+				
+				
 			}
 			/*
 			var _lock:ModelPart;
