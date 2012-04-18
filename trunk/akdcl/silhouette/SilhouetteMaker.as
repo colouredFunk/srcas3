@@ -23,7 +23,7 @@ package akdcl.silhouette{
 			return instance;
 		}
 		
-		private static function generateModelAnimation(_model:MovieClip, _jointXMLDic:Object):XML {
+		/*private static function generateModelAnimation(_model:MovieClip, _jointXMLDic:Object):XML {
 			var _animationXML:XML = <animation/>;
 			var _jointXML:XML;
 			var _frameXML:XML;
@@ -127,7 +127,7 @@ package akdcl.silhouette{
 			
 			//Math.max(_clip.forepawR.localToTarget(_clip, bootPoint).y, _clip.forepawL.localToTarget(_clip, bootPoint).y);
 			return _animationXML;
-		}
+		}*/
 		
 		private var pointTemp:Point;
 		private var xml:XML;
@@ -144,39 +144,51 @@ package akdcl.silhouette{
 			xml = <root/>;
 			xml.appendChild(<models/>);
 			
-			var _i:uint = 0;
+			/*var _i:uint = 0;
 			do {
 				eachFrame();
-			}while (++_i<totalFrames);
+			}while (++_i<totalFrames);*/
 		}
 		
 		public function makeSilhouetteData(_model:MovieClip):void {
 			_model.gotoAndStop(1);
-			generateModelData(_model);
+			generateModelConstruct(_model);
+		}
+		
+		private function formatModelXML(_xml:XML, _xmlCopy:XML, _level:uint = 0):void {
+			var _jointXMLCopy:XML;
+			for each(var _jointXML:XML in _xml.children()) {
+				if (_jointXML.@link.length() > 0) {
+					_jointXML.@link;
+				}else {
+					_jointXML.parent().name();
+				}
+				_jointXMLCopy = _jointXML.copy();
+				delete _jointXMLCopy.*;
+				if (_level > 0) {
+					_jointXMLCopy.@parent = _jointXML.parent().name();
+				}
+				_xmlCopy.appendChild(_jointXMLCopy);
+				if (_jointXML.children().length() > 0) {
+					formatModelXML(_jointXML, _xmlCopy, _level+1);
+				}
+			}
 		}
 		
 		private function generateModelConstruct(_model:MovieClip):Object {
 			var _xml:XML = _model.xml;
-			var _xmlData:XML =<{_xml.name()}/>;
+			var _xmlData:XML = _xml.copy();
+			delete _xmlData.*;
+			formatModelXML(_xml, _xmlData);
 			
-			
-			
-			
-			
-			
-			
-			
-			
-			if (!_jointXMLDic) {
-				_jointXMLDic = {};
-			}
+			trace(_xmlData.toXMLString());
 			
 			var _parent:DisplayObject;
 			var _joint:DisplayObject;
 			var _point:Point;
 			var _rect:Rectangle;
 			var _x:Number;
-			var _y:Number;
+			var _y:Number; 
 			
 			for each(var _jointXML:XML in _xml.children()) {
 				_joint = _model.getChildByName(_jointXML.name());
@@ -206,7 +218,7 @@ package akdcl.silhouette{
 					_jointXML.@y = Math.round(_y * 100) /100;
 					_jointXMLDic[_jointXML.name()] = _jointXML;
 					
-					/*
+					
 					if (_jointXML.@footX.length() > 0) {
 						while (_xml) {
 							if (_xml.parent().name() != _model.name) {
@@ -219,7 +231,6 @@ package akdcl.silhouette{
 							}
 						}
 					}
-					*/
 				}else {
 					trace(_jointXML.name(), "no part in model!!!");
 				}
@@ -227,18 +238,19 @@ package akdcl.silhouette{
 					generateModelConstruct(_model, _jointXML, _jointXMLDic);
 				}
 			}
-			return _jointXMLDic;
+			/*return _jointXMLDic;*/
 		}
 		
 		private function generateModelData(_model:MovieClip):void {
-			var _dic:Object = generateModelConstruct(_model, _model.xml);
-			if (_dic) {
+			//var _dic:Object = 
+			generateModelConstruct(_model);
+			/*if (_dic) {
 				xml.models[_model.xml.name()][0] = _model.xml;
 				var _animationXML:XML = generateModelAnimation(_model, _dic);
 				_animationXML.setName(_model.xml.name());
 				xml.animations[_animationXML.name()][0] = _animationXML;
-			}
-			trace(xml.toXMLString());
+			}*/
+			//trace(xml.toXMLString());
 		}
 	}
 	
