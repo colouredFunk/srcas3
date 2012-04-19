@@ -13,29 +13,8 @@ package akdcl.silhouette{
 	 * @author Akdcl
 	 */
 	final public class SilhouetteMaker {
-		private static var instance:SilhouetteMaker;
-		public static function getInstance():SilhouetteMaker {
-			if (instance) {
-			} else {
-				instance = new SilhouetteMaker();
-			}
-			return instance;
-		}
-		
-		private var pointTemp:Point;
-		public function SilhouetteMaker() {
-			if (instance) {
-				throw new Error("[ERROR]:SilhouetteMaker Singleton already constructed!");
-			}
-			instance = this;
-			init();
-		}
-		
-		private function init():void {
-			pointTemp = new Point();
-		}
-		
-		public function makeSilhouetteData(_model:MovieClip):XML {
+		private static var pointTemp:Point = new Point();
+		public static function makeSilhouetteData(_model:MovieClip):XML {
 			_model.gotoAndStop(1);
 			var _xml:XML = <Silhouette/>;
 			_xml.@name = _model.xml.name();
@@ -45,26 +24,32 @@ package akdcl.silhouette{
 			return _xml;
 		}
 		
-		private function generateConstructor(_model:MovieClip, _xml:XML):void {
+		private static function generateConstructor(_model:MovieClip, _xml:XML):void {
 			var _parent:DisplayObject;
 			var _joint:DisplayObject;
 			var _x:Number;
 			var _y:Number;
 			var _jointXML:XML;
+			var _len:uint;
 			
 			//按照深度顺序检索
-			for (var _i:uint = 0; _i < _model.numChildren; _i++ ) {
+			_len = _model.numChildren;
+			for (var _i:uint = 0; _i < _len; _i++ ) {
 				_joint = _model.getChildAt(_i);
 				_jointXML = _xml.elements(_joint.name)[0];
 				if (_jointXML) {
+					//按照深度排序xml节点忽略最后一个节点
+					if (_i < _model.numChildren - 1) {
+						delete _xml[_joint.name];
+						_xml.insertChildBefore(_xml.children()[_i], _jointXML);
+					}
 					
-					//delete _xml[_joint.name];
-					//_xml.insertChildBefore(_xml.children()[0], _jointXML);
 					if (_jointXML.@link.length() > 0) {
 						_parent = _model.getChildByName(_jointXML.@link);
 					}else {
 						_parent = _model.getChildByName(_jointXML.@parent);
 					}
+					
 					if (_parent) {
 						pointTemp.x = 0;
 						pointTemp.y = 0;
@@ -98,9 +83,27 @@ package akdcl.silhouette{
 					trace("model:" + _model.name, "joint:" + _joint.name, "未找到对应的配置XML节点");
 				}
 			}
+			
+			var _parentXML:XML;
+			for (_i = 0; _i < _len; _i++ ) {
+				_joint = _model.getChildAt(_i);
+				_jointXML = _xml.elements(_joint.name)[0];
+				if (_jointXML.@link.length() > 0) {
+					_parentXML = _xml.elements(_jointXML.@link)[0];
+				}else if (_jointXML.@parent.length() > 0) {
+					_parentXML = _xml.elements(_jointXML.@parent)[0];
+				}else {
+					_parentXML = null;
+				}
+				if (_parentXML && _parentXML.childIndex() > _jointXML.childIndex()) {
+					//将关联节点提前
+					delete _xml[_parentXML.name()];
+					_xml.insertChildBefore(_jointXML, _parentXML);
+				}
+			}
 		}
 		
-		private function generateAnimation(_model:MovieClip, _trussXML:XML):void {
+		private static function generateAnimation(_model:MovieClip, _trussXML:XML):void {
 			var _jointXML:XML;
 			var _frameXML:XML;
 			var _frameXMLList:XMLList;
@@ -198,7 +201,7 @@ package akdcl.silhouette{
 			//Math.max(_clip.forepawR.localToTarget(_clip, bootPoint).y, _clip.forepawL.localToTarget(_clip, bootPoint).y);
 		}
 		
-		private function formatModelXML(_xml:XML, _xmlCopy:XML = null, _level:uint = 0):XML {
+		private static function formatModelXML(_xml:XML, _xmlCopy:XML = null, _level:uint = 0):XML {
 			var _jointXMLCopy:XML;
 			for each(var _jointXML:XML in _xml.children()) {
 				if (_jointXML.@link.length() > 0) {

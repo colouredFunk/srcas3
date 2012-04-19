@@ -1,7 +1,8 @@
-package akdcl.utils
+package akdcl.textures
 {
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
+	import flash.display.DisplayObjectContainer;
 	import flash.display.IBitmapDrawable;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
@@ -20,9 +21,6 @@ package akdcl.utils
 			}
 			return instance;
 		}
-		
-		public var bitmapData:BitmapData;
-		public var xml:XML;
 		
 		private var remainRectList:Array;
 		private var textureList:Array;
@@ -45,13 +43,11 @@ package akdcl.utils
 		}
 		
 		public function clear():void {
-			bitmapData = null;
-			xml = null;
 			textureDic = { };
 			textureList = [];
 		}
 		
-		//displayObject bitmapData
+		//DisplayObject BitmapData
 		public function addTexture(_texture:Object, _prefix:String = null, _id:String = null):void {
 			if (!_id && ("name" in _texture)) {
 				_id = _texture.name;
@@ -67,7 +63,14 @@ package akdcl.utils
 			textureList.push(_id);
 		}
 		
-		public function packTextures(_widthMax:uint, _interval:uint = 1, _verticalSide:Boolean = false, _transparent:Boolean = true):void {
+		public function addTexturesFromContainer(_container:DisplayObjectContainer, _prefix:String = null):void {
+			var _len:uint = _container.numChildren;
+			for (var _i:uint = 0; _i < _len; _i++) {
+				addTexture(_container.getChildAt(_i), _prefix);
+			}
+		}
+		
+		public function packTextures(_widthMax:uint, _interval:uint = 1, _verticalSide:Boolean = false, _transparent:Boolean = true):TextureMix {
 			if (textureList.length == 0) {
 				return;
 			}
@@ -140,13 +143,9 @@ package akdcl.utils
 			
 			_heightMax = getNearest2N(_heightMax - getLowestRect().height);
 			
+			var _bitmapData:BitmapData = new BitmapData(_widthMax, _heightMax, _transparent, 0xFF00FF);
 			
-			if (bitmapData) {
-				bitmapData.dispose();
-			}
-			bitmapData = new BitmapData(_widthMax, _heightMax, _transparent, 0xFF00FF);
-			
-			xml =<TextureAtlas/>;
+			var _xml:XML =<TextureAtlas/>;
 			var _textureXML:XML;
 			_len = textureList.length;
 			for (_i = 0; _i < _len; _i++) {
@@ -161,7 +160,7 @@ package akdcl.utils
 					matrix.tx = _rectNext.x;
 					matrix.ty = _rectNext.y;
 				}
-				bitmapData.draw(_texture as IBitmapDrawable, matrix, null, null, _rectNext);
+				_bitmapData.draw(_texture as IBitmapDrawable, matrix, null, null, _rectNext);
 				
 				_textureXML =<SubTexture/>;
 				_textureXML.@name = _textureID;
@@ -174,11 +173,13 @@ package akdcl.utils
 				_textureXML.@frameY = _rect.y;
 				//_textureXML.@frameWidth = ;
 				//_textureXML.@frameHeight = ;
-				xml.appendChild(_textureXML);
+				_xml.appendChild(_textureXML);
 			}
 			
 			fitRectDic = { };
 			remainRectList.length = 0;
+			
+			return new TextureMix(_bitmapData, _xml);
 		}
 		
 		private function getHighestRect():Rectangle {
