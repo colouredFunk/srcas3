@@ -106,6 +106,7 @@ package akdcl.silhouette
 							to.copy(list[frameID]);
 							betweenFrames = from.frame;
 							playedFrames += betweenFrames;
+							trace(betweenFrames);
 						}else {
 							
 						}

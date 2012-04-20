@@ -155,7 +155,12 @@ package akdcl.silhouette{
 						
 						if (_frameXML && int(_frameXML.@x) == int(_x) && int(_frameXML.@y) == int(_y) && int(_frameXML.@r) == int(_r)) {
 							//忽略相同的节点
-							_frameXML.@f = int(_frameXML.@f) + 1;
+							//if (_k == _labelFrameLength - 1) {
+								//忽略最后一个节点的长度
+								//_frameXML.@f = 1;
+							//}else {
+								_frameXML.@f = int(_frameXML.@f) + 1;
+							//}
 						}else {
 							_frameXML =<{_frameLabel.name} x={_x} y={_y} r={_r} f="1"/>;
 							_jointXML.appendChild(_frameXML);
