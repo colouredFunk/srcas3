@@ -6,7 +6,7 @@ package akdcl.textures
 	 * ...
 	 * @author Akdcl
 	 */
-	public class TextureMix{
+	final public class TextureMix{
 		public var bitmapData:BitmapData;
 		public var xml:XML;
 		public var texture:Object;
