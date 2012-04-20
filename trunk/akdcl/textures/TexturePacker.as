@@ -8,6 +8,8 @@ package akdcl.textures
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	
+	import akdcl.utils.getNearest2N;
+	
 	/**
 	 * ...
 	 * @author Akdcl
@@ -70,9 +72,9 @@ package akdcl.textures
 			}
 		}
 		
-		public function packTextures(_widthMax:uint, _interval:uint = 1, _verticalSide:Boolean = false, _transparent:Boolean = true):TextureMix {
+		public function packTextures(_widthMax:uint, _interval:uint = 2, _verticalSide:Boolean = false, _transparent:Boolean = true):TextureMix {
 			if (textureList.length == 0) {
-				return;
+				return null;
 			}
 			
 			textureList.sort(sortTexture);
@@ -105,17 +107,19 @@ package akdcl.textures
 				for (var _i:uint = 0; _i < _len; _i++ ) {
 					_textureID = _textureListCopy[_i];
 					_texture = textureDic[_textureID];
-					_width = Math.ceil(_texture.width) + _interval;
-					_height = Math.ceil(_texture.height) + _interval;
+					
+					_rectPrev = _texture.getRect(_texture);
+					_width = Math.ceil(_rectPrev.width) + _interval;
+					_height = Math.ceil(_rectPrev.height) + _interval;
 					if (_rect.width >= _width && _rect.height >= _height) {
-						if (_verticalSide?(_texture.height > _texture.width*4?(_rectID > 0?(_rect.height - _height >= remainRectList[_rectID-1].height):true):true):true) {
+						if (_verticalSide?(_rectPrev.height > _rectPrev.width*4?(_rectID > 0?(_rect.height - _height >= remainRectList[_rectID-1].height):true):true):true) {
 							_isFit = true;
 							break;
 						}
 					}
 				}
 				if (_isFit) {
-					fitRectDic[_textureID] = new Rectangle(_rect.x, _rect.y, _width, _height);
+					fitRectDic[_textureID] = new Rectangle(_rect.x, _rect.y, _width - _interval + 1, _height - _interval + 1);
 					_textureListCopy.splice(_i, 1);
 					remainRectList.splice(_rectID+1, 0, new Rectangle(_rect.x + _width, _rect.y, _rect.width - _width, _rect.height));
 					_rect.y += _height;

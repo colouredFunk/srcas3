@@ -7,13 +7,17 @@ package akdcl.silhouette
 	 * @author Akdcl
 	 */
 	public class Silhouette {
+		protected static var allXML:XML =<root/>;
 		protected static var animationData:Object = { };
-		protected static function formatAnimation(_xml:XML, _isRadian:Boolean = false):Object {
-			var _data:Object = animationData[_xml.@name];
+		public static function decode(_xml:XML, _isRadian:Boolean = false):void {
+			var _name:String = _xml.@name;
+			var _data:Object = animationData[_name];
 			if (_data) {
-				return _data;
+				return;
 			}
-			animationData[_xml.@name] = _data = { };
+			
+			allXML.appendChild(_xml);
+			animationData[_name] = _data = { };
 			
 			var _joint:Object;
 			var _frameXMLList:XMLList;
@@ -48,7 +52,7 @@ package akdcl.silhouette
 					
 				}
 			}
-			return _data;
+			trace(_xml);
 		}
 		
 		protected var aData:Object;
@@ -68,11 +72,12 @@ package akdcl.silhouette
 			}
 		}
 		
-		public function formatSilhouette(_xml:XML, _isRadian:Boolean = false):void {
-			if (!container) {
+		public function setup(_xmlID:String, _isRadian:Boolean = false):void {
+			aData = animationData[_xmlID];
+			var _xml:XML = allXML.children().(@name == _xmlID)[0];
+			if (!container || !_xml) {
 				return;
 			}
-			aData = formatAnimation(_xml, _isRadian);
 			
 			var _ani:Animation;
 			var _linkAni:Animation;
@@ -80,9 +85,14 @@ package akdcl.silhouette
 			var _parent:Object;
 			var _jointXML:XML;
 			var _name:String;
+			var _isContent:Boolean;
 			var _index:int;
+			
 			var _len:uint = _xml.children().length();
 			
+			var _indexT:int;
+			var _jointT:Object;
+			var _list:Array = [];
 			
 			//按照link和parent优先索引
 			for (var _i:uint = 0; _i < _len; _i++ ) {
@@ -92,38 +102,46 @@ package akdcl.silhouette
 				if (!_joint) {
 					continue;
 				}
+				
 				_ani = new Animation(_name);
 				_ani.joint = _joint;
 				_parent = jointDic[_jointXML.@parent];
+				_isContent = _jointXML.@cont.length() > 0;
 				
-				//根据z修改深度
-				if (_parent) {
-					_index = _jointXML.@z.length() > 0?int(_jointXML.@z): -1;
-					if (_index < 0) {
-						_parent.addChild(_joint);
-					}else {
-						_parent.addChildAt(_joint, _index);
-					}
-				}else {
-					//container.addChild(_joint);
-					/*_parent = jointDic[_jointXML.@link];
-					if (_parent) {
-						_index = _jointXML.@z.length() > 0?int(_jointXML.@z): -1;
-						if (_index < 0) {
-							container.addChild(_joint);
-						}else {
-							container.addChildAt(_joint, _index);
-						}
-					}*/
-				}
-				
-				_linkAni = aniDic[_jointXML.@link];
-				if (_linkAni) {
+				if (_parent && !_isContent) {
+					_linkAni = aniDic[_jointXML.@parent];
 					_linkAni.addLinked(_ani, Number(_jointXML.@x), Number(_jointXML.@y));
 				}else {
 					_ani.offset.x = _joint.x = Number(_jointXML.@x);
 					_ani.offset.y = _joint.y = Number(_jointXML.@y);
 				}
+				
+				_index = int(_jointXML.@z);
+				
+				if (_parent && _isContent) {
+					if (_index<0) {
+						_parent.addChild(_joint);
+					}else {
+						_parent.addChildAt(_joint, 0);
+					}
+				}else {
+					for (var _j:uint = _index; _j < _list.length; _j++) {
+						_jointT = _list[_j];
+						if (_jointT) {
+							break;
+						}
+					}
+					
+					if (_jointT) {
+						container.addChildAt(_joint, container.getChildIndex(_jointT)-1);
+					}else {
+						container.addChild(_joint);
+					}
+					
+					_list[_index] = _joint;
+					_jointT = null;
+				}
+				
 				//按照link和parent排序
 				aniList.push(_ani);
 				aniDic[_name] = _ani;
@@ -143,6 +161,9 @@ package akdcl.silhouette
 			var _data:Object;
 			for each(var _a:Animation in aniList) {
 				_data = aData[_a.name][_frameLabel];
+				if (!_data) {
+					continue;
+				}
 				if (_delayJoints && _delayJoints.indexOf(_a.name) >= 0) {
 					_toFrame = _delayFrame;
 				}else {

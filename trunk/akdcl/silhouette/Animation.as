@@ -64,6 +64,7 @@ package akdcl.silhouette
 				for each(var _fV:FrameValue in list) {
 					realListFrames += _fV.frame;
 				}
+				listFrames = _listFrame < realListFrames?realListFrames:_listFrame;
 				if (_loopType==0) {
 					//过渡到列表
 					loop = -3;
@@ -90,7 +91,7 @@ package akdcl.silhouette
 			if (loop >= -1) {
 				//列表处理k值
 				var _playedFrames:Number = realListFrames * _k;
-				if (playedFrames == int(_playedFrames)) {
+				if (_playedFrames >= playedFrames) {
 					from.copy(to);
 					if (loop > 0 && (loop & 1)) {
 						if (frameID-- > 0) {
