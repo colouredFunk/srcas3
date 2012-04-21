@@ -6,7 +6,7 @@ package akdcl.silhouette
 	 * ...
 	 * @author Akdcl
 	 */
-	dynamic public class Templet extends MovieClip{
+	public class Templet extends MovieClip{
 		public var xml:XML;
 		public function Templet() {
 			gotoAndStop(1);
@@ -14,6 +14,10 @@ package akdcl.silhouette
 		
 		public function getTempletName():String {
 			return xml.name();
+		}
+		
+		public function getJoint(_id:String):MovieClip {
+			return getChildByName(_id) as MovieClip;
 		}
 		
 		public function remove():void {

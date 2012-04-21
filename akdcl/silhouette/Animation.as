@@ -14,12 +14,13 @@ package akdcl.silhouette
 		
 		public var value:FrameValue;
 		public var offset:FrameValue;
+		public var parent:Animation;
 		
 		private var from:FrameValue;
 		private var to:FrameValue;
 		
-		private var list:Array;
-		private var linkPointDic:Dictionary;
+		private var list:FrameList;
+		private var children:Dictionary;
 		
 		private var currentFrame:Number;
 		private var totalFrames:uint;
@@ -34,6 +35,7 @@ package akdcl.silhouette
 		private var yoyo:Boolean;
 		
 		private var complete:Boolean;
+		private var listComplete:Boolean;
 		
 		public function Animation(_name:String) {
 			name = _name;
@@ -44,7 +46,7 @@ package akdcl.silhouette
 		}
 		
 		//_loopType==0:noLoop, _loopType<0:loop, _loopType>0:loopAndYoyo;
-		public function playTo(_to:Object, _toFrame:uint, _listFrame:uint = 0, _loopType:int = 0 ):void {
+		public function playTo(_to:Object, _toFrame:int, _listFrame:uint = 0, _loopType:int = 0 ):void {
 			complete = false;
 			totalFrames = _toFrame;
 			currentFrame = 0;
@@ -56,23 +58,20 @@ package akdcl.silhouette
 				//普通过渡
 				loop = -4;
 			}else {
-				list = _to as Array;
-				to.copy(list[0]);
-				
-				listFrames = _listFrame;
-				realListFrames = 0;
-				for each(var _fV:FrameValue in list) {
-					realListFrames += _fV.frame;
-				}
-				listFrames = _listFrame < realListFrames?realListFrames:_listFrame;
+				list = _to as FrameList;
+				to.copy(list.getValue(0));
 				if (_loopType==0) {
 					//过渡到列表
+					realListFrames = list.totalFrames - 1;
 					loop = -3;
 				}else {
 					//过渡到循环
+					realListFrames = list.totalFrames;
 					loop = -2;
 					yoyo = _loopType >= 0;
 				}
+				_listFrame *= list.scale;
+				listFrames = _listFrame < realListFrames?realListFrames:_listFrame;
 			}
 		}
 		
@@ -83,60 +82,53 @@ package akdcl.silhouette
 			currentFrame += 1;
 			
 			var _k:Number = currentFrame / totalFrames;
+			var _k2:Number;
 			
 			if (_k > 1) {
 				_k = 1;
 			}
-			
 			if (loop >= -1) {
-				//列表处理k值
-				var _playedFrames:Number = realListFrames * _k;
-				if (_playedFrames >= playedFrames) {
-					from.copy(to);
-					if (loop > 0 && (loop & 1)) {
-						if (frameID-- > 0) {
-							to.copy(list[frameID]);
-							betweenFrames = to.frame;
-							playedFrames += betweenFrames;
+				if (listComplete) {
+				}else {
+					var _playedFrames:Number = realListFrames * _k;
+					if (_playedFrames >= playedFrames) {
+						from.copy(to);
+						if (loop > 0 && (loop & 1)) {
+							if (frameID-- > 0) {
+								to.copy(list.getValue(frameID));
+								betweenFrames = to.frame;
+								playedFrames += betweenFrames;
+							}else {
+								
+							}
 						}else {
-							
-						}
-					}else {
-						if (++frameID < list.length) {
-							to.copy(list[frameID]);
-							betweenFrames = from.frame;
-							playedFrames += betweenFrames;
-							trace(betweenFrames);
-						}else {
-							
+							frameID++;
+							if (frameID>=list.length) {
+								frameID = 0;
+								loop == -1 && (listComplete = true);
+							}
+							if (!listComplete) {
+								to.copy(list.getValue(frameID));
+								betweenFrames = from.frame;
+								playedFrames += betweenFrames;
+							}
 						}
 					}
-				}
-				_k = 1 - (playedFrames - _playedFrames ) / betweenFrames;
-				if (loop >= 0 && yoyo) {
-					_k = 0.5 * (1 - Math.cos(Math.PI * _k));
-				}
-				if (_k > 1) {
-					_k = 1;
-				}
-			}
-			
-			value.betweenValue(from, to, _k);
-			
-			if (joint) {
-				joint.x = value.x + offset.x;
-				joint.y = value.y + offset.y;
-				joint.rotation = value.rotation + offset.rotation;
-				if (linkPointDic) {
-					var _point:Point;
-					for (var _ani:* in linkPointDic) {
-						_point = linkPointDic[_ani];
-						_point = localToLocal(joint, _ani.joint.parent, _point);
-						_ani.offset.x = _point.x;
-						_ani.offset.y = _point.y;
+					_k2 = 1 - (playedFrames - _playedFrames ) / betweenFrames;
+					//if (loop >= 0 && yoyo) {
+						_k2 = 0.5 * (1 - Math.cos(Math.PI * _k2));
+					//}
+					if (_k2 > 1) {
+						_k2 = 1;
 					}
+					value.betweenValue(from, to, _k2);
 				}
+			}else {
+				value.betweenValue(from, to, _k);
 			}
+			
+			updateJoint();
+			
 			if (_k == 1) {
 				//tween complete
 				if (loop == -3) {
@@ -144,16 +136,17 @@ package akdcl.silhouette
 					totalFrames = listFrames;
 					currentFrame = 0;
 					playedFrames = 0;
-					frameID = 0;
-					
 					loop = -1;
+					frameID = 0;
+					listComplete = false;
 				}else if (loop == -2) {
 					//循环开始
 					totalFrames = listFrames;
 					currentFrame = 0;
 					playedFrames = 0;
-					frameID = 0;
 					loop = 0;
+					frameID = 0;
+					listComplete = false;
 				}else if (loop >= 0) {
 					//继续循环
 					currentFrame = 0;
@@ -162,17 +155,39 @@ package akdcl.silhouette
 						loop ++;
 					}
 					frameID = (loop & 1)?list.length - 1:0;
+					to.copy(list.getValue(frameID));
+					listComplete = false;
 				}else {
 					complete = true;
 				}
 			}
 		}
 		
-		public function addLinked(_ani:Animation, _x:Number, _y:Number):void {
-			if (!linkPointDic) {
-				linkPointDic = new Dictionary();
+		private function updateJoint():void {
+			joint.x = value.x + offset.x;
+			joint.y = value.y + offset.y;
+			joint.rotation = value.rotation + offset.rotation;
+			if (children) {
+				var _point:Point;
+				for (var _child:* in children) {
+					_point = children[_child];
+					_point = localToLocal(joint, _child.joint.parent, _point);
+					_child.offset.x = _point.x;
+					_child.offset.y = _point.y;
+					//自动由于列表动画只有一个关键帧而停止更新的时候，需要父节点来驱动
+					if (_child.complete) {
+						_child.updateJoint();
+					}
+				}
 			}
-			linkPointDic[_ani] = new Point(_x, _y);
+		}
+		
+		public function addChild(_child:Animation, _x:Number, _y:Number):void {
+			if (!children) {
+				children = new Dictionary();
+			}
+			children[_child] = new Point(_x, _y);
+			_child.parent = this;
 		}
 	}
 	

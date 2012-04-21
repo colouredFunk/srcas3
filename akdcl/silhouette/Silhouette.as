@@ -19,37 +19,42 @@ package akdcl.silhouette
 			allXML.appendChild(_xml);
 			animationData[_name] = _data = { };
 			
-			var _joint:Object;
-			var _frameXMLList:XMLList;
-			var _frames:Array;
+			var _frame:Object;
+			var _jointFrameXMLList:XMLList;
+			var _frames:FrameList;
 			var _frameValue:FrameValue;
 			var _r:Number;
-			for each(var _jointXML:XML in _xml.children()) {
-				_joint = _data[_jointXML.name()] = {};
-				for each(var _frameXML:XML in _jointXML.children()) {
-					_frameXMLList = _jointXML.elements(_frameXML.name());
-					if (_frameXMLList.length() > 1) {
-						_frames = [];
-						for each(_frameXML in _frameXMLList) {
-							_r = Number(_frameXML.@r);
+			for each(var _frameXML:XML in _xml.elements("animation")) {
+				_frame = _data[_frameXML.@name] = { };
+				for each(var _jointXML:XML in _frameXML.children()) {
+					_name = _jointXML.name();
+					if (_frame[_name]) {
+						continue;
+					}
+					_jointFrameXMLList = _frameXML.elements(_name);
+					if (_jointFrameXMLList.length() > 1) {
+						_frames = _frame[_name] = new FrameList();
+						if (_jointFrameXMLList[0].@scale.length() > 0) {
+							_frames.scale = Number(_jointFrameXMLList[0].@scale);
+						}
+						for each(_jointXML in _jointFrameXMLList) {
+							_r = Number(_jointXML.@r);
 							if (_isRadian) {
 								_r = _r * Math.PI / 180;
 							}
-							_frameValue = new FrameValue(Number(_frameXML.@x), Number(_frameXML.@y), _r);
-							_frameValue.frame = int(_frameXML.@f);
-							_frames.push(_frameValue);
+							_frameValue = new FrameValue(Number(_jointXML.@x), Number(_jointXML.@y), _r);
+							_frameValue.frame = int(_jointXML.@f);
+							_frames.addValue(_frameValue);
 						}
-						_joint[_frameXML.name()] = _frames;
 					}else {
-						_r = Number(_frameXML.@r);
+						_frame[_name] = _frameValue;
+						_r = Number(_jointXML.@r);
 						if (_isRadian) {
 							_r = _r * Math.PI / 180;
 						}
-						_frameValue = new FrameValue(Number(_frameXML.@x), Number(_frameXML.@y), _r);
-						_frameValue.frame = int(_frameXML.@f);
-						_joint[_frameXML.name()] = _frameValue;
+						_frameValue = new FrameValue(Number(_jointXML.@x), Number(_jointXML.@y), _r);
+						_frameValue.frame = int(_jointXML.@f);
 					}
-					
 				}
 			}
 			trace(_xml);
@@ -88,16 +93,17 @@ package akdcl.silhouette
 			var _isContent:Boolean;
 			var _index:int;
 			
-			var _len:uint = _xml.children().length();
 			
 			var _indexT:int;
 			var _jointT:Object;
 			var _list:Array = [];
+			var _jointXMLList:XMLList = _xml.elements("bone");
+			var _len:uint = _jointXMLList.length();
 			
 			//按照link和parent优先索引
 			for (var _i:uint = 0; _i < _len; _i++ ) {
-				_jointXML = _xml.children()[_i];
-				_name = _jointXML.name();
+				_jointXML = _jointXMLList[_i];
+				_name = _jointXML.@name;
 				_joint = jointDic[_name];
 				if (!_joint) {
 					continue;
@@ -110,7 +116,7 @@ package akdcl.silhouette
 				
 				if (_parent && !_isContent) {
 					_linkAni = aniDic[_jointXML.@parent];
-					_linkAni.addLinked(_ani, Number(_jointXML.@x), Number(_jointXML.@y));
+					_linkAni.addChild(_ani, Number(_jointXML.@x), Number(_jointXML.@y));
 				}else {
 					_ani.offset.x = _joint.x = Number(_jointXML.@x);
 					_ani.offset.y = _joint.y = Number(_jointXML.@y);
@@ -148,28 +154,24 @@ package akdcl.silhouette
 			}
 		}
 		
-		public function playTo(_frameLabel:String, _toFrame:uint, _listFrame:uint = 0, _loopType:int = 0, _delayFrame:uint = 0, _delayJoints:Array=null, _halfJoints:Array=null):void {
-			var _frameFix:uint;
+		public function playTo(_frameLabel:String, _toFrame:uint, _listFrame:uint = 0, _loopType:int = 0, _delayFrame:int = 0, _delayJoints:Array=null):void {
+			var _frameFix:int;
 			if (_delayFrame >= 0) {
-				_frameFix = _toFrame + _delayFrame;
-				_delayFrame = _toFrame;
-			}else {
 				_frameFix = _toFrame;
-				_delayFrame = _toFrame - _delayFrame;
+				_delayFrame = _toFrame + _delayFrame;
+			}else {
+				_frameFix = _toFrame - _delayFrame;
+				_delayFrame = _toFrame;
 			}
 			
-			var _data:Object;
+			var _data:Object = aData[_frameLabel];
 			for each(var _a:Animation in aniList) {
-				_data = aData[_a.name][_frameLabel];
-				if (!_data) {
-					continue;
-				}
 				if (_delayJoints && _delayJoints.indexOf(_a.name) >= 0) {
 					_toFrame = _delayFrame;
 				}else {
 					_toFrame = _frameFix;
 				}
-				_a.playTo(_data, _toFrame, (_halfJoints && _halfJoints.indexOf(_a.name) >= 0)?_listFrame * 0.5:_listFrame, _loopType);
+				_a.playTo(_data[_a.name], _toFrame, _listFrame, _loopType);
 			}
 		}
 		
