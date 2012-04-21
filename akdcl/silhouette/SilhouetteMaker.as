@@ -54,6 +54,7 @@ package akdcl.silhouette{
 					_jointXML.@y = Math.round(_y * 100) / 100;
 					
 					if (_jointXML.@cont.length() > 0) {
+						_jointXMLList.(@name == _jointXML.@parent)[0].@conta = 1;
 						_dz++;
 						if (_templet.getChildIndex(_joint) < _templet.getChildIndex(_parent)) {
 							_jointXML.@z = 0;
@@ -109,7 +110,6 @@ package akdcl.silhouette{
 				_xml.appendChild(_frameXML);
 				_templet.gotoAndStop(_frameLabel.name);
 				for (var _k:uint = 0; _k < _labelFrameLength; _k++ ) {
-					
 					for (var _j:uint = 0; _j < _templet.numChildren; _j++ ) {
 						_joint = _templet.getChildAt(_j);
 						_jointXML = _jointXMLList.(@name == _joint.name)[0];
@@ -176,6 +176,9 @@ package akdcl.silhouette{
 							_joint["delay"] = 0;
 							if (!isNaN(_delay) && _delay != 0) {
 								_jointFrameXML.@delay = _delay;
+								if (_delay < 0&&Number(_frameXML.@delay)>_delay) {
+									_frameXML.@delay = _delay;
+								}
 							}
 							if (_jointXML) {
 								_frameXML.insertChildAfter(_jointXML,_jointFrameXML);

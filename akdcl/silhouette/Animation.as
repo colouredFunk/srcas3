@@ -48,11 +48,11 @@ package akdcl.silhouette
 		//_loopType==0:noLoop, _loopType<0:loop, _loopType>0:loopAndYoyo;
 		public function playTo(_to:Object, _toFrame:int, _listFrame:uint = 0, _loopType:int = 0 ):void {
 			complete = false;
-			totalFrames = _toFrame;
 			currentFrame = 0;
 			from.copy(value);
 			
 			if (_to is FrameValue) {
+				totalFrames = _toFrame;
 				list = null;
 				to.copy(_to as FrameValue);
 				//普通过渡
@@ -66,12 +66,18 @@ package akdcl.silhouette
 					loop = -3;
 				}else {
 					//过渡到循环
-					realListFrames = list.totalFrames;
 					loop = -2;
-					yoyo = _loopType >= 0;
+					if (_loopType >= 0) {
+						yoyo = true;
+						realListFrames = list.totalFrames-1;
+					}else {
+						yoyo = false;
+						realListFrames = list.totalFrames;
+					}
 				}
 				_listFrame *= list.scale;
 				listFrames = _listFrame < realListFrames?realListFrames:_listFrame;
+				totalFrames = _toFrame + listFrames * list.delay;
 			}
 		}
 		
@@ -94,13 +100,13 @@ package akdcl.silhouette
 					if (_playedFrames >= playedFrames) {
 						from.copy(to);
 						if (loop > 0 && (loop & 1)) {
-							if (frameID-- > 0) {
-								to.copy(list.getValue(frameID));
-								betweenFrames = to.frame;
-								playedFrames += betweenFrames;
-							}else {
-								
+							frameID--;
+							if (frameID<0) {
+								frameID = list.length - 1;
 							}
+							to.copy(list.getValue(frameID));
+							betweenFrames = to.frame;
+							playedFrames += betweenFrames;
 						}else {
 							frameID++;
 							if (frameID>=list.length) {
@@ -115,9 +121,9 @@ package akdcl.silhouette
 						}
 					}
 					_k2 = 1 - (playedFrames - _playedFrames ) / betweenFrames;
-					//if (loop >= 0 && yoyo) {
+					if (loop >= 0 && (yoyo || list.length == 2)) {
 						_k2 = 0.5 * (1 - Math.cos(Math.PI * _k2));
-					//}
+					}
 					if (_k2 > 1) {
 						_k2 = 1;
 					}
