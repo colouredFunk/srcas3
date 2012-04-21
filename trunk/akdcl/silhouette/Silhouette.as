@@ -37,6 +37,12 @@ package akdcl.silhouette
 						if (_jointFrameXMLList[0].@scale.length() > 0) {
 							_frames.scale = Number(_jointFrameXMLList[0].@scale);
 						}
+						if (_jointFrameXMLList[0].@delay .length() > 0) {
+							_frames.delay = Number(_jointFrameXMLList[0].@delay);
+						}
+						if (_frameXML.@delay.length() > 0) {
+							_frames.delay -= Number(_frameXML.@delay);
+						}
 						for each(_jointXML in _jointFrameXMLList) {
 							_r = Number(_jointXML.@r);
 							if (_isRadian) {
@@ -47,13 +53,13 @@ package akdcl.silhouette
 							_frames.addValue(_frameValue);
 						}
 					}else {
-						_frame[_name] = _frameValue;
 						_r = Number(_jointXML.@r);
 						if (_isRadian) {
 							_r = _r * Math.PI / 180;
 						}
 						_frameValue = new FrameValue(Number(_jointXML.@x), Number(_jointXML.@y), _r);
 						_frameValue.frame = int(_jointXML.@f);
+						_frame[_name] = _frameValue;
 					}
 				}
 			}
@@ -154,23 +160,9 @@ package akdcl.silhouette
 			}
 		}
 		
-		public function playTo(_frameLabel:String, _toFrame:uint, _listFrame:uint = 0, _loopType:int = 0, _delayFrame:int = 0, _delayJoints:Array=null):void {
-			var _frameFix:int;
-			if (_delayFrame >= 0) {
-				_frameFix = _toFrame;
-				_delayFrame = _toFrame + _delayFrame;
-			}else {
-				_frameFix = _toFrame - _delayFrame;
-				_delayFrame = _toFrame;
-			}
-			
+		public function playTo(_frameLabel:String, _toFrame:uint, _listFrame:uint = 0, _loopType:int = 0):void {
 			var _data:Object = aData[_frameLabel];
 			for each(var _a:Animation in aniList) {
-				if (_delayJoints && _delayJoints.indexOf(_a.name) >= 0) {
-					_toFrame = _delayFrame;
-				}else {
-					_toFrame = _frameFix;
-				}
 				_a.playTo(_data[_a.name], _toFrame, _listFrame, _loopType);
 			}
 		}
