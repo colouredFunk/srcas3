@@ -84,8 +84,26 @@ package akdcl.skeleton
 		
 		public function playTo(_frameLabel:String, _toFrame:uint, _listFrame:uint = 0, _loopType:int = 0):void {
 			var _data:Object = animationData[_frameLabel];
-			for each(var _a:Bone in boneList) {
-				_a.animation.playTo(_data[_a.name], _toFrame, _listFrame, _loopType);
+			var _eachD:Object;
+			for each(var _bone:Bone in boneList) {
+				_eachD = _data[_bone.name];
+				if (_eachD) {
+					_bone.animation.playTo(_eachD, _toFrame, _listFrame, _loopType);
+				}
+			}
+		}
+		
+		public function setAnimationScale(_scale:Number, _id:String = null):void {
+			var _bone:Bone;
+			if (_id) {
+				_bone = bones[_id];
+				if (_bone) {
+					_bone.animation.scale = _scale;
+				}
+			}else {
+				for each(_bone in boneList) {
+					_bone.animation.scale = _scale;
+				}
 			}
 		}
 		

@@ -44,17 +44,19 @@ package akdcl.skeleton{
 		public function update():void {
 			animation.update();
 			if (parent) {
-				pointTemp.x = lockX;
-				pointTemp.y = lockY;
+				pointTemp.x = lockX + offset.x;
+				pointTemp.y = lockY + offset.y;
 				pointTemp = joint.parent.globalToLocal(parent.joint.localToGlobal(pointTemp));
 				frame.x = pointTemp.x;
 				frame.y = pointTemp.y;
 				frame.rotation = parent.frame.rotation + parent.offset.rotation;
+				joint.x = frame.x ;
+				joint.y = frame.y ;
+			}else {
+				joint.x = frame.x + offset.x;
+				joint.y = frame.y + offset.y;
 			}
-			
 			joint.rotation = frame.rotation + offset.rotation;
-			joint.x = frame.x + offset.x;
-			joint.y = frame.y + offset.y;
 			
 			joint.scaleX = offset.scaleX;
 			joint.scaleY = offset.scaleY;
