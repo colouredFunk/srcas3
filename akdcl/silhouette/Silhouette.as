@@ -48,7 +48,7 @@ package akdcl.silhouette
 							if (_isRadian) {
 								_r = _r * Math.PI / 180;
 							}
-							_frameValue = new FrameValue(Number(_jointXML.@x), Number(_jointXML.@y), _r);
+							_frameValue = new FrameValue(Number(_jointXML.@x), Number(_jointXML.@y), _r, Number(_jointXML.@sX), Number(_jointXML.@sY));
 							_frameValue.frame = int(_jointXML.@f);
 							_frames.addValue(_frameValue);
 						}
@@ -57,7 +57,7 @@ package akdcl.silhouette
 						if (_isRadian) {
 							_r = _r * Math.PI / 180;
 						}
-						_frameValue = new FrameValue(Number(_jointXML.@x), Number(_jointXML.@y), _r);
+						_frameValue = new FrameValue(Number(_jointXML.@x), Number(_jointXML.@y), _r, Number(_jointXML.@sX), Number(_jointXML.@sY));
 						_frameValue.frame = int(_jointXML.@f);
 						_frame[_name] = _frameValue;
 					}
@@ -96,7 +96,7 @@ package akdcl.silhouette
 			var _parent:Object;
 			var _jointXML:XML;
 			var _name:String;
-			var _isContent:Boolean;
+			//var _isContent:Boolean;
 			var _index:int;
 			
 			
@@ -118,25 +118,27 @@ package akdcl.silhouette
 				_ani = new Animation(_name);
 				_ani.joint = _joint;
 				_parent = jointDic[_jointXML.@parent];
-				_isContent = _jointXML.@cont.length() > 0;
+				//_isContent = _jointXML.@cont.length() > 0;
 				
-				if (_parent && !_isContent) {
+				//if (_parent && !_isContent) {
 					_linkAni = aniDic[_jointXML.@parent];
-					_linkAni.addChild(_ani, Number(_jointXML.@x), Number(_jointXML.@y));
-				}else {
+					if (_linkAni) {
+						_linkAni.addChild(_ani, Number(_jointXML.@x), Number(_jointXML.@y));
+					}
+				/*}else {
 					_ani.offset.x = _joint.x = Number(_jointXML.@x);
 					_ani.offset.y = _joint.y = Number(_jointXML.@y);
-				}
+				}*/
 				
 				_index = int(_jointXML.@z);
 				
-				if (_parent && _isContent) {
+				/*if (_parent && _isContent) {
 					if (_index<0) {
 						_parent.addChild(_joint);
 					}else {
 						_parent.addChildAt(_joint, 0);
 					}
-				}else {
+				}else {*/
 					for (var _j:uint = _index; _j < _list.length; _j++) {
 						_jointT = _list[_j];
 						if (_jointT) {
@@ -152,7 +154,7 @@ package akdcl.silhouette
 					
 					_list[_index] = _joint;
 					_jointT = null;
-				}
+				//}
 				
 				//按照link和parent排序
 				aniList.push(_ani);

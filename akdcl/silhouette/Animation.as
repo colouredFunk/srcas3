@@ -16,6 +16,8 @@ package akdcl.silhouette
 		public var offset:FrameValue;
 		public var parent:Animation;
 		
+		public var scale:Number = 1;
+		
 		private var from:FrameValue;
 		private var to:FrameValue;
 		
@@ -40,9 +42,12 @@ package akdcl.silhouette
 		public function Animation(_name:String) {
 			name = _name;
 			value = new FrameValue();
-			offset = new FrameValue();
 			from = new FrameValue();
 			to = new FrameValue();
+			
+			offset = new FrameValue();
+			offset.scaleX = 0;
+			offset.scaleY = 0;
 		}
 		
 		//_loopType==0:noLoop, _loopType<0:loop, _loopType>0:loopAndYoyo;
@@ -85,7 +90,7 @@ package akdcl.silhouette
 			if (complete) {
 				return;
 			}
-			currentFrame += 1;
+			currentFrame += scale;
 			
 			var _k:Number = currentFrame / totalFrames;
 			var _k2:Number;
@@ -121,7 +126,7 @@ package akdcl.silhouette
 						}
 					}
 					_k2 = 1 - (playedFrames - _playedFrames ) / betweenFrames;
-					if (loop >= 0 && (yoyo || list.length == 2)) {
+					if (loop >= 0 && list.length == 2) {
 						_k2 = 0.5 * (1 - Math.cos(Math.PI * _k2));
 					}
 					if (_k2 > 1) {
@@ -170,9 +175,11 @@ package akdcl.silhouette
 		}
 		
 		private function updateJoint():void {
+			joint.rotation = value.rotation + offset.rotation;
 			joint.x = value.x + offset.x;
 			joint.y = value.y + offset.y;
-			joint.rotation = value.rotation + offset.rotation;
+			joint.scaleX = value.scaleX + offset.scaleX;
+			joint.scaleY = value.scaleY + offset.scaleY;
 			if (children) {
 				var _point:Point;
 				for (var _child:* in children) {

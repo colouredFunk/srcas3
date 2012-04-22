@@ -16,7 +16,7 @@ package akdcl.silhouette{
 		private static const ANIMATION:String = "animation";
 		private static var pointTemp:Point = new Point();
 		public static function encode(_templet:Templet):XML {
-			var _xml:XML = <Silhouette/>;
+			var _xml:XML = <silhouette/>;
 			_xml.@name = _templet.getTempletName();
 			formatTempletXML(_templet.xml, _xml);
 			generateBone(_templet, _xml);
@@ -53,7 +53,7 @@ package akdcl.silhouette{
 					_jointXML.@x = Math.round(_x * 100) /100;
 					_jointXML.@y = Math.round(_y * 100) / 100;
 					
-					if (_jointXML.@cont.length() > 0) {
+					/*if (_jointXML.@cont.length() > 0) {
 						_jointXMLList.(@name == _jointXML.@parent)[0].@conta = 1;
 						_dz++;
 						if (_templet.getChildIndex(_joint) < _templet.getChildIndex(_parent)) {
@@ -61,9 +61,9 @@ package akdcl.silhouette{
 						}else {
 							_jointXML.@z = -1;
 						}
-					}else {
+					}else {*/
 						_jointXML.@z = _templet.getChildIndex(_joint) - _dz;
-					}
+					//}
 					
 				}else {
 					trace("templet:" + _templet.getTempletName(), "joint:" + _joint.name, "未找到对应的配置XML节点");
@@ -77,9 +77,11 @@ package akdcl.silhouette{
 			
 			var _parent:DisplayObjectContainer;
 			var _joint:DisplayObject;
+			var _r:Number;
 			var _x:Number;
 			var _y:Number;
-			var _r:Number;
+			var _sX:Number;
+			var _sY:Number;
 			var _delay:Number;
 			var _scale:Number;
 			
@@ -121,38 +123,41 @@ package akdcl.silhouette{
 						_parent = (_templet.getChildByName(_jointXML.@parent)) as DisplayObjectContainer;
 						
 						if (_parent) {
-							if (_jointXML.@cont.length() > 0) {
-								pointTemp.x = 0;
-								pointTemp.y = 0;
-								pointTemp = localToLocal(_joint, _parent, pointTemp);
-								_x = pointTemp.x;
-								_y = pointTemp.y;
+							/*if (_jointXML.@cont.length() > 0) {
 								_r = _joint.rotation - _parent.rotation;
-							}else {
 								pointTemp.x = 0;
 								pointTemp.y = 0;
 								pointTemp = localToLocal(_joint, _parent, pointTemp);
 								_x = pointTemp.x;
 								_y = pointTemp.y;
+							}else {*/
 								_r = _joint.rotation;
-							}
+								pointTemp.x = 0;
+								pointTemp.y = 0;
+								pointTemp = localToLocal(_joint, _parent, pointTemp);
+								_x = pointTemp.x;
+								_y = pointTemp.y;
+							//}
 						}else {
+							_r = _joint.rotation;
 							_x = _joint.x;
 							_y = _joint.y;
-							_r = _joint.rotation;
 						}
 						
+						_r = Math.round(_r * 100) / 100;
 						_x = Math.round((_x - Number(_jointXML.@x)) * 100) / 100;
 						_y = Math.round((_y - Number(_jointXML.@y)) * 100) / 100;
-						_r = Math.round(_r * 100) / 100;
+						_sX = Math.round(_joint.scaleX * 20) / 20;
+						_sY = Math.round(_joint.scaleY * 20) / 20;
+						
+						if (Math.abs(_r) < 1) {
+							_r = 0;
+						}
 						if (Math.abs(_x) < 1) {
 							_x = 0;
 						}
 						if (Math.abs(_y) < 1) {
 							_y = 0;
-						}
-						if (Math.abs(_r) < 1) {
-							_r = 0;
 						}
 						_jointXML = null;
 						_frameXMLList = _frameXML.elements(_joint.name);
@@ -160,11 +165,11 @@ package akdcl.silhouette{
 							_jointXML = _frameXMLList[_frameXMLList.length() - 1];
 						}
 						
-						if (_jointXML && int(_jointXML.@x) == int(_x) && int(_jointXML.@y) == int(_y) && int(_jointXML.@r) == int(_r)) {
+						if (_jointXML && int(_jointXML.@x) == int(_x) && int(_jointXML.@y) == int(_y) && int(_jointXML.@r) == int(_r) && Number(_jointXML.@sX) == Number(_sX) && Number(_jointXML.@sX) == Number(_sY)) {
 							//忽略相同的节点
 							_jointXML.@f = int(_jointXML.@f) + 1;
 						}else {
-							_jointFrameXML =<{_joint.name} x={_x} y={_y} r={_r} f="1"/>;
+							_jointFrameXML =<{_joint.name} x={_x} y={_y} r={_r} sX={_sX} sY={_sY} f="1"/>;
 							//
 							_scale = Number(_joint["scale"]);
 							_joint["scale"] = 0;
