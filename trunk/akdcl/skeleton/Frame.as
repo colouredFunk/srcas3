@@ -1,4 +1,4 @@
-package akdcl.silhouette
+package akdcl.skeleton
 {
 	//import flash.geom.Point;
 	
@@ -7,14 +7,16 @@ package akdcl.silhouette
 	 * @author Akdcl
 	 */
 	// extends Point
-	final public class FrameValue{
+	final public class Frame{
 		public var rotation:Number;
 		public var x:Number;
 		public var y:Number;
+		
 		public var scaleX:Number;
 		public var scaleY:Number;
+		
 		public var frame:uint;
-		public function FrameValue(_x:Number = 0, _y:Number = 0, _rotation:Number = 0, _scaleX:Number = 1, _scaleY:Number = 1) {
+		public function Frame(_x:Number = 0, _y:Number = 0, _rotation:Number = 0, _scaleX:Number = 1, _scaleY:Number = 1) {
 			setValue(_x, _y, _rotation, _scaleX, _scaleY);
 		}
 		public function setValue(_x:Number, _y:Number, _rotation:Number, _scaleX:Number = 1, _scaleY:Number = 1):void {
@@ -25,7 +27,7 @@ package akdcl.silhouette
 			scaleY = _scaleY;
 		}
 		
-		public function betweenValue(_from:FrameValue, _to:FrameValue, _k:Number):void {
+		public function betweenValue(_from:Frame, _to:Frame, _k:Number):void {
 			rotation = _from.rotation + (_to.rotation - _from.rotation) * _k;
 			//
 			x = _from.x + (_to.x - _from.x) * _k;
@@ -35,7 +37,7 @@ package akdcl.silhouette
 			scaleY = _from.scaleY + (_to.scaleY - _from.scaleY) * _k;
 		}
 		
-		public function copy(_fV:FrameValue):void {
+		public function copy(_fV:Frame):void {
 			rotation = _fV.rotation;
 			//
 			x = _fV.x;
