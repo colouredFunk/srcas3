@@ -74,6 +74,10 @@ package akdcl.skeleton{
 			currentFrame += scale;
 			
 			var _kAll:Number = currentFrame / totalFrames;
+			
+			//_kAll = Math.sin(_kAll * Math.PI * 0.5);
+			//_kAll = 1 - Math.cos(_kAll * Math.PI * 0.5);
+			//_kAll = 0.5 * (1 - Math.cos(Math.PI * _kAll));
 			var _kList:Number;
 			
 			if (_kAll > 1) {
