@@ -10,8 +10,7 @@ package akdcl.skeleton
 		public var xml:XML;
 		private var values:Object;
 		public function Contour() {
-			values = { };
-			gotoAndStop(1);
+			reset();
 		}
 		
 		public function getName():String {
@@ -31,6 +30,11 @@ package akdcl.skeleton
 				return _value[_key];
 			}
 			return false;
+		}
+		
+		public function reset():void {
+			values = { };
+			gotoAndStop(1);
 		}
 		
 		public function remove():void {

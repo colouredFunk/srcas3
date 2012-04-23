@@ -29,10 +29,10 @@ package akdcl.textures
 			_img.pivotY = -int(_textXML.@frameY);
 			_img.name = _textureMix.getNodeName(_textXML);
 			
-			var _sprite:Sprite = new Sprite();
-			_sprite.name = _img.name;
-			_sprite.addChild(_img);
-			return _sprite;
+			//var _sprite:Sprite = new Sprite();
+			//_sprite.name = _img.name;
+			//_sprite.addChild(_img);
+			return _img;
 		}
 	}
 	
