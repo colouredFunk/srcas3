@@ -6,11 +6,11 @@ package akdcl.skeleton{
 	 */
 	final public class Animation {
 		private static const HALF_PI:Number = Math.PI * 0.5;
+		public var callBack:Function;
 		public var scale:Number;
 		public var frame:Frame;
 		public var name:String;
-		
-		public var callBack:Function;
+		private var boneName:String;
 		
 		private var from:Frame;
 		private var to:Frame;
@@ -29,8 +29,9 @@ package akdcl.skeleton{
 		
 		private var complete:Boolean;
 		
-		public function Animation() {
+		public function Animation(_boneName:String) {
 			scale = 1;
+			boneName = _boneName;
 			complete = true;
 			from = new Frame();
 			to = new Frame();
@@ -116,6 +117,9 @@ package akdcl.skeleton{
 						}while (_playedFrames >= playedFrames);
 					}
 					to.copy(list.getValue(frameID));
+					if (callBack!=null) {
+						callBack(name, boneName, 2, frameID);
+					}
 				}
 				_kList = 1 - (playedFrames - _playedFrames ) / betweenFrames;
 				if (loop >= 0 && list.length == 2) {
@@ -140,6 +144,9 @@ package akdcl.skeleton{
 					playedFrames = 0;
 					loop = -1;
 					frameID = 0;
+					if (callBack!=null) {
+						callBack(name, boneName, 1);
+					}
 				}else if (loop == -2) {
 					//循环开始
 					totalFrames = listFrames;
@@ -147,6 +154,9 @@ package akdcl.skeleton{
 					playedFrames = 0;
 					loop = 0;
 					frameID = 0;
+					if (callBack!=null) {
+						callBack(name, boneName, 1);
+					}
 				}else if (loop >= 0) {
 					//继续循环
 					currentFrame = 0;
@@ -156,10 +166,13 @@ package akdcl.skeleton{
 					}
 					frameID = (loop & 1)?list.length - 1:0;
 					to.copy(list.getValue(frameID));
+					if (callBack!=null) {
+						callBack(name, boneName, 0);
+					}
 				}else {
 					complete = true;
 					if (callBack!=null) {
-						callBack(name);
+						callBack(name, boneName, 0);
 					}
 				}
 			}
