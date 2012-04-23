@@ -90,7 +90,7 @@ package akdcl.textures
 			if (textureList.length == 0) {
 				return null;
 			}
-			
+			//贴图按照大小排序
 			textureList.sort(sortTexture);
 			
 			_widthMax = getNearest2N(Math.max(textureDic[textureList[0]].width, _widthMax));
@@ -110,7 +110,9 @@ package akdcl.textures
 			var _len:uint;
 			var _width:uint;
 			var _height:uint;
+			var _strArr:Array;
 			var _movieClipFrame:uint;
+			var _movieClipID:String;
 			
 			var _rect:Rectangle;
 			var _rectPrev:Rectangle;
@@ -129,14 +131,16 @@ package akdcl.textures
 					
 					if (_textureID.indexOf(MOVIE_CLIP_FLAG) == 0) {
 						//如果贴图是动画，则需要跳到标签序列，进行大小比较
-						_movieClipFrame = int(_textureID.split("_").pop());
+						_strArr = _textureID.split("_");
+						_movieClipFrame = int(_strArr.pop());
+						_movieClipID = _strArr[0];
 						_texture.gotoAndStop(_movieClipFrame + 1);
 						_rectPrev = _texture.getRect(_texture);
-						//_rectNext = movieClipMaxRectDic[_textureID.split("_")[]];
+						_rectNext = movieClipMaxRectDic[_movieClipID];
 						if (_rectNext) {
-							movieClipMaxRectDic[_textureID] = _rectNext.union(_rectPrev);
+							movieClipMaxRectDic[_movieClipID] = _rectNext.union(_rectPrev);
 						}else {
-							movieClipMaxRectDic[_textureID] = _rectPrev;
+							movieClipMaxRectDic[_movieClipID] = _rectPrev;
 						}
 					}else {
 						_rectPrev = _texture.getRect(_texture);
@@ -227,7 +231,10 @@ package akdcl.textures
 				
 				if (_textureID.indexOf(MOVIE_CLIP_FLAG) == 0) {
 					//需要统计整个动画的最大高宽，用于starling创建动画的高宽
-					_rect = movieClipMaxRectDic[_textureID];
+					_strArr = _textureID.split("_");
+					_movieClipID = _strArr[0];
+					
+					_rect = movieClipMaxRectDic[_movieClipID];
 					_textureXML.@frameX = _rect.x;
 					_textureXML.@frameY = _rect.y;
 					_textureXML.@frameWidth = _rect.width;
@@ -244,8 +251,6 @@ package akdcl.textures
 			
 			fitRectDic = { };
 			remainRectList.length = 0;
-			
-			trace(_xml);
 			
 			return new TextureMix(_bitmapData, _xml);
 		}

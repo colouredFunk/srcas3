@@ -8,6 +8,8 @@ package akdcl.skeleton
 	 */
 	public class Armature {
 		public var container:Object;
+		public var animationCallBack:Function;
+		
 		protected var animationData:Object;
 		protected var joints:Object;
 		protected var bones:Object;
@@ -82,13 +84,19 @@ package akdcl.skeleton
 			}
 		}
 		
-		public function playTo(_frameLabel:String, _toFrame:uint, _listFrame:uint = 0, _loopType:int = 0):void {
+		public function playTo(_frameLabel:String, _toFrame:uint, _listFrame:uint = 0, _loopType:int = 0, _ease:int = 0):void {
 			var _data:Object = animationData[_frameLabel];
 			var _eachD:Object;
+			var _maxLength:uint=0;
+			var _boneID:String;
 			for each(var _bone:Bone in boneList) {
 				_eachD = _data[_bone.name];
 				if (_eachD) {
-					_bone.animation.playTo(_eachD, _toFrame, _listFrame, _loopType);
+					if (_eachD is FrameList) {
+						
+					}
+					_bone.animation.name = _frameLabel;
+					_bone.animation.playTo(_eachD, _toFrame, _listFrame, _loopType, _ease);
 				}
 			}
 		}

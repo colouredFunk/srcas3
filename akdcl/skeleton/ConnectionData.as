@@ -67,7 +67,6 @@ package akdcl.skeleton
 					}
 				}
 			}
-			trace(armatureXML);
 		}
 		
 		public static function getAnimation(_id:String):Object {
