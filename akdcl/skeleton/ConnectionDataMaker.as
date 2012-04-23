@@ -56,9 +56,9 @@ package akdcl.skeleton{
 				if (_boneXML) {
 					_parent = _contour.getChildByName(_boneXML.@parent);
 					if (_parent) {
-						pointTemp.x = 0;
-						pointTemp.y = 0;
-						pointTemp = localToLocal(_joint, _parent, pointTemp);
+						pointTemp.x = _joint.x;
+						pointTemp.y = _joint.y;
+						pointTemp = localToLocal(_contour, _parent, pointTemp);
 						_x = pointTemp.x;
 						_y = pointTemp.y;
 					}else {
@@ -127,9 +127,9 @@ package akdcl.skeleton{
 						
 						if (_parent) {
 							_r = _joint.rotation - _parent.rotation;
-							pointTemp.x = 0;
-							pointTemp.y = 0;
-							pointTemp = localToLocal(_joint, _parent, pointTemp);
+							pointTemp.x = _joint.x;
+							pointTemp.y = _joint.y;
+							pointTemp = localToLocal(_contour, _parent, pointTemp);
 							_x = pointTemp.x - Number(_boneXML.@x);
 							_y = pointTemp.y - Number(_boneXML.@y);
 						}else {
