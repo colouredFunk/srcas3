@@ -46,9 +46,15 @@ package akdcl.skeleton{
 			if (parent) {
 				pointTemp.x = lockX + offset.x;
 				pointTemp.y = lockY + offset.y;
-				pointTemp = joint.parent.globalToLocal(parent.joint.localToGlobal(pointTemp));
-				frame.x = pointTemp.x+parent.joint.pivotX;
-				frame.y = pointTemp.y+parent.joint.pivotY;
+				if ("transformationMatrix" in parent.joint) {
+					pointTemp = parent.joint.transformationMatrix.transformPoint(pointTemp);
+					frame.x = pointTemp.x + parent.joint.pivotX;
+					frame.y = pointTemp.y + parent.joint.pivotY;
+				}else {
+					pointTemp = parent.joint.transform.matrix.transformPoint(pointTemp);
+					frame.x = pointTemp.x;
+					frame.y = pointTemp.y;
+				}
 				frame.rotation = parent.frame.rotation + parent.offset.rotation;
 				joint.x = frame.x ;
 				joint.y = frame.y ;

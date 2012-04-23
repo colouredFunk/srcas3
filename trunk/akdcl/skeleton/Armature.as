@@ -7,8 +7,8 @@ package akdcl.skeleton
 	 * @author Akdcl
 	 */
 	public class Armature {
+		public var container:Object;
 		protected var animationData:Object;
-		protected var container:Object;
 		protected var joints:Object;
 		protected var bones:Object;
 		protected var boneList:Vector.<Bone>;
