@@ -44,17 +44,17 @@ package akdcl.skeleton{
 		public function update():void {
 			animation.update();
 			if (parent) {
-				pointTemp.x = lockX + offset.x;
-				pointTemp.y = lockY + offset.y;
 				if ("transformationMatrix" in parent.joint) {
+					pointTemp.x = lockX + offset.x + parent.joint.pivotX;
+					pointTemp.y = lockY + offset.y + parent.joint.pivotY;
 					pointTemp = parent.joint.transformationMatrix.transformPoint(pointTemp);
-					frame.x = pointTemp.x + parent.joint.pivotX;
-					frame.y = pointTemp.y + parent.joint.pivotY;
 				}else {
+					pointTemp.x = lockX + offset.x;
+					pointTemp.y = lockY + offset.y;
 					pointTemp = parent.joint.transform.matrix.transformPoint(pointTemp);
-					frame.x = pointTemp.x;
-					frame.y = pointTemp.y;
 				}
+				frame.x = pointTemp.x;
+				frame.y = pointTemp.y;
 				frame.rotation = parent.frame.rotation + parent.offset.rotation;
 				joint.x = frame.x ;
 				joint.y = frame.y ;
@@ -66,6 +66,7 @@ package akdcl.skeleton{
 			
 			joint.scaleX = offset.scaleX;
 			joint.scaleY = offset.scaleY;
+			
 		}
 	}
 	

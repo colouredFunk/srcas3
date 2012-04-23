@@ -5,8 +5,12 @@ package akdcl.skeleton{
 	 * @author Akdcl
 	 */
 	final public class Animation {
+		private static const HALF_PI:Number = Math.PI * 0.5;
 		public var scale:Number;
 		public var frame:Frame;
+		public var name:String;
+		
+		public var callBack:Function;
 		
 		private var from:Frame;
 		private var to:Frame;
@@ -17,6 +21,7 @@ package akdcl.skeleton{
 		private var yoyo:Boolean;
 		
 		private var loop:int;
+		private var ease:int;
 		private var frameID:int;
 		private var betweenFrames:uint;
 		private var playedFrames:uint;
@@ -31,8 +36,9 @@ package akdcl.skeleton{
 			to = new Frame();
 		}
 		
-		//_loopType==0:noLoop, _loopType>0:loop, _loopType<0:loopAndYoyo;
-		public function playTo(_to:Object, _toFrame:int, _listFrame:uint = 0, _loopType:int = 0 ):void {
+		//_loopType==0:不循环, _loopType>0:循环, _loopType<0:循环并自动反转;
+		//_ease==0:线性, _ease>0:淡入, _ease<0:淡出;
+		public function playTo(_to:Object, _toFrame:uint, _listFrame:uint = 0, _loopType:int = 0, _ease:int = 0):void {
 			complete = false;
 			currentFrame = 0;
 			from.copy(frame);
@@ -62,8 +68,12 @@ package akdcl.skeleton{
 					}
 				}
 				listFrames = _listFrame * list.scale;
-				//listFrames = listFrames < realListFrames?realListFrames:listFrames;
 				totalFrames = _toFrame + listFrames * list.delay;
+			}
+			if (_ease==0) {
+				ease = 0;
+			}else {
+				ease = _ease > 0?1: -1;
 			}
 		}
 		
@@ -74,39 +84,42 @@ package akdcl.skeleton{
 			currentFrame += scale;
 			
 			var _kAll:Number = currentFrame / totalFrames;
-			
-			//_kAll = Math.sin(_kAll * Math.PI * 0.5);
-			//_kAll = 1 - Math.cos(_kAll * Math.PI * 0.5);
-			//_kAll = 0.5 * (1 - Math.cos(Math.PI * _kAll));
+			if (ease != 0) {
+				_kAll = ease > 0?Math.sin(_kAll * HALF_PI):(1 - Math.cos(_kAll * HALF_PI));
+			}
 			var _kList:Number;
 			
 			if (_kAll > 1) {
 				_kAll = 1;
 			}
 			if (loop >= -1) {
+				//多关键帧动画过程
 				var _playedFrames:Number = realListFrames * _kAll;
 				if (_playedFrames >= playedFrames) {
+					//到达新的关键点
 					from.copy(to);
 					if (loop > 0 && (loop & 1)) {
-						frameID--;
-						if (frameID<0) {
-							frameID = list.length - 1;
-						}
-						to.copy(list.getValue(frameID));
-						betweenFrames = to.frame;
-						playedFrames += betweenFrames;
+						do {
+							if (--frameID<0) {
+								frameID = list.length - 1;
+							}
+							betweenFrames = list.getValue(frameID).frame;
+							playedFrames += betweenFrames;
+						}while (_playedFrames >= playedFrames);
 					}else {
-						frameID++;
-						if (frameID>=list.length) {
-							frameID = 0;
-						}
-						to.copy(list.getValue(frameID));
-						betweenFrames = from.frame;
-						playedFrames += betweenFrames;
+						do {
+							if (++frameID>=list.length) {
+								frameID = 0;
+							}
+							betweenFrames = list.getValue(frameID).frame;
+							playedFrames += betweenFrames;
+						}while (_playedFrames >= playedFrames);
 					}
+					to.copy(list.getValue(frameID));
 				}
 				_kList = 1 - (playedFrames - _playedFrames ) / betweenFrames;
 				if (loop >= 0 && list.length == 2) {
+					//只有两个关键帧的动画在循环的时候需要平滑
 					_kList = 0.5 * (1 - Math.cos(Math.PI * _kList));
 				}
 				if (_kList > 1) {
@@ -114,6 +127,7 @@ package akdcl.skeleton{
 				}
 				frame.betweenValue(from, to, _kList);
 			}else {
+				//只有单独帧的动画过程
 				frame.betweenValue(from, to, _kAll);
 			}
 			
@@ -144,6 +158,9 @@ package akdcl.skeleton{
 					to.copy(list.getValue(frameID));
 				}else {
 					complete = true;
+					if (callBack!=null) {
+						callBack(name);
+					}
 				}
 			}
 		}
