@@ -30,7 +30,7 @@ package akdcl.skeleton{
 			offset = new Frame();
 			//children = new Vector.<Bone>();
 			
-			animation = new Animation();
+			animation = new Animation(_name);
 			animation.frame = offset;
 		}
 		
