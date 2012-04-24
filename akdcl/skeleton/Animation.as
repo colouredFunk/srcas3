@@ -1,17 +1,33 @@
 package akdcl.skeleton{
 	
 	/**
-	 * ...
+	 * 骨骼动画，处理关键帧数据后，输出到骨骼
 	 * @author Akdcl
 	 */
 	final public class Animation {
 		private static const HALF_PI:Number = Math.PI * 0.5;
-		public var callBack:Function;
-		public var scale:Number;
-		public var frame:Frame;
-		public var name:String;
-		private var boneName:String;
 		
+		/**
+		 * 动画的缩放值默认为1
+		 */
+		public var scale:Number;
+		
+		/**
+		 * @private
+		 */
+		public var frame:Frame;
+		
+		/**
+		 * @private
+		 */
+		public var name:String;
+		
+		/**
+		 * @private
+		 */
+		public var callBack:Function;
+		
+		private var boneName:String;
 		private var from:Frame;
 		private var to:Frame;
 		private var list:FrameList;
@@ -29,6 +45,10 @@ package akdcl.skeleton{
 		
 		private var complete:Boolean;
 		
+		/**
+		 * 构造函数
+		 * @param _boneName 属于的骨骼ID
+		 */
 		public function Animation(_boneName:String) {
 			scale = 1;
 			boneName = _boneName;
@@ -37,8 +57,14 @@ package akdcl.skeleton{
 			to = new Frame();
 		}
 		
-		//_loopType==0:不循环, _loopType>0:循环, _loopType<0:循环并自动反转;
-		//_ease==0:线性, _ease>0:淡入, _ease<0:淡出;
+		/**
+		 * 控制动画播放
+		 * @param _to 关键点Frame或FrameList
+		 * @param _toFrame 过渡到该动画使用的帧数
+		 * @param _listFrame 如果该动画是列表动画，则此值为列表动画所用的帧数
+		 * @param _loopType 动画播放方式，0：不循环，1：循环，-1：循环并自动反转
+		 * @param _ease 缓动方式，0：线性，1：淡入，-1：淡出
+		 */
 		public function playTo(_to:Object, _toFrame:uint, _listFrame:uint = 0, _loopType:int = 0, _ease:int = 0):void {
 			complete = false;
 			currentFrame = 0;
@@ -78,6 +104,9 @@ package akdcl.skeleton{
 			}
 		}
 		
+		/**
+		 * 更新步进
+		 */
 		public function update():void {
 			if (complete) {
 				return;
@@ -104,7 +133,7 @@ package akdcl.skeleton{
 							if (--frameID<0) {
 								frameID = list.length - 1;
 							}
-							betweenFrames = list.getValue(frameID).frame;
+							betweenFrames = list.getValue(frameID).totalFrames;
 							playedFrames += betweenFrames;
 						}while (_playedFrames >= playedFrames);
 					}else {
@@ -112,7 +141,7 @@ package akdcl.skeleton{
 							if (++frameID>=list.length) {
 								frameID = 0;
 							}
-							betweenFrames = list.getValue(frameID).frame;
+							betweenFrames = list.getValue(frameID).totalFrames;
 							playedFrames += betweenFrames;
 						}while (_playedFrames >= playedFrames);
 					}
@@ -136,7 +165,6 @@ package akdcl.skeleton{
 			}
 			
 			if (_kAll == 1) {
-				//tween complete
 				if (loop == -3) {
 					//列表过渡
 					totalFrames = listFrames;
@@ -170,6 +198,7 @@ package akdcl.skeleton{
 						callBack(name, boneName, 0);
 					}
 				}else {
+					//complete
 					complete = true;
 					if (callBack!=null) {
 						callBack(name, boneName, 0);
