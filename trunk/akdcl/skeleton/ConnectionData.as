@@ -43,52 +43,52 @@ package akdcl.skeleton
 			animationData[_name] = _data = { };
 			
 			var _frames:Object;
-			var _frameList:FrameList;
-			var _frame:Frame;
+			var _nodeList:NodeList;
+			var _node:Node;
 			var _frameXMLList:XMLList;
 			var _r:Number;
 			var _animationXMLList:XMLList = _xml.elements(ANIMATION);
 			for each(var _frameXML:XML in _animationXMLList) {
 				_frames = _data[_frameXML.@name] = { };
-				for each(var _boneXML:XML in _frameXML.children()) {
-					_name = _boneXML.name();
+				for each(var _nodeXML:XML in _frameXML.children()) {
+					_name = _nodeXML.name();
 					if (_frames[_name]) {
 						continue;
 					}
 					_frameXMLList = _frameXML.elements(_name);
 					if (_frameXMLList.length() > 1) {
-						_frameList = _frames[_name] = new FrameList();
+						_nodeList = _frames[_name] = new NodeList();
 						if (_frameXMLList[0].@scale.length() > 0) {
-							_frameList.scale = Number(_frameXMLList[0].@scale);
+							_nodeList.scale = Number(_frameXMLList[0].@scale);
 						}
 						if (_frameXMLList[0].@delay .length() > 0) {
-							_frameList.delay = Number(_frameXMLList[0].@delay);
+							_nodeList.delay = Number(_frameXMLList[0].@delay);
 						}
 						if (_frameXML.@delay.length() > 0) {
-							_frameList.delay -= Number(_frameXML.@delay);
+							_nodeList.delay -= Number(_frameXML.@delay);
 						}
-						for each(_boneXML in _frameXMLList) {
-							_r = Number(_boneXML.@r);
+						for each(_nodeXML in _frameXMLList) {
+							_r = Number(_nodeXML.@r);
 							if (_isRadian) {
 								_r = _r * Math.PI / 180;
 							}
-							_frame = new Frame(Number(_boneXML.@x), Number(_boneXML.@y), _r, Number(_boneXML.@sX), Number(_boneXML.@sY));
-							if (_boneXML.@alpha.length()>0) {
-								_frame.alpha = Number(_boneXML.@alpha);
+							_node = new Node(Number(_nodeXML.@x), Number(_nodeXML.@y), _r, Number(_nodeXML.@sX), Number(_nodeXML.@sY));
+							if (_nodeXML.@alpha.length()>0) {
+								_node.alpha = Number(_nodeXML.@alpha);
 							}
-							_frame.totalFrames = int(_boneXML.@f);
-							_frameList.addValue(_frame);
+							_node.totalFrames = int(_nodeXML.@f);
+							_nodeList.addValue(_node);
 						}
 					}else {
-						_r = Number(_boneXML.@r);
+						_r = Number(_nodeXML.@r);
 						if (_isRadian) {
 							_r = _r * Math.PI / 180;
 						}
-						_frame = new Frame(Number(_boneXML.@x), Number(_boneXML.@y), _r, Number(_boneXML.@sX), Number(_boneXML.@sY));
-						if (_boneXML.@alpha.length()>0) {
-							_frame.alpha = Number(_boneXML.@alpha);
+						_node = new Node(Number(_nodeXML.@x), Number(_nodeXML.@y), _r, Number(_nodeXML.@sX), Number(_nodeXML.@sY));
+						if (_nodeXML.@alpha.length()>0) {
+							_node.alpha = Number(_nodeXML.@alpha);
 						}
-						_frames[_name] = _frame;
+						_frames[_name] = _node;
 					}
 				}
 			}

@@ -188,7 +188,7 @@ package akdcl.skeleton
 			}
 			//添加新的关节
 			
-			_bone = new Bone(_id, _joint);
+			_bone = new Bone(_joint, _id);
 			_bone.animation.callBack = animationCallBack;
 			boneList.push(_bone);
 			bones[_id] = _bone;

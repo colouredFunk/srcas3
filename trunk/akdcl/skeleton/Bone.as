@@ -19,19 +19,19 @@ package akdcl.skeleton{
 		public var joint:Object;
 		
 		/**
-		 * 骨骼偏移动画
+		 * 骨骼动画
 		 */
 		public var animation:Animation;
 		
 		/**
 		 * 骨骼关键点信息
 		 */
-		public var frame:Frame;
+		public var node:Node;
 		
 		/**
-		 * 骨骼偏移点信息
+		 * @private
 		 */
-		public var offset:Frame;
+		internal var parentNode:Node;
 		
 		//private var children:Vector.<Bone>;
 		private var parent:Bone;
@@ -40,21 +40,25 @@ package akdcl.skeleton{
 		
 		/**
 		 * 构造函数
-		 * @param _name 用于Armature索引
 		 * @param _joint 受骨骼控制的显示关节
+		 * @param _name 用于Armature索引
 		 */
-		public function Bone(_name:String, _joint:Object) {
-			name = _name;
+		public function Bone(_joint:Object, _name:String = null) {
 			joint = _joint;
+			name = _name;
 			lockX = 0;
 			lockY = 0;
 			
-			frame = new Frame();
-			offset = new Frame();
+			node = new Node();
+			parentNode = new Node();
 			//children = new Vector.<Bone>();
 			
 			animation = new Animation(_name);
-			animation.frame = offset;
+			animation.node = node;
+		}
+		
+		public function getGlobalRotation():Number {
+			return node.rotation + parentNode.rotation;
 		}
 		
 		/**
@@ -63,11 +67,12 @@ package akdcl.skeleton{
 		 * @param _x x坐标
 		 * @param _y y坐标
 		 */
-		public function addChild(_child:Bone, _x:Number, _y:Number):void {
+		public function addChild(_child:Bone, _x:Number = NaN, _y:Number = NaN):Bone {
 			//children.push(_child);
-			_child.lockX = _x;
-			_child.lockY = _y;
+			_child.lockX = isNaN(_x)?_child.node.x-node.x:_x;
+			_child.lockY = isNaN(_y)?_child.node.y-node.y:_y;
 			_child.parent = this;
+			return _child;
 		}
 		
 		/**
@@ -76,48 +81,47 @@ package akdcl.skeleton{
 		public function update():void {
 			animation.update();
 			if (parent) {
-				var _pr:Number = parent.frame.rotation + parent.offset.rotation;
+				var _pr:Number = parent.getGlobalRotation();
 				var _r:Number;
 				var _dX:Number;
 				var _dY:Number;
 				if ("pivotX" in parent.joint) {
-					_dX = lockX + offset.x;
-					_dY = lockY + offset.y;
+					_dX = lockX + node.x;
+					_dY = lockY + node.y;
 					_r = Math.atan2(_dY, _dX)+_pr;
 					//pointTemp = parent.joint.transformationMatrix.transformPoint(pointTemp);
 				}else {
-					_dX = lockX + offset.x;
-					_dY = lockY + offset.y;
+					_dX = lockX + node.x;
+					_dY = lockY + node.y;
 					_r = Math.atan2(_dY, _dX) + _pr * Math.PI / 180;
 					//pointTemp = parent.joint.transform.matrix.transformPoint(pointTemp);
 				}
-				//frame.x = pointTemp.x;
-				//frame.y = pointTemp.y;
 				
 				//
 				var _len:Number = Math.sqrt(_dX * _dX + _dY * _dY);
 				
-				frame.x = _len * Math.cos(_r) + parent.joint.x;
-				frame.y = _len * Math.sin(_r) + parent.joint.y;
+				parentNode.x = _len * Math.cos(_r) + parent.joint.x;
+				parentNode.y = _len * Math.sin(_r) + parent.joint.y;
 				
-				frame.rotation = _pr;
-				joint.x = frame.x;
-				joint.y = frame.y;
+				parentNode.rotation = _pr;
+				joint.x = parentNode.x;
+				joint.y = parentNode.y;
 			}else {
-				joint.x = frame.x + offset.x;
-				joint.y = frame.y + offset.y;
+				joint.x = node.x + parentNode.x;
+				joint.y = node.y + parentNode.y;
 			}
-			joint.rotation = frame.rotation + offset.rotation;
+			joint.rotation = node.rotation + parentNode.rotation;
 			
-			joint.scaleX = offset.scaleX;
-			joint.scaleY = offset.scaleY;
-			
-			if (isNaN(offset.alpha)) {
+			//
+			joint.scaleX = node.scaleX;
+			joint.scaleY = node.scaleY;
+			//
+			if (isNaN(node.alpha)) {
 				
 			}else {
-				if (offset.alpha) {
+				if (node.alpha) {
 					joint.visible = true;
-					joint.alpha = offset.alpha;
+					joint.alpha = node.alpha;
 				}else {
 					joint.visible = false;
 				}
