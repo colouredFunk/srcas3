@@ -14,8 +14,9 @@ package akdcl.skeleton
 		
 		public var scaleX:Number;
 		public var scaleY:Number;
+		public var alpha:Number;
 		
-		public var frame:uint;
+		public var totalFrames:uint;
 		public function Frame(_x:Number = 0, _y:Number = 0, _rotation:Number = 0, _scaleX:Number = 1, _scaleY:Number = 1) {
 			setValue(_x, _y, _rotation, _scaleX, _scaleY);
 		}
@@ -35,6 +36,18 @@ package akdcl.skeleton
 			//
 			scaleX = _from.scaleX + (_to.scaleX - _from.scaleX) * _k;
 			scaleY = _from.scaleY + (_to.scaleY - _from.scaleY) * _k;
+			
+			var _aF:Boolean = isNaN(_from.alpha);
+			var _aT:Boolean = isNaN(_to.alpha);
+			if (_aF && _aT) {
+				alpha = NaN;
+			}else if (_aF) {
+				alpha = 1 + (_to.alpha - 1) * _k;
+			}else if (_aT) {
+				alpha = _from.alpha * (1 - _k) + _k;
+			}else {
+				alpha = _from.alpha + (_to.alpha - _from.alpha) * _k;
+			}
 		}
 		
 		public function copy(_fV:Frame):void {
@@ -45,8 +58,9 @@ package akdcl.skeleton
 			//
 			scaleX = _fV.scaleX;
 			scaleY = _fV.scaleY;
+			alpha = _fV.alpha;
 			//
-			frame = _fV.frame;
+			totalFrames = _fV.totalFrames;
 		}
 		
 		public function toString():String {

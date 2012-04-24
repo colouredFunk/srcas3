@@ -5,14 +5,18 @@ package akdcl.skeleton{
 	
 	import flash.geom.Point;
 	
-	import akdcl.utils.localToLocal;
-	
 	/**
-	 * ...
+	 * 把骨骼模板制作成XML数据，方便保存或修改
 	 * @author Akdcl
 	 */
 	final public class ConnectionDataMaker {
+		private static const NAN_VALUE:uint = 99;
 		private static var pointTemp:Point = new Point();
+		
+		/**
+		 * 将Contour转换成XML数据
+		 * @param _contour 需要转换的Contour
+		 */
 		public static function encode(_contour:Contour):XML {
 			var _xml:XML = <skeleton/>;
 			_xml.@name = _contour.getName();
@@ -56,9 +60,10 @@ package akdcl.skeleton{
 				if (_boneXML) {
 					_parent = _contour.getChildByName(_boneXML.@parent);
 					if (_parent) {
-						pointTemp.x = _joint.x;
+						transfromParentXY(pointTemp, _joint, _parent);
+						/*pointTemp.x = _joint.x;
 						pointTemp.y = _joint.y;
-						pointTemp = localToLocal(_contour, _parent, pointTemp);
+						pointTemp = localToLocal(_contour, _parent, pointTemp)*/;
 						_x = pointTemp.x;
 						_y = pointTemp.y;
 					}else {
@@ -84,6 +89,7 @@ package akdcl.skeleton{
 			var _y:Number;
 			var _sX:Number;
 			var _sY:Number;
+			var _alp:Number;
 			var _delay:Number;
 			var _scale:Number;
 			
@@ -126,12 +132,10 @@ package akdcl.skeleton{
 						_parent = (_contour.getChildByName(_boneXML.@parent)) as DisplayObjectContainer;
 						
 						if (_parent) {
+							transfromParentXY(pointTemp, _joint, _parent, Number(_boneXML.@x), Number(_boneXML.@y));
 							_r = _joint.rotation - _parent.rotation;
-							pointTemp.x = _joint.x;
-							pointTemp.y = _joint.y;
-							pointTemp = localToLocal(_contour, _parent, pointTemp);
-							_x = pointTemp.x - Number(_boneXML.@x);
-							_y = pointTemp.y - Number(_boneXML.@y);
+							_x = pointTemp.x;
+							_y = pointTemp.y;
 						}else {
 							_r = _joint.rotation;
 							_x = _joint.x;
@@ -143,6 +147,8 @@ package akdcl.skeleton{
 						_y = Math.round(_y * 100) / 100;
 						_sX = Math.round(_joint.scaleX * 20) / 20;
 						_sY = Math.round(_joint.scaleY * 20) / 20;
+						_alp = Math.round(_joint.alpha * 20) / 20;
+						
 						if (Math.abs(_r) < 1) {
 							_r = 0;
 						}
@@ -152,18 +158,31 @@ package akdcl.skeleton{
 						if (Math.abs(_y) < 1) {
 							_y = 0;
 						}
+						if (_alp == 1) {
+							_alp = NAN_VALUE;
+						}
 						
 						_boneXML = null;
 						_frameXMLList = _animationXML.elements(_name);
 						if (_frameXMLList.length() > 0) {
 							_boneXML = _frameXMLList[_frameXMLList.length() - 1];
 						}
-						
-						if (_boneXML && int(_boneXML.@x) == int(_x) && int(_boneXML.@y) == int(_y) && int(_boneXML.@r) == int(_r) && Number(_boneXML.@sX) == Number(_sX) && Number(_boneXML.@sX) == Number(_sY)) {
+						//
+						if (_boneXML && 
+							int(_boneXML.@x) == int(_x) && 
+							int(_boneXML.@y) == int(_y) && 
+							int(_boneXML.@r) == int(_r) && 
+							Number(_boneXML.@sX) == _sX && 
+							Number(_boneXML.@sX) == _sY &&
+							(_boneXML.@alpha.length()==0?(_alp == NAN_VALUE):(Number(_boneXML.@alpha)==_alp))
+							) {
 							//忽略相同的节点
 							_boneXML.@f = int(_boneXML.@f) + 1;
 						}else {
 							_boneFrameXML =<{_name} x={_x} y={_y} r={_r} sX={_sX} sY={_sY} f="1"/>;
+							if (_alp != NAN_VALUE) {
+								_boneFrameXML.@alpha = _alp;
+							}
 							_scale = _contour.getValue(_name, "scale");
 							if (_scale) {
 								_boneFrameXML.@scale = _scale;
@@ -186,6 +205,15 @@ package akdcl.skeleton{
 					_contour.nextFrame();
 				}
 			}
+		}
+		
+		private static function transfromParentXY(_point:Point, _joint:DisplayObject, _parent:DisplayObject, _offX:Number = 0, _offY:Number = 0):void {
+			var _dX:Number = _joint.x - _parent.x;
+			var _dY:Number = _joint.y - _parent.y;
+			var _r:Number = Math.atan2(_dY, _dX) - _parent.rotation * Math.PI / 180;
+			var _len:Number = Math.sqrt(_dX * _dX + _dY * _dY);
+			_point.x = _len * Math.cos(_r) - _offX;
+			_point.y = _len * Math.sin(_r) - _offY;
 		}
 	}
 }

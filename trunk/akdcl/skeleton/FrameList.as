@@ -22,7 +22,7 @@ package akdcl.skeleton
 		
 		public function addValue(_value:Frame):void {
 			list.push(_value);
-			totalFrames += _value.frame;
+			totalFrames += _value.totalFrames;
 			length++;
 		}
 		
