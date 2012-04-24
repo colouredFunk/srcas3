@@ -9,7 +9,7 @@ package akdcl.skeleton{
 	 * 把骨骼模板制作成XML数据，方便保存或修改
 	 * @author Akdcl
 	 */
-	final public class ConnectionDataMaker {
+	final public class ConnectionXMLMaker {
 		private static const NAN_VALUE:uint = 99;
 		private static var pointTemp:Point = new Point();
 		

@@ -11,6 +11,8 @@ package akdcl.skeleton{
 		 * 动画的缩放值默认为1
 		 */
 		public var scale:Number;
+		public var isPause:Boolean;
+		public var isComplete:Boolean;
 		
 		/**
 		 * @private
@@ -43,8 +45,6 @@ package akdcl.skeleton{
 		private var playedFrames:uint;
 		private var realListFrames:uint;
 		
-		private var complete:Boolean;
-		
 		/**
 		 * 构造函数
 		 * @param _boneName 属于的骨骼ID
@@ -52,7 +52,7 @@ package akdcl.skeleton{
 		public function Animation(_boneName:String) {
 			scale = 1;
 			boneName = _boneName;
-			complete = true;
+			isComplete = true;
 			from = new Node();
 			to = new Node();
 		}
@@ -61,12 +61,13 @@ package akdcl.skeleton{
 		 * 控制动画播放
 		 * @param _to 关键点Frame或FrameList
 		 * @param _toFrame 过渡到该动画使用的帧数
-		 * @param _listFrame 如果该动画是列表动画，则此值为列表动画所用的帧数
-		 * @param _loopType 动画播放方式，0：不循环，1：循环，-1：循环并自动反转
-		 * @param _ease 缓动方式，0：线性，1：淡入，-1：淡出
+		 * @param _listFrame FrameList列表动画所用的帧数
+		 * @param _loopType FrameList动画播放方式，0：不循环，1：循环，-1：循环并自动反转
+		 * @param _ease 缓动方式，0：线性，1：淡出，-1：淡入
 		 */
 		public function playTo(_to:Object, _toFrame:uint, _listFrame:uint = 0, _loopType:int = 0, _ease:int = 0):void {
-			complete = false;
+			isComplete = false;
+			isPause = false;
 			currentFrame = 0;
 			from.copy(node);
 			
@@ -104,11 +105,20 @@ package akdcl.skeleton{
 			}
 		}
 		
+		public function pause(_bause:Boolean = true):void {
+			isPause = _bause;
+		}
+		
+		public function stop():void {
+			isComplete = true;
+			currentFrame = 0;
+		}
+		
 		/**
 		 * 更新步进
 		 */
 		public function update():void {
-			if (complete) {
+			if (isComplete || isPause) {
 				return;
 			}
 			currentFrame += scale;
@@ -199,7 +209,7 @@ package akdcl.skeleton{
 					}
 				}else {
 					//complete
-					complete = true;
+					isComplete = true;
 					if (callBack!=null) {
 						callBack(name, boneName, 0);
 					}

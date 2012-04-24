@@ -17,15 +17,17 @@ package akdcl.skeleton
 		public var alpha:Number;
 		
 		public var totalFrames:uint;
-		public function Node(_x:Number = 0, _y:Number = 0, _rotation:Number = 0, _scaleX:Number = 1, _scaleY:Number = 1) {
-			setValue(_x, _y, _rotation, _scaleX, _scaleY);
+		public function Node(_x:Number = 0, _y:Number = 0, _rotation:Number = 0) {
+			scaleX = 1;
+			scaleY = 1;
+			alpha = NaN;
+			totalFrames = 1;
+			setValue(_x, _y, _rotation);
 		}
-		public function setValue(_x:Number, _y:Number, _rotation:Number, _scaleX:Number = 1, _scaleY:Number = 1):void {
+		public function setValue(_x:Number, _y:Number, _rotation:Number):void {
 			x = _x;
 			y = _y;
 			rotation = _rotation;
-			scaleX = _scaleX;
-			scaleY = _scaleY;
 		}
 		
 		public function betweenValue(_from:Node, _to:Node, _k:Number):void {

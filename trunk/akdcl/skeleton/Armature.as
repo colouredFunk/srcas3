@@ -17,6 +17,8 @@ package akdcl.skeleton
 		 */
 		public var animationCallBack:Function;
 		
+		public var animationLast:String;
+		
 		/**
 		 * name
 		 */
@@ -121,6 +123,7 @@ package akdcl.skeleton
 		 * <listing version="3.0">playTo("run", 4, 20, 1);</listing >
 		 */
 		public function playTo(_frameLabel:String, _toFrame:uint, _listFrame:uint = 0, _loopType:int = 0, _ease:int = 0):void {
+			animationLast = _frameLabel;
 			var _data:Object = animationData[_frameLabel];
 			var _eachD:Object;
 			for each(var _bone:Bone in boneList) {
@@ -129,6 +132,24 @@ package akdcl.skeleton
 					_bone.animation.name = _frameLabel;
 					_bone.animation.playTo(_eachD, _toFrame, _listFrame, _loopType, _ease);
 				}
+			}
+		}
+		
+		/**
+		 * 暂停或继续动画
+		 */
+		public function pause(_bause:Boolean = true):void {
+			for each(var _bone:Bone in boneList) {
+				_bone.animation.pause(_bause);
+			}
+		}
+		
+		/**
+		 * 停止动画
+		 */
+		public function stop():void {
+			for each(var _bone:Bone in boneList) {
+				_bone.animation.stop();
 			}
 		}
 		
@@ -174,8 +195,13 @@ package akdcl.skeleton
 		 * @example 例子绑定手臂到身体上
 		 * <listing version="3.0">addJoint(new Sprite(), "arm", -1, "body", 5, -10)</listing >
 		 */
-		public function addJoint(_joint:Object, _id:String, _index:int = -1, _parentID:String = null, _x:Number = 0, _y:Number = 0):Object {
+		public function addJoint(_joint:Object, _id:String=null, _index:int = -1, _parentID:String = null, _x:Number = 0, _y:Number = 0):* {
 			var _bone:Bone;
+			if (_id && _id != _joint.name) {
+				_joint.name = _id;
+			}else {
+				_id = _joint.name;
+			}
 			var _jointOld:Object = joints[_id];
 			if (_jointOld) {
 				//替换现有关节
@@ -184,10 +210,10 @@ package akdcl.skeleton
 				_bone.joint = _joint;
 				
 				container.addChildAt(_joint, container.getChildIndex(_jointOld) - 1);
-				return _jointOld;
+				return _joint;
 			}
 			//添加新的关节
-			
+			joints[_id] = _joint;
 			_bone = new Bone(_joint, _id);
 			_bone.animation.callBack = animationCallBack;
 			boneList.push(_bone);
@@ -201,7 +227,7 @@ package akdcl.skeleton
 			}else {
 				container.addChildAt(_joint, _index);
 			}
-			return null;
+			return _joint;
 		}
 		
 		/**
