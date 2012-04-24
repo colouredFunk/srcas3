@@ -15,7 +15,7 @@ package akdcl.skeleton{
 		/**
 		 * @private
 		 */
-		public var frame:Frame;
+		public var node:Node;
 		
 		/**
 		 * @private
@@ -28,9 +28,9 @@ package akdcl.skeleton{
 		public var callBack:Function;
 		
 		private var boneName:String;
-		private var from:Frame;
-		private var to:Frame;
-		private var list:FrameList;
+		private var from:Node;
+		private var to:Node;
+		private var list:NodeList;
 		private var currentFrame:Number;
 		private var totalFrames:uint;
 		private var listFrames:uint;
@@ -53,8 +53,8 @@ package akdcl.skeleton{
 			scale = 1;
 			boneName = _boneName;
 			complete = true;
-			from = new Frame();
-			to = new Frame();
+			from = new Node();
+			to = new Node();
 		}
 		
 		/**
@@ -68,16 +68,16 @@ package akdcl.skeleton{
 		public function playTo(_to:Object, _toFrame:uint, _listFrame:uint = 0, _loopType:int = 0, _ease:int = 0):void {
 			complete = false;
 			currentFrame = 0;
-			from.copy(frame);
+			from.copy(node);
 			
-			if (_to is Frame) {
+			if (_to is Node) {
 				//普通过渡
 				loop = -4;
 				list = null;
-				to.copy(_to as Frame);
+				to.copy(_to as Node);
 				totalFrames = _toFrame;
 			}else {
-				list = _to as FrameList;
+				list = _to as NodeList;
 				to.copy(list.getValue(0));
 				if (_loopType==0) {
 					//列表过渡
@@ -158,10 +158,10 @@ package akdcl.skeleton{
 				if (_kList > 1) {
 					_kList = 1;
 				}
-				frame.betweenValue(from, to, _kList);
+				node.betweenValue(from, to, _kList);
 			}else {
 				//只有单独帧的动画过程
-				frame.betweenValue(from, to, _kAll);
+				node.betweenValue(from, to, _kAll);
 			}
 			
 			if (_kAll == 1) {

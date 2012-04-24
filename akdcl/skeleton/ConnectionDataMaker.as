@@ -98,7 +98,7 @@ package akdcl.skeleton{
 			
 			var _animationXML:XML;
 			var _boneXML:XML;
-			var _boneFrameXML:XML;
+			var _boneNodeXML:XML;
 			var _frameXMLList:XMLList;
 			var _boneXMLList:XMLList = _xml.elements(ConnectionData.BONE);
 			var _length:uint = _contour.currentLabels.length;
@@ -179,25 +179,25 @@ package akdcl.skeleton{
 							//忽略相同的节点
 							_boneXML.@f = int(_boneXML.@f) + 1;
 						}else {
-							_boneFrameXML =<{_name} x={_x} y={_y} r={_r} sX={_sX} sY={_sY} f="1"/>;
+							_boneNodeXML =<{_name} x={_x} y={_y} r={_r} sX={_sX} sY={_sY} f="1"/>;
 							if (_alp != NAN_VALUE) {
-								_boneFrameXML.@alpha = _alp;
+								_boneNodeXML.@alpha = _alp;
 							}
 							_scale = _contour.getValue(_name, "scale");
 							if (_scale) {
-								_boneFrameXML.@scale = _scale;
+								_boneNodeXML.@scale = _scale;
 							}
 							_delay = _contour.getValue(_name, "delay");
 							if (_delay) {
-								_boneFrameXML.@delay = _delay;
+								_boneNodeXML.@delay = _delay;
 								if (_delay < 0 && Number(_animationXML.@delay) > _delay) {
 									_animationXML.@delay = _delay;
 								}
 							}
 							if (_boneXML) {
-								_animationXML.insertChildAfter(_boneXML, _boneFrameXML);
+								_animationXML.insertChildAfter(_boneXML, _boneNodeXML);
 							}else {
-								_animationXML.appendChild(_boneFrameXML);
+								_animationXML.appendChild(_boneNodeXML);
 							}
 						}
 					}
