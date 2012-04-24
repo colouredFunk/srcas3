@@ -67,10 +67,10 @@ package akdcl.skeleton{
 		 * @param _x x坐标
 		 * @param _y y坐标
 		 */
-		public function addChild(_child:Bone, _x:Number = NaN, _y:Number = NaN):Bone {
+		public function addChild(_child:Bone, _x:Number, _y:Number):Bone {
 			//children.push(_child);
-			_child.lockX = isNaN(_x)?_child.node.x-node.x:_x;
-			_child.lockY = isNaN(_y)?_child.node.y-node.y:_y;
+			_child.lockX = _x;
+			_child.lockY = _y;
 			_child.parent = this;
 			return _child;
 		}

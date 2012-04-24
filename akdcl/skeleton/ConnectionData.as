@@ -72,7 +72,9 @@ package akdcl.skeleton
 							if (_isRadian) {
 								_r = _r * Math.PI / 180;
 							}
-							_node = new Node(Number(_nodeXML.@x), Number(_nodeXML.@y), _r, Number(_nodeXML.@sX), Number(_nodeXML.@sY));
+							_node = new Node(Number(_nodeXML.@x), Number(_nodeXML.@y), _r);
+							_node.scaleX = Number(_nodeXML.@sX);
+							_node.scaleY = Number(_nodeXML.@sY);
 							if (_nodeXML.@alpha.length()>0) {
 								_node.alpha = Number(_nodeXML.@alpha);
 							}
@@ -84,7 +86,9 @@ package akdcl.skeleton
 						if (_isRadian) {
 							_r = _r * Math.PI / 180;
 						}
-						_node = new Node(Number(_nodeXML.@x), Number(_nodeXML.@y), _r, Number(_nodeXML.@sX), Number(_nodeXML.@sY));
+						_node = new Node(Number(_nodeXML.@x), Number(_nodeXML.@y), _r);
+						_node.scaleX = Number(_nodeXML.@sX);
+						_node.scaleY = Number(_nodeXML.@sY);
 						if (_nodeXML.@alpha.length()>0) {
 							_node.alpha = Number(_nodeXML.@alpha);
 						}
