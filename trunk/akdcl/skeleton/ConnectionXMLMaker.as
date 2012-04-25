@@ -158,6 +158,20 @@ package akdcl.skeleton{
 						if (Math.abs(_y) < 1) {
 							_y = 0;
 						}
+						//如果scaleXY和alpha为1则忽略
+						//node中默认为1
+						if (_sX == 1) {
+							_sX = NAN_VALUE;
+						}else if (_sX > 3)  {
+							//避免使用matrix使用大于3以上的值充当负值
+							_sX = 3 - _sX;
+						}
+						if (_sY == 1) {
+							_sY = NAN_VALUE;
+						}else if (_sY > 3)  {
+							//避免使用matrix使用大于3以上的值充当负值
+							_sY = 3 - _sY;
+						}
 						if (_alp == 1) {
 							_alp = NAN_VALUE;
 						}
@@ -172,14 +186,25 @@ package akdcl.skeleton{
 							int(_boneXML.@x) == int(_x) && 
 							int(_boneXML.@y) == int(_y) && 
 							int(_boneXML.@r) == int(_r) && 
-							Number(_boneXML.@sX) == _sX && 
-							Number(_boneXML.@sX) == _sY &&
+							(_boneXML.@sX.length()==0?(_sX == NAN_VALUE):(Number(_boneXML.@sX)==_sX)) && 
+							(_boneXML.@sY.length()==0?(_sY == NAN_VALUE):(Number(_boneXML.@sY)==_sY)) && 
 							(_boneXML.@alpha.length()==0?(_alp == NAN_VALUE):(Number(_boneXML.@alpha)==_alp))
 							) {
 							//忽略相同的节点
-							_boneXML.@f = int(_boneXML.@f) + 1;
+							if (_boneXML.@f.length() > 0) {
+								_boneXML.@f = int(_boneXML.@f) + 1;
+							}else {
+								//1+1
+								_boneXML.@f = 2;
+							}
 						}else {
-							_boneNodeXML =<{_name} x={_x} y={_y} r={_r} sX={_sX} sY={_sY} f="1"/>;
+							_boneNodeXML =<{_name} x={_x} y={_y} r={_r}/>;
+							if (_sX != NAN_VALUE) {
+								_boneNodeXML.@sX = _sX;
+							}
+							if (_sY != NAN_VALUE) {
+								_boneNodeXML.@sY = _sY;
+							}
 							if (_alp != NAN_VALUE) {
 								_boneNodeXML.@alpha = _alp;
 							}
@@ -193,6 +218,10 @@ package akdcl.skeleton{
 								if (_delay < 0 && Number(_animationXML.@delay) > _delay) {
 									_animationXML.@delay = _delay;
 								}
+							}
+							_r = _contour.getValue(_name, "offR");
+							if (_r) {
+								_boneNodeXML.@oR = _r;
 							}
 							if (_boneXML) {
 								_animationXML.insertChildAfter(_boneXML, _boneNodeXML);

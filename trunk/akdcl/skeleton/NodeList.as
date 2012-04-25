@@ -9,7 +9,7 @@ package akdcl.skeleton
 		public var scale:Number;
 		public var totalFrames:uint;
 		public var length:uint;
-		private var list:Vector.<Node>;
+		private var list:Vector.<FrameNode>;
 		
 		public function NodeList(_delay:Number = 0, _scale:Number = 1) {
 			delay = _delay;
@@ -17,16 +17,16 @@ package akdcl.skeleton
 			totalFrames = 0;
 			length = 0;
 			
-			list = new Vector.<Node>;
+			list = new Vector.<FrameNode>;
 		}
 		
-		public function addValue(_value:Node):void {
+		public function addValue(_value:FrameNode):void {
 			list.push(_value);
 			totalFrames += _value.totalFrames;
 			length++;
 		}
 		
-		public function getValue(_id:int):Node {
+		public function getValue(_id:int):FrameNode {
 			if (_id<0) {
 				_id = length - 1;
 			}

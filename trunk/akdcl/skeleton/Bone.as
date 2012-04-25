@@ -32,6 +32,7 @@ package akdcl.skeleton{
 		 * @private
 		 */
 		internal var parentNode:Node;
+		private var animationNode:FrameNode;
 		
 		//private var children:Vector.<Bone>;
 		private var parent:Bone;
@@ -54,11 +55,11 @@ package akdcl.skeleton{
 			//children = new Vector.<Bone>();
 			
 			animation = new Animation(_name);
-			animation.node = node;
+			animationNode = animation.node;
 		}
 		
 		public function getGlobalRotation():Number {
-			return node.rotation + parentNode.rotation;
+			return node.rotation + parentNode.rotation + animationNode.rotation;
 		}
 		
 		/**
@@ -81,18 +82,15 @@ package akdcl.skeleton{
 		public function update():void {
 			animation.update();
 			if (parent) {
-				var _pr:Number = parent.getGlobalRotation();
+				//把node和animationNode坐标和映射到parent的坐标系
+				var _pr:Number = parent.joint.rotation;
 				var _r:Number;
-				var _dX:Number;
-				var _dY:Number;
+				var _dX:Number = lockX + node.x + animationNode.x;
+				var _dY:Number = lockY + node.y + animationNode.y;
 				if ("pivotX" in parent.joint) {
-					_dX = lockX + node.x;
-					_dY = lockY + node.y;
 					_r = Math.atan2(_dY, _dX)+_pr;
 					//pointTemp = parent.joint.transformationMatrix.transformPoint(pointTemp);
 				}else {
-					_dX = lockX + node.x;
-					_dY = lockY + node.y;
 					_r = Math.atan2(_dY, _dX) + _pr * Math.PI / 180;
 					//pointTemp = parent.joint.transform.matrix.transformPoint(pointTemp);
 				}
@@ -100,6 +98,7 @@ package akdcl.skeleton{
 				//
 				var _len:Number = Math.sqrt(_dX * _dX + _dY * _dY);
 				
+				//parentGlobalXY
 				parentNode.x = _len * Math.cos(_r) + parent.joint.x;
 				parentNode.y = _len * Math.sin(_r) + parent.joint.y;
 				
@@ -107,21 +106,27 @@ package akdcl.skeleton{
 				joint.x = parentNode.x;
 				joint.y = parentNode.y;
 			}else {
-				joint.x = node.x + parentNode.x;
-				joint.y = node.y + parentNode.y;
+				joint.x = node.x + parentNode.x + animationNode.x;
+				joint.y = node.y + parentNode.y + animationNode.y;
 			}
-			joint.rotation = node.rotation + parentNode.rotation;
+			joint.rotation = node.rotation + parentNode.rotation + animationNode.rotation;
 			
-			//
-			joint.scaleX = node.scaleX;
-			joint.scaleY = node.scaleY;
-			//
-			if (isNaN(node.alpha)) {
+			//scale和alpha只由动画控制
+			if (isNaN(animationNode.scaleX)) {
+			}else {
+				joint.scaleX = animationNode.scaleX;
+			}
+			if (isNaN(animationNode.scaleY)) {
 				
 			}else {
-				if (node.alpha) {
+				joint.scaleY = animationNode.scaleY;
+			}
+			if (isNaN(animationNode.alpha)) {
+				
+			}else {
+				if (animationNode.alpha) {
 					joint.visible = true;
-					joint.alpha = node.alpha;
+					joint.alpha = animationNode.alpha;
 				}else {
 					joint.visible = false;
 				}

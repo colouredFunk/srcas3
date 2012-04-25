@@ -17,7 +17,7 @@ package akdcl.skeleton{
 		/**
 		 * @private
 		 */
-		public var node:Node;
+		public var node:TweenNode;
 		
 		/**
 		 * @private
@@ -30,8 +30,8 @@ package akdcl.skeleton{
 		public var callBack:Function;
 		
 		private var boneName:String;
-		private var from:Node;
-		private var to:Node;
+		private var from:FrameNode;
+		private var to:FrameNode;
 		private var list:NodeList;
 		private var currentFrame:Number;
 		private var totalFrames:uint;
@@ -53,8 +53,9 @@ package akdcl.skeleton{
 			scale = 1;
 			boneName = _boneName;
 			isComplete = true;
-			from = new Node();
-			to = new Node();
+			node = new TweenNode();
+			from = new FrameNode();
+			to = new FrameNode();
 		}
 		
 		/**
@@ -71,16 +72,16 @@ package akdcl.skeleton{
 			currentFrame = 0;
 			from.copy(node);
 			
-			if (_to is Node) {
+			if (_to is FrameNode) {
 				//普通过渡
 				loop = -4;
 				list = null;
-				to.copy(_to as Node);
+				to.copy(_to as FrameNode);
 				totalFrames = _toFrame;
 			}else {
 				list = _to as NodeList;
 				to.copy(list.getValue(0));
-				if (_loopType==0) {
+				if (_loopType == 0) {
 					//列表过渡
 					loop = -3;
 					realListFrames = list.totalFrames - 1;
@@ -98,11 +99,12 @@ package akdcl.skeleton{
 				listFrames = _listFrame * list.scale;
 				totalFrames = _toFrame + listFrames * list.delay;
 			}
-			if (_ease==0) {
+			if (_ease == 0) {
 				ease = 0;
 			}else {
 				ease = _ease > 0?1: -1;
 			}
+			node.betweenValue(from, to);
 		}
 		
 		public function pause(_bause:Boolean = true):void {
@@ -124,55 +126,67 @@ package akdcl.skeleton{
 			currentFrame += scale;
 			
 			var _kAll:Number = currentFrame / totalFrames;
-			if (ease != 0) {
-				_kAll = ease > 0?Math.sin(_kAll * HALF_PI):(1 - Math.cos(_kAll * HALF_PI));
+			if (loop < -1) {
+				_kAll = Math.sin(_kAll * HALF_PI);
 			}
-			var _kList:Number;
+			var _kD:Number;
 			
 			if (_kAll > 1) {
 				_kAll = 1;
 			}
 			if (loop >= -1) {
 				//多关键帧动画过程
+				var _prevFrameID:int;
 				var _playedFrames:Number = realListFrames * _kAll;
 				if (_playedFrames >= playedFrames) {
 					//到达新的关键点
-					from.copy(to);
+					
 					if (loop > 0 && (loop & 1)) {
 						do {
+							betweenFrames = list.getValue(frameID).totalFrames;
+							playedFrames += betweenFrames;
+							_prevFrameID = frameID;
 							if (--frameID<0) {
 								frameID = list.length - 1;
 							}
-							betweenFrames = list.getValue(frameID).totalFrames;
-							playedFrames += betweenFrames;
 						}while (_playedFrames >= playedFrames);
 					}else {
 						do {
+							betweenFrames = list.getValue(frameID).totalFrames;
+							playedFrames += betweenFrames;
+							_prevFrameID = frameID;
 							if (++frameID>=list.length) {
 								frameID = 0;
 							}
-							betweenFrames = list.getValue(frameID).totalFrames;
-							playedFrames += betweenFrames;
 						}while (_playedFrames >= playedFrames);
 					}
+					
+					from.copy(list.getValue(_prevFrameID));
 					to.copy(list.getValue(frameID));
+					node.betweenValue(from, to);
 					if (callBack!=null) {
 						callBack(name, boneName, 2, frameID);
 					}
 				}
-				_kList = 1 - (playedFrames - _playedFrames ) / betweenFrames;
-				if (loop >= 0 && list.length == 2) {
-					//只有两个关键帧的动画在循环的时候需要平滑
-					_kList = 0.5 * (1 - Math.cos(Math.PI * _kList));
+				var _t:Number = betweenFrames - (playedFrames - _playedFrames);
+				var _d:Number = betweenFrames;
+				
+				_kD = _t/_d;
+				if (ease == 2) {
+					_kD = 0.5 * (1 - Math.cos(_t / _d * Math.PI ));
+				}else if (ease != 0) {
+					//_kD = ease < 0?((_t /= _d) * _t * _t):((_t = _t / _d - 1) * _t * _t + 1);
+					_kD = ease > 0?Math.sin(_t/_d * HALF_PI):(1 - Math.cos(_t/_d * HALF_PI));
 				}
-				if (_kList > 1) {
-					_kList = 1;
+				
+				if (_kD > 1) {
+					_kD = 1;
 				}
-				node.betweenValue(from, to, _kList);
 			}else {
 				//只有单独帧的动画过程
-				node.betweenValue(from, to, _kAll);
+				_kD = _kAll;
 			}
+			node.tweenTo(_kD);
 			
 			if (_kAll == 1) {
 				if (loop == -3) {
@@ -203,7 +217,6 @@ package akdcl.skeleton{
 						loop ++;
 					}
 					frameID = (loop & 1)?list.length - 1:0;
-					to.copy(list.getValue(frameID));
 					if (callBack!=null) {
 						callBack(name, boneName, 0);
 					}

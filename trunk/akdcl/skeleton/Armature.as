@@ -64,12 +64,13 @@ package akdcl.skeleton
 		
 		/**
 		 * 初始化骨骼系统
-		 * @param _name 会根据此值在 ConnectionData 中查找对应的骨骼配置和动画配置
+		 * @param _name 会根据此值在 ConnectionData 中查找对应的骨骼配置
+		 * @param _animationID 会根据此值在 ConnectionData 中查找对应的动画配置，不设置则默认和_name相同
 		 * @param _useLocalXY 当设置为true时，启用 container 中关节当前的位置关系而不是 ConnectionData中的配置关系 
 		 */
-		public function setup(_name:String, _useLocalXY:Boolean = false):void {
+		public function setup(_name:String, _animationID:String = null, _useLocalXY:Boolean = false):void {
 			name = _name;
-			animationData = ConnectionData.getAnimation(_name);
+			animationData = ConnectionData.getAnimation(_animationID || _name);
 			var _boneXMLList:XMLList = ConnectionData.getBones(_name);
 			if (!container || !_boneXMLList) {
 				return;
