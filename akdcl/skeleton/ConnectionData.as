@@ -44,7 +44,7 @@ package akdcl.skeleton
 			
 			var _frames:Object;
 			var _nodeList:NodeList;
-			var _node:Node;
+			var _node:FrameNode;
 			var _frameXMLList:XMLList;
 			var _r:Number;
 			var _animationXMLList:XMLList = _xml.elements(ANIMATION);
@@ -72,13 +72,22 @@ package akdcl.skeleton
 							if (_isRadian) {
 								_r = _r * Math.PI / 180;
 							}
-							_node = new Node(Number(_nodeXML.@x), Number(_nodeXML.@y), _r);
-							_node.scaleX = Number(_nodeXML.@sX);
-							_node.scaleY = Number(_nodeXML.@sY);
+							_node = new FrameNode(Number(_nodeXML.@x), Number(_nodeXML.@y), _r);
+							if (_nodeXML.@sX.length()>0) {
+								_node.scaleX = Number(_nodeXML.@sX);
+							}
+							if (_nodeXML.@sY.length()>0) {
+								_node.scaleY = Number(_nodeXML.@sY);
+							}
 							if (_nodeXML.@alpha.length()>0) {
 								_node.alpha = Number(_nodeXML.@alpha);
 							}
-							_node.totalFrames = int(_nodeXML.@f);
+							if (_nodeXML.@oR.length()>0) {
+								_node.offR = Number(_nodeXML.@oR);
+							}
+							if (_nodeXML.@f.length()>0) {
+								_node.totalFrames = int(_nodeXML.@f);
+							}
 							_nodeList.addValue(_node);
 						}
 					}else {
@@ -86,17 +95,23 @@ package akdcl.skeleton
 						if (_isRadian) {
 							_r = _r * Math.PI / 180;
 						}
-						_node = new Node(Number(_nodeXML.@x), Number(_nodeXML.@y), _r);
-						_node.scaleX = Number(_nodeXML.@sX);
-						_node.scaleY = Number(_nodeXML.@sY);
+						_node = new FrameNode(Number(_nodeXML.@x), Number(_nodeXML.@y), _r);
+						if (_nodeXML.@sX.length()>0) {
+							_node.scaleX = Number(_nodeXML.@sX);
+						}
+						if (_nodeXML.@sY.length()>0) {
+							_node.scaleY = Number(_nodeXML.@sY);
+						}
 						if (_nodeXML.@alpha.length()>0) {
 							_node.alpha = Number(_nodeXML.@alpha);
 						}
+							if (_nodeXML.@oR.length()>0) {
+								_node.offR = Number(_nodeXML.@oR);
+							}
 						_frames[_name] = _node;
 					}
 				}
 			}
-			trace(_xml);
 		}
 		
 		public static function getAnimation(_id:String):Object {
