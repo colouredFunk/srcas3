@@ -1,4 +1,4 @@
-/***
+﻿/***
 ImgLoader
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
 创建时间：2011年11月14日 14:26:13
@@ -16,6 +16,7 @@ package zero.net{
 	import flash.utils.*;
 	
 	import zero.utils.stopAll;
+	import zero.codec.PNGEncoder;
 	
 	public class ImgLoader extends Sprite{
 		
@@ -123,7 +124,17 @@ package zero.net{
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,loadError);
 			loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR,loadError);
 			if(xml.@src.toString()){
-				loader.load(new URLRequest(xml.@src.toString()));
+				var bmdClass:Class;
+				try{
+					bmdClass=getDefinitionByName(xml.@src.toString()) as Class;
+				}catch(e:Error){
+					bmdClass=null;
+				}
+				if(bmdClass){
+					loader.loadBytes(PNGEncoder.encode(new bmdClass()));
+				}else{
+					loader.load(new URLRequest(xml.@src.toString()));
+				}
 			}else{
 				loader.loadBytes(data);
 			}
