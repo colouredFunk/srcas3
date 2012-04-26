@@ -14,14 +14,14 @@ package akdcl.skeleton{
 		 */
 		public var animationCallBack:Function;
 		
-		private var animationData:AnimationData;
+		private var animationData:ArmatureAniData;
 		private var tweens:Object;
 		
 		public function Animation() {
 			tweens = { };
 		}
 		
-		public function setData(_aniData:AnimationData):void {
+		public function setData(_aniData:ArmatureAniData):void {
 			animationData = _aniData;
 		}
 		

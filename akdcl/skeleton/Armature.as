@@ -56,7 +56,7 @@ package akdcl.skeleton
 		 */
 		public function setup(_name:String, _animationID:String = null, _useLocalXY:Boolean = false):void {
 			name = _name;
-			animation.setData(ConnectionData.getAnimationData(_animationID || _name));
+			animation.setData(ConnectionData.getArmatureAniData(_animationID || _name));
 			var _boneXMLList:XMLList = ConnectionData.getBones(_name);
 			if (!container || !_boneXMLList) {
 				return;

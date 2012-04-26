@@ -48,13 +48,13 @@ package akdcl.skeleton
 		 */
 		public static function setData(_xml:XML, _isRadian:Boolean = false):void {
 			var _aniName:String = _xml.attribute(NAME);
-			var _aniData:AnimationData = getAnimationData(_aniName);
+			var _aniData:ArmatureAniData = getArmatureAniData(_aniName);
 			if (_aniData) {
 				return;
 			}
 			
 			armatureXML.appendChild(_xml);
-			animationDatas[_aniName] = _aniData = new AnimationData();
+			animationDatas[_aniName] = _aniData = new ArmatureAniData();
 			
 			var _boneName:String;
 			var _frameXMLList:XMLList;
@@ -117,7 +117,7 @@ package akdcl.skeleton
 			return _node;
 		}
 		
-		public static function getAnimationData(_id:String):AnimationData {
+		public static function getArmatureAniData(_id:String):ArmatureAniData {
 			return animationDatas[_id];
 		}
 		

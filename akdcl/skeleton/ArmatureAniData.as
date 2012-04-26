@@ -4,9 +4,9 @@ package akdcl.skeleton{
 	 * ...
 	 * @author Akdcl
 	 */
-	final public class AnimationData {
+	final public class ArmatureAniData {
 		private var animations:Object;
-		public function AnimationData() {
+		public function ArmatureAniData() {
 			animations = { };
 		}
 		public function addAnimation(_animation:Object, _animationName:String, _boneName:String):void {
