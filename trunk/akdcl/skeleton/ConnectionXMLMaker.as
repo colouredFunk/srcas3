@@ -11,7 +11,10 @@ package akdcl.skeleton{
 	 */
 	final public class ConnectionXMLMaker {
 		private static const NAN_VALUE:uint = 99;
+		private static const AT:String = "@";
+		
 		private static var pointTemp:Point = new Point();
+		private static var frameNode:FrameNode = new FrameNode();
 		
 		/**
 		 * 将Contour转换成XML数据
@@ -19,7 +22,7 @@ package akdcl.skeleton{
 		 */
 		public static function encode(_contour:Contour):XML {
 			var _xml:XML = <skeleton/>;
-			_xml.@name = _contour.getName();
+			_xml[AT + ConnectionData.NAME] = _contour.getName();
 			formatXML(_contour.xml, _xml);
 			generateBone(_contour, _xml);
 			generateAnimation(_contour, _xml);
@@ -32,9 +35,9 @@ package akdcl.skeleton{
 			for each(var _boneXML:XML in _boneXMLList) {
 				_boneCopy = _boneXML.copy();
 				_boneCopy.setName(ConnectionData.BONE);
-				_boneCopy.@name = _boneXML.name();
+				_boneCopy[AT + ConnectionData.NAME] = _boneXML.name();
 				if (_level > 0) {
-					_boneCopy.@parent = _boneXML.parent().name();
+					_boneCopy[AT + ConnectionData.PARENT] = _boneXML.parent().name();
 				}
 				delete _boneCopy.*;
 				_xmlCopy.appendChild(_boneCopy);
@@ -56,23 +59,20 @@ package akdcl.skeleton{
 			var _length:uint = _contour.numChildren;
 			for (var _i:uint = 0; _i < _length; _i++ ) {
 				_joint = _contour.getChildAt(_i);
-				_boneXML = _boneXMLList.(@name == _joint.name)[0];
+				_boneXML = _boneXMLList.(attribute(ConnectionData.NAME) == _joint.name)[0];
 				if (_boneXML) {
-					_parent = _contour.getChildByName(_boneXML.@parent);
+					_parent = _contour.getChildByName(_boneXML.attribute(ConnectionData.PARENT));
 					if (_parent) {
 						transfromParentXY(pointTemp, _joint, _parent);
-						/*pointTemp.x = _joint.x;
-						pointTemp.y = _joint.y;
-						pointTemp = localToLocal(_contour, _parent, pointTemp)*/;
 						_x = pointTemp.x;
 						_y = pointTemp.y;
 					}else {
 						_x = _joint.x;
 						_y = _joint.y;
 					}
-					_boneXML.@x = Math.round(_x * 100) /100;
-					_boneXML.@y = Math.round(_y * 100) / 100;
-					_boneXML.@z = _contour.getChildIndex(_joint);
+					_boneXML[AT + ConnectionData.X] = Math.round(_x * 100) / 100;
+					_boneXML[AT + ConnectionData.Y] = Math.round(_y * 100) / 100;
+					_boneXML[AT + ConnectionData.Z] = _contour.getChildIndex(_joint);
 				}else {
 					trace("contour:" + _contour.getName(), "bone:" + _joint.name, "未找到对应的配置XML节点");
 				}
@@ -82,28 +82,21 @@ package akdcl.skeleton{
 		private static function generateAnimation(_contour:Contour, _xml:XML):void {
 			var _frameLabel:FrameLabel;
 			
-			var _parent:DisplayObjectContainer;
-			var _joint:DisplayObject;
-			var _r:Number;
-			var _x:Number;
-			var _y:Number;
-			var _sX:Number;
-			var _sY:Number;
-			var _alp:Number;
-			var _delay:Number;
-			var _scale:Number;
-			
 			var _labelFrameLength:uint;
 			var _name:String;
+			var _joint:DisplayObject;
 			
 			var _animationXML:XML;
 			var _boneXML:XML;
 			var _boneNodeXML:XML;
 			var _frameXMLList:XMLList;
 			var _boneXMLList:XMLList = _xml.elements(ConnectionData.BONE);
-			var _length:uint = _contour.currentLabels.length;
+			
+			var _currentLabels:Array = _contour.currentLabels;
+			var _frameLabels:Array = formatFrameLabels(_currentLabels);
+			var _length:uint = _frameLabels.length;
 			for (var _i:uint = 0; _i < _length; _i++ ) {
-				_frameLabel = _contour.currentLabels[_i];
+				_frameLabel = _frameLabels[_i];
 				//忽略第一帧的帧标签
 				if (_frameLabel.frame == 1) {
 					continue;
@@ -113,127 +106,218 @@ package akdcl.skeleton{
 				if (_i + 1 == _length) {
 					_labelFrameLength = _contour.totalFrames - _frameLabel.frame + 1;
 				}else {
-					_labelFrameLength = _contour.currentLabels[_i + 1].frame - _frameLabel.frame;
+					_labelFrameLength = _frameLabels[_i + 1].frame - _frameLabel.frame;
 				}
-				_animationXML =<{ConnectionData.ANIMATION} name={_frameLabel.name}/>;
+				_animationXML =<{ConnectionData.ANIMATION}/>;
+				_animationXML[AT + ConnectionData.NAME] = _frameLabel.name;
+				_animationXML[AT + ConnectionData.FRAME] = _labelFrameLength;
 				_xml.appendChild(_animationXML);
+				
 				_contour.gotoAndStop(_frameLabel.name);
 				for (var _k:uint = 0; _k < _labelFrameLength; _k++ ) {
-					//扫描标签动画的每帧
+					if (_k == _labelFrameLength - 1) {
+						//为最后一个子标签帧修正其长度
+						setFrameLabels(_animationXML, null, _contour.currentFrame + 1);
+					}else if (_contour.currentFrameLabel && _contour.currentFrameLabel != _frameLabel.name) {
+						//如果这帧带有子标签（不能是最后一帧和第一帧）
+						setFrameLabels(_animationXML, _contour.currentFrameLabel.split("_").pop(), _contour.currentFrame);
+					}
+					
 					for (var _j:uint = 0; _j < _contour.numChildren; _j++ ) {
 						_joint = _contour.getChildAt(_j);
 						_name = _joint.name;
-						_boneXML = _boneXMLList.(@name == _name)[0];
+						_boneXML = _boneXMLList.(attribute(ConnectionData.NAME) == _name)[0];
 						if (!_boneXML) {
 							//没有配置xml的元件忽略
 							continue;
 						}
 						
-						_parent = (_contour.getChildByName(_boneXML.@parent)) as DisplayObjectContainer;
-						
-						if (_parent) {
-							transfromParentXY(pointTemp, _joint, _parent, Number(_boneXML.@x), Number(_boneXML.@y));
-							_r = _joint.rotation - _parent.rotation;
-							_x = pointTemp.x;
-							_y = pointTemp.y;
-						}else {
-							_r = _joint.rotation;
-							_x = _joint.x;
-							_y = _joint.y;
-						}
-						
-						_r = Math.round(_r * 100) / 100;
-						_x = Math.round(_x * 100) / 100;
-						_y = Math.round(_y * 100) / 100;
-						_sX = Math.round(_joint.scaleX * 20) / 20;
-						_sY = Math.round(_joint.scaleY * 20) / 20;
-						_alp = Math.round(_joint.alpha * 20) / 20;
-						
-						if (Math.abs(_r) < 1) {
-							_r = 0;
-						}
-						if (Math.abs(_x) < 1) {
-							_x = 0;
-						}
-						if (Math.abs(_y) < 1) {
-							_y = 0;
-						}
-						//如果scaleXY和alpha为1则忽略
-						//node中默认为1
-						if (_sX == 1) {
-							_sX = NAN_VALUE;
-						}else if (_sX > 3)  {
-							//避免使用matrix使用大于3以上的值充当负值
-							_sX = 3 - _sX;
-						}
-						if (_sY == 1) {
-							_sY = NAN_VALUE;
-						}else if (_sY > 3)  {
-							//避免使用matrix使用大于3以上的值充当负值
-							_sY = 3 - _sY;
-						}
-						if (_alp == 1) {
-							_alp = NAN_VALUE;
-						}
+						setFrameNode(
+							(_contour.getChildByName(_boneXML.attribute(ConnectionData.PARENT))) as DisplayObjectContainer,
+							_joint,
+							_boneXML,
+							_contour.getValue(_name, ConnectionData.OFF_R)
+						);
 						
 						_boneXML = null;
+						//找到该关键的动画列表
 						_frameXMLList = _animationXML.elements(_name);
 						if (_frameXMLList.length() > 0) {
+							//如果已经创建了该关键的动画列表则找到列表的最后一个
 							_boneXML = _frameXMLList[_frameXMLList.length() - 1];
 						}
-						//
-						if (_boneXML && 
-							int(_boneXML.@x) == int(_x) && 
-							int(_boneXML.@y) == int(_y) && 
-							int(_boneXML.@r) == int(_r) && 
-							(_boneXML.@sX.length()==0?(_sX == NAN_VALUE):(Number(_boneXML.@sX)==_sX)) && 
-							(_boneXML.@sY.length()==0?(_sY == NAN_VALUE):(Number(_boneXML.@sY)==_sY)) && 
-							(_boneXML.@alpha.length()==0?(_alp == NAN_VALUE):(Number(_boneXML.@alpha)==_alp))
-							) {
+						
+						if (_boneXML && sameFrameNode(_boneXML)) {
 							//忽略相同的节点
-							if (_boneXML.@f.length() > 0) {
-								_boneXML.@f = int(_boneXML.@f) + 1;
+							if (_boneXML.attribute(ConnectionData.FRAME).length() > 0) {
+								_boneXML[AT + ConnectionData.FRAME] = int(_boneXML.attribute(ConnectionData.FRAME)) + 1;
 							}else {
 								//1+1
-								_boneXML.@f = 2;
+								_boneXML[AT + ConnectionData.FRAME] = 2;
 							}
 						}else {
-							_boneNodeXML =<{_name} x={_x} y={_y} r={_r}/>;
-							if (_sX != NAN_VALUE) {
-								_boneNodeXML.@sX = _sX;
-							}
-							if (_sY != NAN_VALUE) {
-								_boneNodeXML.@sY = _sY;
-							}
-							if (_alp != NAN_VALUE) {
-								_boneNodeXML.@alpha = _alp;
-							}
-							_scale = _contour.getValue(_name, "scale");
-							if (_scale) {
-								_boneNodeXML.@scale = _scale;
-							}
-							_delay = _contour.getValue(_name, "delay");
-							if (_delay) {
-								_boneNodeXML.@delay = _delay;
-								if (_delay < 0 && Number(_animationXML.@delay) > _delay) {
-									_animationXML.@delay = _delay;
-								}
-							}
-							_r = _contour.getValue(_name, "offR");
-							if (_r) {
-								_boneNodeXML.@oR = _r;
-							}
-							if (_boneXML) {
-								_animationXML.insertChildAfter(_boneXML, _boneNodeXML);
-							}else {
-								_animationXML.appendChild(_boneNodeXML);
-							}
+							addFrameNode(
+								_name,
+								_animationXML,
+								_boneXML,
+								_contour.getValue(_name, ConnectionData.SCALE),
+								_contour.getValue(_name, ConnectionData.DELAY)
+							);
 						}
 					}
 					_contour.clearValues();
 					_contour.nextFrame();
 				}
 			}
+		}
+		
+		private static function setFrameLabels(_animationXML:XML, _labelName:String, _frame:int):void {
+			if (_labelName) {
+				var _node:XML =<{ConnectionData.FRAME}/>;
+				_node[AT + ConnectionData.NAME] = _labelName;
+				_node[AT + ConnectionData.FRAME] = _frame;
+			}
+			
+			var _list:XMLList = _animationXML.elements(ConnectionData.FRAME);
+			if (_list.length() > 0) {
+				var _prevNode:XML = _list[_list.length() - 1];
+				//为前一个子标签帧修正长度
+				_prevNode[AT + ConnectionData.FRAME] = _frame-int(_prevNode.attribute(ConnectionData.FRAME));
+				if (_node) {
+					_animationXML.insertChildAfter(_prevNode, _node);
+				}
+			}else {
+				if (_node) {
+					_animationXML.prependChild(_node);
+				}
+			}
+		}
+		
+		private static function formatFrameLabels(_frameLabels:Array):Array {
+			var _labelsFormated:Array = [];
+			var _length:uint = _frameLabels.length;
+			var _frameLabel:FrameLabel;
+			var _prevLabel:FrameLabel;
+			for (var _i:uint = 0; _i < _length; _i++ ) {
+				_frameLabel = _frameLabels[_i];
+				//忽略第一帧的帧标签
+				if (_frameLabel.frame == 1) {
+					continue;
+				}
+				//如果标签是前一个标签的子节点，则忽略
+				if (_prevLabel && _frameLabel.name.indexOf(_prevLabel.name + "_") == 0) {
+					continue;
+				}
+				_labelsFormated.push(_frameLabel);
+				_prevLabel = _frameLabel;
+			}
+			return _labelsFormated;
+		}
+		
+		private static function setFrameNode(_parent:DisplayObjectContainer, _joint:DisplayObject, _boneXML:XML, _offR:Number):void {
+			if (_parent) {
+				transfromParentXY(pointTemp, _joint, _parent, Number(_boneXML.attribute(ConnectionData.X)), Number(_boneXML.attribute(ConnectionData.Y)));
+				frameNode.rotation = _joint.rotation - _parent.rotation;
+				frameNode.x = pointTemp.x;
+				frameNode.y = pointTemp.y;
+			}else {
+				frameNode.rotation = _joint.rotation;
+				frameNode.x = _joint.x;
+				frameNode.y = _joint.y;
+			}
+			
+			frameNode.scaleX = _joint.scaleX;
+			frameNode.scaleY = _joint.scaleY;
+			frameNode.alpha = _joint.alpha;
+			frameNode.offR = _offR;
+			//
+			formatFrameNode();
+		}
+		
+		private static function addFrameNode(_name:String, _parentXML:XML, _prevNode:XML, _scale:Number, _delay:Number):void {
+			var _frameNodeXML:XML =<{_name}/>;
+			if (_prevNode) {
+				_parentXML.insertChildAfter(_prevNode, _frameNodeXML);
+			}else {
+				_parentXML.appendChild(_frameNodeXML);
+			}
+			
+			_frameNodeXML[AT + ConnectionData.X] = frameNode.x;
+			_frameNodeXML[AT + ConnectionData.Y] = frameNode.y;
+			_frameNodeXML[AT + ConnectionData.ROTATION] = frameNode.rotation;
+			if (frameNode.scaleX != NAN_VALUE) {
+				_frameNodeXML[AT + ConnectionData.SCALE_X] = frameNode.scaleX;
+			}
+			if (frameNode.scaleY != NAN_VALUE) {
+				_frameNodeXML[AT + ConnectionData.SCALE_Y] = frameNode.scaleY;
+			}
+			if (frameNode.alpha != NAN_VALUE) {
+				_frameNodeXML[AT + ConnectionData.ALPHA] = frameNode.alpha;
+			}
+			if (frameNode.offR) {
+				_frameNodeXML[AT + ConnectionData.OFF_R] = frameNode.offR;
+			}
+			if (_scale) {
+				_frameNodeXML[AT + ConnectionData.SCALE] = _scale;
+			}
+			if (_delay) {
+				_frameNodeXML[AT + ConnectionData.DELAY] = _delay;
+				//将delay小于0的最小值存于动画列表，当ConnectionData取值时，为所有的FrameNode偏移这个值
+				if (_delay < 0 && Number(_parentXML.attribute(ConnectionData.DELAY)) > _delay) {
+					_parentXML[AT + ConnectionData.DELAY] = _delay;
+				}
+			}
+		}
+		
+		private static function formatFrameNode():void {
+			frameNode.rotation = Math.round(frameNode.rotation * 100) / 100;
+			frameNode.x = Math.round(frameNode.x * 100) / 100;
+			frameNode.y = Math.round(frameNode.y * 100) / 100;
+			frameNode.scaleX = Math.round(frameNode.scaleX * 20) / 20;
+			frameNode.scaleY = Math.round(frameNode.scaleY * 20) / 20;
+			frameNode.alpha = Math.round(frameNode.alpha * 20) / 20;
+					
+			if (Math.abs(frameNode.rotation) < 1) {
+				frameNode.rotation = 0;
+			}
+			if (Math.abs(frameNode.x) < 1) {
+				frameNode.x = 0;
+			}
+			if (Math.abs(frameNode.y) < 1) {
+				frameNode.y = 0;
+			}
+			//如果scaleXY和alpha为1则忽略
+			//node中默认为1
+			if (frameNode.scaleX == 1) {
+				frameNode.scaleX = NAN_VALUE;
+			}else if (frameNode.scaleX > 3)  {
+				//避免使用matrix使用大于3以上的值充当负值
+				frameNode.scaleX = 3 - frameNode.scaleX;
+			}
+			if (frameNode.scaleY == 1) {
+				frameNode.scaleY = NAN_VALUE;
+			}else if (frameNode.scaleY > 3)  {
+				//避免使用matrix使用大于3以上的值充当负值
+				frameNode.scaleY = 3 - frameNode.scaleY;
+			}
+			if (frameNode.alpha == 1) {
+				frameNode.alpha = NAN_VALUE;
+			}
+		}
+		
+		private static function sameFrameNode(_frameNodeXML:XML):Boolean {
+			var _isSame:Boolean = true;
+			//忽略相差一像素以内的位移和旋转
+			_isSame = _isSame && int(_frameNodeXML.attribute(ConnectionData.X)) == int(frameNode.x);
+			_isSame = _isSame && int(_frameNodeXML.attribute(ConnectionData.Y)) == int(frameNode.y);
+			_isSame = _isSame && int(_frameNodeXML.attribute(ConnectionData.ROTATION)) == int(frameNode.rotation);
+			//scaleXY和alpha没有则默认为1
+			_isSame = _isSame && (_frameNodeXML.attribute(ConnectionData.SCALE_X).length() == 0?(frameNode.scaleX == NAN_VALUE):(Number(_frameNodeXML.attribute(ConnectionData.SCALE_X)) == frameNode.scaleX));
+			_isSame = _isSame && (_frameNodeXML.attribute(ConnectionData.SCALE_Y).length() == 0?(frameNode.scaleY == NAN_VALUE):(Number(_frameNodeXML.attribute(ConnectionData.SCALE_Y)) == frameNode.scaleY));
+			_isSame = _isSame && (_frameNodeXML.attribute(ConnectionData.ALPHA).length() == 0?(frameNode.alpha == NAN_VALUE):(Number(_frameNodeXML.attribute(ConnectionData.ALPHA)) == frameNode.alpha));
+			//offR没有则默认为0
+			_isSame = _isSame && (_frameNodeXML.attribute(ConnectionData.OFF_R).length() == 0?(frameNode.offR == 0):(Number(_frameNodeXML.attribute(ConnectionData.OFF_R)) == frameNode.offR));
+			return _isSame;
 		}
 		
 		private static function transfromParentXY(_point:Point, _joint:DisplayObject, _parent:DisplayObject, _offX:Number = 0, _offY:Number = 0):void {

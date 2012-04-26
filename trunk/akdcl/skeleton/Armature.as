@@ -3,21 +3,11 @@ package akdcl.skeleton
 	import flash.geom.Point;
 	
 	/**
-	 * 骨架，包含相关骨骼和显示对象的衔接，同时可以总体控制各个骨骼的动画
+	 * 骨架，包含相关骨骼和显示对象的衔接
 	 * @author Akdcl
 	 */
 	public class Armature {
-		
-		/**
-		 * 动画播放事件回调函数
-		 * 参数1：animationID 动画ID，
-		 * 参数2：boneID 骨骼ID，
-		 * 参数3：typeID 状态标识(0:动画完毕/1:列表动画开始/2:列表动画关键帧位置到达)，
-		 * 参数4：frameID 关键帧标识(当typeID为2时有效)。
-		 */
-		public var animationCallBack:Function;
-		
-		public var animationLast:String;
+		public var animation:Animation;
 		
 		/**
 		 * name
@@ -28,11 +18,6 @@ package akdcl.skeleton
 		 * @private
 		 */
 		protected var container:Object;
-		
-		/**
-		 * @private
-		 */
-		protected var animationData:Object;
 		
 		/**
 		 * @private
@@ -59,6 +44,7 @@ package akdcl.skeleton
 			bones = { };
 			boneList = new Vector.<Bone>;
 			
+			animation = new Animation();
 			container = _container;
 		}
 		
@@ -70,7 +56,7 @@ package akdcl.skeleton
 		 */
 		public function setup(_name:String, _animationID:String = null, _useLocalXY:Boolean = false):void {
 			name = _name;
-			animationData = ConnectionData.getAnimation(_animationID || _name);
+			animation.setData(ConnectionData.getAnimationData(_animationID || _name));
 			var _boneXMLList:XMLList = ConnectionData.getBones(_name);
 			if (!container || !_boneXMLList) {
 				return;
@@ -114,75 +100,14 @@ package akdcl.skeleton
 		}
 		
 		/**
-		 * 播放动画
-		 * @param _frameLabel 动画ID
-		 * @param _toFrame 过渡到该动画使用的帧数
-		 * @param _listFrame 如果该动画是列表动画，则此值为列表动画所用的帧数
-		 * @param _loopType 动画播放方式，0：不循环，1：循环，-1：循环并自动反转
-		 * @param _ease 缓动方式，0：线性，1：淡入，-1：淡出
-		 * @example 例子播放跑步动画
-		 * <listing version="3.0">playTo("run", 4, 20, 1);</listing >
-		 */
-		public function playTo(_frameLabel:String, _toFrame:uint, _listFrame:uint = 0, _loopType:int = 0, _ease:int = 0):void {
-			animationLast = _frameLabel;
-			var _data:Object = animationData[_frameLabel];
-			var _eachD:Object;
-			for each(var _bone:Bone in boneList) {
-				_eachD = _data[_bone.name];
-				if (_eachD) {
-					_bone.animation.name = _frameLabel;
-					_bone.animation.playTo(_eachD, _toFrame, _listFrame, _loopType, _ease);
-				}
-			}
-		}
-		
-		/**
-		 * 暂停或继续动画
-		 */
-		public function pause(_bause:Boolean = true):void {
-			for each(var _bone:Bone in boneList) {
-				_bone.animation.pause(_bause);
-			}
-		}
-		
-		/**
-		 * 停止动画
-		 */
-		public function stop():void {
-			for each(var _bone:Bone in boneList) {
-				_bone.animation.stop();
-			}
-		}
-		
-		/**
-		 * 对骨骼动画的速度进行缩放
-		 * @param _scale 缩放值做为系数乘到原来的动画帧值
-		 * @param _id 指定的骨骼ID，默认为所有骨骼
-		 * @example 例子让ID为"body"的骨骼的动画播放变慢为原来的0.5
-		 * <listing version="3.0">setAnimationScale(0.5, "body");</listing >
-		 */
-		public function setAnimationScale(_scale:Number, _id:String = null):void {
-			var _bone:Bone;
-			if (_id) {
-				_bone = getBone(_id);
-				if (_bone) {
-					_bone.animation.scale = _scale;
-				}
-			}else {
-				for each(_bone in boneList) {
-					_bone.animation.scale = _scale;
-				}
-			}
-		}
-		
-		/**
 		 * 更新步进
 		 */
 		public function update():void {
-			var _length:uint = boneList.length;
-			for (var _i:uint = 0; _i < _length; _i++ ) {
-				boneList[_i].update();
+			for each(var _bone:Bone in boneList) {
+				animation.updateTween(_bone.name);
+				_bone.update();
 			}
+			animation.update();
 		}
 		
 		/**
@@ -216,7 +141,8 @@ package akdcl.skeleton
 			//添加新的关节
 			joints[_id] = _joint;
 			_bone = new Bone(_joint, _id);
-			_bone.animation.callBack = animationCallBack;
+			animation.addTween(_bone);
+			
 			boneList.push(_bone);
 			bones[_id] = _bone;
 			var _boneParent:Bone = getBone(_parentID);
@@ -254,5 +180,4 @@ package akdcl.skeleton
 			return container;
 		}
 	}
-	
 }

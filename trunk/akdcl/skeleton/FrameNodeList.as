@@ -4,14 +4,14 @@ package akdcl.skeleton
 	 * ...
 	 * @author akdcl
 	 */
-	final public class NodeList{
+	final public class FrameNodeList{
 		public var delay:Number;
 		public var scale:Number;
 		public var totalFrames:uint;
 		public var length:uint;
 		private var list:Vector.<FrameNode>;
 		
-		public function NodeList(_delay:Number = 0, _scale:Number = 1) {
+		public function FrameNodeList(_delay:Number = 0, _scale:Number = 1) {
 			delay = _delay;
 			scale = _scale;
 			totalFrames = 0;

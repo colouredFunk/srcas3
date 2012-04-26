@@ -19,11 +19,6 @@ package akdcl.skeleton{
 		public var joint:Object;
 		
 		/**
-		 * 骨骼动画
-		 */
-		public var animation:Animation;
-		
-		/**
 		 * 骨骼关键点信息
 		 */
 		public var node:Node;
@@ -32,7 +27,7 @@ package akdcl.skeleton{
 		 * @private
 		 */
 		internal var parentNode:Node;
-		private var animationNode:FrameNode;
+		internal var tweenNode:TweenNode;
 		
 		//private var children:Vector.<Bone>;
 		private var parent:Bone;
@@ -52,14 +47,12 @@ package akdcl.skeleton{
 			
 			node = new Node();
 			parentNode = new Node();
+			tweenNode = new TweenNode();
 			//children = new Vector.<Bone>();
-			
-			animation = new Animation(_name);
-			animationNode = animation.node;
 		}
 		
 		public function getGlobalRotation():Number {
-			return node.rotation + parentNode.rotation + animationNode.rotation;
+			return node.rotation + parentNode.rotation + tweenNode.rotation;
 		}
 		
 		/**
@@ -80,13 +73,12 @@ package akdcl.skeleton{
 		 * 更新步进
 		 */
 		public function update():void {
-			animation.update();
 			if (parent) {
 				//把node和animationNode坐标和映射到parent的坐标系
 				var _pr:Number = parent.joint.rotation;
 				var _r:Number;
-				var _dX:Number = lockX + node.x + animationNode.x;
-				var _dY:Number = lockY + node.y + animationNode.y;
+				var _dX:Number = lockX + node.x + tweenNode.x;
+				var _dY:Number = lockY + node.y + tweenNode.y;
 				if ("pivotX" in parent.joint) {
 					_r = Math.atan2(_dY, _dX)+_pr;
 					//pointTemp = parent.joint.transformationMatrix.transformPoint(pointTemp);
@@ -106,27 +98,27 @@ package akdcl.skeleton{
 				joint.x = parentNode.x;
 				joint.y = parentNode.y;
 			}else {
-				joint.x = node.x + parentNode.x + animationNode.x;
-				joint.y = node.y + parentNode.y + animationNode.y;
+				joint.x = node.x + parentNode.x + tweenNode.x;
+				joint.y = node.y + parentNode.y + tweenNode.y;
 			}
-			joint.rotation = node.rotation + parentNode.rotation + animationNode.rotation;
+			joint.rotation = node.rotation + parentNode.rotation + tweenNode.rotation;
 			
 			//scale和alpha只由动画控制
-			if (isNaN(animationNode.scaleX)) {
+			if (isNaN(tweenNode.scaleX)) {
 			}else {
-				joint.scaleX = animationNode.scaleX;
+				joint.scaleX = tweenNode.scaleX;
 			}
-			if (isNaN(animationNode.scaleY)) {
+			if (isNaN(tweenNode.scaleY)) {
 				
 			}else {
-				joint.scaleY = animationNode.scaleY;
+				joint.scaleY = tweenNode.scaleY;
 			}
-			if (isNaN(animationNode.alpha)) {
+			if (isNaN(tweenNode.alpha)) {
 				
 			}else {
-				if (animationNode.alpha) {
+				if (tweenNode.alpha) {
 					joint.visible = true;
-					joint.alpha = animationNode.alpha;
+					joint.alpha = tweenNode.alpha;
 				}else {
 					joint.visible = false;
 				}
