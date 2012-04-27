@@ -63,11 +63,6 @@ package akdcl.skeleton{
 				listFrames = _listFrame * list.scale;
 				totalFrames += _listFrame * list.delay;
 			}
-			if (_ease == 0) {
-				ease = 0;
-			}else {
-				ease = _ease > 0?1: -1;
-			}
 			node.betweenValue(from, to);
 		}
 		

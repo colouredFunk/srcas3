@@ -50,11 +50,7 @@ package akdcl.skeleton
 			isComplete = false;
 			isPause = false;
 			currentFrame = 0;
-			if (_ease == 0) {
-				ease = 0;
-			}else {
-				ease = _ease > 0?1: -1;
-			}
+			ease = _ease;
 			totalFrames = _listFrame * _toScale;
 		}
 		
