@@ -9,20 +9,20 @@ package akdcl.skeleton{
 		public function ArmatureAniData() {
 			animations = { };
 		}
-		public function addAnimation(_animation:Object, _animationName:String, _boneName:String):void {
-			var _boneAnimations:Object = animations[_animationName];
-			if (!_boneAnimations) {
-				animations[_animationName] = _boneAnimations = { };
+		public function addAnimation(_boneAniData:Object, _animationName:String, _boneName:String):void {
+			var _boneAniDatas:Object = animations[_animationName];
+			if (!_boneAniDatas) {
+				animations[_animationName] = _boneAniDatas = { };
 			}
-			_boneAnimations[_boneName] = _animation;
+			_boneAniDatas[_boneName] = _boneAniData;
 		}
 		
 		public function getAnimation(_animationName:String, _boneName:String = null):Object {
-			var _boneAnimations:Object = animations[_animationName];
+			var _boneAniDatas:Object = animations[_animationName];
 			if (_boneName) {
-				return _boneAnimations?_boneAnimations[_boneName]:null;
+				return _boneAniDatas?_boneAniDatas[_boneName]:null;
 			}else {
-				return _boneAnimations;
+				return _boneAniDatas;
 			}
 		}
 	}

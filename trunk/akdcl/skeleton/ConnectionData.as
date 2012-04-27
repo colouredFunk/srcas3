@@ -47,15 +47,15 @@ package akdcl.skeleton
 		 * @param _isRadian XML数据中的角度是否使用弧度制，默认使用角度制，当使用starling时需要使用弧度制
 		 */
 		public static function setData(_xml:XML, _isRadian:Boolean = false):void {
-			var _aniName:String = _xml.attribute(NAME);
-			var _aniData:ArmatureAniData = getArmatureAniData(_aniName);
+			var _name:String = _xml.attribute(NAME);
+			var _aniData:ArmatureAniData = getArmatureAniData(_name);
 			if (_aniData) {
 				return;
 			}
 			
 			armatureXML.appendChild(_xml);
-			animationDatas[_aniName] = _aniData = new ArmatureAniData();
-			
+			animationDatas[_name] = _aniData = new ArmatureAniData();
+			var _aniName:String;
 			var _boneName:String;
 			var _frameXMLList:XMLList;
 			var _animationXMLList:XMLList = _xml.elements(ANIMATION);
@@ -75,19 +75,29 @@ package akdcl.skeleton
 				}
 				
 				//有时间需要分离
-				var _boneAnimations:Object = _aniData.getAnimation(_aniName);
-				_boneAnimations.totalFrames = _frameXML.attribute(FRAME);
+				var _boneAniData:Object = _aniData.getAnimation(_aniName);
+				
+				_boneAniData.totalFrames = _frameXML.attribute(FRAME);
 				_frameXMLList = _frameXML.elements(FRAME);
 				if (_frameXMLList.length() > 0) {
+					
 					var _arr:Array = [];
 					var _obj:Object;
+					var _frame:uint = 0;
 					for each(_nodeXML in _frameXMLList) {
 						_obj = { };
 						_obj.name = _nodeXML.attribute(NAME);
-						_obj.frame = int(_nodeXML.attribute(FRAME));
+						_obj.totalFrames = int(_nodeXML.attribute(FRAME));
 						_arr.push(_obj);
+						_frame += _obj.totalFrames;
 					}
-					_boneAnimations.animationList = _arr;
+					
+					_obj = { };
+					//补第一帧信息
+					_obj.name = null;
+					_obj.totalFrames = _boneAniData.totalFrames - _frame;
+					_arr.unshift(_obj);
+					_boneAniData.list = _arr;
 				}
 			}
 		}

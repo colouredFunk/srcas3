@@ -25,7 +25,7 @@ package akdcl.skeleton
 		
 		protected var loop:int;
 		protected var ease:int;
-		protected var frameID:int;
+		protected var toFrameID:int;
 		protected var betweenFrames:uint;
 		protected var playedFrames:uint;
 		protected var noScaleListFrames:uint;

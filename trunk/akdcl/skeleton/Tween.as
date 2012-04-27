@@ -86,56 +86,54 @@ package akdcl.skeleton{
 			if (currentPrecent > 1) {
 				currentPrecent = 1;
 			}
-			var _kD:Number;
-			if (loop >= -1) {
+			if (currentPrecent < 1 && loop >= -1) {
 				//多关键帧动画过程
+				var _kD:Number;
 				var _prevFrameID:int;
 				var _playedFrames:Number = noScaleListFrames * currentPrecent;
 				if (_playedFrames >= playedFrames) {
 					//到达新的关键点
 					if (loop > 0 && (loop & 1)) {
 						do {
-							betweenFrames = list.getValue(frameID).totalFrames;
+							betweenFrames = list.getValue(toFrameID).totalFrames;
 							playedFrames += betweenFrames;
-							_prevFrameID = frameID;
-							if (--frameID<0) {
-								frameID = list.length - 1;
+							_prevFrameID = toFrameID;
+							if (--toFrameID<0) {
+								toFrameID = list.length - 1;
 							}
 						}while (_playedFrames >= playedFrames);
 					}else {
 						do {
-							betweenFrames = list.getValue(frameID).totalFrames;
+							betweenFrames = list.getValue(toFrameID).totalFrames;
 							playedFrames += betweenFrames;
-							_prevFrameID = frameID;
-							if (++frameID>=list.length) {
-								frameID = 0;
+							_prevFrameID = toFrameID;
+							if (++toFrameID>=list.length) {
+								toFrameID = 0;
 							}
 						}while (_playedFrames >= playedFrames);
 					}
 					
 					from.copy(list.getValue(_prevFrameID));
-					to.copy(list.getValue(frameID));
+					to.copy(list.getValue(toFrameID));
 					node.betweenValue(from, to);
 				}
 				var _t:Number = betweenFrames - (playedFrames - _playedFrames);
 				var _d:Number = betweenFrames;
-				
 				_kD = _t/_d;
 				if (ease == 2) {
-					_kD = 0.5 * (1 - Math.cos(_t / _d * Math.PI ));
+					_kD = 0.5 * (1 - Math.cos(_kD * Math.PI ));
 				}else if (ease != 0) {
 					//_kD = ease < 0?((_t /= _d) * _t * _t):((_t = _t / _d - 1) * _t * _t + 1);
-					_kD = ease > 0?Math.sin(_t/_d * HALF_PI):(1 - Math.cos(_t/_d * HALF_PI));
+					_kD = ease > 0?Math.sin(_kD * HALF_PI):(1 - Math.cos(_kD * HALF_PI));
 				}
 				
 				if (_kD > 1) {
 					_kD = 1;
 				}
+				node.tweenTo(_kD);
 			}else {
-				//只有单独帧的动画过程
-				_kD = currentPrecent;
+				node.tweenTo(currentPrecent);
 			}
-			node.tweenTo(_kD);
 			
 			if (currentPrecent == 1) {
 				if (loop == -3) {
@@ -144,14 +142,14 @@ package akdcl.skeleton{
 					currentFrame = 0;
 					playedFrames = 0;
 					loop = -1;
-					frameID = 0;
+					toFrameID = 0;
 				}else if (loop == -2) {
 					//循环开始
 					totalFrames = listFrames;
 					currentFrame = 0;
 					playedFrames = 0;
 					loop = 0;
-					frameID = 0;
+					toFrameID = 0;
 				}else if (loop >= 0) {
 					//继续循环
 					currentFrame = 0;
@@ -159,7 +157,7 @@ package akdcl.skeleton{
 					if (yoyo) {
 						loop ++;
 					}
-					frameID = (loop & 1)?list.length - 1:0;
+					toFrameID = (loop & 1)?list.length - 1:0;
 				}else {
 					//complete
 					isComplete = true;
