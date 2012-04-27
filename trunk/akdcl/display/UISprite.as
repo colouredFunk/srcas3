@@ -22,7 +22,7 @@
 		
 		public var userData:Object;
 		
-		protected var __enabled:Boolean;
+		private var __enabled:Boolean;
 		public function get enabled():Boolean {
 			return __enabled;
 		}

@@ -150,7 +150,7 @@ package akdcl.manager {
 				var _logXML:XML;
 
 				for (var _i:int = _length - 1; _i >= 0; _i--){
-					_path = _classRoot["@" + A_PATH];
+					_path = _classRoot.attribute(A_PATH);
 					_eachClass = _extendsXMLList[_i];
 					_classCheck = getClassNode(_classRoot, _eachClass.attribute(A_ID));
 					if (_classCheck){
@@ -161,7 +161,7 @@ package akdcl.manager {
 						_classRoot["@" + A_PATH] = _path + "|" + _classRoot.childIndex();
 					}
 				}
-				_path = _classRoot["@" + A_PATH];
+				_path = _classRoot.attribute(A_PATH);
 
 				if (_id){
 					lastTarget = _classRoot.elements(E_TARGET).(attribute("_id") == _id)[0];
