@@ -5,24 +5,24 @@ package akdcl.skeleton{
 	 * @author Akdcl
 	 */
 	final public class Animation extends ProcessBase {
-		/**
-		 * 动画播放事件回调函数
-		 * 参数1：animationID 动画ID，
-		 * 参数2：boneID 骨骼ID，
-		 * 参数3：typeID 状态标识(0:动画完毕/1:列表动画开始/2:列表动画关键帧位置到达)，
-		 * 参数4：frameID 关键帧标识(当typeID为2时有效)。
-		 */
-		public var animationCallBack:Function;
+		public static const START:String = "start";
+		public static const COMPLETE:String = "complete";
+		public static const LOOP_COMPLETE:String = "loopComplete";
+		public static const IN_FRAME:String = "inFrame";
 		
-		private var animationData:ArmatureAniData;
+		public var callBack:Function;
+		
+		private var armatureAniData:ArmatureAniData;
+		private var boneAniData
 		private var tweens:Object;
+		private var aniIDNow:String;
 		
 		public function Animation() {
 			tweens = { };
 		}
 		
 		public function setData(_aniData:ArmatureAniData):void {
-			animationData = _aniData;
+			armatureAniData = _aniData;
 		}
 		
 		public function addTween(_bone:Bone):void {
@@ -39,19 +39,131 @@ package akdcl.skeleton{
 		
 		override public function playTo(_to:Object, _listFrame:uint, _toScale:Number = 1, _loopType:int = 0, _ease:int = 0):void {
 			super.playTo(_to, _listFrame, _toScale, _loopType, _ease);
-			var _boneAnimations:Object = animationData.getAnimation(_to as String);
-			if (!_boneAnimations) {
+			boneAniData = armatureAniData.getAnimation(_to as String);
+			if (!boneAniData) {
 				return;
 			}
+			aniIDNow = _to as String;
 			var _eachA:Object;
 			var _tween:Tween;
-			for (var _i:String in tweens) {
-				_tween = tweens[_i];
-				_eachA = _boneAnimations[_i];
+			for (var _boneName:String in tweens) {
+				_tween = tweens[_boneName];
+				_eachA = boneAniData[_boneName];
 				if (_eachA) {
 					_tween.playTo(_eachA, _listFrame, _toScale, _loopType, _ease);
 				}
 			}
+			noScaleListFrames = boneAniData.totalFrames;
+			
+			if (noScaleListFrames == 1) {
+				//普通过渡
+				loop = -4;
+			}else {
+				if (_loopType == 0) {
+					//列表过渡
+					loop = -3;
+					noScaleListFrames --;
+				}else {
+					//循环过渡
+					loop = -2;
+					if (_loopType < 0) {
+						yoyo = true;
+						noScaleListFrames--;
+					}else {
+						yoyo = false;
+					}
+				}
+				listFrames = _listFrame;
+			}
+		}
+		
+		override public function update():void 
+		{
+			if (isComplete || isPause) {
+				return;
+			}
+			super.update();
+			
+			if (loop >= -1 && boneAniData.list) {
+				var _kD:Number;
+				//多关键帧动画过程
+				var _prevFrameID:int;
+				var _playedFrames:Number = noScaleListFrames * currentPrecent;
+				
+				if (_playedFrames >= playedFrames) {
+					//到达新的关键点
+					if (loop > 0 && (loop & 1)) {
+						do {
+							betweenFrames = boneAniData.list[toFrameID].totalFrames;
+							playedFrames += betweenFrames;
+							_prevFrameID = toFrameID;
+							if (--toFrameID<0) {
+								toFrameID = boneAniData.list.length - 1;
+							}
+						}while (_playedFrames >= playedFrames);
+					}else {
+						do {
+							betweenFrames = boneAniData.list[toFrameID].totalFrames;
+							playedFrames += betweenFrames;
+							_prevFrameID = toFrameID;
+							if (++toFrameID>=boneAniData.list.length) {
+								toFrameID = 0;
+							}
+						}while (_playedFrames >= playedFrames);
+					}
+					if (_playedFrames > 0) {
+						if (callBack!=null) {
+							callBack(IN_FRAME, aniIDNow, boneAniData.list[_playedFrames].name);
+						}
+					}
+				}
+				_kD = 1 - (playedFrames - _playedFrames)/betweenFrames;
+				if (_kD > 1) {
+					_kD = 1;
+				}
+			}
+			
+			if (currentPrecent == 1) {
+				if (loop == -3) {
+					//列表过渡
+					totalFrames = listFrames;
+					currentFrame = 0;
+					playedFrames = 0;
+					loop = -1;
+					toFrameID = 0;
+					if (callBack!=null) {
+						callBack(START, aniIDNow);
+					}
+				}else if (loop == -2) {
+					//循环开始
+					totalFrames = listFrames;
+					currentFrame = 0;
+					playedFrames = 0;
+					loop = 0;
+					toFrameID = 0;
+					if (callBack!=null) {
+						callBack(START, aniIDNow);
+					}
+				}else if (loop >= 0) {
+					//继续循环
+					currentFrame = 0;
+					playedFrames = 0;
+					if (yoyo) {
+						loop ++;
+					}
+					toFrameID = (loop & 1)?boneAniData.list.length - 1:0;
+					if (callBack!=null) {
+						callBack(LOOP_COMPLETE, aniIDNow);
+					}
+				}else {
+					//complete
+					isComplete = true;
+					if (callBack!=null) {
+						callBack(COMPLETE, aniIDNow);
+					}
+				}
+			}
+			
 		}
 		
 		public function updateTween(_boneName:String):void {
