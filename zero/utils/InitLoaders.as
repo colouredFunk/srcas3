@@ -16,6 +16,7 @@ package zero.utils{
 	import flash.utils.*;
 	
 	public class InitLoaders{
+		
 		/**
 		 * 
 		 * 1个参数 getURLLoader(loadComplete)
@@ -28,6 +29,7 @@ package zero.utils{
 			initURLLoader.apply(InitLoaders,[urlLoader].concat(args));
 			return urlLoader;
 		}
+		
 		/**
 		 * 
 		 * 2个参数 initURLLoader(urlLoader,loadComplete)
@@ -68,6 +70,7 @@ package zero.utils{
 				addListener(urlLoader,IOErrorEvent.IO_ERROR,loadError);
 			}
 		}
+		
 		public static function clear(_loader:*,unload:Boolean=true):void{
 			if(_loader is URLLoader){
 				var urlLoader:URLLoader=_loader;
