@@ -20,6 +20,7 @@
 				txt.wordWrap=true;
 			}
 		}
+		
 		private var __text:String="";
 		public function get text():String {
 			if (txt.selectable) {
@@ -27,7 +28,6 @@
 			}
 			return __text;
 		}
-		[Inspectable(defaultValue="Txt",type="String",name="文本")]
 		public function set text(_text:String):void {
 			if (__text!=_text) {
 				txt.htmlText = __text = _text;
@@ -49,7 +49,6 @@
 		public function get type():String {
 			return txt.type;
 		}
-		[Inspectable(enumeration="dynamic,input",defaultValue="dynamic",type="String",name="类型")]
 		public function set type(_type:String):void {
 			txt.type=_type;
 		}
@@ -67,7 +66,6 @@
 		}
 		
 		protected var textFormat:TextFormat;
-		
 		
 		override protected function init():void {
 			super.init();
@@ -99,7 +97,7 @@
 					
 				}
 			} else {
-				txt.autoSize=txt.autoSize;
+				txt.autoSize = txt.autoSize;
 			}
 			if (txt.autoSize=="left") {
 				//txt.x=0;
