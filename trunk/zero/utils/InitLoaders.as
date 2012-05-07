@@ -71,6 +71,60 @@ package zero.utils{
 			}
 		}
 		
+		/**
+		 * 
+		 * 1个参数 getLoader(loadComplete)
+		 * 2个参数 getLoader(loadComplete,loadError)
+		 * 3个参数 getLoader(loadProgress,loadComplete,loadError)
+		 * 
+		 */	
+		public static function getLoader(...args):Loader{
+			var loader:Loader=new Loader();
+			initLoader.apply(InitLoaders,[loader].concat(args));
+			return loader;
+		}
+		
+		/**
+		 * 
+		 * 2个参数 initLoader(loader,loadComplete)
+		 * 3个参数 initLoader(loader,loadComplete,loadError)
+		 * 4个参数 initLoader(loader,loadProgress,loadComplete,loadError)
+		 * 
+		 */	
+		public static function initLoader(loader:Loader,...args):void{
+			var loadProgress:Function,loadComplete:Function,loadError:Function;
+			switch(args.length){
+				case 1:
+					loadProgress=null;
+					loadComplete=args[0];
+					loadError=null;
+				break;
+				case 2:
+					loadProgress=null;
+					loadComplete=args[0];
+					loadError=args[1];
+				break;
+				case 3:
+					loadProgress=args[0];
+					loadComplete=args[1];
+					loadError=args[2];
+				break;
+			}
+			if(loadProgress==null){
+			}else{
+				addListener(loader.contentLoaderInfo,ProgressEvent.PROGRESS,loadProgress);
+			}
+			if(loadComplete==null){
+			}else{
+				addListener(loader.contentLoaderInfo,Event.COMPLETE,loadComplete);
+			}
+			if(loadError==null){
+			}else{
+				addListener(loader.contentLoaderInfo,SecurityErrorEvent.SECURITY_ERROR,loadError);
+				addListener(loader.contentLoaderInfo,IOErrorEvent.IO_ERROR,loadError);
+			}
+		}
+		
 		public static function clear(_loader:*,unload:Boolean=true):void{
 			if(_loader is URLLoader){
 				var urlLoader:URLLoader=_loader;
@@ -79,6 +133,7 @@ package zero.utils{
 						urlLoader.close();
 					}catch(e:Error){}
 				}
+				removeListeners(urlLoader);
 			}else if(_loader is Loader){
 				var loader:Loader=_loader;
 				if(unload){
@@ -92,8 +147,8 @@ package zero.utils{
 						loader.unloadAndStop();
 					}catch(e:Error){}
 				}
+				removeListeners(loader.contentLoaderInfo);
 			}
-			removeListeners(_loader);
 		}
 		
 		private static var dict:Dictionary=new Dictionary();
