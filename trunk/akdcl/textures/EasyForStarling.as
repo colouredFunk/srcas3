@@ -20,6 +20,7 @@ package akdcl.textures
 				_img.name = _textureMix.getNodeName(_textXML);
 				_sprite.addChild(_img);
 			}
+			
 		}
 		
 		public static function getJoint(_textXML:XML, _texture:Texture):Image {
