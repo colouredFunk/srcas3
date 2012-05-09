@@ -36,9 +36,13 @@
 		}
 
 		public static function distance(_x0:Number, _y0:Number, _xt:Number, _yt:Number):Number {
+			return Math.sqrt(distanceSquared(_x0, _y0, _xt, _yt));
+		}
+		
+		public static function distanceSquared(_x0:Number, _y0:Number, _xt:Number, _yt:Number):Number {
 			var _dx:Number = _xt - _x0;
 			var _dy:Number = _yt - _y0;
-			return Math.sqrt(_dx * _dx + _dy * _dy);
+			return _dx * _dx + _dy * _dy;
 		}
 
 		//_n小于_nMin返回_nMin，大于_nMax返回_nMax，反之返回_n
