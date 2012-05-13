@@ -135,7 +135,7 @@ package zero.net{
 				}else{
 					loader.load(new URLRequest(xml.@src.toString()));
 				}
-			}else{
+			}else if(data is ByteArray){
 				loader.loadBytes(data);
 			}
 		}
@@ -169,12 +169,14 @@ package zero.net{
 				}else if(align.indexOf("bottom")>-1){
 					loader.y=-loader.contentLoaderInfo.height;
 				}else{
+					//middle
 					loader.y=-loader.contentLoaderInfo.height/2;
 				}
 				if(align.indexOf("left")>-1){
 				}else if(align.indexOf("right")>-1){
 					loader.x=-loader.contentLoaderInfo.width;
 				}else{
+					//center
 					loader.x=-loader.contentLoaderInfo.width/2;
 				}
 			}
