@@ -8,7 +8,6 @@ ShowImages
 
 package zero.ui{
 	import akdcl.media.MediaPlayer;
-	import akdcl.utils.addContextMenu;
 	
 	import com.greensock.TweenMax;
 	
@@ -51,68 +50,149 @@ package zero.ui{
 		private var d:int;
 		
 		private var scrollId:int;
-		private var currId:int;
+		public var currId:int;
 		
-		private var info:String;
-		private var infoMenuItem:ContextMenuItem;
+		//private var info:String;
+		//private var infoMenuItem:ContextMenuItem;
 		
-		public function ShowImages(){
+		private var direction:String;
+		
+		private var imgNodeName:String;
+		
+		private var img_align:String;
+		
+		private var tuijianImgXMLArr:Array;
+		
+		public var onClickIcon:Function;
+		public var onClickImg:Function;
+		
+		public var currImgXML:XML;
+		
+		private var selectedIconEnabled:Boolean;
+		
+		public function ShowImages(_selectedIconEnabled:Boolean,mask_inflate_dx:int=4,mask_inflate_dy:int=4){
 			
-			IconClass=icons.getChildAt(0)["constructor"];
-			switch(IconClass){
-				case Shape:
-				case Bitmap:
-				case Sprite:
-				case MovieClip:
-					throw new Error("需要 IconClass");
-				break;
+			selectedIconEnabled=_selectedIconEnabled;
+			
+			if(icons){
+				IconClass=icons.getChildAt(0)["constructor"];
+				switch(IconClass){
+					case Shape:
+					case Bitmap:
+					case Sprite:
+					case MovieClip:
+						throw new Error("需要 IconClass");
+					break;
+				}
 			}
 			
-			var menu:ContextMenu=img.contextMenu;
-			if (menu&&menu.customItems) {
-			}else{
-				menu=new ContextMenu();
+			initImg(img);
+			initSkin(skin);
+			direction="横向";
+			initIcons(icons,mask_inflate_dx,mask_inflate_dy);
+			initBtns(btnScrollPrev,btnScrollNext,btnPrev,btnNext);
+		}
+		
+		public function initImg(_img:Btn):void{
+			img=_img;
+			if(img){
+				//var menu:ContextMenu=img.contextMenu;
+				//if (menu&&menu.customItems) {
+				//}else{
+				//	menu=new ContextMenu();
+				//}
+				//menu.hideBuiltInItems();
+				//info="大图："+Math.round(img.width)+"x"+Math.round(img.height);
+				//if(icons){
+				//	info+="，小图："+Math.round(icons.getChildAt(0).width)+"x"+Math.round(icons.getChildAt(0).height);
+				//}
+				//infoMenuItem=new ContextMenuItem(info);
+				//menu.customItems.push(infoMenuItem);
+				//infoMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,copyInfo);
+				//this.contextMenu=menu;
+				
+				var b:Rectangle=img.getBounds(img);
+				if(Math.round(b.x)==0){
+					img_align=" left";
+				}else if(Math.round(b.x)==-Math.round(b.width)){
+					img_align=" right";
+				}else{
+					img_align=" center";
+				}
+				if(Math.round(b.y)==0){
+					img_align+=" top";
+				}else if(Math.round(b.y)==-Math.round(b.height)){
+					img_align+=" bottom";
+				}else{
+					img_align+=" middle";
+				}
+				img_align=img_align.substr(1);
 			}
-			menu.hideBuiltInItems();
-			info="大图："+Math.round(img.width)+"x"+Math.round(img.height)+"，小图："+Math.round(icons.getChildAt(0).width)+"x"+Math.round(icons.getChildAt(0).height);
-			infoMenuItem=new ContextMenuItem(info);
-			menu.customItems.push(infoMenuItem);
-			infoMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,copyInfo);
-			this.contextMenu=menu;
-			
-			player = new MediaPlayer();
-			player.repeat = 0;
-			skin.setPlayer(player);
-			skin.setSize(Math.round(img.width),Math.round(img.height));
-			
-			d=icons.getChildAt(1).y-icons.getChildAt(0).y;
-			
-			var b:Rectangle=icons.getBounds(icons);
-			b.inflate(4,4);
-			
-			num=icons.numChildren;
-			
-			var i:int=num;
-			while(--i>=0){
-				icons.removeChildAt(i);
+		}
+		public function initSkin(_skin:AutoFitMediaSkin):void{
+			skin=_skin;
+			if(skin){
+				player = new MediaPlayer();
+				player.repeat = 0;
+				skin.setPlayer(player);
+				skin.setSize(Math.round(img.width),Math.round(img.height));
 			}
-			
-			iconArea=new Sprite();
-			icons.addChild(iconArea);
-			scrollMaskSp=new Sprite();
-			icons.addChild(scrollMaskSp);
-			scrollMaskSp.graphics.clear();
-			scrollMaskSp.graphics.beginFill(0x000000);
-			//scrollMaskSp.graphics.beginFill(0xff0000,0.3);trace("测试");
-			scrollMaskSp.graphics.drawRect(b.x,b.y,b.width,b.height);
-			scrollMaskSp.graphics.endFill();
-			icons.mask=scrollMaskSp;
-			
-			btnScrollPrev.release=scrollPrev;
-			btnScrollNext.release=scrollNext;
-			
-			btnPrev.release=prev;
-			btnNext.release=next;
+		}
+		public function initIcons(_icons:Sprite,mask_inflate_dx:int,mask_inflate_dy:int):void{
+			icons=_icons;
+			if(icons){
+				d=icons.getChildAt(1).x-icons.getChildAt(0).x;
+				if(d*d<4){
+					direction="纵向";
+					d=icons.getChildAt(1).y-icons.getChildAt(0).y;
+				}
+				
+				var b:Rectangle=icons.getBounds(icons);
+				//向外扩展几像素
+				b.inflate(mask_inflate_dx,mask_inflate_dy);
+				
+				num=icons.numChildren;
+				
+				var i:int=num;
+				while(--i>=0){
+					icons.removeChildAt(i);
+				}
+				
+				iconArea=new Sprite();
+				icons.addChild(iconArea);
+				scrollMaskSp=new Sprite();
+				icons.addChild(scrollMaskSp);
+				scrollMaskSp.graphics.clear();
+				scrollMaskSp.graphics.beginFill(0x000000);
+				//scrollMaskSp.graphics.beginFill(0xff0000,0.3);trace("测试");
+				scrollMaskSp.graphics.drawRect(b.x,b.y,b.width,b.height);
+				scrollMaskSp.graphics.endFill();
+				icons.mask=scrollMaskSp;
+			}
+		}
+		public function initBtns(...btns):void{
+			for each(var btn:Btn in btns){
+				if(btn){
+					switch(btn.name){
+						case "btnScrollPrev":
+							btnScrollPrev=btn;
+							btnScrollPrev.release=scrollPrev;
+						break;
+						case "btnScrollNext":
+							btnScrollNext=btn;
+							btnScrollNext.release=scrollNext;
+						break;
+						case "btnPrev":
+							btnPrev=btn;
+							btnPrev.release=prev;
+						break;
+						case "btnNext":
+							btnNext=btn;
+							btnNext.release=next;
+						break;
+					}
+				}
+			}
 		}
 		
 		public function clear():void{
@@ -122,165 +202,315 @@ package zero.ui{
 			
 			xml=null;
 			
-			(img["img"] as ImgLoader).clear();
+			if(img){
+				(img["img"] as ImgLoader).clear();
+			}
 			
-			infoMenuItem.removeEventListener(ContextMenuEvent.MENU_ITEM_SELECT,copyInfo);
-			infoMenuItem=null;
+			//if(infoMenuItem){
+			//	infoMenuItem.removeEventListener(ContextMenuEvent.MENU_ITEM_SELECT,copyInfo);
+			//	infoMenuItem=null;
+			//}
 			
-			player.stop();
-			player=null;
+			if(player){
+				player.stop();
+				player=null;
+			}
+			
+			onClickIcon=null;
+			onClickImg=null;
+			
+			currImgXML=null;
 		}
 		private function clearIcons():void{
-			var i:int=iconArea.numChildren;
-			while(--i>=0){
-				iconArea.getChildAt(i)["clear"]();
-				iconArea.removeChildAt(i);
+			if(iconArea){
+				var i:int=iconArea.numChildren;
+				while(--i>=0){
+					iconArea.getChildAt(i)["clear"]();
+					iconArea.removeChildAt(i);
+				}
 			}
 		}
 		
-		private function copyInfo(event:ContextMenuEvent):void{
-			System.setClipboard(info);
-		}
+		//private function copyInfo(event:ContextMenuEvent):void{
+		//	System.setClipboard(info);
+		//}
 		
-		public function init(_xml:XML):void{
+		public function init(_xml:XML,_imgNodeName:String=null):void{
 			
 			clearIcons();
 			
 			xml=_xml;
+			imgNodeName=_imgNodeName||"img";
 			
-			//trace("xml="+xml.toXMLString());
-			
-			player.stop();
-			iconArea.y=0
+			if(skin){
+				player.stop();
+			}
+			if(skin){
+				skin.visible=false;
+			}
+			if(iconArea){
+				iconArea.x=0;
+				iconArea.y=0;
+			}
 			scrollId=0;
 			currId=0;
-			skin.visible=false;
-			img.visible=false;
-			
-			var y:int=0;
-			var i:int=-1;
-			for each(var imgXML:XML in xml.img){
-				i++;
-				var icon:Btn=new IconClass();
-				iconArea.addChild(icon);
-				icon.y=y;
-				icon["initXML"](imgXML,imgXML.@icon.toString()||imgXML.@src.toString(),clickIcon);
-				y+=d;
+			if(img){
+				img.visible=false;
 			}
 			
-			updateBtns();
+			var imgXML:XML,i:int;
 			
-			if(iconArea.numChildren){
-				clickIcon(iconArea.getChildAt(0) as Btn);
+			if(iconArea){
+				var pos:int=0;
+				i=-1;
+				for each(imgXML in xml[imgNodeName]){
+					i++;
+					var icon:Btn=new IconClass();
+					iconArea.addChild(icon);
+					switch(direction){
+						case "横向":
+							icon.x=pos;
+						break;
+						case "纵向":
+							icon.y=pos;
+						break;
+					}
+					icon["initXML"](imgXML,imgXML.@icon.toString()||imgXML.@src.toString(),clickIcon);
+					pos+=d;
+				}
+			}
+			
+			tuijianImgXMLArr=new Array();
+			
+			i=-1;
+			for each(imgXML in xml[imgNodeName]){
+				i++;
+				if(imgXML.@tuijian.toString()=="true"){
+					tuijianImgXMLArr.push(imgXML);
+				}
+			}
+			if(tuijianImgXMLArr.length){
+			}else{
+				i=-1;
+				for each(imgXML in xml[imgNodeName]){
+					i++;
+					tuijianImgXMLArr.push(imgXML);
+				}
+			}
+			
+			currId=getImgXMLId(tuijianImgXMLArr[0]);
+			
+			if(iconArea&&iconArea.numChildren){
+				selectIcon(iconArea.getChildAt(currId) as Btn);
+			}else{
+				selectImgXML(xml[imgNodeName][currId]);
 			}
 		}
 		
 		private function clickIcon(icon:Btn):void{
-			
-			imgXML=icon["xml"];
-			
-			(img["img"] as ImgLoader).clearLoader();
-			if(/^.*\.flv$/i.test(imgXML.@src.toString())){
-				player.load(imgXML.@src.toString());
-				player.play();
-				skin.visible=true;
-				img.visible=false;
+			if(onClickIcon==null){
+				selectIcon(icon);
 			}else{
-				skin.visible=false;
-				img.visible=true;
-				(img["img"] as ImgLoader).load(imgXML.@src.toString());
+				onClickIcon(icon);
+			}
+		}
+		
+		public function selectIcon(icon:Btn):void{
+			selectImgXML(icon["xml"]);
+			
+			var i:int=-1;
+			for each(var imgXML:XML in xml[imgNodeName]){
+				i++;
+				var _icon:Btn=iconArea.getChildAt(i) as Btn;
+				if(icon==_icon){
+					icon.selected=true;
+					if(selectedIconEnabled){
+					}else{
+						icon.mouseEnabled=false;
+					}
+				}else{
+					_icon.selected=false;
+					if(selectedIconEnabled){
+					}else{
+						_icon.mouseEnabled=true;
+					}
+				}
+			}
+		}
+		public function selectImgXML(imgXML:XML):void{
+			
+			currImgXML=imgXML;
+			
+			if(img){
+				(img["img"] as ImgLoader).clearLoader();
 			}
 			
-			if(imgXML.@href.toString()||imgXML.@js.toString()){
-				img.href=imgXML;
-				img.mouseEnabled=true;
+			if(player){
+				player.stop();
+			}
+			
+			if(/^.*\.flv$/i.test(imgXML.@src.toString())){
+				if(player){
+					player.load(imgXML.@src.toString());
+					player.play();
+				}
+				if(skin){
+					skin.visible=true;
+				}
+				if(img){
+					img.visible=false;
+				}
 			}else{
-				img.mouseEnabled=false;
+				if(skin){
+					skin.visible=false;
+				}
+				if(img){
+					img.visible=true;
+					(img["img"] as ImgLoader).load(<img src={imgXML.@src.toString()} align={img_align}/>);
+				}
+			}
+			
+			if(img){
+				if(onClickImg==null){
+					if(imgXML.@href.toString()||imgXML.@js.toString()){
+						img.href=imgXML;
+						img.mouseEnabled=true;
+					}else{
+						img.mouseEnabled=false;
+					}
+				}else{
+					img.mouseEnabled=true;
+					img.release=onClickImg;
+				}
 			}
 			
 			var i:int=-1;
-			for each(var imgXML:XML in xml.img){
+			for each(var _imgXML:XML in xml[imgNodeName]){
 				i++;
-				var _icon:Btn=iconArea.getChildAt(i) as Btn;
-				_icon.selected=false;
-				_icon.mouseEnabled=true;
+				if(imgXML===_imgXML){
+					currId=i;
+					break;
+				}
 			}
-			icon.selected=true;
-			icon.mouseEnabled=false;
-			currId=iconArea.getChildIndex(icon);
+			
+			while(currId+1>scrollId+num){
+				scrollNext();
+			}
+			while(currId<scrollId){
+				scrollPrev();
+			}
 			
 			updateBtns();
 		}
 		
 		private function updateBtns():void{
-			if(scrollId>0){
-				btnScrollPrev.alpha=1;
-				btnScrollPrev.mouseEnabled=true;
-			}else{
-				btnScrollPrev.alpha=0.5;
-				btnScrollPrev.mouseEnabled=false;
+			if(btnScrollPrev){
+				if(scrollId>0){
+					btnScrollPrev.alpha=1;
+					btnScrollPrev.mouseEnabled=true;
+				}else{
+					btnScrollPrev.alpha=0.5;
+					btnScrollPrev.mouseEnabled=false;
+				}
 			}
-			if(scrollId<xml.img.length()-num){
-				btnScrollNext.alpha=1;
-				btnScrollNext.mouseEnabled=true;
-			}else{
-				btnScrollNext.alpha=0.5;
-				btnScrollNext.mouseEnabled=false;
+			if(btnScrollNext){
+				if(scrollId<xml[imgNodeName].length()-num){
+					btnScrollNext.alpha=1;
+					btnScrollNext.mouseEnabled=true;
+				}else{
+					btnScrollNext.alpha=0.5;
+					btnScrollNext.mouseEnabled=false;
+				}
 			}
-			if(currId>0){
-				btnPrev.alpha=1;
-				btnPrev.mouseEnabled=true;
-			}else{
-				btnPrev.alpha=0.5;
-				btnPrev.mouseEnabled=false;
+			
+			if(btnPrev){
+				if(currId>getImgXMLId(tuijianImgXMLArr[0])){
+					btnPrev.alpha=1;
+					btnPrev.mouseEnabled=true;
+				}else{
+					btnPrev.alpha=0.5;
+					btnPrev.mouseEnabled=false;
+				}
 			}
-			if(currId<xml.img.length()-1){
-				btnNext.alpha=1;
-				btnNext.mouseEnabled=true;
-			}else{
-				btnNext.alpha=0.5;
-				btnNext.mouseEnabled=false;
+			if(btnNext){
+				if(currId<getImgXMLId(tuijianImgXMLArr[tuijianImgXMLArr.length-1])){
+					btnNext.alpha=1;
+					btnNext.mouseEnabled=true;
+				}else{
+					btnNext.alpha=0.5;
+					btnNext.mouseEnabled=false;
+				}
 			}
 		}
 		private function scrollPrev():void{
-			scrollId--;
-			TweenMax.to(iconArea,0.3,{y:-scrollId*d});
-			
-			updateBtns();
+			//scrollId--;
+			if((scrollId-=num)<0){
+				scrollId=0;
+			}
+			scroll();
 		}
 		private function scrollNext():void{
-			scrollId++;
-			TweenMax.to(iconArea,0.3,{y:-scrollId*d});
+			//scrollId++;
+			if((scrollId+=num)>=xml[imgNodeName].length()){
+				scrollId=xml[imgNodeName].length();
+			}
+			scroll();
+		}
+		private function scroll():void{
+			if(iconArea){
+				switch(direction){
+					case "横向":
+						TweenMax.to(iconArea,0.3,{x:-scrollId*d});
+					break;
+					case "纵向":
+						TweenMax.to(iconArea,0.3,{y:-scrollId*d});
+					break;
+				}
+			}
 			
 			updateBtns();
 		}
 		private function prev():void{
-			currId--;
-			
-			clickIcon(iconArea.getChildAt(currId) as Btn);
-			
-			while(currId<scrollId){
-				scrollPrev();
+			var i:int=currId;
+			while(--i>=0){
+				var imgXML:XML=xml[imgNodeName][i];
+				if(imgXML.@tuijian.toString()=="true"){
+					select(i);
+					return;
+				}
 			}
-			while(currId+1>scrollId+num){
-				scrollNext();
-			}
-			
-			updateBtns();
+			select(--currId);
 		}
 		private function next():void{
-			currId++;
-			
-			clickIcon(iconArea.getChildAt(currId) as Btn);
-			
-			while(currId+1>scrollId+num){
-				scrollNext();
+			var i:int=currId;
+			while(++i<xml[imgNodeName].length()){
+				var imgXML:XML=xml[imgNodeName][i];
+				if(imgXML.@tuijian.toString()=="true"){
+					select(i);
+					return;
+				}
 			}
-			while(currId<scrollId){
-				scrollPrev();
-			}
+			select(++currId);
+		}
+		public function select(id:int):void{
+			currId=id;
 			
-			updateBtns();
+			if(iconArea){
+				selectIcon(iconArea.getChildAt(currId) as Btn);
+			}else{
+				selectImgXML(xml[imgNodeName][currId]);
+			}
+		}
+		
+		private function getImgXMLId(imgXML:XML):int{
+			var i:int=-1;
+			for each(var _imgXML:XML in xml[imgNodeName]){
+				i++;
+				if(imgXML===_imgXML){
+					return i;
+				}
+			}
+			throw new Error("getImgXMLId 找不到位置");
 		}
 	}
 }
