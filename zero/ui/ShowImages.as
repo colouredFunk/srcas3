@@ -168,6 +168,8 @@ package zero.ui{
 				scrollMaskSp.graphics.drawRect(b.x,b.y,b.width,b.height);
 				scrollMaskSp.graphics.endFill();
 				icons.mask=scrollMaskSp;
+			}else{
+				num=1;
 			}
 		}
 		public function initBtns(...btns):void{
@@ -393,10 +395,20 @@ package zero.ui{
 				}
 			}
 			
+			//var depth:int=0;
 			while(currId+1>scrollId+num){
+				//trace("+++",currId+1,scrollId+num);
+				//if(++depth>100){
+				//	break;
+				//}
 				scrollNext();
 			}
+			//var depth:int=0;
 			while(currId<scrollId){
+				//trace("---",currId+1,scrollId+num);
+				//if(++depth>100){
+				//	break;
+				//}
 				scrollPrev();
 			}
 			

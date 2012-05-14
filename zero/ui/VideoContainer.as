@@ -43,7 +43,9 @@ package zero.ui{
 			connection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
 			connection.connect(null);
 			
-			btnSkip.release=skip;
+			if(btnSkip){
+				btnSkip.release=skip;
+			}
 		}
 		
 		private function netStatusHandler(event:NetStatusEvent):void {

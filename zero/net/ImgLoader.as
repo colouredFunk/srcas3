@@ -20,7 +20,7 @@ package zero.net{
 	
 	public class ImgLoader extends Sprite{
 		
-		private var xml:XML;
+		public var xml:XML;
 		
 		public var loader:Loader;
 		private var container:Sprite;
