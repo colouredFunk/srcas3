@@ -115,7 +115,7 @@ package akdcl.layout {
 			}
 		}
 
-		public function forEachGroup(_fun:Function, ... args){
+		public function forEachGroup(_fun:Function, ... args):void{
 			var _arr1:Array = args.concat();
 			_arr1.unshift(this);
 			_fun.apply(this, _arr1);
@@ -130,7 +130,7 @@ package akdcl.layout {
 			}
 		}
 
-		public function forEachChild(_fun:Function, ... args){
+		public function forEachChild(_fun:Function, ... args):void{
 			var _arr1:Array;
 
 			var _arrn:Array = args.concat();
