@@ -45,7 +45,7 @@ package akdcl.skeleton
 			boneList = new Vector.<Bone>;
 			
 			animation = new Animation();
-			container = _container;
+			setContainer(_container);
 		}
 		
 		/**
@@ -179,5 +179,10 @@ package akdcl.skeleton
 		public function getContainer():Object {
 			return container;
 		}
+		
+		public function setContainer(_container:Object):void {
+			container = _container;
+		}
+		
 	}
 }
