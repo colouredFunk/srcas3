@@ -45,7 +45,9 @@ package akdcl.skeleton
 			boneList = new Vector.<Bone>;
 			
 			animation = new Animation();
-			setContainer(_container);
+			if (_container) {
+				setContainer(_container);
+			}
 		}
 		
 		/**

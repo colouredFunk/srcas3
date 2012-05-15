@@ -24,11 +24,13 @@ package akdcl.textures
 			return xml.child(_id)[0];
 		}
 		
-		public function getNodeName(_xml:XML):String {
+		public function getNodeName(_xml:XML, _id:String = null):String {
 			var _string:String = _xml.@name;
-			var _start:int = _string.indexOf("_");
-			if (_start > 0) {
-				return _string.substr(_start + 1);
+			if (_id) {
+				var _start:int = _string.indexOf(_id);
+				if (_start == 0) {
+					return _string.substr(_start + _id.length + 1);
+				}
 			}
 			return _string;
 		}
