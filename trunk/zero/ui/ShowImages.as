@@ -23,7 +23,6 @@ package zero.ui{
 	
 	import ui.Btn;
 	
-	import zero.net.ImgLoader;
 	import zero.ui.*;
 	
 	public class ShowImages extends Sprite{
@@ -91,6 +90,13 @@ package zero.ui{
 			direction="横向";
 			initIcons(icons,mask_inflate_dx,mask_inflate_dy);
 			initBtns(btnScrollPrev,btnScrollNext,btnPrev,btnNext);
+			
+			if(skin){
+				skin.visible=false;
+			}
+			if(img){
+				img.visible=false;
+			}
 		}
 		
 		public function initImg(_img:Btn):void{
@@ -244,7 +250,7 @@ package zero.ui{
 			xml=_xml;
 			imgNodeName=_imgNodeName||"img";
 			
-			if(skin){
+			if(player){
 				player.stop();
 			}
 			if(skin){
@@ -343,15 +349,11 @@ package zero.ui{
 			
 			currImgXML=imgXML;
 			
-			if(img){
-				(img["img"] as ImgLoader).clearLoader();
-			}
-			
 			if(player){
 				player.stop();
 			}
 			
-			if(/^.*\.flv$/i.test(imgXML.@src.toString())){
+			if(/^.*\.flv$/i.test(imgXML.@src.toString())&&player&&skin){
 				if(player){
 					player.load(imgXML.@src.toString());
 					player.play();
@@ -456,15 +458,20 @@ package zero.ui{
 		}
 		private function scrollPrev():void{
 			//scrollId--;
-			if((scrollId-=num)<0){
+			scrollId-=num;
+			if(scrollId<0){
 				scrollId=0;
 			}
 			scroll();
 		}
 		private function scrollNext():void{
 			//scrollId++;
-			if((scrollId+=num)>=xml[imgNodeName].length()){
-				scrollId=xml[imgNodeName].length();
+			scrollId+=num;
+			if(scrollId+num>=xml[imgNodeName].length()){
+				scrollId=xml[imgNodeName].length()-num;
+				if(scrollId<0){
+					scrollId=0;
+				}
 			}
 			scroll();
 		}

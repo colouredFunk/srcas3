@@ -324,7 +324,7 @@ package zero.ui{
 			throw new Error("value="+value);
 		}
 		
-		private function getSettingXML(settingName:String):XML{
+		public function getSettingXML(settingName:String):XML{
 			switch(settingName){
 				case "默认":
 					return <setting name="默认"/>;
@@ -341,7 +341,7 @@ package zero.ui{
 			}
 			return null;
 		}
-		private function setSettingXML(settingName:String,settingXML:XML):void{
+		public function setSettingXML(settingName:String,settingXML:XML):void{
 			settingXML=settingXML.copy();
 			switch(settingName){
 				case "默认":
