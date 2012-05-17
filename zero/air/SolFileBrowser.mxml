@@ -95,6 +95,9 @@ SolFileBrowser
 				btn.label=btnLabel;
 				//cb.left=txt.text.length*10;
 				
+				updateFileURLArr(null);
+			}
+			public function updateFileURLArr(_fileURLArr:Array):void{
 				var oldFileURL:String;
 				if(cb.selectedItem){
 					oldFileURL=cb.selectedItem.toString();
@@ -103,16 +106,25 @@ SolFileBrowser
 				}
 				
 				var fileURL:String;
-				if(sol.xml.@currSettingName.toString()=="默认"){
-					fileURLArr=[];
-					fileURL=null;
-				}else{
+				if(_fileURLArr){
+					fileURLArr=_fileURLArr;
 					if(sol.getValue(sol_key)){
-						fileURLArr=sol.getValue(sol_key).fileURLArr;
 						fileURL=sol.getValue(sol_key).fileURL;
 					}else{
+						fileURL=null;
+					}
+				}else{
+					if(sol.xml.@currSettingName.toString()=="默认"){
 						fileURLArr=[];
 						fileURL=null;
+					}else{
+						if(sol.getValue(sol_key)){
+							fileURLArr=sol.getValue(sol_key).fileURLArr;
+							fileURL=sol.getValue(sol_key).fileURL;
+						}else{
+							fileURLArr=[];
+							fileURL=null;
+						}
 					}
 				}
 				
