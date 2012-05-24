@@ -151,8 +151,6 @@ package ui.transformTool
 			shapeBounds = new ShapeClass();
 			containTest = new ContainPointClass();
 			
-			rectArea =  new Rectangle(0, 0, toolContainer.stage.stageWidth, toolContainer.stage.stageHeight);
-			
 			objectInfoList = new Array();
 			recordeList = new Array();
 			selectIndex = -1;
@@ -186,7 +184,8 @@ package ui.transformTool
 			toolContainer.stage.removeEventListener( MouseEvent.MOUSE_MOVE, EventHadler);
 			toolContainer.removeEventListener( MouseEvent.MOUSE_DOWN, EventHadler);
 			toolContainer.stage.removeEventListener( MouseEvent.MOUSE_UP, EventHadler);
-		}	
+		}
+		
 		public function AddControl(_disObject:DisplayObject,_isCenterMid:Boolean=true):void
 		{
 			var _objInfo:Object = findObjectInfo(_disObject);
@@ -455,7 +454,7 @@ package ui.transformTool
 			
 			mousePoint.x = toolContainer.mouseX;
 			mousePoint.y = toolContainer.mouseY;
-			var _isInRectArea:Boolean = rectArea.containsPoint(mousePoint);
+			var _isInRectArea:Boolean = rectArea?rectArea.containsPoint(mousePoint):true;
 			
 			var _matrix:Object;
 			var _areaNum:int;
