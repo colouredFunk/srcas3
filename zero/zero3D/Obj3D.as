@@ -121,36 +121,36 @@ package zero.zero3D{
 			var rad:Number=degrees*Math.PI/180;
 			var c:Number=Math.cos(rad);
 			var s:Number=Math.sin(rad);
-			matrix3D.rawData=Vector.<Number>([
+			matrix3D.rawData=new <Number>[
 				1,0,0,0,
 				0,c,s,0,
 				0,-s,c,0,
 				0,0,0,1
-			]);
+			];
 		}
 		
 		public function setRotaY(degrees:Number):void{
 			var rad:Number=degrees*Math.PI/180;
 			var c:Number=Math.cos(rad);
 			var s:Number=Math.sin(rad);
-			matrix3D.rawData=Vector.<Number>([
+			matrix3D.rawData=new <Number>[
 				c,0,-s,0,
 				0,1,0,0,
 				s,0,c,0,
 				0,0,0,1
-			]);
+			];
 		}
 		
 		public function setRotaZ(degrees:Number):void{
 			var rad:Number=degrees*Math.PI/180;
 			var c:Number=Math.cos(rad);
 			var s:Number=Math.sin(rad);
-			matrix3D.rawData=Vector.<Number>([
+			matrix3D.rawData=new <Number>[
 				c,s,0,0,
 				-s,c,0,0,
 				0,0,1,0,
 				0,0,0,1
-			]);
+			];
 		}
 		
 		public function checkMatrix3D():String{

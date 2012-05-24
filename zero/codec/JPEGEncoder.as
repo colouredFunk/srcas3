@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////
 //
 //  ADOBE SYSTEMS INCORPORATED
 //  Copyright 2007 Adobe Systems Incorporated
@@ -32,12 +32,12 @@ package zero.codec{
 	public class JPEGEncoder{
 		public static const contentType:String = "image/jpeg";
 		
-		private static const std_dc_luminance_nrcodes:Vector.<int> = Vector.<int>([ 0, 0, 1, 5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 ]);
-		private static const std_dc_luminance_values:Vector.<int> =  Vector.<int>([ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ]);
-		private static const std_dc_chrominance_nrcodes:Vector.<int> =  Vector.<int>([ 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 ]);
-		private static const std_dc_chrominance_values:Vector.<int> =  Vector.<int>([ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ]);
-		private static const std_ac_luminance_nrcodes:Vector.<int> =  Vector.<int>([ 0, 0, 2, 1, 3, 3, 2, 4, 3, 5, 5, 4, 4, 0, 0, 1, 0x7D ]);
-		private static const std_ac_luminance_values:Vector.<int> = Vector.<int>([
+		private static const std_dc_luminance_nrcodes:Vector.<int> = new <int>[ 0, 0, 1, 5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 ];
+		private static const std_dc_luminance_values:Vector.<int> =  new <int>[ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ];
+		private static const std_dc_chrominance_nrcodes:Vector.<int> =  new <int>[ 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 ];
+		private static const std_dc_chrominance_values:Vector.<int> =  new <int>[ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ];
+		private static const std_ac_luminance_nrcodes:Vector.<int> =  new <int>[ 0, 0, 2, 1, 3, 3, 2, 4, 3, 5, 5, 4, 4, 0, 0, 1, 0x7D ];
+		private static const std_ac_luminance_values:Vector.<int> = new <int>[
 			0x01, 0x02, 0x03, 0x00, 0x04, 0x11, 0x05, 0x12,
 			0x21, 0x31, 0x41, 0x06, 0x13, 0x51, 0x61, 0x07,
 			0x22, 0x71, 0x14, 0x32, 0x81, 0x91, 0xA1, 0x08,
@@ -59,9 +59,9 @@ package zero.codec{
 			0xE3, 0xE4, 0xE5, 0xE6, 0xE7, 0xE8, 0xE9, 0xEA,
 			0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8,
 			0xF9, 0xFA
-		]);
-		private static const std_ac_chrominance_nrcodes:Vector.<int> = Vector.<int>([ 0, 0, 2, 1, 2, 4, 4, 3, 4, 7, 5, 4, 4, 0, 1, 2, 0x77 ]);
-		private static const std_ac_chrominance_values:Vector.<int> = Vector.<int>([
+		];
+		private static const std_ac_chrominance_nrcodes:Vector.<int> = new <int>[ 0, 0, 2, 1, 2, 4, 4, 3, 4, 7, 5, 4, 4, 0, 1, 2, 0x77 ];
+		private static const std_ac_chrominance_values:Vector.<int> = new <int>[
 			0x00, 0x01, 0x02, 0x03, 0x11, 0x04, 0x05, 0x21,
 			0x31, 0x06, 0x12, 0x41, 0x51, 0x07, 0x61, 0x71,
 			0x13, 0x22, 0x32, 0x81, 0x08, 0x14, 0x42, 0x91,
@@ -83,7 +83,7 @@ package zero.codec{
 			0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, 0xE8, 0xE9,
 			0xEA, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8,
 			0xF9, 0xFA
-		]);
+		];
 		
 		private static var jpegEncoderV:Vector.<JPEGEncoder>=new Vector.<JPEGEncoder>(101);
 		public static function encode(bitmapData:BitmapData,quality:int=80):ByteArray{

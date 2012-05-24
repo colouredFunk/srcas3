@@ -29,12 +29,12 @@ package zero.ui{
 		
 		public var xml:XML;
 		
-		private var loader:Loader;
+		public var loader:Loader;
 		private var dataLoader:URLLoader;
 		
 		private var connection:NetConnection;
 		private var stream:NetStream;
-		private var video:Video;
+		public var video:Video;
 		private var video_is_showing:Boolean;
 		
 		private var align:String;
@@ -48,8 +48,9 @@ package zero.ui{
 		public var autoPlay:Boolean;
 		public var repeat:Boolean;
 		
-		public var onPlayComplete:Function;
+		public var onLoadComplete:Function;
 		public var onFadeComplete:Function;
+		public var onPlayComplete:Function;
 		
 		public function ImgLoader():void{
 			
@@ -97,6 +98,9 @@ package zero.ui{
 				video.attachNetStream(null);
 				video=null;
 			}
+			
+			onLoadComplete=null;
+			onFadeComplete=null;
 			onPlayComplete=null;
 		}
 		public function stopLoader():void{
@@ -399,6 +403,11 @@ package zero.ui{
 			loadData(dataLoader.data);
 		}
 		private function loadImgComplete(...args):void{
+			if(xml.@smoothing.toString()=="true"){
+				if(loader.content is Bitmap){
+					(loader.content as Bitmap).smoothing=true;
+				}
+			}
 			showContent(loader,loader.contentLoaderInfo.width,loader.contentLoaderInfo.height);
 			_loadComplete();
 			var movie:MovieClip=getMovie();
@@ -536,10 +545,10 @@ package zero.ui{
 				stopAll(progressClip);
 				progressClip.visible=false;
 			}
-			//if(onLoadComplete==null){
-			//}else{
-			//	onLoadComplete();
-			//}
+			if(onLoadComplete==null){
+			}else{
+				onLoadComplete();
+			}
 		}
 		private function _loadError():void{
 			if(progressClip){

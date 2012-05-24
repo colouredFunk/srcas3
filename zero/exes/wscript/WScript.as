@@ -50,7 +50,7 @@ package zero.exes.wscript{
 			stream.writeMultiByte(script,"gb2312");
 			stream.close();
 			
-			nativeProcessStartupInfo.arguments=Vector.<String>([vbsFile.nativePath]);
+			nativeProcessStartupInfo.arguments=new <String>[vbsFile.nativePath];
 			nativeProcess=new NativeProcess();
 			nativeProcess.addEventListener(NativeProcessExitEvent.EXIT,exit);
 			nativeProcess.start(nativeProcessStartupInfo);

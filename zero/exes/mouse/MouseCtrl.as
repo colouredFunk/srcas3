@@ -99,7 +99,7 @@ class MoveTo extends NativeProcess{
 		onExit=_onExit;
 		var nativeProcessStartupInfo:NativeProcessStartupInfo=new NativeProcessStartupInfo();
 		nativeProcessStartupInfo.executable=_executable;
-		nativeProcessStartupInfo.arguments=Vector.<String>(["m,"+x+","+y]);
+		nativeProcessStartupInfo.arguments=new <String>["m,"+x+","+y];
 		this.addEventListener(NativeProcessExitEvent.EXIT,_exit);
 		this.start(nativeProcessStartupInfo);
 	}
@@ -120,7 +120,7 @@ class Click extends NativeProcess{
 		onExit=_onExit;
 		var nativeProcessStartupInfo:NativeProcessStartupInfo=new NativeProcessStartupInfo();
 		nativeProcessStartupInfo.executable=_executable;
-		nativeProcessStartupInfo.arguments=Vector.<String>(["l"]);
+		nativeProcessStartupInfo.arguments=new <String>["l"];
 		this.addEventListener(NativeProcessExitEvent.EXIT,_exit);
 		this.start(nativeProcessStartupInfo);
 	}
@@ -141,7 +141,7 @@ class RightClick extends NativeProcess{
 		onExit=_onExit;
 		var nativeProcessStartupInfo:NativeProcessStartupInfo=new NativeProcessStartupInfo();
 		nativeProcessStartupInfo.executable=_executable;
-		nativeProcessStartupInfo.arguments=Vector.<String>(["r"]);
+		nativeProcessStartupInfo.arguments=new <String>["r"];
 		this.addEventListener(NativeProcessExitEvent.EXIT,_exit);
 		this.start(nativeProcessStartupInfo);
 	}

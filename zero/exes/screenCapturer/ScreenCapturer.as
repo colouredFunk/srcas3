@@ -47,7 +47,7 @@ package zero.exes.screenCapturer{
 			}
 			var nativeProcessStartupInfo:NativeProcessStartupInfo=new NativeProcessStartupInfo();
 			nativeProcessStartupInfo.executable=executable;
-			nativeProcessStartupInfo.arguments=Vector.<String>([new File(_bmpPath).nativePath]);
+			nativeProcessStartupInfo.arguments=new <String>[new File(_bmpPath).nativePath];
 			nativeProcess=new NativeProcess();
 			nativeProcess.addEventListener(NativeProcessExitEvent.EXIT,exit);
 			nativeProcess.start(nativeProcessStartupInfo);

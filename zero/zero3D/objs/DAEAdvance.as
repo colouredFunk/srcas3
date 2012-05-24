@@ -43,12 +43,12 @@ package zero.zero3D.objs{
 				var matrix_str_arr:Array=geometryXML.@matrix.toString().split(",");
 				var matrix3D:Matrix3D;
 				if(matrix_str_arr.length==12){
-					matrix3D=new Matrix3D(Vector.<Number>([
+					matrix3D=new Matrix3D(new <Number>[
 						Number(matrix_str_arr[0]),Number(matrix_str_arr[1]),Number(matrix_str_arr[2]),0,
 						Number(matrix_str_arr[3]),Number(matrix_str_arr[4]),Number(matrix_str_arr[5]),0,
 						Number(matrix_str_arr[6]),Number(matrix_str_arr[7]),Number(matrix_str_arr[8]),0,
 						Number(matrix_str_arr[9]),Number(matrix_str_arr[10]),Number(matrix_str_arr[11]),1
-					]));
+					]);
 				}else{
 					matrix3D=new Matrix3D();
 				}

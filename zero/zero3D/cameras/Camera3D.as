@@ -28,12 +28,12 @@ package zero.zero3D.cameras{
 			dScreen=_dScreen;
 			cameraMatrix3D=new Matrix3D();
 			
-			matrix3D.rawData=Vector.<Number>([
+			matrix3D.rawData=new <Number>[
 				0,1,0,0,
 				-1,0,0,0,
 				0,0,1,0,
 				dScreen,0,0,1
-			]);//默认摄像机放在 x轴 dScreen 处，正对原点
+			];//默认摄像机放在 x轴 dScreen 处，正对原点
 		}
 		public function pointAt(x:Number,y:Number,z:Number):void{
 			matrix3D.pointAt(new Vector3D(x,y,z));//发现 Matrix3D.pointAt 是用 y 轴来指向的...不是 z 轴
