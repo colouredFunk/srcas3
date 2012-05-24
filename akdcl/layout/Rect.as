@@ -33,6 +33,7 @@ package akdcl.layout {
 
 		public var autoUpdate:Boolean;
 		public var border:int;
+		public var roundWH:Boolean;
 
 		public function get x():Number {
 			return __x;

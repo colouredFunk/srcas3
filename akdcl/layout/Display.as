@@ -265,8 +265,13 @@ package akdcl.layout {
 					content.scaleX = scaleX;
 					content.scaleY = scaleY;
 				} else {
-					content.width = scaleWidth;
-					content.height = scaleHeight;
+					if (roundWH) {
+						content.width = Math.round(scaleWidth);
+						content.height = Math.round(scaleHeight);
+					}else {
+						content.width = scaleWidth;
+						content.height = scaleHeight;
+					}
 				}
 			}
 			updatePoint(_dispathEvent);

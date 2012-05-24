@@ -77,8 +77,7 @@ package akdcl.skeleton{
 			}
 		}
 		
-		override public function update():void 
-		{
+		override public function update():void {
 			if (isComplete || isPause) {
 				return;
 			}

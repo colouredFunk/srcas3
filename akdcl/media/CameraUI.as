@@ -25,8 +25,8 @@ package akdcl.media {
 	[Event(name="ioError",type="flash.events.IOErrorEvent")]
 
 	public class CameraUI extends UIEventDispatcher {
-		private static const CAMERA_WIDTH:uint = 320;
-		private static const CAMERA_HEIGHT:uint = 240;
+		private static const CAMERA_WIDTH:uint = 240;
+		private static const CAMERA_HEIGHT:uint = 180;
 
 		public var data:BitmapData;
 

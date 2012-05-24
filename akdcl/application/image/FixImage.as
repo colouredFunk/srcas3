@@ -1,9 +1,10 @@
 ﻿package akdcl.application.image {
-	import akdcl.layout.Display;
-	import akdcl.media.CameraUI;
+	
+	import akdcl.events.UIEventDispatcher;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
+	import flash.display.DisplayObjectContainer;
 	import flash.display.Graphics;
 	import flash.display.Shape;
 	import flash.display.Sprite;
@@ -15,6 +16,7 @@
 	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
 
+	import akdcl.layout.Display;
 	import akdcl.display.UISprite;
 	import akdcl.display.UIDisplay;
 
@@ -24,24 +26,24 @@
 	 * ...
 	 * @author Akdcl
 	 */
-	public class FixImage extends UISprite {
+	public class FixImage extends UIEventDispatcher {
 		private static const MATRIX:Matrix = new Matrix();
 
 		public var backgroundColor:uint = 0xffffff;
 
-		public var imageWidth:uint;
-		public var imageHeight:uint;
+		protected var imageWidth:uint;
+		protected var imageHeight:uint;
 
+		protected var container:DisplayObjectContainer;
+		protected var frameArea:DisplayObject;
+		protected var frameIcon:DisplayObject;
+
+		protected var frameBorder:uint = 0;
 		protected var iconWidth:uint;
 		protected var iconHeight:uint;
 
 		protected var areaWidth:uint;
 		protected var areaHeight:uint;
-
-		public var frameBorder:uint = 0;
-
-		public var frameArea:DisplayObject;
-		public var frameIcon:DisplayObject;
 
 		protected var displayArea:UIDisplay;
 		protected var proxyIcon:Display;
@@ -54,46 +56,85 @@
 		protected var transformTool:TransformTool;
 		protected var bitmap:Bitmap;
 		protected var bitmapData:BitmapData;
-		protected var orgBitmapData:BitmapData;
+		protected var rawBitmapData:BitmapData;
 
 		override protected function init():void {
 			super.init();
-
+			shapesContainer = new UISprite();
+			shapeMask = new Shape();
+			shapeMove = new UISprite();
+			shapeMove.blendMode = BlendMode.ERASE;
+			
+			shapesContainer.addChild(shapeMask);
+			shapesContainer.addChild(shapeMove);
+			
+			bitmap = new Bitmap();
+			
+			
+			transformTool = new TransformTool(shapesContainer);
+			transformTool.onChanging = updateBMD;
+			transformTool.area = new Rectangle(0, 0, areaWidth, areaHeight);
+			
+			shapesContainer.enabled = false;
+		}
+		
+		public function setContainer(_container:DisplayObjectContainer):void {
+			var _frameArea:DisplayObject = _container.getChildByName("frameArea");
+			var _frameIcon:DisplayObject = _container.getChildByName("frameIcon");
+			if (!_frameArea || !_frameIcon) {
+				
+				return;
+			}
+			container = _container;
+			frameArea = _frameArea;
+			frameIcon = _frameIcon;
+			
+			updateDisplays();
+			
+			container.addChildAt(displayArea, container.getChildIndex(frameArea) + 1);
+			container.addChildAt(shapesContainer, container.getChildIndex(displayArea) + 1);
+			container.addChildAt(bitmap, container.getChildIndex(frameIcon) + 1);
+			
+			transformTool.Init();
+		}
+		
+		public function setFrameBorder(_border:uint):void {
+			frameBorder = _border;
+			updateDisplays();
+		}
+		
+		protected function updateDisplays():void {
 			areaWidth = frameArea.width - frameBorder * 2;
 			areaHeight = frameArea.height - frameBorder * 2;
 
 			iconWidth = frameIcon.width - frameBorder * 2;
 			iconHeight = frameIcon.height - frameBorder * 2;
-
-			shapesContainer = new UISprite();
-			shapeMask = new Shape();
-			shapeMove = new UISprite();
 			
-			bitmap = new Bitmap();
-
-			displayArea = new UIDisplay(areaWidth, areaHeight, -1);
-			proxyIcon = new Display(frameIcon.x + frameBorder, frameIcon.y + frameBorder, iconWidth, iconHeight);
 			
-			shapeMove.blendMode = BlendMode.ERASE;
+			if (displayArea) {
+				displayArea.proxy.setSize(areaWidth, areaHeight);
+			}else {
+				displayArea = new UIDisplay(areaWidth, areaHeight, -1);
+			}
 			
+			if (proxyIcon) {
+				proxyIcon.setSize(iconWidth, iconHeight);
+				proxyIcon.setPoint(frameIcon.x + frameBorder, frameIcon.y + frameBorder);
+			}else {
+				proxyIcon = new Display(frameIcon.x + frameBorder, frameIcon.y + frameBorder, iconWidth, iconHeight);
+				proxyIcon.roundWH = true;
+			}
+			
+			shapeMask.graphics.clear();
 			shapeMask.graphics.beginFill(0x000000, 0.5);
 			shapeMask.graphics.drawRect(0, 0, areaWidth, areaHeight);
 
 			displayArea.x = shapesContainer.x = frameArea.x + frameBorder;
 			displayArea.y = shapesContainer.y = frameArea.y + frameBorder;
 			
-			addChildAt(displayArea, getChildIndex(frameArea) + 1);
-			addChildAt(shapesContainer, getChildIndex(displayArea) + 1);
-			addChildAt(bitmap, getChildIndex(frameIcon) + 1);
-
-			transformTool = new TransformTool(shapesContainer);
-			transformTool.area = new Rectangle(0, 0, areaWidth, areaHeight);
-			transformTool.onChanging = updateBMD;
-			transformTool.Init();
-
+			transformTool.area.width = areaWidth;
+			transformTool.area.height = areaHeight;
 			shapesContainer.scrollRect = transformTool.area;
-			shapesContainer.addChild(shapeMask);
-			shapesContainer.addChild(shapeMove);
 		}
 
 		public function setImageSize(_width:uint, _height:uint):void {
@@ -118,9 +159,7 @@
 			//
 			transformTool.RemoveControl(shapeMove);
 			transformTool.AddControl(shapeMove, true);
-			transformTool.SetStyle(shapeMove, {eqScale: true, enSetMidPoint: false});
-
-			enabled = false;
+			transformTool.SetStyle(shapeMove, { eqScale: true, enSetMidPoint: false, enSkewX:false, enSkewY:false } );
 		}
 
 		override protected function onRemoveHandler():void {
@@ -136,7 +175,7 @@
 			transformTool = null;
 			bitmap = null;
 			bitmapData = null;
-			orgBitmapData = null;
+			rawBitmapData = null;
 		}
 
 		public function clear():void {
@@ -155,8 +194,8 @@
 			updateBMD();
 		}
 
-		public function getOrgBitmapData():BitmapData {
-			return orgBitmapData;
+		public function getRawBitmapData():BitmapData {
+			return rawBitmapData;
 		}
 
 		//设置 width 和 height 后注意回收bitmapData;
@@ -170,39 +209,37 @@
 			var _bmd:BitmapData;
 
 			var _aspectRatio:Number = _width / _height;
-			var _aspectRatioOrg:Number = imageWidth / imageHeight;
+			var _aspectRatioRaw:Number = imageWidth / imageHeight;
 
-			if (_width * _height > 0 ? (_aspectRatio < _aspectRatioOrg) : (_width > 0)){
+			if (_width * _height > 0 ? (_aspectRatio < _aspectRatioRaw) : (_width > 0)){
 				if (_width <= 1){
 					_width = imageWidth * _width;
 				}
-				_height = _width / _aspectRatioOrg;
+				_height = _width / _aspectRatioRaw;
 				MATRIX.d = MATRIX.a = _width / imageWidth;
 			} else {
 				if (_height <= 1){
 					_height = imageHeight * _height;
 				}
-				_width = _height * _aspectRatioOrg;
+				_width = _height * _aspectRatioRaw;
 				MATRIX.d = MATRIX.a = _height / imageHeight;
 			}
-
+			
 			_bmd = new BitmapData(_width, _height, false, backgroundColor);
 			_bmd.draw(bitmapData, MATRIX);
-
 			//_bmd.dispose();
-
 			return _bmd;
 		}
 
 		public function setImage(_bmd:BitmapData):void {
-			enabled = true;
+			shapesContainer.enabled = true;
 			shapesContainer.blendMode = BlendMode.LAYER;
-			if (orgBitmapData) {
-				orgBitmapData.dispose();
+			if (rawBitmapData) {
+				rawBitmapData.dispose();
 			}
 			
-			orgBitmapData = _bmd;
-			displayArea.setContent(orgBitmapData, 0);
+			rawBitmapData = _bmd;
+			displayArea.setContent(rawBitmapData, 0);
 			reset();
 			proxyIcon.setContent(bitmap, 0, 0, 11);
 		}
