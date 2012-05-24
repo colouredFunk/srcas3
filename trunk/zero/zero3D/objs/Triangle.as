@@ -82,14 +82,14 @@ package zero.zero3D.objs{
 				var meshUvId2:int=meshUvIdV[id2]*2;
 				var meshUvId3:int=meshUvIdV[id3]*2;
 				
-				uvV=Vector.<Number>([
+				uvV=new <Number>[
 					meshUvV[meshUvId1],
 					meshUvV[meshUvId1+1],
 					meshUvV[meshUvId2],
 					meshUvV[meshUvId2+1],
 					meshUvV[meshUvId3],
 					meshUvV[meshUvId3+1]
-				]);
+				];
 			}else{
 				//如果是线框模型可以不用uv
 				uvV=null;

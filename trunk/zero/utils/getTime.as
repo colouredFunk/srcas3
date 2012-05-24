@@ -7,14 +7,14 @@ getTime
 */
 
 package zero.utils{
-	public function getTime():String{
-		var date:Date=new Date();
-		
-		return date.fullYear+"年"+
-			(date.month<9?"0"+(date.month+1):(date.month+1))+"月"+
-			(date.date<10?"0"+date.date:date.date)+"日 "+
-			(date.hours<10?"0"+date.hours:date.hours)+":"+
-			(date.minutes<10?"0"+date.minutes:date.minutes)+":"+
-			(date.seconds<10?"0"+date.seconds:date.seconds)
+	public function getTime(format:String="Y年m月d日 H:i:s",date:Date=null):String{
+		date||(date=new Date());
+		return format
+			.replace(/Y/g,date.fullYear)
+			.replace(/m/g,(100+date.month+1).toString().substr(1))
+			.replace(/d/g,(100+date.date).toString().substr(1))
+			.replace(/H/g,(100+date.hours).toString().substr(1))
+			.replace(/i/g,(100+date.minutes).toString().substr(1))
+			.replace(/s/g,(100+date.seconds).toString().substr(1));
 	}
 }

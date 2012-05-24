@@ -18,9 +18,9 @@ package zero.zero3D.objs{
 			needScale=_needScale;
 			//3d 场景中的 Sprite
 			sprite=_sprite;
-			super(Vector.<Number>([
+			super(new <Number>[
 				0,0,0
-			]));
+			]);
 		}
 		override public function project(camera3D:Camera3D,ruV:Vector.<IRenderUnit>):void{
 			updateVertexVs(camera3D);

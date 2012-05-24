@@ -17,12 +17,12 @@ package zero.zero3D.objs{
 		public function Axiss(len:Number){
 			//用红绿蓝三色绘制的坐标轴,主要用来显示坐标系的状态
 			sprite=new Sprite();
-			super(Vector.<Number>([
+			super(new <Number>[
 				0,0,0,
 				len,0,0,
 				0,len,0,
 				0,0,len
-			]));
+			]);
 		}
 		override public function project(camera3D:Camera3D,ruV:Vector.<IRenderUnit>):void{
 			updateVertexVs(camera3D);

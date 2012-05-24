@@ -26,6 +26,8 @@ package zero.works{
 		private var dataBySizeArr:Array;//用于比较相同的图片
 		private var zipArchive:ZipArchive;
 		private var frame:int;
+		private var startFrame:int;
+		private var endFrame:int;
 		private var bmd:BitmapData;
 		
 		public var boundsRect:Sprite;
@@ -55,11 +57,19 @@ package zero.works{
 			
 			dataBySizeArr=new Array();
 			zipArchive=new ZipArchive();
-			frame=0;
+			
+			//startFrame=0;
+			//endFrame=this.totalFrames;
+			
+			startFrame=1590;
+			endFrame=1920;
+			
+			frame=startFrame-1;
+			
 			this.addEventListener(Event.ENTER_FRAME,enterFrame);
 		}
 		private function enterFrame(event:Event):void{
-			if(++frame>this.totalFrames){
+			if(++frame>endFrame){
 				this.removeEventListener(Event.ENTER_FRAME,enterFrame);
 				new FileReference().save(zipArchive.output(),decodeURI(this.loaderInfo.url).split("/").pop().split(".")[0]+".zip");
 				//for each(var subArr:Array in dataBySizeArr){
@@ -76,9 +86,9 @@ package zero.works{
 			}
 			
 			//1
-			//var imgData:ByteArray=PNGEncoder.encode(bmd);
+			var imgData:ByteArray=PNGEncoder.encode(bmd);
 			
-			///*
+			/*
 			//2 透明 png
 			var bmd2:BitmapData=new BitmapData(bmd.width,bmd.height,true,0xffffffff);
 			bmd2.copyChannel(bmd,bmd.rect,new Point(),BitmapDataChannel.RED,BitmapDataChannel.ALPHA);

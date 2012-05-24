@@ -138,19 +138,19 @@ OutputPane 版本:v1.0
 						case "folder and file":
 						case "folder":
 							msg=encodeMsg(msg);
-							if(msg.indexOf("file:///")>-1){
-								execResult=/^(.*?)file:\/\/\/(.*\/)(.*?)$/.exec(msg);
+							if(msg.search(/file\:\/+/)>-1){
+								execResult=/^(.*?)(file\:\/+)(.*\/)(.*?)$/.exec(msg);
 								
 								if(execResult[0]==msg){
-									msg='<span class="blue">'+execResult[1]+'file:///</span>';
-									var path:String="file:///";
-									for each(var subPath:String in execResult[2].match(/.*?\/+/g)){
+									msg='<span class="blue">'+execResult[1]+execResult[2]+'</span>';
+									var path:String=execResult[2];
+									for each(var subPath:String in execResult[3].match(/.*?\/+/g)){
 										path+=subPath;
 										msg+='<a href="event:file:'+path+'">'+subPath+'</a>';
 									}
-									if(execResult[3]){
-										path+=execResult[3];
-										msg+='<a href="event:file:'+path+'">'+execResult[3]+'</a>';
+									if(execResult[4]){
+										path+=execResult[4];
+										msg+='<a href="event:file:'+path+'">'+execResult[4]+'</a>';
 									}
 								}else{
 									throw new Error("msg 格式不正确");

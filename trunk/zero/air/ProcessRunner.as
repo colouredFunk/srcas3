@@ -31,7 +31,7 @@ package zero.air{
 					nativeProcessStartupInfo=new NativeProcessStartupInfo();
 					nativeProcessStartupInfo.executable=file;
 					if(argument){
-						nativeProcessStartupInfo.arguments=Vector.<String>([argument]);
+						nativeProcessStartupInfo.arguments=new <String>[argument];
 					}
 					
 					process=new NativeProcess();
@@ -102,7 +102,7 @@ package zero.air{
 		
 
 		public function sendMsg(msg:String):void{
-			//nativeProcessStartupInfo.arguments=Vector.<String>(["传给exe的参数"]);
+			//nativeProcessStartupInfo.arguments=new <String>["传给exe的参数"];
 			process.standardInput.writeUTFBytes(msg+"\n");
 			//process.closeInput();//会引起 IOError
 		}

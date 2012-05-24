@@ -40,7 +40,7 @@ package zero{
 		public function ComplexString(_extendsCArr:Array=null){
 			extendsCArr=_extendsCArr;
 			
-			escapeV=Vector.<String>([
+			escapeV=new <String>[
 				"\\x00",//\x00
 				"\\x01",//
 				"\\x02",//
@@ -297,7 +297,7 @@ package zero{
 				"\\xfd",//ý
 				"\\xfe",//þ
 				"\\xff"//ÿ
-			]);
+			];
 
 			unescape_mark=new Object();
 			
