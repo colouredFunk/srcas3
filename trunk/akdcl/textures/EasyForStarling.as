@@ -35,6 +35,16 @@ package akdcl.textures
 			_img.pivotY = -int(_textXML.@frameY);
 			return _img;
 		}
+		
+		public static function getTexture(_id:String, _textureMix:TextureMix):Image {
+			var _textXML:XML = _textureMix.getTexture(_id);
+			var _rect:Rectangle = new Rectangle(int(_textXML.@x), int(_textXML.@y), int(_textXML.@width), int(_textXML.@height));
+			var _subT:SubTexture = new SubTexture(_textureMix.texture as Texture, _rect);
+			var _img:Image = new Image(_subT);
+			_img.pivotX = -int(_textXML.@frameX);
+			_img.pivotY = -int(_textXML.@frameY);
+			return _img;
+		}
 	}
 	
 }
