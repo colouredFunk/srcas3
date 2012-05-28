@@ -1,5 +1,4 @@
 ﻿package akdcl.media.providers {
-	import flash.display.DisplayObject;
 	import flash.events.ActivityEvent;
 	import flash.events.Event;
 	import flash.events.StatusEvent;
@@ -18,8 +17,13 @@
 	/// @eventType	akdcl.events.MediaEvent.DISPLAY_CHANGE
 	[Event(name="displayChange",type="akdcl.events.MediaEvent")]
 
-	final public class CameraProvider extends MediaProvider {
-		public var displayContent:DisplayObject;
+	final public class CameraProvider extends MediaProvider implements IDiplayProvider  {
+		
+		protected var __displayContent:Object;
+		public function get displayContent():Object {
+			return __displayContent;
+		}
+		
 		private var camera:Camera;
 		private var isCameraAdded:Boolean;
 		
@@ -38,7 +42,7 @@
 			playContent.removeEventListener(Event.FRAME_CONSTRUCTED, onVideoFrameConstructedHandler);
 			super.onRemoveHandler();
 			playContent = null;
-			displayContent = null;
+			__displayContent = null;
 			camera = null;
 		}
 		
@@ -51,7 +55,7 @@
 				if (camera.muted && isCameraAdded){
 					Security.showSettings(SecurityPanel.PRIVACY);
 				}
-				displayContent = null;
+				__displayContent = null;
 				playContent.addEventListener(Event.FRAME_CONSTRUCTED, onVideoFrameConstructedHandler);
 				playContent.attachCamera(camera);
 				playContent.smoothing = true;
@@ -63,11 +67,11 @@
 		private function onVideoFrameConstructedHandler(e:Event):void 
 		{
 			if (playContent.videoWidth * playContent.videoHeight > 0) {
-				if (!displayContent) {
+				if (!__displayContent) {
 					onDisplayChange(playContent);
 					onLoadCompleteHandler();
 				}
-			}else if (displayContent) {
+			}else if (__displayContent) {
 				onDisplayChange(null);
 			}
 		}
@@ -134,11 +138,23 @@
 		private function onDisplayChange(_display:*):void {
 			//加载显示对象
 			//playContent;
-			displayContent = _display;
+			__displayContent = _display;
+			showDisplay();
 			if (hasEventListener(MediaEvent.DISPLAY_CHANGE)){
 				dispatchEvent(new MediaEvent(MediaEvent.DISPLAY_CHANGE));
 			}
 		}
-
+		
+		public function showDisplay():void {
+			if (__displayContent) {
+				__displayContent.visible = true;
+			}
+		}
+		
+		public function hideDisplay():void {
+			if (__displayContent) {
+				__displayContent.visible = false;
+			}
+		}
 	}
 }
