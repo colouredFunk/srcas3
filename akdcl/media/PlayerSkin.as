@@ -1,5 +1,4 @@
 package akdcl.media {
-	import akdcl.media.providers.IDiplayProvider;
 	import flash.display.InteractiveObject;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
@@ -9,6 +8,7 @@ package akdcl.media {
 	import akdcl.display.UIDisplay;
 	import akdcl.events.MediaEvent;
 	import akdcl.media.providers.MediaProvider;
+	import akdcl.media.providers.IDiplayProvider;
 	import akdcl.utils.setProgressClip;
 	
 	import ui.Slider;
@@ -177,6 +177,7 @@ package akdcl.media {
 				player.addEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 				player.addEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
 				player.addEventListener(MediaEvent.DISPLAY_CHANGE, onDisplayChangeHandler);
+				player.addEventListener(MediaEvent.PLAY_ITEM_CHANGE, onItemChangeHandler);
 			}
 		}
 		
@@ -189,6 +190,7 @@ package akdcl.media {
 				player.removeEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 				player.removeEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
 				player.removeEventListener(MediaEvent.DISPLAY_CHANGE, onDisplayChangeHandler);
+				player.addEventListener(MediaEvent.PLAY_ITEM_CHANGE, onItemChangeHandler);
 			}
 		}
 
@@ -288,6 +290,12 @@ package akdcl.media {
 				if (_player) {
 					displayContainer.setContent(_player.displayContent, 2, displayAlignX, displayAlignY, displayScaleMode);
 				}
+			}
+		}
+		
+		protected function onItemChangeHandler(e:MediaEvent):void {
+			if (displayContainer&&(player is MediaPlayer)) {
+				displayContainer.visible = (player as MediaPlayer).isDisplayProvider;
 			}
 		}
 	}
