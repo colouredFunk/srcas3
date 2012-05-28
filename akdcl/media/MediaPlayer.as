@@ -1,4 +1,6 @@
 ﻿package akdcl.media {
+	
+	import akdcl.media.providers.IDiplayProvider;
 	import akdcl.utils.PageID;
 	import akdcl.events.MediaEvent;
 	import akdcl.media.providers.MediaProvider;
@@ -20,8 +22,7 @@
 	/// @eventType	akdcl.events.MediaEvent.DISPLAY_CHANGE
 	[Event(name="displayChange",type="akdcl.events.MediaEvent")]
 
-	public class MediaPlayer extends MediaProvider {
-		public var displayContent:Array;
+	public class MediaPlayer extends MediaProvider implements IDiplayProvider  {
 		public var onDisplayChange:Function;
 
 		private var imagePD:ImageProvider;
@@ -31,6 +32,11 @@
 
 		private var pageID:PageID;
 		private var providers:Array;
+		
+		protected var __displayContent:Object;
+		public function get displayContent():Object {
+			return __displayContent;
+		}
 
 		override public function get loadProgress():Number {
 			var _progress:Number = 1;
@@ -124,7 +130,6 @@
 			wmpPD = new WMPProvider();
 			providers = [soundPD, videoPD, wmpPD, imagePD];
 			playContent = [];
-			displayContent = [];
 			pageID = new PageID();
 			pageID.onIDChange = onPlayIDChangeHandler;
 		}
@@ -146,7 +151,7 @@
 			wmpPD = null;
 			pageID = null;
 			
-			displayContent = null;
+			__displayContent = null;
 			providers = null;
 			onDisplayChange = null;
 		}
@@ -165,9 +170,12 @@
 				_content.removeEventListener(MediaEvent.PLAY_COMPLETE, onPlayCompleteHandler);
 				_content.removeEventListener(MediaEvent.DISPLAY_CHANGE, onDisplayChangeHandler);
 			}
+			if (_content is IDiplayProvider) {
+				(_content as IDiplayProvider).hideDisplay();
+			}
 			stop();
-
-			displayContent = [];
+			
+			__displayContent = null;
 
 			playItem = playlist.getItem(_id);
 			switch (playItem.type){
@@ -194,6 +202,7 @@
 					playContent[0] = wmpPD;
 					break;
 			}
+			dispatchEvent(new MediaEvent(MediaEvent.PLAY_ITEM_CHANGE));
 			for each (_content in playContent){
 				_content.addEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 				_content.addEventListener(MediaEvent.LOAD_ERROR, onLoadErrorHandler);
@@ -203,13 +212,7 @@
 				_content.addEventListener(MediaEvent.DISPLAY_CHANGE, onDisplayChangeHandler);
 				//
 				_content.load(playItem);
-				if ("displayContent" in _content && _content["displayContent"]) {
-					if (displayContent.indexOf(_content["displayContent"]) < 0) {
-						displayContent.push(_content["displayContent"]);
-					}
-				}
 			}
-			dispatchEvent(new MediaEvent(MediaEvent.PLAY_ITEM_CHANGE));
 			play(-1);
 		}
 
@@ -299,16 +302,23 @@
 
 		private function onDisplayChangeHandler(_e:MediaEvent):void {
 			//加载显示对象
-			var _content:MediaProvider = _e.target as MediaProvider;
-			if ("displayContent" in _content && _content["displayContent"]) {
-				displayContent[0] = _content["displayContent"];
+			var _content:IDiplayProvider = _e.target as IDiplayProvider;
+			
+			if (_content) {
+				__displayContent = _content.displayContent;
 				if (hasEventListener(MediaEvent.DISPLAY_CHANGE)){
 					dispatchEvent(new MediaEvent(MediaEvent.DISPLAY_CHANGE));
 				}
 				if (onDisplayChange != null) {
-					onDisplayChange(_content["displayContent"]);
+					onDisplayChange(__displayContent);
 				}
 			}
+		}
+		
+		public function showDisplay():void {
+		}
+		
+		public function hideDisplay():void {
 		}
 	}
 

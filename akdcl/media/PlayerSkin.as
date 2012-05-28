@@ -1,4 +1,5 @@
 package akdcl.media {
+	import akdcl.media.providers.IDiplayProvider;
 	import flash.display.InteractiveObject;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
@@ -283,10 +284,9 @@ package akdcl.media {
 		
 		protected function onDisplayChangeHandler(e:MediaEvent):void {
 			if (displayContainer) {
-				if (player["displayContent"] is Array) {
-					displayContainer.setContent(player["displayContent"][0], 2, displayAlignX, displayAlignY, displayScaleMode);
-				}else {
-					displayContainer.setContent(player["displayContent"], 2, displayAlignX, displayAlignY, displayScaleMode);
+				var _player:IDiplayProvider = player as IDiplayProvider;
+				if (_player) {
+					displayContainer.setContent(_player.displayContent, 2, displayAlignX, displayAlignY, displayScaleMode);
 				}
 			}
 		}

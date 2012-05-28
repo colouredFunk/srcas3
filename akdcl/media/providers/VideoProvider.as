@@ -1,7 +1,4 @@
 ﻿package akdcl.media.providers {
-	import flash.display.DisplayObject;
-	import flash.geom.Rectangle;
-
 	import com.greensock.loading.VideoLoader;
 	import com.greensock.events.LoaderEvent;
 	import com.greensock.layout.ScaleMode;
@@ -15,15 +12,18 @@
 	 */
 	/// @eventType	akdcl.events.MediaEvent.DISPLAY_CHANGE
 	[Event(name="displayChange",type="akdcl.events.MediaEvent")]
-	final public class VideoProvider extends MediaProvider {
+	final public class VideoProvider extends MediaProvider implements IDiplayProvider {
 		private static const VIDEOLOADER_GROUP:String = "VideoLoader";
 		private static const DEFAULT_PARAMS:Object = {autoPlay: false, scaleMode: ScaleMode.PROPORTIONAL_INSIDE, bgColor: 0x000000};
 
 		private static var sM:SourceManager = SourceManager.getInstance();
-
-		public var displayContent:DisplayObject;
-
+		
 		private var isBuffering:Boolean = false;
+		
+		protected var __displayContent:Object;
+		public function get displayContent():Object {
+			return __displayContent;
+		}
 
 		override public function get loadProgress():Number {
 			return playContent ? playContent.progress : 0;
@@ -61,7 +61,7 @@
 		{
 			removeContentListener();
 			super.onRemoveHandler();
-			displayContent = null;
+			__displayContent = null;
 		}
 
 		override protected function loadHandler():void {
@@ -87,6 +87,10 @@
 			} else {
 				playContent.addEventListener(LoaderEvent.PROGRESS, onLoadProgressHandler);
 				playContent.addEventListener(LoaderEvent.COMPLETE, onLoadCompleteHandler);
+			}
+			if (playContent.content && playContent.content.width > 0) {
+				onDisplayChange();
+			}else {
 				playContent.addEventListener(LoaderEvent.INIT, onVideoInitHandler);
 			}
 			playContent.addEventListener(VideoLoader.VIDEO_COMPLETE, onPlayCompleteHandler);
@@ -94,7 +98,6 @@
 
 		override protected function waitHandler():void {
 			if (loadProgress >= 1){
-				onDisplayChange();
 				onLoadCompleteHandler();
 			}
 		}
@@ -164,9 +167,22 @@
 
 		private function onDisplayChange():void {
 			//加载显示对象
-			displayContent = playContent.content;
+			__displayContent = playContent.content;
+			showDisplay();
 			if (hasEventListener(MediaEvent.DISPLAY_CHANGE)){
 				dispatchEvent(new MediaEvent(MediaEvent.DISPLAY_CHANGE));
+			}
+		}
+		
+		public function showDisplay():void {
+			if (__displayContent) {
+				__displayContent.visible = true;
+			}
+		}
+		
+		public function hideDisplay():void {
+			if (__displayContent) {
+				__displayContent.visible = false;
 			}
 		}
 	}

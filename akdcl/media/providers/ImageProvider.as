@@ -11,12 +11,16 @@
 	 */
 	/// @eventType	akdcl.events.MediaEvent.DISPLAY_CHANGE
 	[Event(name="displayChange",type="akdcl.events.MediaEvent")]
-	final public class ImageProvider extends MediaProvider {
+	final public class ImageProvider extends MediaProvider implements IDiplayProvider {
 		public static var defaultTotalTime:uint = 5000;
 
 		protected static var rM:RequestManager = RequestManager.getInstance();
 
-		public var displayContent:Object;
+		protected var __displayContent:Object;
+		public function get displayContent():Object {
+			return __displayContent;
+		}
+		
 		private var lastSource:String;
 		private var __loadProgress:Number = 0;
 
@@ -48,7 +52,7 @@
 				rM.unloadDisplay(lastSource, onLoadCompleteHandler, onLoadErrorHandler, onLoadProgressHandler);
 			}
 			super.onRemoveHandler();
-			displayContent = null;
+			__displayContent = null;
 			lastSource = null;
 		}
 
@@ -119,10 +123,16 @@
 
 		private function onDisplayChange():void {
 			//加载显示对象
-			displayContent = playContent;
+			__displayContent = playContent;
 			if (hasEventListener(MediaEvent.DISPLAY_CHANGE)){
 				dispatchEvent(new MediaEvent(MediaEvent.DISPLAY_CHANGE));
 			}
+		}
+		
+		public function showDisplay():void {
+		}
+		
+		public function hideDisplay():void {
 		}
 	}
 
