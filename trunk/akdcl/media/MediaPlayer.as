@@ -37,6 +37,10 @@
 		public function get displayContent():Object {
 			return __displayContent;
 		}
+		
+		public function get isDisplayProvider():Boolean {
+			return playContent[0] is IDiplayProvider
+		}
 
 		override public function get loadProgress():Number {
 			var _progress:Number = 1;
