@@ -184,18 +184,22 @@ package akdcl.manager {
 
 		private function onLogHandler(_e:DataEvent):void {
 			logConnectCount++;
-			localConnection.send(
-				LOCAL_CONNECTION_NAME, 
-				CONNECTION_METHOD_NAME, 
-				id, 
-				logConnectCount, 
-				lastLog.extendsClass, 
-				lastLog.id, 
-				lastLog.name, 
-				lastLog.level, 
-				lastLog.time, 
-				lastLog.message
-			);
+			try {
+				localConnection.send(
+					LOCAL_CONNECTION_NAME, 
+					CONNECTION_METHOD_NAME, 
+					id, 
+					logConnectCount, 
+					lastLog.extendsClass, 
+					lastLog.id, 
+					lastLog.name, 
+					lastLog.level, 
+					lastLog.time, 
+					lastLog.message
+				);
+			}catch (_e:Error) {
+				
+			}
 		}
 
 		private function connectStatusHandler(_e:StatusEvent):void {
