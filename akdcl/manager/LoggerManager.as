@@ -1,4 +1,4 @@
-package akdcl.manager {
+﻿package akdcl.manager {
 	import flash.events.DataEvent;
 	import flash.events.StatusEvent;
 	import flash.events.EventDispatcher;
@@ -196,7 +196,7 @@ package akdcl.manager {
 			removeEventListener(LoggerManager.LOG, onLogHandler);
 		}
 		
-		private function traceToString(_level:String, _msg:String):String {
+		private function traceToString(_level:int, _msg:String):void {
 			var _str:String = "[" + LEVEL_NAMES[_level] + "]:" + _msg;
 			trace(_str);
 		}
