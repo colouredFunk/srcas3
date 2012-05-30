@@ -353,7 +353,7 @@ package zero.ui{
 				player.stop();
 			}
 			
-			if(/^.*\.flv$/i.test(imgXML.@src.toString())&&player&&skin){
+			if(/^.*\.(flv|mp3)$/i.test(imgXML.@src.toString())&&player&&skin){
 				if(player){
 					player.load(imgXML.@src.toString());
 					player.play();
