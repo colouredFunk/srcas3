@@ -87,9 +87,8 @@ package akdcl.manager {
 			resetRequest(_url);
 			_url = request.url;
 			if (!_url){
-				var _str:String = "RequestManager.loadDisplay(url), url is null!";
-				lM.warn(RequestManager, _str);
-				trace("[WARNNING]:" + _str);
+				lM.warn(RequestManager, "RequestManager.loadDisplay(url), url is null!");
+				return;
 			}
 			lM.info(RequestManager, "loadDisplay(url:{0})", null, _url);
 			//
@@ -187,7 +186,6 @@ package akdcl.manager {
 
 			if (_evt is IOErrorEvent || _evt is SecurityError){
 				lM.error(RequestManager, _evt.toString());
-				trace("[ERROR:]" + _evt);
 				_loader.onErrorHandler(_evt);
 			} else {
 				lM.info(RequestManager, "swfComplete:" + _loader.url);
@@ -207,7 +205,6 @@ package akdcl.manager {
 
 			if (_evt is IOErrorEvent || _evt is SecurityError){
 				lM.error(RequestManager, _evt.toString());
-				trace("[ERROR:]" + _evt);
 				_loader.onErrorHandler(_evt);
 			} else {
 				lM.info(RequestManager, "imageComplete:" + _loader.url);
@@ -224,9 +221,7 @@ package akdcl.manager {
 			resetRequest(_url);
 			_url = request.url;
 			if (!_url){
-				var _str:String = "RequestManager.load(url), url is null!";
-				lM.warn(RequestManager, _str);
-				trace("[WARNNING]:" + _str);
+				lM.warn(RequestManager, "RequestManager.load(url), url is null!");
 				return;
 			}
 			lM.info(RequestManager, "load(url:{0})", null, _url);
@@ -254,7 +249,6 @@ package akdcl.manager {
 			_loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onURLLoaderCompleteOrErrorHandler);
 			if (_evt is IOErrorEvent || _evt is SecurityError){
 				lM.error(RequestManager, _evt.toString());
-				trace("[ERROR:]" + _evt);
 				_loader.onErrorHandler(_evt);
 			} else {
 				lM.info(RequestManager, "loadComplete:{0}====>>>>\n" + _loader.data, null, _loader.url);

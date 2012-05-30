@@ -63,6 +63,12 @@ package akdcl.manager {
 		private static const E_EXTENDS_CLASS:String = "extendsClass";
 		private static const A_TYPE:String = "type";
 		private static const A_NAME:String = "name";
+		
+		private static const CLASS:String = "class";
+		private static const ID:String = "id";
+		private static const NAME:String = "name";
+		private static const GLOBAL:String = "global";
+		private static const STATUS:String = "status";
 
 		public var id:String;
 
@@ -91,14 +97,14 @@ package akdcl.manager {
 			if (_target is Class){
 				_describeTypeXML.factory[0].insertChildBefore(_describeTypeXML.factory.elements(E_EXTENDS_CLASS)[0],<{E_EXTENDS_CLASS} {A_TYPE}={_describeTypeXML.attribute(A_NAME)}/>);
 				_extendsClass = _describeTypeXML.factory.elements(E_EXTENDS_CLASS).toXMLString();
-				_extendsClass = _extendsClass.split(E_EXTENDS_CLASS).join("class");
-				_extendsClass = _extendsClass.split(A_TYPE).join("id");
-			} else if (_describeTypeXML.@name == "global"){
+				_extendsClass = _extendsClass.split(E_EXTENDS_CLASS).join(CLASS);
+				_extendsClass = _extendsClass.split(A_TYPE).join(ID);
+			} else if (_describeTypeXML.@name == GLOBAL) {
 				_describeTypeXML.insertChildBefore(_describeTypeXML.elements(E_EXTENDS_CLASS)[0],<{E_EXTENDS_CLASS} {A_TYPE}={_describeTypeXML.attribute(A_NAME)}/>);
 				_describeTypeXML.insertChildBefore(_describeTypeXML.elements(E_EXTENDS_CLASS)[0],<{E_EXTENDS_CLASS} {A_TYPE}={_describeTypeXML.method[0].@uri+"."+_describeTypeXML.method[0].attribute(A_NAME)}/>);
 				_extendsClass = _describeTypeXML.elements(E_EXTENDS_CLASS).toXMLString();
-				_extendsClass = _extendsClass.split(E_EXTENDS_CLASS).join("class");
-				_extendsClass = _extendsClass.split(A_TYPE).join("id");
+				_extendsClass = _extendsClass.split(E_EXTENDS_CLASS).join(CLASS);
+				_extendsClass = _extendsClass.split(A_TYPE).join(ID);
 			} else {
 				var _targetLogDic:Object = targetDic[_target];
 				if (!_targetLogDic){
@@ -106,17 +112,17 @@ package akdcl.manager {
 					_describeTypeXML.insertChildBefore(_describeTypeXML.elements(E_EXTENDS_CLASS)[0],<{E_EXTENDS_CLASS} {A_TYPE}={_describeTypeXML.attribute(A_NAME)}/>);
 
 					_extendsClass = _describeTypeXML.elements(E_EXTENDS_CLASS).toXMLString();
-					_extendsClass = _extendsClass.split(E_EXTENDS_CLASS).join("class");
-					_extendsClass = _extendsClass.split(A_TYPE).join("id");
+					_extendsClass = _extendsClass.split(E_EXTENDS_CLASS).join(CLASS);
+					_extendsClass = _extendsClass.split(A_TYPE).join(ID);
 
 					_targetLogDic.extendsClass = _extendsClass;
 					_targetLogDic.id = String(targetCount++);
 					if (_name){
 						_targetLogDic.name = _name;
-					} else if ("name" in _target){
-						_targetLogDic.name = _target["name"];
-					} else if ("id" in _target){
-						_targetLogDic.name = _target["id"];
+					} else if (NAME in _target){
+						_targetLogDic.name = _target[NAME];
+					} else if (ID in _target){
+						_targetLogDic.name = _target[ID];
 					} else {
 						_targetLogDic.name = _targetLogDic.id;
 					}
@@ -131,7 +137,12 @@ package akdcl.manager {
 				_msg = _msg.replace(new RegExp("\\{" + _i + "\\}", "g"), _args[_i]);
 				_i++;
 			}
-			lastLog = new LogVO(_extendsClass, _id, _name, _level, _msg);
+			if (lastLog) {
+				lastLog.setValue(_extendsClass, _id, _name, _level, _msg);
+			}else {
+				lastLog = new LogVO(_extendsClass, _id, _name, _level, _msg);
+			}
+			
 			
 			logEvent.data = String(lastLog);
 			dispatchEvent(logEvent);
@@ -156,6 +167,7 @@ package akdcl.manager {
 				_args.unshift(_target, WARN, _msg, _name);
 				log.apply(this, _args);
 			}
+			traceToString(WARN, _msg);
 		}
 
 		public function error(_target:Object, _msg:String, _name:String = null, ... _args):void {
@@ -163,6 +175,7 @@ package akdcl.manager {
 				_args.unshift(_target, ERROR, _msg, _name);
 				log.apply(this, _args);
 			}
+			traceToString(WARN, _msg);
 		}
 
 		public function fatal(_target:Object, _msg:String, _name:String = null, ... _args):void {
@@ -170,6 +183,7 @@ package akdcl.manager {
 				_args.unshift(_target, FATAL, _msg, _name);
 				log.apply(this, _args);
 			}
+			traceToString(WARN, _msg);
 		}
 
 		public function startConnect():void {
@@ -180,6 +194,11 @@ package akdcl.manager {
 		public function stopConnect():void {
 			__isConnected = false;
 			removeEventListener(LoggerManager.LOG, onLogHandler);
+		}
+		
+		private function traceToString(_level:String, _msg:String):String {
+			var _str:String = "[" + LEVEL_NAMES[_level] + "]:" + _msg;
+			trace(_str);
 		}
 
 		private function onLogHandler(_e:DataEvent):void {
@@ -203,7 +222,7 @@ package akdcl.manager {
 		}
 
 		private function connectStatusHandler(_e:StatusEvent):void {
-			if (_e.level == "status"){
+			if (_e.level == STATUS) {
 			}
 		}
 	}
@@ -222,12 +241,16 @@ class LogVO {
 	public var message:String;
 
 	public function LogVO(_extends:String, _id:String, _name:String, _level:int, _msg:String){
+		setValue(_extends, _id, _name, _level, _msg);
+	}
+	
+	public function setValue(_extends:String, _id:String, _name:String, _level:int, _msg:String):void {
+		time = getTimer();
 		extendsClass = _extends;
 		id = _id;
 		name = _name;
 		level = _level;
 		message = _msg;
-		time = getTimer();
 	}
 
 	public function toString():String {

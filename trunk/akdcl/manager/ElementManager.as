@@ -42,16 +42,14 @@ package akdcl.manager {
 
 		public function register(_elementID:String, _ElementClass:Class):void {
 			if (elementsDic[_elementID]) {
-				//trace("[WARNNING]:");
+				lM.warn(ElementManager, "register(id:{0}, class:{1}) id is already registed!", null, _elementID, _ElementClass);
 				return;
 			}
 			if (_ElementClass) {
 				lM.info(ElementManager, "register(id:{0}, class:{1})", null, _elementID, _ElementClass);
 				elementsDic[_elementID] = new Elements(_ElementClass);
 			} else {
-				var _str:String = "ElementManager.register(id, class), class is null!";
-				lM.warn(ElementManager, _str);
-				trace("[WARNNING]:" + _str);
+				lM.warn(ElementManager, "register(id:{0}, class:{1}) class is null!", null, _elementID, _ElementClass);
 			}
 		}
 		
@@ -63,16 +61,18 @@ package akdcl.manager {
 			}
 		}
 
-		public function getElement(_elementID:String):* {
+		public function getElement(_elementID:String, _build:Function = null):* {
 			var _elements:Elements = elementsDic[_elementID];
 			if (_elements) {
-				lM.info(ElementManager, "getElement(id:{0}) length:{1}", null, _elementID, Math.max(_elements.getLength() - 1, 0));
-				return _elements.getElement();
+				var _length:uint = _elements.getLength();
+				if (_build == null || _length > 0) {
+					lM.info(ElementManager, "getElement(id:{0}) length:{1}", null, _elementID, Math.max(_length - 1, 0));
+					return _elements.getElement();
+				}
+				return _build(_elementID, _elements.getClass());
 			}
 			
-			var _str:String = "ElementManager.getElement(" + _elementID + "), class is unregistered!";
-			lM.warn(ElementManager, _str);
-			trace("[WARNNING]:" + _str);
+			lM.warn(ElementManager, "getElement(id:{0}) class is unregistered!", null, _elementID);
 			return null;
 		}
 	}
@@ -85,6 +85,10 @@ class Elements extends Object {
 	public function Elements(_ElementClass:Class):void {
 		ElementClass = _ElementClass;
 		elementPrepared = [];
+	}
+	
+	public function getClass():Class {
+		return ElementClass;
 	}
 
 	public function getElement():* {
