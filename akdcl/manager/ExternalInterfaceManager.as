@@ -14,26 +14,15 @@
 	/// @eventType	ExternalInterfaceManager.CALL
 	[Event(name="call",type="ExternalInterfaceManager")]
 
-	final public class ExternalInterfaceManager extends EventDispatcher {
-		private static const ERROR:String = "ExternalInterfaceManager Singleton already constructed!";
-		private static var instance:ExternalInterfaceManager;
-		private static var lM:LoggerManager = LoggerManager.getInstance();
-
+	final public class ExternalInterfaceManager extends BaseManager {
+		baseManager static var instance:ExternalInterfaceManager;
 		public static function getInstance():ExternalInterfaceManager {
-			if (instance){
-			} else {
-				instance = new ExternalInterfaceManager();
-			}
-			return instance;
+			return createConstructor(ExternalInterfaceManager) as ExternalInterfaceManager;
 		}
-
-		public function ExternalInterfaceManager(){
-			if (instance){
-				lM.fatal(ExternalInterfaceManager, ERROR);
-				throw new Error("[ERROR]:" + ERROR);
-			}
-			instance = this;
-
+		
+		public function ExternalInterfaceManager() {
+			super(this);
+			
 			if (Security.sandboxType == Security.LOCAL_WITH_FILE){
 				__isAvailable = false;
 			} else {
@@ -44,6 +33,7 @@
 					__isAvailable = false;
 				}
 			}
+			
 			if (isAvailable){
 				ExternalInterface.addCallback(CALL, swfInterface);
 			}
@@ -52,31 +42,25 @@
 		}
 
 		public static const CALL:String = "call";
-
 		public static const EXTERNAL_LISTENER:String = "swfEventHandler";
 
 		public var eventParams:Array;
-
 		private var swfInterFaceEvent:Event = new Event(CALL);
 
 		private var __isAvailable:Boolean = false;
-
 		public function get isAvailable():Boolean {
 			return __isAvailable;
 		}
 
 		private var __eventType:String = null;
-
 		public function get eventType():String {
 			return __eventType;
 		}
 
 		private var __objectID:String;
-
 		public function get objectID():String {
 			return ExternalInterface.objectID || __objectID;
 		}
-
 		public function set objectID(_str:String):void {
 			__objectID = _str;
 		}

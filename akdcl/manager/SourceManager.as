@@ -7,26 +7,14 @@ package akdcl.manager {
 	 * ...
 	 * @author ...
 	 */
-	final public class SourceManager extends EventDispatcher {
-		private static const ERROR:String = "SourceManager Singleton already constructed!";
-		private static var instance:SourceManager;
-
+	final public class SourceManager extends BaseManager {
+		baseManager static var instance:SourceManager;
 		public static function getInstance():SourceManager {
-			if (instance){
-			} else {
-				instance = new SourceManager();
-			}
-			return instance;
+			return createConstructor(SourceManager) as SourceManager;
 		}
-
-		public function SourceManager(){
-			lM = LoggerManager.getInstance();
-			if (instance){
-				lM.fatal(SourceManager, ERROR);
-				throw new Error("[ERROR]:" + ERROR);
-			}
-			instance = this;
-			lM.info(SourceManager, "init");
+		
+		public function SourceManager() {
+			super(this);
 			
 			sourceGroup = {};
 		}
@@ -35,8 +23,6 @@ package akdcl.manager {
 		public static const BITMAPDATA_GROUP:String = "BitmapData";
 		public static const NETSTREAM_GROUP:String = "NetStream";
 		public static const REMOTE_GROUP:String = "Remote";
-
-		private var lM:LoggerManager;
 		
 		private var sourceGroup:Object;
 

@@ -1,5 +1,5 @@
 ﻿package akdcl.manager {
-	import flash.events.DataEvent;
+	import flash.events.Event;
 	import flash.events.StatusEvent;
 	import flash.events.EventDispatcher;
 
@@ -15,28 +15,19 @@
 	/// @eventType	akdcl.manager.LoggerManager.LOG
 	[Event(name="log",type="akdcl.manager.LoggerManager")]
 
-	final public class LoggerManager extends EventDispatcher {
-		private static var instance:LoggerManager;
-
+	final public class LoggerManager extends BaseManager {
+		baseManager static var instance:LoggerManager;
 		public static function getInstance():LoggerManager {
-			if (instance){
-			} else {
-				instance = new LoggerManager();
-			}
-			return instance;
+			return createConstructor(LoggerManager) as LoggerManager;
 		}
-
-		public function LoggerManager(){
-			if (instance){
-				throw new Error("ERROR:LoggerManager Singleton already constructed!");
-			}
-			instance = this;
-
+		
+		public function LoggerManager() {
+			super(this);
 			id = String(int(Math.random() * 999999));
 
 			targetDic = new Dictionary(true);
 
-			logEvent = new DataEvent(LOG);
+			logEvent = new Event(LOG);
 
 			localConnection = new LocalConnection();
 			localConnection.addEventListener(StatusEvent.STATUS, connectStatusHandler);
@@ -45,7 +36,7 @@
 		public static const LOCAL_CONNECTION_NAME:String = "_LoggerConnectManager";
 		public static const CONNECTION_METHOD_NAME:String = "connectionHandler";
 		
-		public static const LOG:String = "log";
+		public static const LOG:String = "akdcl.manager.LoggerManager.log";
 
 		private static const FATAL:int = 99;
 		private static const ERROR:int = 9;
@@ -74,7 +65,7 @@
 
 		private var targetDic:Dictionary;
 		private var localConnection:LocalConnection;
-		private var logEvent:DataEvent;
+		private var logEvent:Event;
 		private var lastLog:LogVO;
 
 		private var targetCount:uint;
@@ -144,7 +135,6 @@
 			}
 			
 			
-			logEvent.data = String(lastLog);
 			dispatchEvent(logEvent);
 		}
 
@@ -201,7 +191,7 @@
 			trace(_str);
 		}
 
-		private function onLogHandler(_e:DataEvent):void {
+		private function onLogHandler(_e:Event):void {
 			logConnectCount++;
 			try {
 				localConnection.send(

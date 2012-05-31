@@ -16,28 +16,22 @@ package akdcl.manager {
 	 * ...
 	 * @author Akdcl
 	 */
-	final public class ButtonManager {
-		private static var instance:ButtonManager;
-
+	final public class ButtonManager extends BaseManager {
+		baseManager static var instance:ButtonManager;
 		public static function getInstance():ButtonManager {
-			if (instance){
-			} else {
-				instance = new ButtonManager();
-			}
-			return instance;
+			return createConstructor(ButtonManager) as ButtonManager;
 		}
-
-		public function ButtonManager(){
-			if (instance){
-				throw new Error("ERROR:ButtonManager Singleton already constructed!");
-			}
-			instance = this;
+		
+		public function ButtonManager() {
+			super(this);
+			
 			buttonDic = new Dictionary();
 			buttonInDic = new Dictionary();
 			buttonDownDic = new Dictionary();
 			
 			intervalID = setInterval(checkStage, 300);
 		}
+		
 		private static const ROLL_OVER:String = "rollOver";
 		private static const ROLL_OUT:String = "rollOut";
 		private static const PRESS:String = "press";

@@ -9,22 +9,14 @@ package akdcl.manager {
 	 * ...
 	 * @author Akdcl
 	 */
-	final public class SoundManager {
-		private static var instance:SoundManager;
-
+	final public class SoundManager extends BaseManager {
+		baseManager static var instance:SoundManager;
 		public static function getInstance():SoundManager {
-			if (instance){
-			} else {
-				instance = new SoundManager();
-			}
-			return instance;
+			return createConstructor(SoundManager) as SoundManager;
 		}
-
-		public function SoundManager(){
-			if (instance){
-				throw new Error("ERROR:SoundManager Singleton already constructed!");
-			}
-			instance = this;
+		
+		public function SoundManager() {
+			super(this);
 		}
 
 		private static const SOUND_ITEMS_GROUP:String = "soundItems";

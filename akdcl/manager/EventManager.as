@@ -6,30 +6,16 @@ package akdcl.manager {
 	 * ...
 	 * @author Akdcl
 	 */
-	final public class EventManager extends EventDispatcher{
-		private static const ERROR:String = "EventManager Singleton already constructed!";
-		private static var instance:EventManager;
-
+	final public class EventManager extends BaseManager {
+		baseManager static var instance:EventManager;
 		public static function getInstance():EventManager {
-			if (instance){
-			} else {
-				instance = new EventManager();
-			}
-			return instance;
+			return createConstructor(EventManager) as EventManager;
 		}
-
-		public function EventManager(){
-			lM = LoggerManager.getInstance();
-			if (instance){
-				lM.fatal(EventManager, ERROR);
-				throw new Error("[ERROR]:" + ERROR);
-			}
-			instance = this;
-			lM.info(EventManager, "init");
+		
+		public function EventManager() {
+			super(this);
 			targetMap = new Dictionary();
 		}
-
-		private var lM:LoggerManager;
 
 		private var targetMap:Dictionary;
 

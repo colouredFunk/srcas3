@@ -6,33 +6,19 @@ package akdcl.manager {
 	 * ...
 	 * @author ...
 	 */
-	final public class ShareObjectManager {
-		private static const ERROR:String = "RequestManager Singleton already constructed!";
-		public static var instance:ShareObjectManager;
-
+	final public class ShareObjectManager extends BaseManager {
+		baseManager static var instance:ShareObjectManager;
 		public static function getInstance():ShareObjectManager {
-			if (instance){
-			} else {
-				instance = new ShareObjectManager();
-			}
-			return instance;
+			return createConstructor(ShareObjectManager) as ShareObjectManager;
 		}
-
-		public function ShareObjectManager(){
-			lM = LoggerManager.getInstance();
-			if (instance){
-				lM.fatal(ShareObjectManager, ERROR);
-				throw new Error("[ERROR]:" + ERROR);
-			}
-			instance = this;
-			lM.info(ShareObjectManager, "init");
-
+		
+		public function ShareObjectManager() {
+			super(this);
+			
 			setLocal(LOCAL_DOMAIN);
 		}
 
 		private static const LOCAL_DOMAIN:String = "akdcl/shareLocal";
-
-		private var lM:LoggerManager;
 
 		private var shareObject:SharedObject;
 		private var shareObjectGroup:Object;

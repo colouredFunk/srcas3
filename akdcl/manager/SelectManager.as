@@ -6,22 +6,14 @@ package akdcl.manager {
 	 * ...
 	 * @author ...
 	 */
-	final public class SelectManager {
-		private static var instance:SelectManager;
-
+	final public class SelectManager extends BaseManager {
+		baseManager static var instance:SelectManager;
 		public static function getInstance():SelectManager {
-			if (instance){
-			} else {
-				instance = new SelectManager();
-			}
-			return instance;
+			return createConstructor(SelectManager) as SelectManager;
 		}
-
-		public function SelectManager(){
-			if (instance){
-				throw new Error("ERROR:SelectManager Singleton already constructed!");
-			}
-			instance = this;
+		
+		public function SelectManager() {
+			super(this);
 			itemsGroup = {};
 		}
 

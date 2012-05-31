@@ -1,4 +1,4 @@
-package akdcl.manager {
+﻿package akdcl.manager {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Loader;
@@ -24,27 +24,15 @@ package akdcl.manager {
 	 * ...
 	 * @author ...
 	 */
-	final public class RequestManager extends EventDispatcher {
-		private static const ERROR:String = "RequestManager Singleton already constructed!";
-		private static var instance:RequestManager;
-
+	final public class RequestManager extends BaseManager {
+		baseManager static var instance:RequestManager;
 		public static function getInstance():RequestManager {
-			if (instance){
-			} else {
-				instance = new RequestManager();
-			}
-			return instance;
+			return createConstructor(RequestManager) as RequestManager;
 		}
-
-		public function RequestManager(){
-			lM = LoggerManager.getInstance();
-			if (instance){
-				lM.fatal(RequestManager, ERROR);
-				throw new Error("[ERROR]:" + ERROR);
-			}
-			instance = this;
-			lM.info(RequestManager, "init");
-
+		
+		public function RequestManager() {
+			super(this);
+			
 			eM = ElementManager.getInstance();
 			eM.register(REQUEST_LOADER, _RequestLoader);
 			eM.register(REQUEST_URLLOADER, _RequestURLLoader);
@@ -56,8 +44,7 @@ package akdcl.manager {
 			//eventProgressComplete = new ProgressEvent(ProgressEvent.PROGRESS, false, false, 1, 1);
 			
 			loaderDicForImage = { };
-			
-			urlLoaderDic = {};
+			urlLoaderDic = { };
 		}
 
 		public static const DATAFORMAT_XML:String = "xml";
@@ -70,7 +57,6 @@ package akdcl.manager {
 
 		private static const CONTENT_TYPE_STREAM:String = "application/octet-stream";
 
-		private var lM:LoggerManager;
 		private var eM:ElementManager;
 		private var sM:SourceManager;
 
@@ -88,7 +74,7 @@ package akdcl.manager {
 			_url = request.url;
 			if (!_url){
 				lM.warn(RequestManager, "RequestManager.loadDisplay(url), url is null!");
-				return;
+				return null;
 			}
 			lM.info(RequestManager, "loadDisplay(url:{0})", null, _url);
 			//

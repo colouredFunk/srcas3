@@ -1,4 +1,4 @@
-package akdcl.media {
+﻿package akdcl.media {
 
 	import flash.display.BitmapData;
 
@@ -13,6 +13,7 @@ package akdcl.media {
 	import ui.Alert;
 
 	import akdcl.events.UIEventDispatcher;
+	import flash.display.IBitmapDrawable;
 
 	/**
 	 * ...
@@ -109,7 +110,7 @@ package akdcl.media {
 					}
 					data = new BitmapData(cameraP.displayContent.width / cameraP.displayContent.scaleX, cameraP.displayContent.height / cameraP.displayContent.scaleY, false, 0);
 				}
-				data.draw(cameraP.displayContent);
+				data.draw(cameraP.displayContent as IBitmapDrawable);
 				if (hasEventListener(Event.COMPLETE)){
 					dispatchEvent(eventComplete);
 				}

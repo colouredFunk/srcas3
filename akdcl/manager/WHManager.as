@@ -19,22 +19,15 @@ package akdcl.manager {
 	/// @eventType	flash.events.Event.RESIZE
 	[Event(name="resize",type="flash.events.Event")]
 
-	final public class WHManager extends EventDispatcher {
-		private static var instance:WHManager;
-
+	final public class WHManager extends BaseManager {
+		baseManager static var instance:WHManager;
 		public static function getInstance():WHManager {
-			if (instance){
-			} else {
-				instance = new WHManager();
-			}
-			return instance;
+			return createConstructor(WHManager) as WHManager;
 		}
-
-		public function WHManager(){
-			if (instance){
-				throw new Error("ERROR:WHManager Singleton already constructed!");
-			}
-			instance = this;
+		
+		public function WHManager() {
+			super(this);
+			
 			targetList = [];
 			resizeEvent = new Event(Event.RESIZE);
 			timer = new Timer(1000);
