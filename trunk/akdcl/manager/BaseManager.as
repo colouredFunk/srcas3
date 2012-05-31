@@ -7,14 +7,11 @@ package akdcl.manager{
 	 * @author Akdcl
 	 */
 	public class BaseManager extends EventDispatcher {
-		protected namespace baseManager;
-		
 		private static const ABSTRACT_ERROR:String = "Abstract class did not receive reference to self. BaseManager cannot be instantiated directly.";
-		
 		private static const SINGLETON_ERROR:String = "Singleton already constructed!";
-		
 		private static const CONSTRUCTOR:String = "constructor";
 		
+		protected namespace baseManager;
 		protected static var lM:LoggerManager;
 		
 		public function BaseManager(_self:BaseManager) {
@@ -39,7 +36,6 @@ package akdcl.manager{
 		
 		protected static function createConstructor(_constructor:Class):BaseManager {
 			if (_constructor.baseManager::instance) {
-				
 			} else {
 				new _constructor();
 			}
