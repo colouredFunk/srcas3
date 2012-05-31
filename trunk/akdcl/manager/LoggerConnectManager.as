@@ -14,29 +14,21 @@ package akdcl.manager {
 	/// @eventType	akdcl.manager.LoggerConnectManager.LOG_CONNECT
 	[Event(name="logConnect",type="akdcl.manager.LoggerConnectManager")]
 
-	final public class LoggerConnectManager extends EventDispatcher {
-		private static var instance:LoggerConnectManager;
-
+	final public class LoggerConnectManager extends BaseManager {
+		baseManager static var instance:LoggerConnectManager;
 		public static function getInstance():LoggerConnectManager {
-			if (instance){
-			} else {
-				instance = new LoggerConnectManager();
-			}
-			return instance;
+			return createConstructor(LoggerConnectManager) as LoggerConnectManager;
 		}
-
-		public function LoggerConnectManager(){
-			if (instance){
-				throw new Error("ERROR:LoggerConnectManager Singleton already constructed!");
-			}
-			instance = this;
+		
+		public function LoggerConnectManager() {
+			super(this);
 			sourceDic = {};
 
 			logConnectEvent = new Event(LOG_CONNECT);
 			localConnection = new LocalConnection();
 		}
 
-		public static const LOG_CONNECT:String = "logConnect";
+		public static const LOG_CONNECT:String = "akdcl.manager.LoggerConnectManager.logConnect";
 
 		public static const E_CLASSES:String = "classes";
 		public static const E_CLASS:String = "class";
@@ -72,7 +64,6 @@ package akdcl.manager {
 		public var lastTarget:XML;
 
 		private var sourceDic:Object;
-
 		private var logConnectEvent:Event;
 		private var localConnection:LocalConnection;
 

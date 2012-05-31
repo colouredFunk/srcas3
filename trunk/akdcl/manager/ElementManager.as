@@ -1,31 +1,17 @@
 package akdcl.manager {
 	import flash.events.EventDispatcher;
 
-	final public class ElementManager extends EventDispatcher{
-		private static const ERROR:String = "ElementManager Singleton already constructed!";
-		private static var instance:ElementManager;
-
+	final public class ElementManager extends BaseManager {
+		baseManager static var instance:ElementManager;
 		public static function getInstance():ElementManager {
-			if (instance){
-			} else {
-				instance = new ElementManager();
-			}
-			return instance;
+			return createConstructor(ElementManager) as ElementManager;
 		}
-
-		public function ElementManager(){
-			lM = LoggerManager.getInstance();
-			if (instance){
-				lM.fatal(ElementManager, ERROR);
-				throw new Error("[ERROR]:" + ERROR);
-			}
-			instance = this;
-			lM.info(ElementManager, "init");
+		
+		public function ElementManager() {
+			super(this);
 			
 			elementsDic = { };
 		}
-
-		private var lM:LoggerManager;
 		
 		private var elementsDic:Object;
 
