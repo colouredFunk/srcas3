@@ -1,4 +1,4 @@
-package akdcl.manager{
+﻿package akdcl.manager{
 	import flash.events.EventDispatcher;
 	import flash.errors.IllegalOperationError;
 	
@@ -10,28 +10,31 @@ package akdcl.manager{
 		private static const ABSTRACT_ERROR:String = "Abstract class did not receive reference to self. BaseManager cannot be instantiated directly.";
 		private static const SINGLETON_ERROR:String = "Singleton already constructed!";
 		private static const CONSTRUCTOR:String = "constructor";
+		private static const INIT:String = "init";
 		
-		protected namespace baseManager;
 		protected static var lM:LoggerManager;
 		
+		protected namespace baseManager;
+		
 		public function BaseManager(_self:BaseManager) {
+			var _constructor:Class=this[CONSTRUCTOR];
 			if (_self != this) {
 				throw new IllegalOperationError(ABSTRACT_ERROR);
 				if (lM) {
-					lM.fatal(this[CONSTRUCTOR], ABSTRACT_ERROR);
+					lM.fatal(_constructor, ABSTRACT_ERROR);
 				}
 			}
 			
-			if (this[CONSTRUCTOR].baseManager::instance) {
+			if (_constructor.baseManager::instance) {
 				throw new IllegalOperationError(SINGLETON_ERROR);
 				if (lM) {
-					lM.fatal(this[CONSTRUCTOR], SINGLETON_ERROR);
+					lM.fatal(_constructor, SINGLETON_ERROR);
 				}
 			}
-			this[CONSTRUCTOR].baseManager::instance = this;
+			_constructor.baseManager::instance = this;
 			
 			lM = LoggerManager.getInstance();
-			lM.info(this[CONSTRUCTOR], "init");
+			lM.info(_constructor, INIT);
 		}
 		
 		protected static function createConstructor(_constructor:Class):BaseManager {
