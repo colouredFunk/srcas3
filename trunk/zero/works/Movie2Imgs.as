@@ -61,8 +61,8 @@ package zero.works{
 			//startFrame=0;
 			//endFrame=this.totalFrames;
 			
-			startFrame=1590;
-			endFrame=1920;
+			startFrame=1;
+			endFrame=1;
 			
 			frame=startFrame-1;
 			
@@ -86,9 +86,9 @@ package zero.works{
 			}
 			
 			//1
-			var imgData:ByteArray=PNGEncoder.encode(bmd);
+			//var imgData:ByteArray=PNGEncoder.encode(bmd);
 			
-			/*
+			///*
 			//2 透明 png
 			var bmd2:BitmapData=new BitmapData(bmd.width,bmd.height,true,0xffffffff);
 			bmd2.copyChannel(bmd,bmd.rect,new Point(),BitmapDataChannel.RED,BitmapDataChannel.ALPHA);
