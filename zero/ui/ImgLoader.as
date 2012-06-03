@@ -49,6 +49,8 @@ package zero.ui{
 		public var repeat:Boolean;
 		
 		public var onLoadComplete:Function;
+		public var onLoadError:Function;
+		public var onLoadProgress:Function;
 		public var onFadeComplete:Function;
 		public var onPlayComplete:Function;
 		
@@ -100,6 +102,8 @@ package zero.ui{
 			}
 			
 			onLoadComplete=null;
+			onLoadError=null;
+			onLoadProgress=null;
 			onFadeComplete=null;
 			onPlayComplete=null;
 		}
@@ -539,6 +543,10 @@ package zero.ui{
 					progressClip["txt"].text=int(percent*100)+" %";
 				}
 			}
+			if(onLoadProgress==null){
+			}else{
+				onLoadProgress(percent);
+			}
 		}
 		private function _loadComplete():void{
 			if(progressClip){
@@ -556,10 +564,10 @@ package zero.ui{
 				progressClip.visible=false;
 			}
 			trace(this+" 加载失败"+(xml?"，"+xml.toXMLString():""));
-			//if(onLoadError==null){
-			//}else{
-			//	onLoadError();
-			//}
+			if(onLoadError==null){
+			}else{
+				onLoadError();
+			}
 		}
 		
 		public function pause():void{
