@@ -1,7 +1,8 @@
 ﻿package akdcl.application{
-	import ui.UISprite;
+	import akdcl.display.UISprite;
 	import flash.utils.Dictionary;
-	public class RollModel extends UISprite{
+	public class RollModel extends UISprite {
+		public var isRound:Boolean;
 		public var isScale:Boolean;
 		public var isAlpha:Boolean;
 		public var isXY:Boolean;
@@ -12,6 +13,7 @@
 		protected var rollDic:Dictionary;
 		protected var rollList:Array;
 		protected var rollDepth:Array;
+		
 		override protected function init():void {
 			super.init();
 			rollDic = new Dictionary();
@@ -41,7 +43,7 @@
 			_n = _n*(1-scaleA)+scaleA;
 			return _n;
 		}
-		public var scaleOffY:Number = 0.02;
+		public var scaleOffY:Number = 0.0002;
 		public function get viewRotationX():Number {
 			return viewX * 180 / Math.PI;
 		}
@@ -105,8 +107,15 @@
 				_sin = Math.sin(rollDic[_roll] + viewX + viewXOff);
 				_roll.x = _cos * radiusX;
 				_roll.y = _sin * (radiusY + viewY);
+				
+				
 				if (isXY) {
-					_roll.y += _roll.x * addX * (radiusY + viewY) * scaleOffY;
+					_roll.y += _roll.x * (radiusY + viewY) * scaleOffY;
+					//* addX
+				}
+				if (isRound) {
+					_roll.x = Math.round(_roll.x);
+					_roll.y = Math.round(_roll.y);
 				}
 				_scale = getK((_sin + 1) * 0.5);
 				if (isScale) {
