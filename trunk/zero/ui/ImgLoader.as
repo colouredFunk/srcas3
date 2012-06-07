@@ -332,6 +332,7 @@ package zero.ui{
 					loader.load(new URLRequest(src));
 				break;
 				case FileTypes.FLV:
+				case FileTypes.F4V:
 					connection=new NetConnection();
 					connection.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
 					connection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
