@@ -10,7 +10,7 @@ package akdcl.skeleton{
 		public static const LOOP_COMPLETE:String = "loopComplete";
 		public static const IN_FRAME:String = "inFrame";
 		
-		public var callBack:Function;
+		public var onAnimation:Function;
 		
 		private var armatureAniData:ArmatureAniData;
 		private var boneAniData
@@ -111,8 +111,8 @@ package akdcl.skeleton{
 						}while (_playedFrames >= playedFrames);
 					}
 					if (_playedFrames > 0) {
-						if (callBack!=null) {
-							callBack(IN_FRAME, aniIDNow, boneAniData.list[_playedFrames].name);
+						if (onAnimation!=null) {
+							onAnimation(IN_FRAME, aniIDNow, boneAniData.list[_playedFrames].name);
 						}
 					}
 				}
@@ -130,8 +130,8 @@ package akdcl.skeleton{
 					playedFrames = 0;
 					loop = -1;
 					toFrameID = 0;
-					if (callBack!=null) {
-						callBack(START, aniIDNow);
+					if (onAnimation!=null) {
+						onAnimation(START, aniIDNow);
 					}
 				}else if (loop == -2) {
 					//循环开始
@@ -140,8 +140,8 @@ package akdcl.skeleton{
 					playedFrames = 0;
 					loop = 0;
 					toFrameID = 0;
-					if (callBack!=null) {
-						callBack(START, aniIDNow);
+					if (onAnimation!=null) {
+						onAnimation(START, aniIDNow);
 					}
 				}else if (loop >= 0) {
 					//继续循环
@@ -151,14 +151,14 @@ package akdcl.skeleton{
 						loop ++;
 					}
 					toFrameID = (loop & 1)?boneAniData.list.length - 1:0;
-					if (callBack!=null) {
-						callBack(LOOP_COMPLETE, aniIDNow);
+					if (onAnimation!=null) {
+						onAnimation(LOOP_COMPLETE, aniIDNow);
 					}
 				}else {
 					//complete
 					isComplete = true;
-					if (callBack!=null) {
-						callBack(COMPLETE, aniIDNow);
+					if (onAnimation!=null) {
+						onAnimation(COMPLETE, aniIDNow);
 					}
 				}
 			}
