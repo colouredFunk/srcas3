@@ -36,6 +36,7 @@ package zero.ui{
 		public var btnScrollNext:Btn;
 		
 		public var img:Btn;
+		public var bottomContainer:Sprite;
 		private var player:MediaPlayer;
 		public var skin:AutoFitMediaSkin;
 		
@@ -86,6 +87,7 @@ package zero.ui{
 			}
 			
 			initImg(img);
+			initBottomContainer(bottomContainer);
 			initSkin(skin);
 			direction="横向";
 			initIcons(icons,mask_inflate_dx,mask_inflate_dy);
@@ -133,6 +135,18 @@ package zero.ui{
 					img_align+=" middle";
 				}
 				img_align=img_align.substr(1);
+				
+				if(bottomContainer){
+					(img["img"] as ImgLoader).bottomContainer=bottomContainer;
+				}
+			}
+		}
+		public function initBottomContainer(_bottomContainer:Sprite):void{
+			bottomContainer=_bottomContainer;
+			if(bottomContainer){
+				if(img){
+					(img["img"] as ImgLoader).bottomContainer=bottomContainer;
+				}
 			}
 		}
 		public function initSkin(_skin:AutoFitMediaSkin):void{
@@ -353,7 +367,7 @@ package zero.ui{
 				player.stop();
 			}
 			
-			if(/^.*\.(flv|mp3)$/i.test(imgXML.@src.toString())&&player&&skin){
+			if(/^.*\.(flv|f4v|mp3)$/i.test(imgXML.@src.toString())&&player&&skin){
 				if(player){
 					player.load(imgXML.@src.toString());
 					player.play();

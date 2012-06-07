@@ -22,6 +22,7 @@ package zero{
 		public static const SWF:String="swf";
 		public static const MP3:String="mp3";
 		public static const FLV:String="flv";
+		public static const F4V:String="f4v";
 		public static const WAV:String="wav";
 		public static const MID:String="mid";
 		public static const RAR:String="rar";
@@ -37,6 +38,7 @@ package zero{
 			_7368:MP3,
 			_255250:MP3,
 			_7076:FLV,
+			//????:F4V,
 			_8273:WAV,
 			_7784:MID,
 			_8297:RAR,
@@ -51,6 +53,7 @@ package zero{
 			contentTypeMark[SWF]="application/x-shockwave-flash";
 			contentTypeMark[MP3]="audio/mpeg";
 			contentTypeMark[FLV]="video/x-flv";
+			//contentTypeMark[F4V]="video/x-f4v";//?
 			contentTypeMark[WAV]="audio/wav";
 			contentTypeMark[MID]="audio/mid";
 			contentTypeMark[RAR]="";//application/octet-stream
