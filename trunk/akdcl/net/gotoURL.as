@@ -81,8 +81,8 @@
 				case "Firefox":
 				case "IE":
 					if (ExternalInterface.available){
-						//ExternalInterface.call("window.open", _href, _target, "");
-						WebHREF.webGotoURL(_href, _target);
+						ExternalInterface.call("window.open", _href, _target, "");
+						//WebHREF.webGotoURL(_href, _target);
 					} else {
 						navigateToURL(_request, _target);
 					}
