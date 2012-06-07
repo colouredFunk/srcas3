@@ -7,6 +7,11 @@
 	 * @author Akdcl
 	 */
 	public class BaseManager extends EventDispatcher {
+		/*baseManager static var instance:EventManager;
+		public static function getInstance():EventManager {
+			return createConstructor(EventManager) as EventManager;
+		}*/
+		
 		private static const ABSTRACT_ERROR:String = "Abstract class did not receive reference to self. BaseManager cannot be instantiated directly.";
 		private static const SINGLETON_ERROR:String = "Singleton already constructed!";
 		private static const CONSTRUCTOR:String = "constructor";

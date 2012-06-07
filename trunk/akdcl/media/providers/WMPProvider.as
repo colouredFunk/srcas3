@@ -36,7 +36,7 @@
 			}
 			pwrd.getSWFByID=function(_swfID){
 				var _swf;
-				if(navigator.appName.indexOf("Microsoft")!=-1){
+				if(navigator.appName.indexOf("Microsoft")>=0){
 					_swf=window[_swfID];
 				}else{
 					_swf=document[_swfID];

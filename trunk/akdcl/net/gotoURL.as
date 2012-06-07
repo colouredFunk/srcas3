@@ -34,6 +34,10 @@
 		} else {
 			_href = _urlOrXML;
 		}
+		
+		
+		
+		
 
 		if (_js is String && ExternalInterface.available){
 			LoggerManager.getInstance().info(this, "执行JS:" + _js);
@@ -77,7 +81,8 @@
 				case "Firefox":
 				case "IE":
 					if (ExternalInterface.available){
-						ExternalInterface.call("window.open", _href, _target, "");
+						//ExternalInterface.call("window.open", _href, _target, "");
+						WebHREF.webGotoURL(_href, _target);
 					} else {
 						navigateToURL(_request, _target);
 					}
@@ -91,5 +96,42 @@
 					break;
 			}
 		}
+	}
+}
+
+import flash.external.ExternalInterface;
+
+class WebHREF {
+	private static var isHREFCreated:Boolean;
+	private static const JS:XML = <script><![CDATA[
+		function __createHREF() {
+			var _swfHREF = document.createElement("form");
+			_swfHREF.id = "__swfWebHREF";
+			_swfHREF.method = "get";
+			_swfHREF.style.height = 0;
+			_swfHREF.style.width = 0;
+			_swfHREF.style.overflow = "hidden";
+			document.body.appendChild(_swfHREF);
+		}
+		function __gotoURL(_href, _target) {
+			var _swfHREF = document.getElementById("__swfWebHREF");
+			if (_swfHREF) {
+				_swfHREF.action = _href;
+				_swfHREF.target = _target || "_blank";
+				_swfHREF.submit(); 
+			}
+		}
+		__createHREF();
+	]]></script>
+	
+	public static function webGotoURL(_href:String, _target:String = null):void {
+		if (!ExternalInterface.available){
+			return;
+		}
+		if (!isHREFCreated) {
+			ExternalInterface.call("eval", JS.toString());
+			isHREFCreated = true;
+		}
+		ExternalInterface.call("__gotoURL", _href,_target);
 	}
 }
