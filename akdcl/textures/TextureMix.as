@@ -21,7 +21,7 @@ package akdcl.textures
 		}
 		
 		public function getTexture(_id:String):XML {
-			return xml.child(_id)[0];
+			return xml.children().(@name.toString() == _id)[0];
 		}
 		
 		public function getNodeName(_xml:XML, _id:String = null):String {

@@ -125,7 +125,7 @@
 
 			var _i:uint = 0;
 			while (_i < _args.length){
-				_msg = _msg.replace(new RegExp("\\{" + _i + "\\}", "g"), _args[_i]);
+				_msg = _msg.replace(new RegExp("\\{" + _i + "\\}", "g"), String(_args[_i]));
 				_i++;
 			}
 			if (lastLog) {
