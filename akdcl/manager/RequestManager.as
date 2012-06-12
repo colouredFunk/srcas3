@@ -84,7 +84,7 @@
 			
 			if (_type == "swf") {
 				
-					_loader = eM.getElement(REQUEST_LOADER);
+					_loader = eM.getElement(REQUEST_LOADER) as _RequestLoader;
 					_loader.contentLoaderInfo.addEventListener(Event.INIT, onSWFInitHandler);
 					_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onSWFCompleteOrErrorHandler);
 					_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onSWFCompleteOrErrorHandler);
@@ -120,7 +120,7 @@
 				_loader = loaderDicForImage[_url];
 				if (_loader){
 				} else {
-					_loader = eM.getElement(REQUEST_LOADER);
+					_loader = eM.getElement(REQUEST_LOADER) as _RequestLoader;
 					loaderDicForImage[_url] = _loader;
 					_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onImageCompleteOrErrorHandler);
 					_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onImageCompleteOrErrorHandler);
@@ -215,7 +215,7 @@
 			var _loader:_RequestURLLoader = urlLoaderDic[_url];
 			if (_loader){
 			} else {
-				_loader = eM.getElement(REQUEST_URLLOADER);
+				_loader = eM.getElement(REQUEST_URLLOADER) as _RequestURLLoader;
 				_loader.addEventListener(Event.COMPLETE, onURLLoaderCompleteOrErrorHandler);
 				_loader.addEventListener(IOErrorEvent.IO_ERROR, onURLLoaderCompleteOrErrorHandler);
 				_loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onURLLoaderCompleteOrErrorHandler);

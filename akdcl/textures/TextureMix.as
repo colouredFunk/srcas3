@@ -1,5 +1,4 @@
-package akdcl.textures
-{
+package akdcl.textures{
 	import flash.display.BitmapData;
 	
 	/**
@@ -10,6 +9,7 @@ package akdcl.textures
 		public var bitmapData:BitmapData;
 		public var xml:XML;
 		public var texture:Object;
+		
 		public function TextureMix(_bmd:BitmapData, _xml:XML = null, _texture:Object = null):void {
 			bitmapData = _bmd;
 			xml = _xml;
