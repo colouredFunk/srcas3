@@ -123,11 +123,8 @@
 				_name = _targetLogDic.name;
 			}
 
-			var _i:uint = 0;
-			while (_i < _args.length){
-				_msg = _msg.replace(new RegExp("\\{" + _i + "\\}", "g"), String(_args[_i]));
-				_i++;
-			}
+			_msg = formatMessage(_msg, _args);
+			
 			if (lastLog) {
 				lastLog.setValue(_extendsClass, _id, _name, _level, _msg);
 			}else {
@@ -157,7 +154,7 @@
 				_args.unshift(_target, WARN, _msg, _name);
 				log.apply(this, _args);
 			}
-			traceToString(WARN, _msg);
+			traceToString(WARN, _msg, _args);
 		}
 
 		public function error(_target:Object, _msg:String, _name:String = null, ... _args):void {
@@ -165,7 +162,7 @@
 				_args.unshift(_target, ERROR, _msg, _name);
 				log.apply(this, _args);
 			}
-			traceToString(WARN, _msg);
+			traceToString(WARN, _msg, _args);
 		}
 
 		public function fatal(_target:Object, _msg:String, _name:String = null, ... _args):void {
@@ -173,7 +170,7 @@
 				_args.unshift(_target, FATAL, _msg, _name);
 				log.apply(this, _args);
 			}
-			traceToString(WARN, _msg);
+			traceToString(WARN, _msg, _args);
 		}
 
 		public function startConnect():void {
@@ -186,7 +183,17 @@
 			removeEventListener(LoggerManager.LOG, onLogHandler);
 		}
 		
-		private function traceToString(_level:int, _msg:String):void {
+		private function formatMessage(_msg:String, _args:Array):String {
+			var _i:uint = 0;
+			while (_i < _args.length){
+				_msg = _msg.replace(new RegExp("\\{" + _i + "\\}", "g"), String(_args[_i]));
+				_i++;
+			}
+			return _msg;
+		}
+		
+		private function traceToString(_level:int, _msg:String, _args:Array):void {
+			_msg = formatMessage(_msg, _args);
 			var _str:String = "[" + LEVEL_NAMES[_level] + "]:" + _msg;
 			trace(_str);
 		}
