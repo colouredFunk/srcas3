@@ -176,10 +176,12 @@
 		public function startConnect():void {
 			__isConnected = true;
 			addEventListener(LoggerManager.LOG, onLogHandler);
+			info(LoggerManager, "startConnect");
 		}
 
 		public function stopConnect():void {
 			__isConnected = false;
+			info(LoggerManager, "stopConnect");
 			removeEventListener(LoggerManager.LOG, onLogHandler);
 		}
 		
