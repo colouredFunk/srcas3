@@ -1,5 +1,6 @@
 ﻿package akdcl.manager {
 	import akdcl.utils.objectToString;
+	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.external.ExternalInterface;
@@ -45,7 +46,6 @@
 		public static const EXTERNAL_LISTENER:String = "swfEventHandler";
 
 		public var eventParams:Array;
-		private var swfInterFaceEvent:Event = new Event(CALL);
 
 		private var __isAvailable:Boolean = false;
 		public function get isAvailable():Boolean {
@@ -100,9 +100,9 @@
 				}
 			}
 		}
-
-		public function debugMessage(... args):void {
-			callInterface("alert", "[" + objectID + "]:" + args);
+		
+		public function debugMessage(_message:String):void {
+			callInterface("alert", _message);
 		}
 
 		//广播js调用as的事件
@@ -119,7 +119,7 @@
 			lM.info(ExternalInterfaceManager, "接收外部事件(type:{2}, args:{3}) isAvailable:{0} objectID:{1}", null, isAvailable, objectID, __eventType, args);
 			
 			if (hasEventListener(CALL)) {
-				dispatchEvent(swfInterFaceEvent);
+				dispatchEvent(new Event(CALL));
 			}
 			if (hasEventListener(__eventType)){
 				var _event:Event = new Event(__eventType);
