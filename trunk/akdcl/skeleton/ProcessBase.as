@@ -1,5 +1,5 @@
-package akdcl.skeleton
-{
+package akdcl.skeleton {
+	import flash.errors.IllegalOperationError;
 	
 	/**
 	 * ...
@@ -7,7 +7,7 @@ package akdcl.skeleton
 	 */
 	public class ProcessBase {
 		/**
-		 * 动画的缩放值默认为1
+		 * 动画缩放值，默认为1
 		 */
 		public var scale:Number;
 		
@@ -30,7 +30,18 @@ package akdcl.skeleton
 		protected var playedFrames:uint;
 		protected var noScaleListFrames:uint;
 		
-		public function ProcessBase() {
+		public function ProcessBase(_self:ProcessBase) {
+			if (_self != this) {
+				throw new IllegalOperationError("Abstract class did not receive reference to self. ProcessBase cannot be instantiated directly.");
+			}
+			
+			scale = 1;
+			isComplete = true;
+			isPause = false;
+			currentFrame = 0;
+		}
+		
+		public function remove():void {
 			scale = 1;
 			isComplete = true;
 			isPause = false;

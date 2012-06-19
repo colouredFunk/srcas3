@@ -42,19 +42,6 @@ package akdcl.skeleton
 			dSX = _to.scaleX - sSX;
 			dSY = _to.scaleY - sSY;
 			dA = _to.alpha - sA;
-			
-			/*var _aF:Boolean = isNaN(sA);
-			var _aT:Boolean = isNaN(_to.alpha);
-			if (_aF && _aT) {
-				dA = NaN;
-			}else if (_aF) {
-				sA = 1;
-				dA = _to.alpha - sA;
-			}else if (_aT) {
-				dA = 1 - sA;
-			}else {
-				dA = _to.alpha - sA;
-			}*/
 		}
 		
 		public function tweenTo(_k:Number):void {

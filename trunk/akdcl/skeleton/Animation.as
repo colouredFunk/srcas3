@@ -1,7 +1,7 @@
 package akdcl.skeleton{
 	
 	/**
-	 * ...
+	 * 管理tween
 	 * @author Akdcl
 	 */
 	final public class Animation extends ProcessBase {
@@ -13,11 +13,12 @@ package akdcl.skeleton{
 		public var onAnimation:Function;
 		
 		private var armatureAniData:ArmatureAniData;
-		private var boneAniData
+		private var boneAniData:Object;
 		private var tweens:Object;
 		private var aniIDNow:String;
 		
 		public function Animation() {
+			super(this);
 			tweens = { };
 		}
 		
@@ -26,11 +27,22 @@ package akdcl.skeleton{
 		}
 		
 		public function addTween(_bone:Bone):void {
-			var _tween:Tween = tweens[_bone.name];
+			var _boneID:String = _bone.name;
+			var _tween:Tween = tweens[_boneID];
 			if (!_tween) {
-				tweens[_bone.name] = _tween = new Tween();
+				tweens[_boneID] = _tween = Tween.create();
 			}
-			_tween.node = _bone.tweenNode;
+			_tween.setNode(_bone.tweenNode);
+		}
+		
+		public function removeTween(_bone:Bone):void {
+			var _boneID:String = _bone.name;
+			var _tween:Tween = tweens[_boneID];
+			if (_tween) {
+				delete tweens[_boneID];
+				_tween.remove();
+				Tween.recycle(_tween);
+			}
 		}
 		
 		public function getTween(_boneName:String):Tween {
@@ -84,8 +96,8 @@ package akdcl.skeleton{
 			super.update();
 			
 			if (loop >= -1 && boneAniData.list) {
-				var _kD:Number;
 				//多关键帧动画过程
+				var _kD:Number;
 				var _prevFrameID:int;
 				var _playedFrames:Number = noScaleListFrames * currentPrecent;
 				
@@ -150,7 +162,14 @@ package akdcl.skeleton{
 					if (yoyo) {
 						loop ++;
 					}
-					toFrameID = (loop & 1)?boneAniData.list.length - 1:0;
+					
+					//
+					if (boneAniData.list){
+						toFrameID = (loop & 1)?boneAniData.list.length - 1:0;
+					}else {
+						toFrameID = 0;
+					}
+					
 					if (onAnimation!=null) {
 						onAnimation(LOOP_COMPLETE, aniIDNow);
 					}

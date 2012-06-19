@@ -74,10 +74,10 @@ package akdcl.skeleton
 					}
 				}
 				
-				//有时间需要分离
+				//需要分离
 				var _boneAniData:Object = _aniData.getAnimation(_aniName);
 				
-				_boneAniData.totalFrames = _frameXML.attribute(FRAME);
+				_boneAniData.totalFrames = int(_frameXML.attribute(FRAME));
 				_frameXMLList = _frameXML.elements(FRAME);
 				if (_frameXMLList.length() > 0) {
 					

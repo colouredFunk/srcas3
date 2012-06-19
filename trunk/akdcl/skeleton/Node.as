@@ -1,12 +1,8 @@
-package akdcl.skeleton
-{
-	//import flash.geom.Point;
-	
+package akdcl.skeleton {
 	/**
 	 * ...
 	 * @author Akdcl
 	 */
-	// extends Point
 	public class Node{
 		public var rotation:Number;
 		public var x:Number;
@@ -23,5 +19,4 @@ package akdcl.skeleton
 			y = _fV.y;
 		}
 	}
-	
 }

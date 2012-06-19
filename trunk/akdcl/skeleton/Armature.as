@@ -1,5 +1,4 @@
-package akdcl.skeleton
-{
+package akdcl.skeleton{
 	import flash.geom.Point;
 	
 	/**
@@ -142,11 +141,14 @@ package akdcl.skeleton
 			}
 			//添加新的关节
 			joints[_id] = _joint;
-			_bone = new Bone(_joint, _id);
+			_bone = Bone.create();
+			_bone.joint = _joint;
+			_bone.name = _id;
 			animation.addTween(_bone);
 			
 			boneList.push(_bone);
 			bones[_id] = _bone;
+			
 			var _boneParent:Bone = getBone(_parentID);
 			if (_boneParent) {
 				_boneParent.addChild(_bone, _x, _y);
@@ -159,20 +161,18 @@ package akdcl.skeleton
 			return _joint;
 		}
 		
-		/**
-		 * 获取显示关节
-		 * @param _id 关节ID
-		 */
-		public function getJoint(_id:String):Object {
-			return joints[_id];
-		}
-		
-		/**
-		 * 获取骨骼
-		 * @param _id 骨骼ID
-		 */
-		public function getBone(_id:String):Bone {
-			return bones[_id];
+		public function removeJoint(_id:String):Object {
+			var _bone:Bone = bones[_id];
+			_bone.remove();
+			Bone.recycle(_bone);
+			
+			var _joint:Object = joints[_id];
+			if (_joint) {
+				delete joints[_id];
+				container.removeChild(_joint);
+				return _joint;
+			}
+			return null
 		}
 		
 		/**
@@ -184,6 +184,13 @@ package akdcl.skeleton
 		
 		public function setContainer(_container:Object):void {
 			container = _container;
+		}
+		
+		/**
+		 * @private
+		 */
+		private function getBone(_id:String):Bone {
+			return bones[_id];
 		}
 		
 	}
