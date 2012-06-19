@@ -25,13 +25,15 @@ package akdcl.skeleton
 		override public function copy(_fV:Node):void {
 			super.copy(_fV);
 			var _nV:FrameNode = _fV as FrameNode;
-			scaleX = _nV.scaleX;
-			scaleY = _nV.scaleY;
-			alpha = _nV.alpha;
-			//
-			totalFrames = _nV.totalFrames;
-			
-			offR = _nV.offR;
+			if (_nV) {
+				scaleX = _nV.scaleX;
+				scaleY = _nV.scaleY;
+				alpha = _nV.alpha;
+				//
+				totalFrames = _nV.totalFrames;
+				
+				offR = _nV.offR;
+			}
 		}
 	}
 	

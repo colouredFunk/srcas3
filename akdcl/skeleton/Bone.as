@@ -6,7 +6,19 @@ package akdcl.skeleton{
 	 * @author akdcl
 	 */
 	final public class Bone {
-		//private static var pointTemp:Point = new Point();
+		public static const isRadianMode:Boolean = false;
+		
+		private static var list:Vector.<Bone> = new Vector.<Bone>;
+		public static function create():Bone {
+			if (list.length > 0) {
+				return list.pop();
+			}
+			return new Bone();
+		}
+		
+		public static function recycle(_bone:Bone):void {
+			list.push(_bone);
+		}
 		
 		/**
 		 * 用于Armature索引
@@ -26,11 +38,16 @@ package akdcl.skeleton{
 		/**
 		 * @private
 		 */
-		internal var parentNode:Node;
 		internal var tweenNode:TweenNode;
 		
 		//private var children:Vector.<Bone>;
 		private var parent:Bone;
+		private var parentX:Number;
+		private var parentY:Number;
+		private var parentR:Number;
+		private var parentLocalX:Number;
+		private var parentLocalY:Number;
+		
 		private var lockX:Number;
 		private var lockY:Number;
 		
@@ -39,20 +56,35 @@ package akdcl.skeleton{
 		 * @param _joint 受骨骼控制的显示关节
 		 * @param _name 用于Armature索引
 		 */
-		public function Bone(_joint:Object, _name:String = null) {
-			joint = _joint;
-			name = _name;
+		public function Bone() {
+			parentX = 0;
+			parentY = 0;
+			parentR = 0;
+			parentLocalX = 0;
+			parentLocalY = 0;
 			lockX = 0;
 			lockY = 0;
 			
 			node = new Node();
-			parentNode = new Node();
 			tweenNode = new TweenNode();
 			//children = new Vector.<Bone>();
 		}
 		
-		public function getGlobalRotation():Number {
-			return node.rotation + parentNode.rotation + tweenNode.rotation;
+		public function remove():void {
+			joint = null;
+			parent = null;
+		}
+		
+		internal function getGlobalX():Number {
+			return parentLocalX + parentX;
+		}
+		
+		internal function getGlobalY():Number {
+			return parentLocalY + parentY;
+		}
+		
+		internal function getGlobalR():Number {
+			return node.rotation + tweenNode.rotation + parentR;
 		}
 		
 		/**
@@ -70,57 +102,55 @@ package akdcl.skeleton{
 		}
 		
 		/**
-		 * 更新步进
+		 * 更新
 		 */
 		public function update():void {
 			if (parent) {
 				//把node和animationNode坐标和映射到parent的坐标系
-				var _pr:Number = parent.joint.rotation;
-				var _r:Number;
+				parentX = parent.getGlobalX();
+				parentY = parent.getGlobalY();
+				parentR = parent.getGlobalR();
+				
 				var _dX:Number = lockX + node.x + tweenNode.x;
 				var _dY:Number = lockY + node.y + tweenNode.y;
-				if ("pivotX" in parent.joint) {
-					_r = Math.atan2(_dY, _dX)+_pr;
-					//pointTemp = parent.joint.transformationMatrix.transformPoint(pointTemp);
+				var _r:Number;
+				if (isRadianMode) {
+					_r = Math.atan2(_dY, _dX) + parentR;
 				}else {
-					_r = Math.atan2(_dY, _dX) + _pr * Math.PI / 180;
-					//pointTemp = parent.joint.transform.matrix.transformPoint(pointTemp);
+					_r = Math.atan2(_dY, _dX) + parentR * Math.PI / 180;
 				}
 				
-				//
 				var _len:Number = Math.sqrt(_dX * _dX + _dY * _dY);
-				
-				//parentGlobalXY
-				parentNode.x = _len * Math.cos(_r) + parent.joint.x;
-				parentNode.y = _len * Math.sin(_r) + parent.joint.y;
-				
-				parentNode.rotation = _pr;
-				joint.x = parentNode.x;
-				joint.y = parentNode.y;
+				parentLocalX = _len * Math.cos(_r);
+				parentLocalY = _len * Math.sin(_r);
 			}else {
-				joint.x = node.x + parentNode.x + tweenNode.x;
-				joint.y = node.y + parentNode.y + tweenNode.y;
+				parentLocalX = node.x + tweenNode.x;
+				parentLocalY = node.y + tweenNode.y;
 			}
-			joint.rotation = node.rotation + parentNode.rotation + tweenNode.rotation;
 			
-			//scale和alpha只由动画控制
-			if (isNaN(tweenNode.scaleX)) {
-			}else {
-				joint.scaleX = tweenNode.scaleX;
-			}
-			if (isNaN(tweenNode.scaleY)) {
+			if (joint) {
+				joint.x = getGlobalX();
+				joint.y = getGlobalY();
+				joint.rotation = getGlobalR();
 				
-			}else {
-				joint.scaleY = tweenNode.scaleY;
-			}
-			if (isNaN(tweenNode.alpha)) {
 				
-			}else {
-				if (tweenNode.alpha) {
-					joint.visible = true;
-					joint.alpha = tweenNode.alpha;
+				//scale和alpha只由tweenNode控制
+				if (isNaN(tweenNode.scaleX)) {
 				}else {
-					joint.visible = false;
+					joint.scaleX = tweenNode.scaleX;
+				}
+				if (isNaN(tweenNode.scaleY)) {
+				}else {
+					joint.scaleY = tweenNode.scaleY;
+				}
+				if (isNaN(tweenNode.alpha)) {
+				}else {
+					if (tweenNode.alpha) {
+						joint.visible = true;
+						joint.alpha = tweenNode.alpha;
+					}else {
+						joint.visible = false;
+					}
 				}
 			}
 		}

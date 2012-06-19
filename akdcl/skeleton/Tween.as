@@ -1,17 +1,29 @@
 package akdcl.skeleton{
 	
 	/**
-	 * 骨骼动画，处理关键帧数据后，输出到骨骼
+	 * 骨骼动画，处理关键帧数据并渲染到骨骼
 	 * @author Akdcl
 	 */
-	public class Tween extends ProcessBase {
+	final public class Tween extends ProcessBase {
 		private static const HALF_PI:Number = Math.PI * 0.5;
 		
+		private static var list:Vector.<Tween> = new Vector.<Tween>;
+		public static function create():Tween {
+			if (list.length > 0) {
+				return list.pop();
+			}
+			return new Tween();
+		}
+		
+		public static function recycle(_tween:Tween):void {
+			list.push(_tween);
+		}
+		
 		/**
+		 * Bone.TweenNode的引用
 		 * @private
 		 */
-		public var node:TweenNode;
-		
+		private var node:TweenNode;
 		private var from:FrameNode;
 		private var to:FrameNode;
 		private var list:FrameNodeList;
@@ -20,9 +32,19 @@ package akdcl.skeleton{
 		 * 构造函数
 		 */
 		public function Tween() {
-			super();
+			super(this);
 			from = new FrameNode();
 			to = new FrameNode();
+		}
+		
+		override public function remove():void {
+			super.remove();
+			node = null;
+			list = null;
+		}
+		
+		internal function setNode(_node:TweenNode):void {
+			node = _node;
 		}
 		
 		/**
@@ -66,9 +88,6 @@ package akdcl.skeleton{
 			node.betweenValue(from, to);
 		}
 		
-		/**
-		 * 更新步进
-		 */
 		override public function update():void {
 			if (isComplete || isPause) {
 				return;
