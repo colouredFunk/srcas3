@@ -3,7 +3,6 @@
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.display.StageDisplayState;
-	import flash.utils.getTimer;
 
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
@@ -12,6 +11,7 @@
 
 	import flash.system.Security;
 	import flash.system.System;
+	import flash.utils.getTimer;
 
 	import akdcl.utils.addContextMenu;
 	import akdcl.utils.objectToString;
@@ -27,6 +27,12 @@
 			var _instance:DocClass;
 			_instance = instanceMap[_key];
 			return _instance;
+		}
+		
+		protected function onRemoveHandler(_e:Event):void {
+			if (instanceMap[docClassKey] == this) {
+				instanceMap[docClassKey] = null;
+			}
 		}
 
 		public function DocClass(_key:String = "main"){
@@ -160,6 +166,7 @@
 			if (loadProgress == 1 && onLoaded != null){
 				removeEventListener(Event.ENTER_FRAME, onLoadingHandler);
 				onLoaded();
+				lM.id
 				lM.stopConnect();
 			}
 		}
@@ -179,9 +186,7 @@
 		protected function onLoadedHandler():void {
 			lM.info(this, STATUS_LOAD_COMPLETE +"====>>>>\n" + objectToString(flashVars));
 			AuthorInformation.setFileBytes(loaderInfo.bytes);
-
 			addContextMenu(this, "Size: " + loaderInfo.width + " X " + loaderInfo.height, onSizeMenuHandler);
-
 			addContextMenu(this, AuthorInformation.getVersion(), onVersionMenuHandler);
 
 			eiM.dispatchSWFEvent(STATUS_LOAD_COMPLETE);
@@ -219,12 +224,6 @@
 				eiM.debugMessage(_str);
 			} else {
 				throw new Error(_str);
-			}
-		}
-		
-		protected function onRemoveHandler(_e:Event):void {
-			if (instanceMap[docClassKey] == this) {
-				instanceMap[docClassKey] = null;
 			}
 		}
 
