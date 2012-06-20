@@ -6,8 +6,6 @@ package akdcl.skeleton{
 	 * @author akdcl
 	 */
 	final public class Bone {
-		public static const isRadianMode:Boolean = false;
-		
 		private static var list:Vector.<Bone> = new Vector.<Bone>;
 		public static function create():Bone {
 			if (list.length > 0) {
@@ -73,6 +71,7 @@ package akdcl.skeleton{
 		public function remove():void {
 			joint = null;
 			parent = null;
+			name = null;
 		}
 		
 		internal function getGlobalX():Number {
@@ -114,7 +113,7 @@ package akdcl.skeleton{
 				var _dX:Number = lockX + node.x + tweenNode.x;
 				var _dY:Number = lockY + node.y + tweenNode.y;
 				var _r:Number;
-				if (isRadianMode) {
+				if (ConnectionData.isRadian) {
 					_r = Math.atan2(_dY, _dX) + parentR;
 				}else {
 					_r = Math.atan2(_dY, _dX) + parentR * Math.PI / 180;

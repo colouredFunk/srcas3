@@ -3,7 +3,7 @@ package akdcl.skeleton
 	import flash.geom.Point;
 	
 	/**
-	 * 用来格式化、管理骨骼配置与骨骼动画的静态工具类
+	 * 格式化、管理骨骼配置与骨骼动画
 	 * @author Akdcl
 	 */
 	final public class ConnectionData {
@@ -32,6 +32,11 @@ package akdcl.skeleton
 		internal static const FRAME:String = "frame";
 		
 		/**
+		 * rotation数据采用弧度制还是角度制
+		 */
+		public static var isRadian:Boolean;
+		
+		/**
 		 * @private
 		 */
 		private static var armatureXML:XML =<root/>;
@@ -44,9 +49,8 @@ package akdcl.skeleton
 		/**
 		 * 将ConnectionDataMaker生成的XML数据转换成内置数据
 		 * @param _xml XML数据
-		 * @param _isRadian XML数据中的角度是否使用弧度制，默认使用角度制，当使用starling时需要使用弧度制
 		 */
-		public static function setData(_xml:XML, _isRadian:Boolean = false):void {
+		public static function setData(_xml:XML):void {
 			var _name:String = _xml.attribute(NAME);
 			var _aniData:ArmatureAniData = getArmatureAniData(_name);
 			if (_aniData) {
@@ -68,9 +72,9 @@ package akdcl.skeleton
 					}
 					_frameXMLList = _frameXML.elements(_boneName);
 					if (_frameXMLList.length() > 1) {
-						_aniData.addAnimation(getFrameNodeList(_frameXMLList, _isRadian), _aniName, _boneName);
+						_aniData.addAnimation(getFrameNodeList(_frameXMLList), _aniName, _boneName);
 					}else {
-						_aniData.addAnimation(getFrameNode(_nodeXML, _isRadian), _aniName, _boneName);
+						_aniData.addAnimation(getFrameNode(_nodeXML), _aniName, _boneName);
 					}
 				}
 				
@@ -86,7 +90,7 @@ package akdcl.skeleton
 					var _frame:uint = 0;
 					for each(_nodeXML in _frameXMLList) {
 						_obj = { };
-						_obj.name = _nodeXML.attribute(NAME);
+						_obj.name = String(_nodeXML.attribute(NAME));
 						_obj.totalFrames = int(_nodeXML.attribute(FRAME));
 						_arr.push(_obj);
 						_frame += _obj.totalFrames;
@@ -94,7 +98,7 @@ package akdcl.skeleton
 					
 					_obj = { };
 					//补第一帧信息
-					_obj.name = null;
+					_obj.name = "init";
 					_obj.totalFrames = _boneAniData.totalFrames - _frame;
 					_arr.unshift(_obj);
 					_boneAniData.list = _arr;
@@ -102,20 +106,20 @@ package akdcl.skeleton
 			}
 		}
 		
-		private static function getFrameNodeList(_frameXMLList:XMLList, _isRadian:Boolean):FrameNodeList {
+		private static function getFrameNodeList(_frameXMLList:XMLList):FrameNodeList {
 			var _nodeList:FrameNodeList = new FrameNodeList();
 			_nodeList.scale = Number(_frameXMLList[0].attribute(SCALE)) || _nodeList.scale;
 			_nodeList.delay = Number(_frameXMLList[0].attribute(DELAY)) || _nodeList.delay;
 			_nodeList.delay -= Number(_frameXMLList[0].parent().attribute(DELAY)) || 0;
 			for each(var _nodeXML:XML in _frameXMLList) {
-				_nodeList.addValue(getFrameNode(_nodeXML, _isRadian));
+				_nodeList.addValue(getFrameNode(_nodeXML));
 			}
 			return _nodeList;
 		}
 		
-		private static function getFrameNode(_nodeXML:XML, _isRadian:Boolean):FrameNode {
+		private static function getFrameNode(_nodeXML:XML):FrameNode {
 			var _rotation:Number = Number(_nodeXML.attribute(ROTATION));
-			if (_isRadian) {
+			if (isRadian) {
 				_rotation = _rotation * Math.PI / 180;
 			}
 			var _node:FrameNode = new FrameNode(Number(_nodeXML.attribute(X)), Number(_nodeXML.attribute(Y)), _rotation);
@@ -123,6 +127,9 @@ package akdcl.skeleton
 			_node.scaleY = Number(_nodeXML.attribute(SCALE_Y)) || _node.scaleY;
 			_node.alpha = Number(_nodeXML.attribute(ALPHA)) || _node.alpha;
 			_node.offR = Number(_nodeXML.attribute(OFF_R)) || _node.offR;
+			if (isRadian) {
+				_node.offR = _node.offR * Math.PI / 180;
+			}
 			_node.totalFrames = int(_nodeXML.attribute(FRAME)) || _node.totalFrames;
 			return _node;
 		}

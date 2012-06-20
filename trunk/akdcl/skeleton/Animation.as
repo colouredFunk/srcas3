@@ -18,11 +18,34 @@ package akdcl.skeleton{
 		private var aniIDNow:String;
 		
 		public function Animation() {
-			super(this);
 			tweens = { };
 		}
 		
+		override public function reset():void {
+			super.reset();
+			for each(var _tween:Tween in tweens) {
+				Tween.recycle(_tween);
+			}
+			armatureAniData = null;
+			boneAniData = null;
+			aniIDNow = null;
+			tweens = { };
+		}
+		
+		override public function remove():void {
+			super.remove();
+			for each(var _tween:Tween in tweens) {
+				_tween.remove();
+			}
+			
+			armatureAniData = null;
+			boneAniData = null;
+			aniIDNow = null;
+			tweens = null;
+		}
+		
 		public function setData(_aniData:ArmatureAniData):void {
+			reset();
 			armatureAniData = _aniData;
 		}
 		
@@ -40,13 +63,12 @@ package akdcl.skeleton{
 			var _tween:Tween = tweens[_boneID];
 			if (_tween) {
 				delete tweens[_boneID];
-				_tween.remove();
 				Tween.recycle(_tween);
 			}
 		}
 		
-		public function getTween(_boneName:String):Tween {
-			return tweens[_boneName];
+		public function getTween(_boneID:String):Tween {
+			return tweens[_boneID];
 		}
 		
 		override public function playTo(_to:Object, _listFrame:uint, _toScale:Number = 1, _loopType:int = 0, _ease:int = 0):void {
@@ -122,9 +144,9 @@ package akdcl.skeleton{
 							}
 						}while (_playedFrames >= playedFrames);
 					}
-					if (_playedFrames > 0) {
-						if (onAnimation!=null) {
-							onAnimation(IN_FRAME, aniIDNow, boneAniData.list[_playedFrames].name);
+					if (_playedFrames > 0 && currentPrecent != 1) {
+						if (onAnimation != null) {
+							onAnimation(IN_FRAME, aniIDNow, boneAniData.list[_prevFrameID].name);
 						}
 					}
 				}
@@ -191,10 +213,17 @@ package akdcl.skeleton{
 			}
 		}
 		
-		override public function pause(_bause:Boolean = true):void {
-			super.pause(_bause);
+		override public function pause():void {
+			super.pause();
 			for each(var _tween:Tween in tweens) {
-				_tween.pause(_bause);
+				_tween.pause();
+			}
+		}
+		
+		override public function resume():void 	{
+			super.resume();
+			for each(var _tween:Tween in tweens) {
+				_tween.resume();
 			}
 		}
 		

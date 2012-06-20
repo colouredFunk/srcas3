@@ -1,5 +1,4 @@
 package akdcl.skeleton {
-	import flash.errors.IllegalOperationError;
 	
 	/**
 	 * ...
@@ -17,11 +16,11 @@ package akdcl.skeleton {
 		/**
 		 * @private
 		 */
-		protected var currentPrecent:Number;
 		protected var currentFrame:Number;
 		protected var totalFrames:uint;
 		protected var listFrames:uint;
 		protected var yoyo:Boolean;
+		protected var currentPrecent:Number;
 		
 		protected var loop:int;
 		protected var ease:int;
@@ -30,11 +29,14 @@ package akdcl.skeleton {
 		protected var playedFrames:uint;
 		protected var noScaleListFrames:uint;
 		
-		public function ProcessBase(_self:ProcessBase) {
-			if (_self != this) {
-				throw new IllegalOperationError("Abstract class did not receive reference to self. ProcessBase cannot be instantiated directly.");
-			}
-			
+		public function ProcessBase() {
+			scale = 1;
+			isComplete = true;
+			isPause = false;
+			currentFrame = 0;
+		}
+		
+		public function reset():void {
 			scale = 1;
 			isComplete = true;
 			isPause = false;
@@ -42,14 +44,15 @@ package akdcl.skeleton {
 		}
 		
 		public function remove():void {
-			scale = 1;
-			isComplete = true;
-			isPause = false;
-			currentFrame = 0;
+			
 		}
 		
-		public function pause(_bause:Boolean = true):void {
-			isPause = _bause;
+		public function pause():void {
+			isPause = true;
+		}
+		
+		public function resume():void {
+			isPause = false;
 		}
 		
 		public function stop():void {

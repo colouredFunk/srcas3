@@ -1,5 +1,4 @@
-package akdcl.skeleton{
-	import flash.geom.Point;
+package akdcl.skeleton {
 	
 	/**
 	 * 骨架，包含相关骨骼和显示对象的衔接
@@ -44,24 +43,23 @@ package akdcl.skeleton{
 			boneList = new Vector.<Bone>;
 			
 			animation = new Animation();
-			if (_container) {
-				setContainer(_container);
-			}
+			container = _container;
 		}
 		
 		/**
-		 * 初始化骨骼系统
-		 * @param _name 会根据此值在 ConnectionData 中查找对应的骨骼配置
-		 * @param _animationID 会根据此值在 ConnectionData 中查找对应的动画配置，不设置则默认和_name相同
-		 * @param _useLocalXY 当设置为true时，启用 container 中关节当前的位置关系而不是 ConnectionData中的配置关系 
+		 * 从ConnectionData数据设置骨骼
+		 * @param _name 根据此值在 ConnectionData 中查找对应骨骼配置
+		 * @param _animationID 根据此值在 ConnectionData 中查找对应的动画配置，不设置则默认和_name相同
+		 * @param _useLocalXY 设置为true时，启用 container 中关节当前的位置关系而不是 ConnectionData中的配置关系 
 		 */
 		public function setup(_name:String, _animationID:String = null, _useLocalXY:Boolean = false):void {
-			name = _name;
-			animation.setData(ConnectionData.getArmatureAniData(_animationID || _name));
 			var _boneXMLList:XMLList = ConnectionData.getBones(_name);
-			if (!container || !_boneXMLList) {
+			if (!_boneXMLList) {
 				return;
 			}
+			name = _name;
+			
+			animation.setData(ConnectionData.getArmatureAniData(_animationID || _name));
 			
 			var _bone:Bone;
 			var _boneParent:Bone;
@@ -104,6 +102,7 @@ package akdcl.skeleton{
 		 * 更新步进
 		 */
 		public function update():void {
+			//bonelist包含bone的优先顺序
 			for each(var _bone:Bone in boneList) {
 				animation.updateTween(_bone.name);
 				_bone.update();
@@ -163,6 +162,7 @@ package akdcl.skeleton{
 		
 		public function removeJoint(_id:String):Object {
 			var _bone:Bone = bones[_id];
+			animation.removeTween(_bone);
 			_bone.remove();
 			Bone.recycle(_bone);
 			
@@ -182,15 +182,12 @@ package akdcl.skeleton{
 			return container;
 		}
 		
-		public function setContainer(_container:Object):void {
-			container = _container;
+		public function getBone(_id:String):Bone {
+			return bones[_id];
 		}
 		
-		/**
-		 * @private
-		 */
-		private function getBone(_id:String):Bone {
-			return bones[_id];
+		public function getJoint(_id:String):Object {
+			return joints[_id];
 		}
 		
 	}
