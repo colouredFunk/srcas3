@@ -16,6 +16,7 @@ package akdcl.skeleton{
 		}
 		
 		public static function recycle(_tween:Tween):void {
+			_tween.reset();
 			list.push(_tween);
 		}
 		
@@ -23,24 +24,32 @@ package akdcl.skeleton{
 		 * Bone.TweenNode的引用
 		 * @private
 		 */
-		private var node:TweenNode;
 		private var from:FrameNode;
 		private var to:FrameNode;
+		private var node:TweenNode;
 		private var list:FrameNodeList;
 		
 		/**
 		 * 构造函数
 		 */
 		public function Tween() {
-			super(this);
+			super();
 			from = new FrameNode();
 			to = new FrameNode();
+		}
+		
+		override public function reset():void {
+			super.reset();
+			node = null;
+			list = null;
 		}
 		
 		override public function remove():void {
 			super.remove();
 			node = null;
 			list = null;
+			from = null;
+			to = null;
 		}
 		
 		internal function setNode(_node:TweenNode):void {
