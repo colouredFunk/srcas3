@@ -15,9 +15,11 @@ package akdcl.skeleton{
 		}
 		
 		public static function recycle(_bone:Bone):void {
+			_bone.reset();
 			list.push(_bone);
 		}
 		
+		public var isRadian:Boolean;
 		/**
 		 * 用于Armature索引
 		 */
@@ -48,6 +50,7 @@ package akdcl.skeleton{
 		
 		private var lockX:Number;
 		private var lockY:Number;
+		private var lockR:Number;
 		
 		/**
 		 * 构造函数
@@ -62,10 +65,25 @@ package akdcl.skeleton{
 			parentLocalY = 0;
 			lockX = 0;
 			lockY = 0;
+			lockR = 0;
 			
 			node = new Node();
 			tweenNode = new TweenNode();
 			//children = new Vector.<Bone>();
+		}
+		
+		public function reset():void {
+			joint = null;
+			parent = null;
+			name = null;
+			parentX = 0;
+			parentY = 0;
+			parentR = 0;
+			parentLocalX = 0;
+			parentLocalY = 0;
+			lockX = 0;
+			lockY = 0;
+			lockR = 0;
 		}
 		
 		public function remove():void {
@@ -83,7 +101,7 @@ package akdcl.skeleton{
 		}
 		
 		internal function getGlobalR():Number {
-			return node.rotation + tweenNode.rotation + parentR;
+			return node.rotation + tweenNode.rotation + parentR + lockR;
 		}
 		
 		/**
@@ -92,10 +110,11 @@ package akdcl.skeleton{
 		 * @param _x x坐标
 		 * @param _y y坐标
 		 */
-		public function addChild(_child:Bone, _x:Number, _y:Number):Bone {
+		public function addChild(_child:Bone, _x:Number, _y:Number, _r:Number):Bone {
 			//children.push(_child);
 			_child.lockX = _x;
 			_child.lockY = _y;
+			_child.lockR = _r;
 			_child.parent = this;
 			return _child;
 		}
@@ -112,12 +131,7 @@ package akdcl.skeleton{
 				
 				var _dX:Number = lockX + node.x + tweenNode.x;
 				var _dY:Number = lockY + node.y + tweenNode.y;
-				var _r:Number;
-				if (ConnectionData.isRadian) {
-					_r = Math.atan2(_dY, _dX) + parentR;
-				}else {
-					_r = Math.atan2(_dY, _dX) + parentR * Math.PI / 180;
-				}
+				var _r:Number = Math.atan2(_dY, _dX) + parentR * Math.PI / 180;
 				
 				var _len:Number = Math.sqrt(_dX * _dX + _dY * _dY);
 				parentLocalX = _len * Math.cos(_r);
@@ -130,8 +144,11 @@ package akdcl.skeleton{
 			if (joint) {
 				joint.x = getGlobalX();
 				joint.y = getGlobalY();
-				joint.rotation = getGlobalR();
-				
+				if (isRadian) {
+					joint.rotation = getGlobalR() * Math.PI / 180;
+				}else {
+					joint.rotation = getGlobalR();
+				}
 				
 				//scale和alpha只由tweenNode控制
 				if (isNaN(tweenNode.scaleX)) {

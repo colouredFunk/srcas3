@@ -19,15 +19,16 @@ package akdcl.skeleton {
 		protected var currentFrame:Number;
 		protected var totalFrames:uint;
 		protected var listFrames:uint;
-		protected var yoyo:Boolean;
+		protected var noScaleListFrames:uint;
 		protected var currentPrecent:Number;
 		
+		protected var yoyo:Boolean;
 		protected var loop:int;
 		protected var ease:int;
+		
 		protected var toFrameID:int;
-		protected var betweenFrames:uint;
-		protected var playedFrames:uint;
-		protected var noScaleListFrames:uint;
+		protected var betweenFrame:uint;
+		protected var listEndFrame:uint;
 		
 		public function ProcessBase() {
 			scale = 1;
@@ -68,12 +69,18 @@ package akdcl.skeleton {
 			totalFrames = _listFrame * _toScale;
 		}
 		
-		public function update():void {
+		final public function update():void {
+			if (isComplete || isPause) {
+				return;
+			}
 			currentFrame += scale;
 			currentPrecent = currentFrame / totalFrames;
-			if (currentPrecent > 1) {
-				currentPrecent = 1;
-			}
+			currentFrame %= totalFrames;
+			updateHandler();
+		}
+		
+		protected function updateHandler():void {
+			
 		}
 	}
 	
