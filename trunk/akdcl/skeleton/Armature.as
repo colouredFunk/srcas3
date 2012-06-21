@@ -32,18 +32,22 @@ package akdcl.skeleton {
 		 */
 		protected var boneList:Vector.<Bone>;
 		
+		protected var isRadian:Boolean;
+		
 		/**
 		 * 构造函数
 		 * @param _container 包含所有显示关节的显示容器
+		 * @param _isRadian 骨骼旋转角度是否采用弧度制，比如starling使用的是弧度制
 		 */
-		public function Armature(_container:Object) {
+		public function Armature(_container:Object, _isRadian:Boolean = false) {
 			super();
 			joints = { };
 			bones = { };
 			boneList = new Vector.<Bone>;
-			
 			animation = new Animation();
 			container = _container;
+			
+			isRadian = _isRadian;
 		}
 		
 		/**
@@ -93,7 +97,7 @@ package akdcl.skeleton {
 						_z = -1;
 					}
 					_jointHigher = null;
-					addJoint(_joint, _name, _z, _boneXML.@parent, Number(_boneXML.@x), Number(_boneXML.@y));
+					addJoint(_joint, _name, _z, _boneXML.@parent, Number(_boneXML.@x), Number(_boneXML.@y), 0);
 				}
 			}
 		}
@@ -121,7 +125,7 @@ package akdcl.skeleton {
 		 * @example 例子绑定手臂到身体上
 		 * <listing version="3.0">addJoint(new Sprite(), "arm", -1, "body", 5, -10)</listing >
 		 */
-		public function addJoint(_joint:Object, _id:String=null, _index:int = -1, _parentID:String = null, _x:Number = 0, _y:Number = 0):* {
+		public function addJoint(_joint:Object, _id:String=null, _index:int = -1, _parentID:String = null, _x:Number = 0, _y:Number = 0, _r:Number = 0):* {
 			var _bone:Bone;
 			if (_id && _id != _joint.name) {
 				_joint.name = _id;
@@ -143,6 +147,8 @@ package akdcl.skeleton {
 			_bone = Bone.create();
 			_bone.joint = _joint;
 			_bone.name = _id;
+			_bone.isRadian = isRadian;
+			
 			animation.addTween(_bone);
 			
 			boneList.push(_bone);
@@ -150,7 +156,7 @@ package akdcl.skeleton {
 			
 			var _boneParent:Bone = getBone(_parentID);
 			if (_boneParent) {
-				_boneParent.addChild(_bone, _x, _y);
+				_boneParent.addChild(_bone, _x, _y, _r);
 			}
 			if (_index < 0) {
 				container.addChild(_joint);

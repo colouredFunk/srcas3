@@ -97,94 +97,93 @@ package akdcl.skeleton{
 			node.betweenValue(from, to);
 		}
 		
-		override public function update():void {
-			if (isComplete || isPause) {
-				return;
-			}
-			super.update();
-			
-			if (loop < -1) {
+		override protected function updateHandler():void {
+			if (currentPrecent >= 1) {
+				switch(loop) {
+					case -3:
+						//列表过渡
+						loop = -1;
+						currentPrecent = (currentPrecent - 1) * totalFrames / listFrames;
+						if (currentPrecent >= 1) {
+							//
+						}else {
+							currentPrecent %= 1;
+							totalFrames = listFrames;
+							listEndFrame = 0;
+							break;
+						}
+					case -1:
+					case -4:
+						currentPrecent = 1;
+						isComplete = true;
+						break;
+					case -2:
+						//循环开始
+						if (yoyo) {
+							loop = int(currentPrecent) - 1;
+						}else {
+							loop = 0;
+						}
+						currentPrecent %= 1;
+						totalFrames = listFrames;
+						listEndFrame = 0;
+						break;
+					default:
+						//继续循环
+						if (yoyo) {
+							loop += int(currentPrecent);
+						}
+						currentPrecent %= 1;
+						break;
+				}
+			}else if (loop < -1) {
+				//
 				currentPrecent = Math.sin(currentPrecent * HALF_PI);
 			}
-			if (currentPrecent > 1) {
-				currentPrecent = 1;
-			}
-			if (currentPrecent < 1 && loop >= -1) {
+			
+			if (loop >= -1) {
 				//多关键帧动画过程
-				var _kD:Number;
+				updateCurrentPrecent();
+			}
+			node.tweenTo(currentPrecent);
+		}
+		
+		private function updateCurrentPrecent():void {
+			var _playedFrames:Number = noScaleListFrames * currentPrecent;
+			if (_playedFrames <= listEndFrame-betweenFrame || _playedFrames > listEndFrame) {
+				toFrameID = 0;
+				listEndFrame = 0;
 				var _prevFrameID:int;
-				var _playedFrames:Number = noScaleListFrames * currentPrecent;
-				if (_playedFrames >= playedFrames) {
-					//到达新的关键点
-					if (loop > 0 && (loop & 1)) {
-						do {
-							betweenFrames = list.getValue(toFrameID).totalFrames;
-							playedFrames += betweenFrames;
-							_prevFrameID = toFrameID;
-							if (--toFrameID<0) {
-								toFrameID = list.length - 1;
-							}
-						}while (_playedFrames >= playedFrames);
-					}else {
-						do {
-							betweenFrames = list.getValue(toFrameID).totalFrames;
-							playedFrames += betweenFrames;
-							_prevFrameID = toFrameID;
-							if (++toFrameID>=list.length) {
-								toFrameID = 0;
-							}
-						}while (_playedFrames >= playedFrames);
-					}
-					
-					from.copy(list.getValue(_prevFrameID));
-					to.copy(list.getValue(toFrameID));
-					node.betweenValue(from, to);
-				}
-				var _t:Number = betweenFrames - (playedFrames - _playedFrames);
-				var _d:Number = betweenFrames;
-				_kD = _t/_d;
-				if (ease == 2) {
-					_kD = 0.5 * (1 - Math.cos(_kD * Math.PI ));
-				}else if (ease != 0) {
-					//_kD = ease < 0?((_t /= _d) * _t * _t):((_t = _t / _d - 1) * _t * _t + 1);
-					_kD = ease > 0?Math.sin(_kD * HALF_PI):(1 - Math.cos(_kD * HALF_PI));
+				if (loop > 0 && (loop & 1)) {
+					do {
+						betweenFrame = list.getValue(toFrameID).totalFrames;
+						listEndFrame += betweenFrame;
+						_prevFrameID = toFrameID;
+						if (--toFrameID<0) {
+							toFrameID = list.length - 1;
+						}
+					}while (_playedFrames >= listEndFrame);
+				}else {
+					do {
+						betweenFrame = list.getValue(toFrameID).totalFrames;
+						listEndFrame += betweenFrame;
+						_prevFrameID = toFrameID;
+						if (++toFrameID >= list.length) {
+							toFrameID = 0;
+						}
+					}while (_playedFrames >= listEndFrame);
 				}
 				
-				if (_kD > 1) {
-					_kD = 1;
-				}
-				node.tweenTo(_kD);
-			}else {
-				node.tweenTo(currentPrecent);
+				from.copy(list.getValue(_prevFrameID));
+				to.copy(list.getValue(toFrameID));
+				node.betweenValue(from, to);
 			}
 			
-			if (currentPrecent == 1) {
-				if (loop == -3) {
-					//列表过渡
-					totalFrames = listFrames;
-					currentFrame = 0;
-					playedFrames = 0;
-					loop = -1;
-					toFrameID = 0;
-				}else if (loop == -2) {
-					//循环开始
-					totalFrames = listFrames;
-					currentFrame = 0;
-					playedFrames = 0;
-					loop = 0;
-					toFrameID = 0;
-				}else if (loop >= 0) {
-					//继续循环
-					currentFrame = 0;
-					playedFrames = 0;
-					if (yoyo) {
-						loop ++;
-					}
-					toFrameID = (loop & 1)?list.length - 1:0;
-				}else {
-					//complete
-					isComplete = true;
-				}
+			currentPrecent = 1 - (listEndFrame - _playedFrames) / betweenFrame;
+			if (ease == 2) {
+				currentPrecent = 0.5 * (1 - Math.cos(currentPrecent * Math.PI ));
+			}else if (ease != 0) {
+				currentPrecent = ease > 0?Math.sin(currentPrecent * HALF_PI):(1 - Math.cos(currentPrecent * HALF_PI));
 			}
 		}
 	}

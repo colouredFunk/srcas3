@@ -32,11 +32,6 @@ package akdcl.skeleton
 		internal static const FRAME:String = "frame";
 		
 		/**
-		 * rotation数据采用弧度制还是角度制
-		 */
-		public static var isRadian:Boolean;
-		
-		/**
 		 * @private
 		 */
 		private static var armatureXML:XML =<root/>;
@@ -119,17 +114,17 @@ package akdcl.skeleton
 		
 		private static function getFrameNode(_nodeXML:XML):FrameNode {
 			var _rotation:Number = Number(_nodeXML.attribute(ROTATION));
-			if (isRadian) {
-				_rotation = _rotation * Math.PI / 180;
-			}
+			
+			//_rotation = _rotation * Math.PI / 180;
+			
 			var _node:FrameNode = new FrameNode(Number(_nodeXML.attribute(X)), Number(_nodeXML.attribute(Y)), _rotation);
 			_node.scaleX = Number(_nodeXML.attribute(SCALE_X)) || _node.scaleX;
 			_node.scaleY = Number(_nodeXML.attribute(SCALE_Y)) || _node.scaleY;
 			_node.alpha = Number(_nodeXML.attribute(ALPHA)) || _node.alpha;
 			_node.offR = Number(_nodeXML.attribute(OFF_R)) || _node.offR;
-			if (isRadian) {
-				_node.offR = _node.offR * Math.PI / 180;
-			}
+			
+			//_node.offR = _node.offR * Math.PI / 180;
+			
 			_node.totalFrames = int(_nodeXML.attribute(FRAME)) || _node.totalFrames;
 			return _node;
 		}

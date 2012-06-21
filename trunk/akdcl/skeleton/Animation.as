@@ -111,99 +111,97 @@ package akdcl.skeleton{
 			}
 		}
 		
-		override public function update():void {
-			if (isComplete || isPause) {
-				return;
+		override protected function updateHandler():void {
+			if (currentPrecent >= 1) {
+				switch(loop) {
+					case -3:
+						//列表过渡
+						loop = -1;
+						currentPrecent = (currentPrecent - 1) * totalFrames / listFrames;
+						if (currentPrecent >= 1) {
+							//
+						}else {
+							currentPrecent %= 1;
+							totalFrames = listFrames;
+							listEndFrame = 0;
+							if (onAnimation!=null) {
+								onAnimation(START, aniIDNow);
+							}
+							break;
+						}
+					case -1:
+					case -4:
+						currentPrecent = 1;
+						isComplete = true;
+						if (onAnimation!=null) {
+							onAnimation(COMPLETE, aniIDNow);
+						}
+						break;
+					case -2:
+						//循环开始
+						if (yoyo) {
+							loop = int(currentPrecent) - 1;
+						}else {
+							loop = 0;
+						}
+						currentPrecent %= 1;
+						totalFrames = listFrames;
+						listEndFrame = 0;
+						if (onAnimation!=null) {
+							onAnimation(START, aniIDNow);
+						}
+						break;
+					default:
+						//继续循环
+						if (yoyo) {
+							loop += int(currentPrecent);
+						}
+						currentPrecent %= 1;
+						if (onAnimation != null) {
+							onAnimation(LOOP_COMPLETE, aniIDNow);
+						}
+						break;
+				}
 			}
-			super.update();
 			
 			if (loop >= -1 && boneAniData.list) {
 				//多关键帧动画过程
-				var _kD:Number;
+				updateCurrentPrecent();
+			}
+		}
+		
+		private function updateCurrentPrecent():void {
+			var _playedFrames:Number = noScaleListFrames * currentPrecent;
+			if (_playedFrames <= listEndFrame-betweenFrame || _playedFrames > listEndFrame) {
+				toFrameID = 0;
+				listEndFrame = 0;
 				var _prevFrameID:int;
-				var _playedFrames:Number = noScaleListFrames * currentPrecent;
-				
-				if (_playedFrames >= playedFrames) {
-					//到达新的关键点
-					if (loop > 0 && (loop & 1)) {
-						do {
-							betweenFrames = boneAniData.list[toFrameID].totalFrames;
-							playedFrames += betweenFrames;
-							_prevFrameID = toFrameID;
-							if (--toFrameID<0) {
-								toFrameID = boneAniData.list.length - 1;
-							}
-						}while (_playedFrames >= playedFrames);
-					}else {
-						do {
-							betweenFrames = boneAniData.list[toFrameID].totalFrames;
-							playedFrames += betweenFrames;
-							_prevFrameID = toFrameID;
-							if (++toFrameID>=boneAniData.list.length) {
-								toFrameID = 0;
-							}
-						}while (_playedFrames >= playedFrames);
-					}
-					if (_playedFrames > 0 && currentPrecent != 1) {
-						if (onAnimation != null) {
-							onAnimation(IN_FRAME, aniIDNow, boneAniData.list[_prevFrameID].name);
+				if (loop > 0 && (loop & 1)) {
+					do {
+						betweenFrame = boneAniData.list[toFrameID].totalFrames;
+						listEndFrame += betweenFrame;
+						_prevFrameID = toFrameID;
+						if (--toFrameID<0) {
+							toFrameID = boneAniData.list.length - 1;
 						}
-					}
-				}
-				_kD = 1 - (playedFrames - _playedFrames)/betweenFrames;
-				if (_kD > 1) {
-					_kD = 1;
-				}
-			}
-			
-			if (currentPrecent == 1) {
-				if (loop == -3) {
-					//列表过渡
-					totalFrames = listFrames;
-					currentFrame = 0;
-					playedFrames = 0;
-					loop = -1;
-					toFrameID = 0;
-					if (onAnimation!=null) {
-						onAnimation(START, aniIDNow);
-					}
-				}else if (loop == -2) {
-					//循环开始
-					totalFrames = listFrames;
-					currentFrame = 0;
-					playedFrames = 0;
-					loop = 0;
-					toFrameID = 0;
-					if (onAnimation!=null) {
-						onAnimation(START, aniIDNow);
-					}
-				}else if (loop >= 0) {
-					//继续循环
-					currentFrame = 0;
-					playedFrames = 0;
-					if (yoyo) {
-						loop ++;
-					}
-					
-					//
-					if (boneAniData.list){
-						toFrameID = (loop & 1)?boneAniData.list.length - 1:0;
-					}else {
-						toFrameID = 0;
-					}
-					
-					if (onAnimation!=null) {
-						onAnimation(LOOP_COMPLETE, aniIDNow);
-					}
+					}while (_playedFrames >= listEndFrame);
 				}else {
-					//complete
-					isComplete = true;
-					if (onAnimation!=null) {
-						onAnimation(COMPLETE, aniIDNow);
-					}
+					do {
+						betweenFrame = boneAniData.list[toFrameID].totalFrames;
+						listEndFrame += betweenFrame;
+						_prevFrameID = toFrameID;
+						if (++toFrameID>=boneAniData.list.length) {
+							toFrameID = 0;
+						}
+					}while (_playedFrames >= listEndFrame);
+				}
+				
+				if (onAnimation != null) {
+					onAnimation(IN_FRAME, aniIDNow, boneAniData.list[_prevFrameID].name);
 				}
 			}
 			
+			currentPrecent = 1 - (listEndFrame - _playedFrames) / betweenFrame;
 		}
 		
 		public function updateTween(_boneName:String):void {
