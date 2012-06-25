@@ -25,7 +25,7 @@ package akdcl.skeleton
 		internal static const Y:String = "y";
 		internal static const Z:String = "z";
 		internal static const SCALE_X:String = "scaleX";
-		internal static const SCALE_Y:String = "scaleX";
+		internal static const SCALE_Y:String = "scaleY";
 		internal static const ALPHA:String = "alpha";
 		internal static const DELAY:String = "delay";
 		internal static const SCALE:String = "scale";
