@@ -7,25 +7,25 @@ package akdcl.skeleton{
 	final public class Tween extends ProcessBase {
 		private static const HALF_PI:Number = Math.PI * 0.5;
 		
-		private static var list:Vector.<Tween> = new Vector.<Tween>;
+		private static var prepared:Vector.<Tween> = new Vector.<Tween>;
 		public static function create():Tween {
-			if (list.length > 0) {
-				return list.pop();
+			if (prepared.length > 0) {
+				return prepared.pop();
 			}
 			return new Tween();
 		}
 		
 		public static function recycle(_tween:Tween):void {
 			_tween.reset();
-			list.push(_tween);
+			prepared.push(_tween);
 		}
 		
 		/**
 		 * Bone.TweenNode的引用
 		 * @private
 		 */
-		private var from:FrameNode;
-		private var to:FrameNode;
+		private var from:TweenNode;
+		private var to:TweenNode;
 		private var node:TweenNode;
 		private var list:FrameNodeList;
 		
@@ -34,8 +34,8 @@ package akdcl.skeleton{
 		 */
 		public function Tween() {
 			super();
-			from = new FrameNode();
-			to = new FrameNode();
+			from = new TweenNode();
+			to = new TweenNode();
 		}
 		
 		override public function reset():void {
@@ -59,15 +59,15 @@ package akdcl.skeleton{
 		/**
 		 * 控制动画播放
 		 * @param _to 关键点Frame或FrameList
-		 * @param _toFrame 过渡到该动画使用的帧数
 		 * @param _listFrame FrameList列表动画所用的帧数
-		 * @param _loopType FrameList动画播放方式，0：不循环，1：循环，-1：循环并自动反转
-		 * @param _ease 缓动方式，0：线性，1：淡出，-1：淡入
+		 * @param _toScale 过渡到该动画使用的帧数，当要播放的动画是列表动画时，此值表示当前动作过渡到列表动画花费的帧数的百分比(_listFrame*_toScale)
+		 * @param _loop 是否循环播放动画
+		 * @param _ease 缓动方式，0：线性，1：淡出，-1：淡入，2：淡入淡出
 		 */
-		override public function playTo(_to:Object, _listFrame:uint, _toScale:Number = 1, _loopType:int = 0, _ease:int = 0):void {
-			super.playTo(_to, _listFrame, _toScale, _loopType, _ease);
+		override public function playTo(_to:Object, _listFrame:uint, _toScale:Number = 1, _loop:Boolean = false, _ease:int = 0):void {
+			super.playTo(_to, _listFrame, _toScale, _loop, _ease);
+			node.rotation %= 360;
 			from.copy(node);
-			
 			if (_to is FrameNode) {
 				//普通过渡
 				loop = -4;
@@ -75,24 +75,44 @@ package akdcl.skeleton{
 				to.copy(_to as FrameNode);
 			}else {
 				list = _to as FrameNodeList;
-				to.copy(list.getValue(0));
-				if (_loopType == 0) {
-					//列表过渡
-					loop = -3;
-					noScaleListFrames = list.totalFrames - 1;
-				}else {
+				
+				if (_loop) {
 					//循环过渡
 					loop = -2;
 					noScaleListFrames = list.totalFrames;
-					if (_loopType < 0) {
-						yoyo = true;
-						noScaleListFrames--;
-					}else {
-						yoyo = false;
-					}
+				}else {
+					//列表过渡
+					loop = -3;
+					noScaleListFrames = list.totalFrames - 1;
 				}
 				listFrames = _listFrame * list.scale;
-				totalFrames += _listFrame * list.delay;
+				if (_loop && list.delay != 0) {
+					var _playedFrames:Number = noScaleListFrames * (1 - list.delay);
+					var _prevFrameID:int = 0;
+					var _toFrameID:int = 0;
+					var _listEndFrame:int = 0;
+					var _betweenFrame:int = 0;
+					do {
+						_betweenFrame = list.getValue(_toFrameID).totalFrames;
+						_listEndFrame += _betweenFrame;
+						_prevFrameID = _toFrameID;
+						if (++_toFrameID >= list.length) {
+							_toFrameID = 0;
+						}
+					}while (_playedFrames >= _listEndFrame);
+					
+					to.betweenValue(list.getValue(_prevFrameID), list.getValue(_toFrameID));
+			
+					var _currentPrecent = 1 - (_listEndFrame - _playedFrames) / _betweenFrame;
+					if (ease == 2) {
+						_currentPrecent = 0.5 * (1 - Math.cos(_currentPrecent * Math.PI ));
+					}else if (ease != 0) {
+						_currentPrecent = ease > 0?Math.sin(_currentPrecent * HALF_PI):(1 - Math.cos(_currentPrecent * HALF_PI));
+					}
+					to.tweenTo(_currentPrecent);
+				}else {
+					to.copy(list.getValue(0));
+				}
 			}
 			node.betweenValue(from, to);
 		}
@@ -107,8 +127,8 @@ package akdcl.skeleton{
 						if (currentPrecent >= 1) {
 							//
 						}else {
-							currentPrecent %= 1;
 							totalFrames = listFrames;
+							currentPrecent %= 1;
 							listEndFrame = 0;
 							break;
 						}
@@ -119,20 +139,18 @@ package akdcl.skeleton{
 						break;
 					case -2:
 						//循环开始
-						if (yoyo) {
-							loop = int(currentPrecent) - 1;
-						}else {
-							loop = 0;
-						}
-						currentPrecent %= 1;
+						loop = 0;
 						totalFrames = listFrames;
+						if (list.delay != 0) {
+							currentFrame = (1 - list.delay) * totalFrames;
+							currentPrecent += currentFrame / totalFrames;
+							currentPrecent %= 1;
+						}
 						listEndFrame = 0;
 						break;
 					default:
 						//继续循环
-						if (yoyo) {
-							loop += int(currentPrecent);
-						}
+						loop += int(currentPrecent);
 						currentPrecent %= 1;
 						break;
 				}
@@ -151,28 +169,17 @@ package akdcl.skeleton{
 		private function updateCurrentPrecent():void {
 			var _playedFrames:Number = noScaleListFrames * currentPrecent;
 			if (_playedFrames <= listEndFrame-betweenFrame || _playedFrames > listEndFrame) {
-				toFrameID = 0;
 				listEndFrame = 0;
+				toFrameID = 0;
 				var _prevFrameID:int;
-				if (loop > 0 && (loop & 1)) {
-					do {
-						betweenFrame = list.getValue(toFrameID).totalFrames;
-						listEndFrame += betweenFrame;
-						_prevFrameID = toFrameID;
-						if (--toFrameID<0) {
-							toFrameID = list.length - 1;
-						}
-					}while (_playedFrames >= listEndFrame);
-				}else {
-					do {
-						betweenFrame = list.getValue(toFrameID).totalFrames;
-						listEndFrame += betweenFrame;
-						_prevFrameID = toFrameID;
-						if (++toFrameID >= list.length) {
-							toFrameID = 0;
-						}
-					}while (_playedFrames >= listEndFrame);
-				}
+				do {
+					betweenFrame = list.getValue(toFrameID).totalFrames;
+					listEndFrame += betweenFrame;
+					_prevFrameID = toFrameID;
+					if (++toFrameID >= list.length) {
+						toFrameID = 0;
+					}
+				}while (_playedFrames >= listEndFrame);
 				
 				from.copy(list.getValue(_prevFrameID));
 				to.copy(list.getValue(toFrameID));

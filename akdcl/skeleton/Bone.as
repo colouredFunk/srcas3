@@ -6,17 +6,17 @@ package akdcl.skeleton{
 	 * @author akdcl
 	 */
 	final public class Bone {
-		private static var list:Vector.<Bone> = new Vector.<Bone>;
+		private static var prepared:Vector.<Bone> = new Vector.<Bone>;
 		public static function create():Bone {
-			if (list.length > 0) {
-				return list.pop();
+			if (prepared.length > 0) {
+				return prepared.pop();
 			}
 			return new Bone();
 		}
 		
 		public static function recycle(_bone:Bone):void {
 			_bone.reset();
-			list.push(_bone);
+			prepared.push(_bone);
 		}
 		
 		public var isRadian:Boolean;
