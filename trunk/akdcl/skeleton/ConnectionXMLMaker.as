@@ -261,11 +261,8 @@ package akdcl.skeleton{
 				_frameNodeXML[AT + ConnectionData.SCALE] = _scale;
 			}
 			if (_delay) {
+				_delay %= 1;
 				_frameNodeXML[AT + ConnectionData.DELAY] = _delay;
-				//将delay小于0的最小值存于动画列表，当ConnectionData取值时，为所有的FrameNode偏移这个值
-				if (_delay < 0 && Number(_parentXML.attribute(ConnectionData.DELAY)) > _delay) {
-					_parentXML[AT + ConnectionData.DELAY] = _delay;
-				}
 			}
 		}
 		

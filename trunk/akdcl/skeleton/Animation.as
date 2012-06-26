@@ -71,8 +71,8 @@ package akdcl.skeleton{
 			return tweens[_boneID];
 		}
 		
-		override public function playTo(_to:Object, _listFrame:uint, _toScale:Number = 1, _loopType:int = 0, _ease:int = 0):void {
-			super.playTo(_to, _listFrame, _toScale, _loopType, _ease);
+		override public function playTo(_to:Object, _listFrame:uint, _toScale:Number = 1, _loop:Boolean = false, _ease:int = 0):void {
+			super.playTo(_to, _listFrame, _toScale, _loop, _ease);
 			boneAniData = armatureAniData.getAnimation(_to as String);
 			if (!boneAniData) {
 				return;
@@ -84,7 +84,7 @@ package akdcl.skeleton{
 				_tween = tweens[_boneName];
 				_eachA = boneAniData[_boneName];
 				if (_eachA) {
-					_tween.playTo(_eachA, _listFrame, _toScale, _loopType, _ease);
+					_tween.playTo(_eachA, _listFrame, _toScale, _loop, _ease);
 				}
 			}
 			noScaleListFrames = boneAniData.totalFrames;
@@ -93,19 +93,13 @@ package akdcl.skeleton{
 				//普通过渡
 				loop = -4;
 			}else {
-				if (_loopType == 0) {
+				if (_loop) {
+					//循环过渡
+					loop = -2;
+				}else {
 					//列表过渡
 					loop = -3;
 					noScaleListFrames --;
-				}else {
-					//循环过渡
-					loop = -2;
-					if (_loopType < 0) {
-						yoyo = true;
-						noScaleListFrames--;
-					}else {
-						yoyo = false;
-					}
 				}
 				listFrames = _listFrame;
 			}
@@ -139,11 +133,7 @@ package akdcl.skeleton{
 						break;
 					case -2:
 						//循环开始
-						if (yoyo) {
-							loop = int(currentPrecent) - 1;
-						}else {
-							loop = 0;
-						}
+						loop = 0;
 						currentPrecent %= 1;
 						totalFrames = listFrames;
 						listEndFrame = 0;
@@ -153,9 +143,7 @@ package akdcl.skeleton{
 						break;
 					default:
 						//继续循环
-						if (yoyo) {
-							loop += int(currentPrecent);
-						}
+						loop += int(currentPrecent);
 						currentPrecent %= 1;
 						if (onAnimation != null) {
 							onAnimation(LOOP_COMPLETE, aniIDNow);
@@ -175,26 +163,16 @@ package akdcl.skeleton{
 			if (_playedFrames <= listEndFrame-betweenFrame || _playedFrames > listEndFrame) {
 				toFrameID = 0;
 				listEndFrame = 0;
+				
 				var _prevFrameID:int;
-				if (loop > 0 && (loop & 1)) {
-					do {
-						betweenFrame = boneAniData.list[toFrameID].totalFrames;
-						listEndFrame += betweenFrame;
-						_prevFrameID = toFrameID;
-						if (--toFrameID<0) {
-							toFrameID = boneAniData.list.length - 1;
-						}
-					}while (_playedFrames >= listEndFrame);
-				}else {
-					do {
-						betweenFrame = boneAniData.list[toFrameID].totalFrames;
-						listEndFrame += betweenFrame;
-						_prevFrameID = toFrameID;
-						if (++toFrameID>=boneAniData.list.length) {
-							toFrameID = 0;
-						}
-					}while (_playedFrames >= listEndFrame);
-				}
+				do {
+					betweenFrame = boneAniData.list[toFrameID].totalFrames;
+					listEndFrame += betweenFrame;
+					_prevFrameID = toFrameID;
+					if (++toFrameID>=boneAniData.list.length) {
+						toFrameID = 0;
+					}
+				}while (_playedFrames >= listEndFrame);
 				
 				if (onAnimation != null) {
 					onAnimation(IN_FRAME, aniIDNow, boneAniData.list[_prevFrameID].name);

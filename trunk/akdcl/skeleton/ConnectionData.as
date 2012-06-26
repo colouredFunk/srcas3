@@ -105,7 +105,6 @@ package akdcl.skeleton
 			var _nodeList:FrameNodeList = new FrameNodeList();
 			_nodeList.scale = Number(_frameXMLList[0].attribute(SCALE)) || _nodeList.scale;
 			_nodeList.delay = Number(_frameXMLList[0].attribute(DELAY)) || _nodeList.delay;
-			_nodeList.delay -= Number(_frameXMLList[0].parent().attribute(DELAY)) || 0;
 			for each(var _nodeXML:XML in _frameXMLList) {
 				_nodeList.addValue(getFrameNode(_nodeXML));
 			}

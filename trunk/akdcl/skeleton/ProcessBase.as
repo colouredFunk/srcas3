@@ -22,7 +22,6 @@ package akdcl.skeleton {
 		protected var noScaleListFrames:uint;
 		protected var currentPrecent:Number;
 		
-		protected var yoyo:Boolean;
 		protected var loop:int;
 		protected var ease:int;
 		
@@ -61,12 +60,12 @@ package akdcl.skeleton {
 			currentFrame = 0;
 		}
 		
-		public function playTo(_to:Object, _listFrame:uint, _toScale:Number = 1, _loopType:int = 0, _ease:int = 0):void {
+		public function playTo(_to:Object, _listFrame:uint, _toScale:Number = 1, _loop:Boolean = false, _ease:int = 0):void {
 			isComplete = false;
 			isPause = false;
 			currentFrame = 0;
-			ease = _ease;
 			totalFrames = _listFrame * _toScale;
+			ease = _ease;
 		}
 		
 		final public function update():void {
