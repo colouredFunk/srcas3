@@ -32,7 +32,6 @@ package akdcl.skeleton
 		 * @param _id 显示关节ID
 		 * @param _key 值名，scale、delay，scale用来缩放骨骼动画的周期T，delay用来延缓骨骼动画
 		 * @example 例如使手臂动画相对于其他身体部分动画，周期缩短为0.5，并滞后0.1（相对于整个动画周期）
-		 * <listing version="3.0">setValue("arm", "scale", 0.5);setValue("arm", "delay", 0.1);</listing >
 		 */
 		public function setValue(_id:String, _key:String, _v:*):void {
 			var _value:Object = values[_id];
