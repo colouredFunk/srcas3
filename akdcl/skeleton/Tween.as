@@ -62,7 +62,7 @@ package akdcl.skeleton{
 		 * @param _listFrame FrameList列表动画所用的帧数
 		 * @param _toScale 过渡到该动画使用的帧数，当要播放的动画是列表动画时，此值表示当前动作过渡到列表动画花费的帧数的百分比(_listFrame*_toScale)
 		 * @param _loop 是否循环播放动画
-		 * @param _ease 缓动方式，0：线性，1：淡出，-1：淡入，2：淡入淡出
+		 * @param _ease 缓动方式，0：线性，1：sineIn，-1：sineOut，2：sineInOut
 		 */
 		override public function playTo(_to:Object, _listFrame:uint, _toScale:Number = 1, _loop:Boolean = false, _ease:int = 0):void {
 			super.playTo(_to, _listFrame, _toScale, _loop, _ease);
