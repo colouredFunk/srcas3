@@ -9,8 +9,6 @@ package akdcl.textures
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	
-	import akdcl.utils.getNearest2N;
-	
 	/**
 	 * ...
 	 * @author Akdcl
@@ -24,6 +22,10 @@ package akdcl.textures
 				instance = new TexturePacker();
 			}
 			return instance;
+		}
+		
+		public function getNearest2N(_n:uint):uint {
+			return _n & _n - 1 ? 1 << _n.toString(2).length : _n;
 		}
 		
 		private var remainRectList:Array;
