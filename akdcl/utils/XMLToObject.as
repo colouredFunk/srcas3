@@ -82,6 +82,7 @@
 					isSimpleType = false;
 				}
 				result[attribute] = XMLToObject.simpleType(attributes[attribute]);
+				//result["@"+attribute] = XMLToObject.simpleType(attributes[attribute]);
 			}
 			return result;
 		}
