@@ -30,6 +30,7 @@ package akdcl.skeleton
 		internal static const DELAY:String = "delay";
 		internal static const SCALE:String = "scale";
 		internal static const FRAME:String = "frame";
+		internal static const FRAME_LIST:String = "frameList";
 		
 		/**
 		 * @private
@@ -76,7 +77,7 @@ package akdcl.skeleton
 				var _boneAniData:Object = _aniData.getAnimation(_aniName);
 				
 				_boneAniData.totalFrames = int(_frameXML.attribute(FRAME));
-				_frameXMLList = _frameXML.elements(FRAME);
+				_frameXMLList = _frameXML.elements(FRAME_LIST);
 				if (_frameXMLList.length() > 0) {
 					
 					var _arr:Array = [];

@@ -173,12 +173,12 @@ package akdcl.skeleton{
 		
 		private static function setFrameLabels(_animationXML:XML, _labelName:String, _frame:int):void {
 			if (_labelName) {
-				var _node:XML =<{ConnectionData.FRAME}/>;
+				var _node:XML =<{ConnectionData.FRAME_LIST}/>;
 				_node[AT + ConnectionData.NAME] = _labelName;
 				_node[AT + ConnectionData.FRAME] = _frame;
 			}
 			
-			var _list:XMLList = _animationXML.elements(ConnectionData.FRAME);
+			var _list:XMLList = _animationXML.elements(ConnectionData.FRAME_LIST);
 			if (_list.length() > 0) {
 				var _prevNode:XML = _list[_list.length() - 1];
 				//为前一个子标签帧修正长度

@@ -15,25 +15,22 @@
 		}
 
 		public static function simpleType(val:Object):Object {
-			var result:Object = val;
-			if (val != null){
-				if (val is String && String(val) == ""){
-					result = val.toString();
-				} else if (isNaN(Number(val)) || (val.charAt(0) == '0') || ((val.charAt(0) == '-') && (val.charAt(1) == '0')) || val.charAt(val.length - 1) == 'E'){
-					var valStr:String = val.toString();
-					var valStrLC:String = valStr.toLowerCase();
-					if (valStrLC == "true"){
-						result = true;
-					} else if (valStrLC == "false"){
-						result = false;
-					} else {
-						result = valStr;
-					}
-				} else {
-					result = Number(val);
-				}
+			switch(val) {
+				case "NaN":
+					return NaN;
+				case "true":
+					return true;
+				case "false":
+					return false;
+				case "null":
+					return null;
+				case "undefined":
+					return undefined;
 			}
-			return result;
+			if (isNaN(Number(val))) {
+				return val;
+			}
+			return Number(val);
 		}
 
 		public static function decodeXML(dataNode:XMLNode):Object {
@@ -82,7 +79,6 @@
 					isSimpleType = false;
 				}
 				result[attribute] = XMLToObject.simpleType(attributes[attribute]);
-				//result["@"+attribute] = XMLToObject.simpleType(attributes[attribute]);
 			}
 			return result;
 		}
