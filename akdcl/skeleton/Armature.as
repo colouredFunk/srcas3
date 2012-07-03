@@ -85,7 +85,7 @@ package akdcl.skeleton {
 			var _jointParent:Object;
 			var _jointHigher:Object;
 			var _boneXML:XML;
-			var _name:String;
+			var _boneName:String;
 			var _parentName:String;
 			var _x:Number;
 			var _y:Number;
@@ -98,8 +98,8 @@ package akdcl.skeleton {
 			//按照link和parent优先索引排序boneList
 			for (var _i:uint = 0; _i < _length; _i++ ) {
 				_boneXML = _boneXMLList[_i];
-				_name = String(_boneXML.@name);
-				_joint = joints[_name] || container.getChildByName(_name);
+				_boneName = String(_boneXML.@name);
+				_joint = joints[_boneName] || container.getChildByName(_boneName);
 				if (_joint) {
 					//
 					_z = int(_boneXML.@z);
@@ -119,9 +119,9 @@ package akdcl.skeleton {
 					_jointHigher = null;
 					_parentName = String(_boneXML.@parent);
 					
-					addJoint(_joint, _name, _parentName, _z);
+					addJoint(_joint, _boneName, _parentName, _z);
 					
-					_bone = getBone(_name);
+					_bone = getBone(_boneName);
 					if (_useLocalXY && _parentName) {
 						_jointParent = joints[_parentName] || container.getChildByName(_parentName);
 						
@@ -218,7 +218,7 @@ package akdcl.skeleton {
 				container.removeChild(_joint);
 				return _joint;
 			}
-			return null
+			return null;
 		}
 		
 		/**

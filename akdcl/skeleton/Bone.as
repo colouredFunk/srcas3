@@ -21,6 +21,7 @@ package akdcl.skeleton{
 		}
 		
 		public var isRadian:Boolean;
+		
 		/**
 		 * 用于Armature索引
 		 */
@@ -111,9 +112,9 @@ package akdcl.skeleton{
 		 * 加入字骨骼
 		 * @param _child 要绑定的子骨骼
 		 */
-		public function addChild(_child:Bone):Bone {
+		public function addChild(_child:Bone):Bone{
 			//children.push(_child);
-			_child.parent = this;
+			_child.parent=this;
 			return _child;
 		}
 		
