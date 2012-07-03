@@ -27,9 +27,10 @@ package akdcl.textures{
 		public function getNodeName(_xml:XML, _id:String = null):String {
 			var _string:String = _xml.@name;
 			if (_id) {
+				_id += "_";
 				var _start:int = _string.indexOf(_id);
 				if (_start == 0) {
-					return _string.substr(_start + _id.length + 1);
+					return _string.substr(_start + _id.length);
 				}
 			}
 			return _string;
