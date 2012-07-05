@@ -44,6 +44,27 @@ package akdcl.skeleton{
 			tweens = null;
 		}
 		
+		override public function pause():void {
+			super.pause();
+			for each(var _tween:Tween in tweens) {
+				_tween.pause();
+			}
+		}
+		
+		override public function resume():void 	{
+			super.resume();
+			for each(var _tween:Tween in tweens) {
+				_tween.resume();
+			}
+		}
+		
+		override public function stop():void {
+			super.stop();
+			for each(var _tween:Tween in tweens) {
+				_tween.stop();
+			}
+		}
+		
 		public function setData(_aniData:ArmatureAniData):void {
 			reset();
 			armatureAniData = _aniData;
@@ -71,12 +92,21 @@ package akdcl.skeleton{
 			return tweens[_boneID];
 		}
 		
+		public function updateTweens():void {
+			for each(var _tween:Tween in tweens) {
+				_tween.update();
+			}
+		}
+		
 		override public function playTo(_to:Object, _listFrame:uint, _toScale:Number = 1, _loop:Boolean = false, _ease:int = 0):void {
-			super.playTo(_to, _listFrame, _toScale, _loop, _ease);
+			if (!armatureAniData) {
+				return;
+			}
 			boneAniData = armatureAniData.getAnimation(_to as String);
 			if (!boneAniData) {
 				return;
 			}
+			super.playTo(_to, _listFrame, _toScale, _loop, _ease);
 			aniIDNow = _to as String;
 			var _eachA:Object;
 			var _tween:Tween;
@@ -182,40 +212,10 @@ package akdcl.skeleton{
 			currentPrecent = 1 - (listEndFrame - _playedFrames) / betweenFrame;
 		}
 		
-		public function updateTween(_boneName:String):void {
-			var _tween:Tween = tweens[_boneName];
-			if (_tween) {
-				_tween.update();
-			}
-		}
-		
-		override public function pause():void {
-			super.pause();
-			for each(var _tween:Tween in tweens) {
-				_tween.pause();
-			}
-		}
-		
-		override public function resume():void 	{
-			super.resume();
-			for each(var _tween:Tween in tweens) {
-				_tween.resume();
-			}
-		}
-		
-		override public function stop():void {
-			super.stop();
-			for each(var _tween:Tween in tweens) {
-				_tween.stop();
-			}
-		}
-		
 		/**
 		 * 对骨骼动画的速度进行缩放
 		 * @param _scale 缩放值做为系数乘到原来的动画帧值
 		 * @param _boneName 指定的骨骼ID，默认为所有骨骼
-		 * @example 例子让ID为"body"的骨骼的动画播放变慢为原来的0.5
-		 * <listing version="3.0">setAnimationScale(0.5, "body");</listing >
 		 */
 		public function setAnimationScale(_scale:Number, _boneName:String = null):void {
 			var _tween:Tween;
