@@ -23,13 +23,13 @@ package akdcl.skeleton
 		internal static const DELAY:String = "delay";
 		internal static const SCALE:String = "scale";
 		internal static const FRAME:String = "frame";
-		internal static const FRAME_LIST:String = "frameList";
+		internal static const EVENT_FRAME:String = "eventFrame";
 		
 		private static var armarureDatas:Object = { };
 		private static var animationDatas:Object = { };
 		
 		/**
-		 * 将ConnectionDataMaker生成的XML数据转换成内置数据
+		 * 将XML数据转换成内置数据
 		 * @param _xml XML数据
 		 */
 		public static function addSkeletonData(_xml:XML):void {
@@ -39,107 +39,51 @@ package akdcl.skeleton
 				return;
 			}
 			
+			armarureDatas[_name] = _xml.elements(BONE);
 			animationDatas[_name] = _aniData = new ArmatureAniData();
-			
-			
-			var xxxxxData:Object;
-			var _frameXMLList:XMLList;
-			var _animationList:XMLList = _xml.elements(ANIMATION);
-			for each(var _aniEach:XML in _animationList) {
-				_aniData[String(_aniEach.attribute(name))] = xxxxxData = { };
-				for each(var _boneAniEach:XML in _aniEach){
-					if (_boneAniEach.name() != FRAME_LIST) {
-						xxxxxData[boneName] = getFrameNodeList(_boneAniEach);
-					}
-				}
-				_frameXMLList = _aniEach.elements(FRAME_LIST);
-				if (_frameXMLList.length() > 0) {
-					var _obj:Object = { };
-					var _frame:uint = 0;
-					for each(_boneAniEach in _frameXMLList){
-						_frame += _boneAniEach.frame;
-						_obj.name = String(_nodeXML.attribute(NAME));
-						_obj.totalFrames = int(_nodeXML.attribute(FRAME));
-					}
-					_obj.name = "init";
-					_obj.frame = _aniEach.frame - _frame;
-					_aniEach.frameList.unshift(_obj);
-				}
-			}
-
-			skeleton.armarureDatas[name] = json.bone;
-
-			delete json.animation;
-			delete json.bone;
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
 			
 			var _aniName:String;
 			var _boneName:String;
+			var _boneAniData:BoneAniData;
 			var _frameXMLList:XMLList;
-			var _animationXMLList:XMLList = _xml.elements(ANIMATION);
-			for each(var _frameXML:XML in _animationXMLList) {
-				_aniName = _frameXML.attribute(NAME);
-				for each(var _nodeXML:XML in _frameXML.children()) {
-					_boneName = _nodeXML.name();
-					if (_aniData.getAnimation(_aniName, _boneName)) {
-						continue;
-					}
-					_frameXMLList = _frameXML.elements(_boneName);
-					if (_frameXMLList.length() > 1) {
-						_aniData.addAnimation(getFrameNodeList(_frameXMLList), _aniName, _boneName);
-					}else {
-						_aniData.addAnimation(getFrameNode(_nodeXML), _aniName, _boneName);
+			var _animationList:XMLList = _xml.elements(ANIMATION);
+			for each(var _eachAni:XML in _animationList) {
+				_aniName = String(_eachAni.attribute(NAME));
+				_boneAniData = new BoneAniData();
+				_boneAniData.frame = int(_eachAni.attribute(FRAME));
+				_aniData.addAnimation(_boneAniData, _aniName);
+				for each(var _eachBoneAni:XML in _eachAni.children()) {
+					_boneName = String(_eachBoneAni.name());
+					if (_boneName != EVENT_FRAME) {
+						if (_boneAniData.getAnimation(_boneName)) {
+							continue;
+						}
+						_boneAniData.addAnimation(getFrameNodeList(_eachAni.elements(_boneName)), _boneName);
 					}
 				}
-				
-				//需要分离
-				var _boneAniData:Object = _aniData.getAnimation(_aniName);
-				
-				_boneAniData.totalFrames = int(_frameXML.attribute(FRAME));
-				_frameXMLList = _frameXML.elements(FRAME_LIST);
+				_frameXMLList = _eachAni.elements(EVENT_FRAME);
 				if (_frameXMLList.length() > 0) {
-					
-					var _arr:Array = [];
-					var _obj:Object;
+					_boneAniData.eventList = new Vector.<EventFrame>;
+					var _eventFrame:EventFrame;
 					var _frame:uint = 0;
-					for each(_nodeXML in _frameXMLList) {
-						_obj = { };
-						_obj.name = String(_nodeXML.attribute(NAME));
-						_obj.totalFrames = int(_nodeXML.attribute(FRAME));
-						_arr[_arr.length] = _obj;
-						_frame += _obj.totalFrames;
+					for each(_eachBoneAni in _frameXMLList){
+						_eventFrame = new EventFrame(String(_eachBoneAni.attribute(NAME)), int(_eachBoneAni.attribute(FRAME)));
+						_boneAniData.eventList.push(_eventFrame);
+						_frame += _eventFrame.frame;
 					}
-					
-					_obj = { };
-					//补第一帧信息
-					_obj.name = "init";
-					_obj.totalFrames = _boneAniData.totalFrames - _frame;
-					_arr.unshift(_obj);
-					_boneAniData.list = _arr;
+					_boneAniData.eventList.unshift(new EventFrame("init", _boneAniData.frame - _frame));
 				}
 			}
-			//xml动画数据已经转化为ArmatureAniData，可以移除，只保留骨骼配置数据
+
 			delete _xml[ANIMATION];
-			armatureXML.appendChild(_xml);
+			delete _xml[BONE];
 		}
 		
 		private static function getFrameNodeList(_frameXMLList:XMLList):FrameNodeList {
 			var _nodeList:FrameNodeList = new FrameNodeList();
 			_nodeList.scale = Number(_frameXMLList[0].attribute(SCALE)) || _nodeList.scale;
 			_nodeList.delay = Number(_frameXMLList[0].attribute(DELAY)) || _nodeList.delay;
+			
 			for each(var _nodeXML:XML in _frameXMLList) {
 				_nodeList.addValue(getFrameNode(_nodeXML));
 			}
@@ -163,16 +107,12 @@ package akdcl.skeleton
 			return _node;
 		}
 		
-		public static function getArmatureAniData(_id:String):ArmatureAniData {
+		public static function getAnimationData(_id:String):ArmatureAniData {
 			return animationDatas[_id];
 		}
 		
-		public static function getBones(_id:String):XMLList {
-			var _xmlList:XMLList = armatureXML.children().(attribute(NAME) == _id).elements(BONE);
-			if (_xmlList.length() == 0) {
-				return null;
-			}
-			return _xmlList;
+		public static function getArmatureData(_id:String):XMLList {
+			return armarureDatas[_id];
 		}
 	}
 }

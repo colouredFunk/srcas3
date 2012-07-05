@@ -5,80 +5,6 @@ package akdcl.skeleton {
 	 * @author Akdcl
 	 */
 	public class Armature {
-		/**
-		 * 从ConnectionData数据设置骨骼
-		 * @param _name 根据此值在 ConnectionData 中查找对应骨骼配置
-		 * @param _animationID 根据此值在 ConnectionData 中查找对应的动画配置，不设置则默认和_name相同
-		 * @param _useLocalXY 设置为true时，启用 display 中关节当前的位置关系而不是 ConnectionData中的配置关系 
-		 */
-		public function create(_name:String, _armatureFactory:Function, _boneFactory:Function = null, _isRadian:Boolean = false, _useLocalXY:Boolean = false):Armature {
-			var _armatureData:XMLList = ConnectionData.getArmatureData(_name);
-			if(!_armatureData){
-				return null;
-			}
-			var _armatureDisplay:Object = _armatureFactory(_name);
-			var _armature:Armature = new Armature(_armatureDisplay, _isRadian);
-			
-			var _animationData:* = ConnectionData.getAnimationData(_name);
-			if(_animationData){
-				_armature.animation.setData(_animationData);
-			}
-			
-			var _bone:Bone;
-			var _boneData:XML;
-			var _boneName:String;
-			var _parentName:String;
-			var _boneDisplay:Object;
-			var _displayHigher:Object;
-			var _indexZ:int;
-			var _list:Array = [];
-			var _length:uint = _armatureData.length;
-
-			for(var indexI:uint = 0; indexI < _length; indexI++){
-				_boneData = _armatureData[indexI];
-				_boneName = String(_boneData.@name);
-				_parentName = String(_boneData.@parent);
-				_indexZ = int(_boneData.@z);
-				
-				if (_boneFactory != null) {
-					_boneDisplay = _boneFactory(_name, _boneName);
-				}else {
-					_boneDisplay = null;
-				}
-				
-				if(_boneDisplay){
-					_displayHigher = null;
-					for(var indexJ:uint = _indexZ; indexJ < _list.length; indexJ++){
-						_displayHigher = _list[indexJ];
-						if(_displayHigher){
-							break;
-						}
-					}
-					_list[_indexZ] = _boneDisplay;
-					if(_displayHigher){
-						_indexZ = _armature.display.getChildIndex(_displayHigher) - 1;
-					}else{
-						_indexZ = -1;
-					}
-				}
-				
-				_bone = _armature.addBone(_boneName, _boneDisplay, _parentName, _indexZ);
-				_bone.setLockPosition(_boneData.x, _boneData.y, 0);
-			}
-			return _armature;
-			/*if (_useLocalXY && _parentName) {
-				_jointParent = joints[_parentName] || display.getChildByName(_parentName);
-				
-				_x = _joint.x - _jointParent.x;
-				_y = _joint.y - _jointParent.y;
-				_r = Math.atan2(_y, _x) - _jointParent.rotation * Math.PI / 180;
-				_len = Math.sqrt(_x * _x + _y * _y);
-				_x = _len * Math.cos(_r);
-				_y = _len * Math.sin(_r);
-			}*/
-		}
-		
-		
 		public var name:String;
 		public var animation:Animation;
 		
@@ -140,27 +66,28 @@ package akdcl.skeleton {
 			var _bone:Bone = boneDic[_name];
 			if(!_bone){
 				_bone = Bone.create();
-				_bone.name = name;
+				_bone.name = _name;
+				_bone.isRadian = isRadian;
 				boneList.push(_bone);
-				boneDic[name] = _bone;
-				boneParent = boneDic[_parentName];
-				if(boneParent){
-					boneParent.addChild(_bone);
+				boneDic[_name] = _bone;
+				var _boneParent:Bone = boneDic[_parentName];
+				if(_boneParent){
+					_boneParent.addChild(_bone);
 				}
 				animation.addTween(_bone);
 			}
 			if(_display){
-				if(_display.name != name){
-					_display.name = name;
+				if(_display.name != _name){
+					_display.name = _name;
 				}
 				var _displayOld = _bone.display;
 				_bone.display = _display;
 				if(_displayOld){
 					display.addChildAt(_display, display.getChildIndex(_displayOld) - 1);
-				}else if(index < 0){
+				}else if(_index < 0){
 					display.addChild(_display);
 				}else{
-					display.addChildAt(_display, index);
+					display.addChildAt(_display, _index);
 				}
 			}
 			return _bone;
