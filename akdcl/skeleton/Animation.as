@@ -13,7 +13,7 @@ package akdcl.skeleton{
 		public var onAnimation:Function;
 		
 		private var armatureAniData:ArmatureAniData;
-		private var boneAniData:Object;
+		private var boneAniData:BoneAniData;
 		private var tweens:Object;
 		private var aniIDNow:String;
 		
@@ -92,8 +92,9 @@ package akdcl.skeleton{
 			return tweens[_boneID];
 		}
 		
-		public function updateTweens():void {
-			for each(var _tween:Tween in tweens) {
+		public function updateTween(_boneID:String):void {
+			var _tween:Tween = tweens[_boneID];
+			if (_tween) {
 				_tween.update();
 			}
 		}
@@ -108,16 +109,16 @@ package akdcl.skeleton{
 			}
 			super.playTo(_to, _listFrame, _toScale, _loop, _ease);
 			aniIDNow = _to as String;
-			var _eachA:Object;
+			var _eachA:FrameNodeList;
 			var _tween:Tween;
 			for (var _boneName:String in tweens) {
 				_tween = tweens[_boneName];
-				_eachA = boneAniData[_boneName];
+				_eachA = boneAniData.getAnimation(_boneName);
 				if (_eachA) {
 					_tween.playTo(_eachA, _listFrame, _toScale, _loop, _ease);
 				}
 			}
-			noScaleListFrames = boneAniData.totalFrames;
+			noScaleListFrames = boneAniData.frame;
 			
 			if (noScaleListFrames == 1) {
 				//普通过渡
@@ -182,7 +183,7 @@ package akdcl.skeleton{
 				}
 			}
 			
-			if (loop >= -1 && boneAniData.list) {
+			if (loop >= -1 && boneAniData.eventList) {
 				//多关键帧动画过程
 				updateCurrentPrecent();
 			}
@@ -196,16 +197,16 @@ package akdcl.skeleton{
 				
 				var _prevFrameID:int;
 				do {
-					betweenFrame = boneAniData.list[toFrameID].totalFrames;
+					betweenFrame = boneAniData.eventList[toFrameID].frame;
 					listEndFrame += betweenFrame;
 					_prevFrameID = toFrameID;
-					if (++toFrameID>=boneAniData.list.length) {
+					if (++toFrameID>=boneAniData.eventList.length) {
 						toFrameID = 0;
 					}
 				}while (_playedFrames >= listEndFrame);
 				
 				if (onAnimation != null) {
-					onAnimation(IN_FRAME, aniIDNow, boneAniData.list[_prevFrameID].name);
+					onAnimation(IN_FRAME, aniIDNow, boneAniData.eventList[_prevFrameID].name);
 				}
 			}
 			

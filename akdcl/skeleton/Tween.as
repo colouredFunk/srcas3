@@ -68,14 +68,12 @@ package akdcl.skeleton{
 			super.playTo(_to, _listFrame, _toScale, _loop, _ease);
 			node.rotation %= 360;
 			from.copy(node);
-			if (_to is FrameNode) {
+			list = _to as FrameNodeList;
+			if (list.length == 1) {
 				//普通过渡
 				loop = -4;
-				list = null;
-				to.copy(_to as FrameNode);
+				to.copy(list.getValue(0));
 			}else {
-				list = _to as FrameNodeList;
-				
 				if (_loop) {
 					//循环过渡
 					loop = -2;

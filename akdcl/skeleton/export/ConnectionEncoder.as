@@ -30,7 +30,7 @@ package akdcl.skeleton.export{
 		private static const DELAY:String = "delay";
 		private static const SCALE:String = "scale";
 		private static const FRAME:String = "frame";
-		private static const FRAME_LIST:String = "frameList";
+		private static const EVENT_FRAME:String = "eventFrame";
 		
 		private static var pointTemp:Point = new Point();
 		private static var frameNode:Object = {scaleX:1, scaleY:1, alpha:1, alpha:1, offR:0, totalFrames:1, x:0, y:0, rotation:0};
@@ -194,12 +194,12 @@ package akdcl.skeleton.export{
 		
 		private static function setFrameLabels(_animationXML:XML, _labelName:String, _frame:int):void {
 			if (_labelName) {
-				var _node:XML =<{FRAME_LIST}/>;
+				var _node:XML =<{EVENT_FRAME}/>;
 				_node[AT + NAME] = _labelName;
 				_node[AT + FRAME] = _frame;
 			}
 			
-			var _list:XMLList = _animationXML.elements(FRAME_LIST);
+			var _list:XMLList = _animationXML.elements(EVENT_FRAME);
 			if (_list.length() > 0) {
 				var _prevNode:XML = _list[_list.length() - 1];
 				//为前一个子标签帧修正长度

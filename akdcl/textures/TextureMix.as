@@ -16,24 +16,30 @@ package akdcl.textures{
 			texture = _texture;
 		}
 		
-		public function getTextures(_prefix:String):XMLList {
-			return xml.children().(@name.toString().indexOf(_prefix + "_") == 0);
-		}
-		
 		public function getTexture(_id:String):XML {
 			return xml.children().(@name.toString() == _id)[0];
 		}
 		
-		public function getNodeName(_xml:XML, _id:String = null):String {
-			var _string:String = _xml.@name;
-			if (_id) {
-				_id += "_";
-				var _start:int = _string.indexOf(_id);
-				if (_start == 0) {
-					return _string.substr(_start + _id.length);
+		public function getTextureList(_prefix:String):XMLList {
+			return xml.children().(@name.toString().indexOf(_prefix + "_") == 0);
+		}
+		
+		public function getTexturePreFix(_fullName:String):String {
+			var _arr:Array = _fullName.split("_");
+			return _arr.length > 1?_arr[0]:null;
+		}
+		public function getTextureSuffix(_fullName:String, _prefix:String):String{
+			if(!_prefix){
+				_prefix = getTexturePreFix(_fullName);
+			}
+			if(_prefix){
+				_prefix += "_";
+				var _index:int = _fullName.indexOf(_prefix);
+				if(_index == 0){
+					return _fullName.substr(_index + _prefix.length);
 				}
 			}
-			return _string;
+			return null;
 		}
 	}
 }
