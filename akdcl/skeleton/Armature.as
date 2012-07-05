@@ -1,150 +1,109 @@
 package akdcl.skeleton {
 	
 	/**
-	 * 骨架，包含相关骨骼和显示对象的衔接
+	 * 骨架
 	 * @author Akdcl
 	 */
 	public class Armature {
-		public var animation:Animation;
-		
-		/**
-		 * name
-		 */
-		public var name:String;
-		
-		/**
-		 * @private
-		 */
-		protected var container:Object;
-		
-		/**
-		 * @private
-		 */
-		protected var joints:Object;
-		
-		/**
-		 * @private
-		 */
-		protected var bones:Object;
-		
-		/**
-		 * @private
-		 */
-		protected var boneList:Vector.<Bone>;
-		
-		protected var isRadian:Boolean;
-		
-		/**
-		 * 构造函数
-		 * @param _container 包含所有显示关节的显示容器
-		 * @param _isRadian 骨骼旋转角度是否采用弧度制，比如starling使用的是弧度制
-		 */
-		public function Armature(_container:Object, _isRadian:Boolean = false) {
-			super();
-			joints = { };
-			bones = { };
-			boneList = new Vector.<Bone>;
-			animation = new Animation();
-			container = _container;
-			
-			isRadian = _isRadian;
-		}
-		
-		public function remove():void {
-			for each(var _bone:Bone in boneList) {
-				Bone.recycle(_bone);
-			}
-			
-			animation.remove();
-			animation = null;
-			container = null;
-			joints = null;
-			bones = null;
-			boneList.length = 0;
-			boneList = null;
-		}
-		
 		/**
 		 * 从ConnectionData数据设置骨骼
 		 * @param _name 根据此值在 ConnectionData 中查找对应骨骼配置
 		 * @param _animationID 根据此值在 ConnectionData 中查找对应的动画配置，不设置则默认和_name相同
-		 * @param _useLocalXY 设置为true时，启用 container 中关节当前的位置关系而不是 ConnectionData中的配置关系 
+		 * @param _useLocalXY 设置为true时，启用 display 中关节当前的位置关系而不是 ConnectionData中的配置关系 
 		 */
-		public function setup(_name:String, _animationID:String = null, _useLocalXY:Boolean = false):void {
-			var _boneXMLList:XMLList = ConnectionData.getBones(_name);
-			if (!_boneXMLList) {
-				throw "can't find config xml in ConnectionData!";
-				return;
+		public function create(_name:String, _armatureFactory:Function, _boneFactory:Function = null, _isRadian:Boolean = false, _useLocalXY:Boolean = false):Armature {
+			var _armatureData:XMLList = ConnectionData.getArmatureData(_name);
+			if(!_armatureData){
+				return null;
 			}
-			name = _name;
+			var _armatureDisplay:Object = _armatureFactory(_name);
+			var _armature:Armature = new Armature(_armatureDisplay, _isRadian);
 			
-			animation.setData(ConnectionData.getArmatureAniData(_animationID || _name));
+			var _animationData:* = ConnectionData.getAnimationData(_name);
+			if(_animationData){
+				_armature.animation.setData(_animationData);
+			}
 			
 			var _bone:Bone;
-			var _joint:Object;
-			var _jointParent:Object;
-			var _jointHigher:Object;
-			var _boneXML:XML;
+			var _boneData:XML;
 			var _boneName:String;
 			var _parentName:String;
-			var _x:Number;
-			var _y:Number;
-			var _z:int;
-			var _r:Number;
-			var _len:Number;
+			var _boneDisplay:Object;
+			var _displayHigher:Object;
+			var _indexZ:int;
 			var _list:Array = [];
-			var _length:uint = _boneXMLList.length();
-			
-			//按照link和parent优先索引排序boneList
-			for (var _i:uint = 0; _i < _length; _i++ ) {
-				_boneXML = _boneXMLList[_i];
-				_boneName = String(_boneXML.@name);
-				_joint = joints[_boneName] || container.getChildByName(_boneName);
-				if (_joint) {
-					//
-					_z = int(_boneXML.@z);
-					for (var _j:uint = _z; _j < _list.length; _j++) {
-						_jointHigher = _list[_j];
-						if (_jointHigher) {
+			var _length:uint = _armatureData.length;
+
+			for(var indexI:uint = 0; indexI < _length; indexI++){
+				_boneData = _armatureData[indexI];
+				_boneName = String(_boneData.@name);
+				_parentName = String(_boneData.@parent);
+				_indexZ = int(_boneData.@z);
+				
+				if (_boneFactory != null) {
+					_boneDisplay = _boneFactory(_name, _boneName);
+				}else {
+					_boneDisplay = null;
+				}
+				
+				if(_boneDisplay){
+					_displayHigher = null;
+					for(var indexJ:uint = _indexZ; indexJ < _list.length; indexJ++){
+						_displayHigher = _list[indexJ];
+						if(_displayHigher){
 							break;
 						}
 					}
-					_list[_z] = _joint;
-					
-					if (_jointHigher) {
-						_z = container.getChildIndex(_jointHigher) - 1;
-					}else {
-						_z = -1;
+					_list[_indexZ] = _boneDisplay;
+					if(_displayHigher){
+						_indexZ = _armature.display.getChildIndex(_displayHigher) - 1;
+					}else{
+						_indexZ = -1;
 					}
-					_jointHigher = null;
-					_parentName = String(_boneXML.@parent);
-					
-					addJoint(_joint, _boneName, _parentName, _z);
-					
-					_bone = getBone(_boneName);
-					if (_useLocalXY && _parentName) {
-						_jointParent = joints[_parentName] || container.getChildByName(_parentName);
-						
-						_x = _joint.x - _jointParent.x;
-						_y = _joint.y - _jointParent.y;
-						_r = Math.atan2(_y, _x) - _jointParent.rotation * Math.PI / 180;
-						_len = Math.sqrt(_x * _x + _y * _y);
-						_x = _len * Math.cos(_r);
-						_y = _len * Math.sin(_r);
-					}else {
-						_x = Number(_boneXML.@x);
-						_y = Number(_boneXML.@y);
-					}
-					_bone.setLockPosition(_x, _y, 0);
 				}
+				
+				_bone = _armature.addBone(_boneName, _boneDisplay, _parentName, _indexZ);
+				_bone.setLockPosition(_boneData.x, _boneData.y, 0);
 			}
+			return _armature;
+			/*if (_useLocalXY && _parentName) {
+				_jointParent = joints[_parentName] || display.getChildByName(_parentName);
+				
+				_x = _joint.x - _jointParent.x;
+				_y = _joint.y - _jointParent.y;
+				_r = Math.atan2(_y, _x) - _jointParent.rotation * Math.PI / 180;
+				_len = Math.sqrt(_x * _x + _y * _y);
+				_x = _len * Math.cos(_r);
+				_y = _len * Math.sin(_r);
+			}*/
+		}
+		
+		
+		public var name:String;
+		public var animation:Animation;
+		
+		protected var isRadian:Boolean;
+		protected var display:Object;
+		protected var boneDic:Object;
+		protected var boneList:Vector.<Bone>;
+		
+		/**
+		 * 构造函数
+		 * @param _display 包含所有骨骼显示对象的显示容器
+		 * @param _isRadian 骨骼旋转角度是否采用弧度制，比如starling使用的是弧度制
+		 */
+		public function Armature(_display:Object, _isRadian:Boolean = false) {
+			boneDic = { };
+			boneList = new Vector.<Bone>;
+			animation = new Animation();
+			display = _display;
+			isRadian = _isRadian;
 		}
 		
 		/**
 		 * 更新步进
 		 */
 		public function update():void {
-			//bonelist包含bone的优先顺序
 			var _len:uint = boneList.length;
 			var _bone:Bone;
 			for (var _i:uint = 0; _i < _len; _i++ ) {
@@ -156,85 +115,77 @@ package akdcl.skeleton {
 		}
 		
 		/**
-		 * 绑定显示关节
-		 * @param _joint 显示关节
-		 * @param _id 关节ID
-		 * @param _parentID 绑定到父骨骼的ID
-		 * @param _index 绑定到深度，如果是替换原有关节，则使用原有关节的深度
-		 * @example 例子绑定手臂到身体上
-		 * <listing version="3.0">addJoint(new Sprite(), "arm", "body", -1)</listing >
+		 * 删除
 		 */
-		public function addJoint(_joint:Object, _id:String, _parentID:String = null, _index:int = -1):Object {
-			var _bone:Bone;
-			if (_id && _id != _joint.name) {
-				_joint.name = _id;
-			}else {
-				_id = _joint.name;
-			}
-			var _jointOld:Object = joints[_id];
-			if (_jointOld) {
-				//替换现有关节
-				joints[_id] = _joint;
-				_bone = getBone(_id);
-				_bone.joint = _joint;
-				
-				container.addChildAt(_joint, container.getChildIndex(_jointOld) - 1);
-				return _joint;
+		public function remove():void {
+			for each(var _bone:Bone in boneList) {
+				_bone.remove();
 			}
 			
-			//添加新的关节
-			joints[_id] = _joint;
-			_bone = Bone.create();
-			_bone.joint = _joint;
-			_bone.name = _id;
-			_bone.isRadian = isRadian;
-			
-			animation.addTween(_bone);
-			
-			boneList[boneList.length] = _bone;
-			bones[_id] = _bone;
-			
-			var _boneParent:Bone = getBone(_parentID);
-			if (_boneParent) {
-				_boneParent.addChild(_bone);
-			}
-			if (_index < 0) {
-				container.addChild(_joint);
-			}else {
-				container.addChildAt(_joint, _index);
-			}
-			return _joint;
-		}
-		
-		public function removeJoint(_id:String):Object {
-			var _bone:Bone = bones[_id];
-			animation.removeTween(_bone);
-			_bone.remove();
-			Bone.recycle(_bone);
-			
-			var _joint:Object = joints[_id];
-			if (_joint) {
-				delete joints[_id];
-				container.removeChild(_joint);
-				return _joint;
-			}
-			return null;
+			animation.remove();
+			animation = null;
+			display = null;
+			boneDic = null;
+			boneList = null;
 		}
 		
 		/**
-		 * 获取显示关节容器
+		 * 绑定骨骼
+		 * @param _name 骨骼名
+		 * @param _display 骨骼的显示对象
+		 * @param _parentID 绑定到父骨骼名
+		 * @param _index 绑定到深度，如果是替换原有显示对象，则使用原显示对象的深度
 		 */
-		public function getContainer():Object {
-			return container;
+		public function addBone(_name:String, _display:Object=null, _parentName:String = null, _index:int = -1):Bone {
+			var _bone:Bone = boneDic[_name];
+			if(!_bone){
+				_bone = Bone.create();
+				_bone.name = name;
+				boneList.push(_bone);
+				boneDic[name] = _bone;
+				boneParent = boneDic[_parentName];
+				if(boneParent){
+					boneParent.addChild(_bone);
+				}
+				animation.addTween(_bone);
+			}
+			if(_display){
+				if(_display.name != name){
+					_display.name = name;
+				}
+				var _displayOld = _bone.display;
+				_bone.display = _display;
+				if(_displayOld){
+					display.addChildAt(_display, display.getChildIndex(_displayOld) - 1);
+				}else if(index < 0){
+					display.addChild(_display);
+				}else{
+					display.addChildAt(_display, index);
+				}
+			}
+			return _bone;
 		}
 		
-		public function getBone(_id:String):Bone {
-			return bones[_id];
+		public function removeBone(_name:String):void {
+			var _bone = boneDic[_name];
+			if(_bone){
+				if(_bone.display && display.contains(_bone.display)){
+					display.removeChild(_bone.display);
+				}
+				animation.removeTween(_bone);
+				_bone.remove();
+			}
 		}
 		
-		public function getJoint(_id:String):Object {
-			return joints[_id];
+		public function getBone(_name:String):Bone {
+			return boneDic[_name];
 		}
 		
+		/**
+		 * 获取骨架显示对象
+		 */
+		public function getDisplay():Object {
+			return display;
+		}
 	}
 }

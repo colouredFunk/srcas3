@@ -28,7 +28,7 @@ package akdcl.skeleton
 		
 		public function getValue(_id:int):FrameNode {
 			if (_id<0) {
-				_id = length - 1;
+				_id = length + _id;
 			}
 			return list[_id];
 		}

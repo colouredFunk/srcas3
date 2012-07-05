@@ -7,14 +7,7 @@ package akdcl.skeleton
 	 * @author Akdcl
 	 */
 	final public class ConnectionData {
-		/**
-		 * @private
-		 */
 		internal static const BONE:String = "bone";
-		
-		/**
-		 * @private
-		 */
 		internal static const ANIMATION:String = "animation";
 		
 		internal static const NAME:String = "name";
@@ -32,28 +25,67 @@ package akdcl.skeleton
 		internal static const FRAME:String = "frame";
 		internal static const FRAME_LIST:String = "frameList";
 		
-		/**
-		 * @private
-		 */
-		private static var armatureXML:XML =<root/>;
-		
-		/**
-		 * @private
-		 */
+		private static var armarureDatas:Object = { };
 		private static var animationDatas:Object = { };
 		
 		/**
 		 * 将ConnectionDataMaker生成的XML数据转换成内置数据
 		 * @param _xml XML数据
 		 */
-		public static function setData(_xml:XML):void {
+		public static function addSkeletonData(_xml:XML):void {
 			var _name:String = _xml.attribute(NAME);
-			var _aniData:ArmatureAniData = getArmatureAniData(_name);
+			var _aniData:ArmatureAniData = armarureDatas[_name];
 			if (_aniData) {
 				return;
 			}
 			
 			animationDatas[_name] = _aniData = new ArmatureAniData();
+			
+			
+			var xxxxxData:Object;
+			var _frameXMLList:XMLList;
+			var _animationList:XMLList = _xml.elements(ANIMATION);
+			for each(var _aniEach:XML in _animationList) {
+				_aniData[String(_aniEach.attribute(name))] = xxxxxData = { };
+				for each(var _boneAniEach:XML in _aniEach){
+					if (_boneAniEach.name() != FRAME_LIST) {
+						xxxxxData[boneName] = getFrameNodeList(_boneAniEach);
+					}
+				}
+				_frameXMLList = _aniEach.elements(FRAME_LIST);
+				if (_frameXMLList.length() > 0) {
+					var _obj:Object = { };
+					var _frame:uint = 0;
+					for each(_boneAniEach in _frameXMLList){
+						_frame += _boneAniEach.frame;
+						_obj.name = String(_nodeXML.attribute(NAME));
+						_obj.totalFrames = int(_nodeXML.attribute(FRAME));
+					}
+					_obj.name = "init";
+					_obj.frame = _aniEach.frame - _frame;
+					_aniEach.frameList.unshift(_obj);
+				}
+			}
+
+			skeleton.armarureDatas[name] = json.bone;
+
+			delete json.animation;
+			delete json.bone;
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			var _aniName:String;
 			var _boneName:String;
 			var _frameXMLList:XMLList;
