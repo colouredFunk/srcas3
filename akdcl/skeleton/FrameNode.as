@@ -10,14 +10,14 @@ package akdcl.skeleton
 		internal var scaleY:Number;
 		internal var alpha:Number;
 		internal var offR:Number;
-		internal var totalFrames:uint;
+		internal var frame:uint;
 		public function FrameNode(_x:Number = 0, _y:Number = 0, _rotation:Number = 0) {
 			super(_x, _y, _rotation);
 			
 			scaleX = 1;
 			scaleY = 1;
 			alpha = 1;
-			totalFrames = 1;
+			frame = 1;
 			
 			offR = 0;
 		}
@@ -29,8 +29,7 @@ package akdcl.skeleton
 				scaleX = _nV.scaleX;
 				scaleY = _nV.scaleY;
 				alpha = _nV.alpha;
-				//
-				totalFrames = _nV.totalFrames;
+				frame = _nV.frame;
 				
 				offR = _nV.offR;
 			}

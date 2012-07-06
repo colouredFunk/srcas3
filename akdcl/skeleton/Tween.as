@@ -15,91 +15,70 @@ package akdcl.skeleton{
 			return new Tween();
 		}
 		
-		public static function recycle(_tween:Tween):void {
-			_tween.reset();
-			prepared[prepared.length] = _tween;
+		private static function recycle(_tween:Tween):void {
+			if (prepared.indexOf(_tween) < 0) {
+				prepared[prepared.length] = _tween;
+			}
 		}
 		
-		/**
-		 * Bone.TweenNode的引用
-		 * @private
-		 */
 		private var from:TweenNode;
 		private var to:TweenNode;
 		private var node:TweenNode;
-		private var list:FrameNodeList;
+		private var tweenList:FrameNodeList;
 		
-		/**
-		 * 构造函数
-		 */
 		public function Tween() {
 			super();
 			from = new TweenNode();
 			to = new TweenNode();
 		}
 		
-		override public function reset():void {
-			super.reset();
-			node = null;
-			list = null;
-		}
-		
 		override public function remove():void {
 			super.remove();
 			node = null;
-			list = null;
-			from = null;
-			to = null;
+			tweenList = null;
+			recycle(this);
 		}
 		
 		internal function setNode(_node:TweenNode):void {
 			node = _node;
 		}
 		
-		/**
-		 * 控制动画播放
-		 * @param _to 关键点Frame或FrameList
-		 * @param _listFrame FrameList列表动画所用的帧数
-		 * @param _toScale 过渡到该动画使用的帧数，当要播放的动画是列表动画时，此值表示当前动作过渡到列表动画花费的帧数的百分比(_listFrame*_toScale)
-		 * @param _loop 是否循环播放动画
-		 * @param _ease 缓动方式，0：线性，1：sineIn，-1：sineOut，2：sineInOut
-		 */
-		override public function playTo(_to:Object, _listFrame:uint, _toScale:Number = 1, _loop:Boolean = false, _ease:int = 0):void {
-			super.playTo(_to, _listFrame, _toScale, _loop, _ease);
+		override public function playTo(_to:Object, _toFrames:uint, _listFrames:uint, _loop:Boolean = false, _ease:int = 0):void {
+			super.playTo(_to, _toFrames, _listFrames, _loop, _ease);
 			node.rotation %= 360;
 			from.copy(node);
-			list = _to as FrameNodeList;
-			if (list.length == 1) {
+			tweenList = _to as FrameNodeList;
+			if (tweenList.length == 1) {
 				//普通过渡
 				loop = -4;
-				to.copy(list.getValue(0));
+				to.copy(tweenList.getFrame(0));
 			}else {
 				if (_loop) {
 					//循环过渡
 					loop = -2;
-					noScaleListFrames = list.totalFrames;
+					noScaleListFrames = tweenList.frame;
 				}else {
 					//列表过渡
 					loop = -3;
-					noScaleListFrames = list.totalFrames - 1;
+					noScaleListFrames = tweenList.frame - 1;
 				}
-				listFrames = _listFrame * list.scale;
-				if (_loop && list.delay != 0) {
-					var _playedFrames:Number = noScaleListFrames * (1 - list.delay);
+				listFrames = _listFrames * tweenList.scale;
+				if (_loop && tweenList.delay != 0) {
+					var _playedFrames:Number = noScaleListFrames * (1 - tweenList.delay);
 					var _prevFrameID:int = 0;
 					var _toFrameID:int = 0;
 					var _listEndFrame:int = 0;
 					var _betweenFrame:int = 0;
 					do {
-						_betweenFrame = list.getValue(_toFrameID).totalFrames;
+						_betweenFrame = tweenList.getFrame(_toFrameID).frame;
 						_listEndFrame += _betweenFrame;
 						_prevFrameID = _toFrameID;
-						if (++_toFrameID >= list.length) {
+						if (++_toFrameID >= tweenList.length) {
 							_toFrameID = 0;
 						}
 					}while (_playedFrames >= _listEndFrame);
 					
-					to.betweenValue(list.getValue(_prevFrameID), list.getValue(_toFrameID));
+					to.betweenValue(tweenList.getFrame(_prevFrameID), tweenList.getFrame(_toFrameID));
 			
 					var _currentPrecent = 1 - (_listEndFrame - _playedFrames) / _betweenFrame;
 					if (ease == 2) {
@@ -109,7 +88,7 @@ package akdcl.skeleton{
 					}
 					to.tweenTo(_currentPrecent);
 				}else {
-					to.copy(list.getValue(0));
+					to.copy(tweenList.getFrame(0));
 				}
 			}
 			node.betweenValue(from, to);
@@ -139,8 +118,8 @@ package akdcl.skeleton{
 						//循环开始
 						loop = 0;
 						totalFrames = listFrames;
-						if (list.delay != 0) {
-							currentFrame = (1 - list.delay) * totalFrames;
+						if (tweenList.delay != 0) {
+							currentFrame = (1 - tweenList.delay) * totalFrames;
 							currentPrecent += currentFrame / totalFrames;
 							currentPrecent %= 1;
 						}
@@ -171,16 +150,16 @@ package akdcl.skeleton{
 				toFrameID = 0;
 				var _prevFrameID:int;
 				do {
-					betweenFrame = list.getValue(toFrameID).totalFrames;
+					betweenFrame = tweenList.getFrame(toFrameID).frame;
 					listEndFrame += betweenFrame;
 					_prevFrameID = toFrameID;
-					if (++toFrameID >= list.length) {
+					if (++toFrameID >= tweenList.length) {
 						toFrameID = 0;
 					}
 				}while (_playedFrames >= listEndFrame);
 				
-				from.copy(list.getValue(_prevFrameID));
-				to.copy(list.getValue(toFrameID));
+				from.copy(tweenList.getFrame(_prevFrameID));
+				to.copy(tweenList.getFrame(toFrameID));
 				node.betweenValue(from, to);
 			}
 			

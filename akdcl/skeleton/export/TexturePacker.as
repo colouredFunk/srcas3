@@ -21,7 +21,6 @@ package akdcl.skeleton.export {
 		private var textureList:Array;
 		private var textureDic:Object;
 		private var fitRectDic:Object;
-		private var movieClipMaxRectDic:Object;
 		private var matrix:Matrix;
 		private var rect:Rectangle;
 		
@@ -31,6 +30,14 @@ package akdcl.skeleton.export {
 			matrix = new Matrix();
 			rect = new Rectangle();
 			clear();
+		}
+		
+		public function dispose():void {
+			clear();
+			textureList = null;
+			remainRectList = null;
+			matrix = null;
+			rect = null;
 		}
 		
 		//DisplayObject BitmapData
@@ -56,7 +63,7 @@ package akdcl.skeleton.export {
 			}
 		}
 		
-		public function packTextures(_widthMax:uint, _interval:uint = 2, _verticalSide:Boolean = false, _transparent:Boolean = true):Object {
+		public function packTextures(_widthMax:uint, _interval:uint = 2, _verticalSide:Boolean = false, _transparent:Boolean = true):TextureMix {
 			if (textureList.length == 0) {
 				return null;
 			}
@@ -183,14 +190,12 @@ package akdcl.skeleton.export {
 			
 			fitRectDic = { };
 			remainRectList.length = 0;
-			clear();
 			
-			return { bitmapData:_bitmapData, xml:_xml };
+			return new TextureMix(_bitmapData, _xml);
 		}
 		
-		private function clear():void {
+		public function clear():void {
 			textureDic = { };
-			movieClipMaxRectDic = { };
 			textureList.length = 0;
 		}
 		
