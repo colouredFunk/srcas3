@@ -28,11 +28,19 @@ package akdcl.skeleton
 		private static var armarureDatas:Object = { };
 		private static var animationDatas:Object = { };
 		
+		public static function getAnimationData(_id:String):ArmatureAniData {
+			return animationDatas[_id];
+		}
+		
+		public static function getArmatureData(_id:String):XMLList {
+			return armarureDatas[_id];
+		}
+		
 		/**
 		 * 将XML数据转换成内置数据
 		 * @param _xml XML数据
 		 */
-		public static function addSkeletonData(_xml:XML):void {
+		public static function addData(_xml:XML):void {
 			var _name:String = _xml.attribute(NAME);
 			var _aniData:ArmatureAniData = armarureDatas[_name];
 			if (_aniData) {
@@ -50,17 +58,8 @@ package akdcl.skeleton
 			for each(var _eachAni:XML in _animationList) {
 				_aniName = String(_eachAni.attribute(NAME));
 				_boneAniData = new BoneAniData();
-				_boneAniData.frame = int(_eachAni.attribute(FRAME));
 				_aniData.addAnimation(_boneAniData, _aniName);
-				for each(var _eachBoneAni:XML in _eachAni.children()) {
-					_boneName = String(_eachBoneAni.name());
-					if (_boneName != EVENT_FRAME) {
-						if (_boneAniData.getAnimation(_boneName)) {
-							continue;
-						}
-						_boneAniData.addAnimation(getFrameNodeList(_eachAni.elements(_boneName)), _boneName);
-					}
-				}
+				_boneAniData.frame = int(_eachAni.attribute(FRAME));
 				_frameXMLList = _eachAni.elements(EVENT_FRAME);
 				if (_frameXMLList.length() > 0) {
 					_boneAniData.eventList = new Vector.<EventFrame>;
@@ -73,8 +72,17 @@ package akdcl.skeleton
 					}
 					_boneAniData.eventList.unshift(new EventFrame("init", _boneAniData.frame - _frame));
 				}
+				
+				for each(var _eachBoneAni:XML in _eachAni.children()) {
+					_boneName = String(_eachBoneAni.name());
+					if (_boneName != EVENT_FRAME) {
+						if (_boneAniData.getAnimation(_boneName)) {
+							continue;
+						}
+						_boneAniData.addAnimation(getFrameNodeList(_eachAni.elements(_boneName)), _boneName);
+					}
+				}
 			}
-
 			delete _xml[ANIMATION];
 			delete _xml[BONE];
 		}
@@ -85,34 +93,22 @@ package akdcl.skeleton
 			_nodeList.delay = Number(_frameXMLList[0].attribute(DELAY)) || _nodeList.delay;
 			
 			for each(var _nodeXML:XML in _frameXMLList) {
-				_nodeList.addValue(getFrameNode(_nodeXML));
+				_nodeList.addFrame(getFrameNode(_nodeXML));
 			}
 			return _nodeList;
 		}
 		
 		private static function getFrameNode(_nodeXML:XML):FrameNode {
 			var _rotation:Number = Number(_nodeXML.attribute(ROTATION));
-			
 			//_rotation = _rotation * Math.PI / 180;
-			
 			var _node:FrameNode = new FrameNode(Number(_nodeXML.attribute(X)), Number(_nodeXML.attribute(Y)), _rotation);
 			_node.scaleX = Number(_nodeXML.attribute(SCALE_X)) || _node.scaleX;
 			_node.scaleY = Number(_nodeXML.attribute(SCALE_Y)) || _node.scaleY;
 			_node.alpha = Number(_nodeXML.attribute(ALPHA)) || _node.alpha;
 			_node.offR = Number(_nodeXML.attribute(OFF_R)) || _node.offR;
-			
 			//_node.offR = _node.offR * Math.PI / 180;
-			
-			_node.totalFrames = int(_nodeXML.attribute(FRAME)) || _node.totalFrames;
+			_node.frame = int(_nodeXML.attribute(FRAME)) || _node.frame;
 			return _node;
-		}
-		
-		public static function getAnimationData(_id:String):ArmatureAniData {
-			return animationDatas[_id];
-		}
-		
-		public static function getArmatureData(_id:String):XMLList {
-			return armarureDatas[_id];
 		}
 	}
 }

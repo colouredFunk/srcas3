@@ -58,11 +58,11 @@ package akdcl.skeleton {
 		/**
 		 * 绑定骨骼
 		 * @param _name 骨骼名
+		 * @param _parentName 绑定到父骨骼名
 		 * @param _display 骨骼的显示对象
-		 * @param _parentID 绑定到父骨骼名
 		 * @param _index 绑定到深度，如果是替换原有显示对象，则使用原显示对象的深度
 		 */
-		public function addBone(_name:String, _display:Object=null, _parentName:String = null, _index:int = -1):Bone {
+		public function addBone(_name:String, _parentName:String = null, _display:Object=null, _index:int = -1):Bone {
 			var _bone:Bone = boneDic[_name];
 			if(!_bone){
 				_bone = Bone.create();
@@ -80,13 +80,13 @@ package akdcl.skeleton {
 				if(_display.name != _name){
 					_display.name = _name;
 				}
-				var _displayOld = _bone.display;
+				var _displayOld:Object = _bone.display;
 				_bone.display = _display;
 				if(_displayOld){
 					display.addChildAt(_display, display.getChildIndex(_displayOld) - 1);
-				}else if(_index < 0){
+				}else if (_index == -1) {
 					display.addChild(_display);
-				}else{
+				}else if (_index >= 0) {
 					display.addChildAt(_display, _index);
 				}
 			}

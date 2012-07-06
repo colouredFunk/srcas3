@@ -18,24 +18,12 @@ package akdcl.skeleton{
 		private var aniIDNow:String;
 		
 		public function Animation() {
-			tweens = { };
-		}
-		
-		override public function reset():void {
-			super.reset();
-			for each(var _tween:Tween in tweens) {
-				Tween.recycle(_tween);
-			}
-			armatureAniData = null;
-			boneAniData = null;
-			aniIDNow = null;
-			tweens = { };
 		}
 		
 		override public function remove():void {
 			super.remove();
 			for each(var _tween:Tween in tweens) {
-				Tween.recycle(_tween);
+				_tween.remove();
 			}
 			
 			armatureAniData = null;
@@ -66,11 +54,15 @@ package akdcl.skeleton{
 		}
 		
 		public function setData(_aniData:ArmatureAniData):void {
-			reset();
+			remove();
+			tweens = { };
 			armatureAniData = _aniData;
 		}
 		
 		public function addTween(_bone:Bone):void {
+			if (!tweens) {
+				tweens = { };
+			}
 			var _boneID:String = _bone.name;
 			var _tween:Tween = tweens[_boneID];
 			if (!_tween) {
@@ -84,7 +76,7 @@ package akdcl.skeleton{
 			var _tween:Tween = tweens[_boneID];
 			if (_tween) {
 				delete tweens[_boneID];
-				Tween.recycle(_tween);
+				_tween.remove();
 			}
 		}
 		
@@ -99,7 +91,7 @@ package akdcl.skeleton{
 			}
 		}
 		
-		override public function playTo(_to:Object, _listFrame:uint, _toScale:Number = 1, _loop:Boolean = false, _ease:int = 0):void {
+		override public function playTo(_to:Object, _toFrames:uint, _listFrames:uint, _loop:Boolean = false, _ease:int = 0):void {
 			if (!armatureAniData) {
 				return;
 			}
@@ -107,7 +99,7 @@ package akdcl.skeleton{
 			if (!boneAniData) {
 				return;
 			}
-			super.playTo(_to, _listFrame, _toScale, _loop, _ease);
+			super.playTo(_to, _toFrames, _listFrames, _loop, _ease);
 			aniIDNow = _to as String;
 			var _eachA:FrameNodeList;
 			var _tween:Tween;
@@ -115,7 +107,7 @@ package akdcl.skeleton{
 				_tween = tweens[_boneName];
 				_eachA = boneAniData.getAnimation(_boneName);
 				if (_eachA) {
-					_tween.playTo(_eachA, _listFrame, _toScale, _loop, _ease);
+					_tween.playTo(_eachA, _toFrames, _listFrames, _loop, _ease);
 				}
 			}
 			noScaleListFrames = boneAniData.frame;
@@ -132,7 +124,7 @@ package akdcl.skeleton{
 					loop = -3;
 					noScaleListFrames --;
 				}
-				listFrames = _listFrame;
+				listFrames = _listFrames;
 			}
 		}
 		

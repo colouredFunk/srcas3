@@ -1,4 +1,4 @@
-package akdcl.textures{
+package akdcl.skeleton.export{
 	import flash.display.BitmapData;
 	
 	/**
@@ -16,6 +16,15 @@ package akdcl.textures{
 			texture = _texture;
 		}
 		
+		public function dispose():void {
+			bitmapData.dispose();
+			xml = null;
+			if (texture && ("dispose" in texture)) {
+				texture.dispose();
+			}
+			texture = null;
+		}
+		
 		public function getTexture(_id:String):XML {
 			return xml.children().(@name.toString() == _id)[0];
 		}
@@ -28,6 +37,7 @@ package akdcl.textures{
 			var _arr:Array = _fullName.split("_");
 			return _arr.length > 1?_arr[0]:null;
 		}
+		
 		public function getTextureSuffix(_fullName:String, _prefix:String):String{
 			if(!_prefix){
 				_prefix = getTexturePreFix(_fullName);

@@ -9,9 +9,13 @@
 		public static function isInstalled(_mc:MovieClip):Boolean {
 			return _mc.installed;
 		}
-		public static function install(_mc:MovieClip):void {
-			if (("xml" in _mc)?_mc.installed:true) {
-				return;
+		public static function install(_mc:MovieClip):MovieClip {
+			if (_mc) {
+				if (("xml" in _mc)?_mc.installed:true) {
+					return null;
+				}
+			}else {
+				return null;
 			}
 			
 			_mc.getName = function():String {
@@ -46,7 +50,7 @@
 				this.gotoAndStop(1);
 			}
 			
-			_mc.remove = function():void {
+			_mc.dispose = function():void {
 				this.values = null;
 				this.xml = null;
 				this.stop();
@@ -57,6 +61,7 @@
 			
 			_mc.installed = true;
 			_mc.reset();
+			return _mc;
 		}
 	}
 	
