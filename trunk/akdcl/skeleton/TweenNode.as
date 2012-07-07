@@ -32,7 +32,7 @@ package akdcl.skeleton
 			sA = _from.alpha;
 			
 			if (_to.offR) {
-				dR = _to.rotation + _to.offR - sR;
+				dR = _to.rotation + _to.offR * 360 - sR;
 			}else {
 				dR = _to.rotation - sR;
 			}

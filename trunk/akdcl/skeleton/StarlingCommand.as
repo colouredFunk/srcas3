@@ -19,7 +19,7 @@ package akdcl.skeleton {
 			if (!textureMix.texture) {
 				textureMix.texture = Texture.fromBitmapData(textureMix.bitmapData);
 			}
-			var _armature:Armature = StageCommand.createArmature(_name, _animationName, new Sprite(), boneFactory, true);
+			var _armature:Armature = BaseCommand.createArmature(_name, _animationName, new Sprite(), boneFactory, true);
 			textureMix = null;
 			return _armature;
 		}

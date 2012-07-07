@@ -43,7 +43,7 @@ package akdcl.skeleton{
 			node = _node;
 		}
 		
-		override public function playTo(_to:Object, _toFrames:uint, _listFrames:uint, _loop:Boolean = false, _ease:int = 0):void {
+		override public function playTo(_to:Object, _toFrames:uint, _listFrames:uint=0, _loop:Boolean = false, _ease:int = 0):void {
 			super.playTo(_to, _toFrames, _listFrames, _loop, _ease);
 			node.rotation %= 360;
 			from.copy(node);
@@ -121,8 +121,8 @@ package akdcl.skeleton{
 						if (tweenList.delay != 0) {
 							currentFrame = (1 - tweenList.delay) * totalFrames;
 							currentPrecent += currentFrame / totalFrames;
-							currentPrecent %= 1;
 						}
+						currentPrecent %= 1;
 						listEndFrame = 0;
 						break;
 					default:
@@ -145,6 +145,7 @@ package akdcl.skeleton{
 		
 		private function updateCurrentPrecent():void {
 			var _playedFrames:Number = noScaleListFrames * currentPrecent;
+			
 			if (_playedFrames <= listEndFrame-betweenFrame || _playedFrames > listEndFrame) {
 				listEndFrame = 0;
 				toFrameID = 0;

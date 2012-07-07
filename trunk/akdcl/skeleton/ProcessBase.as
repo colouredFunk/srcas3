@@ -50,7 +50,7 @@ package akdcl.skeleton {
 			currentFrame = 0;
 		}
 		
-		public function playTo(_to:Object, _toFrames:uint, _listFrames:uint, _loop:Boolean = false, _ease:int = 0):void {
+		public function playTo(_to:Object, _toFrames:uint, _listFrames:uint = 0, _loop:Boolean = false, _ease:int = 0):void {
 			isComplete = false;
 			isPause = false;
 			currentFrame = 0;
