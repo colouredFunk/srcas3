@@ -53,6 +53,10 @@ package akdcl.skeleton{
 			}
 		}
 		
+		public function getData():ArmatureAniData {
+			return armatureAniData;
+		}
+		
 		public function setData(_aniData:ArmatureAniData):void {
 			remove();
 			tweens = { };
@@ -91,7 +95,7 @@ package akdcl.skeleton{
 			}
 		}
 		
-		override public function playTo(_to:Object, _toFrames:uint, _listFrames:uint, _loop:Boolean = false, _ease:int = 0):void {
+		override public function playTo(_to:Object, _toFrames:uint, _listFrames:uint = 0, _loop:Boolean = false, _ease:int = 0):void {
 			if (!armatureAniData) {
 				return;
 			}

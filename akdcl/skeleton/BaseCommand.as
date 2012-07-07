@@ -4,9 +4,9 @@ package akdcl.skeleton {
 	 * 骨架
 	 * @author Akdcl
 	 */
-	final public class StageCommand {
+	final public class BaseCommand {
 		public static var armatureFactory:Function;
-		public static function createArmature(_name:String, _animationName:String, _armarureDisplayFactory:* = null, _boneDisplayFactory:Function = null, _isRadian:Boolean = false):Armature {
+		public static function createArmature(_name:String, _animationName:String, _armarureDisplayFactory:* = null, _boneDisplayFactory:Function = null, _isRadian:Boolean = false, _useLocalXYZ:Boolean = false):Armature {
 			var _armatureData:XMLList = ConnectionData.getArmatureData(_name);
 			if(!_armatureData){
 				return null;
@@ -23,7 +23,10 @@ package akdcl.skeleton {
 			if (!_armatureDisplay) {
 				return null;
 			}
-			_armatureDisplay.name = _name;
+			try{
+				_armatureDisplay.name = _name;
+			}catch (e:Error) {
+			}
 			
 			var _armature:Armature;
 			if (armatureFactory != null) {
@@ -51,7 +54,7 @@ package akdcl.skeleton {
 				_boneData = _armatureData[indexI];
 				_boneName = String(_boneData.@name);
 				_parentName = String(_boneData.@parent);
-				_indexZ = int(_boneData.@z);
+				_indexZ = _useLocalXYZ? -2:int(_boneData.@z);
 				
 				
 				if (_boneDisplayFactory != null) {
@@ -60,7 +63,7 @@ package akdcl.skeleton {
 					_boneDisplay = _armature.getDisplay().getChildByName(_boneName);
 				}
 				
-				if (_boneDisplay) {
+				if (!_useLocalXYZ && _boneDisplay) {
 					_displayHigher = null;
 					for(var indexJ:uint = _indexZ; indexJ < _list.length; indexJ++){
 						_displayHigher = _list[indexJ];
@@ -70,7 +73,7 @@ package akdcl.skeleton {
 					}
 					_list[_indexZ] = _boneDisplay;
 					if(_displayHigher){
-						_indexZ = _armature.getDisplay().getChildIndex(_displayHigher) - 1;
+						_indexZ = _armature.getDisplay().getChildIndex(_displayHigher);
 					}else{
 						_indexZ = -1;
 					}
