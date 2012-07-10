@@ -15,7 +15,6 @@ OutputPane 版本:v1.0
  xmlns:fx="http://ns.adobe.com/mxml/2009"
  xmlns:s="library://ns.adobe.com/flex/spark"
  xmlns:mx="library://ns.adobe.com/flex/mx"
- width="400" height="400"
 >
 	<mx:TextArea id="txt" wordWrap="false" left="0" top="0" right="0" bottom="0" link="link(event)"/>
 	<mx:Button label="清空" bottom="2" right="22" id="btn" click="reset()"/>

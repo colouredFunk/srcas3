@@ -40,6 +40,8 @@ SolComboBox
 				
 				super.dataProvider=value;
 				
+				//trace("id="+id,"value="+value);
+				
 				if(value is Array){
 					__dataProvider=value as Array;
 					
@@ -115,7 +117,7 @@ SolComboBox
 				this.dataProvider=__dataProvider;
 			}
 			private function change():void{
-				sol.setValue(sol_key,this.selectedItem.toString());
+				sol.setValue(sol_key,(this.selectedItem||this.text).toString());
 				if(onChange==null){
 				}else{
 					onChange();

@@ -13,6 +13,7 @@ package zero.ui{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.geom.*;
+	import flash.media.SoundTransform;
 	import flash.media.Video;
 	import flash.net.*;
 	import flash.system.*;
@@ -413,6 +414,20 @@ package zero.ui{
 					(loader.content as Bitmap).smoothing=true;
 				}
 			}
+			if(xml.@width.toString()){
+				if(loader.content is Bitmap){
+					loader.width=int(xml.@width.toString());
+				}else{
+					loader.scaleX=int(xml.@width.toString())/loader.contentLoaderInfo.width;
+				}
+			}
+			if(xml.@height.toString()){
+				if(loader.content is Bitmap){
+					loader.height=int(xml.@height.toString());
+				}else{
+					loader.scaleY=int(xml.@height.toString())/loader.contentLoaderInfo.height;
+				}
+			}
 			showContent(loader,loader.contentLoaderInfo.width,loader.contentLoaderInfo.height);
 			_loadComplete();
 			var movie:MovieClip=getMovie();
@@ -486,6 +501,9 @@ package zero.ui{
 		
 		private function connectStream():void {
 			stream=new NetStream(connection);
+			if(__vol>-1){
+				setVolume(__vol);
+			}
 			stream.client={onMetaData:function(...args):void{}};//用于解决：ReferenceError: Error #1069: 在 flash.net.NetStream 上找不到属性 onMetaData，且没有默认值。
 			stream.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
 			stream.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);
@@ -494,6 +512,12 @@ package zero.ui{
 			if(bg){
 				video.width=bg.width;
 				video.height=bg.height;
+			}
+			if(xml.@width.toString()){
+				video.width=int(xml.@width.toString());
+			}
+			if(xml.@height.toString()){
+				video.height=int(xml.@height.toString());
 			}
 			video.visible=false;
 			stream.bufferTime=10;
@@ -617,6 +641,16 @@ package zero.ui{
 				onPlayComplete();
 			}
 			
+		}
+		
+		private var __vol:Number;
+		public function setVolume(_vol:Number):void{
+			__vol=_vol;
+			if(stream){
+				var soundTransform:SoundTransform=stream.soundTransform;
+				soundTransform.volume=__vol;
+				stream.soundTransform=soundTransform;
+			}
 		}
 	}
 }
