@@ -520,7 +520,7 @@ package zero.ui{
 				video.height=int(xml.@height.toString());
 			}
 			video.visible=false;
-			stream.bufferTime=10;
+			stream.bufferTime=xml.@bufferTime.toString()?int(xml.@bufferTime.toString()):10;
 			stream.play(xml.@src.toString());
 			container.addChild(video);
 		}
