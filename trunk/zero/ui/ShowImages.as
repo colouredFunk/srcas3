@@ -37,7 +37,7 @@ package zero.ui{
 		
 		public var img:Btn;
 		public var bottomContainer:Sprite;
-		private var player:MediaPlayer;
+		public var player:MediaPlayer;
 		public var skin:AutoFitMediaSkin;
 		
 		public var icons:Sprite;
