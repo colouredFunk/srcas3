@@ -1,4 +1,4 @@
-package akdcl.media {
+﻿package akdcl.media {
 	import flash.display.InteractiveObject;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
@@ -77,8 +77,8 @@ package akdcl.media {
 		
 		override protected function onRemoveHandler():void 
 		{
-			super.onRemoveHandler();
 			setPlayer(null);
+			super.onRemoveHandler();
 		}
 		
 		protected function onClickHandler(_e:Event):void {
@@ -190,7 +190,7 @@ package akdcl.media {
 				player.removeEventListener(MediaEvent.BUFFER_PROGRESS, onBufferProgressHandler);
 				player.removeEventListener(MediaEvent.LOAD_COMPLETE, onLoadCompleteHandler);
 				player.removeEventListener(MediaEvent.DISPLAY_CHANGE, onDisplayChangeHandler);
-				player.addEventListener(MediaEvent.PLAY_ITEM_CHANGE, onItemChangeHandler);
+				player.removeEventListener(MediaEvent.PLAY_ITEM_CHANGE, onItemChangeHandler);
 			}
 		}
 
