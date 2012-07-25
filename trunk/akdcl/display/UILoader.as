@@ -24,7 +24,6 @@ package akdcl.display {
 		
 		protected var loadProgress:Number;
 		
-		private var eventComplete:Event;
 		private var source:String;
 
 		public function UILoader(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = -1){
@@ -35,7 +34,6 @@ package akdcl.display {
 		{
 			super.init();
 			loadProgress = 0;
-			eventComplete = new Event(Event.COMPLETE);
 			setProgressClip(progressClip, 1, true);
 		}
 		
@@ -47,7 +45,6 @@ package akdcl.display {
 				source = null;
 			}
 			progressClip = null;
-			eventComplete = null;
 		}
 
 		public function load(_url:String, _tweenMode:int = 2, _alignX:Number = 0.5, _alignY:Number = 0.5, _scaleMode:Number = 1):void {
@@ -92,12 +89,13 @@ package akdcl.display {
 			setProgressClip(progressClip, 1, true);
 			setContent(_data, tweenMode, alignXReady, alignYReady, scaleModeReady);
 			if (hasEventListener(Event.COMPLETE)){
-				dispatchEvent(eventComplete);
+				dispatchEvent(new Event(Event.COMPLETE));
 			}
 		}
 
 		override protected function showContent():void {
-			if (isHidding && loadProgress < 0){
+			//if (isHidding && loadProgress < 0){
+			if (isHidding && loadProgress < 1){
 
 			} else {
 				super.showContent();

@@ -97,8 +97,6 @@
 		protected var alignYReady:Number;
 		protected var scaleModeReady:Number;
 
-		private var eventChange:Event;
-		private var eventResize:Event;
 		private var scrollRectCopy:Rectangle;
 
 		public function UIDisplay(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = 0) {
@@ -120,8 +118,6 @@
 
 		override protected function init():void {
 			super.init();
-			eventChange = new Event(Event.CHANGE);
-			eventResize = new Event(Event.RESIZE);
 			isHidding = false;
 			tweenOutVar = {alpha: 0, useFrames: true, onComplete: onHideCompleteHandler};
 			tweenInVar = {alpha: 1, useFrames: true};
@@ -146,8 +142,6 @@
 
 			tweenOutVar = null;
 			tweenInVar = null;
-			eventChange = null;
-			eventResize = null;
 			label = null;
 		}
 
@@ -250,11 +244,11 @@
 			}
 		}
 		
-		private function getWidth():Number {
+		public function getWidth():Number {
 			return super.width;
 		}
 		
-		private function getHeight():Number {
+		public function getHeight():Number {
 			return super.height;
 		}
 	}
