@@ -22,12 +22,12 @@ package zero.records{
 		private static const MARK_KEY_DOWN:String="k";
 		private static const MARK_KEY_UP:String="K";
 		private static const MARK_DEACTIVATE:String="d";
-		//private static const MARK_END:String="e";
+		private static const MARK_END:String="e";
 		
-		//private static const STATUS_STOP:int=0;
-		//private static const STATUS_RECORDING:int=1;
-		//private static const STATUS_PLAYING:int=2;
-		//private var status:int;
+		private static const STATUS_STOP:int=0;
+		private static const STATUS_RECORDING:int=1;
+		private static const STATUS_REPLAYING:int=2;
+		private var status:int;
 		
 		public var dataArr:Array;//frame1,data0,data1,...datan,frame2,data0,data1,...datan,...
 		
@@ -49,24 +49,27 @@ package zero.records{
 		
 		public var getInt:Function;
 		
-		private var onPlayComplete:Function;
+		private var onReplayComplete:Function;
+		private var onRecordComplete:Function;
 		
 		private var oldKeyArr:Array;
 		private var keyArr:Array;
+		
+		private var __pause:Boolean;
 		
 		public function Recorder(){
 			halt();
 		}
 		public function halt():void{
 			if(__stage){
-				__stage.removeEventListener(Event.ENTER_FRAME,record_step);
-				__stage.removeEventListener(Event.ENTER_FRAME,replay_step);
+				//__stage.removeEventListener(Event.ENTER_FRAME,record_step);
+				//__stage.removeEventListener(Event.ENTER_FRAME,replay_step);
 				__stage.removeEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
 				__stage.removeEventListener(MouseEvent.MOUSE_UP,mouseUp);
 				__stage.removeEventListener(KeyboardEvent.KEY_DOWN,keyDown);
 				__stage.removeEventListener(KeyboardEvent.KEY_UP,keyUp);
 				__stage.removeEventListener(Event.DEACTIVATE,deactivate);
-				__stage=null;
+				//__stage=null;
 			}
 			//recordTempSubDataArr=null;//不能置空，否则最后一个 step 可能会丢失数据
 			onMouseDown=null;
@@ -77,14 +80,17 @@ package zero.records{
 			//keyArr=null;//不能置空，否则最后一个 step 可能会报错
 			onStep=null;
 			getInt=null;
-			onPlayComplete=null;
-			//status=STATUS_STOP;
+			//onReplayComplete=null;
+			//onRecordComplete=null;//不能置空
+			status=STATUS_STOP;
 		}
-		public function record(_stage:Stage,params:Object):void{
+		public function record(_stage:Stage,_onRecordComplete:Function,params:Object):void{
 			halt();
 			
+			__pause=false;
+			
 			dataArr=new Array();
-			//status=STATUS_RECORDING;
+			status=STATUS_RECORDING;
 			
 			__stage=_stage;
 			
@@ -94,6 +100,7 @@ package zero.records{
 			onKeyUp=params.keyUp;
 			onStep=params.step;
 			getInt=record_getInt;
+			onRecordComplete=_onRecordComplete;
 			
 			if(onMouseDown==null){
 			}else{
@@ -122,8 +129,10 @@ package zero.records{
 			}
 			oldKeyArr=keyArr.slice();
 		}
-		public function replay(_stage:Stage,_onPlayComplete:Function,params:Object,_dataArr:Array=null):void{
+		public function replay(_stage:Stage,_onReplayComplete:Function,params:Object,_dataArr:Array=null):void{
 			halt();
+			
+			__pause=false;
 			
 			if(_dataArr){
 				dataArr=_dataArr;
@@ -131,7 +140,7 @@ package zero.records{
 			
 			//trace("dataArr="+dataArr);
 			if(dataArr){
-				//status=STATUS_PLAYING;
+				status=STATUS_REPLAYING;
 				
 				__stage=_stage;
 				
@@ -141,7 +150,7 @@ package zero.records{
 				onKeyUp=params.keyUp;
 				onStep=params.step;
 				getInt=replay_getInt;
-				onPlayComplete=_onPlayComplete;
+				onReplayComplete=_onReplayComplete;
 				resetKeyArr();
 				
 				frame=0;
@@ -153,19 +162,46 @@ package zero.records{
 			}
 		}
 		
+		public function pause():void{
+			__pause=true;
+		}
+		public function resume():void{
+			__pause=false;
+		}
+		
 		private function mouseDown(...args):void{
+			
+			if(__pause){
+				return;
+			}
+			
 			mouseIsDown=true;
 		}
 		private function mouseUp(...args):void{
+			
+			if(__pause){
+				return;
+			}
+			
 			mouseIsUp=true;
 		}
 		private function deactivate(...args):void{
 			isDeactivate=true;
 		}
 		private function keyDown(event:KeyboardEvent):void{
+			
+			if(__pause){
+				return;
+			}
+			
 			keyArr[event.keyCode]=true;
 		}
 		private function keyUp(event:KeyboardEvent):void{
+			
+			if(__pause){
+				return;
+			}
+			
 			keyArr[event.keyCode]=false;
 		}
 		public function keyIsDown(keyCode:int):Boolean{
@@ -173,6 +209,10 @@ package zero.records{
 		}
 		
 		private function record_step(...args):void{
+			
+			if(__pause){
+				return;
+			}
 			
 			if(frame==0){
 				if(recordTempSubDataArr.length){
@@ -238,6 +278,10 @@ package zero.records{
 				}
 			}
 			
+			
+			if(status==STATUS_STOP){
+				subDataArr.push(MARK_END);
+			}
 			if(subDataArr.length){
 				dataArr.push(frame);
 				dataArr.push.apply(dataArr,subDataArr);
@@ -252,17 +296,33 @@ package zero.records{
 			
 			recordTempSubDataArr=null;
 			
-			//if(status==STATUS_STOP){
-			//	dataArr.push(MARK_END);
-			//}
-			
 			oldKeyArr=keyArr.slice();
+			
+			if(status==STATUS_STOP){
+				var _onRecordComplete:Function=onRecordComplete;
+				onRecordComplete=null;
+				halt();
+				if(_onRecordComplete==null){
+				}else{
+					__stage.removeEventListener(Event.ENTER_FRAME,record_step);
+					__stage=null;
+					_onRecordComplete();
+				}
+			}
 		}
 		private function replay_step(...args):void{
 			
+			if(__pause){
+				return;
+			}
+			
 			frame++;
 			
-			//var isEnd:Boolean=false;
+			var isEnd:Boolean=false;
+			
+			if(status==STATUS_STOP){
+				isEnd=true;
+			}
 			
 			if(dataArr[replayOffset+1] is String){//MARK
 				if(dataArr[replayOffset]==frame){
@@ -304,9 +364,9 @@ package zero.records{
 									onKeyUp(keyCode);
 								}
 							break;
-							//case MARK_END:
-							//	isEnd=true;
-							//break;
+							case MARK_END:
+								isEnd=true;
+							break;
 						}
 					}
 				}
@@ -317,17 +377,17 @@ package zero.records{
 				onStep();
 			}
 			
-			/*
-			if(isEnd||replayOffset>=dataArr.length){
-				trace("isEnd="+isEnd);
-				var _onPlayComplete:Function=onPlayComplete;
-				stop();
-				if(_onPlayComplete==null){
+			if(isEnd){
+				var _onReplayComplete:Function=onReplayComplete;
+				onReplayComplete=null;
+				halt();
+				if(_onReplayComplete==null){
 				}else{
-					_onPlayComplete();
+					__stage.removeEventListener(Event.ENTER_FRAME,replay_step);
+					__stage=null;
+					_onReplayComplete();
 				}
 			}
-			*/
 		}
 		
 		//record_getInt 和 replay_getInt 仅发生在 onStep，onMouseDown，onMouseUp 里
@@ -338,6 +398,16 @@ package zero.records{
 		public function replay_getInt(_int:int):int{
 			//trace("replayOffset="+replayOffset,dataArr[replayOffset]);
 			return dataArr[replayOffset++];
+		}
+		
+		public function isPause():Boolean{
+			return __pause;
+		}
+		public function isRecording():Boolean{
+			return status==STATUS_RECORDING;
+		}
+		public function isReplaying():Boolean{
+			return status==STATUS_REPLAYING;
 		}
 	}
 }
