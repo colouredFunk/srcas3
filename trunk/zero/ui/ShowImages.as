@@ -47,15 +47,14 @@ package zero.ui{
 		private var iconArea:Sprite;
 		private var scrollMaskSp:Sprite;
 		private var num:int;
-		private var d:int;
+		private var dx:int;
+		private var dy:int;
 		
 		private var scrollId:int;
 		public var currId:int;
 		
 		//private var info:String;
 		//private var infoMenuItem:ContextMenuItem;
-		
-		private var direction:String;
 		
 		private var imgNodeName:String;
 		
@@ -69,10 +68,12 @@ package zero.ui{
 		public var currImgXML:XML;
 		
 		private var selectedIconEnabled:Boolean;
+		public var autoPlay:Boolean;//20120803
 		
 		public function ShowImages(_selectedIconEnabled:Boolean,mask_inflate_dx:int=4,mask_inflate_dy:int=4){
 			
 			selectedIconEnabled=_selectedIconEnabled;
+			autoPlay=true;
 			
 			if(icons){
 				IconClass=icons.getChildAt(0)["constructor"];
@@ -89,7 +90,6 @@ package zero.ui{
 			initImg(img);
 			initBottomContainer(bottomContainer);
 			initSkin(skin);
-			direction="横向";
 			initIcons(icons,mask_inflate_dx,mask_inflate_dy);
 			initBtns(btnScrollPrev,btnScrollNext,btnPrev,btnNext);
 			
@@ -161,11 +161,8 @@ package zero.ui{
 		public function initIcons(_icons:Sprite,mask_inflate_dx:int,mask_inflate_dy:int):void{
 			icons=_icons;
 			if(icons){
-				d=icons.getChildAt(1).x-icons.getChildAt(0).x;
-				if(d*d<4){
-					direction="纵向";
-					d=icons.getChildAt(1).y-icons.getChildAt(0).y;
-				}
+				dx=icons.getChildAt(1).x-icons.getChildAt(0).x;
+				dy=icons.getChildAt(1).y-icons.getChildAt(0).y;
 				
 				var b:Rectangle=icons.getBounds(icons);
 				//向外扩展几像素
@@ -283,22 +280,18 @@ package zero.ui{
 			var imgXML:XML,i:int;
 			
 			if(iconArea){
-				var pos:int=0;
+				var x:int=0;
+				var y:int=0;
 				i=-1;
 				for each(imgXML in xml[imgNodeName]){
 					i++;
 					var icon:Btn=new IconClass();
 					iconArea.addChild(icon);
-					switch(direction){
-						case "横向":
-							icon.x=pos;
-						break;
-						case "纵向":
-							icon.y=pos;
-						break;
-					}
+					icon.x=x;
+					icon.y=y;
 					icon["initXML"](imgXML,imgXML.@icon.toString()||imgXML.@src.toString(),clickIcon);
-					pos+=d;
+					x+=dx;
+					y+=dy;
 				}
 			}
 			
@@ -370,7 +363,9 @@ package zero.ui{
 			if(/^.*\.(flv|f4v|mp3)$/i.test(imgXML.@src.toString())&&player&&skin){
 				if(player){
 					player.load(imgXML.@src.toString());
-					player.play();
+					if(autoPlay){
+						player.play();
+					}
 				}
 				if(skin){
 					skin.visible=true;
@@ -384,9 +379,11 @@ package zero.ui{
 				}
 				if(img){
 					img.visible=true;
+					(img["img"] as ImgLoader).autoPlay=autoPlay;
 					(img["img"] as ImgLoader).load(<img src={imgXML.@src.toString()} align={img_align}/>);
 				}
 			}
+			autoPlay=true;
 			
 			if(img){
 				if(onClickImg==null){
@@ -491,14 +488,7 @@ package zero.ui{
 		}
 		private function scroll():void{
 			if(iconArea){
-				switch(direction){
-					case "横向":
-						TweenMax.to(iconArea,0.3,{x:-scrollId*d});
-					break;
-					case "纵向":
-						TweenMax.to(iconArea,0.3,{y:-scrollId*d});
-					break;
-				}
+				TweenMax.to(iconArea,0.3,{x:-scrollId*dx,y:-scrollId*dy});
 			}
 			
 			updateBtns();

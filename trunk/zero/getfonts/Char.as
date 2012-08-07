@@ -15,9 +15,9 @@ package zero.getfonts{
 	import flash.text.*;
 	import flash.utils.*;
 	
-	import zero.swf.records.RECT;
-	import zero.swf.records.shapes.SHAPE;
-	import zero.swf.records.texts.ZONERECORD;
+	import zero.getfonts.swf.records.RECT;
+	import zero.getfonts.swf.records.shapes.SHAPE;
+	import zero.getfonts.swf.records.texts.ZONERECORD;
 	
 	public class Char{
 		public var code:int;//DefineFont3.CodeV
