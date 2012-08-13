@@ -141,12 +141,17 @@ package zero.ui{
 			if(connection){
 				try{
 					connection.close();
-				}catch(e:Error){}
+				}catch(e:Error){
+					//trace("e="+e);
+				}
 			}
 			if(stream){
 				stream.pause();
 				stream.removeEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
 				stream.removeEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);
+			}
+			if(video&&video.parent==container){
+				container.removeChild(video);
 			}
 		}
 		

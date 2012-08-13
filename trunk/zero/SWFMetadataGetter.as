@@ -183,13 +183,13 @@ package zero{
 						}
 					}
 				}catch(e:Error){
-					trace("getModifyDate() 时发生错误,e="+e);
+					//trace("getModifyDate() 时发生错误,e="+e);
 				}
 			}
 			
-			if(metadataXML){
-				trace(metadataXML.toXMLString());
-			}
+			//if(metadataXML){
+			//	trace(metadataXML.toXMLString());
+			//}
 			
 			return null;
 		}
