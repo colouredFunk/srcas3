@@ -272,7 +272,7 @@
 						case DATAFORMAT_JSON:
 							request.data = com.adobe.serialization.json.JSON.encode(_url.data);
 							break;
-						case RequestManager.DATAFORMAT_AMF3:
+						case DATAFORMAT_AMF3:
 							var _bytes:ByteArray = new ByteArray();
 							_bytes.writeObject(_url.data);
 							_bytes.objectEncoding = ObjectEncoding.AMF3;
