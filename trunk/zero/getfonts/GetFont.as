@@ -445,15 +445,18 @@ package zero.getfonts{
 			fontSWFData=null;
 		}
 		public function canShowText(text:String):Boolean{
-			text=getUnrepeatedChars(text);
-			var i:int=text.length;
-			while(--i>=0){
-				if(charArr[text.charCodeAt(i)]){
-				}else{
-					return false;
+			if(charArr){
+				text=getUnrepeatedChars(text);
+				var i:int=text.length;
+				while(--i>=0){
+					if(charArr[text.charCodeAt(i)]){
+					}else{
+						return false;
+					}
 				}
+				return true;
 			}
-			return true;
+			return false;
 		}
 		public function loadGroups(_onLoadGroupsComplete:Function,...charGroupNames):void{
 			clear();
@@ -713,7 +716,13 @@ package zero.getfonts{
 		}
 		private function loadFontSWFComplete(...args):void{
 			trace("loadFontSWFComplete："+fontName);
-			charArr=charDatas[fontName0].charArr.slice();
+			//var canShowChars:String="";
+			charArr=new Array();
+			for each(var char:Char in charDatas[fontName0].charArr){
+				charArr[char.code]=char;
+				//canShowChars+=String.fromCharCode(char.code);
+			}
+			//trace("canShowChars："+canShowChars);
 			fontClass=fontSWFLoader.contentLoaderInfo.applicationDomain.getDefinition(fontName) as Class;
 			Font.registerFont(fontClass);
 			font=new fontClass();
