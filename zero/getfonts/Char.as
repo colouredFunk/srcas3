@@ -27,6 +27,11 @@ package zero.getfonts{
 		public var ZoneRecord:ZONERECORD;//DefineFontAlignZones.ZoneRecordV
 		public function Char(){
 		}
+		public function clear():void{
+			GlyphShape=null;
+			FontBounds=null;
+			ZoneRecord=null;
+		}
 		public function toData():ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=code;
