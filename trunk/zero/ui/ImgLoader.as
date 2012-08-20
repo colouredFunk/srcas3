@@ -35,6 +35,7 @@ package zero.ui{
 		
 		private var connection:NetConnection;
 		private var stream:NetStream;
+		private var flvData:ByteArray;
 		public var video:Video;
 		private var video_is_showing:Boolean;
 		
@@ -97,6 +98,7 @@ package zero.ui{
 			}
 			connection=null;
 			stream=null;
+			flvData=null;
 			if(video){
 				video.attachNetStream(null);
 				video=null;
@@ -164,7 +166,7 @@ package zero.ui{
 		 * load(<img src="Bmd0" align="bottom center"/>)
 		 * 
 		 */		
-		public function load(data:*,_dataType:String=null):void{
+		public function load(data:*,_dataType:String=null,_wid:int=0,_hei:int=0):void{
 			
 			var i:int;
 			
@@ -197,6 +199,7 @@ package zero.ui{
 			dataLoader=null;
 			connection=null;
 			stream=null;
+			flvData=null;
 			if(video){
 				video.attachNetStream(null);
 				video=null;
@@ -226,6 +229,13 @@ package zero.ui{
 				xml=<img src={data}/>;
 			}else{
 				throw new Error("load 未知数据："+data);
+			}
+			
+			if(_wid>0){
+				xml.@width=_wid;
+			}
+			if(_hei>0){
+				xml.@height=_hei;
 			}
 			
 			if(container){
@@ -390,6 +400,14 @@ package zero.ui{
 				case FileTypes.BMP:
 					loadBmd(BMPEncoder.decode(data));
 				break;
+				case FileTypes.FLV:
+				case FileTypes.F4V:
+					flvData=data;
+					connection=new NetConnection();
+					connection.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
+					connection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
+					connection.connect(null);
+				break;
 				default:
 					if(dataLoader){//防止循环加载
 					}else if(xml){
@@ -477,6 +495,7 @@ package zero.ui{
 		}
 		
 		private function netStatusHandler(event:NetStatusEvent):void {
+			trace("event.info.code="+event.info.code);
 			switch (event.info.code) {
 				case "NetConnection.Connect.Success":
 					connectStream();
@@ -498,8 +517,16 @@ package zero.ui{
 				case "NetStream.Play.StreamNotFound":
 					_loadError();
 				break;
+				case "NetStream.Buffer.Empty"://- - //20120817
+					if(flvData){
+						playComplete();
+					}
+				break;
 				case "NetStream.Play.Stop":
-					playComplete();
+					if(flvData){
+					}else{
+						playComplete();
+					}
 				break;
 			}
 		}
@@ -518,6 +545,7 @@ package zero.ui{
 				video.width=bg.width;
 				video.height=bg.height;
 			}
+			//trace("xml="+xml.toXMLString());
 			if(xml.@width.toString()){
 				video.width=int(xml.@width.toString());
 			}
@@ -526,7 +554,13 @@ package zero.ui{
 			}
 			video.visible=false;
 			stream.bufferTime=xml.@bufferTime.toString()?int(xml.@bufferTime.toString()):10;
-			stream.play(xml.@src.toString());
+			if(flvData){
+				//trace("flvData.length="+flvData.length);
+				stream.play(null);
+				stream.appendBytes(flvData);
+			}else{
+				stream.play(xml.@src.toString());
+			}
 			container.addChild(video);
 		}
 		private function loadVideoProgress(...args):void{

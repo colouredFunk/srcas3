@@ -1,4 +1,4 @@
-/***
+﻿/***
 GetFont
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
 创建时间：2012年8月14日 17:15:11
@@ -14,8 +14,6 @@ package zero.getfonts{
 	import flash.system.*;
 	import flash.text.*;
 	import flash.utils.*;
-	
-	import mx.events.Request;
 	
 	import zero.getfonts.swf.SWF;
 	import zero.getfonts.swf.Tag;
@@ -202,15 +200,19 @@ package zero.getfonts{
 				initTxtObj.txt.defaultTextFormat=tf;
 			}
 			initTxtObj.txt.embedFonts=true;
-			for each(var c:String in initTxtObj.unrepeatedText.split("")){
-				initTxtObj.txt.text=c;
-				if(initTxtObj.txt.textWidth){
-				}else{
-					initTxtObj.txt.text="";
-					return false;
+			//trace("canShowText","initTxtObj.txt.defaultTextFormat.font="+initTxtObj.txt.defaultTextFormat.font);
+			if(initTxtObj.unrepeatedText){
+				for each(var c:String in initTxtObj.unrepeatedText.split("")){
+					initTxtObj.txt.text=c;
+					//trace("c="+c,"initTxtObj.txt.textWidth="+initTxtObj.txt.textWidth);
+					if(initTxtObj.txt.textWidth){
+					}else{
+						initTxtObj.txt.text="";
+						return false;
+					}
 				}
+				initTxtObj.txt.text="";
 			}
-			initTxtObj.txt.text="";
 			return true;
 		}
 		private static function getUnrepeatedText(_text:String):String{
@@ -218,6 +220,7 @@ package zero.getfonts{
 			var mark:Object=new Object();
 			for each(var c:String in _text.split("")){
 				switch(c){
+					case "":
 					case "\r":
 					case "\n":
 					break;
@@ -233,7 +236,7 @@ package zero.getfonts{
 			return text;
 		}
 		
-		public static function initTxt(txt:TextField,textOrXML:*,onInitTxtComplete:Function):void{
+		public static function initTxt(txt:TextField,textOrXML:*,onInitTxtComplete:Function=null):void{
 			if(txt){
 				
 				var initTxtObj:InitTxtObj=new InitTxtObj();
@@ -241,7 +244,14 @@ package zero.getfonts{
 				initTxtObj.txt=txt;
 				
 				if(textOrXML is XML){
-					initTxtObj.xml=textOrXML;
+					initTxtObj.xml=textOrXML.copy();
+					if(initTxtObj.xml.@text.toString()=="${children()}"){
+						var old_prettyPrinting:Boolean=XML.prettyPrinting;
+						var old_prettyIndent:int=XML.prettyIndent;
+						initTxtObj.xml.@text=initTxtObj.xml.children().toXMLString().replace(/[\r\n]/g,"").replace(/<br\s*\/>/gi,"\n");
+						XML.prettyPrinting=old_prettyPrinting;
+						XML.prettyIndent=old_prettyIndent;
+					}
 				}else{
 					initTxtObj.xml=<txt text={textOrXML||""}/>;
 				}
@@ -253,7 +263,7 @@ package zero.getfonts{
 				}
 				initTxtObj.unrepeatedText=getUnrepeatedText(text);
 				
-				trace("initTxt，initTxtObj.unrepeatedText="+initTxtObj.unrepeatedText);
+				//trace("initTxt，initTxtObj.unrepeatedText="+initTxtObj.unrepeatedText);
 				
 				initTxtObj.onInitTxtComplete=onInitTxtComplete;
 				
@@ -269,9 +279,11 @@ package zero.getfonts{
 				}
 				initTxtObjV.push(initTxtObj);
 				checkInitTxtComplete(initTxtObj);
+				//trace("initTxtObjV.length="+initTxtObjV.length);
 				if(initTxtObjV.length){
+					//trace("progressing="+progressing);
 					if(progressing){
-						if(Datas.loadingDatas.fontName0==initTxtObj.fontName0){//当前正在加载的和这个的是同一个字体
+						if(Datas.loadingDatas&&Datas.loadingDatas.fontName0==initTxtObj.fontName0){//当前正在加载的和这个的是同一个字体
 							//追加到加载列表
 							Datas.addLoadingCharCodes(initTxtObj.unrepeatedText);
 							initTxtObj.getFont=Datas.notAvalibleGetFont;
@@ -292,9 +304,12 @@ package zero.getfonts{
 			if(datas){
 				for each(var getFont:GetFont in datas.getFontV){
 					if(canShowText(initTxtObj,getFont.fontName)){
-						trace(getFont.fontName,initTxtObj.unrepeatedText);
+						var id:int=initTxtObjV.indexOf(initTxtObj);
+						if(id>-1){
+							initTxtObjV.splice(id,1);
+						}
+						initTxtObj.getFont=getFont;
 						initTxtComplete(initTxtObj);
-						initTxtObjV.splice(initTxtObjV.indexOf(initTxtObj),1);
 						return true;
 					}
 				}
@@ -328,6 +343,7 @@ package zero.getfonts{
 		}
 		
 		private static function initTxtComplete(currInitTxtObj:InitTxtObj):void{
+			//trace("initTxtComplete=======================================================");
 			
 			if(currInitTxtObj.xml.@autoSize.toString()){
 				currInitTxtObj.txt.autoSize=currInitTxtObj.xml.@autoSize.toString();
@@ -482,11 +498,11 @@ package zero.getfonts{
 					text="<"+execResult[1]+execResult[2]+">"+text+"</"+execResult[1]+">";
 				}
 				currInitTxtObj.txt.htmlText=text;
-				trace("text="+text);
-				trace("currInitTxtObj.txt.htmlText="+currInitTxtObj.txt.htmlText);
+				//trace("text="+text);
+				//trace("currInitTxtObj.txt.htmlText="+currInitTxtObj.txt.htmlText);
 			}else{
 				currInitTxtObj.txt.text=text;
-				trace("currInitTxtObj.txt.text="+currInitTxtObj.txt.text);
+				//trace("currInitTxtObj.txt.text="+currInitTxtObj.txt.text);
 			}
 			
 			if(currInitTxtObj.onInitTxtComplete==null){
@@ -499,6 +515,7 @@ package zero.getfonts{
 			}
 			currInitTxtObj.clear();
 			
+			//trace("=======================================================");
 		}
 		
 		public var fontName:String;
