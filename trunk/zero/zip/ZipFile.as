@@ -190,7 +190,22 @@ package zero.zip{
 			external_file_attributes=0x00000000;
 			file_name_charset="gb2312";
 			file_comment_charset="gb2312";
+			date=new Date();
 		}
+		
+		/**
+		 *清除此 zipFile 以便回收
+		 * 
+		 */		
+		public function clear():void{
+			file_name=null;
+			extra_field1=null;
+			extra_field2=null;
+			file_data0=null;
+			file_data=null;
+			file_comment=null;
+		}
+		
 		internal function initByCentralDirectoryData(zipData:ByteArray,offset:int):int{
 			//c.  central directory structure:
 			//[file header] . . .  end of central dir record
@@ -553,11 +568,11 @@ package zero.zip{
 				//          public domain for review and possible adoption as a
 				//          standard."
 				
-				extra_field2=new ByteArray();
-				extra_field2.writeBytes(zipData,offset,extra_field_length);
+				extra_field1=new ByteArray();
+				extra_field1.writeBytes(zipData,offset,extra_field_length);
 				offset+=extra_field_length;
 			}else{
-				extra_field2=null;
+				extra_field1=null;
 			}
 			if(file_comment_length){
 				file_comment=new ByteArray();
@@ -570,7 +585,14 @@ package zero.zip{
 			}
 			return offset;
 		}
-		internal function initByZipData(zipData:ByteArray,offset:int):int{
+		private function outputError(msg:String,_throw:Boolean):void{
+			msg=name+"，"+msg;
+			if(_throw){
+				throw new Error(msg);
+			}
+			trace(msg);
+		}
+		internal function initByZipData(zipData:ByteArray,offset:int,strict_mode:Boolean):int{
 			//a.  local file header:
 			//local file header signature     4 bytes  (0x04034b50)
 			//version needed to extract       2 bytes
@@ -592,7 +614,7 @@ package zero.zip{
 			
 			if(version_needed_to_extract==(zipData[offset++]|(zipData[offset++]<<8))){
 			}else{
-				throw new Error("version_needed_to_extract 不一致");
+				outputError("version_needed_to_extract 不一致",strict_mode);
 			}
 			//version needed to extract (2 bytes)
 			//the minimum software version needed to extract the
@@ -600,35 +622,39 @@ package zero.zip{
 			
 			if(general_purpose_bit_flag==(zipData[offset++]|(zipData[offset++]<<8))){
 			}else{
-				throw new Error("general_purpose_bit_flag 不一致");
+				outputError("general_purpose_bit_flag 不一致",strict_mode);
 			}
 			
 			if(compression_method==(zipData[offset++]|(zipData[offset++]<<8))){
 			}else{
-				throw new Error("compression_method 不一致");
+				outputError("compression_method 不一致",strict_mode);
 			}
 			
 			if(date_and_time_fields==(zipData[offset++]|(zipData[offset++]<<8)|(zipData[offset++]<<16)|(zipData[offset++]<<24))){
 			}else{
-				throw new Error("date_and_time_fields 不一致");
+				outputError("date_and_time_fields 不一致",strict_mode);
 			}
 				
 			if(general_purpose_bit_flag&0x08){
 				offset+=12;
 			}else{
+				
+				//trace("crc32="+(0x100000000+uint(crc32)).toString(16).substr(1));
+				//trace(BytesAndStr16.bytes2str16(zipData,offset,12));
+				
 				if(crc32==(zipData[offset++]|(zipData[offset++]<<8)|(zipData[offset++]<<16)|(zipData[offset++]<<24))){
 				}else{
-					throw new Error("crc32 不一致");
+					outputError("crc32 不一致",strict_mode);
 				}
 				
 				if(compressed_size==(zipData[offset++]|(zipData[offset++]<<8)|(zipData[offset++]<<16)|(zipData[offset++]<<24))){
 				}else{
-					throw new Error("compressed_size 不一致");
+					outputError("compressed_size 不一致",strict_mode);
 				}
 				
 				if(uncompressed_size==(zipData[offset++]|(zipData[offset++]<<8)|(zipData[offset++]<<16)|(zipData[offset++]<<24))){
 				}else{
-					throw new Error("uncompressed_size 不一致");
+					outputError("uncompressed_size 不一致",strict_mode);
 				}
 			}
 			var file_name_length:int=zipData[offset++]|(zipData[offset++]<<8);
@@ -640,21 +666,22 @@ package zero.zip{
 					BytesAndStr16.bytes2str16(zipData,offset,file_name_length)
 				){
 				}else{
-					throw new Error("file_name 不一致");
+					zipData.position=offset;
+					outputError("file_name 不一致（"+zipData.readMultiByte(file_name_length,file_name_charset)+"）",strict_mode);
 				}
 				offset+=file_name_length;
 			}else{
 				if(file_name){
-					throw new Error("file_name 不一致");
+					outputError("file_name 不一致",strict_mode);
 				}
 			}
 			
 			if(extra_field_length){
-				extra_field1=new ByteArray();
-				extra_field1.writeBytes(zipData,offset,extra_field_length);
+				extra_field2=new ByteArray();
+				extra_field2.writeBytes(zipData,offset,extra_field_length);
 				offset+=extra_field_length;
 			}else{
-				extra_field1=null;
+				extra_field2=null;
 			}
 			if(compressed_size){
 				file_data0=new ByteArray();
@@ -691,23 +718,23 @@ package zero.zip{
 				
 				if(crc32==_crc32){
 				}else{
-					throw new Error("crc32 不一致");
+					outputError("crc32 不一致",strict_mode);
 				}
 				
 				if(compressed_size==(zipData[offset++]|(zipData[offset++]<<8)|(zipData[offset++]<<16)|(zipData[offset++]<<24))){
 				}else{
-					throw new Error("compressed_size 不一致");
+					outputError("compressed_size 不一致",strict_mode);
 				}
 				
 				if(uncompressed_size==(zipData[offset++]|(zipData[offset++]<<8)|(zipData[offset++]<<16)|(zipData[offset++]<<24))){
 				}else{
-					throw new Error("uncompressed_size 不一致");
+					outputError("uncompressed_size 不一致",strict_mode);
 				}
 			}
 			
 			if(crc32==data_crc32){
 			}else{
-				throw new Error("crc32 和 data_crc32 不一致");
+				outputError("crc32 和 data_crc32 不一致",strict_mode);
 			}
 			
 			return offset;
@@ -862,34 +889,34 @@ package zero.zip{
 				centralFileData[25]=localFileData[23]=0x00;
 			}
 			
-			//extra_field1=new ByteArray();
-			//extra_field1.writeMultiByte("我顶你个肺","gb2312");trace("测试 extra_field1");
-			
-			if(extra_field1&&extra_field1.length){
-				localFileData.position=offset;
-				localFileData.writeBytes(extra_field1);
-				var extra_field_length:int=extra_field1.length;
-				offset+=extra_field_length;
-				localFileData[24]=extra_field_length;
-				localFileData[25]=extra_field_length>>8;
-			}else{
-				extra_field1=null;
-				localFileData[24]=0x00;
-				localFileData[25]=0x00;
-			}
-			
 			//extra_field2=new ByteArray();
 			//extra_field2.writeMultiByte("我顶你个肺","gb2312");trace("测试 extra_field2");
 			
 			if(extra_field2&&extra_field2.length){
+				localFileData.position=offset;
+				localFileData.writeBytes(extra_field2);
+				var extra_field_length:int=extra_field2.length;
+				offset+=extra_field_length;
+				localFileData[24]=extra_field_length;
+				localFileData[25]=extra_field_length>>8;
+			}else{
+				extra_field2=null;
+				localFileData[24]=0x00;
+				localFileData[25]=0x00;
+			}
+			
+			//extra_field1=new ByteArray();
+			//extra_field1.writeMultiByte("我顶你个肺","gb2312");trace("测试 extra_field1");
+			
+			if(extra_field1&&extra_field1.length){
 				centralFileData.position=offset2;
-				centralFileData.writeBytes(extra_field2);
-				extra_field_length=extra_field2.length;
+				centralFileData.writeBytes(extra_field1);
+				extra_field_length=extra_field1.length;
 				offset2+=extra_field_length;
 				centralFileData[26]=extra_field_length;
 				centralFileData[27]=extra_field_length>>8;
 			}else{
-				extra_field2=null;
+				extra_field1=null;
 				centralFileData[26]=0x00;
 				centralFileData[27]=0x00;
 			}
@@ -969,6 +996,7 @@ package zero.zip{
 		public function getText(charSet:String="utf-8"):String{
 			//internal_file_attributes&0x00000001;//the lowest bit of this field indicates, if set, that the file is apparently an ascii or text file.
 			var _data:ByteArray=data;
+			_data.position=0;
 			return _data.readMultiByte(_data.length,charSet);
 		}
 		
