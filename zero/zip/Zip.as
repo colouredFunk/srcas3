@@ -50,11 +50,29 @@ package zero.zip{
 		}
 		
 		/**
+		 *清除此 zip 以便回收
+		 * 
+		 */		
+		public function clear():void{
+			if(fileV){
+				var i:int=fileV.length;
+				while(--i>=0){
+					fileV[i].clear();
+					fileV[i]=null;
+				}
+				fileV.length=0;
+				fileV=null;
+			}
+			zipfile_comment=null;
+		}
+		
+		/**
 		 * 
 		 * 解码（解压）zip 或 fla 或 swc 等文件
 		 * @param zipData 传入需要解压的ByteArray；
 		 * @param file_name_charset 文件名的编码方式，默认 "gb2312"（zip等），如果是 fla，可能需要传入 "utf-8"，swc 未知（可能是 "utf-8"）；
-		 * @param comment_charset 文件注释的编码方式，默认 "gb2312"。
+		 * @param comment_charset 文件注释的编码方式，默认 "gb2312"；
+		 * @param strict_mode 若 true，则以严格模式解码，稍不符合规范的 zip 文件（如普通的 fla 文件）将可能解码失败，默认 false。
 		 * 
 		 * .zip 文件应该都是 file_name_charset="gb2312"，所以 zip.decode(zipData) 即可；
 		 * .fla 文件应该都是 file_name_charset="utf-8"，所以 zip.decode(flaData,"utf-8") 即可，如果不需要获取和设置文件名，也可以 zip.decode(flaData)；
@@ -65,8 +83,9 @@ package zero.zip{
 		 */
 		public function decode(
 			zipData:ByteArray,
-			file_name_charset:String=null,
-			comment_charset:String=null
+			file_name_charset:String="gb2312",
+			comment_charset:String="gb2312",
+			strict_mode:Boolean=false
 		):void{
 			var scan_offset:int=zipData.length;
 			while(--scan_offset>0){
@@ -145,7 +164,11 @@ package zero.zip{
 										zipfile_comment_charset="gb2312";
 									}
 									
-									//if(offset_of_start_of_central_directory_with_respect_to_the_starting_disk_number+size_of_the_central_directory==scan_offset){
+									if(
+										!strict_mode
+										||
+										offset_of_start_of_central_directory_with_respect_to_the_starting_disk_number+size_of_the_central_directory==scan_offset
+									){
 										var offset:int=0;
 										var offset2:int=offset_of_start_of_central_directory_with_respect_to_the_starting_disk_number;
 										fileV=new Vector.<ZipFile>();
@@ -159,13 +182,20 @@ package zero.zip{
 												&&
 												zipData[offset2++]==0x02
 											){//central file header signature   4 bytes  (0x02014b50)
-												//trace("====================");
 												var file:ZipFile=new ZipFile();
 												file.file_name_charset=file_name_charset;
 												file.file_comment_charset=comment_charset;
 												offset2=file.initByCentralDirectoryData(zipData,offset2);
-												//trace("file.getName()="+file.getName());
-												//if(offset==file.relative_offset_of_local_header){
+												if(
+													!strict_mode
+													||
+													offset==file.relative_offset_of_local_header
+												){
+													if(strict_mode){
+													}else{
+														offset=file.relative_offset_of_local_header;
+													}
+													
 													if(
 														zipData[offset++]==0x50
 														&&
@@ -175,33 +205,36 @@ package zero.zip{
 														&&
 														zipData[offset++]==0x04
 													){//local file header signature     4 bytes  (0x04034b50)
-														offset=file.initByZipData(zipData,offset);
+														//trace("offset="+offset,"offset2="+offset2);
+														offset=file.initByZipData(zipData,offset,strict_mode);
+														//trace("file.name="+file.name);
 														fileV.push(file);
 													}else{
 														trace("local file header signature 异常");
 														break;
 													}
-												//}else{
-												//	trace("relative offset of local header 异常");
-												//	break;
-												//}
+												}else{
+													trace("relative offset of local header 异常");
+													break;
+												}
 											}else{
 												trace("central file header signature 异常");
 												break;
 											}
 										}
-										if(
-											//offset==offset_of_start_of_central_directory_with_respect_to_the_starting_disk_number
-											//&&
+										if((
+												!strict_mode
+												||
+												offset==offset_of_start_of_central_directory_with_respect_to_the_starting_disk_number
+											)&&
 											offset2==scan_offset
 										){
-											//trace("====================");
 											//trace("fileV="+fileV);
 											return;
 										}
 										trace("offset2="+offset2+"，scan_offset="+scan_offset+"，offset2!=scan_offset");
 										fileV=null;
-									//}else{
+									}//else{
 									//	trace("offset_of_start_of_central_directory_with_respect_to_the_starting_disk_number="+offset_of_start_of_central_directory_with_respect_to_the_starting_disk_number);
 									//	trace("size_of_the_central_directory="+size_of_the_central_directory);
 									//	trace("scan_offset="+scan_offset);
@@ -215,7 +248,10 @@ package zero.zip{
 				}
 			}
 			
-			throw new Error("解压 zip 失败");
+			if(strict_mode){
+				throw new Error("严格模式下解压 zip 失败");
+			}
+			throw new Error("非严格模式下解压 zip 失败");
 		}
 		
 		/**
@@ -307,8 +343,60 @@ package zero.zip{
 			
 		}
 		
+		public function getFileById(id:int):ZipFile{
+			return fileV[id];
+		}
+		
+		public function getFileByName(name:String):ZipFile{
+			for each(var file:ZipFile in fileV){
+				if(file.name==name){
+					return file;
+				}
+			}
+			return null;
+		}
+		public function removeFileByName(name:String):void{
+			for each(var file:ZipFile in fileV){
+				if(file.name==name){
+					removeFile(file);
+					return;
+				}
+			}
+		}
+		
+		/**
+		 * 
+		 * value 可以是 String，ByteArray，或 ZipFile
+		 * 
+		 */		
+		public function add(value:*,name:String=null,date:Date=null):void{
+			if(value is ZipFile){
+				var file:ZipFile=value;
+			}else{
+				file=new ZipFile();
+				if(value is String){
+					file.setText(value);
+				}else{
+					file.data=value;
+				}
+			}
+			if(name is String){
+				file.name=name;
+			}
+			if(date){
+				file.date=date;
+			}
+			addFile(file);
+		}
+		
 		public function addFile(file:ZipFile):void{
 			fileV.push(file);
+		}
+		public function removeFile(file:ZipFile):void{
+			var id:int=fileV.indexOf(file);
+			if(id>-1){
+				fileV.splice(id,1);
+			}
 		}
 	}
 }
