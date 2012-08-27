@@ -8,7 +8,7 @@ ZipFile
 
 package zero.zip{
 	import flash.utils.ByteArray;
-	import flash.utils.CompressionAlgorithm;
+	//import flash.utils.CompressionAlgorithm;
 	
 	import zero.BytesAndStr16;
 	import zero.codec.CRC32;
@@ -34,13 +34,13 @@ package zero.zip{
 		private var external_file_attributes:int;
 		internal var relative_offset_of_local_header:int;
 		private var file_name:ByteArray;
-		internal var file_name_charset:String;
+		private var file_name_charset:String;
 		private var extra_field1:ByteArray;
 		private var extra_field2:ByteArray;
 		private var file_data0:ByteArray;
 		private var file_data:ByteArray;
 		private var file_comment:ByteArray;
-		internal var file_comment_charset:String;
+		private var file_comment_charset:String;
 		
 		private var _08074b50:Boolean;//发现于 .swc 文件
 		
@@ -139,7 +139,8 @@ package zero.zip{
 				file_data.writeBytes(_data);
 				file_data0=new ByteArray();
 				file_data0.writeBytes(file_data);
-				file_data0.compress(CompressionAlgorithm.DEFLATE);//尝试压缩
+				//file_data0.compress(CompressionAlgorithm.DEFLATE);//尝试压缩
+				file_data0.deflate();
 				if(file_data0.length<file_data.length){//如果压缩后比原数据要小
 					compression_method=8;
 				}else{
@@ -181,15 +182,15 @@ package zero.zip{
 			}
 		}
 		
-		public function ZipFile(){
+		public function ZipFile(_file_name_charset:String="gb2312",_file_comment_charset:String="gb2312"){
 			version_made_by=0x0014;
 			version_needed_to_extract=0x0014;
 			general_purpose_bit_flag=0x0000;
 			disk_number_start=0;
 			internal_file_attributes=0x0000;
 			external_file_attributes=0x00000000;
-			file_name_charset="gb2312";
-			file_comment_charset="gb2312";
+			file_name_charset=_file_name_charset;
+			file_comment_charset=_file_comment_charset;
 			date=new Date();
 		}
 		
@@ -693,7 +694,8 @@ package zero.zip{
 					case 8:
 						file_data=new ByteArray();
 						file_data.writeBytes(file_data0);
-						file_data.uncompress(CompressionAlgorithm.DEFLATE);
+						//file_data.uncompress(CompressionAlgorithm.DEFLATE);
+						file_data.inflate();
 					break;
 					default:
 						throw new Error("暂不支持的压缩方式："+compression_method);

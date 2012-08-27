@@ -21,6 +21,7 @@ package zero{
 		public static const BMP:String="bmp";
 		public static const SWF:String="swf";
 		public static const MP3:String="mp3";
+		public static const MP4:String="mp4";
 		public static const FLV:String="flv";
 		public static const F4V:String="f4v";
 		public static const WAV:String="wav";
@@ -36,6 +37,7 @@ package zero{
 			_6787:SWF,
 			_7087:SWF,
 			_7368:MP3,
+			_0000:MP3,//- -
 			_255250:MP3,
 			_7076:FLV,
 			//????:F4V,
