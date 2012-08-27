@@ -19,23 +19,26 @@ package zero{
 				swfData,
 				77//Metadata
 			);
-			try{
-				metadataXML=new XML(metadataData.readUTFBytes(metadataData.length));
-			}catch(e:Error){
-				trace("XML格式不正确, e="+e);
-				metadataXML=null;
-			}
-			var metadataName:String=null;
-			try{
-				metadataName=metadataXML.name().toString();
-			}catch(e:Error){
-			}
-			if(metadataName){
-			}else{
-				trace("XML格式不正确");
-				metadataXML=null;
-			}
-			return;
+			if(metadataData){
+				try{
+					metadataXML=new XML(metadataData.readUTFBytes(metadataData.length));
+				}catch(e:Error){
+					trace("XML格式不正确, e="+e);
+					metadataXML=null;
+				}
+				var metadataName:String=null;
+				try{
+					metadataName=metadataXML.name().toString();
+				}catch(e:Error){
+				}
+				if(metadataName){
+				}else{
+					trace("XML格式不正确");
+					metadataXML=null;
+				}
+			}//else{
+			//	trace("获取 metadataData 失败");
+			//}
 		}
 		public static function getModifyDate(swfData:ByteArray=null):String{
 			if(swfData){

@@ -182,9 +182,7 @@ package zero.zip{
 												&&
 												zipData[offset2++]==0x02
 											){//central file header signature   4 bytes  (0x02014b50)
-												var file:ZipFile=new ZipFile();
-												file.file_name_charset=file_name_charset;
-												file.file_comment_charset=comment_charset;
+												var file:ZipFile=new ZipFile(file_name_charset,comment_charset);
 												offset2=file.initByCentralDirectoryData(zipData,offset2);
 												if(
 													!strict_mode
@@ -374,10 +372,13 @@ package zero.zip{
 				var file:ZipFile=value;
 			}else{
 				file=new ZipFile();
-				if(value is String){
-					file.setText(value);
+				if(name&&(name.lastIndexOf("/")==name.length-1)){
 				}else{
-					file.data=value;
+					if(value is String){
+						file.setText(value);
+					}else{
+						file.data=value;
+					}
 				}
 			}
 			if(name is String){

@@ -17,49 +17,54 @@ package zero{
 			41//ProductInfo
 		);
 		
-		var ProductID:uint=productInfoData[0]|(productInfoData[1]<<8)|(productInfoData[2]<<16)|(productInfoData[3]<<24);//UI32
-		
-		var Edition:uint=productInfoData[4]|(productInfoData[5]<<8)|(productInfoData[6]<<16)|(productInfoData[7]<<24);//UI32
-		
-		var MajorVersion:int=productInfoData[8];//UI8
-		
-		var MinorVersion:int=productInfoData[9];//UI8
-		
-		var BuildLow:uint=productInfoData[10]|(productInfoData[11]<<8)|(productInfoData[12]<<16)|(productInfoData[13]<<24);//UI32
-		
-		var BuildHigh:uint=productInfoData[14]|(productInfoData[15]<<8)|(productInfoData[16]<<16)|(productInfoData[17]<<24);//UI32
-		
-		var CompilationDate:Number=//UI64
-			(
-				productInfoData[18]|
-				(productInfoData[19]<<8)|
-				(productInfoData[20]<<16)
-			)
-			+productInfoData[21]*16777216
-			+productInfoData[22]*4294967296
-			+productInfoData[23]*1099511627776
-			+productInfoData[24]*281474976710656
-			+productInfoData[25]*72057594037927940;
-		
-		var date:Date=new Date(CompilationDate);
-		
-		return <ProductInfo
-			ProductID={productIDV[ProductID]}
-			Edition={editionV[Edition]}
-			MajorVersion={MajorVersion}
-			MinorVersion={MinorVersion}
-			BuildLow={BuildLow}
-			BuildHigh={BuildHigh}
-			CompilationDate={
-				date.fullYear+"年"+
-				(100+(date.month+1)).toString().substr(1)+"月"+
-				(date.date<10?("0"+date.date):date.date)+"日 "+
-				(date.hours<10?("0"+date.hours):date.hours)+":"+
-				(date.minutes<10?("0"+date.minutes):date.minutes)+":"+
-				(date.seconds<10?("0"+date.seconds):date.seconds)+"."+
-				date.milliseconds
-			}
-		/>;
+		if(productInfoData){
+			
+			var ProductID:uint=productInfoData[0]|(productInfoData[1]<<8)|(productInfoData[2]<<16)|(productInfoData[3]<<24);//UI32
+			
+			var Edition:uint=productInfoData[4]|(productInfoData[5]<<8)|(productInfoData[6]<<16)|(productInfoData[7]<<24);//UI32
+			
+			var MajorVersion:int=productInfoData[8];//UI8
+			
+			var MinorVersion:int=productInfoData[9];//UI8
+			
+			var BuildLow:uint=productInfoData[10]|(productInfoData[11]<<8)|(productInfoData[12]<<16)|(productInfoData[13]<<24);//UI32
+			
+			var BuildHigh:uint=productInfoData[14]|(productInfoData[15]<<8)|(productInfoData[16]<<16)|(productInfoData[17]<<24);//UI32
+			
+			var CompilationDate:Number=//UI64
+				(
+					productInfoData[18]|
+					(productInfoData[19]<<8)|
+					(productInfoData[20]<<16)
+				)
+				+productInfoData[21]*16777216
+				+productInfoData[22]*4294967296
+				+productInfoData[23]*1099511627776
+				+productInfoData[24]*281474976710656
+				+productInfoData[25]*72057594037927940;
+			
+			var date:Date=new Date(CompilationDate);
+			
+			return <ProductInfo
+				ProductID={productIDV[ProductID]}
+				Edition={editionV[Edition]}
+				MajorVersion={MajorVersion}
+				MinorVersion={MinorVersion}
+				BuildLow={BuildLow}
+				BuildHigh={BuildHigh}
+				CompilationDate={
+					date.fullYear+"年"+
+					(100+(date.month+1)).toString().substr(1)+"月"+
+					(date.date<10?("0"+date.date):date.date)+"日 "+
+					(date.hours<10?("0"+date.hours):date.hours)+":"+
+					(date.minutes<10?("0"+date.minutes):date.minutes)+":"+
+					(date.seconds<10?("0"+date.seconds):date.seconds)+"."+
+					date.milliseconds
+				}
+			/>;
+		}
+		//trace("获取 productInfoData 失败");
+		return null;
 	}
 }
 

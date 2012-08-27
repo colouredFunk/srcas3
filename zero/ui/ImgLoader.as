@@ -349,6 +349,7 @@ package zero.ui{
 				break;
 				case FileTypes.FLV:
 				case FileTypes.F4V:
+				case FileTypes.MP4:
 					connection=new NetConnection();
 					connection.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
 					connection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
@@ -402,6 +403,7 @@ package zero.ui{
 				break;
 				case FileTypes.FLV:
 				case FileTypes.F4V:
+				case FileTypes.MP4:
 					flvData=data;
 					connection=new NetConnection();
 					connection.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
@@ -495,7 +497,7 @@ package zero.ui{
 		}
 		
 		private function netStatusHandler(event:NetStatusEvent):void {
-			trace("event.info.code="+event.info.code);
+			//trace("event.info.code="+event.info.code);
 			switch (event.info.code) {
 				case "NetConnection.Connect.Success":
 					connectStream();
