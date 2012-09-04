@@ -180,10 +180,10 @@ package zero.ui{
 			if(iconArea){
 				switch(direction){
 					case "横向":
-						TweenMax.to(iconArea,0.3,{x:-currId*d});
+						TweenMax.to(iconArea,12,{x:-currId*d,useFrames:true});
 					break;
 					case "纵向":
-						TweenMax.to(iconArea,0.3,{y:-currId*d});
+						TweenMax.to(iconArea,12,{y:-currId*d,useFrames:true});
 					break;
 				}
 			}

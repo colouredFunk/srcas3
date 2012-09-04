@@ -39,7 +39,7 @@ package zero.ui{
 			TweenMax.to(_clip, 0, {tint: _color});
 		}
 
-		public var glowColor:uint = 0x00ff00;
+		public var glowColor:uint = 0xff0000;
 
 		public var barBottom:*;
 
@@ -205,6 +205,10 @@ package zero.ui{
 		}
 		
 		public function setSize(_w:uint, _h:uint):void {
+			if(bufferProgressClip){
+				bufferProgressClip.x=_w/2;
+				bufferProgressClip.y=_h/2;
+			}
 			group.setSize(_w, _h);
 		}
 
