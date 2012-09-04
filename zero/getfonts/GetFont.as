@@ -38,6 +38,8 @@ package zero.getfonts{
 			ascii:/[\x00-\x7f]/
 		}
 		
+		private static const deviceFontNameV:Vector.<String>=new <String>["_sans","SimSun"];
+		
 		public static const blockSize:int=0x80;
 		
 		//private static var requestNum:int;//总请求数
@@ -245,18 +247,22 @@ package zero.getfonts{
 				
 				if(textOrXML is XML){
 					initTxtObj.xml=textOrXML.copy();
-					if(initTxtObj.xml.@text.toString()=="${children()}"){
+					if(initTxtObj.xml.@text.toString()){
+					}else{
 						var old_prettyPrinting:Boolean=XML.prettyPrinting;
 						var old_prettyIndent:int=XML.prettyIndent;
-						initTxtObj.xml.@text=initTxtObj.xml.children().toXMLString().replace(/[\r\n]/g,"").replace(/<br\s*\/>/gi,"\n");
+						var text:String=initTxtObj.xml.children().toXMLString();
 						XML.prettyPrinting=old_prettyPrinting;
 						XML.prettyIndent=old_prettyIndent;
+						if(text){
+							initTxtObj.xml.@text=text.replace(/[\r\n]/g,"").replace(/<br\s*\/>/gi,"\n");
+						}
 					}
 				}else{
 					initTxtObj.xml=<txt text={textOrXML||""}/>;
 				}
 				
-				var text:String=initTxtObj.xml.@text.toString();
+				text=initTxtObj.xml.@text.toString();
 				if(initTxtObj.xml.@html.toString()=="true"){
 					htmlTxt.htmlText=text;//- -
 					text=htmlTxt.text;
@@ -267,7 +273,11 @@ package zero.getfonts{
 				
 				initTxtObj.onInitTxtComplete=onInitTxtComplete;
 				
-				if(canShowText(initTxtObj,initTxtObj.xml.@font.toString())){
+				if(
+					isDeviceFont(initTxtObj.xml.@font.toString()||initTxtObj.txt.defaultTextFormat.font)
+					||
+					canShowText(initTxtObj,initTxtObj.xml.@font.toString())
+				){
 					initTxtComplete(initTxtObj);
 					return;
 				}
@@ -298,6 +308,12 @@ package zero.getfonts{
 				
 			}
 			throw new Error("txt="+txt);
+		}
+		private static function isDeviceFont(fontName:String):Boolean{
+			if(fontName){
+				return deviceFontNameV.indexOf(fontName)>-1;
+			}
+			return true;
 		}
 		private static function checkInitTxtComplete(initTxtObj:InitTxtObj):Boolean{
 			var datas:Datas=datass[initTxtObj.fontName0];
@@ -467,7 +483,13 @@ package zero.getfonts{
 				}
 			}
 			currInitTxtObj.txt.defaultTextFormat=tf;
-			currInitTxtObj.txt.embedFonts=true;
+			
+			if(isDeviceFont(tf.font)){
+				currInitTxtObj.txt.embedFonts=false;
+			}else{
+				currInitTxtObj.txt.embedFonts=true;
+			}
+			
 			var text:String=currInitTxtObj.xml.@text.toString().replace(/\r\n/g,"\n");
 			if(currInitTxtObj.xml.@html.toString()=="true"){
 				var execResult:Array;
@@ -919,6 +941,10 @@ class Datas{
 	private function createGetFontComplete():void{
 		loadingDatas=null;
 		getFontV.push(notAvalibleGetFont);
+		//if(loadingCharCodeV){
+		//	trace("loadingCharCodeV.length="+loadingCharCodeV.length);//loadingCharCodeV.length=20
+		//}
+		loadingCharCodeV=null;//20120831
 		notAvalibleGetFont=null;
 		var _onCreateGetFontComplete:Function=onCreateGetFontComplete;
 		onCreateGetFontComplete=null;

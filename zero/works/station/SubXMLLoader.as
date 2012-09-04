@@ -6,7 +6,7 @@ SubXMLLoader
 用法举例：这家伙还是很懒什么都没写。
 */
 
-package zero.works{
+package zero.works.station{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.geom.*;
@@ -37,11 +37,15 @@ package zero.works{
 			subXMLLoader=null;
 			if(onLoadComplete==null){
 			}else{
-				onLoadComplete();
+				if(onLoadComplete.length==1){
+					onLoadComplete(xml);
+				}else{
+					onLoadComplete();
+				}
 				onLoadComplete=null;
 			}
 		}
-		private static function loadSubXMLComplete():void{
+		private static function loadSubXMLComplete(...args):void{
 			var subXML:XML=new XML(subXMLLoader.data);
 			for each(var navXML:XML in xml.nav){
 				if(navXML.@xml.toString()){
@@ -49,6 +53,7 @@ package zero.works{
 					for each(var attXML:XML in subXML.attributes()){
 						navXML["@"+attXML.name().toString()]=attXML.toString();
 					}
+					navXML.setChildren(subXML.children());
 					break;
 				}
 			}

@@ -567,7 +567,15 @@ package zero.ui{
 		}
 		private function loadVideoProgress(...args):void{
 			if(stream&&stream.bufferTime>0){
-				_loadProgress(stream.bufferLength/stream.bufferTime);
+				var percent:Number=stream.bufferLength/stream.bufferTime;
+				if(percent>0){
+					if(percent>1){
+						percent=1;
+					}
+				}else{
+					percent=0;
+				}
+				_loadProgress(percent);
 			}
 		}
 		
@@ -596,7 +604,7 @@ package zero.ui{
 			}
 			content.visible=true;
 			content.alpha=0;
-			TweenMax.to(content,0.4,{alpha:1,onComplete:onFadeComplete});
+			TweenMax.to(content,12,{alpha:1,onComplete:onFadeComplete,useFrames:true});
 		}
 		private function _loadProgress(percent:Number):void{
 			if(progressClip){

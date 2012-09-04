@@ -68,11 +68,18 @@ package zero.ui{
 		public var currImgXML:XML;
 		
 		private var selectedIconEnabled:Boolean;
+		
 		public var autoPlay:Boolean;//20120803
 		
-		public function ShowImages(_selectedIconEnabled:Boolean,mask_inflate_dx:int=4,mask_inflate_dy:int=4){
+		//20120901
+		private var showAsGrid:Boolean;
+		private var gridDY:int;
+		private var gridMode:int;
+		
+		public function ShowImages(_selectedIconEnabled:Boolean,mask_inflate_dx:int=4,mask_inflate_dy:int=4,_showAsGrid:Boolean=false){
 			
 			selectedIconEnabled=_selectedIconEnabled;
+			showAsGrid=_showAsGrid;
 			autoPlay=true;
 			
 			if(icons){
@@ -163,6 +170,16 @@ package zero.ui{
 			if(icons){
 				dx=icons.getChildAt(1).x-icons.getChildAt(0).x;
 				dy=icons.getChildAt(1).y-icons.getChildAt(0).y;
+				if(showAsGrid){
+					i=0;
+					while(++i<icons.numChildren){
+						gridDY=icons.getChildAt(i).y-icons.getChildAt(i-1).y;
+						if(gridDY*gridDY>dy*dy){
+							gridMode=i;
+							break;
+						}
+					}
+				}
 				
 				var b:Rectangle=icons.getBounds(icons);
 				//向外扩展几像素
@@ -292,6 +309,12 @@ package zero.ui{
 					icon["initXML"](imgXML,imgXML.@icon.toString()||imgXML.@src.toString(),clickIcon);
 					x+=dx;
 					y+=dy;
+					if(showAsGrid){
+						if((i+1)%gridMode==0){
+							x=0;
+							y+=gridDY;
+						}
+					}
 				}
 			}
 			
@@ -488,7 +511,11 @@ package zero.ui{
 		}
 		private function scroll():void{
 			if(iconArea){
-				TweenMax.to(iconArea,0.3,{x:-scrollId*dx,y:-scrollId*dy});
+				if(showAsGrid){
+					TweenMax.to(iconArea,12,{x:0,y:-Math.ceil(scrollId/gridMode)*gridDY,useFrames:true});
+				}else{
+					TweenMax.to(iconArea,12,{x:-scrollId*dx,y:-scrollId*dy,useFrames:true});
+				}
 			}
 			
 			updateBtns();
