@@ -16,15 +16,14 @@ package zero.works{
 	import flash.text.*;
 	import flash.utils.*;
 	
-	import riaidea.utils.zip.ZipArchive;
-	
 	import zero.*;
 	import zero.codec.*;
+	import zero.zip.Zip;
 	
 	public class Movie2Imgs extends MovieClip{
 		
 		private var dataBySizeArr:Array;//用于比较相同的图片
-		private var zipArchive:ZipArchive;
+		private var zip:Zip;
 		private var frame:int;
 		private var startFrame:int;
 		private var endFrame:int;
@@ -56,7 +55,7 @@ package zero.works{
 			this.removeEventListener(Event.ENTER_FRAME,init);
 			
 			dataBySizeArr=new Array();
-			zipArchive=new ZipArchive();
+			zip=new Zip();
 			
 			startFrame=1;
 			endFrame=this.totalFrames;
@@ -71,7 +70,7 @@ package zero.works{
 		private function enterFrame(event:Event):void{
 			if(++frame>endFrame){
 				this.removeEventListener(Event.ENTER_FRAME,enterFrame);
-				new FileReference().save(zipArchive.output(),decodeURI(this.loaderInfo.url).split("/").pop().split(".")[0]+".zip");
+				new FileReference().save(zip.encode(),decodeURI(this.loaderInfo.url).split("/").pop().split(".")[0]+".zip");
 				//for each(var subArr:Array in dataBySizeArr){
 				//	trace(dataBySizeArr.indexOf(subArr),"frames="+subArr);
 				//}
@@ -133,7 +132,10 @@ package zero.works{
 				dataBySizeArr[imgData.length]=new Array();
 			}
 			dataBySizeArr[imgData.length].push(frame);
-			zipArchive.addFileFromBytes(decodeURI(this.loaderInfo.url).split("/").pop().split(".")[0]+"/"+decodeURI(this.loaderInfo.url).split("/").pop().split(".")[0]+(10000+frame).toString().substr(1)+"."+FileTypes.getType(imgData),imgData);
+			zip.add(
+				imgData,
+				decodeURI(this.loaderInfo.url).split("/").pop().split(".")[0]+"/"+decodeURI(this.loaderInfo.url).split("/").pop().split(".")[0]+(10000+frame).toString().substr(1)+"."+FileTypes.getType(imgData)
+			);
 		}
 	}
 }

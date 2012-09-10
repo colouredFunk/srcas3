@@ -27,7 +27,7 @@ package zero.works.station{
 		
 		private var xmlLoader:URLLoader;
 		
-		private var bg:ImgLoader;
+		protected var bg:ImgLoader;
 		private var char:ImgLoader;
 		
 		private var onFadeInComplete:Function;
@@ -36,6 +36,7 @@ package zero.works.station{
 		public var appArea:Sprite;
 		
 		public function BasePage(){
+			this.visible=false;
 			var i:int=this.numChildren;
 			while(--i>=0){
 				var child:DisplayObject=this.getChildAt(i);
@@ -97,6 +98,7 @@ package zero.works.station{
 			}
 		}
 		public function fadeIn(_onFadeInComplete:Function):void{
+			this.visible=true;
 			onFadeInComplete=_onFadeInComplete;
 			var bgXML:XML=xml.bg[0];
 			if(bgXML){
@@ -104,6 +106,7 @@ package zero.works.station{
 				bg.onFadeComplete=fadeInComplete;
 				bg.load(bgXML);
 			}else{
+				this.alpha=0;
 				TweenMax.to(this,12,{alpha:1,onComplete:fadeInComplete,useFrames:true});
 			}
 		}

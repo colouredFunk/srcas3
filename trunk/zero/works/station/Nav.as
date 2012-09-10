@@ -45,24 +45,38 @@ package zero.works.station{
 					btnNavV.push(btnNav);
 				}
 			}
-			var dx:int=btnNavV[1].x-btnNavV[0].x;
-			var dy:int=btnNavV[1].y-btnNavV[0].y;
 			
+			if(btnNavV.length==2){
+				var autoAdjustXY:Boolean=true;
+				var dx:int=btnNavV[1].x-btnNavV[0].x;
+				var dy:int=btnNavV[1].y-btnNavV[0].y;
+			}else{
+				autoAdjustXY=false;
+			}
+			
+			if(autoAdjustXY){
+				var x:int=btnNavV[0].x;
+				var y:int=btnNavV[0].y;
+			}
 			i=-1;
-			var x:int=btnNavV[0].x;
-			var y:int=btnNavV[0].y;
-			var b:Rectangle=btnNavV[0].getBounds(clip);
+			if(clip.bg){
+				var b:Rectangle=btnNavV[0].getBounds(clip);
+			}
 			for each(var navXML:XML in xml.nav){
 				i++;
-				if(i<2){
+				if(i<btnNavV.length){
 					btnNav=btnNavV[i];
 				}else{
 					btnNavV[i]=btnNav=new BtnNav();
 					clip.addChild(btnNav);
 				}
-				btnNav.x=x;
-				btnNav.y=y;
-				b=b.union(btnNav.getBounds(clip));
+				if(autoAdjustXY){
+					btnNav.x=x;
+					btnNav.y=y;
+				}
+				if(clip.bg){
+					b=b.union(btnNav.getBounds(clip));
+				}
 				if(btnNav.label&&navXML.label[0]){
 					GetFont.initTxt(btnNav.label["txt"],navXML.label[0]);
 					if(btnNav.label2){
@@ -75,8 +89,10 @@ package zero.works.station{
 						GetFont.initTxt(btnNav.enLabel2["txt"],navXML.enLabel[0]);
 					}
 				}
-				x+=dx;
-				y+=dy;
+				if(autoAdjustXY){
+					x+=dx;
+					y+=dy;
+				}
 				if(navXML.@href.toString()||navXML.@js.toString()){
 					btnNav.href=navXML;
 				}else{
@@ -88,6 +104,9 @@ package zero.works.station{
 			}
 			if(btnNav.line){
 				btnNav.line.visible=false;
+			}
+			while(++i<btnNavV.length){
+				btnNavV[i].visible=false;
 			}
 			
 			btnNav=btnNavV[getSelectedId()];
@@ -106,6 +125,17 @@ package zero.works.station{
 				}
 			}
 			
+			if(clip.btnPrev&&clip.btnNext){
+				btnNav=btnNavV[0];
+				dx=btnNav.x-clip.btnPrev.x;
+				dy=btnNav.y-clip.btnPrev.y;
+				btnNav=btnNavV[btnNavV.length-1];
+				clip.btnNext.x=btnNav.x+dx;
+				clip.btnNext.y=btnNav.y+dy;
+				clip.btnPrev.release=prev;
+				clip.btnNext.release=next;
+			}
+			
 			if(clip.bg){
 				var d:int=20;
 				clip.bg.x=b.x-d;
@@ -115,6 +145,31 @@ package zero.works.station{
 			}
 			
 			clip.mouseEnabled=false;
+		}
+		private function prev():void{
+			select(xml.nav[getSelectedId()-1]);
+		}
+		private function next():void{
+			select(xml.nav[getSelectedId()+1]);
+		}
+		private function updateBtns():void{
+			if(clip.btnPrev&&clip.btnNext){
+				var currId:int=getSelectedId();
+				if(currId>0){
+					clip.btnPrev.mouseEnabled=true;
+					clip.btnPrev.alpha=1;
+				}else{
+					clip.btnPrev.mouseEnabled=false;
+					clip.btnPrev.alpha=0.5;
+				}
+				if(currId<btnNavV.length-1){
+					clip.btnNext.mouseEnabled=true;
+					clip.btnNext.alpha=1;
+				}else{
+					clip.btnNext.mouseEnabled=false;
+					clip.btnNext.alpha=0.5;
+				}
+			}
 		}
 		private function click(event:MouseEvent):void{
 			var btnNav:BtnNav=event.target as BtnNav;
@@ -157,6 +212,7 @@ package zero.works.station{
 					}
 				}
 			}
+			updateBtns();
 		}
 		private function getSelectedId():int{
 			var i:int=-1;
