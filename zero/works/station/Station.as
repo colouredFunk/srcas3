@@ -46,6 +46,9 @@ package zero.works.station{
 		private var prevloader:MultiLoader;
 		private var prevloadPercent:Number;
 		
+		private var nav_layoutXML:XML;
+		private var switch_layoutXML:XML;
+		
 		public function Station(_optionsXMLPath:String,switchClass:Class){
 			optionsXMLPath=_optionsXMLPath;
 			_switch=new switchClass();
@@ -95,6 +98,17 @@ package zero.works.station{
 			nav.init(main.nav,optionsXML);
 			nav.clip.mouseChildren=true;
 			nav.clip.visible=false;
+			nav_layoutXML=optionsXML.nav_layout[0];
+			if(nav_layoutXML){
+			}else{
+				nav_layoutXML=getLayout(nav.clip,null,"center");
+			}
+			switch_layoutXML=optionsXML.switch_layout[0];
+			if(switch_layoutXML){
+			}else{
+				switch_layoutXML=getLayout(_switch,null,"center middle");
+			}
+			
 			main.mouseEnabled=false;
 			main.container.mouseChildren=true;
 			if(main.btnSkip){
@@ -182,6 +196,7 @@ package zero.works.station{
 				prevloader.onLoadProgress=prevloadProgress;
 				prevloader.onLoadComplete=prevloadComplete;
 				prevloader.load(nodeXMLList,MultiLoader.BINARY);
+				main.loading.show();
 				resize();
 			}else{
 				prevloadPercent=0;
@@ -192,6 +207,10 @@ package zero.works.station{
 			main.loading.value=value*prevloadPercent;
 		}
 		private function prevloadComplete(...args):void{
+			
+			prevloader.clear();
+			prevloader=null;
+			
 			var kaitouXML:XML=optionsXML.kaitou[0];
 			if(kaitouXML){
 				if(kaitouXML.@skip.toString()=="true"){
@@ -246,10 +265,7 @@ package zero.works.station{
 				kaitouLoader.pause();
 			}
 			
-			nav.clip.visible=true;
-			TweenMax.killTweensOf(nav.clip);
-			nav.clip.alpha=1;
-			TweenMax.from(nav.clip,12,{alpha:0,useFrames:true});
+			showNav();
 			
 			if(main.subLoading){
 				stopAll(main.loading);
@@ -265,6 +281,35 @@ package zero.works.station{
 			main.container.addChild(_switch);
 			_switch.init(optionsXML.nav,optionsXML.@simulateDownload.toString()=="true",loadPage,loadPageProgress,loadPageComplete,showingPage,pageFadeInComplete,pageFadeOutComplete);
 			
+			var prevloadsXML:XML=<prevloads/>;
+			for each(var matchStr:String in optionsXML.toXMLString().match(/<[^<>]+\s+src=".*?"[^<>]+>/g)){
+				try{
+					var srcXML:XML=new XML(matchStr);
+					if(srcXML.name().toString()){
+					}else{
+						srcXML=null;
+					}
+				}catch(e:Error){
+					srcXML=null;
+				}
+				if(srcXML&&srcXML.@innerprevload.toString()=="true"){
+					prevloadsXML.appendChild(<node src={srcXML.@src.toString()}/>);
+				}
+			}
+			var nodeXMLList:XMLList=prevloadsXML.children();
+			if(nodeXMLList.length()){
+				trace("内页预加载："+nodeXMLList.toXMLString());
+				prevloader=new MultiLoader();
+				//prevloader.onLoadProgress=innerprevloadProgress;
+				//prevloader.onLoadComplete=innerPrevloadComplete;
+				prevloader.load(nodeXMLList,MultiLoader.BINARY);
+			}
+		}
+		protected function showNav():void{
+			nav.clip.visible=true;
+			TweenMax.killTweensOf(nav.clip);
+			nav.clip.alpha=1;
+			TweenMax.from(nav.clip,12,{alpha:0,useFrames:true});
 		}
 		
 		private function back():void{
@@ -302,7 +347,7 @@ package zero.works.station{
 			main.loading.hide();
 			resize();
 		}
-		private function showingPage():void{
+		protected function showingPage():void{
 			nav.clip.mouseChildren=false;
 		}
 		private function pageFadeInComplete():void{
@@ -336,12 +381,14 @@ package zero.works.station{
 			
 		}
 		
-		private function getLayout(sp:Sprite,xml:XML,align:String="auto"):void{
-			var layoutXML:XML=xml.layout[0];
+		private function getLayout(sp:Sprite,xml:XML,align:String="auto"):XML{
+			var layoutXML:XML=xml?xml.layout[0]:null;
 			if(layoutXML){
 			}else{
 				layoutXML=<layout/>;
-				xml.appendChild(layoutXML);
+				if(xml){
+					xml.appendChild(layoutXML);
+				}
 				
 				if(align=="auto"){
 					
@@ -380,6 +427,7 @@ package zero.works.station{
 					}
 				}
 			}
+			return layoutXML;
 		}
 		private function updateSpByLayout(sp:Sprite,layoutXML:XML):void{
 			if(layoutXML.@horizontalCenter.toString()){
@@ -396,6 +444,13 @@ package zero.works.station{
 			}else if(layoutXML.@bottom.toString()){
 				sp.y=stage.stageHeight-int(layoutXML.@bottom.toString());
 			}
+			
+			if(layoutXML.@min_x.toString()){
+				var min_x:int=int(layoutXML.@min_x.toString());
+				if(sp.x<min_x){
+					sp.x=min_x;
+				}
+			}
 		}
 		protected function resize(...args):void{
 			
@@ -408,8 +463,7 @@ package zero.works.station{
 			
 			if(main){
 				
-				nav.clip.x=-(1920-stage.stageWidth)/2;
-				//nav.clip.y=-(854-stage.stageHeight)/2;
+				updateSpByLayout(nav.clip,nav_layoutXML);
 				
 				var btnBackXML:XML=optionsXML.btnBack[0];
 				if(btnBackXML){
@@ -477,8 +531,7 @@ package zero.works.station{
 				}
 				
 				if(_switch){
-					_switch.x=-(1920-stage.stageWidth)/2;
-					_switch.y=-(854-stage.stageHeight)/2;
+					updateSpByLayout(_switch,switch_layoutXML);
 					if(
 						_switch.currLoader
 						&&
