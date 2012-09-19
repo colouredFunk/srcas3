@@ -85,8 +85,8 @@ package zero.works{
 			}
 			
 			//1
-			var imgData:ByteArray=PNGEncoder.encode(bmd);
-			//var imgData:ByteArray=JPEGEncoder.encode(bmd);
+			//var imgData:ByteArray=PNGEncoder.encode(bmd);
+			var imgData:ByteArray=JPEGEncoder.encode(bmd);
 			
 			/*
 			//2 透明 png

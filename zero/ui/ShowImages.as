@@ -64,6 +64,7 @@ package zero.ui{
 		
 		public var onClickIcon:Function;
 		public var onClickImg:Function;
+		public var onSelectImgXML:Function;
 		
 		public var currImgXML:XML;
 		
@@ -76,10 +77,14 @@ package zero.ui{
 		private var gridDY:int;
 		private var gridMode:int;
 		
-		public function ShowImages(_selectedIconEnabled:Boolean,mask_inflate_dx:int=4,mask_inflate_dy:int=4,_showAsGrid:Boolean=false){
+		//20120914
+		private var selected:Boolean;
+		
+		public function ShowImages(_selectedIconEnabled:Boolean,mask_inflate_dx:int=4,mask_inflate_dy:int=4,_showAsGrid:Boolean=false,_selected:Boolean=true){
 			
 			selectedIconEnabled=_selectedIconEnabled;
 			showAsGrid=_showAsGrid;
+			selected=_selected;
 			autoPlay=true;
 			
 			if(icons){
@@ -168,8 +173,13 @@ package zero.ui{
 		public function initIcons(_icons:Sprite,mask_inflate_dx:int,mask_inflate_dy:int):void{
 			icons=_icons;
 			if(icons){
-				dx=icons.getChildAt(1).x-icons.getChildAt(0).x;
-				dy=icons.getChildAt(1).y-icons.getChildAt(0).y;
+				if(icons.numChildren>1){
+					dx=icons.getChildAt(1).x-icons.getChildAt(0).x;
+					dy=icons.getChildAt(1).y-icons.getChildAt(0).y;
+				}else{
+					dx=icons.getChildAt(0).width;
+					dy=0;
+				}
 				if(showAsGrid){
 					i=0;
 					while(++i<icons.numChildren){
@@ -254,6 +264,7 @@ package zero.ui{
 			
 			onClickIcon=null;
 			onClickImg=null;
+			onSelectImgXML=null;
 			
 			currImgXML=null;
 		}
@@ -361,16 +372,20 @@ package zero.ui{
 				i++;
 				var _icon:Btn=iconArea.getChildAt(i) as Btn;
 				if(icon==_icon){
-					icon.selected=true;
-					if(selectedIconEnabled){
-					}else{
-						icon.mouseEnabled=false;
+					if(selected){
+						icon.selected=true;
+						if(selectedIconEnabled){
+						}else{
+							icon.mouseEnabled=false;
+						}
 					}
 				}else{
-					_icon.selected=false;
-					if(selectedIconEnabled){
-					}else{
-						_icon.mouseEnabled=true;
+					if(selected){
+						_icon.selected=false;
+						if(selectedIconEnabled){
+						}else{
+							_icon.mouseEnabled=true;
+						}
 					}
 				}
 			}
@@ -449,6 +464,11 @@ package zero.ui{
 			}
 			
 			updateBtns();
+			
+			if(onSelectImgXML==null){
+			}else{
+				onSelectImgXML();
+			}
 		}
 		
 		private function updateBtns():void{
@@ -457,7 +477,7 @@ package zero.ui{
 					btnScrollPrev.alpha=1;
 					btnScrollPrev.mouseEnabled=true;
 				}else{
-					btnScrollPrev.alpha=0.5;
+					btnScrollPrev.alpha=0.3;
 					btnScrollPrev.mouseEnabled=false;
 				}
 			}
@@ -466,7 +486,7 @@ package zero.ui{
 					btnScrollNext.alpha=1;
 					btnScrollNext.mouseEnabled=true;
 				}else{
-					btnScrollNext.alpha=0.5;
+					btnScrollNext.alpha=0.3;
 					btnScrollNext.mouseEnabled=false;
 				}
 			}
@@ -476,7 +496,7 @@ package zero.ui{
 					btnPrev.alpha=1;
 					btnPrev.mouseEnabled=true;
 				}else{
-					btnPrev.alpha=0.5;
+					btnPrev.alpha=0.3;
 					btnPrev.mouseEnabled=false;
 				}
 			}
@@ -485,7 +505,7 @@ package zero.ui{
 					btnNext.alpha=1;
 					btnNext.mouseEnabled=true;
 				}else{
-					btnNext.alpha=0.5;
+					btnNext.alpha=0.3;
 					btnNext.mouseEnabled=false;
 				}
 			}

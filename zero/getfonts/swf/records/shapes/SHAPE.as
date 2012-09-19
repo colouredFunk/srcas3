@@ -21,7 +21,7 @@ package zero.getfonts.swf.records.shapes{
 	public class SHAPE{
 		public var ShapeRecordV:Vector.<SHAPERECORD>;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
 			
 			var i:int;
 			
@@ -307,7 +307,7 @@ package zero.getfonts.swf.records.shapes{
 			}
 			return offset-int(4-bGroupBitsOffset/8);
 		}
-		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toData(_toDataOptions:Object):ByteArray{
 			var data:ByteArray=new ByteArray();
 			
 			var currNumFillBits:int;

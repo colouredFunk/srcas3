@@ -22,7 +22,7 @@ package zero.getfonts.swf.records.shapes{
 		public var Width:int;							//UI16
 		public var Color:uint;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
 			Width=data[offset++]|(data[offset++]<<8);
 			if(_initByDataOptions&&_initByDataOptions.ColorUseRGBA){//20110813
 				Color=(data[offset++]<<16)|(data[offset++]<<8)|data[offset++]|(data[offset++]<<24);
@@ -31,7 +31,7 @@ package zero.getfonts.swf.records.shapes{
 			}
 			return offset;
 		}
-		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toData(_toDataOptions:Object):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=Width;
 			data[1]=Width>>8;

@@ -11,19 +11,19 @@ package zero.getfonts.swf{
 	
 	import flash.utils.ByteArray;
 	
-	public class BytesData{//implements I_zero_swf_CheckCodesRight{
+	public class BytesData{
 		public var ownData:ByteArray;
 		public var dataOffset:int;
 		public var dataLength:int;
 		public function BytesData(){
 		}
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
 			ownData=data;
 			dataOffset=offset;
 			dataLength=endOffset-offset;
 			return endOffset;
 		}
-		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toData(_toDataOptions:Object):ByteArray{
 			var data:ByteArray=new ByteArray();
 			if(dataLength>0){
 				data.writeBytes(ownData,dataOffset,dataLength);

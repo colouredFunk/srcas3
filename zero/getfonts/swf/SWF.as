@@ -213,7 +213,7 @@ package zero.getfonts.swf{
 			return offset;
 		}
 		
-		public function initBySWFData_start(swfData:ByteArray,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):Object/*zero_swf_InitByDataOptions*/{
+		public function initBySWFData_start(swfData:ByteArray,_initByDataOptions:Object):Object{
 			//~~~~~
 			var data:ByteArray=swfData2Data(swfData);
 			var offset:int=initInfoByData(data);
@@ -228,13 +228,13 @@ package zero.getfonts.swf{
 			///
 			if(_initByDataOptions){
 			}else{
-				_initByDataOptions=new Object/*zero_swf_InitByDataOptions*/();
+				_initByDataOptions=new Object();
 			}
 			_initByDataOptions.swf_Version=Version;
 			
 			return _initByDataOptions;
 		}
-		public function initBySWFData(swfData:ByteArray,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):void{
+		public function initBySWFData(swfData:ByteArray,_initByDataOptions:Object):void{
 			_initByDataOptions=initBySWFData_start(swfData,_initByDataOptions);
 			
 			//@@@@@
@@ -252,7 +252,7 @@ package zero.getfonts.swf{
 			//$$$$$
 		}
 		
-		public function infoToData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function infoToData(_toDataOptions:Object):ByteArray{
 			var data:ByteArray=new ByteArray();
 			
 			var Xmin:int=x*20;
@@ -308,7 +308,7 @@ package zero.getfonts.swf{
 			return data;
 		}
 		
-		public function toSWFData_start(_toDataOptions:Object/*zero_swf_ToDataOptions*/):Object/*zero_swf_ToDataOptions*/{
+		public function toSWFData_start(_toDataOptions:Object):Object{
 			//#####
 			if(_toDataOptions&&_toDataOptions.FrameCount>0){//20111205
 				FrameCount=_toDataOptions.FrameCount;
@@ -320,13 +320,13 @@ package zero.getfonts.swf{
 			///
 			if(_toDataOptions){
 			}else{
-				_toDataOptions=new Object/*zero_swf_ToDataOptions*/();
+				_toDataOptions=new Object();
 			}
 			_toDataOptions.swf_Version=Version;
 			
 			return _toDataOptions;
 		}
-		public function toSWFData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toSWFData(_toDataOptions:Object):ByteArray{
 			_toDataOptions=toSWFData_start(_toDataOptions);
 			
 			//临时变量
@@ -347,7 +347,7 @@ package zero.getfonts.swf{
 			
 			return toSWFData_end(tagsData,_toDataOptions);
 		}
-		public function toSWFData_end(tagsData:ByteArray,_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toSWFData_end(tagsData:ByteArray,_toDataOptions:Object):ByteArray{
 			//~~~~~
 			var data:ByteArray=infoToData(_toDataOptions);
 			

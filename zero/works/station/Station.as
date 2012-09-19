@@ -178,7 +178,7 @@ package zero.works.station{
 			}
 			var nodeXMLList:XMLList=prevloadsXML.children();
 			if(nodeXMLList.length()){
-				trace("预加载："+nodeXMLList.toXMLString());
+				//trace("预加载："+nodeXMLList.toXMLString());
 				if(optionsXML.@prevloadPercent.toString()){
 					prevloadPercent=Number(optionsXML.@prevloadPercent.toString());
 				}else{
@@ -298,7 +298,7 @@ package zero.works.station{
 			}
 			var nodeXMLList:XMLList=prevloadsXML.children();
 			if(nodeXMLList.length()){
-				trace("内页预加载："+nodeXMLList.toXMLString());
+				//trace("内页预加载："+nodeXMLList.toXMLString());
 				prevloader=new MultiLoader();
 				//prevloader.onLoadProgress=innerprevloadProgress;
 				//prevloader.onLoadComplete=innerPrevloadComplete;
@@ -445,6 +445,12 @@ package zero.works.station{
 				sp.y=stage.stageHeight-int(layoutXML.@bottom.toString());
 			}
 			
+			if(layoutXML.@max_x.toString()){
+				var max_x:int=int(layoutXML.@max_x.toString());
+				if(sp.x>max_x){
+					sp.x=max_x;
+				}
+			}
 			if(layoutXML.@min_x.toString()){
 				var min_x:int=int(layoutXML.@min_x.toString());
 				if(sp.x<min_x){

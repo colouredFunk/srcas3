@@ -20,7 +20,7 @@ MATRIX
 //TranslateY 		SB[NTranslateBits] 					y translate value in twips
 package zero.getfonts.swf.records{
 	import flash.utils.ByteArray;
-	public class MATRIX{//implements I_zero_swf_CheckCodesRight{
+	public class MATRIX{
 		public var HasScale:Boolean;
 		public var ScaleX:int;
 		public var ScaleY:int;
@@ -30,7 +30,7 @@ package zero.getfonts.swf.records{
 		public var TranslateX:int;
 		public var TranslateY:int;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
 			var bGroupValue:int=(data[offset++]<<24)|(data[offset++]<<16)|(data[offset++]<<8)|data[offset++];
 			HasScale=((bGroupValue&0x80000000)?true:false);						//10000000 00000000 00000000 00000000
 			
@@ -126,7 +126,7 @@ package zero.getfonts.swf.records{
 			
 			return offset-int(4-bGroupBitsOffset/8);
 		}
-		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toData(_toDataOptions:Object):ByteArray{
 			var data:ByteArray=new ByteArray();
 			var bGroupValue:int=0;
 			var offset:int=0;

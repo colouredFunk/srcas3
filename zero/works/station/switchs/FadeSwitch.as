@@ -16,6 +16,7 @@ package zero.works.station.switchs{
 	import flash.utils.*;
 	
 	import zero.utils.killAllTweens;
+	import zero.utils.removeAll;
 	import zero.utils.stopAll;
 	
 	/**
@@ -90,12 +91,13 @@ package zero.works.station.switchs{
 			var i:int=bottomContainer.numChildren;
 			while(--i>=0){
 				oldPage=(bottomContainer.getChildAt(i) as Loader).content;
+				if(oldPage.hasOwnProperty("clear")){
+					oldPage["clear"]();
+				}
 				if(oldPage is DisplayObjectContainer){
 					killAllTweens(oldPage as DisplayObjectContainer);
 					stopAll(oldPage as DisplayObjectContainer);
-				}
-				if(oldPage.hasOwnProperty("clear")){
-					oldPage["clear"]();
+					removeAll(oldPage as DisplayObjectContainer);
 				}
 				bottomContainer.removeChildAt(i);
 			}

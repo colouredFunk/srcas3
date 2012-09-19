@@ -142,11 +142,12 @@ package zero.works.station{
 			}
 		}
 		
+		protected var isPause:Boolean;
 		public function pause():void{
-			
+			isPause=true;
 		}
 		public function resume():void{
-			
+			isPause=false;
 		}
 		
 		public function clear():void{

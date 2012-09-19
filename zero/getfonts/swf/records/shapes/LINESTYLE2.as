@@ -63,7 +63,7 @@ package zero.getfonts.swf.records.shapes{
 		public var Color:uint;							//RGBA
 		public var FillType:FILLSTYLE;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
 			Width=data[offset++]|(data[offset++]<<8);
 			var flags:int=data[offset++];
 			StartCapStyle=(flags<<24)>>>30;					//11000000
@@ -89,7 +89,7 @@ package zero.getfonts.swf.records.shapes{
 			
 			return offset;
 		}
-		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toData(_toDataOptions:Object):ByteArray{
 			var data:ByteArray=new ByteArray();
 			
 			data[0]=Width;

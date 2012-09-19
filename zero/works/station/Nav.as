@@ -127,10 +127,8 @@ package zero.works.station{
 			
 			if(clip.btnPrev&&clip.btnNext){
 				btnNav=btnNavV[0];
-				dx=btnNav.x-clip.btnPrev.x;
 				dy=btnNav.y-clip.btnPrev.y;
 				btnNav=btnNavV[btnNavV.length-1];
-				clip.btnNext.x=btnNav.x+dx;
 				clip.btnNext.y=btnNav.y+dy;
 				clip.btnPrev.release=prev;
 				clip.btnNext.release=next;
