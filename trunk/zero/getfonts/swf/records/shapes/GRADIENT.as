@@ -38,7 +38,7 @@ package zero.getfonts.swf.records.shapes{
 		public var RatioV:Vector.<int>;
 		public var ColorV:Vector.<uint>;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
 			var flags:int=data[offset++];
 			SpreadMode=(flags<<24)>>>30;				//11000000
 			InterpolationMode=(flags<<26)>>>30;			//00110000
@@ -55,7 +55,7 @@ package zero.getfonts.swf.records.shapes{
 			}
 			return offset;
 		}
-		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toData(_toDataOptions:Object):ByteArray{
 			var data:ByteArray=new ByteArray();
 			var flags:int=0;
 			flags|=SpreadMode<<6;						//11000000

@@ -14,13 +14,13 @@ RECT
 //Ymax 			SB[Nbits] 	y maximum position for rectangle in twips
 package zero.getfonts.swf.records{
 	import flash.utils.ByteArray;
-	public class RECT{//implements I_zero_swf_CheckCodesRight{
+	public class RECT{
 		public var Xmin:int;
 		public var Xmax:int;
 		public var Ymin:int;
 		public var Ymax:int;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
 			var bGroupValue:int=(data[offset++]<<24)|(data[offset++]<<16)|(data[offset++]<<8)|data[offset++];
 			var Nbits:int=bGroupValue>>>27;							//11111000 00000000 00000000 00000000
 			var bGroupBitsOffset:int=5;
@@ -59,7 +59,7 @@ package zero.getfonts.swf.records{
 			
 			return offset-int(4-bGroupBitsOffset/8);
 		}
-		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toData(_toDataOptions:Object):ByteArray{
 			var data:ByteArray=new ByteArray();
 			var bGroupValue:int=0;
 			var offset:int=0;

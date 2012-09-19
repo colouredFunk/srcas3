@@ -41,7 +41,7 @@ package zero.getfonts.swf.records.shapes{
 		public var BitmapId:int;
 		public var BitmapMatrix:MATRIX;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
 			FillStyleType=data[offset++];
 			switch(FillStyleType){
 				case 0x00:
@@ -78,7 +78,7 @@ package zero.getfonts.swf.records.shapes{
 			}
 			return offset;
 		}
-		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toData(_toDataOptions:Object):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data[0]=FillStyleType;
 			switch(FillStyleType){

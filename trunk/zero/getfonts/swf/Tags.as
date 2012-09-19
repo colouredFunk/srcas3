@@ -73,7 +73,7 @@ package zero.getfonts.swf{
 			tagId:int,
 			tagCount:int,
 			timeLimit:int,//20110606 主要用于 DefineSprite 和 SWF 中减少瞬时调用 initByData_step 的次数，以提高运行速度，对 SWFProgresser 基本不影响
-			_initByDataOptions:Object/*zero_swf_InitByDataOptions*/
+			_initByDataOptions:Object
 		):int{
 			if(_initByDataOptions&&_initByDataOptions.optionV){
 			}else{
@@ -119,7 +119,7 @@ package zero.getfonts.swf{
 			tagId:int,
 			tagCount:int,
 			timeLimit:int,//20110606 主要用于 DefineSprite 和 SWF 中减少瞬时调用 initByData_step 的次数，以提高运行速度，对 SWFProgresser 基本不影响
-			_toDataOptions:Object/*zero_swf_ToDataOptions*/
+			_toDataOptions:Object
 		):int{
 			var t:int=getTimer();
 			while(getTimer()-t<timeLimit){

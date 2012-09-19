@@ -132,7 +132,7 @@ package zero.getfonts.swf.avm2{
 	
 	import zero.output;
 	import zero.getfonts.swf.BytesData;
-	public class ABCFileWithSimpleConstant_pool{//implements I_zero_swf_CheckCodesRight{
+	public class ABCFileWithSimpleConstant_pool{
 		public var minor_version:int;					//UI16
 		public var major_version:int;					//UI16
 		public var integerV:Vector.<int>;
@@ -147,7 +147,7 @@ package zero.getfonts.swf.avm2{
 		
 		public var restData:BytesData;
 		//
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
 			data.endian=Endian.LITTLE_ENDIAN;
 			minor_version=data[offset++]|(data[offset++]<<8);
 			major_version=data[offset++]|(data[offset++]<<8);
@@ -297,7 +297,7 @@ package zero.getfonts.swf.avm2{
 			restData=new BytesData();
 			return restData.initByData(data,offset,endOffset,_initByDataOptions);
 		}
-		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toData(_toDataOptions:Object):ByteArray{
 			var data:ByteArray=new ByteArray();
 			data.endian=Endian.LITTLE_ENDIAN;
 			data[0]=minor_version;

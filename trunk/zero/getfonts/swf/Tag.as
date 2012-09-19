@@ -40,7 +40,7 @@ package zero.getfonts.swf{
 			
 			__bodyData=data;
 		}
-		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toData(_toDataOptions:Object):ByteArray{
 			var bodyData:ByteArray;
 			if(__body){
 				bodyData=__body.toData(_toDataOptions);
@@ -117,7 +117,7 @@ package zero.getfonts.swf{
 		}
 		
 		private var __body:*;
-		public function getBody(TagBodyClass:Class,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):*{
+		public function getBody(TagBodyClass:Class,_initByDataOptions:Object):*{
 			if(__body){
 			}else{
 				if(__bodyData){

@@ -115,10 +115,10 @@ package zero.getfonts.swf.records.shapes{
 		public var LineStyleV:Vector.<LINESTYLE>;
 		public var LineStyle2V:Vector.<LINESTYLE2>;
 		
-		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object/*zero_swf_InitByDataOptions*/):int{
+		public function initByData(data:ByteArray,offset:int,endOffset:int,_initByDataOptions:Object):int{
 			throw new Error("直接在 SHAPEWITHSTYLE 里 initByData");
 		}
-		public function toData(_toDataOptions:Object/*zero_swf_ToDataOptions*/):ByteArray{
+		public function toData(_toDataOptions:Object):ByteArray{
 			throw new Error("直接在 SHAPEWITHSTYLE 里 toData");
 		}
 	}
