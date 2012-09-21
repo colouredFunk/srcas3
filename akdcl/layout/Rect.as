@@ -128,17 +128,21 @@ package akdcl.layout {
 		public function Rect(_x:Number, _y:Number, _width:Number, _height:Number, _alignX:Number = 0, _alignY:Number = 0):void {
 			__x = _x;
 			__y = _y;
-			if (_width > 1){
+			if (_width > 1) {
 				__width = _width;
 				percentWidth = 0;
 			} else {
 				percentWidth = _width;
+				//?
+				__width = 0;
 			}
 			if (_height > 1){
 				__height = _height;
 				percentHeight = 0;
 			} else {
 				percentHeight = _height;
+				//?
+				__height = 0;
 			}
 			__alignX = _alignX;
 			__alignY = _alignY;

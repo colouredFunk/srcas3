@@ -55,8 +55,9 @@ package akdcl.manager {
 		public var startY:int;
 		public var lastX:int;
 		public var lastY:int;
-		public var speedX:int;
-		public var speedY:int;
+		public var speedX:Number = 0;
+		public var speedY:Number = 0;
+		public var isDraged:Boolean;
 		
 		private function checkStage():void {
 			for each(buttonTarget in buttonDic) {
@@ -158,6 +159,7 @@ package akdcl.manager {
 				
 				setButtonStyle(buttonTarget);
 			}
+			isDraged = false;
 		}
 		private function onStageMouseMoveHandler(_e:MouseEvent):void {
 			if (_e.stageX > stage.stageWidth || _e.stageX < 0 || _e.stageY > stage.stageHeight || _e.stageY < 0) {
@@ -215,8 +217,10 @@ package akdcl.manager {
 			lastX = stage.mouseX;
 			lastY = stage.mouseY;
 			if (Math.abs(speedX) > moveAccuracy || Math.abs(speedY) > moveAccuracy) {
-				var _iEvt:UIEvent = new UIEvent(UIEvent.DRAG_MOVE);
-				_e.currentTarget.dispatchEvent(_iEvt);
+				if (_e.currentTarget.hasEventListener(UIEvent.DRAG_MOVE)) {
+					_e.currentTarget.dispatchEvent(new UIEvent(UIEvent.DRAG_MOVE));
+				}
+				isDraged = true;
 			}
 		}
 		private function buttonCallBack(_button:Object, _method:*):void {

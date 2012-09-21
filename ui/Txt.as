@@ -37,10 +37,12 @@
 		public function get autoSize():String {
 			return txt.autoSize;
 		}
+		
 		[Inspectable(enumeration="left,right,center,none",defaultValue="left",type="String",name="对齐")]
 		public function set autoSize(_autoSize:String):void {
 			try{
 				txt.autoSize = _autoSize;
+				txt.wordWrap = false;
 			}catch (_ero:*) {
 				
 			}
@@ -72,8 +74,7 @@
 			txt.mouseWheelEnabled = false;
 			txt.mouseEnabled = false;
 			txt.selectable = false;
-			txt.wordWrap = false;
-			txt.autoSize = "left";
+			//txt.autoSize = "left";
 		}
 		
 		override protected function onRemoveHandler():void 

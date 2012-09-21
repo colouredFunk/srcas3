@@ -19,6 +19,8 @@
 		public var mouseWheelEnabled:Boolean = true;
 		protected var timeHolded:uint;
 		protected var scale:Number;
+		
+		private var mouseOffX:Number = 0;
 
 		protected var __maximum:Number = 100;
 		public function get maximum():Number {
@@ -91,6 +93,11 @@
 		}
 
 		protected function onPressHandler(_e:UIEvent):void {
+			if (thumb && thumb.getRect(thumb).contains(thumb.mouseX, 0)) {
+				mouseOffX = thumb.mouseX;
+			}else {
+				mouseOffX = 0;
+			}
 			timeHolded = 1;
 			onHoldingHandler(null);
 			addEventListener(Event.ENTER_FRAME, onHoldingHandler);
@@ -111,7 +118,7 @@
 			if (bar){
 				value = Math.round((mouseX - bar.x + offXThumb) / scale / __snapInterval) * __snapInterval + __minimum;
 			} else {
-				value = Math.round(mouseX / scale / __snapInterval) * __snapInterval + __minimum;
+				value = Math.round((mouseX - mouseOffX) / scale / __snapInterval) * __snapInterval + __minimum;
 			}
 			timeHolded++;
 		}
