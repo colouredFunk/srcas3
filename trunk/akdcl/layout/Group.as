@@ -24,14 +24,19 @@ package akdcl.layout {
 					_rect.userData = {xml: _xml};
 					return _rect;
 				case "Rect":
-				default:
 					_rect = new Rect(0, 0, Number(_xml.@width), Number(_xml.@height), Number(_xml.@alignX), Number(_xml.@alignY));
 					_rect.border = Number(_xml.@border);
 					_rect.userData = {xml: _xml};
 					return _rect;
+				default:
+					return null;
 			}
-			for each (var _xml:XML in _xml.children()){
-				_rect.addChild(createGroup(_xml, _index + 1));
+			var _childRect:Object;
+			for each (var _xml:XML in _xml.children()) {
+				_childRect = createGroup(_xml, _index + 1);
+				if (_childRect) {
+					_rect.addChild(_childRect);
+				}
 			}
 			return _rect;
 		}

@@ -102,7 +102,9 @@
 		private var scrollRectCopy:Rectangle;
 
 		public function UIDisplay(_rectWidth:uint = 0, _rectHeight:uint = 0, _bgColor:int = 0) {
-			if (container){
+			
+			super();
+			if (container) {
 				_rectWidth = _rectWidth || container.width / container.scaleX;
 				_rectHeight = _rectHeight || container.height / container.scaleY;
 			} else {
@@ -115,11 +117,6 @@
 			if (_bgColor >= 0){
 				setUseScroll(true, _bgColor)
 			}
-			super();
-		}
-
-		override protected function init():void {
-			super.init();
 			eventChange = new Event(Event.CHANGE);
 			eventResize = new Event(Event.RESIZE);
 			isHidding = false;
@@ -130,7 +127,6 @@
 			contextMenu = createMenu(this);
 			mouseChildren = false;
 			proxy.addEventListener(Event.RESIZE, onProxyResizeHandler);
-
 		}
 		
 		override protected function onRemoveHandler():void 

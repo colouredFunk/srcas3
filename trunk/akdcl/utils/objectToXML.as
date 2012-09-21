@@ -36,7 +36,7 @@ package akdcl.utils {
 				}
 				return null;
 			default:
-				return _obj
+				return _obj;
 		}
 		return null;
 	}

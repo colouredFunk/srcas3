@@ -23,8 +23,6 @@ package akdcl.manager {
 		public function LoggerConnectManager() {
 			super(this);
 			sourceDic = {};
-
-			logConnectEvent = new Event(LOG_CONNECT);
 			localConnection = new LocalConnection();
 		}
 
@@ -64,7 +62,6 @@ package akdcl.manager {
 		public var lastTarget:XML;
 
 		private var sourceDic:Object;
-		private var logConnectEvent:Event;
 		private var localConnection:LocalConnection;
 
 		//private var timeOff:uint;
@@ -176,7 +173,7 @@ package akdcl.manager {
 				_logXML["@" + A_MSG] = _msg;
 				lastSource.elements(E_LOGS)[0].appendChild(_logXML);
 
-				dispatchEvent(logConnectEvent);
+				dispatchEvent(new Event(LOG_CONNECT));
 			}
 		}
 
