@@ -82,7 +82,6 @@ package akdcl.manager {
 		public function removeButton(_button:*):void {
 			_button.removeEventListener(MouseEvent.ROLL_OVER, onRollOverHandler);
 			_button.removeEventListener(MouseEvent.ROLL_OUT, onRollOutHandler);
-			_button.removeEventListener(Event.ENTER_FRAME, onMouseMoveHandler);
 			delete buttonDic[_button];
 			delete buttonInDic[_button];
 			delete buttonDownDic[_button];
@@ -90,14 +89,12 @@ package akdcl.manager {
 		private function onStageMouseDownHandler(_e:Event):void {
 			lastX = startX = stage.mouseX;
 			lastY = startY = stage.mouseY;
+			stage.addEventListener(Event.ENTER_FRAME, onMouseMoveHandler);
 			for each(buttonTarget in buttonInDic) {
 				if (buttonDownDic[buttonTarget]) {
 					
 				}else {
 					buttonDownDic[buttonTarget] = buttonTarget;
-					if (buttonTarget.hasEventListener(UIEvent.DRAG_MOVE)) {
-						buttonTarget.addEventListener(Event.ENTER_FRAME, onMouseMoveHandler);
-					}
 					if (buttonTarget.hasEventListener(UIEvent.PRESS)) {
 						buttonTarget.dispatchEvent(new UIEvent(UIEvent.PRESS));
 					}
@@ -114,6 +111,8 @@ package akdcl.manager {
 			if (mobileMode) {
 				stage.removeEventListener(MouseEvent.MOUSE_MOVE, onStageMouseMoveHandler);
 			}
+			stage.removeEventListener(Event.ENTER_FRAME, onMouseMoveHandler);
+			
 			//trace(_e.target, _e.currentTarget, buttonTarget);
 			//var _parent:DisplayObjectContainer;
 			if (_e && _e.target != stage) {
@@ -127,9 +126,7 @@ package akdcl.manager {
 					buttonTarget = buttonTarget.parent;
 				}
 			}
-			
 			for each(buttonTarget in buttonDownDic) {
-				buttonTarget.removeEventListener(Event.ENTER_FRAME, onMouseMoveHandler);
 				delete buttonDownDic[buttonTarget];
 				if (buttonInDic[buttonTarget]) {
 					if (buttonTarget.hasEventListener(UIEvent.RELEASE)) {
@@ -170,12 +167,14 @@ package akdcl.manager {
 		
 		private function onRollOverHandler(_e:Object):void {
 			buttonTarget = (_e is MouseEvent)?_e.currentTarget:_e as InteractiveObject;
+			
 			if (buttonInDic[buttonTarget]) {
 				
 			}else {
 				buttonInDic[buttonTarget] = buttonTarget;
 				buttonTarget.addEventListener(MouseEvent.ROLL_OUT, onRollOutHandler);
 				if (_e is MouseEvent?_e.buttonDown:false) {
+					
 					if (buttonTarget.hasEventListener(UIEvent.DRAG_OVER)) {
 						buttonTarget.dispatchEvent(new UIEvent(UIEvent.DRAG_OVER));
 					}
@@ -194,7 +193,6 @@ package akdcl.manager {
 			if (buttonInDic[buttonTarget]) {
 				delete buttonInDic[buttonTarget];
 				buttonTarget.removeEventListener(MouseEvent.ROLL_OUT, onRollOutHandler);
-				//buttonTarget.removeEventListener(Event.ENTER_FRAME, onMouseMoveHandler);
 				if (_e.buttonDown) {
 					if (buttonTarget.hasEventListener(UIEvent.DRAG_OUT)) {
 						buttonTarget.dispatchEvent(new UIEvent(UIEvent.DRAG_OUT));
@@ -217,8 +215,10 @@ package akdcl.manager {
 			lastX = stage.mouseX;
 			lastY = stage.mouseY;
 			if (Math.abs(speedX) > moveAccuracy || Math.abs(speedY) > moveAccuracy) {
-				if (_e.currentTarget.hasEventListener(UIEvent.DRAG_MOVE)) {
-					_e.currentTarget.dispatchEvent(new UIEvent(UIEvent.DRAG_MOVE));
+				for each(buttonTarget in buttonDownDic) {
+					if (buttonTarget.hasEventListener(UIEvent.DRAG_MOVE)) {
+						buttonTarget.dispatchEvent(new UIEvent(UIEvent.DRAG_MOVE));
+					}
 				}
 				isDraged = true;
 			}

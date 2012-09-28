@@ -73,6 +73,9 @@ package akdcl.layout {
 			}
 			__scrollX = _value;
 			__alignX = __scrollX / (__width - scaleWidth);
+			if (isNaN(__alignX)) {
+				__alignX = 0;
+			}
 			if (autoUpdate){
 				updatePoint(true);
 			}
@@ -107,6 +110,9 @@ package akdcl.layout {
 			}
 			__scrollY = _value;
 			__alignY = __scrollY / (__height - scaleHeight);
+			if (isNaN(__alignY)) {
+				__alignY = 0;
+			}
 			if (autoUpdate){
 				updatePoint(true);
 			}
