@@ -262,6 +262,7 @@ package akdcl.layout {
 							//_percent += _width / _widthD;
 							_value += _width;
 						}
+						childrenHeight = Math.max(_child.height, childrenHeight);
 					}
 					if (_percent < 1){
 						if (_averageCount > 0){
@@ -318,6 +319,7 @@ package akdcl.layout {
 							//预设
 							_value += _child.height;
 						}
+						childrenWidth = Math.max(_child.width, childrenWidth);
 					}
 					if (_percent < 1){
 						if (_averageCount > 0){
