@@ -15,19 +15,20 @@ package zero.getfonts{
 	import flash.text.*;
 	import flash.utils.*;
 	
-	import zero.getfonts.swf.SWF;
-	import zero.getfonts.swf.Tag;
-	import zero.getfonts.swf.TagTypes;
-	import zero.getfonts.swf.records.RECT;
-	import zero.getfonts.swf.records.shapes.SHAPE;
-	import zero.getfonts.swf.records.texts.ZONERECORD;
-	import zero.getfonts.swf.tagBodys.DefineFont3;
-	import zero.getfonts.swf.tagBodys.DefineFontAlignZones;
-	import zero.getfonts.swf.tagBodys.DefineFontName;
+	import zero.swf.SWF;
+	import zero.swf.Tag;
+	import zero.swf.TagTypes;
+	import zero.swf.records.RECT;
+	import zero.swf.records.shapes.SHAPE;
+	import zero.swf.records.texts.ZONERECORD;
+	import zero.swf.tagBodys.DefineFont3;
+	import zero.swf.tagBodys.DefineFontAlignZones;
+	import zero.swf.tagBodys.DefineFontName;
 	
 	public class GetFont{
 		
 		public static var fontsFolderPath:String="http://www.wanmei.com/public/swf/fonts/";
+		//public static var fontsFolderPath:String="";
 		
 		public static const charGroups:Object={
 			//《现代汉语常用字表》之一 常用字(2500字)
@@ -251,6 +252,8 @@ package zero.getfonts{
 					}else{
 						var old_prettyPrinting:Boolean=XML.prettyPrinting;
 						var old_prettyIndent:int=XML.prettyIndent;
+						XML.prettyPrinting=true;
+						XML.prettyIndent=-1;
 						var text:String=initTxtObj.xml.children().toXMLString();
 						XML.prettyPrinting=old_prettyPrinting;
 						XML.prettyIndent=old_prettyIndent;
@@ -601,12 +604,12 @@ import flash.utils.ByteArray;
 import zero.BytesAndStr16;
 import zero.getfonts.Char;
 import zero.getfonts.GetFont;
-import zero.getfonts.swf.*;
-import zero.getfonts.swf.avm2.ABCFileWithSimpleConstant_pool;
-import zero.getfonts.swf.records.RECT;
-import zero.getfonts.swf.records.shapes.SHAPE;
-import zero.getfonts.swf.records.texts.ZONERECORD;
-import zero.getfonts.swf.tagBodys.*;
+import zero.swf.*;
+import zero.swf.avm2.ABCFileWithSimpleConstant_pool;
+import zero.swf.records.RECT;
+import zero.swf.records.shapes.SHAPE;
+import zero.swf.records.texts.ZONERECORD;
+import zero.swf.tagBodys.*;
 
 class Request{
 	public var src:String;

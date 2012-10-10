@@ -11,7 +11,7 @@ package zero.swf{
 	import flash.utils.ByteArray;
 	import flash.utils.getDefinitionByName;
 	
-	import zero.swf.funs.SimpleDoABC;
+	import zero.swf.utils.SimpleDoABC;
 	import zero.swf.tagBodys.*;
 	
 	public class SWFExtend extends SWF{
