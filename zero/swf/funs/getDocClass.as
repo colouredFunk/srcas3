@@ -10,7 +10,7 @@ package zero.swf.funs{
 	import zero.*;
 	import zero.swf.*;
 	import zero.swf.avm2.*;
-	import zero.swf.funs.*;
+	import zero.swf.utils.*;
 	import zero.swf.tagBodys.*;
 	public function getDocClass(swf:SWFExtend):ABCClass{
 		if(swf.isAS3){

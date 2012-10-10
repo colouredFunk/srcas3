@@ -72,36 +72,40 @@ package zero.ui{
 			_contentHei:int
 		):void{
 			
-			contentYMin=_contentYMin;
-			contentYMax=_contentYMin+viewHei-_contentHei;
-			
-			if(contentYMax>contentYMin){
+			if(_content){
+				_content.y=_contentY;
+				
+				contentYMin=_contentYMin;
+				contentYMax=_contentYMin+viewHei-_contentHei;
+				
+				if(contentYMax>contentYMin){
+					unsetContent();
+					return;
+				}
+				
+				this.visible=true;
+				this.mouseChildren=true;
+				
+				thumb["gra"].gra.height=viewHei/_contentHei*(bar.y+bar.height-d*2);
+				top=bar.y+d;
+				bottom=bar.y+bar.height-thumb.height-d*2;
+				
+				content=_content;
+				
+				thumb.y=(_contentY-contentYMin)*(bottom-top)/(contentYMax-contentYMin)+top;
+				
+				stage.addEventListener(MouseEvent.MOUSE_WHEEL,mouseWheel);
+				bar.addEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
+				thumb.addEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
+				this.addEventListener(Event.ENTER_FRAME,update);
+				if(btnUp){
+					btnUp.addEventListener(MouseEvent.MOUSE_DOWN,startUp);
+				}
+				if(btnDown){
+					btnDown.addEventListener(MouseEvent.MOUSE_DOWN,startDown);
+				}
+			}else{
 				unsetContent();
-				return;
-			}
-			
-			this.visible=true;
-			this.mouseChildren=true;
-			
-			thumb["gra"].gra.height=viewHei/_contentHei*(bar.y+bar.height-d*2);
-			top=bar.y+d;
-			bottom=bar.y+bar.height-thumb.height-d*2;
-			
-			content=_content;
-			
-			content.y=_contentY;
-			
-			thumb.y=(_contentY-contentYMin)*(bottom-top)/(contentYMax-contentYMin)+top;
-			
-			stage.addEventListener(MouseEvent.MOUSE_WHEEL,mouseWheel);
-			bar.addEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
-			thumb.addEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
-			this.addEventListener(Event.ENTER_FRAME,update);
-			if(btnUp){
-				btnUp.addEventListener(MouseEvent.MOUSE_DOWN,startUp);
-			}
-			if(btnDown){
-				btnDown.addEventListener(MouseEvent.MOUSE_DOWN,startDown);
 			}
 		}
 		public function unsetContent():void{

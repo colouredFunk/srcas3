@@ -9,6 +9,7 @@ Station
 package zero.works.station{
 	import akdcl.utils.addContextMenu;
 	
+	import assets.BtnImg;
 	import assets.Main;
 	
 	import com.greensock.*;
@@ -48,6 +49,8 @@ package zero.works.station{
 		
 		private var nav_layoutXML:XML;
 		private var switch_layoutXML:XML;
+		
+		private var imgsSpV:Vector.<Sprite>;
 		
 		public function Station(_optionsXMLPath:String,switchClass:Class){
 			optionsXMLPath=_optionsXMLPath;
@@ -91,7 +94,9 @@ package zero.works.station{
 			}
 			
 			main.loading=main.mainLoading;
-			main.loading.style=optionsXML.loading[0].style[0];
+			if(optionsXML.loading[0]){
+				main.loading.style=optionsXML.loading[0].style[0];
+			}
 			
 			nav=new Nav();
 			
@@ -129,20 +134,36 @@ package zero.works.station{
 			var imgsXML:XML=optionsXML.imgs[0];
 			if(imgsXML){
 				if(main.imgs){
+					imgsSpV=new Vector.<Sprite>();
 					main.imgs.mouseChildren=true;
-					for each(var imgXML:XML in imgsXML.children()){
+					for each(var subXML:XML in imgsXML.children()){
 						
-						var btn:Btn=main.imgs[imgXML.name().toString()];
-						
-						getLayout(btn,imgXML);
-						
-						var img:ImgLoader=new ImgLoader();
-						btn["container"].addChild(img);
-						img.load(imgXML);
-						if(imgXML.@href.toString()||imgXML.@js.toString()){
-							btn.href=imgXML;
-							btn.mouseEnabled=true;
+						var sp:Sprite=main.imgs[subXML.name().toString()];
+						if(sp){
+						}else{
+							sp=new BtnImg();
+							main.imgs.addChild(sp);
 						}
+						
+						getLayout(sp,subXML);
+						
+						var btn:BtnImg=sp as BtnImg;
+						if(btn){
+							var img:ImgLoader=new ImgLoader();
+							btn.container.addChild(img);
+							img.load(subXML);
+							if(subXML.@href.toString()||subXML.@js.toString()){
+								btn.href=subXML;
+								btn.mouseEnabled=true;
+							}else{
+								btn.href=null;
+								btn.mouseEnabled=false;
+							}
+						}else{
+							GetFont.initTxt(sp["txt"],subXML);
+						}
+						
+						imgsSpV.push(sp);
 					}
 				}
 			}
@@ -208,8 +229,10 @@ package zero.works.station{
 		}
 		private function prevloadComplete(...args):void{
 			
-			prevloader.clear();
-			prevloader=null;
+			if(prevloader){
+				prevloader.clear();
+				prevloader=null;
+			}
 			
 			var kaitouXML:XML=optionsXML.kaitou[0];
 			if(kaitouXML){
@@ -230,7 +253,7 @@ package zero.works.station{
 					main.loading.show();
 				}
 			}else{
-				trace("没有开头动画");
+				//trace("没有开头动画");
 				playKaitouComplete();
 			}
 			
@@ -271,9 +294,11 @@ package zero.works.station{
 				stopAll(main.loading);
 				main.removeChild(main.loading);
 				main.loading=main.subLoading;
-				var style:XML=optionsXML.loading[0].style[1];
-				if(style){
-					main.loading.style=style;
+				if(optionsXML.loading[0]){
+					var style:XML=optionsXML.loading[0].style[1];
+					if(style){
+						main.loading.style=style;
+					}
 				}
 				main.loading.visible=true;
 			}
@@ -433,14 +458,14 @@ package zero.works.station{
 			if(layoutXML.@horizontalCenter.toString()){
 				sp.x=stage.stageWidth/2+int(layoutXML.@horizontalCenter.toString());
 			}else if(layoutXML.@left.toString()){
-				//
+				sp.x=int(layoutXML.@left.toString());
 			}else if(layoutXML.@right.toString()){
 				sp.x=stage.stageWidth-int(layoutXML.@right.toString());
 			}
 			if(layoutXML.@verticalCenter.toString()){
 				sp.y=stage.stageHeight/2+int(layoutXML.@verticalCenter.toString());
 			}else if(layoutXML.@top.toString()){
-				//
+				sp.y=int(layoutXML.@top.toString());
 			}else if(layoutXML.@bottom.toString()){
 				sp.y=stage.stageHeight-int(layoutXML.@bottom.toString());
 			}
@@ -462,13 +487,14 @@ package zero.works.station{
 			
 			//trace(stage.stageWidth,stage.stageHeight);
 			
-			this.graphics.clear();
-			this.graphics.beginFill(0x000000);
-			this.graphics.drawRect(0,0,stage.stageWidth,stage.stageHeight);
-			this.graphics.endFill();
+			//this.graphics.clear();
+			//this.graphics.beginFill(0x000000);
+			//this.graphics.drawRect(0,0,stage.stageWidth,stage.stageHeight);
+			//this.graphics.endFill();
 			
 			if(main){
 				
+				//trace("nav_layoutXML="+nav_layoutXML.toXMLString());
 				updateSpByLayout(nav.clip,nav_layoutXML);
 				
 				var btnBackXML:XML=optionsXML.btnBack[0];
@@ -481,8 +507,10 @@ package zero.works.station{
 				var imgsXML:XML=optionsXML.imgs[0];
 				if(imgsXML){
 					if(main.imgs){
-						for each(var imgXML:XML in imgsXML.children()){
-							updateSpByLayout(main.imgs[imgXML.name().toString()],imgXML.layout[0]);
+						var i:int=-1;
+						for each(var subXML:XML in imgsXML.children()){
+							i++;
+							updateSpByLayout(imgsSpV[i],subXML.layout[0]);
 						}
 					}
 				}
@@ -498,6 +526,8 @@ package zero.works.station{
 					if(bottomXML){
 						if(bottomXML.@align.toString().indexOf("right")>-1){
 							bottom.x=stage.stageWidth;
+						}else if(bottomXML.@align.toString().indexOf("center")>-1){
+							bottom.x=stage.stageWidth/2;
 						}
 					}
 				}
