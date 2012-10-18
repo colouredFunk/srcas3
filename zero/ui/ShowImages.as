@@ -111,6 +111,9 @@ package zero.ui{
 			if(img){
 				img.visible=false;
 			}
+			if(bottomContainer){
+				bottomContainer.visible=false;
+			}
 		}
 		
 		public function initImg(_img:Btn):void{
@@ -304,6 +307,9 @@ package zero.ui{
 			if(img){
 				img.visible=false;
 			}
+			if(bottomContainer){
+				bottomContainer.visible=false;
+			}
 			
 			var imgXML:XML,i:int;
 			
@@ -411,6 +417,9 @@ package zero.ui{
 				if(img){
 					img.visible=false;
 				}
+				if(bottomContainer){
+					bottomContainer.visible=false;
+				}
 			}else{
 				if(skin){
 					skin.visible=false;
@@ -419,6 +428,9 @@ package zero.ui{
 					img.visible=true;
 					(img["img"] as ImgLoader).autoPlay=autoPlay;
 					(img["img"] as ImgLoader).load(<img src={imgXML.@src.toString()} align={img_align}/>);
+				}
+				if(bottomContainer){
+					bottomContainer.visible=true;
 				}
 			}
 			autoPlay=true;
@@ -581,6 +593,15 @@ package zero.ui{
 				}
 			}
 			throw new Error("getImgXMLId 找不到位置");
+		}
+		
+		public function pause():void{
+			if(img){
+				(img["img"] as ImgLoader).pause();
+			}
+			if(player){
+				player.pause();
+			}
 		}
 	}
 }

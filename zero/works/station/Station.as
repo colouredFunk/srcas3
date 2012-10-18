@@ -38,7 +38,7 @@ package zero.works.station{
 		protected var main:Main;
 		private var bg:ImgLoader;
 		private var bottom:ImgLoader;
-		private var nav:Nav;
+		protected var nav:Nav;
 		
 		private var btnSkip_dy:int;
 		
@@ -128,6 +128,17 @@ package zero.works.station{
 					GetFont.initTxt(main.btnBack["label"].txt,btnBackXML.label[0]);
 					main.btnBack.release=back;
 					main.btnBack.alpha=0;
+				}
+			}
+			
+			BtnFullScreen;
+			
+			var musicXML:XML=optionsXML.music[0];
+			if(musicXML){
+				if(main.musicCtrl){
+					main.musicCtrl.mouseChildren=true;
+					getLayout(main.musicCtrl,musicXML);
+					(main.musicCtrl as MusicCtrl).init(musicXML.@src.toString());
 				}
 			}
 			
@@ -501,6 +512,13 @@ package zero.works.station{
 				if(btnBackXML){
 					if(main.btnBack){
 						updateSpByLayout(main.btnBack,btnBackXML.layout[0]);
+					}
+				}
+				
+				var musicXML:XML=optionsXML.music[0];
+				if(musicXML){
+					if(main.musicCtrl){
+						updateSpByLayout(main.musicCtrl,musicXML.layout[0]);
 					}
 				}
 				

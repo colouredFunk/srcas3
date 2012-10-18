@@ -13,23 +13,28 @@ package zero.works.station{
 	import akdcl.media.PlayerSkin;
 	import akdcl.utils.stringToBoolean;
 	
-	import com.greensock.TweenNano;
+	import com.greensock.TweenMax;
 	
 	import flash.display.*;
 	import flash.events.*;
-	import flash.external.*;
 	import flash.geom.*;
 	import flash.net.*;
 	import flash.system.*;
 	import flash.text.*;
 	import flash.utils.*;
+	
+	import ui.Btn;
+	
+	import zero.ui.Slider;
 
 	public class MusicCtrl extends Sprite{
-		public var player:MediaPlayer;
-		public var btnSound:*;
-		public var soundView:*;
 		
 		private var so:SharedObject;
+		private var player:MediaPlayer;
+		
+		public var btnSound:BtnSound;
+		public var slider:Slider;
+		
 		
 		public function MusicCtrl(){
 			Security.allowDomain("*");
@@ -38,139 +43,80 @@ package zero.works.station{
 		
 		public function init(src:String):void{
 			
-			player=new MediaPlayer();
-			player.addEventListener(MediaEvent.STATE_CHANGE, onPlayStateChangeHandler);
-			
-			//;
-			soundView = btnSound.soundView;
-			if(soundView){
-				soundView.getMove=function():int{
-					return player.isPlaying?4:-4;
-				};
-				soundView.run();
+			so=SharedObject.getLocal("musicctrl","/");
+			if(so.data.hasOwnProperty("playing")){
+			}else{
+				so.data.playing=true;
+			}
+			if(so.data.hasOwnProperty("volume")){
+			}else{
+				so.data.volume=0.8;
 			}
 			
-			//;
-			//player.playlist = "http://10.8.1.44/test.mp3";
-			//player.playlist = this.loaderInfo.parameters.mp3;
+			player=new MediaPlayer();
 			player.playlist = src;
 			
-			btnSound.release = clickBtnSound;
-			//DocClass.getInstance().eiM.addEventListener(ExternalInterfaceManager.CALL, onInterfaceCallHandler);
-			
-			if(ExternalInterface.available){
-				ExternalInterface.addCallback("music_play",music_play);
-				ExternalInterface.addCallback("music_stop",music_stop);
-			}
-			
-			so=SharedObject.getLocal("musicctrl","/");
-			
-			if(this.loaderInfo.parameters.on=="false"){
-			}else if(ExternalInterface.available){
-				if(ExternalInterface.call("eval","musicPlaying")===true){
-					player.play();
-				}else if(ExternalInterface.call("eval","musicPlaying")===false){
-				}else{
-					if(so.data.musicPlaying===false){
-					}else{
-						player.play();
-					}
-					//throw new Error("so.data.musicPlaying="+so.data.musicPlaying);
-				}
+			if(so.data.playing){
+				player.volume=so.data.volume;
 			}else{
-				if(so.data.musicPlaying===false){
-				}else{
-					player.play();
-				}
-				//throw new Error("so.data.musicPlaying="+so.data.musicPlaying);
+				player.volume=0;
 			}
 			
-			
-			//import zero.net.getPageParams;
-			//throw new Error(getPageParams().info);
-			
-			//bgMusicOn=ctrlOn;
-			//bgMusicOff=ctrlOff;
-		}
-		private function music_play():void{
-			 btnSound.selected=true;
-			 changePlayerPlay();
-		}
-		private function music_stop():void{
-			 btnSound.selected=false;
-			 changePlayerPlay();
-		}
-		private function ctrlOn():void{
-			//trace("so.data.musicPlaying="+so.data.musicPlaying);
-			if(so.data.musicPlaying===false){
-			}else{
-				music_play();
+			if(btnSound){
+				btnSound.release = clickBtnSound;
 			}
-		}
-		private function ctrlOff():void{
-			music_stop();
+			if(slider){
+				slider.onUpdate=updateVolume;
+			}
+			
+			bgMusicOn=ctrlOn;
+			bgMusicOff=ctrlOff;
+			
+			playOrPause(1);
 		}
 		private function clickBtnSound():void{
-			changePlayerPlay();
-			so.data.musicPlaying=!btnSound.selected;
-			//throw new Error("so.data.musicPlaying="+so.data.musicPlaying);
+			so.data.playing=!so.data.playing;
+			playOrPause(1);
 		}
-		public function changePlayerPlay():void
-		{
-			btnSound.selected = ! btnSound.selected;
-			if (btnSound.selected)
-			{
-				TweenNano.to(player,1,{volume:0, onComplete:player.pause});
+		private function ctrlOn():void{
+			playOrPause(1);
+		}
+		private function ctrlOff():void{
+			player.pause();
+			if(btnSound){
+				btnSound.selected=false;
 			}
-			else
-			{
+		}
+		private function playOrPause(duration:Number):void{
+			if(btnSound){
+				btnSound.selected=so.data.playing;
+			}
+			TweenMax.killTweensOf(player);
+			if(so.data.playing){
 				player.play();
-				var volume:Number=Number(this.loaderInfo.parameters.volume);
-				if(volume>=0){
-				}else{
-					volume=0.6;
-				}
-				TweenNano.to(player,1,{volume:volume});
+				TweenMax.to(player,duration,{volume:so.data.volume,onUpdate:updateSlider});
+			}else{
+				TweenMax.to(player,duration,{volume:0,onComplete:player.pause,onUpdate:updateSlider});
 			}
 		}
-		public function onPlayStateChangeHandler(_e:MediaEvent):void
-		{
-			btnSound.selected = ! player.isPlaying;
+		private function updateSlider():void{
+			if(slider){
+				slider.value=player.volume;
+			}
 		}
-		public function onInterfaceCallHandler(_evt:Event):void
-		{
-			switch (DocClass.getInstance().eiM.eventType)
-			{
-				case "play" :
-					player.play();
-					break;
-				case "pause" :
-					player.pause();
-					break;
-				case "stop" :
-					player.stop();
-					break;
-				case "next" :
-					player.next();
-					break;
-				case "prev" :
-					player.prev();
-					break;
-				case "setPlaylist" :
-					player.playlist = DocClass.getInstance().eiM.eventParams[0];
-					break;
-				case "setRepeat" :
-					player.repeat = int(DocClass.getInstance().eiM.eventParams[0]);
-					break;
-				case "setPlayID" :
-					player.playID = int(DocClass.getInstance().eiM.eventParams[0]);
-					break;
-				case "setVolume" :
-					player.volume = Number(DocClass.getInstance().eiM.eventParams[0]);
-					break;
-				case "setMute" :
-					player.mute = stringToBoolean(DocClass.getInstance().eiM.eventParams[0]);
-					break;
+		private function updateVolume():void{
+			player.volume=so.data.volume=slider.value;
+			if(so.data.volume>0){
+				if(so.data.playing){
+				}else{
+					so.data.playing=true;
+					playOrPause(0);
+				}
+			}else{
+				if(so.data.playing){
+					so.data.playing=false;
+					playOrPause(0);
+				}
 			}
 		}
 	}

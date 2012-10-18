@@ -18,6 +18,8 @@ package zero.swf.funs{
 	import zero.swf.*;
 	import zero.swf.avm2.*;
 	import zero.swf.tagBodys.*;
+	import zero.swf.utils.getABCFiles;
+
 	public class FixNames{
 		
 		private static const wordReg:RegExp=/^[A-Za-z_\$\u4e00-\u9fa5][\w\$\.\:\u4e00-\u9fa5]*$/;
