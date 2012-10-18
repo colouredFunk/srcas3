@@ -31,6 +31,8 @@ package zero.works{
 		
 		public var boundsRect:Sprite;
 		
+		private var colorB:Rectangle;
+		
 		public function Movie2Imgs(){
 			if(boundsRect){
 				boundsRect.visible=false;
@@ -74,6 +76,7 @@ package zero.works{
 				//for each(var subArr:Array in dataBySizeArr){
 				//	trace(dataBySizeArr.indexOf(subArr),"frames="+subArr);
 				//}
+				trace("colorB="+colorB);
 				return;
 			}
 			this.gotoAndStop(frame);
@@ -84,14 +87,28 @@ package zero.works{
 				bmd.draw(this);
 			}
 			
+			var b:Rectangle=bmd.getColorBoundsRect(0xff101010,0xff000000,false);
+			if(colorB){
+				colorB=colorB.union(b);
+			}else{
+				colorB=b;
+			}
+			
 			//1
-			//var imgData:ByteArray=PNGEncoder.encode(bmd);
-			var imgData:ByteArray=JPEGEncoder.encode(bmd);
+			var imgData:ByteArray=PNGEncoder.encode(bmd);
+			//var imgData:ByteArray=JPEGEncoder.encode(bmd);
 			
 			/*
 			//2 透明 png
 			var bmd2:BitmapData=new BitmapData(bmd.width,bmd.height,true,0xffffffff);
 			bmd2.copyChannel(bmd,bmd.rect,new Point(),BitmapDataChannel.RED,BitmapDataChannel.ALPHA);
+			var imgData:ByteArray=PNGEncoder.encode(bmd2);
+			//*/
+			
+			/*
+			//2 黑底变透明
+			var bmd2:BitmapData=bmd.clone();
+			bmd2.copyChannel(bmd,bmd.rect,new Point(),BitmapDataChannel.BLUE,BitmapDataChannel.ALPHA);
 			var imgData:ByteArray=PNGEncoder.encode(bmd2);
 			//*/
 			
