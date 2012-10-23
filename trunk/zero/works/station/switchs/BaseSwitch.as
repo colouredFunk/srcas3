@@ -144,6 +144,9 @@ package zero.works.station.switchs{
 			if(page.hasOwnProperty("init")){
 				page["init"](navXMLV[currLoadId]);
 			}
+			if(page.hasOwnProperty("resize")){
+				page["resize"](stage.stageWidth,stage.stageHeight);
+			}
 			if(page.hasOwnProperty("fadeIn")){
 				page["fadeIn"](new TempFun(pageFadeInComplete,page).fun);
 			}else{

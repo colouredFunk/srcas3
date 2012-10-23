@@ -46,6 +46,7 @@ package zero.ui{
 		
 		private var iconArea:Sprite;
 		private var scrollMaskSp:Sprite;
+		private var scrollNum:int;
 		private var num:int;
 		private var dx:int;
 		private var dy:int;
@@ -80,11 +81,19 @@ package zero.ui{
 		//20120914
 		private var selected:Boolean;
 		
-		public function ShowImages(_selectedIconEnabled:Boolean,mask_inflate_dx:int=4,mask_inflate_dy:int=4,_showAsGrid:Boolean=false,_selected:Boolean=true){
+		public function ShowImages(
+			_selectedIconEnabled:Boolean,
+			mask_inflate_dx:int=4,
+			mask_inflate_dy:int=4,
+			_showAsGrid:Boolean=false,
+			_selected:Boolean=true,
+			_scrollNum:int=0
+		){
 			
 			selectedIconEnabled=_selectedIconEnabled;
 			showAsGrid=_showAsGrid;
 			selected=_selected;
+			scrollNum=_scrollNum;
 			autoPlay=true;
 			
 			if(icons){
@@ -176,6 +185,9 @@ package zero.ui{
 		public function initIcons(_icons:Sprite,mask_inflate_dx:int,mask_inflate_dy:int):void{
 			icons=_icons;
 			if(icons){
+				
+				num=icons.numChildren;
+				
 				if(icons.numChildren>1){
 					dx=icons.getChildAt(1).x-icons.getChildAt(0).x;
 					dy=icons.getChildAt(1).y-icons.getChildAt(0).y;
@@ -198,9 +210,7 @@ package zero.ui{
 				//向外扩展几像素
 				b.inflate(mask_inflate_dx,mask_inflate_dy);
 				
-				num=icons.numChildren;
-				
-				var i:int=num;
+				var i:int=icons.numChildren;
 				while(--i>=0){
 					icons.removeChildAt(i);
 				}
@@ -217,6 +227,11 @@ package zero.ui{
 				icons.mask=scrollMaskSp;
 			}else{
 				num=1;
+			}
+			
+			if(scrollNum>0){
+			}else{
+				scrollNum=num;
 			}
 		}
 		public function initBtns(...btns):void{
@@ -459,8 +474,8 @@ package zero.ui{
 			}
 			
 			//var depth:int=0;
-			while(currId+1>scrollId+num){
-				//trace("+++",currId+1,scrollId+num);
+			while(currId+1>scrollId+scrollNum){
+				//trace("+++",currId+1,scrollId+scrollNum);
 				//if(++depth>100){
 				//	break;
 				//}
@@ -468,7 +483,7 @@ package zero.ui{
 			}
 			//var depth:int=0;
 			while(currId<scrollId){
-				//trace("---",currId+1,scrollId+num);
+				//trace("---",currId+1,scrollId+scrollNum);
 				//if(++depth>100){
 				//	break;
 				//}
@@ -524,7 +539,7 @@ package zero.ui{
 		}
 		private function scrollPrev():void{
 			//scrollId--;
-			scrollId-=num;
+			scrollId-=scrollNum;
 			if(scrollId<0){
 				scrollId=0;
 			}
@@ -532,7 +547,7 @@ package zero.ui{
 		}
 		private function scrollNext():void{
 			//scrollId++;
-			scrollId+=num;
+			scrollId+=scrollNum;
 			if(scrollId+num>=xml[imgNodeName].length()){
 				scrollId=xml[imgNodeName].length()-num;
 				if(scrollId<0){
