@@ -27,11 +27,10 @@ package zero.works.station{
 			loadSubXML();
 		}
 		private static function loadSubXML():void{
-			for each(var navXML:XML in xml.nav){
-				if(navXML.@xml.toString()){
-					subXMLLoader.load(new URLRequest(navXML.@xml.toString()));
-					return;
-				}
+			var hasAttXMLXML:XML=getHasAttXMLXML(xml);
+			if(hasAttXMLXML){
+				subXMLLoader.load(new URLRequest(hasAttXMLXML.@xml.toString()));
+				return;
 			}
 			subXMLLoader.removeEventListener(Event.COMPLETE,loadSubXMLComplete);
 			subXMLLoader=null;
@@ -47,17 +46,27 @@ package zero.works.station{
 		}
 		private static function loadSubXMLComplete(...args):void{
 			var subXML:XML=new XML(subXMLLoader.data);
-			for each(var navXML:XML in xml.nav){
-				if(navXML.@xml.toString()){
-					delete navXML.@xml;
-					for each(var attXML:XML in subXML.attributes()){
-						navXML["@"+attXML.name().toString()]=attXML.toString();
-					}
-					navXML.setChildren(subXML.children());
-					break;
-				}
+			var hasAttXMLXML:XML=getHasAttXMLXML(xml);
+			delete hasAttXMLXML.@xml;
+			for each(var attXML:XML in subXML.attributes()){
+				hasAttXMLXML["@"+attXML.name().toString()]=attXML.toString();
+			}
+			for each(var childXML:XML in subXML.children()){
+				hasAttXMLXML.appendChild(childXML);
 			}
 			loadSubXML();
+		}
+		private static function getHasAttXMLXML(xml:XML):XML{
+			for each(var subXML:XML in xml.children()){
+				if(subXML.@xml.toString()){
+					return subXML;
+				}
+				var hasAttXMLXML:XML=getHasAttXMLXML(subXML);
+				if(hasAttXMLXML){
+					return hasAttXMLXML;
+				}
+			}
+			return null;
 		}
 	}
 }

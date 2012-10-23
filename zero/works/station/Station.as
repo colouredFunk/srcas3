@@ -38,7 +38,7 @@ package zero.works.station{
 		protected var main:Main;
 		private var bg:ImgLoader;
 		private var bottom:ImgLoader;
-		protected var nav:Nav;
+		public var nav:Nav;
 		
 		private var btnSkip_dy:int;
 		
@@ -386,7 +386,7 @@ package zero.works.station{
 		protected function showingPage():void{
 			nav.clip.mouseChildren=false;
 		}
-		private function pageFadeInComplete():void{
+		protected function pageFadeInComplete():void{
 			nav.clip.mouseChildren=true;
 			if(kaitouLoader){
 				kaitouLoader.clear();

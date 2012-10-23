@@ -1,20 +1,20 @@
 package zero.ui{
 	import akdcl.display.UIDisplay;
-	import com.greensock.TweenMax;
-	import com.greensock.easing.Elastic;
-
-	import flash.events.Event;
-	import flash.events.MouseEvent;
-	import flash.display.Stage;
-
 	import akdcl.events.MediaEvent;
-
 	import akdcl.layout.Display;
 	import akdcl.layout.Group;
-
 	import akdcl.media.PlayState;
 	import akdcl.media.PlayerSkin;
 	import akdcl.media.providers.MediaProvider;
+	
+	import com.greensock.TweenMax;
+	import com.greensock.easing.Elastic;
+	
+	import flash.display.Stage;
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	
+	import zero.utils.stopAll;
 
 	/**
 	 * ...
@@ -49,6 +49,9 @@ package zero.ui{
 
 		override protected function init():void {
 			super.init();
+			
+			stopAll(this);
+			
 			displayContainer = new UIDisplay(50, 50, -1);
 			displayContainer.addEventListener(MouseEvent.CLICK, onDisplayClickHandler);
 			addChildAt(displayContainer, 0);
