@@ -41,6 +41,7 @@ package zero.works.station{
 		public var nav:Nav;
 		
 		private var btnSkip_dy:int;
+		private var kaitouIsPlaying:Boolean;
 		
 		private var kaitouLoader:ImgLoader;
 		
@@ -52,9 +53,14 @@ package zero.works.station{
 		
 		private var imgsSpV:Vector.<Sprite>;
 		
-		public function Station(_optionsXMLPath:String,switchClass:Class){
+		public var loading_value1:Number;
+		private var loading_value2:Number;
+		private var loading_time:int;
+		
+		public function Station(_optionsXMLPath:String,switchClass:Class,_loading_time:int){
 			optionsXMLPath=_optionsXMLPath;
 			_switch=new switchClass();
+			loading_time=_loading_time;
 			onLoaded=loaded;
 		}
 		override protected function onInitHandler(_evt:Event):void{super.onInitHandler(_evt);
@@ -98,6 +104,10 @@ package zero.works.station{
 				main.loading.style=optionsXML.loading[0].style[0];
 			}
 			
+			if(main.musicCtrl){
+				main.musicCtrl.visible=false;
+			}
+			
 			nav=new Nav();
 			
 			nav.init(main.nav,optionsXML);
@@ -121,6 +131,148 @@ package zero.works.station{
 				btnSkip_dy=main.btnSkip.y-main.loading.y;
 			}
 			
+			var prevloadsXML:XML=<prevloads/>;
+			for each(var matchStr:String in optionsXML.toXMLString().match(/<[^<>]+\s+src=".*?"[^<>]+>/g)){
+				try{
+					var srcXML:XML=new XML(matchStr);
+					if(srcXML.name().toString()){
+					}else{
+						srcXML=null;
+					}
+				}catch(e:Error){
+					srcXML=null;
+				}
+				if(srcXML&&srcXML.@prevload.toString()=="true"){
+					prevloadsXML.appendChild(<node src={srcXML.@src.toString()}/>);
+				}
+			}
+			
+			loading_value1=0;
+			TweenMax.to(this,loading_time*30,{loading_value1:1,useFrames:true});
+			this.addEventListener(Event.ENTER_FRAME,checkMainLoading);
+			main.loading.show();
+			
+			var nodeXMLList:XMLList=prevloadsXML.children();
+			if(nodeXMLList.length()){
+				trace("预加载：\n"+nodeXMLList.toXMLString());
+				if(optionsXML.@prevloadPercent.toString()){
+					prevloadPercent=Number(optionsXML.@prevloadPercent.toString());
+				}else{
+					prevloadPercent=0.2;
+				}
+				var kaitouXML:XML=optionsXML.kaitou[0];
+				if(kaitouXML){
+					if(kaitouXML.@skip.toString()=="true"){
+						prevloadPercent=1;
+					}
+				}else{
+					prevloadPercent=1;
+				}
+				prevloader=new MultiLoader();
+				prevloader.onLoadProgress=prevloadProgress;
+				prevloader.onLoadComplete=prevloadComplete;
+				prevloader.load(nodeXMLList,MultiLoader.BINARY);
+				resize();
+			}else{
+				prevloadPercent=0;
+				prevloadComplete();
+			}
+		}
+		private function prevloadProgress(value:Number):void{
+			loading_value2=value*prevloadPercent;
+		}
+		private function prevloadComplete(...args):void{
+			
+			if(prevloader){
+				prevloader.clear();
+				prevloader=null;
+			}
+			
+			if(main.btnSkip){
+				main.btnSkip.mouseEnabled=true;
+				TweenMax.to(main.btnSkip,12,{alpha:1,useFrames:true});
+				main.btnSkip.release=skipLoading;
+			}
+			
+			var kaitouXML:XML=optionsXML.kaitou[0];
+			if(kaitouXML){
+				if(kaitouXML.@skip.toString()=="true"){
+					//trace("跳过开头动画");
+				}else{
+					if(main.btnSkip){
+						main.btnSkip.release=skipKaitou1;
+					}
+					main.container.addChild(kaitouLoader=new ImgLoader());
+					kaitouLoader.autoPlay=false;
+					kaitouLoader.onLoadProgress=loadKaitouProgress;
+					kaitouLoader.onLoadComplete=loadKaitouComplete;
+					kaitouLoader.onPlayComplete=playKaitouComplete;
+					kaitouLoader.load(kaitouXML.video[0]);
+				}
+			}else{
+				//trace("没有开头动画");
+			}
+			
+			resize();
+		}
+		
+		private function skipLoading():void{
+			main.btnSkip.mouseEnabled=false;
+			TweenMax.to(main.btnSkip,12,{alpha:0,useFrames:true});
+			TweenMax.killTweensOf(this);
+			loading_value1=1;
+		}
+		private function loadKaitouProgress(value:Number):void{
+			loading_value2=prevloadPercent+value*(1-prevloadPercent);
+		}
+		protected function loadKaitouComplete():void{
+			loading_value2=1;
+		}
+		private function playKaitou():void{
+			if(main.btnSkip){
+				main.btnSkip.release=skipKaitou2;
+			}
+			kaitouIsPlaying=true;
+			kaitouLoader.resume();
+			resize();
+		}
+		
+		private function skipKaitou1():void{
+			//开头动画未加载完毕，跳过
+			main.btnSkip.mouseEnabled=false;
+			TweenMax.to(main.btnSkip,12,{alpha:0,useFrames:true});
+			kaitouLoader.clear();
+			main.container.removeChild(kaitouLoader);
+			kaitouLoader=null;
+			loading_value2=1;
+		}
+		private function checkMainLoading(...args):void{
+			main.loading.value=Math.min(loading_value1,loading_value2);
+			if(
+				loading_value1>=1
+				&&
+				loading_value2>=1
+			){
+				this.removeEventListener(Event.ENTER_FRAME,checkMainLoading);
+				main.loading.hide(kaitouLoader?playKaitou:showPages);
+			}
+		}
+		
+		private function skipKaitou2():void{
+			//开头动画正在播放，跳过
+			kaitouLoader.pause();
+			playKaitouComplete();
+		}
+		
+		private function playKaitouComplete():void{
+			showPages();
+		}
+		protected function showPages():void{
+			if(main.btnSkip){
+				main.btnSkip.mouseEnabled=false;
+				TweenMax.to(main.btnSkip,12,{alpha:0,useFrames:true});
+			}
+			
 			var btnBackXML:XML=optionsXML.btnBack[0];
 			if(btnBackXML){
 				if(main.btnBack){
@@ -136,6 +288,7 @@ package zero.works.station{
 			var musicXML:XML=optionsXML.music[0];
 			if(musicXML){
 				if(main.musicCtrl){
+					main.musicCtrl.visible=true;
 					main.musicCtrl.mouseChildren=true;
 					getLayout(main.musicCtrl,musicXML);
 					(main.musicCtrl as MusicCtrl).init(musicXML.@src.toString());
@@ -191,112 +344,11 @@ package zero.works.station{
 				main.addChild(bottom=new ImgLoader());
 				bottom.load(bottomXML);
 				bottom.mouseEnabled=bottom.mouseChildren=false;
-			}
-			
-			var prevloadsXML:XML=<prevloads/>;
-			for each(var matchStr:String in optionsXML.toXMLString().match(/<[^<>]+\s+src=".*?"[^<>]+>/g)){
-				try{
-					var srcXML:XML=new XML(matchStr);
-					if(srcXML.name().toString()){
-					}else{
-						srcXML=null;
-					}
-				}catch(e:Error){
-					srcXML=null;
-				}
-				if(srcXML&&srcXML.@prevload.toString()=="true"){
-					prevloadsXML.appendChild(<node src={srcXML.@src.toString()}/>);
-				}
-			}
-			var nodeXMLList:XMLList=prevloadsXML.children();
-			if(nodeXMLList.length()){
-				//trace("预加载："+nodeXMLList.toXMLString());
-				if(optionsXML.@prevloadPercent.toString()){
-					prevloadPercent=Number(optionsXML.@prevloadPercent.toString());
-				}else{
-					prevloadPercent=0.2;
-				}
-				var kaitouXML:XML=optionsXML.kaitou[0];
-				if(kaitouXML){
-					if(kaitouXML.@skip.toString()=="true"){
-						prevloadPercent=1;
-					}
-				}else{
-					prevloadPercent=1;
-				}
-				prevloader=new MultiLoader();
-				prevloader.onLoadProgress=prevloadProgress;
-				prevloader.onLoadComplete=prevloadComplete;
-				prevloader.load(nodeXMLList,MultiLoader.BINARY);
-				main.loading.show();
-				resize();
-			}else{
-				prevloadPercent=0;
-				prevloadComplete();
-			}
-		}
-		private function prevloadProgress(value:Number):void{
-			main.loading.value=value*prevloadPercent;
-		}
-		private function prevloadComplete(...args):void{
-			
-			if(prevloader){
-				prevloader.clear();
-				prevloader=null;
-			}
-			
-			var kaitouXML:XML=optionsXML.kaitou[0];
-			if(kaitouXML){
-				if(kaitouXML.@skip.toString()=="true"){
-					trace("跳过开头动画");
-					playKaitouComplete();
-				}else{
-					if(main.btnSkip){
-						main.btnSkip.mouseEnabled=true;
-						main.btnSkip.release=playKaitouComplete;
-						TweenMax.to(main.btnSkip,12,{alpha:1,useFrames:true});
-					}
-					main.container.addChild(kaitouLoader=new ImgLoader());
-					kaitouLoader.onLoadProgress=loadKaitouProgress;
-					kaitouLoader.onLoadComplete=loadKaitouComplete;
-					kaitouLoader.onPlayComplete=playKaitouComplete;
-					kaitouLoader.load(kaitouXML.video[0]);
-					main.loading.show();
-				}
-			}else{
-				//trace("没有开头动画");
-				playKaitouComplete();
-			}
-			
-			resize();
-		}
-		
-		private function loadKaitouProgress(value:Number):void{
-			main.loading.value=prevloadPercent+value*(1-prevloadPercent);
-		}
-		protected function loadKaitouComplete():void{
-			main.loading.hide();
-			set_btnSkip_dy_1();
-		}
-		protected function set_btnSkip_dy_1():void{
-			if(main.btnSkip){
-				btnSkip_dy=-1;
-			}
-			resize();
-		}
-		protected function playKaitouComplete():void{
-			if(main.btnSkip){
-				main.btnSkip.mouseEnabled=false;
-				TweenMax.to(main.btnSkip,12,{alpha:0,useFrames:true});
-			}
-			
-			main.loading.hide();
-			
-			if(kaitouLoader){
-				if(btnSkip_dy>-1){
-					kaitouLoader.stopLoader();
-				}
-				kaitouLoader.pause();
+				//var bottom_layoutXML:XML=bottomXML.layout[0];
+				//if(bottom_layoutXML){
+				//}else{
+				//	bottomXML.layout[0]=bottom_layoutXML=getLayout(bottom,null,"left bottom");
+				//}
 			}
 			
 			showNav();
@@ -334,12 +386,14 @@ package zero.works.station{
 			}
 			var nodeXMLList:XMLList=prevloadsXML.children();
 			if(nodeXMLList.length()){
-				//trace("内页预加载："+nodeXMLList.toXMLString());
+				trace("内页预加载：\n"+nodeXMLList.toXMLString());
 				prevloader=new MultiLoader();
 				//prevloader.onLoadProgress=innerprevloadProgress;
 				//prevloader.onLoadComplete=innerPrevloadComplete;
 				prevloader.load(nodeXMLList,MultiLoader.BINARY);
 			}
+			
+			resize();
 		}
 		protected function showNav():void{
 			nav.clip.visible=true;
@@ -380,7 +434,7 @@ package zero.works.station{
 			main.loading.value=value;
 		}
 		private function loadPageComplete():void{
-			main.loading.hide();
+			main.loading.hide(null);
 			resize();
 		}
 		protected function showingPage():void{
@@ -493,6 +547,19 @@ package zero.works.station{
 					sp.x=min_x;
 				}
 			}
+			
+			if(layoutXML.@max_y.toString()){
+				var max_y:int=int(layoutXML.@max_y.toString());
+				if(sp.y>max_y){
+					sp.y=max_y;
+				}
+			}
+			if(layoutXML.@min_y.toString()){
+				var min_y:int=int(layoutXML.@min_y.toString());
+				if(sp.y<min_y){
+					sp.y=min_y;
+				}
+			}
 		}
 		protected function resize(...args):void{
 			
@@ -525,10 +592,12 @@ package zero.works.station{
 				var imgsXML:XML=optionsXML.imgs[0];
 				if(imgsXML){
 					if(main.imgs){
-						var i:int=-1;
-						for each(var subXML:XML in imgsXML.children()){
-							i++;
-							updateSpByLayout(imgsSpV[i],subXML.layout[0]);
+						if(imgsSpV){
+							var i:int=-1;
+							for each(var subXML:XML in imgsXML.children()){
+								i++;
+								updateSpByLayout(imgsSpV[i],subXML.layout[0]);
+							}
 						}
 					}
 				}
@@ -539,13 +608,18 @@ package zero.works.station{
 				}
 				
 				if(bottom){
-					bottom.y=stage.stageHeight;//底部左下角对齐
 					var bottomXML:XML=optionsXML.bottom[0];
 					if(bottomXML){
-						if(bottomXML.@align.toString().indexOf("right")>-1){
-							bottom.x=stage.stageWidth;
-						}else if(bottomXML.@align.toString().indexOf("center")>-1){
-							bottom.x=stage.stageWidth/2;
+						var bottom_layoutXML:XML=bottomXML.layout[0];
+						if(bottom_layoutXML){
+							updateSpByLayout(bottom,bottom_layoutXML);
+						}else{
+							bottom.y=stage.stageHeight;//底部左下角对齐
+							if(bottomXML.@align.toString().indexOf("right")>-1){
+								bottom.x=stage.stageWidth;
+							}else if(bottomXML.@align.toString().indexOf("center")>-1){
+								bottom.x=stage.stageWidth/2;
+							}
 						}
 					}
 				}
@@ -555,11 +629,11 @@ package zero.works.station{
 				
 				if(main.btnSkip){
 					main.btnSkip.x=stage.stageWidth/2;
-					if(btnSkip_dy>-1){
-						main.btnSkip.y=main.loading.y+btnSkip_dy;
-					}else{
+					if(kaitouIsPlaying){
 						var b:Rectangle=main.btnSkip.getBounds(main);
 						main.btnSkip.y+=stage.stageHeight-20-b.bottom;
+					}else{
+						main.btnSkip.y=main.loading.y+btnSkip_dy;
 					}
 				}
 				
