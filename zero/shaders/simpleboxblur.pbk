@@ -1,40 +1,74 @@
 <languageVersion: 1.0;>
-kernel simpleboxblur
+kernel SimpleBoxBlur
 <
     namespace : "AIF";
-    vendor : "zero";
+    vendor : "Adobe Systems";
     version : 2;
-    description : "A simple box blur";
+    description : "A simple fixed-size box blur";
 >
 {
-    parameter int blurX
-    <
-        minValue: 0;
-        maxValue: 100;
-        defaultValue: 5;
-    >;
-    parameter int blurY
-    <
-        minValue: 0;
-        maxValue: 100;
-        defaultValue: 5;
-    >;
-    
-    input image4 bg;
     input image4 src;
     output float4 dst;
-    
     void evaluatePixel()
     {
         float4 colorAccumulator = float4(0.0, 0.0, 0.0, 0.0);
+       
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-3,-3));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-3,-2));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-3,-1));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-3,0));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-3,1));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-3,2));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-3,3));
+       
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-2,-3));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-2,-2));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-2,-1));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-2,0));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-2,1));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-2,2));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-2,3));
+       
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-1,-3));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-1,-2));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-1,-1));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-1,0));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-1,1));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-1,2));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(-1,3));
         
-        for(int y=0;y<blurY;y++){
-            for(int x=0;x<blurX;x++){
-                colorAccumulator += sampleNearest(bg, outCoord() + float2(x-blurX/2,y-blurY/2));
-            }
-        }
-        //srcP=
-        colorAccumulator[3]=sampleNearest(src,outCoord()).a;
-        dst = colorAccumulator / float(blurX*blurY);
+        colorAccumulator += sampleNearest(src, outCoord() + float2(0,-3));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(0,-2));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(0,-1));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(0,0));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(0,1));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(0,2));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(0,3));
+       
+        colorAccumulator += sampleNearest(src, outCoord() + float2(1,-3));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(1,-2));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(1,-1));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(1,0));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(1,1));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(1,2));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(1,3));
+       
+        colorAccumulator += sampleNearest(src, outCoord() + float2(2,-3));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(2,-2));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(2,-1));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(2,0));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(2,1));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(2,2));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(2,3));
+       
+        colorAccumulator += sampleNearest(src, outCoord() + float2(3,-3));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(3,-2));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(3,-1));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(3,0));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(3,1));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(3,2));
+        colorAccumulator += sampleNearest(src, outCoord() + float2(3,3));
+        
+        dst = colorAccumulator / 49.0;
     }
 }
