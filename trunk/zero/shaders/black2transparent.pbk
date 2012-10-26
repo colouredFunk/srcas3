@@ -1,0 +1,20 @@
+<languageVersion: 1.0;>
+
+kernel pixelate
+<
+    namespace : "zero.shaders";
+    vendor : "zero";
+    version : 1;
+    description : "black2transparent";
+>
+{
+    input image4 img;
+    input image4 bg;
+    output pixel4 result;
+
+    void evaluatePixel()
+    {
+        result = sampleNearest(img,outCoord());
+        result = sampleNearest(bg,outCoord());
+    }
+}
