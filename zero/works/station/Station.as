@@ -343,7 +343,7 @@ package zero.works.station{
 			if(bottomXML){
 				main.addChild(bottom=new ImgLoader());
 				bottom.load(bottomXML);
-				bottom.mouseEnabled=bottom.mouseChildren=false;
+				bottom.mouseEnabled=false;
 				//var bottom_layoutXML:XML=bottomXML.layout[0];
 				//if(bottom_layoutXML){
 				//}else{

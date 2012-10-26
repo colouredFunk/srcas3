@@ -1,0 +1,30 @@
+<languageVersion: 1.0;>
+
+kernel pixelate
+<
+    namespace : "zero.shaders";
+    vendor : "zero";
+    version : 1;
+    description : "pixelate an image";
+>
+{
+    parameter int dimension
+    <
+        minValue: 1;
+        maxValue: 100;
+        defaultValue: 2;
+    >;
+
+    input image4 img;
+    output pixel4 result;
+
+    void evaluatePixel()
+    {
+        float dimAsFloat = float(dimension);
+
+        float2 sc = floor(outCoord() / float2(dimAsFloat, dimAsFloat));
+        sc *= dimAsFloat;
+
+        result = sampleNearest(img, sc);
+    }
+}
