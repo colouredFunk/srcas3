@@ -1,0 +1,78 @@
+<languageVersion: 1.0;>
+kernel maoboli
+<
+    namespace : "zero.shaders";
+    vendor : "zero";
+    version : 2;
+    description : "maoboli";
+>
+{
+    //不支持循环 - -
+    //parameter int blurX
+    //<
+    //    minValue: 0;
+    //    maxValue: 100;
+    //    defaultValue: 5;
+    //>;
+    //parameter int blurY
+    //<
+    //    minValue: 0;
+    //    maxValue: 100;
+    //    defaultValue: 5;
+    //>;
+    
+    input image4 bg;
+    input image4 src;
+    output pixel4 dst;
+
+    void evaluatePixel()
+    {
+        /*
+        float4 colorAccumulator = float4(0.0, 0.0, 0.0, 0.0);
+        
+        //不支持循环 - -
+        
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(-2,-2));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(-1,-2));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(0,-2));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(1,-2));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(2,-2));
+        
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(-2,-1));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(-1,-1));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(0,-1));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(1,-1));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(2,-1));
+        
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(-2,0));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(-1,0));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(0,0));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(1,0));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(2,0));
+        
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(-2,1));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(-1,1));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(0,1));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(1,1));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(2,1));
+        
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(-2,2));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(-1,2));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(0,2));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(1,2));
+        colorAccumulator += sampleNearest(bg, outCoord() + float2(2,2));
+        
+        dst = colorAccumulator / float(5*5);
+        
+        dst.a=sampleNearest(src,outCoord()).a;
+        */
+        
+        //dst=sampleNearest(src,outCoord());
+        //dst.a=sampleNearest(bg,outCoord()).a;
+        
+        pixel4 bgP=sampleNearest(bg,outCoord());
+        
+        dst = sampleNearest(src,outCoord());
+        dst.r=bgP.r;
+    }
+}

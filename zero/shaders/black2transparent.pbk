@@ -4,17 +4,19 @@ kernel pixelate
 <
     namespace : "zero.shaders";
     vendor : "zero";
-    version : 1;
+    version : 2;
     description : "black2transparent";
 >
 {
-    input image4 img;
     input image4 bg;
-    output pixel4 result;
+    input image4 src;
+    output pixel4 dst;
 
     void evaluatePixel()
     {
-        result = sampleNearest(img,outCoord());
-        result = sampleNearest(bg,outCoord());
+        pixel4 bgP=sampleNearest(bg,outCoord());
+        
+        dst = sampleNearest(src,outCoord());
+        dst.r=bgP.r;
     }
 }
