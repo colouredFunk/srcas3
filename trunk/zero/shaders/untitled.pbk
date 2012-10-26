@@ -1,0 +1,39 @@
+<languageVersion: 1.0;>
+kernel simpleboxblur
+<
+    namespace : "AIF";
+    vendor : "zero";
+    version : 2;
+    description : "A simple box blur";
+>
+{
+    parameter int blurX
+    <
+        minValue: 0;
+        maxValue: 100;
+        defaultValue: 5;
+    >;
+    parameter int blurY
+    <
+        minValue: 0;
+        maxValue: 100;
+        defaultValue: 5;
+    >;
+    
+    input image4 bg;
+    input image4 src;
+    output float4 dst;
+    
+    void evaluatePixel()
+    {
+        float4 colorAccumulator = float4(0.0, 0.0, 0.0, 0.0);
+        
+        for(int y=0;y<blurY;y++){
+            for(int x=0;x<blurX;x++){
+                colorAccumulator += sampleNearest(bg, outCoord() + float2(x-blurX/2,y-blurY/2));
+            }
+        }
+        dst = colorAccumulator / float(blurX*blurY);
+        dst.a=sampleNearest(src,outCoord()).a;
+    }
+}

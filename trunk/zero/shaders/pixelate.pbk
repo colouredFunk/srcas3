@@ -4,7 +4,7 @@ kernel pixelate
 <
     namespace : "zero.shaders";
     vendor : "zero";
-    version : 1;
+    version : 2;
     description : "pixelate an image";
 >
 {
@@ -15,8 +15,8 @@ kernel pixelate
         defaultValue: 2;
     >;
 
-    input image4 img;
-    output pixel4 result;
+    input image4 src;
+    output pixel4 dst;
 
     void evaluatePixel()
     {
@@ -25,6 +25,6 @@ kernel pixelate
         float2 sc = floor(outCoord() / float2(dimAsFloat, dimAsFloat));
         sc *= dimAsFloat;
 
-        result = sampleNearest(img, sc);
+        dst = sampleNearest(src, sc);
     }
 }
