@@ -6,7 +6,7 @@ Pixelate
 用法举例：这家伙还是很懒什么都没写。
 */
 
-package zero.shaders{
+package zero.shaders.filters{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.geom.*;
@@ -14,6 +14,8 @@ package zero.shaders{
 	import flash.system.*;
 	import flash.text.*;
 	import flash.utils.*;
+	
+	import zero.shaders.BaseShader;
 	
 	/**
 	 * 

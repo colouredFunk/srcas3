@@ -8,15 +8,12 @@ kernel pixelate
     description : "black2transparent";
 >
 {
-    input image4 bg;
     input image4 src;
     output pixel4 dst;
 
     void evaluatePixel()
     {
-        pixel4 bgP=sampleNearest(bg,outCoord());
-        
-        dst = sampleNearest(src,outCoord());
-        dst.r=bgP.r;
+        dst=sampleNearest(src,outCoord());
+        dst.a=(dst.r+dst.g+dst.b)/3.0;
     }
 }
