@@ -14,7 +14,7 @@
 	[Event(name="displayChange",type="akdcl.events.MediaEvent")]
 	final public class VideoProvider extends MediaProvider implements IDiplayProvider {
 		private static const VIDEOLOADER_GROUP:String = "VideoLoader";
-		private static const DEFAULT_PARAMS:Object = {autoPlay: false, scaleMode: ScaleMode.PROPORTIONAL_INSIDE, bgColor: 0x000000};
+		private static const DEFAULT_PARAMS:Object = {autoPlay: false, repeat:0, scaleMode: ScaleMode.PROPORTIONAL_INSIDE, bgColor: 0x000000};
 
 		private static var sM:SourceManager = SourceManager.getInstance();
 		

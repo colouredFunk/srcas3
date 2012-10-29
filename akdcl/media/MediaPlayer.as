@@ -276,7 +276,7 @@
 			super.onPlayCompleteHandler(_evt);
 			switch (repeat){
 				case 0:
-					stop();
+					//stop();
 					break;
 				case 1:
 					stop();
@@ -284,7 +284,7 @@
 					break;
 				case 2:
 					if (playID == playlist.length - 1){
-						stop();
+						//stop();
 					} else {
 						next();
 					}
@@ -299,7 +299,7 @@
 					break;
 				case 4:
 					//待完善
-					stop();
+					//stop();
 					break;
 			}
 		}
