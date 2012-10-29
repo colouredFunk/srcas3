@@ -17,14 +17,26 @@ kernel pixelate
 
     input image4 src;
     output pixel4 dst;
+    //parameter float2 srcSize
+    //<
+    //    parameterType: "inputSize";
+    //    inputSizeName: "src";
+   // >;
 
     void evaluatePixel()
     {
-        float dimAsFloat = float(dimension);
-
-        float2 sc = floor(outCoord() / float2(dimAsFloat, dimAsFloat));
-        sc *= dimAsFloat;
-
-        dst = sampleNearest(src, sc);
+        float f_dimension=float(dimension);
+        float2 oc=outCoord();
+        
+        //float xOffset=(ceil(srcSize.x/f_dimension)*f_dimension-srcSize.x)/2.0;
+        //float yOffset=(ceil(srcSize.y/f_dimension)*f_dimension-srcSize.y)/2.0;
+        
+        //oc.x=floor(oc.x/f_dimension + .5)*f_dimension+xOffset;
+        //oc.y=floor(oc.y/f_dimension + .5)*f_dimension+yOffset;
+        
+        oc.x=floor(oc.x/f_dimension + .5)*f_dimension;//Math.round(oc.x/f_dimension)*f_dimension
+        oc.y=floor(oc.y/f_dimension + .5)*f_dimension;//Math.round(oc.x/f_dimension)*f_dimension
+        
+        dst = sampleNearest(src,oc);
     }
 }
