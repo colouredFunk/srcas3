@@ -28,7 +28,6 @@ package zero.shaders.filters{
 		
 		public function Black2Transparent(){
 			super(code);
-			//outputParamInfos();
 		}
 	}
 }

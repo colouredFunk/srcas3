@@ -28,7 +28,6 @@ package zero.shaders.blenders{
 		
 		public function Maoboli(){
 			super(code);
-			outputParamInfos();
 		}
 	}
 }

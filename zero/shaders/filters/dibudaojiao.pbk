@@ -1,0 +1,41 @@
+<languageVersion: 1.0;>
+
+kernel dibudaojiao
+<
+    namespace : "zero.shaders";
+    vendor : "zero";
+    version : 2;
+    description : "dibudaojiao";
+>
+{
+    parameter int strength
+    <
+        minValue: 1;
+        maxValue: 1000;
+        defaultValue: 5;
+    >;
+
+    input image4 src;
+    output pixel4 dst;
+    parameter float2 srcSize
+    <
+        parameterType: "inputSize";
+        inputSizeName: "src";
+    >;
+
+    void evaluatePixel()
+    {
+        float f_strength=float(strength);
+        float2 oc=outCoord();
+        
+        dst = sampleNearest(src,oc);
+        
+        float d=oc.y-(srcSize.y-f_strength);
+        if(d>0.0){
+            d=(f_strength-d)/f_strength;
+            dst.r*=d;
+            dst.g*=d;
+            dst.b*=d;
+        }
+    }
+}
