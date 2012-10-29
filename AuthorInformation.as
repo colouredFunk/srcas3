@@ -1,41 +1,85 @@
-package {
+﻿package {
 	import flash.utils.ByteArray;
-	import zero.SWFMetadataGetter;
-
+	
+	import zero.codec.CRC32;
+	import zero.swf.utils.getModificationDate;
+	import zero.utils.getTime;
 
 	/**
 	 * ...
 	 * @author akdcl
 	 */
 	final public class AuthorInformation {
-		private static const author:String = "Chunlei.Duan";
-		private static var modifyDate:String = "--";
-		private static var version:String = "--";
+		private static const author:String = "Zhibin.Lu";
+		private static var modifyDate:String;
+		private static var swf_version:String;
+		private static var xml_version:String;
 
 		public static function setFileBytes(_bytes:ByteArray):void {
-			SWFMetadataGetter.init(_bytes);
-			var _modifyDate:String = SWFMetadataGetter.getModifyDate();
-			if (_modifyDate){
-				_modifyDate = _modifyDate.split("+")[0];
-
-				modifyDate = _modifyDate.split("T").join(" ");
-
-				var _ary:Array = _modifyDate.split("T");
-				_ary[0] = _ary[0].split("-");
-				_ary[1] = _ary[1].split(":");
-				_modifyDate = _ary[0][1] + _ary[0][2] + "." + (int(_ary[1][0]) * 60 + int(_ary[1][1]));
-
-				version = _ary[0][0].substr(2, 2) + "." + _modifyDate;
+			modifyDate=getTime("Y年m月d日 H:i:s.ms",getModificationDate(_bytes));
+			if (modifyDate){
+				swf_version = modifyDate;
+			}else{
+				modifyDate=null;
+				swf_version = "SWF CRC32：#"+(0x100000000+uint(CRC32(_bytes))).toString(16).substr(1).toUpperCase();
 			}
 		}
 
 		public static function getModifyDate():String {
-			return "ModifyDate: " + modifyDate;
+			return modifyDate||"修改时间：--";
 		}
-
+		
 		public static function getVersion():String {
-			return "Version: " + version;
+			return swf_version||"SWF 版本：--";
 		}
+		
+		/*
+		private static function genVersion(_data:*,name:String):String{
+			if(so){
+				if(so.data.versions){
+				}else{
+					so.data.versions=new Object();
+				}
+				var saveData:Object=so.data.versions[name];
+				if(saveData){
+				}else{
+					so.data.versions[name]=saveData=new Object();
+				}
+				if(saveData["version"]>0){
+				}else{
+					saveData["len"]=0;
+					saveData["crc32"]=0;
+					saveData["version"]=999;
+				}
+				if(_data is ByteArray){
+					var data:ByteArray=_data;
+				}else{
+					data=new ByteArray();
+					data.writeUTFBytes(_data);
+				}
+				//trace('saveData["len"]='+saveData["len"],'data.length='+data.length);
+				if(saveData["len"]==data.length){
+					var crc32:int=CRC32(data);
+					if(saveData["crc32"]==crc32){
+					}else{
+						saveData["crc32"]=crc32;
+						saveData["version"]++;
+					}
+				}else{
+					saveData["len"]=data.length;
+					delete saveData["crc32"];
+					saveData["version"]++;
+				}
+				if(saveData["version"]>10000){
+					saveData["version"]=9999;//9.9.9.9
+				}else if(saveData["version"]<1000){
+					saveData["version"]=1000;//1.0.0.0
+				}
+				return saveData["version"].toString().split("").join(".");
+			}
+			return null;
+		}
+		*/
 
 		public static function getAuthor():String {
 			return "Author: " + author;
