@@ -105,6 +105,12 @@ package zero.works.station{
 				if(navXML.@visible.toString()=="false"){
 					btnNav.visible=false;
 				}
+				if(navXML.icon[0]){
+					//trace(navXML.icon[0].toXMLString());
+					var icon:ImgLoader=new ImgLoader();
+					btnNav.icon.addChild(icon);
+					icon.load(navXML.icon[0]);
+				}
 			}
 			if(btnNav.line){
 				btnNav.line.visible=false;

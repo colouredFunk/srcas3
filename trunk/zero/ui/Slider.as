@@ -46,6 +46,7 @@ package zero.ui{
 			bar.addEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
 			thumb.addEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
 			line.mouseEnabled=line.mouseChildren=false;
+			this.mouseEnabled=false;
 		}
 		public function clear():void{
 			mouseUp();
