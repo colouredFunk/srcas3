@@ -28,7 +28,6 @@ package zero.shaders.filters{
 		
 		public function SimpleBoxBlur(){
 			super(code);
-			outputParamInfos();
 		}
 	}
 }
