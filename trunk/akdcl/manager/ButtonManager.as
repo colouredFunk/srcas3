@@ -1,4 +1,5 @@
 package akdcl.manager {
+	import flash.display.DisplayObjectContainer;
 	import flash.display.InteractiveObject;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
@@ -79,6 +80,8 @@ package akdcl.manager {
 			buttonDic[_button] = _button;
 			setButtonStyle(_button);
 		}
+		
+		
 		public function removeButton(_button:*):void {
 			_button.removeEventListener(MouseEvent.ROLL_OVER, onRollOverHandler);
 			_button.removeEventListener(MouseEvent.ROLL_OUT, onRollOutHandler);
@@ -86,6 +89,22 @@ package akdcl.manager {
 			delete buttonInDic[_button];
 			delete buttonDownDic[_button];
 		}
+		
+		public function removeFromDown(_container:DisplayObjectContainer):void {
+			var _parent:DisplayObjectContainer
+			for each(buttonTarget in buttonDownDic) {
+				_parent = buttonTarget.parent;
+				do {
+					if (!_parent || _parent == _container) {
+						delete buttonDownDic[buttonTarget];
+						setButtonStyle(buttonTarget);
+						break;
+					}
+					_parent = _parent.parent;
+				}while (_parent);
+			}
+		}
+		
 		private function onStageMouseDownHandler(_e:Event):void {
 			lastX = startX = stage.mouseX;
 			lastY = startY = stage.mouseY;
@@ -95,6 +114,7 @@ package akdcl.manager {
 					
 				}else {
 					buttonDownDic[buttonTarget] = buttonTarget;
+					buttonTarget.addEventListener(MouseEvent.ROLL_OUT, onRollOutHandler);
 					if (buttonTarget.hasEventListener(UIEvent.PRESS)) {
 						buttonTarget.dispatchEvent(new UIEvent(UIEvent.PRESS));
 					}
@@ -115,7 +135,7 @@ package akdcl.manager {
 			
 			//trace(_e.target, _e.currentTarget, buttonTarget);
 			//var _parent:DisplayObjectContainer;
-			if (_e && _e.target != stage) {
+			if (!mobileMode && _e && _e.target != stage) {
 				buttonTarget = _e.target as InteractiveObject;
 				while (buttonTarget) {
 					if (buttonInDic[buttonTarget] && !buttonDownDic[buttonTarget]) {
@@ -130,12 +150,12 @@ package akdcl.manager {
 				delete buttonDownDic[buttonTarget];
 				if (buttonInDic[buttonTarget]) {
 					if (buttonTarget.hasEventListener(UIEvent.RELEASE)) {
-						buttonTarget.dispatchEvent(new UIEvent(UIEvent.RELEASE, true, _e.target));
+						buttonTarget.dispatchEvent(new UIEvent(UIEvent.RELEASE, true, _e?_e.target:buttonTarget));
 					}
 					buttonCallBack(buttonTarget, RELEASE);
 				}else {
 					if (buttonTarget.hasEventListener(UIEvent.RELEASE_OUTSIDE)) {
-						buttonTarget.dispatchEvent(new UIEvent(UIEvent.RELEASE_OUTSIDE, true, _e.target));
+						buttonTarget.dispatchEvent(new UIEvent(UIEvent.RELEASE_OUTSIDE, true, _e?_e.target:buttonTarget));
 					}
 					buttonCallBack(buttonTarget, RELEASE_OUTSIDE);
 					/*
@@ -154,10 +174,11 @@ package akdcl.manager {
 					*/
 				}
 				
-				setButtonStyle(buttonTarget);
+				setButtonStyle(buttonTarget, mobileMode);
 			}
 			isDraged = false;
 		}
+		
 		private function onStageMouseMoveHandler(_e:MouseEvent):void {
 			if (_e.stageX > stage.stageWidth || _e.stageX < 0 || _e.stageY > stage.stageHeight || _e.stageY < 0) {
 				onStageMouseUpHandler(null);
@@ -242,9 +263,9 @@ package akdcl.manager {
 			}
 		}
 		
-		public function setButtonStyle(_button:Object):void {
-			var _isDown:Boolean = buttonDownDic[_button]!=null;
-			var _isIn:Boolean = buttonInDic[_button] != null;
+		public function setButtonStyle(_button:Object, _isMobileMouseUp:Boolean = false):void {
+			var _isDown:Boolean = buttonDownDic[_button] != null;
+			var _isIn:Boolean = _isMobileMouseUp?false:(buttonInDic[_button] != null);
 			var _isSelected:Boolean = _button.hasOwnProperty("selected") && _button.selected;
 			var _isActive:Boolean = _isDown || _isIn || _isSelected;
 			var _frameTo:uint;
