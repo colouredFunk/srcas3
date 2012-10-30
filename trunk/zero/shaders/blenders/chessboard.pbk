@@ -1,0 +1,44 @@
+<languageVersion: 1.0;>
+
+kernel chessboard
+<
+    namespace : "zero.shaders";
+    vendor : "zero";
+    version : 2;
+    description : "chessboard";
+>
+{
+    parameter int dimension
+    <
+        minValue: 1;
+        maxValue: 100;
+        defaultValue: 20;
+    >;
+    parameter pixel4 whiteColor
+    <
+        defaultValue: pixel4(1.0,1.0,1.0,1.0);
+    >;
+    parameter pixel4 blackColor
+    <
+        defaultValue: pixel4(0.0,0.0,0.0,1.0);
+    >;
+
+    input image4 src;
+    output pixel4 dst;
+
+    void evaluatePixel()
+    {
+        float f_dimension=float(dimension);
+        float2 oc=outCoord();
+        
+        dst=sample(src,oc);
+        
+        if(mod(floor(oc.x/f_dimension + .5)+floor(oc.y/f_dimension + .5),2.0)==0.0){
+            dst.rgb=whiteColor.rgb;
+            dst.a*=whiteColor.a;
+        }else{
+            dst.rgb=blackColor.rgb;
+            dst.a*=blackColor.a;
+        }
+    }
+}
