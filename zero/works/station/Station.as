@@ -35,9 +35,9 @@ package zero.works.station{
 	
 	public class Station extends DocClass{
 		
-		protected var main:Main;
-		private var bg:ImgLoader;
-		private var bottom:ImgLoader;
+		public var main:Main;
+		public var bg:ImgLoader;
+		public var bottom:ImgLoader;
 		public var nav:Nav;
 		
 		private var btnSkip_dy:int;
@@ -422,9 +422,12 @@ package zero.works.station{
 			if(main.fade_ani){
 				main.fade_ani.gotoAndPlay(int(main.fade_ani.totalFrames/2)+1);
 			}
-			main.loading.show();
 			for each(var navXML:XML in optionsXML.nav){
 				if(navXML.@selected.toString()=="true"){
+					if(navXML.@noShowLoading.toString()=="true"){
+					}else{
+						main.loading.show();
+					}
 					nav.select(navXML);
 					return;
 				}

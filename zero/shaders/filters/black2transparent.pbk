@@ -1,6 +1,6 @@
 <languageVersion: 1.0;>
 
-kernel pixelate
+kernel black2transparent
 <
     namespace : "zero.shaders";
     vendor : "zero";
