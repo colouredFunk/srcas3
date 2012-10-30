@@ -19,7 +19,7 @@ package zero.shaders{
 	public class BaseShader extends Shader{
 		public function BaseShader(code:ByteArray){
 			super(code);
-			outputParamInfos();
+			//outputParamInfos();
 		}
 		public function outputParamInfos():void{
 			for(var paramName:String in data){

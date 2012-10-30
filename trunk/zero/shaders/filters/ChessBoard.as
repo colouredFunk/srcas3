@@ -6,7 +6,7 @@ ChessBoard
 用法举例：这家伙还是很懒什么都没写。
 */
 
-package zero.shaders.blenders{
+package zero.shaders.filters{
 	import flash.display.*;
 	import flash.events.*;
 	import flash.geom.*;
@@ -33,7 +33,7 @@ package zero.shaders.blenders{
 		 * @param _blackColor 黑颜色
 		 * 
 		 */		
-		public function ChessBoard(_dimension:int=20,_whiteColor:uint=0xffffffff,_blackColor:uint=0x00000000){
+		public function ChessBoard(_dimension:int=20,_whiteColor:uint=0xffffffff,_blackColor:uint=0xff000000){
 			super(code);
 			dimension=_dimension;
 			whiteColor=_whiteColor;
