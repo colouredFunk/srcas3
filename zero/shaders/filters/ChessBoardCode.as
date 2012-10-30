@@ -6,7 +6,7 @@ ChessBoardCode
 用法举例：这家伙还是很懒什么都没写。
 */
 
-package zero.shaders.blenders{
+package zero.shaders.filters{
 	import flash.utils.ByteArray;
 	[Embed(source="chessboard.pbj", mimeType="application/octet-stream")]
 	public class ChessBoardCode extends ByteArray{
