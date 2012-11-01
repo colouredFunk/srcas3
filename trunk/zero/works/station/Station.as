@@ -277,7 +277,14 @@ package zero.works.station{
 			if(btnBackXML){
 				if(main.btnBack){
 					getLayout(main.btnBack,btnBackXML,"center middle");
-					GetFont.initTxt(main.btnBack["label"].txt,btnBackXML.label[0]);
+					if(btnBackXML.label[0]){
+						GetFont.initTxt(main.btnBack["label"].txt,btnBackXML.label[0]);
+					}
+					if(btnBackXML.icon[0]){
+						var icon:ImgLoader=new ImgLoader();
+						main.btnBack["icon"].addChild(icon);
+						icon.load(btnBackXML.icon[0]);
+					}
 					main.btnBack.release=back;
 					main.btnBack.alpha=0;
 				}
@@ -579,7 +586,7 @@ package zero.works.station{
 				updateSpByLayout(nav.clip,nav_layoutXML);
 				
 				var btnBackXML:XML=optionsXML.btnBack[0];
-				if(btnBackXML){
+				if(btnBackXML&&btnBackXML.layout[0]){
 					if(main.btnBack){
 						updateSpByLayout(main.btnBack,btnBackXML.layout[0]);
 					}
