@@ -20,6 +20,12 @@ kernel xishou
         maxValue:2048.0;
         defaultValue:1000.0;
     >;
+    //parameter float powValue
+    //<
+    //    minValue:0.0;
+    //    maxValue:1.0;
+    //    defaultValue:0.1;
+    //>;
     
     input image4 src;
     output pixel4 dst;
@@ -27,16 +33,38 @@ kernel xishou
     void evaluatePixel()
     {
         float2 oc=outCoord();
-        float2 v=oc-center;
-        float d=length(v);
-        if(d<1.0){
-            d=1.0;
-        }else if(d>strength){
-            d=strength;
-        }
-        v=normalize(v);
-        v*=strength/d;
         
-        dst=sampleNearest(src,oc+v);
+        //1
+        //float2 v=oc-center;
+        //float d=length(v);
+        //if(d<1.0){
+        //    d=1.0;
+        //}else if(d>strength){
+        //    d=strength;
+        //}
+        //v=normalize(v);
+        //v*=strength/d;
+        //
+        //dst=sampleNearest(src,oc+v);
+        
+        //2
+        //float k=pow(distance(oc,center)/strength,powValue);//ºÜÂý
+        //if(k<0.0001){
+        //    k=0.0001;
+        //}
+        //if(k>1.0){
+        //    k=1.0;
+        //}
+        //dst=sampleNearest(src,center+(oc-center)/k);
+        
+        //3
+        float k=sqrt(distance(oc,center)/strength);
+        if(k<0.0001){
+            k=0.0001;
+        }
+        if(k>1.0){
+            k=1.0;
+        }
+        dst=sampleNearest(src,center+(oc-center)/k);
     }
 }

@@ -30,11 +30,14 @@ package zero.shaders.filters{
 		 * 
 		 * @param _center 中心点（(0,0)~(2048,2048)），默认(0,0)
 		 * @param _strength 强度（1~2048），默认1000
+		 * @param _powValue 幂的次数（0~1），默认0.1
 		 * 
 		 */		
-		public function Xishou(_center:Point=null,_strength:Number=1000){
+		public function Xishou(_center:Point=null,_strength:Number=1000/*,_powValue:Number=0.1*/){
 			super(code);
 			_center&&(center=_center);
+			strength=_strength;
+			//powValue=_powValue;
 		}
 		
 		/**
@@ -55,11 +58,25 @@ package zero.shaders.filters{
 		 * 强度（1~2048），默认1000
 		 * 
 		 */		
-		public function get strength():int{
+		public function get strength():Number{
 			return (data.strength as ShaderParameter).value[0];
 		}
-		public function set strength(_strength:int):void{
+		public function set strength(_strength:Number):void{
 			(data.strength as ShaderParameter).value=[_strength];
 		}
+		
+		/**
+		 * 
+		 * 幂的次数（0~1），默认0.1
+		 * 
+		 */		
+		/*
+		public function get powValue():Number{
+			return (data.powValue as ShaderParameter).value[0];
+		}
+		public function set powValue(_powValue:Number):void{
+			(data.powValue as ShaderParameter).value=[_powValue];
+		}
+		*/
 	}
 }

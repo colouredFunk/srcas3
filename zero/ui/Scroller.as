@@ -86,9 +86,11 @@ package zero.ui{
 				this.visible=true;
 				this.mouseChildren=true;
 				
-				thumb["gra"].gra.height=viewHei/_contentHei*(bar.y+bar.height-d*2);
+				if(thumb["gra"].hasOwnProperty("gra")){
+					thumb["gra"].gra.height=viewHei/_contentHei*(bar.y+bar.height-d*2);
+				}
 				top=bar.y+d;
-				bottom=bar.y+bar.height-thumb.height-d*2;
+				bottom=bar.y+bar.height-(thumb["gra"].hasOwnProperty("gra")?thumb.height:0)-d;
 				
 				content=_content;
 				
@@ -139,7 +141,7 @@ package zero.ui{
 		private function mouseDown(event:MouseEvent):void{
 			if(event.target==thumb){
 			}else{
-				thumb.y=this.mouseY-thumb.height/2;
+				thumb.y=this.mouseY-(thumb["gra"].hasOwnProperty("gra")?thumb.height:0)/2;
 				adjustThumb();
 			}
 			thumb.startDrag(false,new Rectangle(thumb.x,top,0,bottom-top));

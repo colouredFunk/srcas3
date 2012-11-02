@@ -298,7 +298,7 @@ package zero.works.station{
 					main.musicCtrl.visible=true;
 					main.musicCtrl.mouseChildren=true;
 					getLayout(main.musicCtrl,musicXML);
-					(main.musicCtrl as MusicCtrl).init(musicXML.@src.toString());
+					(main.musicCtrl as MusicCtrl).init(musicXML,getQualifiedClassName(this)+"_musicctrl");
 				}
 			}
 			
@@ -370,7 +370,6 @@ package zero.works.station{
 						main.loading.style=style;
 					}
 				}
-				main.loading.visible=true;
 			}
 			
 			main.container.addChild(_switch);
@@ -433,6 +432,7 @@ package zero.works.station{
 				if(navXML.@selected.toString()=="true"){
 					if(navXML.@noShowLoading.toString()=="true"){
 					}else{
+						main.loading.visible=true;
 						main.loading.show();
 					}
 					nav.select(navXML);
