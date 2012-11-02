@@ -41,20 +41,25 @@ package zero.works.station{
 			Security.allowInsecureDomain("*");
 		}
 		
-		public function init(src:String):void{
+		public function init(xml:XML,so_key:String):void{
 			
-			so=SharedObject.getLocal("musicctrl","/");
+			so=SharedObject.getLocal(so_key,"/");
 			if(so.data.hasOwnProperty("playing")){
 			}else{
 				so.data.playing=true;
 			}
 			if(so.data.hasOwnProperty("volume")){
 			}else{
-				so.data.volume=0.8;
+				var defaultVolume:Number=Number(xml.@defaultVolume.toString());
+				if(defaultVolume>=0&&defaultVolume<=1){
+				}else{
+					defaultVolume=0.8;
+				}
+				so.data.volume=defaultVolume;
 			}
 			
 			player=new MediaPlayer();
-			player.playlist = src;
+			player.playlist = xml.@src.toString();
 			
 			if(so.data.playing){
 				player.volume=so.data.volume;
