@@ -133,11 +133,14 @@ package apmn{
 	import flash.ui.ContextMenuItem;
 	import flash.ui.Keyboard;
 	
+	
+	[Event(name="change", type="flash.events.Event")]
+	
 	/**
 	 * 
 	 * 分色显示的代码编辑器
 	 * 
-	 */	
+	 */
 	public class Wonderflized extends Sprite {
 		
 		private var tabView:TabView;
@@ -233,7 +236,10 @@ package apmn{
 			return getCurrAdvancedTextEditor().text.replace(/\r\n|\r/g,"\n");
 		}
 		public function set text(_text:String):void{
-			getCurrAdvancedTextEditor().text=_text;
+			if(text==_text){
+			}else{
+				getCurrAdvancedTextEditor().text=_text;
+			}
 		}
 	}
 }
@@ -271,6 +277,7 @@ class Catalog {
         var add:Function = function (id:String):void {
             catalog.push(new CatalogEntry(id));
         };
+		
         add("AS3");
         add("ArgumentError");
         add("Array");
@@ -1994,7 +2001,13 @@ class SyntaxHighlighter {
         formats[" interface"] = classFormat;
         formats[" trace"]     = new TextFormat(null, null, 0xcc6666, true);
         formats[" function"]  = new TextFormat(null, null, 0x339966, true);
-    }
+		
+		//20121107
+		var reserved2Format:TextFormat = new TextFormat(null, null, 0x0033ff, false);
+		for each (r in "Array,concat,every,filter,forEach,indexOf,join,lastIndexOf,map,pop,push,reverse,shift,slice,some,sort,sortOn,splice,toLocaleString,toString,unshift,Math,abs,acos,asin,atan,atan2,ceil,cos,exp,floor,log,max,min,pow,random,round,sin,sqrt,tan,Infinity,-Infinity,NaN,undefined,Array,Boolean,decodeURI,decodeURIComponent,encodeURI,encodeURIComponent,escape,int,isFinite,isNaN,isXMLName,Number,Object,parseFloat,parseInt,String,uint,unescape,Vector,XML,XMLList,ArgumentError,arguments,Array,Boolean,Class,Date,DefinitionError,Error,EvalError,Function,int,Math,Namespace,Number,Object,QName,RangeError,ReferenceError,RegExp,SecurityError,String,SyntaxError,TypeError,uint,URIError,Vector,VerifyError,XML,XMLList,a,b,c,d,tx,ty,left,top,right,bottom,length,x,y,width,height,name,matrix,element,item".split(",")) {
+			formats[" " + r] = reserved2Format;
+		}
+	}
         
     /**
      * シンタックスハイライトを再描画
