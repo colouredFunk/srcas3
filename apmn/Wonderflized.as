@@ -1985,7 +1985,7 @@ class SyntaxHighlighter {
         var reserved:String =
             "as,break,case,catch,class,const,continue,default,delete,do,else,extends,false,finally," +
             "for,function,if,implements,import,in,instanceof,interface,internal,is,native,new,null," +
-            "package,private,protected,public,return,super,switch,this,throw,to,true,try,typeof,use," +
+            "package,private,protected,public,return,super,switch,this,throw,from,to,fromTo,true,try,typeof,use," +
             "var,void,while,with,each,get,set,namespace,include,dynamic,final,native,override,static," +
             "abstract,boolean,byte,cast,char,debugger,double,enum,export,float,goto,intrinsic,long," +
             "prototype,short,synchronized,throws,to,transient,type,virtual,volatile";
