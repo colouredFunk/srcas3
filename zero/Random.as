@@ -42,7 +42,7 @@ package zero{
 			//2
 			//http://bbs.9ria.com/thread-139603-1-1.html
 			ran^=(ran<<21);
-			ran^=(ran>>>35);
+			ran^=(ran>>>3);
 			ran^=(ran<<4);
 			return ran;
 		}
