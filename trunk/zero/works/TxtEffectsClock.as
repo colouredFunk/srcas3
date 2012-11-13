@@ -18,7 +18,7 @@ package zero.works{
 	
 	public class TxtEffectsClock extends BaseCom{
 		
-		public var defaultXMLStr:String='<xml startTime="2012-09-20 00:00:00" endTime="2012-09-24 00:00:00"/>';
+		public var defaultXMLStr:String='<xml startTime="2012-11-13 00:00:00" endTime="2012-11-14 12:00:00"/>';
 		
 		public var txt0:TxtEffects;
 		public var txt1:TxtEffects;
@@ -116,8 +116,10 @@ package zero.works{
 			}
 			if(txt4){
 				txt4.value=mss*10;
-				
-				txt4.txt2.num1.getChildAt(0)["text"]=int(Math.random()*10).toString();
+				if(currTime==startTime||currTime==endTime){
+					
+				}else{
+					txt4.txt2.num1.getChildAt(0)["text"]=int(Math.random()*10).toString();
 //这个能后一位也变化么？
 //weishenchu00966(魏慎初（金花）ENTJ) 17:01:41
 //弄个假的　
@@ -129,6 +131,7 @@ package zero.works{
 //可以啊
 //weishenchu00966(魏慎初（金花）ENTJ) 17:02:24
 //那帮忙弄一下吧　谢谢了
+				}
 
 
 			}
