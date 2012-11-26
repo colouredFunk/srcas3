@@ -77,21 +77,21 @@ package zero.works.station{
 				if(clip.bg){
 					b=b.union(btnNav.getBounds(clip));
 				}
-				if(navXML.label[0]){
-					if(btnNav.label){
-						GetFont.initTxt(btnNav.label["txt"],navXML.label[0]);
-					}
-					if(btnNav.label2){
-						GetFont.initTxt(btnNav.label2["txt"],navXML.label[0]);
-					}
+				var labelXML:XML=navXML.label[0];
+				if(labelXML&&btnNav.label){
+					GetFont.initTxt(btnNav.label["txt"],labelXML);
 				}
-				if(navXML.enLabel[0]){
-					if(btnNav.enLabel){
-						GetFont.initTxt(btnNav.enLabel["txt"],navXML.enLabel[0]);
-					}
-					if(btnNav.enLabel2){
-						GetFont.initTxt(btnNav.enLabel2["txt"],navXML.enLabel[0]);
-					}
+				labelXML=navXML.label2[0]||labelXML;
+				if(labelXML&&btnNav.label2){
+					GetFont.initTxt(btnNav.label2["txt"],labelXML);
+				}
+				var enLabelXML:XML=navXML.enLabel[0];
+				if(enLabelXML&&btnNav.enLabel){
+					GetFont.initTxt(btnNav.enLabel["txt"],enLabelXML);
+				}
+				enLabelXML=navXML.enLabel2[0]||enLabelXML;
+				if(enLabelXML&&btnNav.enLabel2){
+					GetFont.initTxt(btnNav.enLabel2["txt"],enLabelXML);
 				}
 				if(autoAdjustXY){
 					x+=dx;

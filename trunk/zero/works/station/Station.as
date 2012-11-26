@@ -182,7 +182,7 @@ package zero.works.station{
 			loading_value2=value*prevloadPercent;
 		}
 		private function prevloadComplete(...args):void{
-			
+			trace("预加载完毕");
 			if(prevloader){
 				prevloader.clear();
 				prevloader=null;
@@ -281,14 +281,32 @@ package zero.works.station{
 						GetFont.initTxt(main.btnBack["label"].txt,btnBackXML.label[0]);
 					}
 					if(btnBackXML.icon[0]){
-						var icon:ImgLoader=new ImgLoader();
-						main.btnBack["icon"].addChild(icon);
-						icon.load(btnBackXML.icon[0]);
+						var btnBacn_icon:ImgLoader=new ImgLoader();
+						main.btnBack["icon"].addChild(btnBacn_icon);
+						btnBacn_icon.load(btnBackXML.icon[0]);
+					}
+					if(btnBackXML.bg[0]){
+						var btnBacn_bg:ImgLoader=new ImgLoader();
+						main.btnBack["bg"].addChild(btnBacn_bg);
+						btnBacn_bg.load(btnBackXML.bg[0]);
 					}
 					main.btnBack.release=back;
 					main.btnBack.alpha=0;
 				}
 			}
+			
+			var bgXML:XML=optionsXML.bg[0];
+			if(bgXML){
+				main.addChildAt(bg=new ImgLoader(),0);
+				bg.onFadeComplete=fadeBgComplete;
+				bg.load(bgXML);
+				bg.mouseEnabled=bg.mouseChildren=false;
+				resize();
+			}else{
+				fadeBgComplete();
+			}
+		}
+		protected function fadeBgComplete():void{
 			
 			BtnFullScreen;
 			
@@ -337,13 +355,6 @@ package zero.works.station{
 						imgsSpV.push(sp);
 					}
 				}
-			}
-			
-			var bgXML:XML=optionsXML.bg[0];
-			if(bgXML){
-				main.addChildAt(bg=new ImgLoader(),0);
-				bg.load(bgXML);
-				bg.mouseEnabled=bg.mouseChildren=false;
 			}
 			
 			var bottomXML:XML=optionsXML.bottom[0];
