@@ -14,6 +14,7 @@ package zero.swf.funs{
 	import zero.swf.*;
 	import zero.swf.avm2.*;
 	import zero.swf.tagBodys.*;
+	import zero.swf.utils.getABCFileWithSimpleConstant_pools;
 	
 	public function replaceAS3Strs(
 		swfData:ByteArray,
@@ -37,7 +38,6 @@ package zero.swf.funs{
 			i++;
 			mark["~"+str0]=strtArr[i];
 		}
-		
 		for each(var ABCData:ABCFileWithSimpleConstant_pool in getABCFileWithSimpleConstant_pools(swf)){
 			i=ABCData.stringV.length;
 			while(--i>0){

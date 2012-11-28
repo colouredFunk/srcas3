@@ -14,6 +14,7 @@ package zero.swf.funs{
 	import zero.swf.avm1.*;
 	import zero.swf.codes.Code;
 	import zero.swf.tagBodys.*;
+	import zero.swf.utils.getActions;
 	
 	public function replaceAS2Strs(
 		swfData:ByteArray,
@@ -31,12 +32,11 @@ package zero.swf.funs{
 		}
 		
 		var mark:Object=new Object();
-		i=-1;
+		var i:int=-1;
 		for each(var str0:String in str0Arr){
 			i++;
 			mark["~"+str0]=strtArr[i];
 		}
-		
 		for each(var Actions:ACTIONRECORDs in getActions(swf)){
 			for each(var code:* in Actions.codeArr){
 				if(code is Code){
