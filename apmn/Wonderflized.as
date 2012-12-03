@@ -174,11 +174,15 @@ package apmn{
 			wid=_wid;
 			hei=_hei;
 			
-			contextMenu = new ContextMenu();
-			contextMenu.hideBuiltInItems();
-			var apmnItem:ContextMenuItem = new ContextMenuItem("http://wonderfl.net/c/Apmn/");
-			apmnItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,link);
-			contextMenu.customItems.push(apmnItem);
+			if(contextMenu){
+				contextMenu = new ContextMenu();
+				contextMenu["hideBuiltInItems"]();
+				var apmnItem:ContextMenuItem = new ContextMenuItem("http://wonderfl.net/c/Apmn/");
+				apmnItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,link);
+				contextMenu["customItems"].push(apmnItem);
+			}else{
+				trace("contextMenu 不可用");
+			}
 		}
 		private function link(...args):void{
 			navigateToURL(new URLRequest("http://wonderfl.net/c/Apmn/"),"_blank");
@@ -1897,13 +1901,14 @@ class FeedbackManager extends EventDispatcher {
     public function FeedbackManager():void {
         sendConn = new LocalConnection();
         recvConn = new LocalConnection();
-        Security.allowDomain("*");
+        try{
+			Security.allowDomain("*");
+		}catch(e:Error){}
         try {
             recvConn.connect("_feedbackManager");
             recvConn.allowDomain("*");
             recvConn.client = { change:changeHandler };
-        } catch (e:*) {
-        }
+        } catch (e:*) {}
     }
     
     private function changeHandler(targetX:Number, targetY:Number):void {
