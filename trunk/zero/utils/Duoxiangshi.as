@@ -1,5 +1,5 @@
 /***
-Douxiangshi
+Duoxiangshi
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
 创建时间：2012年11月23日 09:57:35
 简要说明：这家伙很懒什么都没写。
@@ -12,7 +12,7 @@ package zero.utils{
 	 * 处理由单词和 +，-，*，(，) 组成的多项式
 	 * 
 	 */	
-	public class Douxiangshi{
+	public class Duoxiangshi{
 		
 		/*
 		private static function test():void{
@@ -84,9 +84,9 @@ package zero.utils{
 		test();
 		//*/
 		
-		//Douxiangshi.normalize("xo+((e*fL-f*(yoc-yo))*((xoc-xo)*fL+(xoc-xo)*tz-(xc-xo)*fL)-(d*fL-f*(xoc-xo))*((yoc-yo)*fL+(yoc-yo)*tz-(yc-yo)*fL))");
-		//Douxiangshi.normalize("((a*fL-c*(xoc-xo))*(e*fL-f*(yoc-yo))-(d*fL-f*(xoc-xo))*(b*fL-c*(yoc-yo)))");
-		//Douxiangshi.normalize("xo+((e*fL-f*(yoc-yo))*((xoc-xo)*fL+(xoc-xo)*tz-(xc-xo)*fL)-(d*fL-f*(xoc-xo))*((yoc-yo)*fL+(yoc-yo)*tz-(yc-yo)*fL))/((a*fL-c*(xoc-xo))*(e*fL-f*(yoc-yo))-(d*fL-f*(xoc-xo))*(b*fL-c*(yoc-yo)))");
+		//Duoxiangshi.normalize("xo+((e*fL-f*(yoc-yo))*((xoc-xo)*fL+(xoc-xo)*tz-(xc-xo)*fL)-(d*fL-f*(xoc-xo))*((yoc-yo)*fL+(yoc-yo)*tz-(yc-yo)*fL))");
+		//Duoxiangshi.normalize("((a*fL-c*(xoc-xo))*(e*fL-f*(yoc-yo))-(d*fL-f*(xoc-xo))*(b*fL-c*(yoc-yo)))");
+		//Duoxiangshi.normalize("xo+((e*fL-f*(yoc-yo))*((xoc-xo)*fL+(xoc-xo)*tz-(xc-xo)*fL)-(d*fL-f*(xoc-xo))*((yoc-yo)*fL+(yoc-yo)*tz-(yc-yo)*fL))/((a*fL-c*(xoc-xo))*(e*fL-f*(yoc-yo))-(d*fL-f*(xoc-xo))*(b*fL-c*(yoc-yo)))");
 		
 		private static const itemReg_g:RegExp=/[\+\-]\w+(?:\*[\+\-]\w+)*/g;
 		//private static const itemReg:RegExp=new RegExp(itemReg_g.source);
@@ -199,7 +199,7 @@ package zero.utils{
 			
 			code=removeInnerBrackets(code).replace(/([\*\(])\+/g,"$1");
 			
-			trace(code);
+			//trace(code);
 			
 			return code;
 		}
@@ -207,18 +207,18 @@ package zero.utils{
 		
 		private static function removeInnerBrackets(code:String):String{
 			while(true){
-				var matchArr:Array=code.match(/(?<![\*\/])\([^\(\)]+\)(?![\*\/])/);
+				var matchArr:Array=code.match(/(?<![\*\/=])\([^\(\)]+\)(?![\*\/=])/);
 				if(matchArr&&matchArr.length){
 					var normalizeSeg:String=matchArr[0].replace(/\(([^\(\)]+)\)/,"$1");
-					if(code.charAt(code.search(/(?<![\*\/])\([^\(\)]+\)(?![\*\/])/)-1)=="-"){
+					if(code.charAt(code.search(/(?<![\*\/=])\([^\(\)]+\)(?![\*\/=])/)-1)=="-"){
 						var itemArr:Array=normalizeSeg.match(itemReg_g);
 						normalizeSeg="";
 						for each(var item:String in itemArr){
 							normalizeSeg+=(item.charAt(0)=="-"?"+":"-")+item.substr(1);
 						}
-						code=code.replace(/(?<![\*\/])\-\([^\(\)]+\)(?![\*\/])/,normalizeSeg);
+						code=code.replace(/(?<![\*\/=])\-\([^\(\)]+\)(?![\*\/=])/,normalizeSeg);
 					}else{
-						code=code.replace(/(?<![\*\/])(\+)?\([^\(\)]+\)(?![\*\/])/,normalizeSeg);
+						code=code.replace(/(?<![\*\/=])(\+)?\([^\(\)]+\)(?![\*\/=])/,normalizeSeg);
 					}
 					//trace("  code="+code);
 				}else{
