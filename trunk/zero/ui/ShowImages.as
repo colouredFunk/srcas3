@@ -442,7 +442,7 @@ package zero.ui{
 				if(img){
 					img.visible=true;
 					(img["img"] as ImgLoader).autoPlay=autoPlay;
-					(img["img"] as ImgLoader).load(<img src={imgXML.@src.toString()} align={img_align}/>);
+					(img["img"] as ImgLoader).load(<img src={imgXML.@src.toString()} align={img_align} width={imgXML.@width.toString()} height={imgXML.@height.toString()}/>);
 				}
 				if(bottomContainer){
 					bottomContainer.visible=true;
