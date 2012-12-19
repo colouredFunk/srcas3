@@ -50,8 +50,12 @@ package zero.works.station{
 			}
 			if(so.data.hasOwnProperty("volume")){
 			}else{
-				var defaultVolume:Number=Number(xml.@defaultVolume.toString());
-				if(defaultVolume>=0&&defaultVolume<=1){
+				if(xml.@defaultVolume.toString()){
+					var defaultVolume:Number=Number(xml.@defaultVolume.toString());
+					if(defaultVolume>=0&&defaultVolume<=1){
+					}else{
+						defaultVolume=0.8;
+					}
 				}else{
 					defaultVolume=0.8;
 				}
