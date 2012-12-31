@@ -455,6 +455,9 @@ package zero.ui{
 					if(imgXML.@href.toString()||imgXML.@js.toString()){
 						img.href=imgXML;
 						img.mouseEnabled=true;
+					}else if(imgXML.@big.toString()){
+						img.href=<img href={imgXML.@big.toString()} target="_blank"/>;
+						img.mouseEnabled=true;
 					}else{
 						img.mouseEnabled=false;
 					}

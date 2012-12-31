@@ -108,15 +108,17 @@ package zero.works.station{
 				main.musicCtrl.visible=false;
 			}
 			
-			nav=new Nav();
-			
-			nav.init(main.nav,optionsXML);
-			nav.clip.mouseChildren=true;
-			nav.clip.visible=false;
-			nav_layoutXML=optionsXML.nav_layout[0];
-			if(nav_layoutXML){
-			}else{
-				nav_layoutXML=getLayout(nav.clip,null,"center");
+			if(main.nav){
+				nav=new Nav();
+				
+				nav.init(main.nav,optionsXML);
+				nav.clip.mouseChildren=true;
+				nav.clip.visible=false;
+				nav_layoutXML=optionsXML.nav_layout[0];
+				if(nav_layoutXML){
+				}else{
+					nav_layoutXML=getLayout(nav.clip,null,"center");
+				}
 			}
 			switch_layoutXML=optionsXML.switch_layout[0];
 			if(switch_layoutXML){
@@ -413,10 +415,12 @@ package zero.works.station{
 			resize();
 		}
 		protected function showNav():void{
-			nav.clip.visible=true;
-			TweenMax.killTweensOf(nav.clip);
-			nav.clip.alpha=1;
-			TweenMax.from(nav.clip,12,{alpha:0,useFrames:true});
+			if(nav){
+				nav.clip.visible=true;
+				TweenMax.killTweensOf(nav.clip);
+				nav.clip.alpha=1;
+				TweenMax.from(nav.clip,12,{alpha:0,useFrames:true});
+			}
 		}
 		
 		private function back():void{
@@ -446,7 +450,9 @@ package zero.works.station{
 						main.loading.visible=true;
 						main.loading.show();
 					}
-					nav.select(navXML);
+					if(nav){
+						nav.select(navXML);
+					}
 					return;
 				}
 			}
@@ -459,10 +465,14 @@ package zero.works.station{
 			resize();
 		}
 		protected function showingPage():void{
-			nav.clip.mouseChildren=false;
+			if(nav){
+				nav.clip.mouseChildren=false;
+			}
 		}
 		protected function pageFadeInComplete():void{
-			nav.clip.mouseChildren=true;
+			if(nav){
+				nav.clip.mouseChildren=true;
+			}
 			if(kaitouLoader){
 				kaitouLoader.clear();
 				main.container.removeChild(kaitouLoader);
@@ -594,7 +604,9 @@ package zero.works.station{
 			if(main){
 				
 				//trace("nav_layoutXML="+nav_layoutXML.toXMLString());
-				updateSpByLayout(nav.clip,nav_layoutXML);
+				if(nav){
+					updateSpByLayout(nav.clip,nav_layoutXML);
+				}
 				
 				var btnBackXML:XML=optionsXML.btnBack[0];
 				if(btnBackXML&&btnBackXML.layout[0]){
