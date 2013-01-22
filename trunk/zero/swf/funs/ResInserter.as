@@ -14,6 +14,7 @@ package zero.swf.funs{
 	
 	import zero.swf.*;
 	import zero.swf.tagBodys.*;
+	import zero.swf.utils.SimpleDoABC;
 	
 	public class ResInserter{
 		public static const BITMAP:String="bmd";
