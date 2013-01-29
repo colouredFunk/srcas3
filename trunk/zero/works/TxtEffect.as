@@ -80,7 +80,7 @@ package zero.works{
 			txt.y=-txt.height/2;
 		}
 		
-		private var __value:int;
+		private var __value:int=-1;
 		public function get value():int{
 			return __value;
 		}

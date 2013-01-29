@@ -230,7 +230,8 @@ package zero.works.station{
 		protected function loadKaitouComplete():void{
 			loading_value2=1;
 		}
-		private function playKaitou():void{
+		protected function playKaitou():void{
+			trace("playKaitou");
 			if(main.btnSkip){
 				main.btnSkip.release=skipKaitou2;
 			}
@@ -433,6 +434,7 @@ package zero.works.station{
 			}
 		}
 		private function loadPage():void{
+			trace("loadPage");
 			var btnBackXML:XML=optionsXML.btnBack[0];
 			if(btnBackXML){
 				if(main.btnBack){
@@ -444,6 +446,7 @@ package zero.works.station{
 				main.fade_ani.gotoAndPlay(int(main.fade_ani.totalFrames/2)+1);
 			}
 			for each(var navXML:XML in optionsXML.nav){
+				trace("navXML.@selected.toString()="+navXML.@selected.toString());
 				if(navXML.@selected.toString()=="true"){
 					if(navXML.@noShowLoading.toString()=="true"){
 					}else{
