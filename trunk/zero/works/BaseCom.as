@@ -74,7 +74,10 @@ package zero.works{
 			this.contextMenu.customItems.push(item);
 			item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,clickMenuItem);
 			
-			if(this.loaderInfo.parameters.xml){
+			if(xml){
+				initXML(xml);
+				initParam();
+			}else if(this.loaderInfo.parameters.xml){
 				initXML(this.loaderInfo.parameters.xml);
 			}else{
 				initXML(defaultXML);

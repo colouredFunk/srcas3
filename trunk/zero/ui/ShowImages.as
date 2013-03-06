@@ -67,6 +67,7 @@ package zero.ui{
 		public var onClickImg:Function;
 		public var onSelectImgXML:Function;
 		
+		public var currIcon:Btn;
 		public var currImgXML:XML;
 		
 		private var selectedIconEnabled:Boolean;
@@ -81,19 +82,24 @@ package zero.ui{
 		//20120914
 		private var selected:Boolean;
 		
+		//20130305
+		private var loop:Boolean;
+		
 		public function ShowImages(
 			_selectedIconEnabled:Boolean,
 			mask_inflate_dx:int=4,
 			mask_inflate_dy:int=4,
 			_showAsGrid:Boolean=false,
 			_selected:Boolean=true,
-			_scrollNum:int=0
+			_scrollNum:int=0,
+			_loop:Boolean=false
 		){
 			
 			selectedIconEnabled=_selectedIconEnabled;
 			showAsGrid=_showAsGrid;
 			selected=_selected;
 			scrollNum=_scrollNum;
+			loop=_loop;
 			autoPlay=true;
 			
 			if(icons){
@@ -386,26 +392,29 @@ package zero.ui{
 		}
 		
 		public function selectIcon(icon:Btn):void{
+			
+			currIcon=icon;
+			
 			selectImgXML(icon["xml"]);
 			
 			var i:int=-1;
 			for each(var imgXML:XML in xml[imgNodeName]){
 				i++;
-				var _icon:Btn=iconArea.getChildAt(i) as Btn;
-				if(icon==_icon){
+				icon=iconArea.getChildAt(i) as Btn;
+				if(currIcon==icon){
 					if(selected){
-						icon.selected=true;
+						currIcon.selected=true;
 						if(selectedIconEnabled){
 						}else{
-							icon.mouseEnabled=false;
+							currIcon.mouseEnabled=false;
 						}
 					}
 				}else{
 					if(selected){
-						_icon.selected=false;
+						icon.selected=false;
 						if(selectedIconEnabled){
 						}else{
-							_icon.mouseEnabled=true;
+							icon.mouseEnabled=true;
 						}
 					}
 				}
@@ -502,41 +511,44 @@ package zero.ui{
 		}
 		
 		private function updateBtns():void{
-			if(btnScrollPrev){
-				if(scrollId>0){
-					btnScrollPrev.alpha=1;
-					btnScrollPrev.mouseEnabled=true;
-				}else{
-					btnScrollPrev.alpha=0.3;
-					btnScrollPrev.mouseEnabled=false;
+			if(loop){
+			}else{
+				if(btnScrollPrev){
+					if(scrollId>0){
+						btnScrollPrev.alpha=1;
+						btnScrollPrev.mouseEnabled=true;
+					}else{
+						btnScrollPrev.alpha=0.3;
+						btnScrollPrev.mouseEnabled=false;
+					}
 				}
-			}
-			if(btnScrollNext){
-				if(scrollId<xml[imgNodeName].length()-num){
-					btnScrollNext.alpha=1;
-					btnScrollNext.mouseEnabled=true;
-				}else{
-					btnScrollNext.alpha=0.3;
-					btnScrollNext.mouseEnabled=false;
+				if(btnScrollNext){
+					if(scrollId<xml[imgNodeName].length()-num){
+						btnScrollNext.alpha=1;
+						btnScrollNext.mouseEnabled=true;
+					}else{
+						btnScrollNext.alpha=0.3;
+						btnScrollNext.mouseEnabled=false;
+					}
 				}
-			}
-			
-			if(btnPrev){
-				if(currId>getImgXMLId(tuijianImgXMLArr[0])){
-					btnPrev.alpha=1;
-					btnPrev.mouseEnabled=true;
-				}else{
-					btnPrev.alpha=0.3;
-					btnPrev.mouseEnabled=false;
+				
+				if(btnPrev){
+					if(currId>getImgXMLId(tuijianImgXMLArr[0])){
+						btnPrev.alpha=1;
+						btnPrev.mouseEnabled=true;
+					}else{
+						btnPrev.alpha=0.3;
+						btnPrev.mouseEnabled=false;
+					}
 				}
-			}
-			if(btnNext){
-				if(currId<getImgXMLId(tuijianImgXMLArr[tuijianImgXMLArr.length-1])){
-					btnNext.alpha=1;
-					btnNext.mouseEnabled=true;
-				}else{
-					btnNext.alpha=0.3;
-					btnNext.mouseEnabled=false;
+				if(btnNext){
+					if(currId<getImgXMLId(tuijianImgXMLArr[tuijianImgXMLArr.length-1])){
+						btnNext.alpha=1;
+						btnNext.mouseEnabled=true;
+					}else{
+						btnNext.alpha=0.3;
+						btnNext.mouseEnabled=false;
+					}
 				}
 			}
 		}
@@ -570,7 +582,7 @@ package zero.ui{
 			
 			updateBtns();
 		}
-		private function prev():void{
+		public function prev():void{
 			var i:int=currId;
 			while(--i>=0){
 				var imgXML:XML=xml[imgNodeName][i];
@@ -581,7 +593,7 @@ package zero.ui{
 			}
 			select(--currId);
 		}
-		private function next():void{
+		public function next():void{
 			var i:int=currId;
 			while(++i<xml[imgNodeName].length()){
 				var imgXML:XML=xml[imgNodeName][i];
@@ -594,6 +606,11 @@ package zero.ui{
 		}
 		public function select(id:int):void{
 			currId=id;
+			if(currId<0){
+				currId+=xml[imgNodeName].length();
+			}else if(currId>=xml[imgNodeName].length()){
+				currId-=xml[imgNodeName].length();
+			}
 			
 			if(iconArea){
 				selectIcon(iconArea.getChildAt(currId) as Btn);
