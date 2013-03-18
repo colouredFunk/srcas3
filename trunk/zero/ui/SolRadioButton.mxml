@@ -124,6 +124,10 @@ SolRadioButton
 					}
 				}
 				
+				if(enabledElement){
+					enabledElement["enabled"]=selected;
+				}
+				
 				if(oldSelectedValue&&group.selectedValue){
 					if(oldSelectedValue==group.selectedValue){
 					}else{
@@ -152,7 +156,6 @@ SolRadioButton
 			}
 			
 			private function change(event:Event):void{
-				//trace("group.selectedValue="+group.selectedValue);
 				sol.setValue(sol_key,group.selectedValue);
 				if(onChange==null){
 				}else{
