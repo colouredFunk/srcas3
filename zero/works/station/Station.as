@@ -44,6 +44,7 @@ package zero.works.station{
 		private var kaitouIsPlaying:Boolean;
 		
 		private var kaitouLoader:ImgLoader;
+		private var kaitouLoaderGrid:Grid;
 		
 		private var prevloader:MultiLoader;
 		private var prevloadPercent:Number;
@@ -131,6 +132,12 @@ package zero.works.station{
 			if(main.btnSkip){
 				main.btnSkip.alpha=0;
 				btnSkip_dy=main.btnSkip.y-main.loading.y;
+				
+				var btnSkipXML:XML=optionsXML.kaitou[0].btnSkip[0];
+				if(btnSkipXML&&btnSkipXML.@autoHide.toString()=="true"){
+					main.btnSkip.addEventListener(MouseEvent.MOUSE_OVER,showBtnSkip);
+					main.btnSkip.addEventListener(MouseEvent.MOUSE_OUT,hideBtnSkip);
+				}
 			}
 			
 			var prevloadsXML:XML=<prevloads/>;
@@ -184,7 +191,7 @@ package zero.works.station{
 			loading_value2=value*prevloadPercent;
 		}
 		private function prevloadComplete(...args):void{
-			trace("预加载完毕");
+			//trace("预加载完毕");
 			if(prevloader){
 				prevloader.clear();
 				prevloader=null;
@@ -192,6 +199,7 @@ package zero.works.station{
 			
 			if(main.btnSkip){
 				main.btnSkip.mouseEnabled=true;
+				TweenMax.killTweensOf(main.btnSkip);
 				TweenMax.to(main.btnSkip,12,{alpha:1,useFrames:true});
 				main.btnSkip.release=skipLoading;
 			}
@@ -205,6 +213,7 @@ package zero.works.station{
 						main.btnSkip.release=skipKaitou1;
 					}
 					main.container.addChild(kaitouLoader=new ImgLoader());
+					kaitouLoader.visible=false;
 					kaitouLoader.autoPlay=false;
 					kaitouLoader.onLoadProgress=loadKaitouProgress;
 					kaitouLoader.onLoadComplete=loadKaitouComplete;
@@ -220,6 +229,9 @@ package zero.works.station{
 		
 		private function skipLoading():void{
 			main.btnSkip.mouseEnabled=false;
+			main.btnSkip.removeEventListener(MouseEvent.MOUSE_OVER,showBtnSkip);
+			main.btnSkip.removeEventListener(MouseEvent.MOUSE_OUT,hideBtnSkip);
+			TweenMax.killTweensOf(main.btnSkip);
 			TweenMax.to(main.btnSkip,12,{alpha:0,useFrames:true});
 			TweenMax.killTweensOf(this);
 			loading_value1=1;
@@ -231,11 +243,20 @@ package zero.works.station{
 			loading_value2=1;
 		}
 		protected function playKaitou():void{
-			trace("playKaitou");
+			//trace("playKaitou");
 			if(main.btnSkip){
 				main.btnSkip.release=skipKaitou2;
 			}
+			var btnSkipXML:XML=optionsXML.kaitou[0].btnSkip[0];
+			if(btnSkipXML&&btnSkipXML.@autoHide.toString()=="true"){
+				hideBtnSkip();
+			}
 			kaitouIsPlaying=true;
+			kaitouLoader.visible=true;
+			var kaitouXML:XML=optionsXML.kaitou[0];
+			if(kaitouXML.@needGrid.toString()=="true"){
+				main.container.addChild(kaitouLoaderGrid=new Grid());
+			}
 			kaitouLoader.resume();
 			resize();
 		}
@@ -243,10 +264,18 @@ package zero.works.station{
 		private function skipKaitou1():void{
 			//开头动画未加载完毕，跳过
 			main.btnSkip.mouseEnabled=false;
+			main.btnSkip.removeEventListener(MouseEvent.MOUSE_OVER,showBtnSkip);
+			main.btnSkip.removeEventListener(MouseEvent.MOUSE_OUT,hideBtnSkip);
+			TweenMax.killTweensOf(main.btnSkip);
 			TweenMax.to(main.btnSkip,12,{alpha:0,useFrames:true});
 			kaitouLoader.clear();
 			main.container.removeChild(kaitouLoader);
 			kaitouLoader=null;
+			if(kaitouLoaderGrid){
+				main.container.removeChild(kaitouLoaderGrid);
+				kaitouLoaderGrid.clear();
+				kaitouLoaderGrid=null;
+			}
 			loading_value2=1;
 		}
 		private function checkMainLoading(...args):void{
@@ -267,12 +296,24 @@ package zero.works.station{
 			playKaitouComplete();
 		}
 		
+		private function showBtnSkip(...args):void{
+			TweenMax.killTweensOf(main.btnSkip);
+			TweenMax.to(main.btnSkip,12,{alpha:1,delay:30,useFrames:true});
+		}
+		private function hideBtnSkip(...args):void{
+			TweenMax.killTweensOf(main.btnSkip);
+			TweenMax.to(main.btnSkip,12,{alpha:0,useFrames:true});
+		}
+		
 		private function playKaitouComplete():void{
 			showPages();
 		}
 		protected function showPages():void{
 			if(main.btnSkip){
 				main.btnSkip.mouseEnabled=false;
+				main.btnSkip.removeEventListener(MouseEvent.MOUSE_OVER,showBtnSkip);
+				main.btnSkip.removeEventListener(MouseEvent.MOUSE_OUT,hideBtnSkip);
+				TweenMax.killTweensOf(main.btnSkip);
 				TweenMax.to(main.btnSkip,12,{alpha:0,useFrames:true});
 			}
 			
@@ -481,6 +522,11 @@ package zero.works.station{
 				main.container.removeChild(kaitouLoader);
 				kaitouLoader=null;
 			}
+			if(kaitouLoaderGrid){
+				main.container.removeChild(kaitouLoaderGrid);
+				kaitouLoaderGrid.clear();
+				kaitouLoaderGrid=null;
+			}
 			if(main.fade_ani){
 				main.fade_ani.gotoAndPlay(2);
 			}
@@ -664,12 +710,21 @@ package zero.works.station{
 				main.loading.y=-(854-stage.stageHeight)/2;
 				
 				if(main.btnSkip){
+					var btnSkipXML:XML=optionsXML.kaitou[0].btnSkip[0];
 					main.btnSkip.x=stage.stageWidth/2;
 					if(kaitouIsPlaying){
-						var b:Rectangle=main.btnSkip.getBounds(main);
-						main.btnSkip.y+=stage.stageHeight-20-b.bottom;
+						if(btnSkipXML&&btnSkipXML.playing_layout[0]){
+							updateSpByLayout(main.btnSkip,btnSkipXML.playing_layout[0]);
+						}else{
+							var b:Rectangle=main.btnSkip.getBounds(main);
+							main.btnSkip.y+=stage.stageHeight-20-b.bottom;
+						}
 					}else{
-						main.btnSkip.y=main.loading.y+btnSkip_dy;
+						if(btnSkipXML&&btnSkipXML.layout[0]){
+							updateSpByLayout(main.btnSkip,btnSkipXML.layout[0]);
+						}else{
+							main.btnSkip.y=main.loading.y+btnSkip_dy;
+						}
 					}
 				}
 				
