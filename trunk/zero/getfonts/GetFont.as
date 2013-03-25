@@ -821,7 +821,7 @@ class Datas{
 	}
 	private function initFontSWF():void{
 		var shellTagV:Vector.<Tag>=new Vector.<Tag>();
-		Tags.getTagsByData(shellTagV,shellData,0,shellData.length);
+		Tags.getTagsByData(shellTagV,shellData,0,shellData.length,null);
 		for each(var tag:Tag in shellTagV){
 			switch(tag.type){
 				

@@ -53,7 +53,7 @@ package zero.works.station{
 			this.graphics.beginBitmapFill(bmd);
 			this.graphics.drawRect(0,0,stage.stageWidth,stage.stageHeight);
 			this.graphics.endFill();
-			//trace(this.getBounds(stage));
+			trace(this.getBounds(stage));
 		}
 	}
 }

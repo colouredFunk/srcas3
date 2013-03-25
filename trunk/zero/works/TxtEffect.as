@@ -76,8 +76,8 @@ package zero.works{
 			txt.htmlText=htmlText;
 			
 			txt.autoSize=TextFieldAutoSize.CENTER;
-			txt.x=-txt.width/2;
-			txt.y=-txt.height/2;
+			//txt.x=-txt.width/2;
+			//txt.y=-txt.height/2;
 		}
 		
 		private var __value:int=-1;
