@@ -43,7 +43,7 @@ package zero.works.station{
 		private var btnSkip_dy:int;
 		private var kaitouIsPlaying:Boolean;
 		
-		private var kaitouLoader:ImgLoader;
+		protected var kaitouLoader:ImgLoader;
 		private var kaitouLoaderGrid:Grid;
 		
 		private var prevloader:MultiLoader;
