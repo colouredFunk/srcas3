@@ -386,6 +386,8 @@ package zero.getfonts{
 				fontHTML.@face=currInitTxtObj.xml.@font.toString();
 			}
 			
+			//trace("currInitTxtObj.xml="+currInitTxtObj.xml.toXMLString());
+			
 			for each(var attXML:XML in currInitTxtObj.xml.attributes()){
 				switch(attXML.name().toString()){
 					case "align"://String
@@ -482,6 +484,12 @@ package zero.getfonts{
 						//表示使用此文本格式的文本的目标 URL。
 						tf.url=attXML.toString();
 						aHTML.@href=attXML.toString();
+					break;
+					case "width":
+						currInitTxtObj.txt.width=Number(attXML.toString());
+					break;
+					case "wordWrap":
+						currInitTxtObj.txt.wordWrap=(attXML.toString()=="true");
 					break;
 				}
 			}
