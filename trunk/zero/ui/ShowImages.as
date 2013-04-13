@@ -374,12 +374,14 @@ package zero.ui{
 				}
 			}
 			
-			currId=getImgXMLId(tuijianImgXMLArr[0]);
-			
-			if(iconArea&&iconArea.numChildren){
-				selectIcon(iconArea.getChildAt(currId) as Btn);
-			}else{
-				selectImgXML(xml[imgNodeName][currId]);
+			if(xml[imgNodeName].length()){
+				currId=getImgXMLId(tuijianImgXMLArr[0]);
+				
+				if(iconArea&&iconArea.numChildren){
+					selectIcon(iconArea.getChildAt(currId) as Btn);
+				}else{
+					selectImgXML(xml[imgNodeName][currId]);
+				}
 			}
 		}
 		
