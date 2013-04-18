@@ -95,7 +95,12 @@ package zero.getfonts{
 		
 		public static function initBySWFData(swfData:ByteArray):void{
 			var swf:SWF=new SWF();
-			swf.initBySWFData(swfData,null);
+			try{
+				swf.initBySWFData(swfData,null);
+			}catch(e:Error){
+				trace("SWF 已加密或已损坏");
+				return;
+			}
 			var i:int,FontID:int;
 			var fontObjArr:Array=new Array();
 			for each(var tag:Tag in swf.tagV){
