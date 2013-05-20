@@ -58,17 +58,22 @@ package zero.works{
 		}
 		
 		private static function getTimeLoadComplete(event:Event):void{
-			trace("getTimeLoadComplete getTimeLoader.data="+getTimeLoader.data);
-			var execResult:Array=/(\d\d\d\d)\-(\d\d)\-(\d\d) (\d\d)\:(\d\d)\:(\d\d)/.exec(getTimeLoader.data);
-			
-			getTimeComplete(new Date(
-				int(execResult[1]),
-				int(execResult[2])-1,
-				int(execResult[3]),
-				int(execResult[4]),
-				int(execResult[5]),
-				int(execResult[6])
-			));
+			if(getTimeLoader.data){
+				trace("getTimeLoadComplete getTimeLoader.data="+getTimeLoader.data);
+				var execResult:Array=/(\d\d\d\d)\-(\d\d)\-(\d\d) (\d\d)\:(\d\d)\:(\d\d)/.exec(getTimeLoader.data);
+				if(execResult){
+					getTimeComplete(new Date(
+						int(execResult[1]),
+						int(execResult[2])-1,
+						int(execResult[3]),
+						int(execResult[4]),
+						int(execResult[5]),
+						int(execResult[6])
+					));
+					return;
+				}
+			}
+			getTimeComplete(new Date());
 		}
 		private static function getTimeLoadError(event:Event):void{
 			trace("getTimeLoadError");

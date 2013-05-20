@@ -21,7 +21,7 @@ package zero.works.station{
 	public class SoundView extends Sprite{
 		
 		private static const COUNTS_LINE:uint=7;
-		private static const DX_LINE:uint=2;
+		//private static const DX_LINE:uint=2;
 		
 		public var clip_0:SoundViewLine;
 		
@@ -48,7 +48,8 @@ package zero.works.station{
 		}
 		private function setLine(_line:SoundViewLine, _id:uint, ...args):void {
 			addChild(_line);
-			_line.x=_id*DX_LINE;
+			//_line.x=_id*DX_LINE;
+			_line.x=_id*_line.width*2;//20130509
 		}
 	}
 }

@@ -105,11 +105,17 @@ package zero.works.station{
 				if(navXML.@visible.toString()=="false"){
 					btnNav.visible=false;
 				}
-				if(navXML.icon[0]){
-					//trace(navXML.icon[0].toXMLString());
+				var iconXML:XML=navXML.icon[0];
+				if(iconXML){
 					var icon:ImgLoader=new ImgLoader();
 					btnNav.icon.addChild(icon);
-					icon.load(navXML.icon[0]);
+					icon.load(iconXML);
+				}
+				var iconXML2:XML=navXML.icon2[0];
+				if(iconXML2){
+					var icon2:ImgLoader=new ImgLoader();
+					btnNav.icon2.addChild(icon2);
+					icon2.load(iconXML2);
 				}
 			}
 			if(btnNav.line){

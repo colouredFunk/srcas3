@@ -21,7 +21,7 @@ package zero.works.station{
 	import zero.getfonts.GetFont;
 	import zero.ui.ImgLoader;
 	
-	public class BasePage extends Sprite{
+	public class BasePage extends MovieClip{
 		
 		public var xml:XML;
 		
@@ -35,7 +35,10 @@ package zero.works.station{
 		
 		public var appArea:Sprite;
 		
+		private var fadeInTargetFrameLabel:FrameLabel;//20130511
+		
 		public function BasePage(){
+			this.stop();
 			this.visible=false;
 			var i:int=this.numChildren;
 			while(--i>=0){
@@ -64,15 +67,16 @@ package zero.works.station{
 				xmlLoader.addEventListener(Event.COMPLETE,loadXMLComplete);
 				xmlLoader.load(new URLRequest("../xml/options.xml"));
 			}
+			
 		}
 		private function loadXMLComplete(...args):void{
-			SubXMLLoader.loadSubXMLs(new XML(xmlLoader.data.replace(/\s+(src|href|xml)="/g,' $1="../')),loadSubXMLsComplete);
+			SubXMLLoader.loadSubXMLs(new XML(xmlLoader.data.replace(/\s+(src|href|xml|icon)="/g,' $1="../')),loadSubXMLsComplete);
 			xmlLoader.removeEventListener(Event.COMPLETE,loadXMLComplete);
 			xmlLoader=null;
 		}
 		private function loadSubXMLsComplete(xml0:XML):void{
 			for each(var navXML:XML in xml0.nav){
-				if(navXML.swf[0].@src.toString().indexOf(getQualifiedClassName(this).split(/\W+/).pop().toLowerCase())>-1){
+				if(navXML.swf[0]&&navXML.swf[0].@src.toString().indexOf(getQualifiedClassName(this).split(/\W+/).pop().toLowerCase())>-1){
 					xml=navXML;
 					init(xml);
 					_resize();
@@ -114,6 +118,25 @@ package zero.works.station{
 			TweenMax.from(char,12,{alpha:0,x:100,ease:Back.easeOut,onComplete:fadeOutComplete,useFrames:true});
 		}
 		protected function fadeInComplete():void{
+			if(this.currentLabels&&this.currentLabels.length==1){
+				var frameLabel:FrameLabel=this.currentLabels[0];
+				if(frameLabel.name=="fadeInTarget"){
+					fadeInTargetFrameLabel=frameLabel;
+				}
+			}
+			if(fadeInTargetFrameLabel){
+				this.play();
+				this.addFrameScript(frameLabel.frame-1,fadeInTargetFrame);
+			}else{
+				_fadeInComplete();
+			}
+		}
+		protected function fadeInTargetFrame():void{
+			this.addFrameScript(fadeInTargetFrameLabel.frame-1,null);
+			this.stop();
+			_fadeInComplete();
+		}
+		private function _fadeInComplete():void{
 			var charXML:XML=xml.char[0];
 			if(charXML){
 				this.addChildAt(char=new ImgLoader(),bg?1:0);
@@ -135,6 +158,19 @@ package zero.works.station{
 			}
 		}
 		protected function fadeOutComplete():void{
+			if(fadeInTargetFrameLabel){
+				this.addFrameScript(this.totalFrames-1,lastFrame);
+				this.play();
+			}else{
+				_fadeOutComplete();
+			}
+		}
+		private function lastFrame():void{
+			this.addFrameScript(this.totalFrames-1,null);
+			this.stop();
+			_fadeOutComplete();
+		}
+		private function _fadeOutComplete():void{
 			if(onFadeOutComplete==null){
 			}else{
 				onFadeOutComplete();

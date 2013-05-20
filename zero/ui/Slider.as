@@ -27,6 +27,8 @@ package zero.ui{
 		
 		public var onUpdate:Function;
 		
+		public var ctrling:Boolean;
+		
 		public function get value():Number{
 			return __value;
 		}
@@ -62,11 +64,13 @@ package zero.ui{
 			thumb.startDrag(false,new Rectangle(0,thumb.y,bar.width,0));
 			stage.addEventListener(MouseEvent.MOUSE_UP,mouseUp);
 			this.addEventListener(Event.ENTER_FRAME,update);
+			ctrling=true;
 		}
 		private function mouseUp(...args):void{
 			stage.removeEventListener(MouseEvent.MOUSE_UP,mouseUp);
 			this.removeEventListener(Event.ENTER_FRAME,update);
 			stopDrag();
+			ctrling=false;
 		}
 		private function update(...args):void{
 			value=thumb.x/bar.width;

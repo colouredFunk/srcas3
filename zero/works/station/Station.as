@@ -17,6 +17,7 @@ package zero.works.station{
 	
 	import flash.display.*;
 	import flash.events.*;
+	import flash.external.ExternalInterface;
 	import flash.geom.*;
 	import flash.net.*;
 	import flash.system.*;
@@ -70,17 +71,58 @@ package zero.works.station{
 			resize();
 		}
 		private function loaded():void{
-			
-			addContextMenu(this, "XML CRC32：#"+(0x100000000+uint(CRC32String(optionsXML.toXMLString()))).toString(16).substr(1).toUpperCase(),openXMLPage);
-			GetFont.initBySWFData(this.loaderInfo.bytes);
-			
-			SubXMLLoader.loadSubXMLs(optionsXML,loadSubXMLsComplete);
+			this.addEventListener(Event.ENTER_FRAME,checkXML);
+		}
+		private function checkXML(...args):void{
+			if(optionsXML){
+				this.removeEventListener(Event.ENTER_FRAME,checkXML);
+				addContextMenu(this, "XML CRC32：#"+(0x100000000+uint(CRC32String(optionsXML.toXMLString()))).toString(16).substr(1).toUpperCase(),openXMLPage);
+				GetFont.initBySWFData(this.loaderInfo.bytes);
+				
+				SubXMLLoader.loadSubXMLs(optionsXML,loadSubXMLsComplete);
+			}
 		}
 		private function openXMLPage(...args):void{//右键 xml 版本，跳到 xml 页面
 			navigateToURL(new URLRequest(optionsXMLPath),"_blank");
 		}
 		
 		protected function loadSubXMLsComplete():void{
+			
+			//20130513
+			if(ExternalInterface.available){
+				try{
+					var pageURL:String=ExternalInterface.call("top.location.href.toString")
+				}catch(e:Error){
+					pageURL=null;
+				}
+				if(pageURL){
+				}else{
+					try{
+						pageURL=ExternalInterface.call("window.location.href.toString")
+					}catch(e:Error){
+						pageURL=null;
+					}
+				}
+			}else{
+				pageURL=null;
+			}
+			//pageURL="http://10.8.1.44/work/201305/%E7%A5%9E%E9%9B%95%E4%BE%A0%E4%BE%A35%E6%9C%88%E8%B5%84%E6%96%99%E7%89%87%E5%AE%98%E7%BD%91/web/index.htm#zuoxiangqicheng";
+			if(pageURL){
+				var matchArr:Array=pageURL.match(/#\w+/g);
+				if(matchArr&&matchArr.length){
+					var anchor:String=matchArr[0].substr(1);
+					for each(var navXML:XML in optionsXML.nav){
+						if(navXML.@anchor.toString()==anchor){
+							var anchorNavXML:XML=navXML;
+							for each(navXML in optionsXML.nav){
+								navXML.@selected=false;
+							}
+							anchorNavXML.@selected=true;
+							break;
+						}
+					}
+				}
+			}
 			
 			this.addChild(main=new Main());
 			if(main.fade_ani){
@@ -140,7 +182,7 @@ package zero.works.station{
 				}
 			}
 			
-			var prevloadsXML:XML=<prevloads/>;
+			var prevloadXMLArr:Array=new Array();
 			for each(var matchStr:String in optionsXML.toXMLString().match(/<[^<>]+\s+src=".*?"[^<>]+>/g)){
 				try{
 					var srcXML:XML=new XML(matchStr);
@@ -152,7 +194,7 @@ package zero.works.station{
 					srcXML=null;
 				}
 				if(srcXML&&srcXML.@prevload.toString()=="true"){
-					prevloadsXML.appendChild(<node src={srcXML.@src.toString()}/>);
+					prevloadXMLArr.push(<node src={srcXML.@src.toString()}/>);
 				}
 			}
 			
@@ -161,8 +203,14 @@ package zero.works.station{
 			this.addEventListener(Event.ENTER_FRAME,checkMainLoading);
 			main.loading.show();
 			
-			var nodeXMLList:XMLList=prevloadsXML.children();
-			if(nodeXMLList.length()){
+			if(prevloadXMLArr.length){
+				prevloadXMLArr.sort(sortPrevloadXMLArr);
+				i=-1;
+				var nodeXMLList:XMLList=new XMLList();
+				for each(var prevloadXML:XML in prevloadXMLArr){
+					i++;
+					nodeXMLList[i]=prevloadXML;
+				}
 				trace("预加载：\n"+nodeXMLList.toXMLString());
 				if(optionsXML.@prevloadPercent.toString()){
 					prevloadPercent=Number(optionsXML.@prevloadPercent.toString());
@@ -186,6 +234,27 @@ package zero.works.station{
 				prevloadPercent=0;
 				prevloadComplete();
 			}
+		}
+		private static const extOrders:Object={
+			jpg:1,
+			png:2,
+			gif:3,
+			swf:4,
+			flv:5
+		}
+		private function sortPrevloadXMLArr(prevloadXML1:XML,prevloadXML2:XML):int{
+			var ext1:String=prevloadXML1.@src.toString().replace(/^.*\.(\w+)$/,"$1").toLowerCase();
+			var ext2:String=prevloadXML2.@src.toString().replace(/^.*\.(\w+)$/,"$1").toLowerCase();
+			//trace("ext1="+ext1,"ext2="+ext2);
+			var extOrder1:int=extOrders[ext1];//没有就自动0了
+			var extOrder2:int=extOrders[ext2];//没有就自动0了
+			if(extOrder1<extOrder2){
+				return -1;
+			}
+			if(extOrder1>extOrder2){
+				return 1;
+			}
+			return 0;
 		}
 		private function prevloadProgress(value:Number):void{
 			loading_value2=value*prevloadPercent;
@@ -350,10 +419,7 @@ package zero.works.station{
 				fadeBgComplete();
 			}
 		}
-		protected function fadeBgComplete():void{
-			
-			BtnFullScreen;
-			
+		protected function showMusicCtrl():void{
 			var musicXML:XML=optionsXML.music[0];
 			if(musicXML){
 				if(main.musicCtrl){
@@ -363,6 +429,12 @@ package zero.works.station{
 					(main.musicCtrl as MusicCtrl).init(musicXML,getQualifiedClassName(this)+"_musicctrl");
 				}
 			}
+		}
+		protected function fadeBgComplete():void{
+			
+			BtnFullScreen;
+			
+			showMusicCtrl();
 			
 			var imgsXML:XML=optionsXML.imgs[0];
 			if(imgsXML){
@@ -391,6 +463,9 @@ package zero.works.station{
 							}else{
 								btn.href=null;
 								btn.mouseEnabled=false;
+							}
+							if(subXML.@mouseChildren=="true"){
+								btn.mouseChildren=true;
 							}
 						}else{
 							GetFont.initTxt(sp["txt"],subXML);
@@ -475,7 +550,7 @@ package zero.works.station{
 			}
 		}
 		private function loadPage():void{
-			trace("loadPage");
+			//trace("loadPage");
 			var btnBackXML:XML=optionsXML.btnBack[0];
 			if(btnBackXML){
 				if(main.btnBack){
@@ -487,7 +562,7 @@ package zero.works.station{
 				main.fade_ani.gotoAndPlay(int(main.fade_ani.totalFrames/2)+1);
 			}
 			for each(var navXML:XML in optionsXML.nav){
-				trace("navXML.@selected.toString()="+navXML.@selected.toString());
+				//trace("navXML.@selected.toString()="+navXML.@selected.toString());
 				if(navXML.@selected.toString()=="true"){
 					if(navXML.@noShowLoading.toString()=="true"){
 					}else{
@@ -751,6 +826,11 @@ package zero.works.station{
 				
 				if(_switch){
 					updateSpByLayout(_switch,switch_layoutXML);
+					
+					_switch.x=Math.round(_switch.x);//20130510
+					
+					//trace("_switch.x="+_switch.x);
+					
 					if(
 						_switch.currLoader
 						&&
