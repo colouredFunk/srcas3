@@ -44,6 +44,7 @@ package zero.ui{
 		
 		public var container:Sprite;
 		public var bottomContainer:Sprite;
+		public var boundsMask:Sprite;//20130512
 		public var bg:Sprite;
 		public var progressClip:Sprite;
 		
@@ -439,21 +440,43 @@ package zero.ui{
 					(loader.content as Bitmap).smoothing=true;
 				}
 			}
-			if(xml.@width.toString()){
-				if(loader.content is Bitmap){
-					loader.width=int(xml.@width.toString());
+			var wid:int=-1;
+			var hei:int=-1;
+			if(boundsMask){
+				if(loader.contentLoaderInfo.width/loader.contentLoaderInfo.height>boundsMask.width/boundsMask.height){
+					hei=boundsMask.height;
+					wid=loader.contentLoaderInfo.width/loader.contentLoaderInfo.height*hei;
 				}else{
-					loader.scaleX=int(xml.@width.toString())/loader.contentLoaderInfo.width;
+					wid=boundsMask.width;
+					hei=loader.contentLoaderInfo.height/loader.contentLoaderInfo.width*wid;
+				}
+			}else{
+				if(xml.@width.toString()){
+					wid=int(xml.@width.toString());
+				}
+				if(xml.@height.toString()){
+					hei=int(xml.@height.toString());
 				}
 			}
-			if(xml.@height.toString()){
+			if(wid>-1){
 				if(loader.content is Bitmap){
-					loader.height=int(xml.@height.toString());
+					loader.width=wid;
 				}else{
-					loader.scaleY=int(xml.@height.toString())/loader.contentLoaderInfo.height;
+					loader.scaleX=wid/loader.contentLoaderInfo.width;
 				}
+			}else{
+				wid=loader.contentLoaderInfo.width;
 			}
-			showContent(loader,loader.contentLoaderInfo.width,loader.contentLoaderInfo.height);
+			if(hei>-1){
+				if(loader.content is Bitmap){
+					loader.height=hei;
+				}else{
+					loader.scaleY=hei/loader.contentLoaderInfo.height;
+				}
+			}else{
+				hei=loader.contentLoaderInfo.height;
+			}
+			showContent(loader,wid,hei);
 			_loadComplete();
 			var movie:MovieClip=getMovie();
 			if(movie){

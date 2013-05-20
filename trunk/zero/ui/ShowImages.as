@@ -23,6 +23,7 @@ package zero.ui{
 	
 	import ui.Btn;
 	
+	import zero.getfonts.GetFont;
 	import zero.ui.*;
 	
 	public class ShowImages extends Sprite{
@@ -430,6 +431,19 @@ package zero.ui{
 				player.stop();
 			}
 			
+			if(img.hasOwnProperty("label")){//20130512
+				var label:Sprite=img["label"];
+				var labelXML:XML=imgXML.label[0];
+				if(labelXML){
+					label.visible=true;
+					GetFont.initTxt(label["txt"],labelXML);
+				}else{
+					label.visible=false;
+				}
+				if(img.hasOwnProperty("label_bg")){
+					img["label_bg"].visible=label.visible;
+				}
+			}
 			if(/^.*\.(flv|f4v|mp3)$/i.test(imgXML.@src.toString())&&player&&skin){
 				if(player){
 					player.load(imgXML.@src.toString());
