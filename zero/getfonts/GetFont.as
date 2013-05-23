@@ -104,6 +104,7 @@ package zero.getfonts{
 			var i:int,FontID:int;
 			var fontObjArr:Array=new Array();
 			for each(var tag:Tag in swf.tagV){
+				//trace(TagTypes.typeNameV[tag.type]);
 				switch(tag.type){
 					
 					//case TagTypes.DefineText:
@@ -121,6 +122,13 @@ package zero.getfonts{
 					case TagTypes.DefineFont3:
 						
 						var defineFont3:DefineFont3=tag.getBody(DefineFont3,null);
+						if(defineFont3.FontFlagsBold){
+							if(defineFont3.FontName.toLowerCase().indexOf("bold")>-1){
+							}else{
+								defineFont3.FontName+=" Bold";
+							}
+						}
+						//trace("defineFont3.FontName="+defineFont3.FontName);
 						FontID=defineFont3.id;
 						fontObjArr[FontID]={
 							fontName0:defineFont3.FontName,
