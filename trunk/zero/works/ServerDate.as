@@ -42,7 +42,7 @@ package zero.works{
 			switch(Security.sandboxType){
 				case Security.REMOTE:
 					try{
-						getTimeLoader.load(new URLRequest("http://event21.wanmei.com/demo/flash/systime.jsp?"+Math.random()));
+						getTimeLoader.load(new URLRequest("http://event20.wanmei.com/demo/flash/systime.jsp?"+Math.random()));
 					}catch(e:Error){
 						getTimeComplete(new Date());
 					}
