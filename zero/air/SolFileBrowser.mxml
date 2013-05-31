@@ -98,6 +98,7 @@ SolFileBrowser
 				if(dragDropClient){
 				}else{
 					dragDropClient=this.parentApplication as InteractiveObject;
+					//trace("dragDropClient="+dragDropClient);
 				}
 				dragDropClient.addEventListener(NativeDragEvent.NATIVE_DRAG_ENTER,nativeDragEnter);
 				dragDropClient.addEventListener(NativeDragEvent.NATIVE_DRAG_DROP,nativeDragDrop);
