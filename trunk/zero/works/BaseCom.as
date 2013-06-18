@@ -96,7 +96,7 @@ package zero.works{
 				'<script src="http://www.wanmei.com/public/js/swfobject.js" type="text/javascript"></script>\n'+
 				'<div id="containerID"></div>\n'+
 				'<script type="text/javascript">\n'+
-				'	addSWF("'+src+'","containerID",'+wid+','+hei+',{xml:"'+xml.toXMLString().replace(/"/g,"'")+'"});\n'+
+				'	addSWF("'+src+'","containerID",'+wid+','+hei+',{xml:"'+xml.toXMLString().replace(/"/g,"'").replace(/[\r\n]+/g,'"+\n"')+'"});\n'+
 				'</script>\n'
 			);
 		}
