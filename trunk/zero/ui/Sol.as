@@ -68,30 +68,29 @@ package zero.ui{
 					}
 				}
 				if(xml){
-					if(xml.@currSettingName.toString()&&getSettingXML(xml.@currSettingName.toString())){
-						var _settingXMLMark:Object=new Object();
-						var _settingXMLArr:Array=new Array();
-						var _settingXML:XML;
-						for each(_settingXML in xml.setting){
-							if(_settingXMLMark["~"+_settingXML.@name.toString()]){
-							}else{
-								_settingXMLMark["~"+_settingXML.@name.toString()]=true;
-								_settingXMLArr.push(_settingXML);
+					if(xml.@version.toString()==version){
+						if(xml.@currSettingName.toString()&&getSettingXML(xml.@currSettingName.toString())){
+							var _settingXMLMark:Object=new Object();
+							var _settingXMLArr:Array=new Array();
+							var _settingXML:XML;
+							for each(_settingXML in xml.setting){
+								if(_settingXMLMark["~"+_settingXML.@name.toString()]){
+								}else{
+									_settingXMLMark["~"+_settingXML.@name.toString()]=true;
+									_settingXMLArr.push(_settingXML);
+								}
 							}
-						}
-						_settingXMLArr.sortOn("@name",Array.CASEINSENSITIVE);
-						xml=<sol version={version} currSettingName={xml.@currSettingName.toString()}/>
-						for each(_settingXML in _settingXMLArr){
-							xml.appendChild(_settingXML);
+							_settingXMLArr.sortOn("@name",Array.CASEINSENSITIVE);
+							xml=<sol version={version} currSettingName={xml.@currSettingName.toString()}/>
+							for each(_settingXML in _settingXMLArr){
+								xml.appendChild(_settingXML);
+							}
+						}else{
+							reset();
 						}
 					}else{
 						reset();
 					}
-				}else{
-					reset();
-				}
-				
-				if(xml.@version.toString()==version){
 				}else{
 					reset();
 				}
