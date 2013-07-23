@@ -117,8 +117,10 @@
 		}
 
 		protected function onInitHandler(_evt:Event):void {
-			Security.allowDomain("*");
-			Security.allowInsecureDomain("*");
+			try{
+				Security.allowDomain("*");
+				Security.allowInsecureDomain("*");
+			}catch(e:Error){}
 			setStageAlignAndScale(0, -1, 1);
 			if (stage) {
 				stage.showDefaultContextMenu = false;

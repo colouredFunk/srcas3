@@ -24,7 +24,7 @@ package zero{
 	 */	
 	public class Random{
 		
-		private static const random:Random=new Random();
+		private static var random:Random;
 		
 		/**
 		 * 
@@ -33,7 +33,11 @@ package zero{
 		 * 
 		 */		
 		public static function init(seed:uint):void{
-			random.init(seed);
+			if(random){
+				random.init(seed);
+			}else{
+				random=new Random(seed);
+			}
 		}
 		
 		private static function getNextRan(ran:uint):uint{
