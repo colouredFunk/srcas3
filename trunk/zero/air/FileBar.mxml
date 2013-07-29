@@ -65,7 +65,11 @@ FileBar
 				
 			}
 			private function browse():void{
-				file.browseForOpen("选择一个 "+description+"：",[new FileFilter(description+"（"+extension+"）",extension)]);
+				var fileFilterArr:Array=[new FileFilter(description+"（"+extension+"）",extension)];
+				for each(var matchStr:String in extension.match(/\*\.[^\.;]+/g)){
+					fileFilterArr.push(new FileFilter(matchStr,matchStr));
+				}
+				file.browseForOpen("选择一个 "+description+"：",fileFilterArr);
 			}
 			private function select(event:Event):void{
 				txt.text=decodeURI(file.url);
