@@ -22,16 +22,21 @@ package zero.air{
 		public var onOutputData:Function;
 		public var onExit:Function;
 		
-		public function ProcessRunner(fileURI:String,argument:String=null):void{
-			trace(fileURI,argument);
+		public function ProcessRunner(fileURI:String,workingDirectory:File=null,arguments:Vector.<String>=null,_onOutputData:Function=null,_onExit:Function=null):void{
+			//trace(fileURI,arguments);
 			//输入 exe,bat,或vbs等的路径
+			onOutputData=_onOutputData;
+			onExit=_onExit;
 			if(NativeProcess.isSupported){
 				if(Capabilities.os.toLowerCase().indexOf("win")>=0){
 					var file:File=new File(fileURI);
 					nativeProcessStartupInfo=new NativeProcessStartupInfo();
 					nativeProcessStartupInfo.executable=file;
-					if(argument){
-						nativeProcessStartupInfo.arguments=new <String>[argument];
+					if(arguments){
+						nativeProcessStartupInfo.arguments=arguments;
+					}
+					if(workingDirectory){
+						nativeProcessStartupInfo.workingDirectory=workingDirectory;
 					}
 					
 					process=new NativeProcess();
@@ -56,8 +61,8 @@ package zero.air{
 			process.removeEventListener(ProgressEvent.STANDARD_OUTPUT_DATA,outputData);
 			process.removeEventListener(NativeProcessExitEvent.EXIT,exit);
 			process.closeInput();
-			//process.exit();//建议进程关闭
-			process.exit(true);//强制进程关闭
+			//process.exit();//trace("建议进程关闭");
+			process.exit(true);//trace("强制进程关闭");
 			
 			onOutputData=null;
 			onExit=null;
@@ -69,11 +74,11 @@ package zero.air{
 		private function outputData(event:ProgressEvent):void{
 			//标准输出
 			if(onOutputData==null){
-				
 			}else{
 				onOutputData(
-					process.standardOutput.readUTFBytes(
-						process.standardOutput.bytesAvailable
+					process.standardOutput.readMultiByte(
+						process.standardOutput.bytesAvailable,
+						"gb2312"
 					)
 				);
 			}
@@ -81,7 +86,7 @@ package zero.air{
 		
 		/*
 		public function onErrorData(event:ProgressEvent):void{
-			trace("ERROR -",process.standardError.readUTFBytes(process.standardError.bytesAvailable)); 
+			trace("ERROR -",process.standardError.readMultiByte(process.standardError.bytesAvailable,"gb2312")); 
 		}
 		public function onIOError(event:IOErrorEvent):void{
 			trace(event.toString());
@@ -92,7 +97,7 @@ package zero.air{
 			//1 进程运行main函数完毕 event.exitCode==main函数返回值
 			//2 用户从任务管理器中删除进程 event.exitCode==1
 			//3 调用了process.exit() event.exitCode==NaN
-			trace("Process exited with ",event.exitCode);
+			//trace("Process exited with ",event.exitCode);
 			if(onExit==null){
 			}else{
 				onExit(event.exitCode);
@@ -103,7 +108,7 @@ package zero.air{
 
 		public function sendMsg(msg:String):void{
 			//nativeProcessStartupInfo.arguments=new <String>["传给exe的参数"];
-			process.standardInput.writeUTFBytes(msg+"\n");
+			process.standardInput.writeMultiByte(msg+"\n","gb2312");
 			//process.closeInput();//会引起 IOError
 		}
 	}

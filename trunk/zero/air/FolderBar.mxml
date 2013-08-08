@@ -22,7 +22,9 @@ FolderBar
 	
 	<fx:Script>
 		<![CDATA[
+			import zero.ui.So;
 			
+			private var so_key:String;
 			private var description:String;
 			private var dragDropClient:InteractiveObject;
 			private var onChange:Function;
@@ -30,7 +32,8 @@ FolderBar
 			protected var folder:File
 			
 			/**
-			 * @param _url 路径
+			 * @param _so_key 记忆字段
+			 * @param _defaultURL 默认路径
 			 * @param _onChange 当变化时
 			 * @param _description 描述，比如："文件夹"，默认："文件夹"
 			 * @param _dragDropClient 拖放对象，默认为this
@@ -38,12 +41,14 @@ FolderBar
 			 * 
 			 */
 			public function init(
-				_url:String=null,
+				_so_key:String,
+				_defaultURL:String=null,
 				_onChange:Function=null,
 				_description:String=null,
 				_dragDropClient:InteractiveObject=null
 			):void{
 				
+				so_key=_so_key;
 				description=_description||"文件夹";
 				dragDropClient=_dragDropClient||this;
 				onChange=_onChange;
@@ -54,16 +59,23 @@ FolderBar
 				dragDropClient.addEventListener(NativeDragEvent.NATIVE_DRAG_ENTER,nativeDragEnter);
 				dragDropClient.addEventListener(NativeDragEvent.NATIVE_DRAG_DROP,nativeDragDrop);
 				
+				var _url:String=So.read(so_key);
+				if(_url){
+				}else{
+					_url=_defaultURL;
+				}
 				if(_url){
 					txt.text=decodeURI(_url.replace(/\\/g,"/"));
 					changeTxt();
+				}else{
+					txt.text="";
 				}
 				
 			}
 			private function browse():void{
 				folder.browseForDirectory("选择一个 "+description+"：");
 			}
-			private function select(event:Event):void{
+			private function select(...args):void{
 				txt.text=decodeURI(folder.url);
 				change();
 			}
@@ -100,9 +112,10 @@ FolderBar
 				//try{
 				//	trace("folder.url="+decodeURI(folder.url));
 				//}catch(e:Error){}
+				So.write(so_key,txt.text);
 				if(onChange==null){
 				}else{
-					onChange(txt.text);
+					onChange();
 				}
 			}
 			
