@@ -22,7 +22,9 @@ FileBar
 	
 	<fx:Script>
 		<![CDATA[
+			import zero.ui.So;
 			
+			private var so_key:String;
 			private var description:String;
 			private var extension:String;
 			private var dragDropClient:InteractiveObject;
@@ -40,13 +42,15 @@ FileBar
 			 * 
 			 */
 			public function init(
-				_url:String=null,
+				_so_key:String,
+				_defaultURL:String=null,
 				_onChange:Function=null,
 				_description:String=null,
 				_extension:String=null,
 				_dragDropClient:InteractiveObject=null
 			):void{
 				
+				so_key=_so_key;
 				description=_description||"文件";
 				extension=_extension||"*.*";
 				dragDropClient=_dragDropClient||this;
@@ -58,9 +62,16 @@ FileBar
 				dragDropClient.addEventListener(NativeDragEvent.NATIVE_DRAG_ENTER,nativeDragEnter);
 				dragDropClient.addEventListener(NativeDragEvent.NATIVE_DRAG_DROP,nativeDragDrop);
 				
+				var _url:String=So.read(so_key);
+				if(_url){
+				}else{
+					_url=_defaultURL;
+				}
 				if(_url){
 					txt.text=decodeURI(_url.replace(/\\/g,"/"));
 					changeTxt();
+				}else{
+					txt.text="";
 				}
 				
 			}
@@ -71,7 +82,7 @@ FileBar
 				}
 				file.browseForOpen("选择一个 "+description+"：",fileFilterArr);
 			}
-			private function select(event:Event):void{
+			private function select(...args):void{
 				txt.text=decodeURI(file.url);
 				change();
 			}
@@ -114,9 +125,10 @@ FileBar
 				//try{
 				//	trace("file.url="+decodeURI(file.url));
 				//}catch(e:Error){}
+				So.write(so_key,txt.text);
 				if(onChange==null){
 				}else{
-					onChange(txt.text);
+					onChange();
 				}
 			}
 			
