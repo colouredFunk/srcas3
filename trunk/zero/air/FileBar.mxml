@@ -63,7 +63,7 @@ FileBar
 				dragDropClient.addEventListener(NativeDragEvent.NATIVE_DRAG_DROP,nativeDragDrop);
 				
 				var _url:String=So.read(so_key);
-				if(_url){
+				if(_url is String){
 				}else{
 					_url=_defaultURL;
 				}
@@ -77,8 +77,11 @@ FileBar
 			}
 			private function browse():void{
 				var fileFilterArr:Array=[new FileFilter(description+"（"+extension+"）",extension)];
-				for each(var matchStr:String in extension.match(/\*\.[^\.;]+/g)){
-					fileFilterArr.push(new FileFilter(matchStr,matchStr));
+				var matchArr:Array=extension.match(/\*\.[^\.;]+/g);
+				if(matchArr&&matchArr.length>1){
+					for each(var matchStr:String in matchArr){
+						fileFilterArr.push(new FileFilter(matchStr,matchStr));
+					}
 				}
 				file.browseForOpen("选择一个 "+description+"：",fileFilterArr);
 			}

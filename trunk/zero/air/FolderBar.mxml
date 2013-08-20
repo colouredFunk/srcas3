@@ -60,7 +60,7 @@ FolderBar
 				dragDropClient.addEventListener(NativeDragEvent.NATIVE_DRAG_DROP,nativeDragDrop);
 				
 				var _url:String=So.read(so_key);
-				if(_url){
+				if(_url is String){
 				}else{
 					_url=_defaultURL;
 				}
