@@ -16,16 +16,27 @@ package zero.air{
 	import flash.utils.*;
 	public class ProcessRunner{
 		
-		private var process:NativeProcess;
+		protected var process:NativeProcess;
 		private var nativeProcessStartupInfo:NativeProcessStartupInfo;
 		
 		public var onOutputData:Function;
+		private var hasOutputData:Boolean;
+		public var onOutputClose:Function;
 		public var onExit:Function;
 		
-		public function ProcessRunner(fileURI:String,workingDirectory:File=null,arguments:Vector.<String>=null,_onOutputData:Function=null,_onExit:Function=null):void{
+		public function ProcessRunner(
+			fileURI:String,
+			workingDirectory:File,
+			arguments:Vector.<String>,
+			_onOutputData:Function,
+			_onOutputClose:Function,
+			_onExit:Function
+		):void{
 			//trace(fileURI,arguments);
 			//输入 exe,bat,或vbs等的路径
 			onOutputData=_onOutputData;
+			hasOutputData=false;
+			onOutputClose=_onOutputClose;
 			onExit=_onExit;
 			if(NativeProcess.isSupported){
 				if(Capabilities.os.toLowerCase().indexOf("win")>=0){
@@ -42,6 +53,7 @@ package zero.air{
 					process=new NativeProcess();
 					process.addEventListener(ProgressEvent.STANDARD_INPUT_PROGRESS,inputData);
 					process.addEventListener(ProgressEvent.STANDARD_OUTPUT_DATA,outputData);
+					process.addEventListener(Event.STANDARD_OUTPUT_CLOSE,outputClose);
 					process.addEventListener(NativeProcessExitEvent.EXIT,exit);
 					
 					//process.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, onErrorData);
@@ -59,12 +71,14 @@ package zero.air{
 		public function clear():void{
 			process.removeEventListener(ProgressEvent.STANDARD_INPUT_PROGRESS,inputData);
 			process.removeEventListener(ProgressEvent.STANDARD_OUTPUT_DATA,outputData);
+			process.removeEventListener(Event.STANDARD_OUTPUT_CLOSE,outputClose);
 			process.removeEventListener(NativeProcessExitEvent.EXIT,exit);
 			process.closeInput();
 			//process.exit();//trace("建议进程关闭");
 			process.exit(true);//trace("强制进程关闭");
 			
 			onOutputData=null;
+			onOutputClose=null;
 			onExit=null;
 		}
 		private function inputData(event:ProgressEvent):void{
@@ -73,6 +87,8 @@ package zero.air{
 		}
 		private function outputData(event:ProgressEvent):void{
 			//标准输出
+			//trace("outputData");
+			hasOutputData=true;
 			if(onOutputData==null){
 			}else{
 				onOutputData(
@@ -83,17 +99,30 @@ package zero.air{
 				);
 			}
 		}
+		private function outputClose(event:Event):void{
+			//trace("outputClose");
+			if(onOutputClose==null){
+			}else{
+				onOutputClose(
+					hasOutputData?process.standardOutput.readMultiByte(
+						process.standardOutput.bytesAvailable,
+						"gb2312"
+					):null
+				);
+			}
+		}
 		
 		/*
 		public function onErrorData(event:ProgressEvent):void{
-			trace("ERROR -",process.standardError.readMultiByte(process.standardError.bytesAvailable,"gb2312")); 
+			trace("ERROR -",process.standardError.readMultiByte(process.standardError.bytesAvailable,"gb2312"));
 		}
 		public function onIOError(event:IOErrorEvent):void{
 			trace(event.toString());
 		}
 		*/
 		
-		public function exit(event:NativeProcessExitEvent):void{
+		private function exit(event:NativeProcessExitEvent):void{
+			//trace("exit");
 			//1 进程运行main函数完毕 event.exitCode==main函数返回值
 			//2 用户从任务管理器中删除进程 event.exitCode==1
 			//3 调用了process.exit() event.exitCode==NaN
