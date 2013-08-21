@@ -28,13 +28,16 @@ FolderBar
 			private var description:String;
 			private var dragDropClient:InteractiveObject;
 			private var onChange:Function;
+			private var delay:Boolean;
+			private var timeoutId:int;
 			
-			protected var folder:File
+			protected var folder:File;
 			
 			/**
 			 * @param _so_key 记忆字段
 			 * @param _defaultURL 默认路径
 			 * @param _onChange 当变化时
+			 * @param _delay 当变化时延时触发
 			 * @param _description 描述，比如："文件夹"，默认："文件夹"
 			 * @param _dragDropClient 拖放对象，默认为this
 			 * @return 
@@ -44,6 +47,7 @@ FolderBar
 				_so_key:String,
 				_defaultURL:String=null,
 				_onChange:Function=null,
+				_delay:Boolean=true,
 				_description:String=null,
 				_dragDropClient:InteractiveObject=null
 			):void{
@@ -52,6 +56,7 @@ FolderBar
 				description=_description||"文件夹";
 				dragDropClient=_dragDropClient||this;
 				onChange=_onChange;
+				delay=_delay;
 				
 				folder=new File();
 				folder.addEventListener(Event.SELECT,select);
@@ -113,6 +118,18 @@ FolderBar
 				//	trace("folder.url="+decodeURI(folder.url));
 				//}catch(e:Error){}
 				So.write(so_key,txt.text);
+				if(delay){
+					clearTimeout(timeoutId);
+					timeoutId=setTimeout(changeDelay,500);
+				}else{
+					if(onChange==null){
+					}else{
+						onChange();
+					}
+				}
+			}
+			private function changeDelay():void{
+				clearTimeout(timeoutId);
 				if(onChange==null){
 				}else{
 					onChange();
