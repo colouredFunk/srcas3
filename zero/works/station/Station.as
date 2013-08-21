@@ -26,7 +26,7 @@ package zero.works.station{
 	
 	import ui.Btn;
 	
-	import zero.codec.CRC32String;
+	import zero.codec.MyCRC32;
 	import zero.getfonts.GetFont;
 	import zero.net.MultiLoader;
 	import zero.ui.ImgLoader;
@@ -76,7 +76,7 @@ package zero.works.station{
 		private function checkXML(...args):void{
 			if(optionsXML){
 				this.removeEventListener(Event.ENTER_FRAME,checkXML);
-				addContextMenu(this, "XML CRC32：#"+(0x100000000+uint(CRC32String(optionsXML.toXMLString()))).toString(16).substr(1).toUpperCase(),openXMLPage);
+				addContextMenu(this, "XML CRC32：#"+(0x100000000+MyCRC32.crc32(optionsXML.toXMLString())).toString(16).substr(1).toUpperCase(),openXMLPage);
 				GetFont.initBySWFData(this.loaderInfo.bytes);
 				
 				SubXMLLoader.loadSubXMLs(optionsXML,loadSubXMLsComplete);

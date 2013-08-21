@@ -29,12 +29,15 @@ FileBar
 			private var extension:String;
 			private var dragDropClient:InteractiveObject;
 			private var onChange:Function;
+			private var delay:Boolean;
+			private var timeoutId:int;
 			
 			protected var file:File;
 			
 			/**
 			 * @param _url 路径
 			 * @param _onChange 当变化时
+			 * @param _delay 当变化时延时触发
 			 * @param _description 描述，比如："图片文件"，默认："文件"
 			 * @param _extension 扩展名，比如："*.jpg;*.png;*.gif;*.bmp"，默认："*.*"
 			 * @param _dragDropClient 拖放对象，默认为this
@@ -45,6 +48,7 @@ FileBar
 				_so_key:String,
 				_defaultURL:String=null,
 				_onChange:Function=null,
+				_delay:Boolean=true,
 				_description:String=null,
 				_extension:String=null,
 				_dragDropClient:InteractiveObject=null
@@ -55,6 +59,7 @@ FileBar
 				extension=_extension||"*.*";
 				dragDropClient=_dragDropClient||this;
 				onChange=_onChange;
+				delay=_delay;
 				
 				file=new File();
 				file.addEventListener(Event.SELECT,select);
@@ -129,6 +134,18 @@ FileBar
 				//	trace("file.url="+decodeURI(file.url));
 				//}catch(e:Error){}
 				So.write(so_key,txt.text);
+				if(delay){
+					clearTimeout(timeoutId);
+					timeoutId=setTimeout(changeDelay,500);
+				}else{
+					if(onChange==null){
+					}else{
+						onChange();
+					}
+				}
+			}
+			private function changeDelay():void{
+				clearTimeout(timeoutId);
 				if(onChange==null){
 				}else{
 					onChange();
