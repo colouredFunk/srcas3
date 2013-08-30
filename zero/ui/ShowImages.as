@@ -86,6 +86,12 @@ package zero.ui{
 		//20130305
 		private var loop:Boolean;
 		
+		//20130827
+		private var __img:ImgLoader;
+		
+		//20130829
+		private var autoAdjust:Boolean;
+		
 		public function ShowImages(
 			_selectedIconEnabled:Boolean,
 			mask_inflate_dx:int=4,
@@ -167,16 +173,21 @@ package zero.ui{
 				}
 				img_align=img_align.substr(1);
 				
+				if(img.hasOwnProperty("img")){
+					__img=img["img"];
+				}else if(img.hasOwnProperty("imgContainer")){
+					img["imgContainer"].addChild(__img=new ImgLoader());
+				}
 				if(bottomContainer){
-					(img["img"] as ImgLoader).bottomContainer=bottomContainer;
+					__img.bottomContainer=bottomContainer;
 				}
 			}
 		}
 		public function initBottomContainer(_bottomContainer:Sprite):void{
 			bottomContainer=_bottomContainer;
 			if(bottomContainer){
-				if(img){
-					(img["img"] as ImgLoader).bottomContainer=bottomContainer;
+				if(__img){
+					__img.bottomContainer=bottomContainer;
 				}
 			}
 		}
@@ -273,8 +284,8 @@ package zero.ui{
 			
 			xml=null;
 			
-			if(img){
-				(img["img"] as ImgLoader).clear();
+			if(__img){
+				__img.clear();
 			}
 			
 			//if(infoMenuItem){
@@ -312,6 +323,12 @@ package zero.ui{
 			clearIcons();
 			
 			xml=_xml;
+			autoAdjust=xml.@autoAdjust.toString()=="true";
+			if(autoAdjust){
+				if(img&&img.hasOwnProperty("bg")&&img["bg"]){
+					img["bg"].alpha=0;
+				}
+			}
 			imgNodeName=_imgNodeName||"img";
 			
 			if(player){
@@ -427,6 +444,8 @@ package zero.ui{
 			
 			currImgXML=imgXML;
 			
+			//trace("currImgXML="+currImgXML.toXMLString());
+			
 			if(player){
 				player.stop();
 			}
@@ -444,7 +463,7 @@ package zero.ui{
 					img["label_bg"].visible=label.visible;
 				}
 			}
-			if(/^.*\.(flv|f4v|mp3)$/i.test(imgXML.@src.toString())&&player&&skin){
+			if(/^.*\.(flv|f4v|mp4|mp3)$/i.test(imgXML.@src.toString())&&player&&skin){
 				if(player){
 					player.load(imgXML.@src.toString());
 					if(autoPlay){
@@ -466,8 +485,11 @@ package zero.ui{
 				}
 				if(img){
 					img.visible=true;
-					(img["img"] as ImgLoader).autoPlay=autoPlay;
-					(img["img"] as ImgLoader).load(<img src={imgXML.@src.toString()} align={img_align} width={imgXML.@width.toString()} height={imgXML.@height.toString()}/>);
+				}
+				if(__img){
+					__img.autoPlay=autoPlay;
+					__img.onLoadComplete=loadImgComplete;
+					__img.load(<img src={imgXML.@src.toString()} align={img_align} width={imgXML.@width.toString()} height={imgXML.@height.toString()}/>);
 				}
 				if(bottomContainer){
 					bottomContainer.visible=true;
@@ -523,6 +545,17 @@ package zero.ui{
 			if(onSelectImgXML==null){
 			}else{
 				onSelectImgXML();
+			}
+		}
+		
+		private function loadImgComplete():void{
+			if(autoAdjust){
+				if(img&&img.hasOwnProperty("bg")&&img["bg"]){
+					img["bg"].width=__img.width;
+					img["bg"].height=__img.height;
+					img["bg"].x=-__img.width/2;
+					img["bg"].y=-__img.height/2;
+				}
 			}
 		}
 		
@@ -647,8 +680,8 @@ package zero.ui{
 		}
 		
 		public function pause():void{
-			if(img){
-				(img["img"] as ImgLoader).pause();
+			if(__img){
+				__img.pause();
 			}
 			if(player){
 				player.pause();

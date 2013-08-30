@@ -534,6 +534,22 @@ package zero.ui{
 							stream.pause();
 						}
 						video_is_showing=true;
+						
+						if(bg){
+							video.width=bg.width;
+							video.height=bg.height;
+						}else{
+							video.width=video.videoWidth;
+							video.height=video.videoHeight;
+						}
+						//trace("xml="+xml.toXMLString());
+						if(xml.@width.toString()){
+							video.width=int(xml.@width.toString());
+						}
+						if(xml.@height.toString()){
+							video.height=int(xml.@height.toString());
+						}
+						
 						this.removeEventListener(Event.ENTER_FRAME,loadVideoProgress);
 						showContent(video,video.width,video.height);
 						_loadComplete();
@@ -566,17 +582,6 @@ package zero.ui{
 			stream.addEventListener(AsyncErrorEvent.ASYNC_ERROR, asyncErrorHandler);
 			video=new Video();
 			video.attachNetStream(stream);
-			if(bg){
-				video.width=bg.width;
-				video.height=bg.height;
-			}
-			//trace("xml="+xml.toXMLString());
-			if(xml.@width.toString()){
-				video.width=int(xml.@width.toString());
-			}
-			if(xml.@height.toString()){
-				video.height=int(xml.@height.toString());
-			}
 			video.visible=false;
 			stream.bufferTime=xml.@bufferTime.toString()?int(xml.@bufferTime.toString()):10;
 			if(flvData){
