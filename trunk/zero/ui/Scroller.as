@@ -33,6 +33,8 @@ package zero.ui{
 		private var content:DisplayObject;
 		private var upDownSpeed:int;
 		
+		private var mouseWheelClient:DisplayObject;
+		
 		public function Scroller(){
 			d=thumb.y-bar.y;
 			this.visible=false;
@@ -57,19 +59,30 @@ package zero.ui{
 			stage.removeEventListener(MouseEvent.MOUSE_UP,stopUpDown);
 		}
 		public function setHei(hei:int):void{
-			var b1:Rectangle=btnUp.getBounds(this);
-			var b2:Rectangle=btnDown.getBounds(this);
+			if(btnUp){
+				var b1:Rectangle=btnUp.getBounds(this);
+			}else{
+				b1=new Rectangle(bar.x,bar.y,bar.width,0);
+			}
+			if(btnDown){
+				var b2:Rectangle=btnDown.getBounds(this);
+			}else{
+				b2=new Rectangle(bar.x,bar.y+bar.height,bar.width,0);
+			}
 			bar.y=b1.bottom;
-			hei-=btnUp.height+btnDown.height;
+			hei-=b1.height+b2.height;
 			bar["gra"].gra.height=hei;
-			btnDown.y+=b1.bottom+hei-b2.bottom+b2.height;
+			if(btnDown){
+				btnDown.y+=b1.bottom+hei-b2.bottom+b2.height;
+			}
 		}
 		public function setContent(
 			_content:DisplayObject,
 			_contentYMin:int,
 			_contentY:int,
 			viewHei:int,
-			_contentHei:int
+			_contentHei:int,
+			_mouseWheelClient:DisplayObject
 		):void{
 			
 			if(_content){
@@ -96,7 +109,8 @@ package zero.ui{
 				
 				thumb.y=(_contentY-contentYMin)*(bottom-top)/(contentYMax-contentYMin)+top;
 				
-				stage.addEventListener(MouseEvent.MOUSE_WHEEL,mouseWheel);
+				mouseWheelClient=_mouseWheelClient||content.stage;
+				mouseWheelClient.addEventListener(MouseEvent.MOUSE_WHEEL,mouseWheel);
 				bar.addEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
 				thumb.addEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
 				this.addEventListener(Event.ENTER_FRAME,update);
@@ -113,7 +127,6 @@ package zero.ui{
 		public function unsetContent():void{
 			this.visible=false;
 			this.mouseChildren=false;
-			stage.removeEventListener(MouseEvent.MOUSE_WHEEL,mouseWheel);
 			bar.removeEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
 			thumb.removeEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
 			this.removeEventListener(Event.ENTER_FRAME,update);
@@ -123,6 +136,11 @@ package zero.ui{
 			if(btnDown){
 				btnDown.removeEventListener(MouseEvent.MOUSE_DOWN,startDown);
 			}
+			if(mouseWheelClient){
+				mouseWheelClient.removeEventListener(MouseEvent.MOUSE_WHEEL,mouseWheel);
+				mouseWheelClient=null;
+			}
+			content=null;
 		}
 		public function clear():void{
 			unsetContent();
