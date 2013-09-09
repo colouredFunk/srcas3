@@ -89,8 +89,8 @@ package zero.ui{
 		//20130827
 		private var __img:ImgLoader;
 		
-		//20130829
-		private var autoAdjust:Boolean;
+		//20130906
+		public var statusTxt:Sprite;
 		
 		public function ShowImages(
 			_selectedIconEnabled:Boolean,
@@ -323,12 +323,6 @@ package zero.ui{
 			clearIcons();
 			
 			xml=_xml;
-			autoAdjust=xml.@autoAdjust.toString()=="true";
-			if(autoAdjust){
-				if(img&&img.hasOwnProperty("bg")&&img["bg"]){
-					img["bg"].alpha=0;
-				}
-			}
 			imgNodeName=_imgNodeName||"img";
 			
 			if(player){
@@ -362,7 +356,23 @@ package zero.ui{
 					iconArea.addChild(icon);
 					icon.x=x;
 					icon.y=y;
-					icon["initXML"](imgXML,imgXML.@icon.toString()||imgXML.@src.toString(),clickIcon);
+					if(
+						imgXML.@iconWidth.toString()
+						&&
+						imgXML.@iconHeight.toString()
+					){
+						icon["initXML"](
+							imgXML,
+							<icon src={imgXML.@icon.toString()||imgXML.@src.toString()} width={imgXML.@iconWidth.toString()} height={imgXML.@iconHeight.toString()}/>,
+							clickIcon
+						);
+					}else{
+						icon["initXML"](
+							imgXML,
+							imgXML.@icon.toString()||imgXML.@src.toString(),
+							clickIcon
+						);
+					}
 					x+=dx;
 					y+=dy;
 					if(showAsGrid){
@@ -488,7 +498,7 @@ package zero.ui{
 				}
 				if(__img){
 					__img.autoPlay=autoPlay;
-					__img.onLoadComplete=loadImgComplete;
+					//__img.onLoadComplete=loadImgComplete;
 					__img.load(<img src={imgXML.@src.toString()} align={img_align} width={imgXML.@width.toString()} height={imgXML.@height.toString()}/>);
 				}
 				if(bottomContainer){
@@ -540,22 +550,16 @@ package zero.ui{
 				scrollPrev();
 			}
 			
+			if(statusTxt){
+				statusTxt["txt"].text="第"+(currId+1)+"个/共"+xml[imgNodeName].length()+"个";
+			}
+			//trace('statusTxt["txt"].text='+statusTxt["txt"].text);
+			
 			updateBtns();
 			
 			if(onSelectImgXML==null){
 			}else{
 				onSelectImgXML();
-			}
-		}
-		
-		private function loadImgComplete():void{
-			if(autoAdjust){
-				if(img&&img.hasOwnProperty("bg")&&img["bg"]){
-					img["bg"].width=__img.width;
-					img["bg"].height=__img.height;
-					img["bg"].x=-__img.width/2;
-					img["bg"].y=-__img.height/2;
-				}
 			}
 		}
 		
