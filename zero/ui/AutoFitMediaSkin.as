@@ -1,4 +1,4 @@
-package zero.ui{
+﻿package zero.ui{
 	import akdcl.display.UIDisplay;
 	import akdcl.events.MediaEvent;
 	import akdcl.layout.Display;
