@@ -1,4 +1,4 @@
-/***
+﻿/***
 ShowImages
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
 创建时间：2012年5月7日 10:16:07
@@ -551,7 +551,8 @@ package zero.ui{
 			}
 			
 			if(statusTxt){
-				statusTxt["txt"].text="第"+(currId+1)+"个/共"+xml[imgNodeName].length()+"个";
+				//statusTxt["txt"].text="第"+(currId+1)+"个/共"+xml[imgNodeName].length()+"个";
+				statusTxt["txt"].text=(currId+1)+"/"+xml[imgNodeName].length();
 			}
 			//trace('statusTxt["txt"].text='+statusTxt["txt"].text);
 			
