@@ -88,9 +88,11 @@ package zero.works.station{
 			playOrPause(1);
 		}
 		private function ctrlOn():void{
+			this.mouseChildren=true;
 			playOrPause(1);
 		}
 		private function ctrlOff():void{
+			this.mouseChildren=false;
 			player.pause();
 			if(btnSound){
 				btnSound.selected=false;
