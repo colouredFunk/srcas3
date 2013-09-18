@@ -38,6 +38,10 @@ package zero.works.station{
 		private var fadeInTargetFrameLabel:FrameLabel;//20130511
 		
 		public function BasePage(){
+			
+			Security.allowDomain("*");
+			Security.allowInsecureDomain("*");
+			
 			this.stop();
 			this.visible=false;
 			var i:int=this.numChildren;

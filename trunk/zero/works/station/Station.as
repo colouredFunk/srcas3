@@ -60,6 +60,10 @@ package zero.works.station{
 		private var loading_time:int;
 		
 		public function Station(_optionsXMLPath:String,switchClass:Class,_loading_time:int){
+			
+			Security.allowDomain("*");
+			Security.allowInsecureDomain("*");
+			
 			optionsXMLPath=_optionsXMLPath;
 			_switch=new switchClass();
 			loading_time=_loading_time;
@@ -76,7 +80,7 @@ package zero.works.station{
 		private function checkXML(...args):void{
 			if(optionsXML){
 				this.removeEventListener(Event.ENTER_FRAME,checkXML);
-				addContextMenu(this, "XML CRC32：#"+(0x100000000+MyCRC32.crc32(optionsXML.toXMLString())).toString(16).substr(1).toUpperCase(),openXMLPage);
+				addContextMenu(this, "XML CRC32：#"+(0x100000000+MyCRC32.crc32string(optionsXML.toXMLString())).toString(16).substr(1).toUpperCase(),openXMLPage);
 				GetFont.initBySWFData(this.loaderInfo.bytes);
 				
 				SubXMLLoader.loadSubXMLs(optionsXML,loadSubXMLsComplete);
@@ -183,16 +187,8 @@ package zero.works.station{
 			}
 			
 			var prevloadXMLArr:Array=new Array();
-			for each(var matchStr:String in optionsXML.toXMLString().match(/<[^<>]+\s+src=".*?"[^<>]+>/g)){
-				try{
-					var srcXML:XML=new XML(matchStr);
-					if(srcXML.name().toString()){
-					}else{
-						srcXML=null;
-					}
-				}catch(e:Error){
-					srcXML=null;
-				}
+			for each(var prevloadAttXML:XML in optionsXML..@prevload){
+				var srcXML:XML=prevloadAttXML.parent();
 				if(srcXML&&srcXML.@prevload.toString()=="true"){
 					prevloadXMLArr.push(<node src={srcXML.@src.toString()}/>);
 				}
@@ -506,16 +502,8 @@ package zero.works.station{
 			_switch.init(optionsXML.nav,optionsXML.@simulateDownload.toString()=="true",loadPage,loadPageProgress,loadPageComplete,showingPage,pageFadeInComplete,pageFadeOutComplete);
 			
 			var prevloadsXML:XML=<prevloads/>;
-			for each(var matchStr:String in optionsXML.toXMLString().match(/<[^<>]+\s+src=".*?"[^<>]+>/g)){
-				try{
-					var srcXML:XML=new XML(matchStr);
-					if(srcXML.name().toString()){
-					}else{
-						srcXML=null;
-					}
-				}catch(e:Error){
-					srcXML=null;
-				}
+			for each(var innerprevloadAttXML:XML in optionsXML..@innerprevload){
+				var srcXML:XML=innerprevloadAttXML.parent();
 				if(srcXML&&srcXML.@innerprevload.toString()=="true"){
 					prevloadsXML.appendChild(<node src={srcXML.@src.toString()}/>);
 				}
