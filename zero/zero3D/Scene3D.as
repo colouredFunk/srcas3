@@ -7,8 +7,13 @@ Scene3D 版本:v1.0
 用法举例:这家伙很懒什么都没写
 */
 
-package zero.zero3D.objs{
-	import zero.zero3D.*;
+package zero.zero3D{
+	import zero.zero3D.Obj3DContainer;
+	/**
+	 * 
+	 * 3D场景，其实啥都没干，就是个容器
+	 * 
+	 */	
 	public class Scene3D extends Obj3DContainer{
 		public function Scene3D(){
 		}
