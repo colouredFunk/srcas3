@@ -54,6 +54,7 @@ package zero.exes.wscript{
 			nativeProcess=new NativeProcess();
 			nativeProcess.addEventListener(NativeProcessExitEvent.EXIT,exit);
 			nativeProcess.start(nativeProcessStartupInfo);
+			nativeProcess.closeInput();
 		}
 		private static function exit(event:NativeProcessExitEvent):void{
 			trace("event.exitCode="+event.exitCode);

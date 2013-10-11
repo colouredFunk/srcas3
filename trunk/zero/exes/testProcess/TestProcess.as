@@ -45,6 +45,7 @@ package zero.exes.testProcess{
 			nativeProcess.addEventListener(NativeProcessExitEvent.EXIT,exit);
 			nativeProcess.addEventListener(ProgressEvent.STANDARD_OUTPUT_DATA,output);
 			nativeProcess.start(nativeProcessStartupInfo);
+			nativeProcess.closeInput();
 		}
 		public static function end():void{
 			if(nativeProcess){
