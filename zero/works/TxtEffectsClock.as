@@ -16,6 +16,8 @@ package zero.works{
 	import flash.ui.*;
 	import flash.utils.*;
 	
+	import zero.utils.getDate;
+	
 	public class TxtEffectsClock extends BaseCom{
 		
 		public var defaultXMLStr:String='<xml startTime="2013-08-30 00:00:00" endTime="2013-09-03 12:00:00"/>';
@@ -72,8 +74,8 @@ package zero.works{
 				return;
 			}
 			
-			var startTime:int=getDateByDateStr(xml.@startTime.toString()).time/100;
-			var endTime:int=getDateByDateStr(xml.@endTime.toString()).time/100;
+			var startTime:int=getDate(xml.@startTime.toString()).time/100;
+			var endTime:int=getDate(xml.@endTime.toString()).time/100;
 			
 			var currTime:int=ServerDate.getDate().time/100;
 			if(currTime<startTime){

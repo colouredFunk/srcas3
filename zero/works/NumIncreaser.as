@@ -15,6 +15,8 @@ package zero.works{
 	import flash.text.*;
 	import flash.utils.*;
 	
+	import zero.utils.getDate;
+	
 	public class NumIncreaser extends BaseCom{
 		
 		public var defaultXMLStr:String='<xml startTime="2012-02-10 00:00:00" endTime="2012-03-03 00:00:00" startNum="0" endNum="1000000"/>';
@@ -57,9 +59,8 @@ package zero.works{
 			}
 		}
 		public function getTimeComplete():void{
-			
-			var startTime:int=getDateByDateStr(xml.@startTime.toString()).time/1000;
-			var endTime:int=getDateByDateStr(xml.@endTime.toString()).time/1000;
+			var startTime:int=getDate(xml.@startTime.toString()).time/1000;
+			var endTime:int=getDate(xml.@endTime.toString()).time/1000;
 			
 			var currTime:int=ServerDate.getDate().time/1000;
 			if(currTime<startTime){

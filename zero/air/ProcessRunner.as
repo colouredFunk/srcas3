@@ -61,6 +61,7 @@ package zero.air{
 					//process.addEventListener(IOErrorEvent.STANDARD_ERROR_IO_ERROR, onIOError);
 					
 					process.start(nativeProcessStartupInfo);
+					process.closeInput();
 				}else{
 					throw new Error("貌似你的系统不是 windows");
 				}

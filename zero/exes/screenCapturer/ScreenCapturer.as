@@ -51,6 +51,7 @@ package zero.exes.screenCapturer{
 			nativeProcess=new NativeProcess();
 			nativeProcess.addEventListener(NativeProcessExitEvent.EXIT,exit);
 			nativeProcess.start(nativeProcessStartupInfo);
+			nativeProcess.closeInput();
 		}
 		private static function exit(event:NativeProcessExitEvent):void{
 			switch(event.exitCode){
