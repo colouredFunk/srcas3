@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+/***
+DefaultParamItem
+创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
+创建时间：2012年11月12日 10:58:16
+简要说明：这家伙很懒什么都没写。
+用法举例：这家伙还是很懒什么都没写。
+*/
+-->
+
+<s:HGroup
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	xmlns:local="*"
+>
+	<s:Button id="btn" rollOver="rollOverThis()" rollOut="rollOutThis()" click="clickThis()"/>
+	<s:Button id="btnX" label="x" width="25" click="clickX()"/>
+	<fx:Script>
+		<![CDATA[
+			
+			public var param:Object;
+			private var onRollOverThis:Function;
+			private var onRollOutThis:Function;
+			private var onClickThis:Function;
+			private var onClickX:Function;
+			
+			public function init(_param:Object,showBtnX:Boolean,_onRollOverThis:Function,_onRollOutThis:Function,_onClickThis:Function,_onClickX:Function):void{
+				param=_param;
+				btnX.enabled=showBtnX;
+				onRollOverThis=_onRollOverThis;
+				onRollOutThis=_onRollOutThis;
+				onClickThis=_onClickThis;
+				onClickX=_onClickX;
+				btn.label=param.name;
+			}
+			public function clear():void{
+				param=null;
+				onClickThis=null;
+				onClickX=null;
+			}
+			private function rollOverThis():void{
+				if(onRollOverThis==null){
+				}else{
+					onRollOverThis(this);
+				}
+			}
+			private function rollOutThis():void{
+				if(onRollOutThis==null){
+				}else{
+					onRollOutThis(this);
+				}
+			}
+			private function clickThis():void{
+				if(onClickThis==null){
+				}else{
+					onClickThis(this);
+				}
+			}
+			private function clickX():void{
+				if(onClickX==null){
+				}else{
+					onClickX(this);
+				}
+			}
+		]]>
+	</fx:Script>
+	
+</s:HGroup>

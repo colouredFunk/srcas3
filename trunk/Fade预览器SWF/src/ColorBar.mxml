@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+/***
+ColorBar
+创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
+创建时间：2012年11月09日 09:22:26
+简要说明：这家伙很懒什么都没写。
+用法举例：这家伙还是很懒什么都没写。
+*/
+-->
+
+<local:BaseBar
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	xmlns:local="*"
+	xmlns:ui="zero.ui.*"
+>
+	<s:HGroup verticalAlign="middle" left="2" top="2" right="2" bottom="2">
+		<s:Label text="#"/>
+		<mx:TextInput id="valueTxt" width="80" restrict="0-9a-fA-F" maxChars="8" change="change(event)"/>
+		<s:HSlider id="alphaBar" width="40" change="change(event)"/>
+		<mx:ColorPicker id="cp" change="change(event)"/>
+	</s:HGroup>
+	
+	<fx:Script>
+		<![CDATA[
+			import zero.shaders.Pixel4;
+			
+			public function init(name:String,value:Pixel4,_onChange:Function):void{
+				_init(name,_onChange);
+				alphaBar.minimum=0x00;
+				alphaBar.maximum=0xff;
+				alphaBar.stepSize=1;
+				setValue(value);
+			}
+			override protected function change(event:Event):void{
+				switch(event.target){
+					case valueTxt:
+						alphaBar.value=int("0x"+valueTxt.text.substr(0,valueTxt.length-6));
+						cp.selectedColor=int("0x"+valueTxt.text.substr(valueTxt.length-6));
+					break;
+					case alphaBar:
+					case cp:
+						valueTxt.text=(0x100+alphaBar.value).toString(16).substr(1)+(0x1000000+cp.selectedColor).toString(16).substr(1);
+					break;
+				}
+				super.change(event);
+			}
+			public function getValue():Pixel4{
+				var color:uint=uint("0x"+valueTxt.text);
+				return new Pixel4(((color>>16)&0xff)/0xff,((color>>8)&0xff)/0xff,(color&0xff)/0xff,((color>>24)&0xff)/0xff);
+			}
+			public function setValue(_value:Pixel4):void{
+				var color:uint=(int(_value.a*0xff)<<24)|(int(_value.r*0xff)<<16)|(int(_value.g*0xff)<<8)|int(_value.b*0xff);
+				valueTxt.text=(0x100000000+color).toString(16).substr(1);
+				alphaBar.value=color>>>24;
+				cp.selectedColor=color&0x00ffffff;
+			}
+		]]>
+	</fx:Script>
+	
+</local:BaseBar>

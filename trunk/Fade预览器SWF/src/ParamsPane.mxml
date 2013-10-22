@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+/***
+ParamsPane
+创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
+创建时间：2012年11月05日 09:36:17
+简要说明：这家伙很懒什么都没写。
+用法举例：这家伙还是很懒什么都没写。
+*/
+-->
+
+<s:VGroup
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	xmlns:local="*"
+	xmlns:ui="zero.ui.*"
+	gap="1"
+>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.IVisualElement;
+			
+			import zero.shaders.Float2;
+			import zero.shaders.Pixel4;
+			import zero.shaders.as3s.AS3BaseShader;
+			import zero.ui.So;
+			
+			private var as3Shader:AS3BaseShader;
+			private var so_key:String;
+			private var onChange:Function;
+			
+			private var bars:Object;
+			
+			public var bmp:Bitmap;
+			public var pointViewerNameV:Vector.<String>;
+			public var pointViewerMark:Object;
+			
+			public function init(_as3Shader:AS3BaseShader,_so_key:String,useDefaultValueAsCurrValue:Boolean,pointViewerContainer:Sprite,_onChange:Function):void{
+				
+				as3Shader=_as3Shader;
+				so_key=_so_key;
+				onChange=_onChange;
+				
+				var i:int=pointViewerContainer.numChildren;
+				while(--i>=0){
+					pointViewerContainer.removeChildAt(i);
+				}
+				pointViewerContainer.removeEventListener(MouseEvent.MOUSE_DOWN,startDragPointViewer);
+				
+				for(name in bars){
+					var bar:BaseBar=bars[name];
+					bar.clear();
+					this.removeElement(bar);
+					delete bars[name];
+				}
+				
+				var so_obj:Object=So.read(so_key);
+				if(so_obj){
+				}else{
+					so_obj={
+						defaultParams:{},
+						params:{},
+						lastParams:{}
+					}
+				}
+				
+				pointViewerNameV=new Vector.<String>();
+				pointViewerMark=new Object();
+				bars=new Object();
+				i=-1;
+				//trace("xml="+as3Shader["constructor"].xml.params[0]);
+				for each(var paramXML:XML in as3Shader["constructor"].xml.params[0].children()){
+					var name:String=paramXML.name().toString();
+					//trace('as3Shader.shader["constructor"].nameV='+as3Shader.shader["constructor"].nameV);
+					//trace("name="+name);
+					if(as3Shader.shader["constructor"].nameV.indexOf(name)>-1){
+					}else{
+						continue;
+					}
+					i++;
+					
+					//trace("i="+i);
+					//trace('as3Shader.shader["constructor"].typeV='+as3Shader.shader["constructor"].typeV);
+					var type:Class=as3Shader.shader["constructor"].typeV[i];
+					var value1:*=as3Shader[name];
+					var value2:*=as3Shader[name];
+					if(value1&&value2){
+						switch(type){
+							case Boolean:
+								//
+							break;
+							case uint:
+							case int:
+							case Number:
+								//
+							break;
+							case Float2:
+								value1=[value1.x,value1.y];
+								value2=[value2.x,value2.y];
+							break;
+							case Pixel4:
+								value1=[value1.r,value1.g,value1.b,value1.a];
+								value2=[value2.r,value2.g,value2.b,value2.a];
+							break;
+							default:
+								throw new Error("暂不支持的参数类型："+type);
+							break;
+						}
+					}
+					
+					if(paramXML.@enum.toString()){
+						paramXML.@minValue=0;
+						paramXML.@maxValue=paramXML.@enum.toString().split("|").length-1;
+					}
+					
+					if(paramXML.@minValue.toString()){
+						var minValue:Number=Number(paramXML.@minValue.toString());
+					}else{
+						minValue=NaN;
+					}
+					if(paramXML.@maxValue.toString()){
+						var maxValue:Number=Number(paramXML.@maxValue.toString());
+					}else{
+						maxValue=NaN;
+					}
+					
+					if(name=="alpha"){
+						value1=1;
+						value2=1;
+					}else if(type==uint){
+						value1=0;
+						value2=0;
+					}else{
+						if(isNaN(minValue)||isNaN(maxValue)){
+						}else{
+							if(as3Shader[name]==minValue){
+								value1=minValue;
+								value2=maxValue;
+							}else if(as3Shader[name]==maxValue){
+								value2=minValue;
+								value1=maxValue;
+							}
+						}
+					}
+					
+					if(
+						so_obj.params.hasOwnProperty(name)
+					){
+					}else{
+						if(useDefaultValueAsCurrValue){
+							so_obj.params[name]=value1;
+						}else{
+							so_obj.params[name]=value2;
+						}
+					}
+					if(useDefaultValueAsCurrValue){
+						so_obj.defaultParams[name]=value1;
+					}else{
+						so_obj.defaultParams[name]=value2;
+					}
+					
+					switch(type){
+						case Boolean:
+							var boolBar:BoolBar=new BoolBar();
+							this.addElement(boolBar);
+							bars[name]=boolBar;
+							boolBar.init(
+								name,
+								so_obj.params[name],
+								changeAndSyncOtherParamsPane
+							);
+						break;
+						case uint:
+						case int:
+						case Number:
+							var numBar:NumBar=new NumBar();
+							this.addElement(numBar);
+							bars[name]=numBar;
+							numBar.init(
+								name,
+								type==uint||type==int,
+								minValue,
+								maxValue,
+								so_obj.params[name],
+								type==uint?changeAndSyncOtherParamsPane:change
+							);
+						break;
+						case Float2:
+							var pointViewer:PointViewer=new PointViewer();
+							pointViewerContainer.addChild(pointViewer);
+							pointViewerNameV.push(name);
+							pointViewerMark[name]=pointViewer;
+							if(so_obj.params[name]){
+								pointViewer.x=so_obj.params[name][0];
+								pointViewer.y=so_obj.params[name][1];
+								pointViewer.alpha=1;
+							}else{
+								pointViewer.x=bmp.width/2;
+								pointViewer.y=bmp.height/2;
+								pointViewer.alpha=0.2;
+							}
+							//pointViewer.buttonMode=true;
+						break;
+						case Pixel4:
+							var colorBar:ColorBar=new ColorBar();
+							this.addElement(colorBar);
+							bars[name]=colorBar;
+							colorBar.init(
+								name,
+								so_obj.params[name]?new Pixel4(
+									so_obj.params[name][0],
+									so_obj.params[name][1],
+									so_obj.params[name][2],
+									so_obj.params[name][3]
+								):new Pixel4(0,0,0,1),
+								change
+							);
+						break;
+						default:
+							throw new Error("暂不支持的参数类型："+type);
+						break;
+					}
+				}
+				
+				pointViewerContainer.mouseEnabled=false;
+				pointViewerContainer.mouseChildren=true;
+				pointViewerContainer.addEventListener(MouseEvent.MOUSE_DOWN,startDragPointViewer);
+				pointViewerContainer.buttonMode=true;
+				
+				So.write(so_key,so_obj);
+				
+			}
+			private function changeAndSyncOtherParamsPane():void{
+				needSyncOtherParamsPane=true;
+				change();
+			}
+			private function change():void{
+				
+				var so_obj:Object=So.read(so_key);
+				var i:int=-1;
+				for each(var paramXML:XML in as3Shader["constructor"].xml.params[0].children()){
+					var name:String=paramXML.name().toString();
+					if(as3Shader.shader["constructor"].nameV.indexOf(name)>-1){
+					}else{
+						continue;
+					}
+					i++;
+					var type:Class=as3Shader.shader["constructor"].typeV[i];
+					switch(type){
+						case Boolean:
+							var boolBar:BoolBar=bars[name];
+							so_obj.params[name]=boolBar.getValue();
+						break;
+						case uint:
+						case int:
+						case Number:
+							var numBar:NumBar=bars[name];
+							so_obj.params[name]=numBar.getValue();
+						break;
+						case Float2:
+							if(pointViewerMark[name].alpha<0.9){
+								so_obj.params[name]=null;
+							}else{
+								so_obj.params[name]=[pointViewerMark[name].x,pointViewerMark[name].y];
+							}
+						break;
+						case Pixel4:
+							var colorBar:ColorBar=bars[name];
+							var color:Pixel4=colorBar.getValue();
+							so_obj.params[name]=[color.r,color.g,color.b,color.a];
+						break;
+						default:
+							throw new Error("暂不支持的参数类型："+type);
+						break;
+					}
+				}
+				
+				So.write(so_key,so_obj);
+				
+				if(onChange==null){
+				}else{
+					onChange();
+				}
+			}
+			public function setParams(paramArr:Array,confirm:Boolean):void{
+				
+				var so_obj:Object=So.read(so_key);
+				
+				so_obj.lastParams=so_obj.params;
+				if(confirm){
+					//修改 so_obj.params 将会同步修改 so_obj.lastParams
+				}else{
+					//修改 so_obj.params 不会同步修改 so_obj.lastParams
+					so_obj.params=new Object();
+				}
+				changeParams(paramArr);
+			}
+			public function changeParams(paramArr:Array):void{
+				
+				var so_obj:Object=So.read(so_key);
+				
+				if(paramArr){
+					var params:Object=new Object();
+					for each(var subArr:Array in paramArr){
+						params[subArr[0]]=subArr[1];
+					}
+				}
+				
+				var i:int=-1;
+				for each(var paramXML:XML in as3Shader["constructor"].xml.params[0].children()){
+					var name:String=paramXML.name().toString();
+					if(as3Shader.shader["constructor"].nameV.indexOf(name)>-1){
+					}else{
+						continue;
+					}
+					i++;
+					var type:Class=as3Shader.shader["constructor"].typeV[i];
+					switch(type){
+						case Boolean:
+							var boolBar:BoolBar=bars[name];
+							boolBar.setValue(params?params[name]:so_obj.defaultParams[name]);
+						break;
+						case uint:
+						case int:
+						case Number:
+							var numBar:NumBar=bars[name];
+							numBar.setValue(params?params[name]:so_obj.defaultParams[name]);
+						break;
+						case Float2:
+							if(params){
+								var subParam:Object=params[name];
+							}else{
+								subParam=so_obj.defaultParams[name];
+							}
+							if(subParam){
+								if(params){
+									pointViewerMark[name].x=subParam.x;
+									pointViewerMark[name].y=subParam.y;
+								}else{
+									pointViewerMark[name].x=subParam[0];
+									pointViewerMark[name].y=subParam[1];
+								}
+								pointViewerMark[name].alpha=1;
+							}else{
+								pointViewerMark[name].x=bmp.width/2;
+								pointViewerMark[name].y=bmp.height/2;
+								pointViewerMark[name].alpha=0.2;
+							}
+						break;
+						case Pixel4:
+							var colorBar:ColorBar=bars[name];
+							colorBar.setValue(
+								params
+								?
+								new Pixel4(
+									params[name].r,
+									params[name].g,
+									params[name].b,
+									params[name].a
+								)
+								:
+								so_obj.defaultParams[name]
+								?
+								new Pixel4(
+									so_obj.defaultParams[name][0],
+									so_obj.defaultParams[name][1],
+									so_obj.defaultParams[name][2],
+									so_obj.defaultParams[name][3]
+								)
+								:
+								new Pixel4(0,0,0,1)
+							);
+						break;
+						default:
+							throw new Error("暂不支持的参数类型："+type);
+						break;
+					}
+				}
+				change();
+			}
+			public function unSetParams():void{
+				
+				var so_obj:Object=So.read(so_key);
+				
+				so_obj.params=so_obj.lastParams;
+				
+				var i:int=-1;
+				for each(var paramXML:XML in as3Shader["constructor"].xml.params[0].children()){
+					var name:String=paramXML.name().toString();
+					if(as3Shader.shader["constructor"].nameV.indexOf(name)>-1){
+					}else{
+						continue;
+					}
+					i++;
+					var type:Class=as3Shader.shader["constructor"].typeV[i];
+					switch(type){
+						case Boolean:
+							var boolBar:BoolBar=bars[name];
+							boolBar.setValue(so_obj.params[name]);
+						break;
+						case uint:
+						case int:
+						case Number:
+							var numBar:NumBar=bars[name];
+							numBar.setValue(so_obj.params[name]);
+						break;
+						case Float2:
+							if(so_obj.params[name]){
+								pointViewerMark[name].x=so_obj.params[name][0];
+								pointViewerMark[name].y=so_obj.params[name][1];
+								pointViewerMark[name].alpha=1;
+							}else{
+								pointViewerMark[name].x=bmp.width/2;
+								pointViewerMark[name].y=bmp.height/2;
+								pointViewerMark[name].alpha=0.2;
+							}
+						break;
+						case Pixel4:
+							var colorBar:ColorBar=bars[name];
+							colorBar.setValue(
+								so_obj.params[name]
+								?
+								new Pixel4(
+									so_obj.params[name][0],
+									so_obj.params[name][1],
+									so_obj.params[name][2],
+									so_obj.params[name][3]
+								)
+								:
+								new Pixel4(0,0,0,1)
+							);
+						break;
+						default:
+							throw new Error("暂不支持的参数类型："+type);
+						break;
+					}
+				}
+				change();
+			}
+			public function getParamArr():Array{
+				var paramArr:Array=new Array();
+				for each(var name:String in pointViewerNameV){
+					if(pointViewerMark[name].alpha<0.9){
+						paramArr.push([name,null]);
+					}else{
+						paramArr.push([name,new Float2(pointViewerMark[name].x,pointViewerMark[name].y)]);
+					}
+				}
+				for(var i:int=0;i<this.numElements;i++){
+					var bar:BaseBar=this.getElementAt(i) as BaseBar;
+					paramArr.push([bar.getName(),bar["getValue"]()]);
+				}
+				return paramArr;
+			}
+			public function setPoint(...args):void{
+				var x:int=bmp.mouseX;
+				var y:int=bmp.mouseY;
+				//if(x<0){
+				//	x=0;
+				//}else if(x>bmp.width){
+				//	x=bmp.width;
+				//}
+				//if(y<0){
+				//	y=0;
+				//}else if(y>bmp.height){
+				//	y=bmp.height;
+				//}
+				currPointViewer.x=x;
+				currPointViewer.y=y;
+				currPointViewer.alpha=1;
+				change();
+			}
+			
+			private var currPointViewer:PointViewer;
+			private function startDragPointViewer(event:MouseEvent):void{
+				for each(var name:String in pointViewerNameV){
+					if(event.target==pointViewerMark[name]){
+						currPointViewer=pointViewerMark[name];
+						break;
+					}
+				}
+				stage.addEventListener(MouseEvent.MOUSE_UP,stopDragPointViewer);
+				this.addEventListener(Event.ENTER_FRAME,setPoint);
+				setPoint();
+			}
+			private function stopDragPointViewer(...args):void{
+				currPointViewer=null;
+				stage.removeEventListener(MouseEvent.MOUSE_UP,stopDragPointViewer);
+				this.removeEventListener(Event.ENTER_FRAME,setPoint);
+			}
+		]]>
+	</fx:Script>
+	
+</s:VGroup>

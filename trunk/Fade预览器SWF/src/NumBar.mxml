@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+/***
+NumBar
+创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
+创建时间：2012年11月05日 09:11:22
+简要说明：这家伙很懒什么都没写。
+用法举例：这家伙还是很懒什么都没写。
+*/
+-->
+
+<local:BaseBar
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	xmlns:local="*"
+	xmlns:ui="zero.ui.*"
+>
+	<s:HGroup verticalAlign="middle" left="1" top="1" right="1" bottom="1">
+		<mx:TextInput id="valueTxt" width="40" change="change(event)"/>
+		<s:Label id="minValueTxt"/>
+		<s:HSlider id="valueBar" width="80" change="change(event)"/>
+		<s:Label id="maxValueTxt"/>
+	</s:HGroup>
+	
+	<fx:Script>
+		<![CDATA[
+			
+			public function init(name:String,isInt:Boolean,minValue:Number,maxValue:Number,defaultValue:Number,_onChange:Function):void{
+				_init(name,_onChange);
+				minValueTxt.text=minValue.toString();
+				maxValueTxt.text=maxValue.toString();
+				valueBar.minimum=minValue;
+				valueBar.maximum=maxValue;
+				if(isInt){
+					valueTxt.restrict="0-9\\-";
+					valueBar.stepSize=1;
+				}else{
+					valueTxt.restrict="0-9.\\-";
+					var dValue:Number=maxValue-minValue;
+					if(dValue>20){
+						valueBar.stepSize=1;
+					}else{
+						valueBar.stepSize=dValue/100;
+					}
+				}
+				setValue(defaultValue);
+			}
+			override protected function change(event:Event):void{
+				switch(event.target){
+					case valueTxt:
+						var value:Number=Number(valueTxt.text);
+						if(isNaN(value)||value<valueBar.minimum){
+							valueBar.value=valueBar.minimum;
+						}else if(value>valueBar.maximum){
+							valueBar.value=valueBar.maximum;
+						}else{
+							valueBar.value=value;
+						}
+					break;
+					case valueBar:
+						valueTxt.text=(Math.round(valueBar.value*100000)/100000).toString();
+					break;
+				}
+				super.change(event);
+			}
+			public function getValue():Number{
+				var value:Number=Number(valueTxt.text);
+				if(isNaN(value)){
+					valueTxt.text=valueBar.minimum.toString()
+					return valueBar.minimum;
+				}
+				return value;
+			}
+			public function setValue(_value:Number):void{
+				valueTxt.text=_value.toString();
+				valueBar.value=_value;
+			}
+		]]>
+	</fx:Script>
+	
+</local:BaseBar>

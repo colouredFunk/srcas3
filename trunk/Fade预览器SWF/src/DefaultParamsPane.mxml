@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+/***
+DefaultParamsPane
+创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
+创建时间：2012年11月13日 15:01:38
+简要说明：这家伙很懒什么都没写。
+用法举例：这家伙还是很懒什么都没写。
+*/
+-->
+
+<s:VGroup
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	xmlns:local="*"
+>
+	<s:VGroup id="itemArea"/>
+	<s:Button label="保存参数们" id="btnSave"/>
+	
+	<fx:Script>
+		<![CDATA[
+			import zero.ui.So;
+			import zero.utils.getTime;
+			
+			private var so_key:String;
+			
+			private var onPreviewParams:Function;
+			private var onUnpreviewParams:Function;
+			private var onConfirmParams:Function;
+			
+			public function init(_so_key:String,defaultParamsArr:Array,_onPreviewParams:Function,_onUnpreviewParams:Function,_onConfirmParams:Function):void{
+				so_key=_so_key;
+				onPreviewParams=_onPreviewParams;
+				onUnpreviewParams=_onUnpreviewParams;
+				onConfirmParams=_onConfirmParams;
+				var i:int=itemArea.numElements;
+				while(--i>=0){
+					var item:DefaultParamItem=itemArea.getElementAt(i) as DefaultParamItem;
+					item.clear();
+					itemArea.removeElement(item);
+				}
+				
+				var so_obj:Object=So.read(so_key);
+				if(so_obj){
+				}else{
+					so_obj={
+						//currParamName:"",
+						paramArr:new Array()
+					}
+				}
+				for each(var defaultParams:Object in defaultParamsArr){
+					addParam({name:defaultParams.name,params:defaultParams},false);
+				}
+				for each(var param:Object in so_obj.paramArr){
+					addParam(param,true);
+				}
+				
+				So.write(so_key,so_obj);
+			}
+			private function addParam(param:Object,showBtnX:Boolean):void{
+				var item:DefaultParamItem=new DefaultParamItem();
+				itemArea.addElement(item);
+				item.init(param,showBtnX,rollOverItem,rollOutItem,clickItem,clickItemX);
+			}
+			private function rollOverItem(item:DefaultParamItem):void{
+				if(onPreviewParams==null){
+				}else{
+					onPreviewParams(item.param.params);
+				}
+			}
+			private function rollOutItem(item:DefaultParamItem):void{
+				if(onUnpreviewParams==null){
+				}else{
+					onUnpreviewParams(item.param.params);
+				}
+			}
+			private function clickItem(item:DefaultParamItem):void{
+				if(onConfirmParams==null){
+				}else{
+					onConfirmParams(item.param.params);
+				}
+			}
+			private function clickItemX(item:DefaultParamItem):void{
+				var so_obj:Object=So.read(so_key);
+				for each(var param:Object in so_obj.paramArr){
+					if(item.btn.label==param.name){
+						so_obj.paramArr.splice(so_obj.paramArr.indexOf(param),1);
+						break;
+					}
+				}
+				So.write(so_key,so_obj);
+				item.clear();
+				itemArea.removeElement(item);
+			}
+			public function saveParams(params:Object):void{
+				var so_obj:Object=So.read(so_key);
+				var mark:Object=new Object();
+				for each(var param:Object in so_obj.paramArr){
+					mark[param.name]=true;
+				}
+				//var name:String="参数们"+getTime("YmdHis");
+				var name:String="预设";
+				var nameId:int=0;
+				do{
+					nameId++;
+				}while(mark[name+nameId]);
+				name+=nameId;
+				trace("saveParams：params.fromParamArr="+params.fromParamArr+"，params.toParamArr="+params.toParamArr);
+				param={name:name,params:params};
+				so_obj.paramArr.push(param);
+				So.write(so_key,so_obj);
+				addParam(param,true);
+			}
+			
+		]]>
+	</fx:Script>
+	
+</s:VGroup>

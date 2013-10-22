@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+/***
+BaseBar
+创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
+创建时间：2012年11月09日 09:45:10
+简要说明：这家伙很懒什么都没写。
+用法举例：这家伙还是很懒什么都没写。
+*/
+-->
+
+<s:BorderContainer
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	xmlns:local="*"
+	xmlns:ui="zero.ui.*"
+	backgroundColor="0xcccccc"
+>
+	<fx:Script>
+		<![CDATA[
+			import spark.components.HGroup;
+			import spark.components.Label;
+			
+			private var nameTxt:Label;
+			private var onChange:Function;
+			
+			protected function _init(name:String,_onChange:Function):void{
+				(this.getElementAt(0) as HGroup).addElementAt(nameTxt=new Label(),0);
+				nameTxt.text=name+"：";
+				onChange=_onChange;
+			}
+			public function clear():void{
+				onChange=null;
+			}
+			protected function change(event:Event):void{
+				if(onChange==null){
+				}else{
+					onChange();
+				}
+			}
+			public function getName():String{
+				return nameTxt.text.replace(/：$/,"");
+			}
+		]]>
+	</fx:Script>
+</s:BorderContainer>
