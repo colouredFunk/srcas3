@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+/***
+Zero3DDemos
+创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；已婚（单身美女们没机会了~~）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
+创建时间：2013年09月22日 11:14:57
+简要说明：这家伙很懒什么都没写。
+用法举例：这家伙还是很懒什么都没写。
+*/
+-->
+
+<s:Application
+	xmlns:fx="http://ns.adobe.com/mxml/2009"
+	xmlns:s="library://ns.adobe.com/flex/spark"
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	xmlns:local="*"
+	xmlns:ui="zero.ui.*"
+	applicationComplete="applicationComplete()"
+>	
+	
+	<s:BorderContainer left="5" top="30" right="5" bottom="5" backgroundColor="0x666666">
+		<mx:UIComponent id="container" horizontalCenter="0" verticalCenter="0"/>
+	</s:BorderContainer>
+	
+	<s:TabBar x="5" y="5" dataProvider='{new ArrayCollection(["坐标系","平面","正方体","地球仪","影片剪辑","球形全景","立方形全景","混杂"])}' id="tabBar" change="tab()"/>
+	
+	<fx:Script>
+		<![CDATA[
+			import demos.*;
+			
+			import mx.collections.ArrayCollection;
+			
+			private var currDemo:Sprite;
+			
+			private function applicationComplete():void{
+				tabBar.selectedItem="立方形全景";
+				tab();
+			}
+			
+			private function tab():void{
+				
+				if(currDemo){
+					currDemo["clear"]();
+					container.removeChild(currDemo);
+					currDemo=null;
+				}
+				
+				switch(tabBar.selectedItem){
+					case "坐标系":
+						currDemo=new AxissDemo();
+					break;
+					case "平面":
+						currDemo=new PlaneDemo();
+					break;
+					case "正方体":
+						currDemo=new CubeDemo();
+					break;
+					case "地球仪":
+						currDemo=new EarthDemo();
+					break;
+					case "影片剪辑":
+						currDemo=new Sprite3DDemo();
+					break;
+					case "球形全景":
+						currDemo=new SphereQuanjingDemo();
+					break;
+					case "立方形全景":
+						currDemo=new CubeQuanjingDemo();
+					break;
+					case "混杂":
+						currDemo=new ComplexDemo();
+					break;
+				}
+				
+				container.addChild(currDemo);
+				
+			}
+			
+		]]>
+	</fx:Script>
+	
+</s:Application>
