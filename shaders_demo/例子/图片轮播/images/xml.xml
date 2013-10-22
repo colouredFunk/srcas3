@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xml fadeTime="1" delayTime="1.5" wid="480" hei="360">
+	<img src="../images/1.jpg"/>
+	<img src="../images/2.jpg"/>
+	<img src="../images/3.jpg"/>
+	<img src="../images/4.jpg"/>
+	<img src="../images/5.jpg"/>
+</xml>
