@@ -1,0 +1,22 @@
+<languageVersion: 1.0;>
+
+${info}
+
+kernel ${className}
+<
+	namespace:"${namespace}";
+	vendor:"Z§§§Á¡è";
+	version:2;
+	description:"${description}";
+>
+{
+	
+${params}
+	input image4 src;${inputs}
+	output pixel4 dst;
+	
+	void evaluatePixel()
+	{
+		${codes}
+	}
+}
