@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>Fade测试</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>com.adobe.flexbuilder.project.flexbuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>com.adobe.flexbuilder.project.actionscriptnature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>[source path] src_zero_swf</name>
+			<type>2</type>
+			<location>F:/zero-swf/src</location>
+		</link>
+		<link>
+			<name>[source path] src_2012</name>
+			<type>2</type>
+			<location>F:/src_2012</location>
+		</link>
+	</linkedResources>
+</projectDescription>

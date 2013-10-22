@@ -1,0 +1,109 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<a href="http://baike.baidu.com/view/6423021.htm">http://baike.baidu.com/view/6423021.htm</a>
+
+<h1 id="6529177">AGAL</h1>
+<div></div>
+<div id="lemmaContent-0" tangram_guid="TANGRAM__10" sizcache04393852535171862="1" sizset="0">　　AGAL(Adobe Graphics Assembly   Language)是Adobe开发的图形汇编语言，汇编语言是仅高于计算机二进制<a href="/view/52.htm" target="_blank">机器码</a>的低级语言，可以精确地操控机器硬件比如可编程显卡，PC的Dirext9、MAC的OpenGL以及移动设备中的OpenGL   ES 2都是可编程显卡，并且都支持AGAL。通过Adobe官方提供的<a href="/view/487018.htm" target="_blank">编译器</a>AGALMiniAssembler（实际上是一个AS类库），我们可以通过字符串指令来获得一个AGAL二进制流，再通过context3D上传给显卡的编程管线。对于顶点以及片段的运算都是通过AGAL交由<a href="/view/2882.htm" target="_blank">显卡</a>来处理的，这就是传说中的GPU<a href="/view/1039397.htm" target="_blank">硬件加速</a>。
+  <div></div>
+  ），最新的测试版flash player 11中提供了可调用显卡资源来渲染图形API，即<a href="/view/1785794.htm" target="_blank">Molehill</a>
+  <div></div>
+  下面摘取了一些AGAL的函数
+  <div></div>
+  add 0×01 add destination = source1 + source2,   componentwise
+  <div></div>
+  sub 0×02 subtract destination = source1 – source2,   componentwise
+  <div></div>
+  mul 0×03 multiply destination = source1 * source2,   componentwise
+  <div></div>
+  div 0×04 divide destination = source1 / source2,   componentwise
+  <div></div>
+  …..
+  <div></div>
+  摘抄一段AGAL的<a href="/view/6159.htm" target="_blank">寄存器</a>解释，有助于理解AGAL
+  <div></div>
+  1。属性寄存器
+  <div></div>
+  这些寄存器参考<a href="/view/415314.htm" target="_blank">顶点着色</a>器的VertexBuffer输入。因此，他们只能在<a href="/view/415314.htm" target="_blank">顶点着色</a>器中可用。
+  <div></div>
+  要通过正确的索引分配一个VertexBuffer到一个特定的属性寄存器，使用方法
+  <div></div>
+  Context3D：setVertexBufferAt（）
+  <div></div>
+  在着色器中，访问属性寄存器的语法：va&lt;n&gt;，其中&lt;n&gt;是属性寄存器的索引号。
+  <div></div>
+  有一共有8个属性寄存器用于<a href="/view/415314.htm" target="_blank">顶点着色</a>器。
+  <div></div>
+  2。常量寄存器
+  <div></div>
+  这些寄存器是用来从ActionScript传递参数到着色的。这是通过Context3D::setProgramConstants()系列函数来实现。
+  <div></div>
+  在着色器中，这些寄存器的访问语法：
+  <div></div>
+  vc&lt;n&gt;，用于顶点着色器
+  <div></div>
+  fc&lt;n&gt;，用于像素着色器
+  <div></div>
+  其中&lt;n&gt;是常量寄存器的索引值。
+  <div></div>
+  有128个常量寄存器用于<a href="/view/415314.htm" target="_blank">顶点着色</a>器和28常量寄存器用于<a href="/view/3182320.htm" target="_blank">像素着色器</a>。
+  <div></div>
+  3。临时寄存器
+  <div></div>
+  这些寄存器在着色器中，可以用于临时计算。
+  <div></div>
+  这些寄存器的访问语法：
+  <div></div>
+  vt&lt;n&gt; (vertex)，用于<a href="/view/415314.htm" target="_blank">顶点着色</a>器
+  <div></div>
+  ft&lt;n&gt; (pixel)，用于<a href="/view/3182320.htm" target="_blank">像素着色器</a>
+  <div></div>
+  &lt;n&gt;是寄存器编号。
+  <div></div>
+  有8个用于<a href="/view/415314.htm" target="_blank">顶点着色</a>器，8个用于<a href="/view/3182320.htm" target="_blank">像素着色器</a>。
+  <div></div>
+  4。输出寄存器
+  <div></div>
+  输出<a href="/view/6159.htm" target="_blank">寄存器</a>是在顶点和<a href="/view/3182320.htm" target="_blank">像素着色器</a>存储其计算输出。此输出用于<a href="/view/415314.htm" target="_blank">顶点着色</a>器是顶点的剪辑空间位置。用于<a href="/view/3182320.htm" target="_blank">像素着色器</a>是该像素的颜色。
+  <div></div>
+  访问这些寄存器运算的语法：
+  <div></div>
+  op，用于<a href="/view/415314.htm" target="_blank">顶点着色</a>器
+  <div></div>
+  oc，用于<a href="/view/3182320.htm" target="_blank">像素着色器</a>
+  <div></div>
+  但显然只能一个输出寄存器用于顶点和<a href="/view/3182320.htm" target="_blank">像素着色器</a>。
+  <div></div>
+  5。变寄存器
+  <div></div>
+  这些寄存器用来从<a href="/view/415314.htm" target="_blank">顶点着色</a>器传递数据到<a href="/view/3182320.htm" target="_blank">像素着色器</a>。传递数据被正确地插入图形芯片，从而使<a href="/view/3182320.htm" target="_blank">像素着色器</a>接收到正确的正在处理的像素的值。
+  <div></div>
+  以这种方式获取传递的典型数据是顶点颜色，或 纹理UV 坐标。
+  <div></div>
+  这些<a href="/view/6159.htm" target="_blank">寄存器</a>可以被访问的语法v &lt;n&gt;，其中&lt;n&gt;是寄存器编号。
+  <div></div>
+  有8个变寄存器可用。
+  <div></div>
+  6。纹理取样器
+  <div></div>
+  纹理采样寄存器是用来基于<a href="/view/4961929.htm" target="_blank">UV坐标</a>从纹理中获取颜色值。
+  <div></div>
+  纹理是通过ActionScriptcall指定方法Context3D::setTextureAt()。
+  <div></div>
+  纹理样本的使用语法是：fs&lt;n&gt;   &lt;flags&gt;，其中&lt;n&gt;是取样指数，&lt;flags&gt;是由一个或多个标记，用于指定如何进行采样。
+  <div></div>
+  &lt;flags&gt;是以逗号分隔的一组字符串，它定义：
+  <div></div>
+  纹理尺寸。可以是：二维，三维，多维数据集
+  <div></div>
+  纹理映射。可以是：nomip，mipnone，mipnearest，mipnone
+  <div></div>
+  纹理过滤。可以是：最近点采样，线性
+  <div></div>
+  纹理重复。可以是：重复，包装，夹取。
+  <div></div>
+  因此，举例来说，一个标准的2D纹理没有纹理映射，并进行线性过滤，可以进行采样到临时寄存器FT1，使用以下命令：
+  <div></div>
+  &ldquo;tex ft1, v0, fs0 &lt;2d,linear,nomip&gt; &ldquo;
+  <div></div>
+  变寄存器v0持有插值的纹理 UVs。</div>
