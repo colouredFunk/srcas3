@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+/***
+BoolBar
+创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
+创建时间：2012年11月18日 01:25:14
+简要说明：这家伙很懒什么都没写。
+用法举例：这家伙还是很懒什么都没写。
+*/
+-->
+
+<local:BaseBar
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	xmlns:local="*"
+	xmlns:ui="zero.ui.*"
+>
+	<s:HGroup verticalAlign="middle" left="1" top="1" right="1" bottom="1">
+		<s:CheckBox id="cb" change="change(event)"/>
+	</s:HGroup>
+	
+	<fx:Script>
+		<![CDATA[
+			
+			public function init(name:String,defaultValue:Boolean,_onChange:Function):void{
+				_init(name,_onChange);
+				cb.selected=defaultValue;
+				setValue(defaultValue);
+			}
+			override protected function change(event:Event):void{
+				super.change(event);
+			}
+			public function getValue():Boolean{
+				return cb.selected;
+			}
+			public function setValue(_value:Boolean):void{
+				cb.selected=_value;
+			}
+		]]>
+	</fx:Script>
+	
+</local:BaseBar>

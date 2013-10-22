@@ -1,0 +1,749 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+/***
+FadeViewer
+创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
+创建时间：2012年11月03日 20:45:21
+简要说明：这家伙很懒什么都没写。
+用法举例：这家伙还是很懒什么都没写。
+*/
+-->
+
+<s:Group
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	xmlns:local="*"
+	xmlns:ui="zero.ui.*"
+	enabled="false"
+>
+	<mx:HDividedBox left="5" right="5" top="5" bottom="215" horizontalGap="2">
+		<mx:Tree width="150" height="100%" id="shaderClassTree" change="confirmShader(event)" itemRollOver="previewShader(event)" itemRollOut="unpreviewShader(event)"/>
+		<s:BorderContainer height="100%">
+			<s:Scroller left="5" top="5" right="5" bottom="5">
+				<s:HGroup verticalAlign="bottom" id="paramsArea">
+					<s:VGroup horizontalAlign="center">
+						<s:BorderContainer width="170" height="130" backgroundColor="0xcccccc">
+							<mx:UIComponent id="viewArea1"/>
+						</s:BorderContainer>
+						<local:ParamsPane id="fromParamsPane"/>
+					</s:VGroup>
+					<s:VGroup>
+						<s:RadioButton groupName="baseShader" label="BaseShader" id="baseShaderRb0" selected="true" visible="false"/>
+						<s:RadioButton groupName="baseShader" label="AS3BaseShader" id="baseShaderRb1" visible="false"/>
+						<s:RadioButton groupName="baseShader" label="BaseEffect" id="baseShaderRb2" visible="false"/>
+						<s:RadioButton groupName="baseShader" label="AS3BaseEffect" id="baseShaderRb3" visible="false"/>
+						<s:RadioButton groupName="mode" label="&gt;==" id="modeRb0"/>
+						<s:RadioButton groupName="mode" label="&gt;=&gt;" selected="true"/>
+						<s:RadioButton groupName="mode" label="==&gt;"/>
+						<s:RadioButton groupName="mode" label="&lt;=&lt;"/>
+						<s:Button label="重置参数" mouseOver="previewResetParams()" mouseOut="unpreviewResetParams()" click="confirmResetParams()"/>
+						<local:DefaultParamsPane id="defaultParamsPane"/>
+					</s:VGroup>
+					<s:VGroup horizontalAlign="center">
+						<s:BorderContainer width="170" height="130" backgroundColor="0xcccccc">
+							<mx:UIComponent id="viewArea2"/>
+						</s:BorderContainer>
+						<local:ParamsPane id="toParamsPane"/>
+					</s:VGroup>
+				</s:HGroup>
+			</s:Scroller>
+		</s:BorderContainer>
+	</mx:HDividedBox>
+	<s:VGroup left="5" right="5" bottom="5" horizontalAlign="right">
+		<s:Group width="100%" height="150">
+			<s:BorderContainer left="0" right="175" height="100%" id="codeAreaContainer" resize="resizeCodeAreaContainer()">
+				<mx:UIComponent width="100%" height="100%" id="codeArea"/>
+			</s:BorderContainer>
+			<s:BorderContainer backgroundColor="0xcccccc" id="viewArea3Container" width="170" height="100%" right="0">
+				<mx:UIComponent id="viewArea3"/>
+			</s:BorderContainer>
+		</s:Group>
+		<s:HGroup verticalAlign="middle">
+			<s:Label id="durationLabel1"/>
+			<mx:TextInput width="50" restrict="0-9." id="durationTxt" text="0.8"/>
+			<s:Label text="延迟"/>
+			<mx:TextInput width="50" restrict="0-9." id="delayTxt" text="0"/>
+			<s:CheckBox label="使用帧作为单位" id="useFramesCb" selected="true"/>
+			<s:Label text="缓动："/>
+			<mx:TextInput id="easeTxt" width="40" restrict="0-9\-" maxChars="4" text="0"/>
+			<s:HSlider id="easeBar" width="60" minimum="-200" maximum="200" change="changeEaseBar()"/>
+			<s:CheckBox label="当完成时删除滤镜" id="autoRemoveFilterCb"/>
+			<s:CheckBox label="当更新时(" id="onUpdateCb"/>
+			<s:CheckBox label="mc" id="onUpdateMcCb"/>
+			<s:Label text=")"/>
+			<s:CheckBox label="当完成时(" id="onCompleteCb"/>
+			<s:CheckBox label="mc" id="onCompleteMcCb"/>
+			<s:Label text=")"/>
+		</s:HGroup>
+		<s:HGroup verticalAlign="middle">
+			<s:Label color="0xff6600" id="statusTxt"/>
+			<s:Button label="复制代码" click="copyCode()"/>
+			<s:Label text="Fade预览器1.1 创建人：ZЁЯ¤"/>
+		</s:HGroup>
+	</s:VGroup>
+	<s:TitleWindow width="300" height="600" id="testPane" visible="false" top="15" right="15">
+		<mx:TextArea id="outputTxt" width="100%" height="100%"/>
+	</s:TitleWindow>
+	
+	<fx:Script>
+		<![CDATA[
+			import apmn.Wonderflized;
+			
+			import flash.display.*;
+			import flash.events.*;
+			import flash.filters.*;
+			import flash.geom.*;
+			import flash.net.*;
+			import flash.system.*;
+			import flash.text.*;
+			import flash.utils.*;
+			
+			import mx.collections.XMLListCollection;
+			import mx.events.ListEvent;
+			import mx.events.ResizeEvent;
+			import mx.events.ScrollEvent;
+			import mx.events.TreeEvent;
+			
+			import zero.shaders.Fade;
+			import zero.shaders.Float2;
+			import zero.shaders.Pixel4;
+			import zero.shaders.as3s.AS3BaseShader;
+			import zero.stage3Ds.Fade;
+			import zero.stage3Ds.as3s.AS3BaseEffect;
+			import zero.ui.So;
+			
+			private var shaderss:Object;
+			
+			private var bmp:Bmp;
+			private var bmd:BitmapData;
+			
+			private var currFromAS3Shader:AS3BaseShader;
+			private var currToAS3Shader:AS3BaseShader;
+			private var currFilter:ShaderFilter;
+			private var timeoutId:int;
+			
+			private var prevShaderName:String;//预览时需要保存当前选择的滤镜
+			
+			//private var filters0:Array=[new GlowFilter()];
+			private var filters0:Array=[];
+			
+			private var wonderflized:Wonderflized;
+			
+			private var shaderClassXLC:XMLListCollection;
+			
+			private var viewArea1_pointViewerContainer:Sprite;
+			private var viewArea2_pointViewerContainer:Sprite;
+			
+			public function init():void{
+				
+				//trace("三角形阵列");
+				//trace("可保存为预设");
+				trace("注掉所有与像素着色器无关的寄存器");
+				trace("分别对 公司的电脑 和 家里的电脑 测试 Xiuzhengs");
+				
+				So.init("FadeViewer_20121110102400");
+				
+				/*
+				if(datas.length){
+					trace("测试");
+					return;
+				}
+				//*/
+				
+				if(datas.length){
+				}else{
+					trace("没有Shader");
+					return;
+				}
+				
+				//trace("stage.stage3Ds="+stage.stage3Ds);
+				zero.stage3Ds.Fade.init(stage.stage3Ds[0],initComplete,initError);
+			}
+			private function initComplete():void{
+				baseShaderRb2.enabled=true;
+				baseShaderRb3.enabled=true;
+				_init();
+			}
+			private function initError():void{
+				baseShaderRb2.enabled=false;
+				baseShaderRb3.enabled=false;
+				_init();
+			}
+			private function _init():void{
+				// ^_^
+				
+				this.enabled=true;
+				
+				shaderss=new Object();
+				var shaderClassXML:XML=<shaderClasses/>;
+				
+				var firstAS3Shader:AS3BaseShader=null;
+				var firstFenleiNode:XML=null;
+				for each(var fenlei:Object in datas){
+					var node:XML=<node name={fenlei.name}/>;
+					for each(var subFenlei:Object in fenlei.shaderArr){
+						var fromAS3Shader:AS3BaseShader=new subFenlei.as3ShaderClass();
+						var toAS3Shader:AS3BaseShader=new subFenlei.as3ShaderClass();
+						fromAS3Shader.shader=new subFenlei.shaderClass();
+						toAS3Shader.shader=fromAS3Shader.shader;
+						if(zero.stage3Ds.Fade.ready){
+							if(subFenlei.as3EffectClass){
+								//trace("支持 as3Effect 的 fromAS3Shader："+fromAS3Shader);
+								fromAS3Shader.as3Effect=new subFenlei.as3EffectClass();
+								fromAS3Shader.as3Effect.effect=new subFenlei.effectClass();
+								toAS3Shader.as3Effect=new subFenlei.as3EffectClass();
+								toAS3Shader.as3Effect.effect=fromAS3Shader.as3Effect.effect;
+							}
+						}
+						
+						if(firstAS3Shader){
+						}else{
+							firstAS3Shader=fromAS3Shader;
+							firstFenleiNode=node;
+						}
+						for each(var defaultParams:Object in subFenlei.defaultParamsArr){
+							//trace(defaultParams.name);
+							var fromParamArr:Array=new Array();
+							var fromMark:Object=new Object();
+							var toParamArr:Array=new Array();
+							var toMark:Object=new Object();
+							for each(var name:String in fromAS3Shader.shader["constructor"].nameV){
+								fromMark[name]=[name,fromAS3Shader.shader[name]];
+								fromParamArr.push(fromMark[name]);
+								toMark[name]=[name,fromAS3Shader.shader[name]];
+								toParamArr.push(toMark[name]);
+							}
+							for each(var subArr:Array in defaultParams.fromParamArr){
+								if(fromMark[subArr[0]]){
+									fromMark[subArr[0]][1]=subArr[1];
+								}else{
+									fromMark[subArr[0]]=subArr;
+									fromParamArr.push(subArr);
+								}
+							}
+							for each(subArr in defaultParams.toParamArr){
+								if(toMark[subArr[0]]){
+									toMark[subArr[0]][1]=subArr[1];
+								}else{
+									toMark[subArr[0]]=subArr;
+									toParamArr.push(subArr);
+								}
+							}
+							defaultParams.fromParamArr=fromParamArr;
+							defaultParams.toParamArr=toParamArr;
+						}
+						shaderss[fromAS3Shader.shader.data.description]={fromAS3Shader:fromAS3Shader,toAS3Shader:toAS3Shader,defaultParamsArr:subFenlei.defaultParamsArr};
+						node.appendChild(<node name={fromAS3Shader.shader.data.description}/>);
+					}
+					shaderClassXML.appendChild(node);
+				}
+				
+				shaderClassTree.labelField="@name";
+				shaderClassTree.dataProvider=shaderClassXLC=new XMLListCollection(shaderClassXML.children());
+				shaderClassTree.validateNow();
+				
+				bmp=new Bmp();
+				bmd=bmp.bitmapData.clone();
+				
+				fromParamsPane.bmp=new Bitmap(bmd.clone());
+				viewArea1.addChild(fromParamsPane.bmp);
+				viewArea1_pointViewerContainer=new Sprite();
+				viewArea1.addChild(viewArea1_pointViewerContainer);
+				viewArea1_pointViewerContainer.x=fromParamsPane.bmp.x=5;
+				viewArea1_pointViewerContainer.y=fromParamsPane.bmp.y=5;
+				fromParamsPane.bmp.filters=filters0;
+				
+				toParamsPane.bmp=new Bitmap(bmd.clone());
+				viewArea2.addChild(toParamsPane.bmp);
+				viewArea2_pointViewerContainer=new Sprite();
+				viewArea2.addChild(viewArea2_pointViewerContainer);
+				viewArea2_pointViewerContainer.x=toParamsPane.bmp.x=5;
+				viewArea2_pointViewerContainer.y=toParamsPane.bmp.y=5;
+				toParamsPane.bmp.filters=filters0;
+				
+				viewArea3.addChild(bmp);
+				
+				//如出现小数，将会引起效果不一致
+				//bmp.x=(viewArea3Container.width-bmp.width)/2;
+				//bmp.y=(viewArea3Container.height-bmp.height)/2;
+				bmp.x=Math.round((viewArea3Container.width-bmp.width)/2);
+				bmp.y=Math.round((viewArea3Container.height-bmp.height)/2);
+				
+				bmp.filters=filters0;
+				
+				codeArea.addChild(wonderflized=new Wonderflized(100,100,false));
+				resizeCodeAreaContainer();
+				
+				currFilter=new ShaderFilter();
+				
+				So.add(useFramesCb,{onChange:changeUseFrames});
+				So.add(durationTxt,{onChange:fadeDelay});
+				So.add(delayTxt,{onChange:fadeDelay});
+				So.add(baseShaderRb0,{onChange:_changeParams});
+				So.add(modeRb0,{onChange:fadeDelay,enabledObjArr:[fromParamsPane,[fromParamsPane,toParamsPane],toParamsPane,[fromParamsPane,toParamsPane]]});
+				So.add(easeTxt,{onChange:changeEase});
+				So.add(autoRemoveFilterCb,{onChange:fadeDelay});
+				So.add(onUpdateCb,{onChange:fadeDelay,enabledObj:onUpdateMcCb});
+				So.add(onCompleteCb,{onChange:fadeDelay,enabledObj:onCompleteMcCb});
+				So.add(onUpdateMcCb,{onChange:fadeDelay});
+				So.add(onCompleteMcCb,{onChange:fadeDelay});
+				
+				var shaderClassTree_width:int=So.read("shaderClassTree_width");
+				if(shaderClassTree_width>0){
+					shaderClassTree.width=shaderClassTree_width;
+				}
+				
+				var openItemNameArr:Array=So.read("shaderClassTree_openItemNameArr")||[firstFenleiNode.@name.toString()];
+				if(shaderss[So.read("selectedShader")]){
+					var selectedAS3Shader:AS3BaseShader=shaderss[So.read("selectedShader")].fromAS3Shader;
+				}else{
+					selectedAS3Shader=firstAS3Shader;
+				}
+				for each(node in shaderClassXLC.source){
+					if(openItemNameArr.indexOf(node.@name.toString())>-1){
+						shaderClassTree.expandChildrenOf(node,true);
+					}
+					for each(var subNode:XML in node.node){
+						if(subNode.@name.toString()==selectedAS3Shader.shader.data.description){
+							shaderClassTree.expandChildrenOf(node,true);
+							shaderClassTree.selectedItem=subNode;
+						}
+					}
+				}
+				//shaderClassTree.validateNow();
+				
+				shaderClassTree.addEventListener(ScrollEvent.SCROLL,updateShaderClassTree);
+				shaderClassTree.addEventListener(TreeEvent.ITEM_OPEN,updateShaderClassTree);
+				shaderClassTree.addEventListener(TreeEvent.ITEM_CLOSE,updateShaderClassTree);
+				
+				var shaderClassTree_verticalScrollPosition:int=So.read("shaderClassTree_verticalScrollPosition");
+				if(shaderClassTree_verticalScrollPosition>0){
+					shaderClassTree.verticalScrollPosition=shaderClassTree_verticalScrollPosition;
+				}
+				
+				shaderClassTree.addEventListener(ResizeEvent.RESIZE,resizeShaderClassTree);
+				
+				prevShaderName=shaderClassTree.selectedItem.@name.toString();
+				updateParams(prevShaderName);
+				
+				//trace(Duoxiangshi);
+				
+				//Duoxiangshi.normalize("(xo*(a*d-b*c)+(((xoc-xo)*d-(yoc-yo)*c)-((xc-xo)*d-(yc-yo)*c)))/(a*d-b*c)");
+				//Duoxiangshi.normalize("(yo*(a*d-b*c)+(((xc-xo)*b-(yc-yo)*a)-((xoc-xo)*b-(yoc-yo)*a)))/(a*d-b*c)");
+				
+				//Duoxiangshi.normalize("((a*fL-c*(xoc-xo))*(e*fL-f*(yoc-yo))-(d*fL-f*(xoc-xo))*(b*fL-c*(yoc-yo)))");
+				
+				//Duoxiangshi.normalize("(e*fL-f*(yoc-yo))*((xoc-xo)*fL+(xoc-xo)*tz-(xc-xo)*fL)");
+				//Duoxiangshi.normalize("(d*fL-f*(xoc-xo))*((yoc-yo)*fL+(yoc-yo)*tz-(yc-yo)*fL)");
+				//Duoxiangshi.normalize("(xo*(((a*fL-c*(xoc-xo))*(e*fL-f*(yoc-yo))-(d*fL-f*(xoc-xo))*(b*fL-c*(yoc-yo))))+((e*fL-f*(yoc-yo))*((xoc-xo)*fL+(xoc-xo)*tz-(xc-xo)*fL)-(d*fL-f*(xoc-xo))*((yoc-yo)*fL+(yoc-yo)*tz-(yc-yo)*fL)))");
+				//Duoxiangshi.normalize("(yo*(((d*fL-f*(xoc-xo))*(b*fL-c*(yoc-yo))-(a*fL-c*(xoc-xo))*(e*fL-f*(yoc-yo))))+((b*fL-c*(yoc-yo))*((xoc-xo)*fL+(xoc-xo)*tz-(xc-xo)*fL)-(a*fL-c*(xoc-xo))*((yoc-yo)*fL+(yoc-yo)*tz-(yc-yo)*fL)))");
+			}
+			private function updateShaderClassTree(...args):void{
+				var openItemNameArr:Array=new Array();
+				for each(var openItem:XML in shaderClassTree.openItems){
+					openItemNameArr.push(openItem.@name.toString());
+				}
+				So.write("shaderClassTree_openItemNameArr",openItemNameArr);
+				So.write("shaderClassTree_verticalScrollPosition",shaderClassTree.verticalScrollPosition);
+			}
+			private function updateParams(shaderName:String):void{
+				
+				stopRenderBmps(currFromAS3Shader);
+				stopRenderBmps(currToAS3Shader);
+				
+				currFromAS3Shader=shaderss[shaderName].fromAS3Shader;
+				currToAS3Shader=shaderss[shaderName].toAS3Shader;
+				
+				So.write("selectedShader",currFromAS3Shader.shader.data.description);
+				
+				currFilter.shader=currFromAS3Shader.shader;
+				
+				fromParamsPane.init(currFromAS3Shader,"fromParamsPane_"+getCurrShaderClassName(false),true,viewArea1_pointViewerContainer,changeFromParams);
+				toParamsPane.init(currFromAS3Shader,"toParamsPane_"+getCurrShaderClassName(false),false,viewArea2_pointViewerContainer,changeToParams);
+				
+				defaultParamsPane.init("defaultParamsPane_"+getCurrShaderClassName(false),shaderss[shaderName].defaultParamsArr,previewDefaultParams,unpreviewDefaultParams,previewDefaultParams);
+				defaultParamsPane.btnSave.addEventListener(MouseEvent.CLICK,saveCurrParams);
+				
+				_changeParams();
+			}
+			private function stopRenderBmps(fromAS3Shader:AS3BaseShader):void{
+				if(fromAS3Shader){
+					fromAS3Shader.stopRenderBmp();
+					if(fromAS3Shader.as3Effect){
+						//trace("支持 as3Effect 的 fromAS3Shader"+fromAS3Shader);
+						fromAS3Shader.as3Effect.stopRenderBmp();
+					}
+				}
+			}
+			private function _changeParams():void{
+				if(currFromAS3Shader){
+					if(currFromAS3Shader.as3Effect){
+						baseShaderRb2.enabled=true;
+						baseShaderRb3.enabled=true;
+					}else{
+						baseShaderRb2.enabled=false;
+						baseShaderRb3.enabled=false;
+					}
+					changeFromParams();
+					changeToParams();
+				}
+			}
+			
+			private function previewDefaultParams(params:Object):void{
+				fromParamsPane.setParams(params.fromParamArr,false);
+				toParamsPane.setParams(params.toParamArr,false);
+			}
+			private function unpreviewDefaultParams(params:Object):void{
+				fromParamsPane.unSetParams();
+				toParamsPane.unSetParams();
+			}
+			private function confirmDefaultParams(params:Object):void{
+				fromParamsPane.setParams(params.fromParamArr,true);
+				toParamsPane.setParams(params.toParamArr,true);
+			}
+			private function saveCurrParams(...args):void{
+				defaultParamsPane.saveParams({
+					fromParamArr:fromParamsPane.getParamArr(),
+					toParamArr:toParamsPane.getParamArr()
+				});
+			}
+			
+			private function sec2frame(sec:Number):Number{
+				if(sec>0){
+				}else{
+					sec=0;
+				}
+				return Math.round(sec*stage.frameRate);
+			}
+			private function frame2sec(frame:Number):Number{
+				if(frame>0){
+				}else{
+					frame=0;
+				}
+				return Math.round(frame/stage.frameRate*100)/100;
+			}
+			private function changeUseFrames():void{
+				if(useFramesCb.selected){
+					durationLabel1.text="渐变帧数：";
+					//durationLabel2.text="帧";
+					durationTxt.text=sec2frame(Number(durationTxt.text)).toString();
+					delayTxt.text=sec2frame(Number(delayTxt.text)).toString();
+				}else{
+					durationLabel1.text="渐变秒数：";
+					//durationLabel2.text="秒";
+					durationTxt.text=frame2sec(Number(durationTxt.text)).toString();
+					delayTxt.text=frame2sec(Number(delayTxt.text)).toString();
+				}
+				if(So.has(durationTxt)){
+					So.updateSoByObj(durationTxt);
+				}
+				if(So.has(delayTxt)){
+					So.updateSoByObj(delayTxt);
+				}
+			}
+			private function changeEase():void{
+				easeBar.value=int(easeTxt.text);
+				fadeDelay();
+			}
+			private function changeEaseBar():void{
+				easeTxt.text=easeBar.value.toString();
+				So.updateSoByObj(easeTxt);
+			}
+			private function changeFromParams():void{
+				changeParams(fromParamsPane,toParamsPane);
+			}
+			private function changeToParams():void{
+				changeParams(toParamsPane,fromParamsPane);
+			}
+			private function changeParams(paramsPane:ParamsPane,otherParamsPane:ParamsPane):void{
+				
+				var paramArr:Array=paramsPane.getParamArr();
+				
+				//trace("needSyncOtherParamsPane="+needSyncOtherParamsPane);
+				if(needSyncOtherParamsPane){
+					needSyncOtherParamsPane=false;
+					var otherParamArr:Array=otherParamsPane.getParamArr();
+					var needSync:Boolean=false;//是否需要同步
+					
+					var i:int=-1;
+					for each(var subArr:Array in paramArr){
+						i++;
+						var type:Class=currFromAS3Shader.shader["constructor"].typeV[currFromAS3Shader.shader["constructor"].nameV.indexOf(subArr[0])];
+						switch(type){
+							case Boolean:
+							case uint:
+								if(otherParamArr[i][1]==subArr[1]){
+								}else{
+									needSync=true;
+									otherParamArr[i]=subArr;
+								}
+							break;
+						}
+					}
+					if(needSync){
+						otherParamsPane.changeParams(otherParamArr);
+					}
+				}
+				if(paramsPane==fromParamsPane){
+					stopRenderBmps(currFromAS3Shader);
+				}else{
+					stopRenderBmps(currToAS3Shader);
+				}
+				paramsPane.bmp.filters=filters0;
+				paramsPane.bmp.bitmapData.copyPixels(bmd,bmd.rect,new Point());
+				switch(baseShaderRb0.group.selectedValue){
+					case "BaseShader":
+						for each(subArr in paramArr){
+							currFromAS3Shader.shader[subArr[0]]=subArr[1];
+						}
+						currFromAS3Shader.shader.updateSrcSize(paramsPane.bmp);
+						currFromAS3Shader.shader.initNullParams();
+						currFromAS3Shader.shader.updateParams();
+						paramsPane.bmp.filters=filters0.concat(currFilter);
+					break;
+					case "AS3BaseShader":
+						if(paramsPane==fromParamsPane){
+							currFromAS3Shader.renderBmp(paramsPane.bmp,bmd,paramArr);
+						}else{
+							currToAS3Shader.renderBmp(paramsPane.bmp,bmd,paramArr);
+						}
+					break;
+					case "BaseEffect":
+						if(currFromAS3Shader.as3Effect){
+							var vars:Object=new Object();
+							for each(subArr in paramArr){
+								vars[subArr[0]]=subArr[1];
+							}
+							zero.stage3Ds.Fade.to(bmd,paramsPane.bmp.bitmapData,0,currFromAS3Shader.as3Effect.effect["constructor"],vars);
+						}
+					break;
+					case "AS3BaseEffect":
+						if(currFromAS3Shader.as3Effect){
+							if(paramsPane==fromParamsPane){
+								currFromAS3Shader.as3Effect.renderBmp(paramsPane.bmp,bmd,paramArr);
+							}else{
+								currToAS3Shader.as3Effect.renderBmp(paramsPane.bmp,bmd,paramArr);
+							}
+						}
+					break;
+				}
+				zero.shaders.Fade.stop(bmp);
+				bmp.filters=filters0;
+				fadeDelay();
+			}
+			private function fadeDelay():void{
+				clearTimeout(timeoutId);
+				timeoutId=setTimeout(fade,500);
+			}
+			
+			
+			private function getParamsCode(vars:Object,hasPrevVars:Boolean,paramArr:Array):String{
+				
+				vars.useFrames=useFramesCb.selected;
+				vars.ease=int(easeTxt.text);
+				vars.delay=Number(delayTxt.text);
+				vars.autoRemoveFilter=autoRemoveFilterCb.selected;
+				vars.onComplete=fadeDelay;
+				
+				var code:String="";
+				
+				for each(var subArr:Array in paramArr){
+					vars[subArr[0]]=subArr[1];
+					var _varsCode:String=","+subArr[0]+":";
+					switch(currFromAS3Shader.shader["constructor"].typeV[currFromAS3Shader.shader["constructor"].nameV.indexOf(subArr[0])]){
+						case Float2:
+							if(subArr[1]){
+								_varsCode+="new Float2("+subArr[1].x+","+subArr[1].y+")";
+							}else{
+								_varsCode="";
+							}
+						break;
+						case Pixel4:
+							if(subArr[1]){
+								_varsCode+="new Pixel4("+subArr[1].r+","+subArr[1].g+","+subArr[1].b+","+subArr[1].a+")";
+							}else{
+								_varsCode="";
+							}
+						break;
+						default:
+							_varsCode+=subArr[1];
+						break;
+					}
+					code+=_varsCode;
+				}
+				if(hasPrevVars){
+				}else{
+					if(useFramesCb.selected){
+						code+=",useFrames:true";
+					}
+					if(vars.ease){
+						code+=",ease:"+vars.ease;
+					}
+					if(vars.delay>0){
+						code+=",delay:"+vars.delay;
+					}
+					if(autoRemoveFilterCb.selected){
+						code+=",autoRemoveFilter:true";
+					}
+					if(onUpdateCb.selected){
+						code+=",onUpdate:onUpdateHandler";
+					}
+					if(onCompleteCb.selected){
+						code+=",onComplete:onCompleteHandler";
+					}
+				}
+				return ",\n	{"+code.substr(1)+"}";
+			}
+			
+			private function fade():void{
+				clearTimeout(timeoutId);
+				
+				statusTxt.text="";
+				
+				var fromVarsCode:String="";
+				var toVarsCode:String="";
+				switch(modeRb0.group.selectedValue){
+					case ">==":
+					case ">=>":
+					//case "==>":
+					case "<=<":
+						var hasFromVars:Boolean=true;
+					break;
+				}
+				switch(modeRb0.group.selectedValue){
+					case ">==":
+					case ">=>":
+						var fromVars:Object=new Object();
+						fromVarsCode+=getParamsCode(fromVars,false,fromParamsPane.getParamArr());
+					break;
+					case "<=<":
+						var toVars:Object=new Object();
+						toVarsCode+=getParamsCode(toVars,hasFromVars,fromParamsPane.getParamArr());
+					break;
+				}
+				
+				switch(modeRb0.group.selectedValue){
+					case ">=>":
+					case "==>":
+						toVars=new Object();
+						toVarsCode+=getParamsCode(toVars,hasFromVars,toParamsPane.getParamArr());
+					break;
+					case "<=<":
+						fromVars=new Object();
+						fromVarsCode+=getParamsCode(fromVars,false,toParamsPane.getParamArr());
+					break;
+				}
+				
+				var code:String=
+					"import zero.shaders.*;\n"+
+					"import "+getCurrShaderClassName(true)+";\n"+
+					'Fade.'+(fromVarsCode&&toVarsCode?"fromTo":(fromVarsCode?"from":"to"))+'(mc,'+durationTxt.text+','+getCurrShaderClassName(false)+fromVarsCode+toVarsCode+'\n);\n';
+				
+				if(onUpdateCb.selected){
+					code+=
+						'function onUpdateHandler('+(onUpdateMcCb.selected?"mc":"")+'):void{\n'+
+						'	trace("onUpdate"'+(onUpdateMcCb.selected?"+mc":"")+');\n'+
+						'}\n';
+				}
+				if(onCompleteCb.selected){
+					code+=
+						'function onCompleteHandler('+(onCompleteMcCb.selected?"mc":"")+'):void{\n'+
+						'	trace("onComplete"'+(onCompleteMcCb.selected?"+mc":"")+');\n'+
+						'}\n';
+				}
+				
+				wonderflized.text=code;
+				
+				bmp.filters=filters0;
+				zero.shaders.Fade.fromTo(bmp,Number(durationTxt.text),currFromAS3Shader.shader["constructor"],fromVars,toVars);
+			}
+			private function getCurrShaderClassName(full:Boolean):String{
+				var shaderClassName:String=getQualifiedClassName(currFromAS3Shader.shader).replace(/:+/g,".");
+				if(full){
+					return shaderClassName;
+				}
+				return shaderClassName.replace(/^.*?([^\.]+)$/,"$1");
+			}
+			private function copyCode():void{
+				System.setClipboard(wonderflized.text);
+				statusTxt.text="代码已复制至剪贴板";
+			}
+			
+			private function previewResetParams():void{
+				fromParamsPane.setParams(null,false);
+				toParamsPane.setParams(null,false);
+			}
+			private function unpreviewResetParams():void{
+				fromParamsPane.unSetParams();
+				toParamsPane.unSetParams();
+			}
+			private function confirmResetParams():void{
+				fromParamsPane.setParams(null,true);
+				toParamsPane.setParams(null,true);
+			}
+			
+			private function resizeCodeAreaContainer():void{
+				if(wonderflized){
+					wonderflized.wid=codeAreaContainer.width-2;
+					wonderflized.hei=codeAreaContainer.height-2;
+				}
+			}
+			
+			private function resizeShaderClassTree(...args):void{
+				So.write("shaderClassTree_width",shaderClassTree.width);
+				//trace("shaderClassTree.width="+shaderClassTree.width);
+			}
+			
+			private function previewShader(event:ListEvent):void{
+				//容易出错
+				/*
+				var shaderName:String=event.itemRenderer.data.@name.toString();
+				if(shaderss[shaderName]){
+				}else{
+					return;
+				}
+				
+				if(currAS3Shader.description==shaderName){
+					return;
+				}
+				
+				updateParams(shaderName);
+				*/
+			}
+			private function unpreviewShader(event:ListEvent):void{
+				//容易出错
+				/*
+				var shaderName:String=event.itemRenderer.data.@name.toString();
+				if(shaderss[shaderName]){
+				}else{
+					return;
+				}
+				
+				if(prevShaderName==shaderName){
+					return;
+				}
+				
+				updateParams(prevShaderName);
+				*/
+			}
+			private function confirmShader(event:ListEvent):void{
+				var shaderName:String=event.itemRenderer.data.@name.toString();
+				if(shaderss[shaderName]){
+				}else{
+					return;
+				}
+				
+				prevShaderName=shaderName;
+				if(currFromAS3Shader.shader.data.description==shaderName){
+					return;
+				}
+				
+				updateParams(shaderName);
+			}
+			
+		]]>
+	</fx:Script>
+	
+</s:Group>
