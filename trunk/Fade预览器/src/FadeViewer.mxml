@@ -1,0 +1,945 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+/***
+FadeViewer
+创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；未婚（已有女友）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
+创建时间：2012年12月01日 17:37:28
+简要说明：这家伙很懒什么都没写。
+用法举例：这家伙还是很懒什么都没写。
+*/
+-->
+
+<s:WindowedApplication
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	showStatusBar="false"
+	xmlns:local="*"
+	xmlns:ui="zero.ui.*"
+	applicationComplete="applicationComplete()"
+>
+	
+	<local:Main id="main" width="100%" top="0" bottom="25"/>
+	<s:Button label="整理源代码" click="doo()" right="5" bottom="5"/>
+	<s:BorderContainer width="100%" height="100%" id="dooArea" visible="false" backgroundAlpha="0.8">
+		<s:TitleWindow horizontalCenter="0" verticalCenter="0" close="closeDooArea()" left="100" top="100" right="100" bottom="100">
+			<ui:OutputPane id="outputPane" width="100%" height="100%"/>
+		</s:TitleWindow>
+	</s:BorderContainer>
+	
+	<fx:Script>
+		<![CDATA[
+			import flash.display.*;
+			import flash.display3D.Context3DProgramType;
+			import flash.events.*;
+			import flash.geom.*;
+			import flash.net.*;
+			import flash.system.*;
+			import flash.text.*;
+			import flash.utils.*;
+			
+			import zero.BytesAndStr16;
+			import zero.air.ReadAndWriteFile;
+			import zero.output;
+			import zero.outputError;
+			import zero.ui.So;
+			import zero.stage3Ds.AGAL2Program;
+			import zero.utils.getTime;
+			import zero.utils.stackGetCode;
+			
+			public static function get Name():String{
+				var applicationDescriptor:XML=NativeApplication.nativeApplication.applicationDescriptor;
+				var ns:Namespace=applicationDescriptor.namespaceDeclarations()[0];
+				return applicationDescriptor.ns::name[0].toString();
+			}
+			public static function get Version():String{
+				var applicationDescriptor:XML=NativeApplication.nativeApplication.applicationDescriptor;
+				var ns:Namespace=applicationDescriptor.namespaceDeclarations()[0];
+				return applicationDescriptor.ns::versionNumber[0].toString();
+			}
+			
+			private function applicationComplete():void{
+				// ^_^
+				
+				title=Name+" V"+Version;
+				
+				outputPane.init();
+				
+				main.init();
+				
+				//doo();
+			}
+			
+			private static const shadersFolderPath:String="file:///F:/zero-swf/src/zero/shaders/";
+			private static const stage3DsFolderPath:String="file:///F:/zero-swf/src/zero/stage3Ds/";
+			private static const pbkTempCode:String=ReadAndWriteFile.readStrFromURL(File.applicationDirectory.nativePath+"/模板们/PBK模板.pbk","gb2312");
+			private static const agalTempCode:String=ReadAndWriteFile.readStrFromURL(File.applicationDirectory.nativePath+"/模板们/AGAL模板.agal");
+			private static const shaderTempCode:String=ReadAndWriteFile.readStrFromURL(File.applicationDirectory.nativePath+"/模板们/Shader模板.as");
+			private static const effectTempCode:String=ReadAndWriteFile.readStrFromURL(File.applicationDirectory.nativePath+"/模板们/Effect模板.as");
+			private static const shaderCodeTempCode:String=ReadAndWriteFile.readStrFromURL(File.applicationDirectory.nativePath+"/模板们/ShaderCode模板.as");
+			private static const effectCodeTempCode:String=ReadAndWriteFile.readStrFromURL(File.applicationDirectory.nativePath+"/模板们/EffectCode模板.as");
+			private static const datasFile:File=new File("file:///F:/zero-swf/Fade预览器SWF/src/datas.as");
+			
+			private static const kernelTypes:Object={
+				Boolean:"bool",
+				uint:"int",
+				int:"float",
+				Number:"float",
+				Float2:"float2",
+				Pixel4:"pixel4"
+			}
+			
+			private var dooXML:XML;
+			private var shaderXMLV:Vector.<XML>;
+			private var as3ShaderFile:File;
+			private var as3EffectFile:File;
+			private var replaces:Object;
+			private var paramsXML:XML;
+			private var constParamsXML:XML;
+			private var constFunsXML:XML;
+			private var shaderFile:File;
+			private var effectFile:File;
+			private var shaderCodeFile:File;
+			private var effectCodeFile:File;
+			private var pbkFile:File;
+			private var pbjFile:File;
+			private var agalFile:File;
+			private var as3ShaderCode:String;
+			private var effectCode:String;
+			private var effectCodeCode:String;
+			private var evaluatePixelCode:String;
+			private var updateParamsCode:String;
+			private var nameVCode:String;
+			
+			private function doo():void{
+				dooXML=<doo/>;
+				dooArea.visible=true;
+				output("开始整理 "+getTime(),"green");
+				for each(var file:File in new File(shadersFolderPath+"as3s").getDirectoryListing()){
+					if(file.isDirectory){
+						switch(file.name){
+							case ".svn":
+							case "bak":
+								//
+							break;
+							default:
+								var folderXML:XML=<{file.name}/>;
+								for each(var subFile:File in file.getDirectoryListing()){
+									//if(subFile.name=="AS3Penjian.as"){trace("测试");
+										if(/\.txt$/i.test(subFile.name)){
+											folderXML.@name=subFile.name.replace(/\.txt$/i,"");
+										}else if(/^AS3(\w+)\.as$/.test(subFile.name)){
+											folderXML.appendChild(<{subFile.name.replace(/^AS3(\w+)\.as$/,"$1")}/>);
+										}
+									//}
+								}
+								dooXML.appendChild(folderXML);
+							break;
+						}
+					}
+				}
+				shaderXMLV=new Vector.<XML>();
+				for each(folderXML in dooXML.children()){
+					for each(var shaderXML:XML in folderXML.children()){
+						shaderXMLV.push(shaderXML);
+					}
+				}
+				
+				dooNext();
+			}
+			private function dooNext():void{
+				if(shaderXMLV.length){
+					var shaderXML:XML=shaderXMLV.shift();
+					
+					as3ShaderFile=new File(shadersFolderPath+"as3s/"+shaderXML.parent().name().toString()+"/AS3"+shaderXML.name().toString()+".as");
+					as3EffectFile=new File(stage3DsFolderPath+"as3s/"+shaderXML.parent().name().toString()+"/AS3"+shaderXML.name().toString()+".as");
+					shaderFile=new File(shadersFolderPath+shaderXML.parent().name().toString()+"/"+shaderXML.name().toString()+".as");
+					effectFile=new File(stage3DsFolderPath+shaderXML.parent().name().toString()+"/"+shaderXML.name().toString()+".as");
+					shaderCodeFile=new File(shadersFolderPath+shaderXML.parent().name().toString()+"/"+shaderXML.name().toString()+"Code.as");
+					effectCodeFile=new File(stage3DsFolderPath+shaderXML.parent().name().toString()+"/"+shaderXML.name().toString()+"Code.as");
+					pbkFile=new File(shadersFolderPath+"pbs/"+shaderXML.parent().name().toString()+"/"+shaderXML.name().toString()+".pbk");
+					pbjFile=new File(shadersFolderPath+"pbs/"+shaderXML.parent().name().toString()+"/"+shaderXML.name().toString()+".pbj");
+					agalFile=new File(stage3DsFolderPath+shaderXML.parent().name().toString()+"/"+shaderXML.name().toString()+".agal");
+					evaluatePixelCode=null;
+					
+					as3ShaderCode=ReadAndWriteFile.readStrFromFile(as3ShaderFile);
+					
+					var execResult:Array=/override\s+protected\s+function\s+updateParams\s*\(\s*\)\s*:\s*void\s*(\{[\s\S]+\})/.exec(as3ShaderCode);
+					if(execResult){
+						updateParamsCode=stackGetCode(removeComments(execResult[1]),"{","}");
+					}else{
+						updateParamsCode="";
+					}
+					
+					execResult=/override\s+protected\s+function\s+evaluatePixel\s*\(\s*\)\s*:\s*void\s*(\{[\s\S]+\})/.exec(as3ShaderCode);
+					evaluatePixelCode=stackGetCode(removeComments(execResult[1]),"{","}");
+					
+					execResult=/^(\/\*\*\*[\s\S]+?\*\/)[\s\S]+?package\s+(\S+)\s*\{[\s\S]+?public\s+class\s+(\w+)\W([\s\S]+?)super\s*\(\s*"(.*)"\s*\)/.exec(as3ShaderCode);
+					replaces={
+						info:execResult[1].replace("AS3",""),
+						namespace:execResult[2].replace(".as3s.","."),
+						imports:"",
+						className:execResult[3].replace("AS3",""),
+						description:execResult[5]
+					}
+					replaces["time"]=/创建时间：(.*)/.exec(replaces["info"])[1];
+					
+					as3ShaderCode=ReadAndWriteFile.readStrFromURL(shadersFolderPath+"as3s/AS3BaseShader.as")+execResult[4];
+					
+					paramsXML=<params name={shaderXML.name().toString()}/>;
+					for each(var matchStr:String in as3ShaderCode.match(/(?<!\/\/)public\s+var\s+(\w+)\s*:\s*\w+(=[^;]+)?\W+xml\s*.\s*params\s*\[\s*0\s*\]\s*\.\s*appendChild\s*\(\s*<\s*\1[\s\S]+?>\s*\)\s*;?/g)){
+						execResult=/^public\s+var\s+\w+\s*:\s*(\w+)(=[^;]+)?\W+[^<]+(<[\s\S]+>)[^>]+$/.exec(matchStr);
+						var paramXML:XML=new XML(execResult[3]);
+						paramXML.@type=execResult[1];
+						paramXML.@defaultValue=execResult[2].substr(1);
+						if(paramXML.@enum.toString()){
+							paramXML.@minValue=0;
+							paramXML.@maxValue=paramXML.@enum.toString().split("|").length-1;
+						}
+						paramsXML.appendChild(paramXML);
+					}
+					//trace(paramsXML.toXMLString());
+					
+					constParamsXML=<constParams name={shaderXML.name().toString()}/>;
+					for each(matchStr in as3ShaderCode.match(/(?<!\/\/)protected\s+(?:function\s+get|var)\s+(\w+)\W*:\s*\w+\s*[\s\S]+?\s+xml\s*.\s*constParams\s*\[\s*0\s*\]\s*\.\s*appendChild\s*\(\s*<\s*\1[\s\S]+?>\s*\)\s*;?/g)){
+						execResult=/^protected\s+function\s+get\s+\w+\s*\(\s*\)\s*:\s*(\w+)\s*[^\{]*\{\s*([\s\S]+?)\s*\}[^\}]*\s+[^<]+(<[\s\S]+>)[^>]+$/.exec(matchStr);
+						if(execResult){
+							paramXML=new XML(execResult[3]);
+							paramXML.@type=execResult[1];
+							paramXML.@code=execResult[2];
+						}else{
+							execResult=/^protected\s+var\s+\w+\s*:\s*(\w+)(=[^;]+)?\W[^<]+(<[\s\S]+>)[^>]+$/.exec(matchStr);
+							paramXML=new XML(execResult[3]);
+							paramXML.@type=execResult[1];
+							if(execResult[2]){
+								paramXML.@defaultValue=execResult[2].substr(1);
+							}
+						}
+						if(paramXML.@enum.toString()){
+							paramXML.@minValue=0;
+							paramXML.@maxValue=paramXML.@enum.toString().split("|").length-1;
+						}
+						constParamsXML.appendChild(paramXML);
+					}
+					//trace(constParamsXML.toXMLString());
+					
+					constFunsXML=<constFuns name={shaderXML.name().toString()}/>;
+					for each(matchStr in as3ShaderCode.match(/(?<!\/\/)protected\s+function\s+(\w+)\W*:\s*void\s*[\s\S]+?\s+xml\s*.\s*constFuns\s*\[\s*0\s*\]\s*\.\s*appendChild\s*\(\s*<\s*\1[\s\S]+?>\s*\)\s*;?/g)){
+						execResult=/^protected\s+function\s+\w+\s*\(\s*\)\s*:\s*void\s*[^\{]*\{\s*([\s\S]+?)\s*\}[^\}]*\s+[^<]+(<[\s\S]+>)[^>]+$/.exec(matchStr);
+						var funXML:XML=new XML(execResult[2]);
+						funXML.@code=execResult[1];
+						constFunsXML.appendChild(funXML);
+					}
+					//trace(constFunsXML.toXMLString());
+					
+					var pbkCode:String=getPBKCode();
+					if(pbkFile.exists&&ReadAndWriteFile.readStrFromFile(pbkFile,"gb2312")==pbkCode){
+						if(So.read("needCompile_"+decodeURI(pbkFile.url))===false){
+							var needCompile:Boolean=false;
+						}else{
+							needCompile=true;
+						}
+					}else{
+						ReadAndWriteFile.writeStrToFile(pbkCode,pbkFile,"gb2312");
+						output("保存至："+decodeURI(pbkFile.url),"folder and file");
+						needCompile=true;
+					}
+					if(needCompile){
+						PBKCompiler.compile(pbkFile,compilePBKComplete,compilePBKError);
+					}else{
+						compilePBKComplete();
+					}
+					
+				}else{
+					getDatasCode();
+					output("整理完毕\n","green");
+				}
+			}
+			private function normalizeValueByKernelType(value:String,kernelType:String):String{
+				switch(kernelType){
+					case "float":
+						if(value.indexOf(".")>-1){
+						}else{
+							value+=".0";
+						}
+					break;
+					default:
+						//
+					break;
+				}
+				return value;
+			}
+			private function xmlList2XMLV(...args):Vector.<XML>{
+				var xmlV:Vector.<XML>=new Vector.<XML>();
+				for each(var xmlList:XMLList in args){
+					for each(var xml:XML in xmlList){
+						xmlV.push(xml);
+					}
+				}
+				return xmlV;
+			}
+			private function getPBKCode():String{
+				var params:String="";
+				var inputs:String="";
+				//if(codeHasWord(evaluatePixelCode,"src")){
+				//	inputs+='	input image4 src;\r\n';
+				//}
+				for each(var paramXML:XML in xmlList2XMLV(paramsXML.children(),constParamsXML.children())){
+					if(codeHasWord(evaluatePixelCode,paramXML.name().toString())){
+						var kernelType:String=kernelTypes[paramXML.@type.toString()];
+						if(kernelType){
+						}else{
+							throw new Error("没有对应的 kernelType："+paramXML.@type.toString());
+						}
+						
+						params+='	parameter '+kernelType+' '+paramXML.name().toString()+';\n';
+						/*
+						params+=
+							'	parameter '+kernelType+' '+paramXML.name().toString()+'\n'+
+							'	<\n'+
+							'		description:"'+paramXML.@description.toString()+'";\n';
+						if(paramXML.@minValue.toString()){
+							params+=
+								'		minValue:'+normalizeValueByKernelType(paramXML.@minValue.toString(),kernelType)+';\n';
+						}
+						if(paramXML.@maxValue.toString()){
+							params+=
+								'		maxValue:'+normalizeValueByKernelType(paramXML.@maxValue.toString(),kernelType)+';\n';
+						}
+						if(paramXML.@defaultValue.toString()){
+							switch(paramXML.@defaultValue.toString()){
+								case "null":
+									//
+								break;
+								default:
+									params+=
+										'		defaultValue:'+normalizeValueByKernelType(paramXML.@defaultValue.toString(),kernelType)+';\n';
+								break;
+							}
+						}
+						params+=
+							'	>;\n'+
+							'	\n';
+						*/
+						if(paramXML.@inputName.toString()){
+							inputs+='	input image1 '+paramXML.@inputName.toString()+';\n';
+						}
+						
+					}
+				}
+				if(codeHasWord(evaluatePixelCode,"srcSize")){
+					params+=
+						'	parameter float2 srcSize\n'+
+						'	<\n'+
+						'		description:"输入图像的宽高";\n'+
+						'		parameterType:"inputSize";\n'+
+						'		inputSizeName:"src";\n'+
+						'	>;\n'+
+						'	\n';
+				}
+				
+				evaluatePixelCode=evaluatePixelCode.replace(/\bMath\s*\.\s*PI\s*\/\s*180\b/g,(Math.PI/180).toString());
+				evaluatePixelCode=evaluatePixelCode.replace(/\bMath\s*\.\s*PI\s*\*\s*0\.5\b/g,(Math.PI*0.5).toString());
+				evaluatePixelCode=evaluatePixelCode.replace(/\bMath\s*\.\s*PI\s*\/\s*2\b/g,(Math.PI/2).toString());
+				evaluatePixelCode=evaluatePixelCode.replace(/\bMath\s*\.\s*PI\s*\*\s*2\b/g,(Math.PI*2).toString());
+				evaluatePixelCode=evaluatePixelCode.replace(/\b180\s*\/\s*Math\s*\.\s*PI\b/g,(180/Math.PI).toString());
+				evaluatePixelCode=evaluatePixelCode.replace(/\bMath\s*\.\s*PI\b/g,Math.PI.toString());
+				evaluatePixelCode=evaluatePixelCode.replace(/\bMath\s*\.\s*atan2\b/g,"atan");
+				evaluatePixelCode=evaluatePixelCode.replace(/\bMath\s*\./g,"");
+				
+				evaluatePixelCode=evaluatePixelCode.replace(/\bNumber\b/g,"float");
+				evaluatePixelCode=evaluatePixelCode.replace(/\bBoolean\b/g,"bool");
+				
+				var reg:RegExp=/\bvar\s+(\w+)\s*:\s*(\w+)\b/g;
+				var matchArr:Array=evaluatePixelCode.match(reg);
+				if(matchArr&&matchArr.length){
+					reg=new RegExp(reg.source);//为了去掉全局标志
+					for each(var varsCode:String in matchArr){
+						var execResult:Array=reg.exec(varsCode);
+						evaluatePixelCode=evaluatePixelCode.replace(varsCode,execResult[2].toLowerCase()+" "+execResult[1]);
+					}
+				}
+				
+				reg=/\bnew\s+(\w+)\b/g;
+				matchArr=evaluatePixelCode.match(reg);
+				if(matchArr&&matchArr.length){
+					reg=new RegExp(reg.source);//为了去掉全局标志
+					for each(var newCode:String in matchArr){
+						execResult=reg.exec(newCode);
+						evaluatePixelCode=evaluatePixelCode.replace(newCode,execResult[1].toLowerCase());
+					}
+				}
+				
+				return replaceCode(pbkTempCode,replaces)
+					.replace(/\$\{params\}/g,params)
+					.replace(/\$\{inputs\}/g,inputs)
+					.replace(
+						/\$\{codes\}/g,
+						normalizeCode(
+							evaluatePixelCode
+							.replace(/^\{\s*|\s*\}$/g,"")
+							.replace(/\n	/g,"\n")
+							//.replace(/\n	/g,"\n")
+						)
+					);
+			}
+			private function removeComments(code:String):String{
+				//简单的去掉注释
+				return code
+					.replace(/\n\s*\/\/.*/g,"")
+					.replace(/\/\*[\s\S]*?\*\//g,"");
+			}
+			private function codeHasWord(code:String,word:String):Boolean{
+				//简单的判断代码中是否使用某变量
+				return code.search(new RegExp("\\b"+word+"\\b"))>-1;
+			}
+			private function compilePBKComplete():void{
+				So.write("needCompile_"+decodeURI(pbkFile.url),false);
+				
+				var shaderCode:String=getShaderCode();
+				if(shaderFile.exists&&ReadAndWriteFile.readStrFromFile(shaderFile)==shaderCode){
+				}else{
+					ReadAndWriteFile.writeStrToFile(shaderCode,shaderFile);
+					output("保存至："+decodeURI(shaderFile.url),"folder and file");
+				}
+				
+				var shaderCodeCode:String=getShaderCodeCode();
+				if(shaderCodeFile.exists&&ReadAndWriteFile.readStrFromFile(shaderCodeFile)==shaderCodeCode){
+				}else{
+					ReadAndWriteFile.writeStrToFile(shaderCodeCode,shaderCodeFile);
+					output("保存至："+decodeURI(shaderCodeFile.url),"folder and file");
+				}
+				
+				if(as3EffectFile.exists){
+					
+					var as3EffectCode:String=ReadAndWriteFile.readStrFromFile(as3EffectFile);
+					var execResult:Array=/override\s+protected\s+function\s+evaluatePixel\s*\(\s*\)\s*:\s*void\s*(\{[\s\S]+\})/.exec(as3EffectCode);
+					var evaluatePixelCode:String=stackGetCode(removeComments(execResult[1]),"{","}");
+					
+					var reg:RegExp=/line\s*\(([^\)]+)\)\s*;/g;
+					var matchArr:Array=evaluatePixelCode.match(reg);
+					reg=new RegExp("^"+reg.source+"$");//为了去掉全局标志和加上开始结束标记
+					
+					var agalCode:String="";
+					var fcMark:Object=new Object();
+					var fcId:int=-1;
+					
+					execResult=/constant\s*\(([^\)]+)\)\s*;/.exec(evaluatePixelCode);
+					if(execResult){
+						for each(var constValue:String in execResult[1].replace(/"/g,"").replace(/\s+/g,"").split(",")){
+							if(constValue=="null"){
+							}else{
+								if(fcMark[constValue]>-1){
+									throw new Error("重复的 constValue："+constValue);
+								}
+							}
+							fcMark[constValue]=++fcId;
+						}
+					}
+					
+					for each(var matchStr:String in matchArr){
+						execResult=/^(\w{3})((?:,(?:\[[^\]]+\]|[^,]+)){2,4})$/.exec(matchStr.replace(reg,"$1").replace(/\s+/g,""));
+						if(execResult){
+						}else{
+							outputError("不合法的 line："+matchStr);
+							continue;
+						}
+						var opcode:String=execResult[1];
+						var paramArr:Array=execResult[2].match(/\[[^\]]+\]|[^,]+/g);
+						for(var paramId:int=0;paramId<paramArr.length;paramId++){
+							var param:String=paramArr[paramId].replace(/"/g,"").replace(/[\[\]]+/g,"");
+							if(/^\[[^\]]+\]$/.test(paramArr[paramId])){
+								var accessor:String="";
+								var arr:Array=param.split(",");
+								if(arr.length>0&&arr.length<5){
+								}else{
+									throw new Error("constValue的个数只能是1，2，3或4：arr="+arr);
+								}
+								
+								var I:int=-1;
+								for each(constValue in arr){
+									if(fcMark[constValue]>-1){
+										var _fcId:int=fcMark[constValue];
+									}else{
+										fcMark[constValue]=_fcId=++fcId;
+									}
+									var i:int=int(_fcId/4);
+									if(I>-1){
+										if(I==i){
+										}else{
+											throw new Error("请组织好 constValue 们为4个一组");
+										}
+									}else{
+										I=i;
+									}
+									var j:int=_fcId%4;
+									switch(j){
+										case 0:
+											var c:String="x";
+										break;
+										case 1:
+											c="y";
+										break;
+										case 2:
+											c="z";
+										break;
+										case 3:
+											c="w";
+										break;
+									}
+									accessor+=c;
+								}
+								
+								if(accessor=="xyzw"){
+									param="fc"+i;
+								}else{
+									param="fc"+i+"."+accessor;
+								}
+							}
+							paramArr[paramId]=param;
+						}
+						if(paramArr.length==4){
+							paramArr[2]+="<"+paramArr[3]+">";
+							paramArr.length=3;
+						}
+						agalCode+=opcode+" "+paramArr+"\n";
+					}
+					
+					agalCode=replaceCode(agalTempCode.replace(/\$\{code\}/g,agalCode).replace(/\$\{namespace\}/g,replaces["namespace"].replace("shaders","stage3Ds")),replaces);
+					if(agalFile.exists&&ReadAndWriteFile.readStrFromFile(agalFile)==agalCode){
+					}else{
+						ReadAndWriteFile.writeStrToFile(agalCode,agalFile);
+						output("保存至："+decodeURI(agalFile.url),"folder and file");
+					}
+					
+					var agalInfo:Object={};
+					var agalData:ByteArray=AGAL2Program(
+						Context3DProgramType.FRAGMENT,//片段着色器（好像也叫像素着色器）
+						agalCode,
+						agalInfo
+					);
+					effectCode=effectCode.replace(/\$\{byteV\}/g,agalInfo.info);
+					
+					execResult=/protected\s+function\s+updateParams\s*\(\s*\)\s*:\s*void\s*(\{[\s\S]+\})/.exec(ReadAndWriteFile.readStrFromURL(stage3DsFolderPath+"as3s/AS3BaseEffect.as"));
+					if(execResult){
+						var updateParamsCode:String=stackGetCode(removeComments(execResult[1]),"{","}").replace(/^\s*\{|\s*\}$/g,"")+"\n";
+					}else{
+						updateParamsCode="";
+					}
+					execResult=/override\s+protected\s+function\s+updateParams\s*\(\s*\)\s*:\s*void\s*(\{[\s\S]+\})/.exec(as3EffectCode);
+					if(execResult){
+						updateParamsCode+=stackGetCode(removeComments(execResult[1]),"{","}").replace(/^\s*\{|\s*\}$/g,"").replace(/.*\bsuper\b.*[\r\n]*/,"");
+					}
+					
+					var dataArr:Array=new Array();
+					var updateParamsCodeArr:Array=new Array();
+					var constValueArr:Array=new Array();
+					for(constValue in fcMark){
+						fcId=fcMark[constValue];
+						if(constValue=="null"){
+							//
+						}else if(isNaN(Number(constValue))){
+							dataArr[fcId]=0+",//"+constValue;
+							if(nameVCode.indexOf('"'+constValue+'"')>-1){
+								updateParamsCodeArr[fcId]="data["+fcId+"]="+constValue;
+							}else{
+								updateParamsCodeArr[fcId]="//0 "+constValue;
+							}
+							constValueArr[fcId]=constValue;
+						}else{
+							dataArr[fcId]=constValue+",";
+							updateParamsCodeArr[fcId]="//"+constValue;
+						}
+					}
+					if(dataArr.length){
+						fcId=Math.ceil(dataArr.length/4)*4;
+						while(--fcId>=0){
+							if(
+								dataArr[fcId]=="null"
+								||
+								dataArr[fcId]==undefined
+							){
+								dataArr[fcId]=0+",//占位";
+								updateParamsCodeArr[fcId]="//0 占位";
+							}
+							if(fcId%4==0){
+								dataArr.splice(fcId,0,"\n			//fc"+int(fcId/4));
+								updateParamsCodeArr.splice(fcId,0,"\n			//fc"+int(fcId/4));
+							}
+						}
+						effectCode=effectCode.replace(
+							/\$\{data\}/g,
+							"\n			"+dataArr.join("\n			")
+							.replace(/,([^,]*)$/,"$1")+//去掉最后一个“,”
+							"\n			"+
+							"\n		"
+						);
+					}else{
+						effectCode=effectCode.replace(/\$\{data\}/g,"");
+					}
+					
+					if(updateParamsCode){
+						updateParamsCode=updateParamsCode.replace(/\beffect\s*\./g,"");
+						reg=/(\w+)\s*=\s*(.*)/g;
+						matchArr=updateParamsCode.match(reg);
+						reg=new RegExp("^"+reg.source+"$");//为了去掉全局标志和加上开始结束标记
+						for each(matchStr in matchArr){
+							execResult=reg.exec(matchStr);
+							constValue=execResult[1];
+							if(fcMark[constValue]>-1){
+								fcId=fcMark[constValue];
+								i=int(fcId/4)*5+fcId%4+1;
+								updateParamsCodeArr[i]="data["+fcId+"]="+execResult[2]+updateParamsCodeArr[i];
+							}
+						}
+						updateParamsCode="			"+updateParamsCodeArr.join("\n			")+"\n";
+					}
+					effectCode=effectCode.replace(/\$\{updateParams\}/g,updateParamsCode);
+					
+					if(effectFile.exists&&ReadAndWriteFile.readStrFromFile(effectFile)==effectCode){
+					}else{
+						ReadAndWriteFile.writeStrToFile(effectCode,effectFile);
+						output("保存至："+decodeURI(effectFile.url),"folder and file");
+					}
+					
+					if(effectCodeFile.exists&&ReadAndWriteFile.readStrFromFile(effectCodeFile)==effectCodeCode){
+					}else{
+						ReadAndWriteFile.writeStrToFile(effectCodeCode,effectCodeFile);
+						output("保存至："+decodeURI(effectCodeFile.url),"folder and file");
+					}
+				}
+				
+				dooNext();
+			}
+			private function getShaderCode():String{
+				
+				nameVCode="";
+				var paramsInfo:String="";
+				var _params:String="";
+				var params:String="";
+				var shader_initParams:String="";
+				var effect_initParams:String="";
+				var shader_updateParams:String="";
+				//var effect_updateParams:String="";
+				var updateInputs:String="";
+				
+				var constParamsCodes:String="";
+				for each(paramXML in constParamsXML.children()){
+					if(codeHasWord(evaluatePixelCode,paramXML.name().toString())){
+						constParamsCodes+=removeComments(paramXML.@code.toString())+"\n";
+					}
+				}
+				
+				var constFunsCodes:String="";
+				for each(paramXML in constFunsXML.children()){
+					if(codeHasWord(updateParamsCode,paramXML.name().toString())){
+						constFunsCodes+=removeComments(paramXML.@code.toString())+"\n";
+					}
+				}
+				//trace("constFunsCodes="+constFunsCodes);
+				
+				for each(var paramXML:XML in paramsXML.children()){
+					if(codeHasWord(evaluatePixelCode+"\n"+constParamsCodes+"\n"+constFunsCodes,paramXML.name().toString())){
+						var paramInfo:String=paramXML.@description.toString();
+						if(paramXML.@minValue.toString()&&paramXML.@maxValue.toString()){
+							if(paramXML.@enum.toString()){
+								var enumArr:Array=paramXML.@enum.toString().split("|");
+								var enumParamInfo:String="";
+								for each(var enumValue:String in enumArr){
+									enumParamInfo+="，"+enumArr.indexOf(enumValue)+"："+enumValue;
+								}
+								paramInfo+=' （'+enumParamInfo.substr(1)+'） 默认 '+paramXML.@defaultValue.toString()+"："+enumArr[0];
+							}else{
+								paramInfo+=' （'+paramXML.@minValue.toString()+'~'+paramXML.@maxValue.toString()+'） 默认 '+paramXML.@defaultValue.toString();
+							}
+						}else{
+							paramInfo+=' 默认 '+paramXML.@defaultValue.toString();
+						}
+						paramsInfo+='		 * '+paramInfo+'<br/>\n';
+						nameVCode+=',"'+paramXML.name().toString()+'"';
+						_params+=',_'+paramXML.name().toString()+':'+paramXML.@type.toString()+'='+paramXML.@defaultValue.toString();
+						params+=
+							'		/**\n'+
+							'		 * \n'+
+							'		 * '+paramInfo+'\n'+
+							'		 * \n'+
+							'		 */\n'+
+							'		public var '+paramXML.name().toString()+':'+paramXML.@type.toString()+';\n'+
+							'		\n';
+						shader_initParams+='			'+paramXML.name().toString()+'=_'+paramXML.name().toString()+';\n';
+						effect_initParams+='			'+paramXML.name().toString()+'=_'+paramXML.name().toString()+';\n';
+					}
+					if(codeHasWord(evaluatePixelCode,paramXML.name().toString())){
+						
+						shader_initParams+='			(data.'+paramXML.name().toString()+' as ShaderParameter).value=[];\n';
+						
+						if(paramXML.@inputName.toString()){
+							if(paramXML.@inputName.toString()){
+								shader_updateParams+=
+									'			if('+paramXML.@inputName.toString()+'_size>0){\n'+
+									'			}else{\n'+
+									'				'+paramXML.@inputName.toString()+'_size=1;\n'+
+									'			}\n';
+							}
+						}
+						
+						switch(kernelTypes[paramXML.@type.toString()]){
+							case "bool":
+								shader_updateParams+='			(data.'+paramXML.name().toString()+' as ShaderParameter).value[0]=('+paramXML.name().toString()+'?1:0);\n';
+							break;
+							case "int":
+								shader_updateParams+='			(data.'+paramXML.name().toString()+' as ShaderParameter).value[0]='+paramXML.name().toString()+';\n';
+							break;
+							case "float":
+								shader_updateParams+='			(data.'+paramXML.name().toString()+' as ShaderParameter).value[0]='+paramXML.name().toString()+';\n';
+							break;
+							case "float2":
+								shader_updateParams+=
+									'			(data.'+paramXML.name().toString()+' as ShaderParameter).value[0]='+paramXML.name().toString()+'.x;\n'+
+									'			(data.'+paramXML.name().toString()+' as ShaderParameter).value[1]='+paramXML.name().toString()+'.y;\n';
+							break;;
+							case "pixel4":
+								shader_updateParams+=
+								'			(data.'+paramXML.name().toString()+' as ShaderParameter).value[0]='+paramXML.name().toString()+'.r;\n'+
+								'			(data.'+paramXML.name().toString()+' as ShaderParameter).value[1]='+paramXML.name().toString()+'.g;\n'+
+								'			(data.'+paramXML.name().toString()+' as ShaderParameter).value[2]='+paramXML.name().toString()+'.b;\n'+
+								'			(data.'+paramXML.name().toString()+' as ShaderParameter).value[3]='+paramXML.name().toString()+'.a;\n';
+							break;
+							default:
+								throw new Error("暂不支持的 type："+paramXML.@type.toString());
+							break;
+						}
+							
+						if(paramXML.@inputName.toString()){
+							shader_initParams+='			(data.'+paramXML.@inputName.toString()+' as ShaderInput).input=new Vector.<Number>();\n';
+							shader_updateParams+='			update'+paramXML.@inputName.toString().charAt(0).toUpperCase()+paramXML.@inputName.toString().substr(1)+'();\n';
+							var execResult:Array=new RegExp("protected\\s+function\\s+get\\s+"+paramXML.@inputName.toString()+"\\s*\\(\\s*\\)\\s*:\\s*Vector\\s*\\.\\s*<\\s*Number\\s*>\\s*\\{\\s*return\\s+([^;]+);\\s*\\}").exec(as3ShaderCode);
+							updateInputs+=
+								'		protected function update'+paramXML.@inputName.toString().charAt(0).toUpperCase()+paramXML.@inputName.toString().substr(1)+'():void{\n'+
+								'			var '+paramXML.@inputName.toString()+':ShaderInput=data.'+paramXML.@inputName.toString()+' as ShaderInput;\n'+
+								'			if('+paramXML.@inputName.toString()+'.input.length=='+paramXML.@inputName.toString()+'_size*'+paramXML.@inputName.toString()+'_size){\n'+
+								'			}else{\n'+
+								'				'+paramXML.@inputName.toString()+'.width='+paramXML.@inputName.toString()+'.height='+paramXML.@inputName.toString()+'_size;\n'+
+								'				'+paramXML.@inputName.toString()+'.input='+execResult[1]+';\n'+
+								'			}\n'+
+								'		}\n'+
+								'		';
+						}
+					}
+				}
+				if(codeHasWord(evaluatePixelCode,"srcSize")){
+					shader_initParams+='			(data.srcSize as ShaderParameter).value=[];\n';
+					shader_updateParams+=
+						'			(data.srcSize as ShaderParameter).value[0]=srcSize.x;\n'+
+						'			(data.srcSize as ShaderParameter).value[1]=srcSize.y;\n';
+				}
+				
+				//trace("evaluatePixelCode="+evaluatePixelCode);
+				//trace("constFunsCodes="+constFunsCodes);
+				
+				var usedFunMark:Object=new Object();
+				for each(paramXML in constParamsXML.children()){
+					if(codeHasWord(evaluatePixelCode+"\n"+constFunsCodes,paramXML.name().toString())){
+						
+						//trace('paramXML.name().toString()='+paramXML.name().toString());
+						
+						for each(var funXML:XML in constFunsXML.children()){
+							if(usedFunMark[funXML.toXMLString()]){
+							}else{
+								if(codeHasWord(removeComments(funXML.@code.toString()),paramXML.name().toString())){
+									//trace(removeComments(funXML.@code.toString()));
+									//trace('xxx paramXML.name().toString()='+paramXML.name().toString());
+									usedFunMark[funXML.toXMLString()]=true;
+									params+=
+										'		private function '+funXML.name().toString()+'():void{\n'+
+										'			'+funXML.@code.toString()+'\n'+
+										'		}\n';
+									shader_updateParams+='			'+funXML.name().toString()+'();\n';
+								}
+							}
+						}
+						
+						var valueCode:String=paramXML.name().toString();
+						switch(kernelTypes[paramXML.@type.toString()]){
+							case "float":
+								if(paramXML.@code.toString().indexOf("return")==0){
+									valueCode="("+paramXML.@code.toString().replace(/^return\s+|\s*;$/g,"")+")";
+								}
+							break;
+							case "float2":
+								//trace(paramXML.toXMLString());
+							break;
+							default:
+								throw new Error("暂不支持的 type："+paramXML.@type.toString());
+							break;
+						}
+						if(valueCode==paramXML.name().toString()){
+							params+=
+								'		/**\n'+
+								'		 * \n'+
+								'		 * '+paramXML.@description.toString()+'\n'+
+								'		 * \n'+
+								'		 */\n';
+							if(paramXML.@code.toString()){
+								params+=
+									'		private function get '+paramXML.name().toString()+'():'+paramXML.@type.toString()+'{\n'+
+									'			'+paramXML.@code.toString()+'\n'+
+									'		}\n';
+							}else{
+								params+='		private var '+paramXML.name().toString()+':'+paramXML.@type.toString();
+								if(paramXML.@defaultValue.toString()){
+									params+='='+paramXML.@defaultValue.toString();
+								}
+								params+=';\n';
+							}
+						}
+						if(codeHasWord(evaluatePixelCode,paramXML.name().toString())){
+							shader_initParams+='			(data.'+paramXML.name().toString()+' as ShaderParameter).value=[];\n';
+							switch(kernelTypes[paramXML.@type.toString()]){
+								case "float":
+									shader_updateParams+='			(data.'+paramXML.name().toString()+' as ShaderParameter).value[0]='+valueCode+';\n';
+								break;
+								case "float2":
+									shader_updateParams+=
+										'			(data.'+paramXML.name().toString()+' as ShaderParameter).value[0]='+valueCode+'.x;\n'+
+										'			(data.'+paramXML.name().toString()+' as ShaderParameter).value[1]='+valueCode+'.y;\n';
+								break;
+								default:
+									throw new Error("暂不支持的 type："+paramXML.@type.toString());
+								break;
+							}
+						}
+					}
+				}
+				
+				var pbjData:ByteArray=ReadAndWriteFile.readDataFromFile(pbjFile);
+				
+				nameVCode=nameVCode.substr(1);
+				
+				if(as3EffectFile.exists){
+					effectCode=replaceCode(effectTempCode.replace(/\$\{namespace\}/g,replaces["namespace"].replace("shaders","stage3Ds")),replaces)
+						.replace(/\$\{nameV\}/g,nameVCode)
+						.replace(/\$\{paramsInfo\}/g,paramsInfo)
+						.replace(/\$\{_params\}/g,_params.substr(1))
+						.replace(/\$\{params\}/g,params)
+						.replace(/\$\{initParams\}/g,effect_initParams)
+						//.replace(/\$\{updateParams\}/g,effect_updateParams)
+						.replace(/\$\{updateInputs\}/g,updateInputs);
+				}
+				
+				return replaceCode(shaderTempCode,replaces)
+					.replace(/\$\{nameV\}/g,nameVCode)
+					.replace(/\$\{byteV\}/g,"0x"+BytesAndStr16.bytes2str16(pbjData,0,pbjData.length).replace(/ /g,",0x"))
+					.replace(/\$\{paramsInfo\}/g,paramsInfo)
+					.replace(/\$\{_params\}/g,_params.substr(1))
+					.replace(/\$\{params\}/g,params)
+					.replace(/\$\{initParams\}/g,shader_initParams)
+					.replace(/\$\{updateParams\}/g,shader_updateParams)
+					.replace(/\$\{updateInputs\}/g,updateInputs);
+			}
+			private function getShaderCodeCode():String{
+				if(as3EffectFile.exists){
+					effectCodeCode=replaceCode(effectCodeTempCode.replace(/\$\{namespace\}/g,replaces["namespace"].replace("shaders","stage3Ds")).replace(/\$\{className\}/g,replaces["className"]+"Code"),replaces)
+						.replace(/\$\{agalName\}/g,replaces["className"]+".agal");
+				}
+				return replaceCode(shaderCodeTempCode.replace(/\$\{className\}/g,replaces["className"]+"Code"),replaces)
+					.replace(/\$\{pbjName\}/g,"../"+replaces["namespace"].replace("zero.shaders.","pbs/")+"/"+replaces["className"]+".pbj");
+			}
+			private function compilePBKError():void{
+				So.write("needCompile_"+decodeURI(pbkFile.url),true);
+				dooNext();
+			}
+			private function replaceCode(code:String,replaces:Object):String{
+				for(var name:String in replaces){
+					code=code.replace(new RegExp("\\$\\{"+name+"\\}","g"),replaces[name]);
+				}
+				return code;
+			}
+			
+			private function getDatasCode():void{
+				var datasCode:String=ReadAndWriteFile.readStrFromFile(datasFile).replace(/package[\s\S]+$/,
+					'package{\n'+
+					'${imports}'+
+					'	public const datas:Array=[\n'+
+					'${classVs}\n'+
+					'	];\n'+
+					'}\n'
+				);
+				var importsCode:String="	import zero.shaders.*;\n";
+				var classVsCode:String="";
+				for each(var folderXML:XML in dooXML.children()){
+					var classVCode:String="";
+					for each(var shaderXML:XML in folderXML.children()){
+						
+						as3EffectFile=new File(stage3DsFolderPath+"as3s/"+folderXML.name().toString()+"/AS3"+shaderXML.name().toString()+".as");
+						
+						classVCode+=
+							",\n			{"+
+							"\n				as3ShaderClass:zero.shaders.as3s."+folderXML.name().toString()+".AS3"+shaderXML.name().toString()+","+
+							"\n				shaderClass:zero.shaders."+folderXML.name().toString()+"."+shaderXML.name().toString()+","+
+							"\n				as3EffectClass:"+(as3EffectFile.exists?"zero.stage3Ds.as3s."+folderXML.name().toString()+".AS3"+shaderXML.name().toString():"null")+","+
+							"\n				effectClass:"+(as3EffectFile.exists?"zero.stage3Ds."+folderXML.name().toString()+"."+shaderXML.name().toString():"null");
+						
+						var defaultParamsCode:String="";
+						
+						as3ShaderFile=new File(shadersFolderPath+"as3s/"+folderXML.name().toString()+"/AS3"+shaderXML.name().toString()+".as");
+						as3ShaderCode=ReadAndWriteFile.readStrFromFile(as3ShaderFile);
+						for each(var matchStr:String in as3ShaderCode.match(/[^\n]*\n[^\n]*Fade\.[\s\S]+?\);/g)){
+							//trace("matchStr="+matchStr);
+							var name:String=matchStr.split("\n")[0].replace("//","").replace(/^\s*|\s*$/g,"");
+							if(name){
+								var subDefaultParamsCode:String="";
+								var fromToId:int=-1;
+								for each(var subMatchStr:String in matchStr.match(/\{[\s\S]+?\}/g)){
+									var subSubDefaultParamsCode:String="";
+									var reg:RegExp=/(\w+):(new\s+(?:Float2|Pixel4)\s*\([^\)]*\)|[\w\.-]+)/g;
+									var matchArr:Array=subMatchStr.match(reg);
+									reg=new RegExp("^"+reg.source+"$");//为了去掉全局标志和加上开始结束标记
+									for each(var param:String in matchArr){
+										var execResult:Array=reg.exec(param);
+										subSubDefaultParamsCode+=',["'+execResult[1]+'",'+execResult[2]+']';
+									}
+									fromToId++;
+									subDefaultParamsCode+=",\n						"+(fromToId==0?"fromParamArr":"toParamArr")+":["+subSubDefaultParamsCode.substr(1)+"]";
+								}
+								defaultParamsCode+=',\n					{\n						name:"'+name+'",'+subDefaultParamsCode.substr(1)+'\n					}';
+							}else{
+								trace("缺少 name："+matchStr);
+							}
+						}
+						
+						if(defaultParamsCode){
+							defaultParamsCode=defaultParamsCode.substr(1)+"\n				";
+						}
+						classVCode+=",\n				defaultParamsArr:["+defaultParamsCode+"]";
+						classVCode+="\n			}";
+					}
+					if(classVCode){
+						importsCode+="	import zero.shaders."+folderXML.name().toString()+".*;\n";
+						importsCode+="	import zero.shaders.as3s."+folderXML.name().toString()+".*;\n";
+						classVsCode+='		{name:"'+folderXML.@name.toString()+'",shaderArr:['+classVCode.substr(1)+'\n		]},\n';
+						if(new File(stage3DsFolderPath+"as3s/"+folderXML.name().toString()).exists){
+							importsCode+="	import zero.stage3Ds."+folderXML.name().toString()+".*;\n";
+							importsCode+="	import zero.stage3Ds.as3s."+folderXML.name().toString()+".*;\n";
+						}
+					}
+				}
+				datasCode=datasCode.replace(/\$\{imports\}/g,importsCode);
+				datasCode=datasCode.replace(/\$\{classVs\}/g,classVsCode.substr(0,classVsCode.length-2));
+				datasCode=datasCode.replace(/\r\n/g,"\n");
+				if(datasCode==ReadAndWriteFile.readStrFromFile(datasFile)){
+				}else{
+					//trace("暂不写入 datas.as");
+					ReadAndWriteFile.writeStrToFile(datasCode,datasFile);
+					output("保存至："+decodeURI(datasFile.url),"folder and file");
+				}
+			}
+			
+			private function closeDooArea():void{
+				dooArea.visible=false;
+			}
+		]]>
+	</fx:Script>
+	
+</s:WindowedApplication>
