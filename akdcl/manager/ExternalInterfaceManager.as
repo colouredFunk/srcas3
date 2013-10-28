@@ -44,6 +44,8 @@
 
 		public static const CALL:String = "call";
 		public static const EXTERNAL_LISTENER:String = "swfEventHandler";
+		
+		public static var callResult:*;//20131023
 
 		public var eventParams:Array;
 
@@ -108,7 +110,7 @@
 		//广播js调用as的事件
 		//addEventListener(ExternalInterfaceManager.CALL);
 		//addEventListener(__eventType);
-		private function swfInterface(_type:String, ... args):void {
+		private function swfInterface(_type:String, ... args):* {
 			__eventType = _type;
 			if (args && args.length > 0) {
 				eventParams = args;
@@ -125,6 +127,14 @@
 				var _event:Event = new Event(__eventType);
 				dispatchEvent(_event);
 			}
+			
+			if(callResult===undefined){
+			}else{
+				var _callResult:*=callResult;
+				callResult=undefined;
+				return _callResult;
+			}
+			
 		}
 	}
 }
