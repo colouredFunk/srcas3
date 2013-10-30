@@ -70,6 +70,7 @@ package zero.works.media{
 				initSound(_source);
 				initSoundChannel(0);
 			}else{
+				state=VideoState.PLAYING;
 				initSoundChannel(currPlayheadTime);
 			}
 		}
@@ -93,8 +94,8 @@ package zero.works.media{
 			}
 		}
 		
-		private function initSoundChannel(playheadTime:Number):void{
-			soundChannel=sound.play(playheadTime*1000);
+		private function initSoundChannel(_playheadTime:Number):void{
+			soundChannel=sound.play(_playheadTime*1000);
 			soundChannel.addEventListener(Event.SOUND_COMPLETE,playComplete);
 			volume=volume;
 		}
@@ -171,15 +172,32 @@ package zero.works.media{
 		}
 		
 		public function get playheadTime():Number{
+			if(state==VideoState.PAUSED){
+				return currPlayheadTime;
+			}
 			if(soundChannel){
 				return soundChannel.position/1000;
 			}
 			return currPlayheadTime;
 		}
 		public function set playheadTime(_playheadTime:Number):void{
-			currPlayheadTime=playheadTime;
+			if(sound){
+				if(sound.bytesLoaded>0&&sound.bytesTotal>0){
+					if(_playheadTime>totalTime*sound.bytesLoaded/sound.bytesTotal){
+						_playheadTime=totalTime*sound.bytesLoaded/sound.bytesTotal;
+					}
+				}else{
+					_playheadTime=0;
+				}
+			}
+			currPlayheadTime=_playheadTime;
 			clearSoundChannel();
-			initSoundChannel(currPlayheadTime);
+			if(sound){
+				if(state==VideoState.PAUSED){
+				}else{
+					initSoundChannel(currPlayheadTime);
+				}
+			}
 		}
 		
 		public function get totalTime():Number{

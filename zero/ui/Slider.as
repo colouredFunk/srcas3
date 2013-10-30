@@ -21,6 +21,7 @@ package zero.ui{
 		
 		private var __value:Number;
 		
+		public var bottom:Sprite;
 		public var bar:Btn;
 		public var line:Sprite;
 		public var thumb:Btn;
@@ -28,6 +29,9 @@ package zero.ui{
 		public var onUpdate:Function;
 		
 		public var ctrling:Boolean;
+		
+		public var immediately:Boolean;
+		private var timeoutId:int;
 		
 		public function get value():Number{
 			return __value;
@@ -44,6 +48,7 @@ package zero.ui{
 		}
 		
 		public function Slider(){
+			immediately=true;
 			value=0;
 			bar.addEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
 			thumb.addEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
@@ -51,6 +56,7 @@ package zero.ui{
 			this.mouseEnabled=false;
 		}
 		public function clear():void{
+			clearTimeout(timeoutId);
 			mouseUp();
 			bar.removeEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
 			thumb.removeEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
@@ -65,19 +71,46 @@ package zero.ui{
 			stage.addEventListener(MouseEvent.MOUSE_UP,mouseUp);
 			this.addEventListener(Event.ENTER_FRAME,update);
 			ctrling=true;
+			updateDelay();
 		}
 		private function mouseUp(...args):void{
 			stage.removeEventListener(MouseEvent.MOUSE_UP,mouseUp);
 			this.removeEventListener(Event.ENTER_FRAME,update);
 			stopDrag();
+			updateDelay();
 			ctrling=false;
 		}
 		private function update(...args):void{
+			var oldValue:Number=value;
 			value=thumb.x/bar.width;
+			if(oldValue==value){
+			}else{
+				if(immediately){
+					updateDelay();
+				}else{
+					clearTimeout(timeoutId);
+					timeoutId=setTimeout(updateDelay,100);
+				}
+			}
+		}
+		private function updateDelay():void{
+			clearTimeout(timeoutId);
 			if(onUpdate==null){
 			}else{
 				onUpdate();
 			}
 		}
+		
+		public function getWid():int{
+			return bar["gra"].gra.width;
+		}
+		public function setWid(wid:int):void{
+			var oldWid:int=bar["gra"].gra.width;
+			bar["gra"].gra.width=wid;
+			if(bottom){
+				bottom.width+=wid-oldWid;
+			}
+		}
+		
 	}
 }
