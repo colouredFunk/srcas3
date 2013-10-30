@@ -29,13 +29,15 @@ package zero.works.media{
 		public function init(geciXML:XML):void{
 			txt["txt"].autoSize=TextFieldAutoSize.LEFT;
 			txt["txt"].htmlText=geciXML.children().toXMLString().replace(/\r\n/g,"\n");
+			update(0);
 		}
 		public function clear():void{
 			txt["txt"].text="";
 		}
 		
 		public function update(progress:Number):void{
-			txt.y=-progress*txt.height;
+			var b:Rectangle=maskShape.getBounds(this);
+			txt.y=b.x+b.height/2-progress*txt.height;
 		}
 		
 	}
