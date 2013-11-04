@@ -24,6 +24,7 @@ package zero.ui{
 		public var bottom:Sprite;
 		public var bar:Btn;
 		public var line:Sprite;
+		public var line2:Sprite;
 		public var thumb:Btn;
 		
 		public var onUpdate:Function;
@@ -47,12 +48,21 @@ package zero.ui{
 			thumb.x=line.width=bar.width*__value;
 		}
 		
+		public function set value2(_value2:Number):void{
+			if(line2){
+				line2.width=bar.width*_value2;
+			}
+		}
+		
 		public function Slider(){
 			immediately=true;
 			value=0;
 			bar.addEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
 			thumb.addEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
 			line.mouseEnabled=line.mouseChildren=false;
+			if(line2){
+				line2.mouseEnabled=line2.mouseChildren=false;
+			}
 			this.mouseEnabled=false;
 		}
 		public function clear():void{
@@ -77,7 +87,7 @@ package zero.ui{
 			stage.removeEventListener(MouseEvent.MOUSE_UP,mouseUp);
 			this.removeEventListener(Event.ENTER_FRAME,update);
 			stopDrag();
-			updateDelay();
+			updateDelay(true);
 			ctrling=false;
 		}
 		private function update(...args):void{
@@ -93,11 +103,15 @@ package zero.ui{
 				}
 			}
 		}
-		private function updateDelay():void{
+		private function updateDelay(isRelease:Boolean=false):void{
 			clearTimeout(timeoutId);
 			if(onUpdate==null){
 			}else{
-				onUpdate();
+				if(onUpdate.length==1){
+					onUpdate(isRelease);
+				}else{
+					onUpdate();
+				}
 			}
 		}
 		

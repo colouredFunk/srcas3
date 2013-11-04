@@ -53,10 +53,15 @@ package zero.works.media{
 				<!-- 读写 -->
 				<autoPlay name="自动播放" default="null" description="如果设置为 true，则在设置 source 属性后自动开始播放 FLV 文件。"/>
 				<autoRewind name="自动倒带" default="true" description="如果为 true，则播放停止时（由于播放器到达流的末端或调用了 stop() 方法），会使 FLV 文件后退到第 1 帧。"/>
+				<blackBtnVisible name="黑按钮" default="false" description="黑按钮。"/>
+				<blackBtnAlpha name="黑按钮透明度" default="1" description="黑按钮透明度。"/>
 				<bufferTime name="缓冲时间" default="10" description="指定开始播放视频流前要在内存中缓冲的秒数。"/>
+				<gridVisible name="显示网格" default="false" description="显示网格。"/>
+				<gridAlpha name="网格透明度" default="1" description="网格透明度。"/>
 				<playheadTime name="播放头位置" description="表示当前播放头的时间或位置（以秒为单位计算），可以是小数值。"/>
 				<repeat name="循环播放" default="false" description="是否循环播放。"/>
 				<scaleMode name="缩放模式" enum="exactFit|maintainAspectRatio|noScale" default="maintainAspectRatio" description="指定在视频加载后如何调整其大小。"/>
+				<skinAutoHide name="自动隐藏皮肤" default="true" description="自动隐藏皮肤。"/>
 				<source name="视频地址" description="它指定要进行流式处理的 FLV 文件的 URL 以及如何对其进行流式处理。"/>
 				<volume name="音量" default="0.8" description="介于 0 到 1 的范围内，指示音量控制设置。"/>
 				
@@ -91,6 +96,7 @@ package zero.works.media{
 		private var values:Object;
 		
 		public var skin:Sprite;
+		private var hideSkinDelayTime:int;
 		
 		public var bottom:Sprite;
 		
@@ -114,8 +120,7 @@ package zero.works.media{
 		public var btnPlay:Btn;
 		public var btnPause:Btn;
 		public var btnStop:Btn;
-		public var btnVol:Btn;
-		private var volMaskShapeWid0:int;
+		public var volCtrl:VolCtrl;
 		
 		public var btnFullScreen:Btn;
 		
@@ -125,6 +130,8 @@ package zero.works.media{
 		public var items:Sprite;
 		
 		public var geci:Geci;
+		
+		public var blackBtn:Btn;
 		
 		private var timeoutId:int;
 		
@@ -185,7 +192,7 @@ package zero.works.media{
 				if(styleXML){
 					delete __list.style;
 				}
-				initUI();
+				//initUI();
 				select(0);
 			}else{
 				throw new Error("list格式不正确："+_list);
@@ -201,6 +208,7 @@ package zero.works.media{
 		}
 		
 		public function WanmeiMediaPlayer(){
+			this.visible=false;
 		}
 		
 		public function init(
@@ -263,10 +271,20 @@ package zero.works.media{
 				break;
 			}
 			
+			for each(var interfaceXML:XML in interfacesXML.children()){
+				var valueName:String=interfaceXML.name().toString();
+				if(this.loaderInfo.parameters.hasOwnProperty(valueName)){
+					setValue(valueName,this.loaderInfo.parameters[valueName]);
+				}
+			}
+			
+			this.visible=true;
+			
 		}
 		
 		private function initSkin():void{
 			if(skin){
+				skin.mouseEnabled=false;
 				skinBottom=skin["skinBottom"];
 				nameTxt=skin["nameTxt"];
 				timeTxt=skin["timeTxt"];
@@ -274,7 +292,7 @@ package zero.works.media{
 				btnPlay=skin["btnPlay"];
 				btnPause=skin["btnPause"];
 				btnStop=skin["btnStop"];
-				btnVol=skin["btnVol"];
+				volCtrl=skin["volCtrl"];
 				btnFullScreen=skin["btnFullScreen"];
 				btnPrev=skin["btnPrev"];
 				btnNext=skin["btnNext"];
@@ -333,8 +351,8 @@ package zero.works.media{
 				coverBtn.removeEventListener(MouseEvent.DOUBLE_CLICK,doubleClickCoverBtn);
 			}
 			
-			if(btnVol){
-				btnVol.removeEventListener(MouseEvent.MOUSE_DOWN,startCtrlVol);
+			if(volCtrl){
+				volCtrl.clear();
 			}
 			
 			stage.removeEventListener(FullScreenEvent.FULL_SCREEN,changeFullScreen);
@@ -346,6 +364,12 @@ package zero.works.media{
 			__list=null;
 			
 			stage.removeEventListener(Event.RESIZE,resize);
+			
+			
+			this.removeEventListener(MouseEvent.MOUSE_MOVE,resetHideSkinDelayTime);
+			this.removeEventListener(Event.ENTER_FRAME,checkHideSkin);
+			
+			stage.removeEventListener(Event.MOUSE_LEAVE,hideSkin);
 			
 		}
 		
@@ -366,8 +390,8 @@ package zero.works.media{
 				middleBtn.alpha=0;
 			}
 			
-			if(btnVol){
-				btnVol.removeEventListener(MouseEvent.MOUSE_DOWN,startCtrlVol);
+			if(volCtrl){
+				volCtrl.clear();
 			}
 			
 			if(nameTxt){
@@ -397,13 +421,12 @@ package zero.works.media{
 				btnNext.release=next;
 			}
 			
-			if(btnVol){
-				if(volMaskShapeWid0>0){
-				}else{
-					volMaskShapeWid0=btnVol["maskShape"].width;
-					updateBtnVol(getValue("volume")*volMaskShapeWid0);
-					btnVol.addEventListener(MouseEvent.MOUSE_DOWN,startCtrlVol);
-				}
+			if(blackBtn){
+				blackBtn.release=clickBlackBtn;
+			}
+			
+			if(volCtrl){
+				volCtrl.init(getValue("volume"),updateVol);
 			}
 			
 			if(btnFullScreen){
@@ -436,6 +459,10 @@ package zero.works.media{
 			
 		}
 		
+		private function updateVol(volume:Number):void{
+			setValue("volume",volume);
+		}
+		
 		private function rollOverCoverBtn(...args):void{
 			if(getValue("state")==VideoState.PLAYING){
 			}else{
@@ -449,6 +476,28 @@ package zero.works.media{
 				TweenMax.to(middleBtn,8,{alpha:0,useFrames:true});
 			}
 		}
+		private function resetHideSkinDelayTime(...args):void{
+			hideSkinDelayTime=1000;
+			TweenMax.killTweensOf(skin);
+			TweenMax.to(skin,8,{alpha:1,useFrames:true});
+			skin.mouseChildren=true;
+			this.addEventListener(Event.ENTER_FRAME,checkHideSkin);
+		}
+		private function checkHideSkin(...args):void{
+			if((hideSkinDelayTime-=30)<0){
+				if(skin.hitTestPoint(stage.mouseX,stage.mouseY,false)){
+				}else{
+					hideSkin();
+				}
+			}
+		}
+		private function hideSkin(...args):void{
+			TweenMax.killTweensOf(skin);
+			TweenMax.to(skin,8,{alpha:0,useFrames:true});
+			skin.mouseChildren=false;
+			this.removeEventListener(Event.ENTER_FRAME,checkHideSkin);	
+		}
+		
 		private function clickCoverBtn(...args):void{
 			if(getValue("state")==VideoState.PLAYING){
 				if(middleBtn){
@@ -464,6 +513,7 @@ package zero.works.media{
 		}
 		private function doubleClickCoverBtn(...args):void{
 			switchFullScreen();
+			clickCoverBtn();//消除双击的第一击的clickCoverBtn()
 		}
 		
 		private function clickItem():void{
@@ -476,51 +526,6 @@ package zero.works.media{
 					break;
 				}
 			}
-		}
-		
-		private function startCtrlVol(...args):void{
-			stage.addEventListener(MouseEvent.MOUSE_UP,stopCtrlVol);
-			this.addEventListener(Event.ENTER_FRAME,ctrlVol);
-		}
-		private function ctrlVol(...args):void{
-			if(btnVol){
-				var _wid:int=btnVol.mouseX-btnVol["maskShape"].x;
-				if(_wid>1){
-					if(_wid>volMaskShapeWid0){
-						_wid=volMaskShapeWid0;
-					}
-					setValue("volume",_wid/volMaskShapeWid0);
-				}else{
-					_wid=1;
-					setValue("volume",0);
-				}
-				updateBtnVol(_wid);
-			}
-		}
-		private function updateBtnVol(_wid:int):void{
-			btnVol["maskShape"].width=_wid;
-			if(btnVol.hasOwnProperty("thumb")){
-				btnVol["thumb"].x=btnVol["maskShape"].x+_wid;
-			}
-			if(btnVol.hasOwnProperty("laba")){
-				var laba:MovieClip=btnVol["laba"];
-				if(laba.totalFrames>1){
-					if(_wid>1){
-						if(_wid==volMaskShapeWid0){
-							laba.gotoAndStop(laba.totalFrames);
-						}else{
-							laba.gotoAndStop(2+int((laba.totalFrames-2)*_wid/volMaskShapeWid0));
-						}
-					}else{
-						laba.gotoAndStop(1);
-					}
-				}
-				btnVol["thumb"].x=btnVol["maskShape"].x+_wid;
-			}
-		}
-		private function stopCtrlVol(...args):void{
-			stage.removeEventListener(MouseEvent.MOUSE_UP,stopCtrlVol);
-			this.removeEventListener(Event.ENTER_FRAME,ctrlVol);
 		}
 		
 		public function prev():void{
@@ -558,6 +563,11 @@ package zero.works.media{
 			}
 		}
 		
+		private function clickBlackBtn():void{
+			var eiM:ExternalInterfaceManager=ExternalInterfaceManager.getInstance();
+			eiM.dispatchSWFEvent("clickBlackBtn");
+		}
+		
 		private function changePlayer(type:String):void{
 			
 			clearTimeout(timeoutId);//- -
@@ -577,15 +587,15 @@ package zero.works.media{
 			switch(currType){
 				case "mp3":
 					player=new MP3Player();
-					if(slider){
-						slider.immediately=true;
-					}
+					//if(slider){
+					//	slider.immediately=true;
+					//}
 				break;
 				default:
 					player=new VideoPlayer();
-					if(slider){
-						slider.immediately=false;
-					}
+					//if(slider){
+					//	slider.immediately=false;
+					//}
 				break;
 			}
 			if(playerContainer){
@@ -647,6 +657,12 @@ package zero.works.media{
 			if(grid){
 				grid.resize(_wid,_hei);
 			}
+			if(blackBtn){
+				blackBtn.x=int(_wid/2);
+				blackBtn.y=int(_hei/2);
+				blackBtn["black"].width=_wid;
+				blackBtn["black"].height=_hei;
+			}
 			
 			if(skin){
 				skin.y=_hei;
@@ -656,8 +672,8 @@ package zero.works.media{
 				if(timeTxt){
 					timeTxt.x+=_wid-wid;
 				}
-				if(btnVol){
-					btnVol.x+=_wid-wid;
+				if(volCtrl){
+					volCtrl.x+=_wid-wid;
 				}
 				if(btnFullScreen){
 					btnFullScreen.x+=_wid-wid;
@@ -692,7 +708,7 @@ package zero.works.media{
 					load(eiM.eventParams[0]);
 				break;
 				case "play":
-					if(eiM.eventParams[0]>0){
+					if(eiM.eventParams&&eiM.eventParams[0]>0){
 						play(eiM.eventParams[0]);
 					}else{
 						play();
@@ -738,9 +754,12 @@ package zero.works.media{
 				//break;
 				case VideoProgressEvent.PROGRESS:
 					if(player.bytesTotal>0){
+						slider.value2=player.bytesLoaded/player.bytesTotal;
 						if(player.bytesLoaded==player.bytesTotal){
 							eiM.dispatchSWFEvent("loadComplete");
 						}
+					}else{
+						slider.value2=0;
 					}
 				break;
 				case VideoEvent.COMPLETE:
@@ -763,7 +782,7 @@ package zero.works.media{
 					switch(valueName){
 						
 						case "autoPlay":
-							switch(values["autoPlay"]){
+							switch(values[valueName]){
 								case true:
 								case "true":
 									return true;
@@ -781,7 +800,30 @@ package zero.works.media{
 						
 						case "repeat":
 						case "bg":
+							
+						case "gridVisible":
+						case "gridAlpha":
+						
+						case "blackBtnVisible":
+						case "blackBtnAlpha":
+							
 							return values[valueName];
+						break;
+						
+						case "skinAutoHide":
+							switch(values[valueName]){
+								case true:
+								case "true":
+									return true;
+								break;
+								case false:
+								case "false":
+									return false;
+								break;
+								default:
+									return null;
+								break;
+							}
 						break;
 						
 						case "bufferProgress":
@@ -872,6 +914,50 @@ package zero.works.media{
 							}
 						break;
 						
+						case "gridVisible":
+							switch(value){
+								case true:
+								case "true":
+									values[valueName]=true;
+								break;
+								default:
+									values[valueName]=false;
+								break;
+							}
+							if(grid){
+								grid.visible=values[valueName];
+							}
+						break;
+						case "gridAlpha":
+							values[valueName]=Number(value);
+							if(grid){
+								grid.alpha=values[valueName];
+							}
+						break;
+						case "blackBtnVisible":
+							switch(value){
+								case true:
+								case "true":
+									values[valueName]=true;
+								break;
+								default:
+									values[valueName]=false;
+								break;
+							}
+							if(blackBtn){
+								blackBtn.visible=values[valueName];
+							}
+							if(skin){
+								skin.visible=!values[valueName];
+							}
+						break;
+						case "blackBtnAlpha":
+							values[valueName]=Number(value);
+							if(blackBtn){
+								blackBtn["black"].alpha=values[valueName];
+							}
+						break;
+						
 						case "bg":
 							values[valueName]=value;
 							if(bgLoader){
@@ -879,6 +965,36 @@ package zero.works.media{
 								}else{
 									bgLoader.load(<img src={value} width={wid} height={hei}/>);
 								}
+							}
+						break;
+						
+						case "skinAutoHide":
+							switch(value){
+								case true:
+								case "true":
+									values[valueName]=true;
+									if(skin){
+										skin.mouseChildren=false;
+										skin.alpha=0;
+										this.addEventListener(MouseEvent.MOUSE_MOVE,resetHideSkinDelayTime);
+										stage.addEventListener(Event.MOUSE_LEAVE,hideSkin);
+									}
+								break;
+								case false:
+								case "false":
+									values[valueName]=false;
+									if(skin){
+										skin.mouseChildren=true;
+										skin.alpha=1;
+									}
+								break;
+								default:
+									values[valueName]=null;
+									if(skin){
+										skin.mouseChildren=false;
+										skin.alpha=0;
+									}
+								break;
 							}
 						break;
 						
@@ -920,6 +1036,8 @@ package zero.works.media{
 		
 		public function load(source:String):void{
 			setValue("source",source);
+			var eiM:ExternalInterfaceManager=ExternalInterfaceManager.getInstance();
+			eiM.dispatchSWFEvent("load");
 		}
 		public function play(startTime:Number=-1):void{
 			if(btnPlay){
@@ -949,6 +1067,8 @@ package zero.works.media{
 					}
 				}
 			}
+			var eiM:ExternalInterfaceManager=ExternalInterfaceManager.getInstance();
+			eiM.dispatchSWFEvent("play");
 		}
 		private function startDelay():void{
 			if(player){
@@ -1001,6 +1121,8 @@ package zero.works.media{
 				//trace("pause，currPlayheadTime="+currPlayheadTime);
 				player.pause();
 			}
+			var eiM:ExternalInterfaceManager=ExternalInterfaceManager.getInstance();
+			eiM.dispatchSWFEvent("pause");
 		}
 		public function stop():void{
 			currPlayheadTime=0;
@@ -1018,15 +1140,22 @@ package zero.works.media{
 				}
 			}
 			clearGeci();
+			var eiM:ExternalInterfaceManager=ExternalInterfaceManager.getInstance();
+			eiM.dispatchSWFEvent("stop");
 		}
 		public function reset():void{
 			stop();
+			var eiM:ExternalInterfaceManager=ExternalInterfaceManager.getInstance();
+			eiM.dispatchSWFEvent("reset");
 		}
 		
-		private function update():void{
+		private function update(isRelease:Boolean):void{
 			clearTimeout(timeoutId);
 			currPlayheadTime=slider.value*getValue("totalTime");
-			setValue("playheadTime",currPlayheadTime);
+			if(isRelease){
+				setValue("playheadTime",currPlayheadTime);
+			}
+			updateTimeStr(currPlayheadTime);
 		}
 		
 		private function enterFrame(...args):void{
@@ -1038,10 +1167,13 @@ package zero.works.media{
 						slider.value=getValue("playheadTime")/getValue("totalTime");
 					}
 				}
-				if(styleXML){
-					if(timeTxt){
-						timeTxt["txt"].htmlText=styleXML.head[0].time[0].children().toXMLString().replace(/\$\{time\}/g,getTimeStr(getValue("playheadTime"))).replace(/\$\{totalTime\}/g,getTimeStr(getValue("totalTime")));
-					}
+				updateTimeStr(getValue("playheadTime"));
+			}
+		}
+		private function updateTimeStr(_playheadTime:Number):void{
+			if(styleXML){
+				if(timeTxt){
+					timeTxt["txt"].htmlText=styleXML.head[0].time[0].children().toXMLString().replace(/\$\{time\}/g,getTimeStr(_playheadTime)).replace(/\$\{totalTime\}/g,getTimeStr(getValue("totalTime")));
 				}
 			}
 		}
