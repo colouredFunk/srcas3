@@ -1,4 +1,4 @@
-/***
+﻿/***
 WanmeiMediaPlayer
 创建人：ZЁЯ¤　身高：168cm+；体重：57kg+；已婚（单身美女们没机会了~~）；最爱的运动：睡觉；格言：路见不平，拔腿就跑。QQ：358315553。
 创建时间：2013年10月23日 09:36:59
@@ -42,8 +42,6 @@ package zero.works.media{
 		private static const interfacesXML:XML=
 			<interfaces>
 				
-				<bg name="背景图" description="背景图。"/>
-				
 				<!-- 只读 -->
 				<bufferProgress name="缓冲进度" description="缓冲进度。"/>
 				<loadProgress name="加载进度" description="加载进度。"/>
@@ -51,11 +49,11 @@ package zero.works.media{
 				<totalTime name="总播放时间" description="表示视频的总播放时间，以秒为单位。"/>
 				
 				<!-- 读写 -->
-				<autoPlay name="自动播放" default="null" description="如果设置为 true，则在设置 source 属性后自动开始播放 FLV 文件。"/>
+				<autoPlay name="自动播放" default="false" description="如果设置为 true，则在设置 source 属性后自动开始播放 FLV 文件。"/>
 				<autoRewind name="自动倒带" default="true" description="如果为 true，则播放停止时（由于播放器到达流的末端或调用了 stop() 方法），会使 FLV 文件后退到第 1 帧。"/>
 				<blackBtnVisible name="黑按钮" default="false" description="黑按钮。"/>
 				<blackBtnAlpha name="黑按钮透明度" default="1" description="黑按钮透明度。"/>
-				<bufferTime name="缓冲时间" default="10" description="指定开始播放视频流前要在内存中缓冲的秒数。"/>
+				<bufferTime name="缓冲时间" default="5" description="指定开始播放视频流前要在内存中缓冲的秒数。"/>
 				<gridVisible name="显示网格" default="false" description="显示网格。"/>
 				<gridAlpha name="网格透明度" default="1" description="网格透明度。"/>
 				<playheadTime name="播放头位置" description="表示当前播放头的时间或位置（以秒为单位计算），可以是小数值。"/>
@@ -64,6 +62,8 @@ package zero.works.media{
 				<skinAutoHide name="自动隐藏皮肤" default="true" description="自动隐藏皮肤。"/>
 				<source name="视频地址" description="它指定要进行流式处理的 FLV 文件的 URL 以及如何对其进行流式处理。"/>
 				<volume name="音量" default="0.8" description="介于 0 到 1 的范围内，指示音量控制设置。"/>
+				
+				<bg name="背景图" description="背景图。"/>
 				
 			</interfaces>
 		;
