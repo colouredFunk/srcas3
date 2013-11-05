@@ -19,7 +19,12 @@ package zero.ui{
 	
 	public class Slider extends Sprite{
 		
+		public var wid0:Number;
+		private var bottomWid0:Number;
+		
 		private var __value:Number;
+		private var __value2:Number;
+		private var __wid:Number;
 		
 		public var bottom:Sprite;
 		public var bar:Btn;
@@ -48,15 +53,38 @@ package zero.ui{
 			thumb.x=line.width=bar.width*__value;
 		}
 		
+		public function get value2():Number{
+			return __value2;
+		}
 		public function set value2(_value2:Number):void{
+			__value2=_value2;
 			if(line2){
 				line2.width=bar.width*_value2;
 			}
 		}
 		
+		public function get wid():Number{
+			//trace("__wid="+__wid);
+			return __wid;
+		}
+		public function set wid(_wid:Number):void{
+			//trace("_wid="+_wid);
+			bar["gra"].gra.width=_wid;
+			if(bottom){
+				bottom.width=bottomWid0+_wid-wid0;
+			}
+			__wid=_wid;
+			value2=value2;
+		}
+		
 		public function Slider(){
 			immediately=true;
 			value=0;
+			value2=0;
+			wid0=__wid=bar["gra"].gra.width;
+			if(bottom){
+				bottomWid0=bottom.width;
+			}
 			bar.addEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
 			thumb.addEventListener(MouseEvent.MOUSE_DOWN,mouseDown);
 			line.mouseEnabled=line.mouseChildren=false;
@@ -112,17 +140,6 @@ package zero.ui{
 				}else{
 					onUpdate();
 				}
-			}
-		}
-		
-		public function getWid():int{
-			return bar["gra"].gra.width;
-		}
-		public function setWid(wid:int):void{
-			var oldWid:int=bar["gra"].gra.width;
-			bar["gra"].gra.width=wid;
-			if(bottom){
-				bottom.width+=wid-oldWid;
 			}
 		}
 		

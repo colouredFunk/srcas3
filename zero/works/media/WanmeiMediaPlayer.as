@@ -54,8 +54,7 @@ package zero.works.media{
 				<blackBtnVisible name="黑按钮" default="false" description="黑按钮。"/>
 				<blackBtnAlpha name="黑按钮透明度" default="1" description="黑按钮透明度。"/>
 				<bufferTime name="缓冲时间" default="5" description="指定开始播放视频流前要在内存中缓冲的秒数。"/>
-				<gridVisible name="显示网格" default="false" description="显示网格。"/>
-				<gridAlpha name="网格透明度" default="1" description="网格透明度。"/>
+				<gridAlpha name="网格透明度" default="0" description="网格透明度。"/>
 				<playheadTime name="播放头位置" description="表示当前播放头的时间或位置（以秒为单位计算），可以是小数值。"/>
 				<repeat name="循环播放" default="false" description="是否循环播放。"/>
 				<scaleMode name="缩放模式" enum="exactFit|maintainAspectRatio|noScale" default="maintainAspectRatio" description="指定在视频加载后如何调整其大小。"/>
@@ -63,7 +62,9 @@ package zero.works.media{
 				<source name="视频地址" description="它指定要进行流式处理的 FLV 文件的 URL 以及如何对其进行流式处理。"/>
 				<volume name="音量" default="0.8" description="介于 0 到 1 的范围内，指示音量控制设置。"/>
 				
-				<bg name="背景图" description="背景图。"/>
+				<backImg name="背景图" description="背景图。"/>
+				<frontImg name="前景图" description="前景图。"/>
+				<startImg name="开始图" description="开始图。"/>
 				
 			</interfaces>
 		;
@@ -95,13 +96,21 @@ package zero.works.media{
 		
 		private var values:Object;
 		
+		private var rightObjs:Object;
+		
 		public var skin:Sprite;
 		private var hideSkinDelayTime:int;
 		
 		public var bottom:Sprite;
 		
-		public var bgBottomContainer:Sprite;
-		public var bgLoader:ImgLoader;
+		public var backImgBottomContainer:Sprite;
+		public var backImgLoader:ImgLoader;
+		
+		public var frontImgBottomContainer:Sprite;
+		public var frontImgLoader:ImgLoader;
+		
+		public var startImgBottomContainer:Sprite;
+		public var startImgLoader:ImgLoader;
 		
 		public var playerContainer:Sprite;
 		
@@ -222,9 +231,21 @@ package zero.works.media{
 			
 			initSkin();
 			
-			if(bgBottomContainer){
-				if(bgLoader){
-					bgLoader.bottomContainer=bgBottomContainer;
+			if(backImgBottomContainer){
+				if(backImgLoader){
+					backImgLoader.bottomContainer=backImgBottomContainer;
+				}
+			}
+			
+			if(frontImgBottomContainer){
+				if(frontImgLoader){
+					frontImgLoader.bottomContainer=frontImgBottomContainer;
+				}
+			}
+			
+			if(startImgBottomContainer){
+				if(startImgLoader){
+					startImgLoader.bottomContainer=startImgBottomContainer;
 				}
 			}
 			
@@ -271,10 +292,24 @@ package zero.works.media{
 				break;
 			}
 			
+			if(this.loaderInfo.parameters.hasOwnProperty("source")){
+				setValue("source",this.loaderInfo.parameters["source"]);
+			}
+			if(this.loaderInfo.parameters.hasOwnProperty("autoPlay")){
+				setValue("autoPlay",this.loaderInfo.parameters["autoPlay"]);
+			}
 			for each(var interfaceXML:XML in interfacesXML.children()){
 				var valueName:String=interfaceXML.name().toString();
-				if(this.loaderInfo.parameters.hasOwnProperty(valueName)){
-					setValue(valueName,this.loaderInfo.parameters[valueName]);
+				switch(valueName){
+					case "source":
+					case "autoPlay":
+						//
+					break;
+					default:
+						if(this.loaderInfo.parameters.hasOwnProperty(valueName)){
+							setValue(valueName,this.loaderInfo.parameters[valueName]);
+						}
+					break;
 				}
 			}
 			
@@ -336,8 +371,18 @@ package zero.works.media{
 			
 			values=null;
 			
-			if(bgLoader){
-				bgLoader.clear();
+			rightObjs=null;
+			
+			if(backImgLoader){
+				backImgLoader.clear();
+			}
+			
+			if(frontImgLoader){
+				frontImgLoader.clear();
+			}
+			
+			if(startImgLoader){
+				startImgLoader.clear();
 			}
 			
 			if(slider){
@@ -345,8 +390,8 @@ package zero.works.media{
 			}
 			
 			if(coverBtn){
-				coverBtn.removeEventListener(MouseEvent.MOUSE_OVER,rollOverCoverBtn);
-				coverBtn.removeEventListener(MouseEvent.MOUSE_OUT,rollOutCoverBtn);
+				//coverBtn.removeEventListener(MouseEvent.MOUSE_OVER,rollOverCoverBtn);
+				//coverBtn.removeEventListener(MouseEvent.MOUSE_OUT,rollOutCoverBtn);
 				coverBtn.removeEventListener(MouseEvent.CLICK,clickCoverBtn);
 				coverBtn.removeEventListener(MouseEvent.DOUBLE_CLICK,doubleClickCoverBtn);
 			}
@@ -379,8 +424,8 @@ package zero.works.media{
 			
 			if(coverBtn){
 				coverBtn.buttonMode=true;
-				coverBtn.addEventListener(MouseEvent.MOUSE_OVER,rollOverCoverBtn);
-				coverBtn.addEventListener(MouseEvent.MOUSE_OUT,rollOutCoverBtn);
+				//coverBtn.addEventListener(MouseEvent.MOUSE_OVER,rollOverCoverBtn);
+				//coverBtn.addEventListener(MouseEvent.MOUSE_OUT,rollOutCoverBtn);
 				coverBtn.addEventListener(MouseEvent.CLICK,clickCoverBtn);
 				coverBtn.doubleClickEnabled=true;
 				coverBtn.addEventListener(MouseEvent.DOUBLE_CLICK,doubleClickCoverBtn);
@@ -463,21 +508,21 @@ package zero.works.media{
 			setValue("volume",volume);
 		}
 		
-		private function rollOverCoverBtn(...args):void{
-			if(getValue("state")==VideoState.PLAYING){
-			}else{
-				if(middleBtn){
-					TweenMax.to(middleBtn,8,{alpha:1,useFrames:true});
-				}
-			}
-		}
-		private function rollOutCoverBtn(...args):void{
-			if(middleBtn){
-				TweenMax.to(middleBtn,8,{alpha:0,useFrames:true});
-			}
-		}
+		//private function rollOverCoverBtn(...args):void{
+		//	if(getValue("state")==VideoState.PLAYING){
+		//	}else{
+		//		if(middleBtn){
+		//			TweenMax.to(middleBtn,8,{alpha:1,useFrames:true});
+		//		}
+		//	}
+		//}
+		//private function rollOutCoverBtn(...args):void{
+		//	if(middleBtn){
+		//		TweenMax.to(middleBtn,8,{alpha:0,useFrames:true});
+		//	}
+		//}
 		private function resetHideSkinDelayTime(...args):void{
-			hideSkinDelayTime=1000;
+			hideSkinDelayTime=3000;
 			TweenMax.killTweensOf(skin);
 			TweenMax.to(skin,8,{alpha:1,useFrames:true});
 			skin.mouseChildren=true;
@@ -632,7 +677,7 @@ package zero.works.media{
 			player.addEventListener(VideoProgressEvent.PROGRESS,playerEvents);
 			player.addEventListener(VideoEvent.COMPLETE,playerEvents);
 			
-			player.setSize(wid,hei);
+			setPlayerSize();
 			
 			initUI();
 			
@@ -670,24 +715,66 @@ package zero.works.media{
 					skinBottom.width=_wid;
 				}
 				if(timeTxt){
-					timeTxt.x+=_wid-wid;
-				}
-				if(volCtrl){
-					volCtrl.x+=_wid-wid;
-				}
-				if(btnFullScreen){
-					btnFullScreen.x+=_wid-wid;
+					if(_wid<360){
+						timeTxt.visible=false;
+						var sliderDWid:int=volCtrl.x-timeTxt.x;
+					}else{
+						timeTxt.visible=true;
+						sliderDWid=0;
+					}
+				}else{
+					sliderDWid=0;
 				}
 				if(slider){
-					slider.setWid(slider.getWid()+_wid-wid);
+					slider.wid=slider.wid0-wid0+_wid+sliderDWid;
+					if(slider.wid<20){
+						slider.visible=false;
+					}else{
+						slider.visible=true;
+					}
+				}
+				if(rightObjs){
+				}else{
+					rightObjs=new Object();
+					rightObjs.nameArr=["timeTxt","volCtrl","btnFullScreen"];
+					for each(var rightObjName:String in rightObjs.nameArr){
+						var rightObj:DisplayObject=this[rightObjName];
+						if(rightObj){
+							rightObjs[rightObjName]={x0:rightObj.x};
+						}
+					}
+				}
+				for each(rightObjName in rightObjs.nameArr){
+					rightObj=this[rightObjName];
+					if(rightObj){
+						rightObj.x=rightObjs[rightObjName].x0-wid0+_wid;
+					}
 				}
 			}
 			
 			wid=_wid;
 			hei=_hei;
 			
+			setPlayerSize();
+		}
+		
+		private function setPlayerSize():void{
 			if(player){
-				player.setSize(wid,hei);
+				if(skin){
+					switch(getValue("skinAutoHide")){
+						case true:
+							player.setSize(wid,hei);
+						break;
+						case false:
+							player.setSize(wid,hei-skin.height);
+						break;
+						default:
+							player.setSize(wid,hei);
+						break;
+					}
+				}else{
+					player.setSize(wid,hei);
+				}
 			}
 		}
 		
@@ -754,16 +841,21 @@ package zero.works.media{
 				//break;
 				case VideoProgressEvent.PROGRESS:
 					if(player.bytesTotal>0){
-						slider.value2=player.bytesLoaded/player.bytesTotal;
+						if(slider){
+							slider.value2=player.bytesLoaded/player.bytesTotal;
+						}
 						if(player.bytesLoaded==player.bytesTotal){
 							eiM.dispatchSWFEvent("loadComplete");
 						}
 					}else{
-						slider.value2=0;
+						if(slider){
+							slider.value2=0;
+						}
 					}
 				break;
 				case VideoEvent.COMPLETE:
 					eiM.dispatchSWFEvent("playComplete");
+					stop();
 					if(getValue("repeat")){
 						setValue("source",values["source"]);
 					}else{
@@ -799,9 +891,10 @@ package zero.works.media{
 						case "source":
 						
 						case "repeat":
-						case "bg":
+						case "backImg":
+						case "frontImg":
+						case "startImg":
 							
-						case "gridVisible":
 						case "gridAlpha":
 						
 						case "blackBtnVisible":
@@ -826,16 +919,25 @@ package zero.works.media{
 							}
 						break;
 						
+						case "bufferTime":
+							return values[valueName];
+						break;
+						
 						case "bufferProgress":
 							switch(getValue("state")){
 								case VideoState.BUFFERING:
 								case VideoState.PAUSED:
 								case VideoState.PLAYING:
 									if(player.bytesTotal>0){
+										var bufferTime:Number=getValue("bufferTime");
+										if(bufferTime>=0){
+										}else{
+											bufferTime=getValue("totalTime");
+										}
 										var dTime:Number=getValue("totalTime")*player.bytesLoaded/player.bytesTotal-getValue("playheadTime");
 										if(dTime>0){
-											if(dTime<getValue("bufferTime")){
-												return dTime/getValue("bufferTime");
+											if(dTime<bufferTime){
+												return dTime/bufferTime;
 											}
 											return 1;
 										}
@@ -914,24 +1016,21 @@ package zero.works.media{
 							}
 						break;
 						
-						case "gridVisible":
-							switch(value){
-								case true:
-								case "true":
-									values[valueName]=true;
-								break;
-								default:
-									values[valueName]=false;
-								break;
-							}
-							if(grid){
-								grid.visible=values[valueName];
-							}
-						break;
 						case "gridAlpha":
 							values[valueName]=Number(value);
+							if(values[valueName]>1){
+								values[valueName]=1;
+							}else if(values[valueName]>0){
+							}else{
+								values[valueName]=0;
+							}
 							if(grid){
-								grid.alpha=values[valueName];
+								if(values[valueName]>0){
+									grid.alpha=values[valueName];
+									grid.visible=true;
+								}else{
+									grid.visible=false;
+								}
 							}
 						break;
 						case "blackBtnVisible":
@@ -958,12 +1057,32 @@ package zero.works.media{
 							}
 						break;
 						
-						case "bg":
+						case "backImg":
 							values[valueName]=value;
-							if(bgLoader){
-								if(bgLoader.xml&&bgLoader.xml.@src.toString()==value){
+							if(backImgLoader){
+								if(backImgLoader.xml&&backImgLoader.xml.@src.toString()==value){
 								}else{
-									bgLoader.load(<img src={value} width={wid} height={hei}/>);
+									backImgLoader.load(<img src={value} width={wid} height={hei}/>);
+								}
+							}
+						break;
+						
+						case "frontImg":
+							values[valueName]=value;
+							if(frontImgLoader){
+								if(frontImgLoader.xml&&frontImgLoader.xml.@src.toString()==value){
+								}else{
+									frontImgLoader.load(<img src={value} width={wid} height={hei}/>);
+								}
+							}
+						break;
+						
+						case "startImg":
+							values[valueName]=value;
+							if(startImgLoader){
+								if(startImgLoader.xml&&startImgLoader.xml.@src.toString()==value){
+								}else{
+									startImgLoader.load(<img src={value} width={wid} height={hei}/>);
 								}
 							}
 						break;
@@ -1013,7 +1132,13 @@ package zero.works.media{
 									}
 								break;
 								case "Number":
-									player[valueName]=Number(value);
+									if(valueName=="playheadTime"){
+										try{
+											player[valueName]=Number(value);
+										}catch(e:Error){}
+									}else{
+										player[valueName]=Number(value);
+									}
 								break;
 								case "int":
 									player[valueName]=int(value);
@@ -1038,6 +1163,12 @@ package zero.works.media{
 			setValue("source",source);
 			var eiM:ExternalInterfaceManager=ExternalInterfaceManager.getInstance();
 			eiM.dispatchSWFEvent("load");
+			if(middleBtn){
+				TweenMax.to(middleBtn,8,{alpha:1,useFrames:true});
+			}
+			if(startImgLoader){
+				TweenMax.to(startImgLoader,8,{alpha:1,useFrames:true});
+			}
 		}
 		public function play(startTime:Number=-1):void{
 			if(btnPlay){
@@ -1048,6 +1179,7 @@ package zero.works.media{
 			}
 			if(player){
 				initGeci();
+				trace("currPlayheadTime="+currPlayheadTime);
 				if(currPlayheadTime>0){
 					//trace("currPlayheadTime="+currPlayheadTime);
 					player.play();
@@ -1069,14 +1201,24 @@ package zero.works.media{
 			}
 			var eiM:ExternalInterfaceManager=ExternalInterfaceManager.getInstance();
 			eiM.dispatchSWFEvent("play");
+			if(middleBtn){
+				TweenMax.to(middleBtn,8,{alpha:0,useFrames:true});
+			}
+			if(startImgLoader){
+				TweenMax.to(startImgLoader,8,{alpha:0,useFrames:true});
+			}
 		}
 		private function startDelay():void{
 			if(player){
-				player.visible=false;
-			}
-			if(values["source"]){
-				clearTimeout(timeoutId);
-				timeoutId=setTimeout(start,100);
+				//if(player){
+					player.visible=false;
+				//}
+				if(values["source"]){
+					clearTimeout(timeoutId);
+					timeoutId=setTimeout(start,100);
+				}
+			}else{
+				start();
 			}
 		}
 		private function start():void{
@@ -1123,9 +1265,13 @@ package zero.works.media{
 			}
 			var eiM:ExternalInterfaceManager=ExternalInterfaceManager.getInstance();
 			eiM.dispatchSWFEvent("pause");
+			if(middleBtn){
+				TweenMax.to(middleBtn,8,{alpha:1,useFrames:true});
+			}
 		}
 		public function stop():void{
 			currPlayheadTime=0;
+			values["playheadTime"]=0;
 			if(btnPlay){
 				btnPlay.visible=true;
 			}
@@ -1142,6 +1288,12 @@ package zero.works.media{
 			clearGeci();
 			var eiM:ExternalInterfaceManager=ExternalInterfaceManager.getInstance();
 			eiM.dispatchSWFEvent("stop");
+			if(middleBtn){
+				TweenMax.to(middleBtn,8,{alpha:1,useFrames:true});
+			}
+			if(startImgLoader){
+				TweenMax.to(startImgLoader,8,{alpha:1,useFrames:true});
+			}
 		}
 		public function reset():void{
 			stop();

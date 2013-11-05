@@ -30,7 +30,7 @@ package zero.works.media{
 			this.graphics.beginBitmapFill(bmd);
 			this.graphics.drawRect(0,0,wid,hei);
 			this.graphics.endFill();
-			trace("grid："+this.getBounds(stage));
+			//trace("grid："+this.getBounds(stage));
 		}
 	}
 }
